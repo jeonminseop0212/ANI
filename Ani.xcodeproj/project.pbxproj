@@ -8,12 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		F5B1EF9120725964000CFB0B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B1EF9020725964000CFB0B /* AppDelegate.swift */; };
-		F5B1EF9320725964000CFB0B /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B1EF9220725964000CFB0B /* ViewController.swift */; };
-		F5B1EF9620725964000CFB0B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F5B1EF9420725964000CFB0B /* Main.storyboard */; };
+		F5B1EF9320725964000CFB0B /* RecruitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B1EF9220725964000CFB0B /* RecruitViewController.swift */; };
 		F5B1EF9820725964000CFB0B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F5B1EF9720725964000CFB0B /* Assets.xcassets */; };
 		F5B1EF9B20725964000CFB0B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F5B1EF9920725964000CFB0B /* LaunchScreen.storyboard */; };
 		F5B1EFA620725964000CFB0B /* AniTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B1EFA520725964000CFB0B /* AniTests.swift */; };
 		F5B1EFB120725964000CFB0B /* AniUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B1EFB020725964000CFB0B /* AniUITests.swift */; };
+		F5B1EFC220725BDC000CFB0B /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B1EFC120725BDC000CFB0B /* TabBarController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,8 +36,7 @@
 /* Begin PBXFileReference section */
 		F5B1EF8D20725963000CFB0B /* Ani.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Ani.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5B1EF9020725964000CFB0B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		F5B1EF9220725964000CFB0B /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		F5B1EF9520725964000CFB0B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		F5B1EF9220725964000CFB0B /* RecruitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecruitViewController.swift; sourceTree = "<group>"; };
 		F5B1EF9720725964000CFB0B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F5B1EF9A20725964000CFB0B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		F5B1EF9C20725964000CFB0B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -47,6 +46,7 @@
 		F5B1EFAC20725964000CFB0B /* AniUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AniUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5B1EFB020725964000CFB0B /* AniUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AniUITests.swift; sourceTree = "<group>"; };
 		F5B1EFB220725964000CFB0B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F5B1EFC120725BDC000CFB0B /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -97,11 +97,9 @@
 		F5B1EF8F20725963000CFB0B /* Ani */ = {
 			isa = PBXGroup;
 			children = (
-				F5B1EF9020725964000CFB0B /* AppDelegate.swift */,
-				F5B1EF9220725964000CFB0B /* ViewController.swift */,
-				F5B1EF9420725964000CFB0B /* Main.storyboard */,
-				F5B1EF9720725964000CFB0B /* Assets.xcassets */,
-				F5B1EF9920725964000CFB0B /* LaunchScreen.storyboard */,
+				F5B1EFBE20725B6C000CFB0B /* Supporting */,
+				F5B1EFBF20725B79000CFB0B /* RecruitViewController */,
+				F5B1EFC020725B86000CFB0B /* TabbarController */,
 				F5B1EF9C20725964000CFB0B /* Info.plist */,
 			);
 			path = Ani;
@@ -123,6 +121,32 @@
 				F5B1EFB220725964000CFB0B /* Info.plist */,
 			);
 			path = AniUITests;
+			sourceTree = "<group>";
+		};
+		F5B1EFBE20725B6C000CFB0B /* Supporting */ = {
+			isa = PBXGroup;
+			children = (
+				F5B1EF9020725964000CFB0B /* AppDelegate.swift */,
+				F5B1EF9720725964000CFB0B /* Assets.xcassets */,
+				F5B1EF9920725964000CFB0B /* LaunchScreen.storyboard */,
+			);
+			path = Supporting;
+			sourceTree = "<group>";
+		};
+		F5B1EFBF20725B79000CFB0B /* RecruitViewController */ = {
+			isa = PBXGroup;
+			children = (
+				F5B1EF9220725964000CFB0B /* RecruitViewController.swift */,
+			);
+			path = RecruitViewController;
+			sourceTree = "<group>";
+		};
+		F5B1EFC020725B86000CFB0B /* TabbarController */ = {
+			isa = PBXGroup;
+			children = (
+				F5B1EFC120725BDC000CFB0B /* TabBarController.swift */,
+			);
+			path = TabbarController;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -234,7 +258,6 @@
 			files = (
 				F5B1EF9B20725964000CFB0B /* LaunchScreen.storyboard in Resources */,
 				F5B1EF9820725964000CFB0B /* Assets.xcassets in Resources */,
-				F5B1EF9620725964000CFB0B /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -259,7 +282,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F5B1EF9320725964000CFB0B /* ViewController.swift in Sources */,
+				F5B1EFC220725BDC000CFB0B /* TabBarController.swift in Sources */,
+				F5B1EF9320725964000CFB0B /* RecruitViewController.swift in Sources */,
 				F5B1EF9120725964000CFB0B /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -296,14 +320,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		F5B1EF9420725964000CFB0B /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				F5B1EF9520725964000CFB0B /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		F5B1EF9920725964000CFB0B /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
