@@ -14,6 +14,7 @@
 		F5B1EFA620725964000CFB0B /* AniTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B1EFA520725964000CFB0B /* AniTests.swift */; };
 		F5B1EFB120725964000CFB0B /* AniUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B1EFB020725964000CFB0B /* AniUITests.swift */; };
 		F5B1EFC220725BDC000CFB0B /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B1EFC120725BDC000CFB0B /* TabBarController.swift */; };
+		F5B1EFC520726658000CFB0B /* TinyConstraints.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5B1EFC420726658000CFB0B /* TinyConstraints.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +48,7 @@
 		F5B1EFB020725964000CFB0B /* AniUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AniUITests.swift; sourceTree = "<group>"; };
 		F5B1EFB220725964000CFB0B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F5B1EFC120725BDC000CFB0B /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
+		F5B1EFC420726658000CFB0B /* TinyConstraints.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TinyConstraints.framework; path = Carthage/Build/iOS/TinyConstraints.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F5B1EFC520726658000CFB0B /* TinyConstraints.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -81,6 +84,7 @@
 				F5B1EFA420725964000CFB0B /* AniTests */,
 				F5B1EFAF20725964000CFB0B /* AniUITests */,
 				F5B1EF8E20725963000CFB0B /* Products */,
+				F5B1EFC320726657000CFB0B /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -149,6 +153,14 @@
 			path = TabbarController;
 			sourceTree = "<group>";
 		};
+		F5B1EFC320726657000CFB0B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				F5B1EFC420726658000CFB0B /* TinyConstraints.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -159,6 +171,7 @@
 				F5B1EF8920725963000CFB0B /* Sources */,
 				F5B1EF8A20725963000CFB0B /* Frameworks */,
 				F5B1EF8B20725963000CFB0B /* Resources */,
+				F5B1EFC62072666A000CFB0B /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -276,6 +289,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		F5B1EFC62072666A000CFB0B /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Carthage/Build/iOS/TinyConstraints.framework",
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "/usr/local/bin/carthage copy-frameworks";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		F5B1EF8920725963000CFB0B /* Sources */ = {
@@ -444,6 +474,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = BY8G5B9E3U;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				INFOPLIST_FILE = Ani/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.gmail-jeonminsopdev.Ani";
@@ -459,6 +493,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = BY8G5B9E3U;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				INFOPLIST_FILE = Ani/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.gmail-jeonminsopdev.Ani";

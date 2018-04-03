@@ -7,9 +7,10 @@
 //
 
 import UIKit
+import TinyConstraints
 
 class RecruitViewController: UIViewController {
-
+  
   override func viewDidLoad() {
     super.viewDidLoad()
   }
