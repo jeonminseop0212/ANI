@@ -13,7 +13,7 @@ class RecruitViewController: UIViewController {
   
   override func viewDidLoad() {
     super.viewDidLoad()
-    //test
+    
   }
 }
 
