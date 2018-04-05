@@ -16,6 +16,8 @@ class ANIRecruitViewController: UIViewController {
   
   private weak var recruitView: ANIRecuruitView?
   
+  private weak var recruitView: ANIRecuruitView?
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     setup()
