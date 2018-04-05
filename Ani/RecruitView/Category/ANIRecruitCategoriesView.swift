@@ -30,7 +30,8 @@ class ANIRecruitCategoriesView: UIView {
     flowlayout.scrollDirection = .horizontal
     flowlayout.sectionInset = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
     let collectionView = UICollectionView(frame: self.frame, collectionViewLayout: flowlayout)
-    collectionView.register(ANIRecruitCategoryCell.self, forCellWithReuseIdentifier: "Cell")
+    let id = NSStringFromClass(ANIRecruitCategoryCell.self)
+    collectionView.register(ANIRecruitCategoryCell.self, forCellWithReuseIdentifier: id)
     collectionView.backgroundColor = .white
     collectionView.showsHorizontalScrollIndicator = false
     collectionView.alwaysBounceHorizontal = true
@@ -53,7 +54,8 @@ extension ANIRecruitCategoriesView: UICollectionViewDataSource, UICollectionView
   }
   
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-    let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath) as! ANIRecruitCategoryCell
+    let id = NSStringFromClass(ANIRecruitCategoryCell.self)
+    let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! ANIRecruitCategoryCell
     cell.categoryLabel?.text = testArr[indexPath.item]
     cell.backgroundColor = ANIColor.lightGray
     cell.layer.cornerRadius = cell.frame.height / 2
