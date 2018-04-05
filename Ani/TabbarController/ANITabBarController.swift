@@ -8,11 +8,11 @@
 
 import UIKit
 
-class TabBarController: UITabBarController {
+class ANITabBarController: UITabBarController {
 
   override func viewDidLoad() {
     super.viewDidLoad()
-    let recruitVC = RecruitViewController()
+    let recruitVC = ANIRecruitViewController()
     recruitVC.tabBarItem = UITabBarItem(tabBarSystemItem: .downloads, tag: 1)
     let recruitNV = UINavigationController(rootViewController: recruitVC)
     setViewControllers([recruitNV], animated: false)
