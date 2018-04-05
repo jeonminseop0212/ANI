@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		F51D221020767E62009D1B26 /* ANIColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F51D220F20767E62009D1B26 /* ANIColor.swift */; };
 		F51D221220767F03009D1B26 /* UIColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F51D221120767F03009D1B26 /* UIColor.swift */; };
+		F51D221520768B24009D1B26 /* UISearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F51D221420768B24009D1B26 /* UISearchBar.swift */; };
 		F566348320752656006CB81B /* ANIRecruitCategoriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F566348220752656006CB81B /* ANIRecruitCategoriesView.swift */; };
 		F56634862075285D006CB81B /* ANIRecruitCategoryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F56634852075285D006CB81B /* ANIRecruitCategoryCell.swift */; };
 		F5B1EF9120725964000CFB0B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B1EF9020725964000CFB0B /* AppDelegate.swift */; };
@@ -41,6 +42,7 @@
 /* Begin PBXFileReference section */
 		F51D220F20767E62009D1B26 /* ANIColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIColor.swift; sourceTree = "<group>"; };
 		F51D221120767F03009D1B26 /* UIColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColor.swift; sourceTree = "<group>"; };
+		F51D221420768B24009D1B26 /* UISearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UISearchBar.swift; sourceTree = "<group>"; };
 		F566348220752656006CB81B /* ANIRecruitCategoriesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitCategoriesView.swift; sourceTree = "<group>"; };
 		F56634852075285D006CB81B /* ANIRecruitCategoryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitCategoryCell.swift; sourceTree = "<group>"; };
 		F5B1EF8D20725963000CFB0B /* Ani.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Ani.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -89,8 +91,18 @@
 			isa = PBXGroup;
 			children = (
 				F51D220F20767E62009D1B26 /* ANIColor.swift */,
+				F51D221320768B01009D1B26 /* Extensioin */,
 			);
 			path = Utility;
+			sourceTree = "<group>";
+		};
+		F51D221320768B01009D1B26 /* Extensioin */ = {
+			isa = PBXGroup;
+			children = (
+				F51D221120767F03009D1B26 /* UIColor.swift */,
+				F51D221420768B24009D1B26 /* UISearchBar.swift */,
+			);
+			path = Extensioin;
 			sourceTree = "<group>";
 		};
 		F56634842075265E006CB81B /* RecruitView */ = {
@@ -160,7 +172,6 @@
 				F5B1EF9020725964000CFB0B /* AppDelegate.swift */,
 				F5B1EF9720725964000CFB0B /* Assets.xcassets */,
 				F5B1EF9920725964000CFB0B /* LaunchScreen.storyboard */,
-				F51D221120767F03009D1B26 /* UIColor.swift */,
 			);
 			path = Supporting;
 			sourceTree = "<group>";
@@ -345,6 +356,7 @@
 				F5B1EFC220725BDC000CFB0B /* ANITabBarController.swift in Sources */,
 				F566348320752656006CB81B /* ANIRecruitCategoriesView.swift in Sources */,
 				F5B1EF9320725964000CFB0B /* ANIRecruitViewController.swift in Sources */,
+				F51D221520768B24009D1B26 /* UISearchBar.swift in Sources */,
 				F51D221020767E62009D1B26 /* ANIColor.swift in Sources */,
 				F5B1EF9120725964000CFB0B /* AppDelegate.swift in Sources */,
 			);
