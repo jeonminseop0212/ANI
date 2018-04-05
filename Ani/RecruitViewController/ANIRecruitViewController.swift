@@ -12,7 +12,7 @@ import TinyConstraints
 class ANIRecruitViewController: UIViewController {
   
   private weak var categoriesView: ANIRecruitCategoriesView?
-  private let CATEGORIES_VIEW_HEIGHT: CGFloat = 50.0
+  private let CATEGORIES_VIEW_HEIGHT: CGFloat = 45.0
   
   private weak var recruitView: ANIRecuruitView?
   
