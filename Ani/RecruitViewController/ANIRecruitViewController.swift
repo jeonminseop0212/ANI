@@ -20,6 +20,7 @@ class ANIRecruitViewController: UIViewController {
   }
   
   private func setup() {
+    self.view.backgroundColor = .white
     //nav barの下からviewが開始するように
     self.navigationController?.navigationBar.isTranslucent = false
     
@@ -31,6 +32,14 @@ class ANIRecruitViewController: UIViewController {
     categoriesView.rightToSuperview()
     categoriesView.height(CATEGORIES_VIEW_HEIGHT)
     self.categoriesView = categoriesView
+    
+    //searchBar
+    let searchBar = UISearchBar()
+    searchBar.placeholder = "Search"
+    searchBar.textField?.backgroundColor = ANIColor.lightGray
+//    searchBar.showsCancelButton = true
+//    searchBar.delegate = self
+    navigationItem.titleView = searchBar
   }
 }
 
