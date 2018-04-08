@@ -10,10 +10,11 @@ import UIKit
 
 class ANIRecuruitView: UIView {
 
-  private weak var recruitCollectionView: UICollectionView?
+  var recruitCollectionView: UICollectionView?
   
   private var testRecruitLists = [Recurit]()
-  
+  private let CATEGORIES_VIEW_HEIGHT: CGFloat = 45.0
+
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()
@@ -30,6 +31,7 @@ class ANIRecuruitView: UIView {
     flowlayout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
     let collectionView = UICollectionView(frame: self.frame, collectionViewLayout: flowlayout)
     let id = NSStringFromClass(ANIRecruitViewCell.self)
+    collectionView.contentInset = UIEdgeInsets(top: CATEGORIES_VIEW_HEIGHT, left: 0, bottom: 0, right: 0)
     collectionView.backgroundColor = .white
     collectionView.register(ANIRecruitViewCell.self, forCellWithReuseIdentifier: id)
     collectionView.alwaysBounceVertical = true
@@ -43,9 +45,11 @@ class ANIRecuruitView: UIView {
   private func setupTestData() {
     let user1 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
     let user2 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki")
+    let user3 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
     let recruit1 = Recurit(recruitImage: UIImage(named: "cat1")!, title: "귀여운 고양이 분양받아가세요 >_<", subTitle: "이것저것 내용을 적을꺼야 으흐므흐믛 내용이 생각안나니까 대충적어 놓을꺼야이것저것 내용을 적을꺼야 으흐므흐믛 내용이 생각안나니까 대충적어 놓을꺼야", user: user1, supportCount: 10, loveCount: 10)
-    let recurit2 = Recurit(recruitImage: UIImage(named: "cat2")!, title: "귀여운 고양이 분양받아가세요 >_<", subTitle: "이것저것 내용을 적을꺼야 으흐므흐믛 내용이 생각안나니까 대충적어 놓을꺼야이것저것 내용을 적을꺼야 으흐므흐믛 내용이 생각안나니까 대충적어 놓을꺼야", user: user2, supportCount: 5, loveCount: 15)
-    self.testRecruitLists = [recruit1, recurit2]
+    let recruit2 = Recurit(recruitImage: UIImage(named: "cat2")!, title: "귀여운 고양이 분양받아가세요 >_<", subTitle: "이것저것 내용을 적을꺼야 으흐므흐믛 내용이 생각안나니까 대충적어 놓을꺼야이것저것 내용을 적을꺼야 으흐므흐믛 내용이 생각안나니까 대충적어 놓을꺼야", user: user2, supportCount: 5, loveCount: 15)
+    let recruit3 = Recurit(recruitImage: UIImage(named: "cat1")!, title: "귀여운 고양이 분양받아가세요 >_<", subTitle: "이것저것 내용을 적을꺼야 으흐므흐믛 내용이 생각안나니까 대충적어 놓을꺼야이것저것 내용을 적을꺼야 으흐므흐믛 내용이 생각안나니까 대충적어 놓을꺼야", user: user3, supportCount: 10, loveCount: 10)
+    self.testRecruitLists = [recruit1, recruit2, recruit3]
   }
 }
 

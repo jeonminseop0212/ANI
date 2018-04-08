@@ -18,6 +18,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     window = UIWindow(frame: UIScreen.main.bounds)
     window?.rootViewController = ANITabBarController()
     window?.makeKeyAndVisible()
+    
+    //navigation bar
+    let navigationBarAppearane = UINavigationBar.appearance()
+    navigationBarAppearane.barTintColor = .white
+    navigationBarAppearane.tintColor = ANIColor.dark
+    navigationBarAppearane.setBackgroundImage(UIImage(), for: .default)
+    navigationBarAppearane.shadowImage = UIImage()
+    
     return true
   }
 

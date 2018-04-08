@@ -12,9 +12,16 @@ class ANITabBarController: UITabBarController {
 
   override func viewDidLoad() {
     super.viewDidLoad()
+    //tabBar上の線を消す
+    let tabBarAppearane = UITabBar.appearance()
+    tabBarAppearane.barTintColor = .white
+    tabBar.alpha = 0.95
+    tabBar.layer.borderWidth = 0.0
+    tabBar.clipsToBounds = true
+    
     let recruitVC = ANIRecruitViewController()
     recruitVC.tabBarItem = UITabBarItem(tabBarSystemItem: .downloads, tag: 1)
-    let recruitNV = UINavigationController(rootViewController: recruitVC)
+    let recruitNV = ScrollingNavigationController(rootViewController: recruitVC)
     setViewControllers([recruitNV], animated: false)
   }
 }
