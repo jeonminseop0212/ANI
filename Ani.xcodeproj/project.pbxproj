@@ -27,6 +27,11 @@
 		F5E9E2292076C6470021D4CC /* ScrollingNavbar+Sizes.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E2282076C6470021D4CC /* ScrollingNavbar+Sizes.swift */; };
 		F5E9E22B2076C64F0021D4CC /* ScrollingNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E22A2076C64F0021D4CC /* ScrollingNavigationController.swift */; };
 		F5E9E22D2076C65A0021D4CC /* ScrollingNavigationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E22C2076C65A0021D4CC /* ScrollingNavigationViewController.swift */; };
+		F5E9E22F2079AEC30021D4CC /* Orientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E22E2079AEC30021D4CC /* Orientation.swift */; };
+		F5E9E2332079AFF40021D4CC /* ANICommunityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E2322079AFF40021D4CC /* ANICommunityViewController.swift */; };
+		F5E9E2372079B1900021D4CC /* ANICommunityMenuBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E2362079B1900021D4CC /* ANICommunityMenuBar.swift */; };
+		F5E9E2392079B9D20021D4CC /* ANICommunityMenuBarCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E2382079B9D20021D4CC /* ANICommunityMenuBarCell.swift */; };
+		F5E9E23D2079C10C0021D4CC /* ANICommunityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E23C2079C10C0021D4CC /* ANICommunityView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -73,6 +78,11 @@
 		F5E9E2282076C6470021D4CC /* ScrollingNavbar+Sizes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ScrollingNavbar+Sizes.swift"; sourceTree = "<group>"; };
 		F5E9E22A2076C64F0021D4CC /* ScrollingNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollingNavigationController.swift; sourceTree = "<group>"; };
 		F5E9E22C2076C65A0021D4CC /* ScrollingNavigationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollingNavigationViewController.swift; sourceTree = "<group>"; };
+		F5E9E22E2079AEC30021D4CC /* Orientation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Orientation.swift; sourceTree = "<group>"; };
+		F5E9E2322079AFF40021D4CC /* ANICommunityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommunityViewController.swift; sourceTree = "<group>"; };
+		F5E9E2362079B1900021D4CC /* ANICommunityMenuBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommunityMenuBar.swift; sourceTree = "<group>"; };
+		F5E9E2382079B9D20021D4CC /* ANICommunityMenuBarCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommunityMenuBarCell.swift; sourceTree = "<group>"; };
+		F5E9E23C2079C10C0021D4CC /* ANICommunityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommunityView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -107,6 +117,7 @@
 				F5E9E2272076C62E0021D4CC /* ScrollingNavBar */,
 				F51D220F20767E62009D1B26 /* ANIColor.swift */,
 				F51D221320768B01009D1B26 /* Extensioin */,
+				F5E9E22E2079AEC30021D4CC /* Orientation.swift */,
 			);
 			path = Utility;
 			sourceTree = "<group>";
@@ -173,8 +184,8 @@
 			children = (
 				F5B1EFBE20725B6C000CFB0B /* Supporting */,
 				F5E9E222207696060021D4CC /* Model */,
-				F5B1EFBF20725B79000CFB0B /* RecruitViewController */,
-				F56634842075265E006CB81B /* RecruitView */,
+				F5E9E2302079AF8C0021D4CC /* ViewController */,
+				F5E9E2342079B1660021D4CC /* View */,
 				F5B1EFC020725B86000CFB0B /* TabbarController */,
 				F51D220E20767E49009D1B26 /* Utility */,
 				F5B1EF9C20725964000CFB0B /* Info.plist */,
@@ -251,6 +262,58 @@
 				F5E9E22C2076C65A0021D4CC /* ScrollingNavigationViewController.swift */,
 			);
 			path = ScrollingNavBar;
+			sourceTree = "<group>";
+		};
+		F5E9E2302079AF8C0021D4CC /* ViewController */ = {
+			isa = PBXGroup;
+			children = (
+				F5B1EFBF20725B79000CFB0B /* RecruitViewController */,
+				F5E9E2312079AFA40021D4CC /* CommunityViewController */,
+			);
+			path = ViewController;
+			sourceTree = "<group>";
+		};
+		F5E9E2312079AFA40021D4CC /* CommunityViewController */ = {
+			isa = PBXGroup;
+			children = (
+				F5E9E2322079AFF40021D4CC /* ANICommunityViewController.swift */,
+			);
+			path = CommunityViewController;
+			sourceTree = "<group>";
+		};
+		F5E9E2342079B1660021D4CC /* View */ = {
+			isa = PBXGroup;
+			children = (
+				F56634842075265E006CB81B /* RecruitView */,
+				F5E9E2352079B16F0021D4CC /* CommunityView */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		F5E9E2352079B16F0021D4CC /* CommunityView */ = {
+			isa = PBXGroup;
+			children = (
+				F5E9E23A2079C0B00021D4CC /* MenuBar */,
+				F5E9E23B2079C0BD0021D4CC /* Community */,
+			);
+			path = CommunityView;
+			sourceTree = "<group>";
+		};
+		F5E9E23A2079C0B00021D4CC /* MenuBar */ = {
+			isa = PBXGroup;
+			children = (
+				F5E9E2362079B1900021D4CC /* ANICommunityMenuBar.swift */,
+				F5E9E2382079B9D20021D4CC /* ANICommunityMenuBarCell.swift */,
+			);
+			path = MenuBar;
+			sourceTree = "<group>";
+		};
+		F5E9E23B2079C0BD0021D4CC /* Community */ = {
+			isa = PBXGroup;
+			children = (
+				F5E9E23C2079C10C0021D4CC /* ANICommunityView.swift */,
+			);
+			path = Community;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -412,9 +475,14 @@
 				F51D221920768E8D009D1B26 /* ANIRecuruitView.swift in Sources */,
 				F5E9E2292076C6470021D4CC /* ScrollingNavbar+Sizes.swift in Sources */,
 				F566348320752656006CB81B /* ANIRecruitCategoriesView.swift in Sources */,
+				F5E9E22F2079AEC30021D4CC /* Orientation.swift in Sources */,
+				F5E9E2372079B1900021D4CC /* ANICommunityMenuBar.swift in Sources */,
 				F5B1EF9320725964000CFB0B /* ANIRecruitViewController.swift in Sources */,
 				F51D221520768B24009D1B26 /* UISearchBar.swift in Sources */,
+				F5E9E2392079B9D20021D4CC /* ANICommunityMenuBarCell.swift in Sources */,
+				F5E9E23D2079C10C0021D4CC /* ANICommunityView.swift in Sources */,
 				F5E9E22D2076C65A0021D4CC /* ScrollingNavigationViewController.swift in Sources */,
+				F5E9E2332079AFF40021D4CC /* ANICommunityViewController.swift in Sources */,
 				F5E9E22620769AD60021D4CC /* User.swift in Sources */,
 				F51D221020767E62009D1B26 /* ANIColor.swift in Sources */,
 				F5E9E221207692C60021D4CC /* ANIRecruitViewCell.swift in Sources */,

@@ -12,7 +12,7 @@ import TinyConstraints
 class ANIRecruitViewController: ScrollingNavigationViewController {
   
   private weak var categoriesView: ANIRecruitCategoriesView?
-  private let CATEGORIES_VIEW_HEIGHT: CGFloat = 45.0
+  static let CATEGORIES_VIEW_HEIGHT: CGFloat = 45.0
   
   private weak var recruitView: ANIRecuruitView?
   
@@ -32,6 +32,7 @@ class ANIRecruitViewController: ScrollingNavigationViewController {
   }
   
   private func setup() {
+    Orientation.lockOrientation(.portrait)
     self.view.backgroundColor = .white
     //nav barの下からviewが開始するように
     self.navigationController?.navigationBar.isTranslucent = false
@@ -47,10 +48,7 @@ class ANIRecruitViewController: ScrollingNavigationViewController {
     //rcruitView
     let recruitView = ANIRecuruitView()
     self.view.addSubview(recruitView)
-    recruitView.topToSuperview()
-    recruitView.leftToSuperview()
-    recruitView.rightToSuperview()
-    recruitView.bottomToSuperview()
+    recruitView.edgesToSuperview()
     self.recruitView = recruitView
     
     //categoriesView
@@ -59,7 +57,7 @@ class ANIRecruitViewController: ScrollingNavigationViewController {
     categoriesView.topToSuperview()
     categoriesView.leftToSuperview()
     categoriesView.rightToSuperview()
-    categoriesView.height(CATEGORIES_VIEW_HEIGHT)
+    categoriesView.height(ANIRecruitViewController.CATEGORIES_VIEW_HEIGHT)
     self.categoriesView = categoriesView
   }
 }

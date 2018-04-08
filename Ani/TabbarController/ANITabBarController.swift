@@ -22,6 +22,10 @@ class ANITabBarController: UITabBarController {
     let recruitVC = ANIRecruitViewController()
     recruitVC.tabBarItem = UITabBarItem(tabBarSystemItem: .downloads, tag: 1)
     let recruitNV = ScrollingNavigationController(rootViewController: recruitVC)
-    setViewControllers([recruitNV], animated: false)
+    
+    let communityVC = ANICommunityViewController()
+    communityVC.tabBarItem = UITabBarItem(tabBarSystemItem: .bookmarks, tag: 2)
+    let communityNV = UINavigationController(rootViewController: communityVC)
+    setViewControllers([recruitNV, communityNV], animated: false)
   }
 }
