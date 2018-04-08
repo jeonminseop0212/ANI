@@ -10,9 +10,10 @@ import UIKit
 import TinyConstraints
 
 class ANICommunityMenuBar: UIView {
-  private weak var menuCollectionView: UICollectionView?
+  var menuCollectionView: UICollectionView?
   private let menus = ["STORY", "Q&A"]
-  private var horizontalBarleftConstraint:Constraint?
+  var horizontalBarleftConstraint:Constraint?
+  var aniCoummunityViewController: ANICommunityViewController?
     
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -25,8 +26,7 @@ class ANICommunityMenuBar: UIView {
   }
   
   private func setup() {
-    self.backgroundColor = .white
-    
+    self.backgroundColor = .white    
     let flowlayout = UICollectionViewFlowLayout()
     let collectionView = UICollectionView(frame: self.frame, collectionViewLayout: flowlayout)
     let id = NSStringFromClass(ANICommunityMenuBarCell.self)
@@ -77,12 +77,7 @@ extension ANICommunityMenuBar: UICollectionViewDataSource, UICollectionViewDeleg
   }
   
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-    print(indexPath.item)
-    let x = CGFloat(indexPath.item) * frame.width / 2
-    horizontalBarleftConstraint?.constant = x
-    
-    UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
-      self.layoutIfNeeded()
-    }, completion: nil)
+    guard let aniCoummunityViewController = self.aniCoummunityViewController else { return }
+    aniCoummunityViewController.scrollToMenuIndex(menuIndex: indexPath.item)
   }
 }
