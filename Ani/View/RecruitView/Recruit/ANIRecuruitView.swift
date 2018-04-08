@@ -13,7 +13,6 @@ class ANIRecuruitView: UIView {
   var recruitCollectionView: UICollectionView?
   
   private var testRecruitLists = [Recurit]()
-  private let CATEGORIES_VIEW_HEIGHT: CGFloat = 45.0
 
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -31,7 +30,8 @@ class ANIRecuruitView: UIView {
     flowlayout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
     let collectionView = UICollectionView(frame: self.frame, collectionViewLayout: flowlayout)
     let id = NSStringFromClass(ANIRecruitViewCell.self)
-    collectionView.contentInset = UIEdgeInsets(top: CATEGORIES_VIEW_HEIGHT, left: 0, bottom: 0, right: 0)
+    collectionView.contentInset = UIEdgeInsets(top: ANIRecruitViewController.CATEGORIES_VIEW_HEIGHT, left: 0, bottom: 0, right: 0)
+    collectionView.scrollIndicatorInsets  = UIEdgeInsets(top: ANIRecruitViewController.CATEGORIES_VIEW_HEIGHT, left: 0, bottom: 0, right: 0)
     collectionView.backgroundColor = .white
     collectionView.register(ANIRecruitViewCell.self, forCellWithReuseIdentifier: id)
     collectionView.alwaysBounceVertical = true
