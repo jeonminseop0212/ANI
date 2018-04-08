@@ -21,9 +21,20 @@
 		F5B1EFB120725964000CFB0B /* AniUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B1EFB020725964000CFB0B /* AniUITests.swift */; };
 		F5B1EFC220725BDC000CFB0B /* ANITabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B1EFC120725BDC000CFB0B /* ANITabBarController.swift */; };
 		F5B1EFC520726658000CFB0B /* TinyConstraints.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5B1EFC420726658000CFB0B /* TinyConstraints.framework */; };
+		F5C381FD2079F73F000BBB8C /* ANIStoryViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5C381FC2079F73F000BBB8C /* ANIStoryViewCell.swift */; };
+		F5C381FF207A068D000BBB8C /* ANIQnaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5C381FE207A068D000BBB8C /* ANIQnaView.swift */; };
+		F5DF835D207A17C200EA7FBE /* ANIQnaViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5DF835C207A17C200EA7FBE /* ANIQnaViewCell.swift */; };
 		F5E9E221207692C60021D4CC /* ANIRecruitViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E220207692C60021D4CC /* ANIRecruitViewCell.swift */; };
 		F5E9E2242076961E0021D4CC /* Recruit.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E2232076961D0021D4CC /* Recruit.swift */; };
 		F5E9E22620769AD60021D4CC /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E22520769AD60021D4CC /* User.swift */; };
+		F5E9E2292076C6470021D4CC /* ScrollingNavbar+Sizes.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E2282076C6470021D4CC /* ScrollingNavbar+Sizes.swift */; };
+		F5E9E22B2076C64F0021D4CC /* ScrollingNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E22A2076C64F0021D4CC /* ScrollingNavigationController.swift */; };
+		F5E9E22D2076C65A0021D4CC /* ScrollingNavigationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E22C2076C65A0021D4CC /* ScrollingNavigationViewController.swift */; };
+		F5E9E22F2079AEC30021D4CC /* Orientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E22E2079AEC30021D4CC /* Orientation.swift */; };
+		F5E9E2332079AFF40021D4CC /* ANICommunityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E2322079AFF40021D4CC /* ANICommunityViewController.swift */; };
+		F5E9E2372079B1900021D4CC /* ANICommunityMenuBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E2362079B1900021D4CC /* ANICommunityMenuBar.swift */; };
+		F5E9E2392079B9D20021D4CC /* ANICommunityMenuBarCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E2382079B9D20021D4CC /* ANICommunityMenuBarCell.swift */; };
+		F5E9E23D2079C10C0021D4CC /* ANIStoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E23C2079C10C0021D4CC /* ANIStoryView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -64,9 +75,20 @@
 		F5B1EFB220725964000CFB0B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F5B1EFC120725BDC000CFB0B /* ANITabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANITabBarController.swift; sourceTree = "<group>"; };
 		F5B1EFC420726658000CFB0B /* TinyConstraints.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TinyConstraints.framework; path = Carthage/Build/iOS/TinyConstraints.framework; sourceTree = "<group>"; };
+		F5C381FC2079F73F000BBB8C /* ANIStoryViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIStoryViewCell.swift; sourceTree = "<group>"; };
+		F5C381FE207A068D000BBB8C /* ANIQnaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIQnaView.swift; sourceTree = "<group>"; };
+		F5DF835C207A17C200EA7FBE /* ANIQnaViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIQnaViewCell.swift; sourceTree = "<group>"; };
 		F5E9E220207692C60021D4CC /* ANIRecruitViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitViewCell.swift; sourceTree = "<group>"; };
 		F5E9E2232076961D0021D4CC /* Recruit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Recruit.swift; sourceTree = "<group>"; };
 		F5E9E22520769AD60021D4CC /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		F5E9E2282076C6470021D4CC /* ScrollingNavbar+Sizes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ScrollingNavbar+Sizes.swift"; sourceTree = "<group>"; };
+		F5E9E22A2076C64F0021D4CC /* ScrollingNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollingNavigationController.swift; sourceTree = "<group>"; };
+		F5E9E22C2076C65A0021D4CC /* ScrollingNavigationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollingNavigationViewController.swift; sourceTree = "<group>"; };
+		F5E9E22E2079AEC30021D4CC /* Orientation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Orientation.swift; sourceTree = "<group>"; };
+		F5E9E2322079AFF40021D4CC /* ANICommunityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommunityViewController.swift; sourceTree = "<group>"; };
+		F5E9E2362079B1900021D4CC /* ANICommunityMenuBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommunityMenuBar.swift; sourceTree = "<group>"; };
+		F5E9E2382079B9D20021D4CC /* ANICommunityMenuBarCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommunityMenuBarCell.swift; sourceTree = "<group>"; };
+		F5E9E23C2079C10C0021D4CC /* ANIStoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIStoryView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,8 +120,10 @@
 		F51D220E20767E49009D1B26 /* Utility */ = {
 			isa = PBXGroup;
 			children = (
+				F5E9E2272076C62E0021D4CC /* ScrollingNavBar */,
 				F51D220F20767E62009D1B26 /* ANIColor.swift */,
 				F51D221320768B01009D1B26 /* Extensioin */,
+				F5E9E22E2079AEC30021D4CC /* Orientation.swift */,
 			);
 			path = Utility;
 			sourceTree = "<group>";
@@ -134,8 +158,8 @@
 		F56634842075265E006CB81B /* RecruitView */ = {
 			isa = PBXGroup;
 			children = (
-				F51D221720768E5F009D1B26 /* Recruit */,
 				F51D221620768E53009D1B26 /* Category */,
+				F51D221720768E5F009D1B26 /* Recruit */,
 			);
 			path = RecruitView;
 			sourceTree = "<group>";
@@ -166,8 +190,8 @@
 			children = (
 				F5B1EFBE20725B6C000CFB0B /* Supporting */,
 				F5E9E222207696060021D4CC /* Model */,
-				F5B1EFBF20725B79000CFB0B /* RecruitViewController */,
-				F56634842075265E006CB81B /* RecruitView */,
+				F5E9E2302079AF8C0021D4CC /* ViewController */,
+				F5E9E2342079B1660021D4CC /* View */,
 				F5B1EFC020725B86000CFB0B /* TabbarController */,
 				F51D220E20767E49009D1B26 /* Utility */,
 				F5B1EF9C20725964000CFB0B /* Info.plist */,
@@ -234,6 +258,71 @@
 				F5E9E22520769AD60021D4CC /* User.swift */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		F5E9E2272076C62E0021D4CC /* ScrollingNavBar */ = {
+			isa = PBXGroup;
+			children = (
+				F5E9E2282076C6470021D4CC /* ScrollingNavbar+Sizes.swift */,
+				F5E9E22A2076C64F0021D4CC /* ScrollingNavigationController.swift */,
+				F5E9E22C2076C65A0021D4CC /* ScrollingNavigationViewController.swift */,
+			);
+			path = ScrollingNavBar;
+			sourceTree = "<group>";
+		};
+		F5E9E2302079AF8C0021D4CC /* ViewController */ = {
+			isa = PBXGroup;
+			children = (
+				F5B1EFBF20725B79000CFB0B /* RecruitViewController */,
+				F5E9E2312079AFA40021D4CC /* CommunityViewController */,
+			);
+			path = ViewController;
+			sourceTree = "<group>";
+		};
+		F5E9E2312079AFA40021D4CC /* CommunityViewController */ = {
+			isa = PBXGroup;
+			children = (
+				F5E9E2322079AFF40021D4CC /* ANICommunityViewController.swift */,
+			);
+			path = CommunityViewController;
+			sourceTree = "<group>";
+		};
+		F5E9E2342079B1660021D4CC /* View */ = {
+			isa = PBXGroup;
+			children = (
+				F56634842075265E006CB81B /* RecruitView */,
+				F5E9E2352079B16F0021D4CC /* CommunityView */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		F5E9E2352079B16F0021D4CC /* CommunityView */ = {
+			isa = PBXGroup;
+			children = (
+				F5E9E23A2079C0B00021D4CC /* MenuBar */,
+				F5E9E23B2079C0BD0021D4CC /* Community */,
+			);
+			path = CommunityView;
+			sourceTree = "<group>";
+		};
+		F5E9E23A2079C0B00021D4CC /* MenuBar */ = {
+			isa = PBXGroup;
+			children = (
+				F5E9E2362079B1900021D4CC /* ANICommunityMenuBar.swift */,
+				F5E9E2382079B9D20021D4CC /* ANICommunityMenuBarCell.swift */,
+			);
+			path = MenuBar;
+			sourceTree = "<group>";
+		};
+		F5E9E23B2079C0BD0021D4CC /* Community */ = {
+			isa = PBXGroup;
+			children = (
+				F5C381FC2079F73F000BBB8C /* ANIStoryViewCell.swift */,
+				F5E9E23C2079C10C0021D4CC /* ANIStoryView.swift */,
+				F5DF835C207A17C200EA7FBE /* ANIQnaViewCell.swift */,
+				F5C381FE207A068D000BBB8C /* ANIQnaView.swift */,
+			);
+			path = Community;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -388,13 +477,24 @@
 			buildActionMask = 2147483647;
 			files = (
 				F56634862075285D006CB81B /* ANIRecruitCategoryCell.swift in Sources */,
+				F5E9E22B2076C64F0021D4CC /* ScrollingNavigationController.swift in Sources */,
 				F51D221220767F03009D1B26 /* UIColor.swift in Sources */,
+				F5C381FD2079F73F000BBB8C /* ANIStoryViewCell.swift in Sources */,
 				F5B1EFC220725BDC000CFB0B /* ANITabBarController.swift in Sources */,
 				F5E9E2242076961E0021D4CC /* Recruit.swift in Sources */,
+				F5DF835D207A17C200EA7FBE /* ANIQnaViewCell.swift in Sources */,
 				F51D221920768E8D009D1B26 /* ANIRecuruitView.swift in Sources */,
+				F5E9E2292076C6470021D4CC /* ScrollingNavbar+Sizes.swift in Sources */,
+				F5C381FF207A068D000BBB8C /* ANIQnaView.swift in Sources */,
 				F566348320752656006CB81B /* ANIRecruitCategoriesView.swift in Sources */,
+				F5E9E22F2079AEC30021D4CC /* Orientation.swift in Sources */,
+				F5E9E2372079B1900021D4CC /* ANICommunityMenuBar.swift in Sources */,
 				F5B1EF9320725964000CFB0B /* ANIRecruitViewController.swift in Sources */,
 				F51D221520768B24009D1B26 /* UISearchBar.swift in Sources */,
+				F5E9E2392079B9D20021D4CC /* ANICommunityMenuBarCell.swift in Sources */,
+				F5E9E23D2079C10C0021D4CC /* ANIStoryView.swift in Sources */,
+				F5E9E22D2076C65A0021D4CC /* ScrollingNavigationViewController.swift in Sources */,
+				F5E9E2332079AFF40021D4CC /* ANICommunityViewController.swift in Sources */,
 				F5E9E22620769AD60021D4CC /* User.swift in Sources */,
 				F51D221020767E62009D1B26 /* ANIColor.swift in Sources */,
 				F5E9E221207692C60021D4CC /* ANIRecruitViewCell.swift in Sources */,
