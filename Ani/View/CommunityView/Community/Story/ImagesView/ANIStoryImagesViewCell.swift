@@ -1,5 +1,5 @@
 //
-//  ANICommunityViewCell.swift
+//  ANIStoryImagesViewCell.swift
 //  Ani
 //
 //  Created by 전민섭 on 2018/04/08.
@@ -8,9 +8,8 @@
 
 import UIKit
 
-class ANIStoryViewCell: UICollectionViewCell {
-  private weak var storyView: ANIStoryView?
-
+class ANIStoryImagesViewCell: UICollectionViewCell {
+  var imageView: UIImageView?
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()
@@ -21,9 +20,10 @@ class ANIStoryViewCell: UICollectionViewCell {
   }
   
   private func setup() {
-    let storyView = ANIStoryView()
-    addSubview(storyView)
-    storyView.edgesToSuperview()
-    self.storyView = storyView
+    let imageView = UIImageView()
+    imageView.contentMode = .redraw
+    addSubview(imageView)
+    imageView.edgesToSuperview()
+    self.imageView = imageView
   }
 }
