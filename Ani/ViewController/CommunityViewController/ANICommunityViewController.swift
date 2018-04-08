@@ -39,10 +39,10 @@ class ANICommunityViewController: UIViewController {
     containerCollectionView.showsHorizontalScrollIndicator = false
     containerCollectionView.backgroundColor = .white
     containerCollectionView.isPagingEnabled = true
-    let storyId = NSStringFromClass(ANIStoryViewCell.self)
-    containerCollectionView.register(ANIStoryViewCell.self, forCellWithReuseIdentifier: storyId)
-    let qnaId = NSStringFromClass(ANIQnaViewCell.self)
-    containerCollectionView.register(ANIQnaViewCell.self, forCellWithReuseIdentifier: qnaId)
+    let storyId = NSStringFromClass(ANICommunityStoryCell.self)
+    containerCollectionView.register(ANICommunityStoryCell.self, forCellWithReuseIdentifier: storyId)
+    let qnaId = NSStringFromClass(ANICommunityQnaCell.self)
+    containerCollectionView.register(ANICommunityQnaCell.self, forCellWithReuseIdentifier: qnaId)
 
     self.view.addSubview(containerCollectionView)
     containerCollectionView.edgesToSuperview()
@@ -74,13 +74,13 @@ extension ANICommunityViewController: UICollectionViewDataSource, UICollectionVi
   
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     if indexPath.item == 0 {
-      let storyId = NSStringFromClass(ANIStoryViewCell.self)
-      let cell = collectionView.dequeueReusableCell(withReuseIdentifier: storyId, for: indexPath) as! ANIStoryViewCell
+      let storyId = NSStringFromClass(ANICommunityStoryCell.self)
+      let cell = collectionView.dequeueReusableCell(withReuseIdentifier: storyId, for: indexPath) as! ANICommunityStoryCell
       cell.frame.origin.y = collectionView.frame.origin.y
       return cell
     } else {
-      let qnaId = NSStringFromClass(ANIQnaViewCell.self)
-      let cell = collectionView.dequeueReusableCell(withReuseIdentifier: qnaId, for: indexPath) as! ANIQnaViewCell
+      let qnaId = NSStringFromClass(ANICommunityQnaCell.self)
+      let cell = collectionView.dequeueReusableCell(withReuseIdentifier: qnaId, for: indexPath) as! ANICommunityQnaCell
       cell.frame.origin.y = collectionView.frame.origin.y
       return cell
     }

@@ -8,18 +8,17 @@
 
 import UIKit
 
-class ANIRecruitViewCell: UICollectionViewCell {
-  var recruitImageView = UIImageView()
+class ANIStoryViewCell: UICollectionViewCell {
+  var storyImagesView = ANIStoryImagesView()
   var titleLabel = UILabel()
   var subTitleTextView = UITextView()
   var line = UIImageView()
   var profileImageView = UIImageView()
   var userNameLabel = UILabel()
-  var supportCountLabel = UILabel()
-  var supportButton = UIButton()
   var loveButton = UIButton()
   var loveCountLabel = UILabel()
-  var clipButton = UIButton()
+  var commentButton = UIButton()
+  var commentCountLabel = UILabel()
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -31,15 +30,14 @@ class ANIRecruitViewCell: UICollectionViewCell {
   }
   
   private func setup() {
-    //recruitImageView
-    let recruitImageView = UIImageView()
-    recruitImageView.contentMode = .redraw
-    addSubview(recruitImageView)
-    recruitImageView.topToSuperview()
-    recruitImageView.leftToSuperview()
-    recruitImageView.rightToSuperview()
-    recruitImageView.height(150.0)
-    self.recruitImageView = recruitImageView
+    //storyImageView
+    let storyImagesView = ANIStoryImagesView()
+    addSubview(storyImagesView)
+    storyImagesView.topToSuperview()
+    storyImagesView.leftToSuperview()
+    storyImagesView.rightToSuperview()
+    storyImagesView.height(200.0 + ANIStoryImagesView.PAGE_CONTROL_HEIGHT)
+    self.storyImagesView = storyImagesView
     
     //titleLabel
     let titleLabel = UILabel()
@@ -47,12 +45,12 @@ class ANIRecruitViewCell: UICollectionViewCell {
     titleLabel.textAlignment = .left
     titleLabel.textColor = ANIColor.dark
     addSubview(titleLabel)
-    titleLabel.topToBottom(of: recruitImageView, offset: 10.0)
+    titleLabel.topToBottom(of: storyImagesView, offset: 10.0)
     titleLabel.leftToSuperview(offset: 10.0)
     titleLabel.rightToSuperview(offset: 10.0)
     titleLabel.height(20.0)
     self.titleLabel = titleLabel
-    
+
     //subTitleTextView
     let subTitleTextView = UITextView()
     subTitleTextView.font = UIFont.systemFont(ofSize: 14.0)
@@ -64,9 +62,9 @@ class ANIRecruitViewCell: UICollectionViewCell {
     subTitleTextView.topToBottom(of: titleLabel, offset: 2.0)
     subTitleTextView.leftToSuperview(offset: 5.0)
     subTitleTextView.rightToSuperview(offset: 5.0)
-    subTitleTextView.height(80.0)
+    subTitleTextView.height(60.0)
     self.subTitleTextView = subTitleTextView
-    
+
     //line
     let line = UIImageView()
     line.image = UIImage(named: "line")
@@ -76,7 +74,7 @@ class ANIRecruitViewCell: UICollectionViewCell {
     line.rightToSuperview()
     line.height(0.5)
     self.line = line
-    
+
     //profileImageView
     let profileImageView = UIImageView()
     addSubview(profileImageView)
@@ -87,26 +85,35 @@ class ANIRecruitViewCell: UICollectionViewCell {
     profileImageView.layer.cornerRadius = profileImageView.constraints[0].constant / 2
     profileImageView.layer.masksToBounds = true
     self.profileImageView = profileImageView
-    
-    //clipButton
-    let clipButton = UIButton()
-    clipButton.setImage(UIImage(named: "clip"), for: .normal)
-    addSubview(clipButton)
-    clipButton.centerY(to: profileImageView)
-    clipButton.rightToSuperview(offset: 20.0)
-    clipButton.width(21.0)
-    clipButton.height(21.0)
-    self.clipButton = clipButton
+
+    //commentCountLabel
+    let commentCountLabel = UILabel()
+    addSubview(commentCountLabel)
+    commentCountLabel.centerY(to: profileImageView)
+    commentCountLabel.rightToSuperview(offset: 20.0)
+    commentCountLabel.width(30.0)
+    commentCountLabel.height(20.0)
+    self.commentCountLabel = commentCountLabel
+
+    //commentButton
+    let commentButton = UIButton()
+    commentButton.setImage(UIImage(named: "comment"), for: .normal)
+    addSubview(commentButton)
+    commentButton.centerY(to: profileImageView)
+    commentButton.rightToLeft(of: commentCountLabel, offset: -10.0)
+    commentButton.width(25.0)
+    commentButton.height(24.0)
+    self.commentButton = commentButton
     
     //loveCountLabel
     let loveCountLabel = UILabel()
     addSubview(loveCountLabel)
     loveCountLabel.centerY(to: profileImageView)
-    loveCountLabel.rightToLeft(of: clipButton, offset: -10.0)
+    loveCountLabel.rightToLeft(of: commentButton, offset: -10.0)
     loveCountLabel.width(30.0)
     loveCountLabel.height(20.0)
     self.loveCountLabel = loveCountLabel
-    
+
     //loveButton
     let loveButton = UIButton()
     loveButton.setImage(UIImage(named: "love"), for: .normal)
@@ -116,35 +123,17 @@ class ANIRecruitViewCell: UICollectionViewCell {
     loveButton.width(21.0)
     loveButton.height(21.0)
     self.loveButton = loveButton
-    
-    //supportCountLabel
-    let supportCountLabel = UILabel()
-    addSubview(supportCountLabel)
-    supportCountLabel.centerY(to: profileImageView)
-    supportCountLabel.rightToLeft(of: loveButton, offset: -10.0)
-    supportCountLabel.width(30.0)
-    supportCountLabel.height(20.0)
-    self.supportCountLabel = supportCountLabel
-    
-    //supportButton
-    let supportButton = UIButton()
-    supportButton.setImage(UIImage(named: "support"), for: .normal)
-    addSubview(supportButton)
-    supportButton.centerY(to: profileImageView)
-    supportButton.rightToLeft(of: supportCountLabel, offset: -10.0)
-    supportButton.width(21.0)
-    supportButton.height(21.0)
-    self.supportButton = supportButton
-    
+
     //userNameLabel
     let userNameLabel = UILabel()
     userNameLabel.font = UIFont.systemFont(ofSize: 13.0)
     userNameLabel.textColor = ANIColor.subTitle
     addSubview(userNameLabel)
     userNameLabel.leftToRight(of: profileImageView, offset: 10.0)
-    userNameLabel.rightToLeft(of: supportButton, offset: 10.0)
+    userNameLabel.rightToLeft(of: loveButton, offset: 10.0)
     userNameLabel.centerY(to: profileImageView)
     userNameLabel.height(20.0)
     self.userNameLabel = userNameLabel
   }
 }
+

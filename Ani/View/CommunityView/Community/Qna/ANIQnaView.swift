@@ -75,9 +75,9 @@ extension ANIQnaView: UICollectionViewDataSource, UICollectionViewDelegateFlowLa
     return CGSize(width: collectionView.frame.width, height: 320.0)
   }
   
-  //  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-  //    return 0.0
-  //  }
+  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+    return 0.0
+  }
 }
 
 
