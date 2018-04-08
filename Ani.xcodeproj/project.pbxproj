@@ -24,6 +24,9 @@
 		F5E9E221207692C60021D4CC /* ANIRecruitViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E220207692C60021D4CC /* ANIRecruitViewCell.swift */; };
 		F5E9E2242076961E0021D4CC /* Recruit.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E2232076961D0021D4CC /* Recruit.swift */; };
 		F5E9E22620769AD60021D4CC /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E22520769AD60021D4CC /* User.swift */; };
+		F5E9E2292076C6470021D4CC /* ScrollingNavbar+Sizes.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E2282076C6470021D4CC /* ScrollingNavbar+Sizes.swift */; };
+		F5E9E22B2076C64F0021D4CC /* ScrollingNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E22A2076C64F0021D4CC /* ScrollingNavigationController.swift */; };
+		F5E9E22D2076C65A0021D4CC /* ScrollingNavigationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E22C2076C65A0021D4CC /* ScrollingNavigationViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,6 +70,9 @@
 		F5E9E220207692C60021D4CC /* ANIRecruitViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitViewCell.swift; sourceTree = "<group>"; };
 		F5E9E2232076961D0021D4CC /* Recruit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Recruit.swift; sourceTree = "<group>"; };
 		F5E9E22520769AD60021D4CC /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		F5E9E2282076C6470021D4CC /* ScrollingNavbar+Sizes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ScrollingNavbar+Sizes.swift"; sourceTree = "<group>"; };
+		F5E9E22A2076C64F0021D4CC /* ScrollingNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollingNavigationController.swift; sourceTree = "<group>"; };
+		F5E9E22C2076C65A0021D4CC /* ScrollingNavigationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollingNavigationViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,6 +104,7 @@
 		F51D220E20767E49009D1B26 /* Utility */ = {
 			isa = PBXGroup;
 			children = (
+				F5E9E2272076C62E0021D4CC /* ScrollingNavBar */,
 				F51D220F20767E62009D1B26 /* ANIColor.swift */,
 				F51D221320768B01009D1B26 /* Extensioin */,
 			);
@@ -134,8 +141,8 @@
 		F56634842075265E006CB81B /* RecruitView */ = {
 			isa = PBXGroup;
 			children = (
-				F51D221720768E5F009D1B26 /* Recruit */,
 				F51D221620768E53009D1B26 /* Category */,
+				F51D221720768E5F009D1B26 /* Recruit */,
 			);
 			path = RecruitView;
 			sourceTree = "<group>";
@@ -234,6 +241,16 @@
 				F5E9E22520769AD60021D4CC /* User.swift */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		F5E9E2272076C62E0021D4CC /* ScrollingNavBar */ = {
+			isa = PBXGroup;
+			children = (
+				F5E9E2282076C6470021D4CC /* ScrollingNavbar+Sizes.swift */,
+				F5E9E22A2076C64F0021D4CC /* ScrollingNavigationController.swift */,
+				F5E9E22C2076C65A0021D4CC /* ScrollingNavigationViewController.swift */,
+			);
+			path = ScrollingNavBar;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -388,13 +405,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				F56634862075285D006CB81B /* ANIRecruitCategoryCell.swift in Sources */,
+				F5E9E22B2076C64F0021D4CC /* ScrollingNavigationController.swift in Sources */,
 				F51D221220767F03009D1B26 /* UIColor.swift in Sources */,
 				F5B1EFC220725BDC000CFB0B /* ANITabBarController.swift in Sources */,
 				F5E9E2242076961E0021D4CC /* Recruit.swift in Sources */,
 				F51D221920768E8D009D1B26 /* ANIRecuruitView.swift in Sources */,
+				F5E9E2292076C6470021D4CC /* ScrollingNavbar+Sizes.swift in Sources */,
 				F566348320752656006CB81B /* ANIRecruitCategoriesView.swift in Sources */,
 				F5B1EF9320725964000CFB0B /* ANIRecruitViewController.swift in Sources */,
 				F51D221520768B24009D1B26 /* UISearchBar.swift in Sources */,
+				F5E9E22D2076C65A0021D4CC /* ScrollingNavigationViewController.swift in Sources */,
 				F5E9E22620769AD60021D4CC /* User.swift in Sources */,
 				F51D221020767E62009D1B26 /* ANIColor.swift in Sources */,
 				F5E9E221207692C60021D4CC /* ANIRecruitViewCell.swift in Sources */,

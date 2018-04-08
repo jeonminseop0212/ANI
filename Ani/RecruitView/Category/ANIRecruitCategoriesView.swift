@@ -28,7 +28,7 @@ class ANIRecruitCategoriesView: UIView {
   private func setup() {
     let flowlayout = UICollectionViewFlowLayout()
     flowlayout.scrollDirection = .horizontal
-    flowlayout.sectionInset = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
+    flowlayout.sectionInset = UIEdgeInsets(top: -10, left: 10, bottom: 0, right: 10)
     let collectionView = UICollectionView(frame: self.frame, collectionViewLayout: flowlayout)
     let id = NSStringFromClass(ANIRecruitCategoryCell.self)
     collectionView.register(ANIRecruitCategoryCell.self, forCellWithReuseIdentifier: id)
