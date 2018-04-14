@@ -65,20 +65,10 @@ class ANIStoryViewCell: UICollectionViewCell {
     subTitleTextView.height(60.0)
     self.subTitleTextView = subTitleTextView
 
-    //line
-    let line = UIImageView()
-    line.image = UIImage(named: "line")
-    addSubview(line)
-    line.topToBottom(of: subTitleTextView)
-    line.leftToSuperview()
-    line.rightToSuperview()
-    line.height(0.5)
-    self.line = line
-
     //profileImageView
     let profileImageView = UIImageView()
     addSubview(profileImageView)
-    profileImageView.topToBottom(of: line, offset: 10.0)
+    profileImageView.topToBottom(of: subTitleTextView, offset: 10.0)
     profileImageView.leftToSuperview(offset: 10.0)
     profileImageView.width(32.0)
     profileImageView.height(32.0)
@@ -134,6 +124,16 @@ class ANIStoryViewCell: UICollectionViewCell {
     userNameLabel.centerY(to: profileImageView)
     userNameLabel.height(20.0)
     self.userNameLabel = userNameLabel
+    
+    //line
+    let line = UIImageView()
+    line.image = UIImage(named: "line")
+    addSubview(line)
+    line.topToBottom(of: profileImageView, offset: 10.0)
+    line.leftToSuperview()
+    line.rightToSuperview()
+    line.height(0.5)
+    self.line = line
   }
 }
 
