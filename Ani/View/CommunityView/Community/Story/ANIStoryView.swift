@@ -50,9 +50,9 @@ class ANIStoryView: UIView {
     let user1 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
     let user2 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki")
     let user3 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
-    let story1 = Story(storyImages: [cat1, cat2, cat3], title: "우리 고양이가 침대에 똥을 쌌어!!", subTitle: "이것저것 내용을 적을꺼야 으흐므흐믛 내용이 생각안나니까 대충적어놓을꺼야 으흐므흐므흠", user: user1, loveCount: 10, commentCount: 10)
-    let story2 = Story(storyImages: [cat2, cat1, cat3, cat4], title: "우리 고양이가 침대에 똥을 쌌어!!", subTitle: "이것저것 내용을 적을꺼야 으흐므흐믛 내용이 생각안나니까 대충적어놓을꺼야 으흐므흐므흠", user: user2, loveCount: 5, commentCount: 8)
-    let story3 = Story(storyImages: [cat3, cat2, cat1], title: "우리 고양이가 침대에 똥을 쌌어!!", subTitle: "이것저것 내용을 적을꺼야 으흐므흐믛 내용이 생각안나니까 대충적어놓을꺼야 으흐므흐므흠", user: user3, loveCount: 15, commentCount: 20)
+    let story1 = Story(storyImages: [cat1, cat2, cat3], title: "うちの猫がベッドでうんこしたよおおお！", subTitle: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user1, loveCount: 10, commentCount: 10)
+    let story2 = Story(storyImages: [cat2, cat1, cat3, cat4], title: "うちの猫がベッドでうんこしたよおおお！", subTitle: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user2, loveCount: 5, commentCount: 8)
+    let story3 = Story(storyImages: [cat3, cat2, cat1], title: "うちの猫がベッドでうんこしたよおおお！", subTitle: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user3, loveCount: 15, commentCount: 20)
     self.testStoryLists = [story1, story2, story3]
   }
 }
