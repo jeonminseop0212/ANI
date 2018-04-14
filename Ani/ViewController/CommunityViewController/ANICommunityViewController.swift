@@ -25,7 +25,6 @@ class ANICommunityViewController: UIViewController {
     //basic
     Orientation.lockOrientation(.portrait)
     navigationController?.setNavigationBarHidden(true, animated: false)
-    self.view.backgroundColor = .white
     
     //container
     let flowLayout = UICollectionViewFlowLayout()
@@ -37,7 +36,7 @@ class ANICommunityViewController: UIViewController {
     containerCollectionView.dataSource = self
     containerCollectionView.delegate = self
     containerCollectionView.showsHorizontalScrollIndicator = false
-    containerCollectionView.backgroundColor = .white
+    containerCollectionView.backgroundColor = ANIColor.bg
     containerCollectionView.isPagingEnabled = true
     let storyId = NSStringFromClass(ANICommunityStoryCell.self)
     containerCollectionView.register(ANICommunityStoryCell.self, forCellWithReuseIdentifier: storyId)

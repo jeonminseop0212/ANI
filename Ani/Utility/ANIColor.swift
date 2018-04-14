@@ -14,4 +14,5 @@ struct ANIColor {
   static var dark = UIColor(red: 48, green: 48, blue: 48)
   static var gray = UIColor(red: 216, green: 216, blue: 216)
   static var green = UIColor(red: 103, green: 219, blue: 64)
+  static var bg = UIColor(red: 244, green: 244, blue: 244)
 }
