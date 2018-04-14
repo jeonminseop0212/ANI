@@ -12,7 +12,6 @@ class ANIRecruitViewCell: UICollectionViewCell {
   var recruitImageView = UIImageView()
   var titleLabel = UILabel()
   var subTitleTextView = UITextView()
-  var line = UIImageView()
   var profileImageView = UIImageView()
   var userNameLabel = UILabel()
   var supportCountLabel = UILabel()
@@ -20,6 +19,7 @@ class ANIRecruitViewCell: UICollectionViewCell {
   var loveButton = UIButton()
   var loveCountLabel = UILabel()
   var clipButton = UIButton()
+  var line = UIImageView()
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -67,20 +67,10 @@ class ANIRecruitViewCell: UICollectionViewCell {
     subTitleTextView.height(80.0)
     self.subTitleTextView = subTitleTextView
     
-    //line
-    let line = UIImageView()
-    line.image = UIImage(named: "line")
-    addSubview(line)
-    line.topToBottom(of: subTitleTextView)
-    line.leftToSuperview()
-    line.rightToSuperview()
-    line.height(0.5)
-    self.line = line
-    
     //profileImageView
     let profileImageView = UIImageView()
     addSubview(profileImageView)
-    profileImageView.topToBottom(of: line, offset: 10.0)
+    profileImageView.topToBottom(of: subTitleTextView, offset: 10.0)
     profileImageView.leftToSuperview(offset: 10.0)
     profileImageView.width(32.0)
     profileImageView.height(32.0)
@@ -146,5 +136,15 @@ class ANIRecruitViewCell: UICollectionViewCell {
     userNameLabel.centerY(to: profileImageView)
     userNameLabel.height(20.0)
     self.userNameLabel = userNameLabel
+    
+    //line
+    let line = UIImageView()
+    line.image = UIImage(named: "line")
+    addSubview(line)
+    line.topToBottom(of: profileImageView, offset: 10.0)
+    line.leftToSuperview()
+    line.rightToSuperview()
+    line.height(0.5)
+    self.line = line
   }
 }
