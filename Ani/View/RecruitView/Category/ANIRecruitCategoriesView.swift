@@ -43,7 +43,7 @@ class ANIRecruitCategoriesView: UIView {
   }
   
   private func setTestModel() {
-    let arr = ["고양이", "강아지", "뱀", "햄스터", "금붕어"]
+    let arr = ["シャム", "ペルシャ", "スコティッシュフォールド", "アメリカン・ショートヘア", "バーマン", "ブリティッシュショートヘア", "ミックス"]
     self.testArr = arr
   }
 }

@@ -51,9 +51,9 @@ class ANIQnaView: UIView {
     let user1 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
     let user2 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki")
     let user3 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
-    let qna1 = Qna(qnaImages: [cat1, cat2, cat3], subTitle: "이것저것 내용을 적을꺼야 으흐므흐믛 내용이 생각안나니까 대충적어 놓을꺼야이것저것 내용을 적을꺼야 으흐므흐믛 내용이 생각안나니까 대충적어 놓을꺼야", user: user1, loveCount: 10, commentCount: 5)
-    let qna2 = Qna(qnaImages: [cat2, cat1, cat3, cat4], subTitle: "이것저것 내용을 적을꺼야 으흐므흐믛 내용이 생각안나니까 대충적어 놓을꺼야이것저것 내용을 적을꺼야 으흐므흐믛 내용이 생각안나니까 대충적어 놓을꺼야", user: user2, loveCount: 5, commentCount: 5)
-    let qna3 = Qna(qnaImages: [cat3, cat2, cat1], subTitle: "이것저것 내용을 적을꺼야 으흐므흐믛 내용이 생각안나니까 대충적어 놓을꺼야이것저것 내용을 적을꺼야 으흐므흐믛 내용이 생각안나니까 대충적어 놓을꺼야", user: user3, loveCount: 15, commentCount: 10)
+    let qna1 = Qna(qnaImages: [cat1, cat2, cat3], subTitle: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user1, loveCount: 10, commentCount: 5)
+    let qna2 = Qna(qnaImages: [cat2, cat1, cat3, cat4], subTitle: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user2, loveCount: 5, commentCount: 5)
+    let qna3 = Qna(qnaImages: [cat3, cat2, cat1], subTitle: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user3, loveCount: 15, commentCount: 10)
     
     self.testQnaLists = [qna1, qna2, qna3]
   }

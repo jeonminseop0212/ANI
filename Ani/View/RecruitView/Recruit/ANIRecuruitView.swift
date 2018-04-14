@@ -46,9 +46,9 @@ class ANIRecuruitView: UIView {
     let user1 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
     let user2 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki")
     let user3 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
-    let recruit1 = Recurit(recruitImage: UIImage(named: "cat1")!, title: "귀여운 고양이 분양받아가세요 >_<", subTitle: "이것저것 내용을 적을꺼야 으흐므흐믛 내용이 생각안나니까 대충적어 놓을꺼야이것저것 내용을 적을꺼야 으흐므흐믛 내용이 생각안나니까 대충적어 놓을꺼야", user: user1, supportCount: 10, loveCount: 10)
-    let recruit2 = Recurit(recruitImage: UIImage(named: "cat2")!, title: "귀여운 고양이 분양받아가세요 >_<", subTitle: "이것저것 내용을 적을꺼야 으흐므흐믛 내용이 생각안나니까 대충적어 놓을꺼야이것저것 내용을 적을꺼야 으흐므흐믛 내용이 생각안나니까 대충적어 놓을꺼야", user: user2, supportCount: 5, loveCount: 15)
-    let recruit3 = Recurit(recruitImage: UIImage(named: "cat1")!, title: "귀여운 고양이 분양받아가세요 >_<", subTitle: "이것저것 내용을 적을꺼야 으흐므흐믛 내용이 생각안나니까 대충적어 놓을꺼야이것저것 내용을 적을꺼야 으흐므흐믛 내용이 생각안나니까 대충적어 놓을꺼야", user: user3, supportCount: 10, loveCount: 10)
+    let recruit1 = Recurit(recruitImage: UIImage(named: "cat1")!, title: "かわいい猫ちゃんの里親になって >_<", subTitle: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user1, supportCount: 10, loveCount: 10)
+    let recruit2 = Recurit(recruitImage: UIImage(named: "cat2")!, title: "かわいい猫ちゃんの里親になって >_<", subTitle: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user2, supportCount: 5, loveCount: 15)
+    let recruit3 = Recurit(recruitImage: UIImage(named: "cat1")!, title: "かわいい猫ちゃんの里親になって >_<", subTitle: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user3, supportCount: 10, loveCount: 10)
     self.testRecruitLists = [recruit1, recruit2, recruit3]
   }
 }
