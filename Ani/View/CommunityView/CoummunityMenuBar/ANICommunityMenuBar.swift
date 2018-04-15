@@ -50,7 +50,7 @@ class ANICommunityMenuBar: UIView {
     addSubview(horizontalBar)
     horizontalBarleftConstraint = horizontalBar.leftToSuperview()
     horizontalBar.widthToSuperview(multiplier: 1/2)
-    horizontalBar.height(5.0)
+    horizontalBar.height(3.0)
     horizontalBar.bottomToSuperview()
   }
 }
