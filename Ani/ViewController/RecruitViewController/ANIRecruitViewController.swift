@@ -45,6 +45,15 @@ class ANIRecruitViewController: ScrollingNavigationViewController {
 //    searchBar.delegate = self
     navigationItem.titleView = searchBar
     
+    //navigation bar right item
+    let filterImage = UIImage(named: "filter")?.withRenderingMode(.alwaysOriginal)
+    let filterButton = UIButton(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
+    filterButton.setImage(filterImage, for: .normal)
+    filterButton.addTarget(self, action: #selector(filter), for: .touchUpInside)
+    let rightBarButton = UIBarButtonItem()
+    rightBarButton.customView = filterButton
+    navigationItem.rightBarButtonItem = rightBarButton
+    
     //rcruitView
     let recruitView = ANIRecuruitView()
     self.view.addSubview(recruitView)
@@ -59,6 +68,10 @@ class ANIRecruitViewController: ScrollingNavigationViewController {
     categoriesView.rightToSuperview()
     categoriesView.height(ANIRecruitViewController.CATEGORIES_VIEW_HEIGHT)
     self.categoriesView = categoriesView
+  }
+  
+  @objc func filter() {
+    print("filtering")
   }
 }
 
