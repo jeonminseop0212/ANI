@@ -26,6 +26,10 @@ class ANITabBarController: UITabBarController {
     let communityVC = ANICommunityViewController()
     communityVC.tabBarItem = UITabBarItem(tabBarSystemItem: .bookmarks, tag: 2)
     let communityNV = UINavigationController(rootViewController: communityVC)
-    setViewControllers([recruitNV, communityNV], animated: false)
+    
+    let notiVC = ANINotiViewController()
+    notiVC.tabBarItem = UITabBarItem(tabBarSystemItem: .bookmarks, tag: 3)
+    let notiNV = UINavigationController(rootViewController: notiVC)
+    setViewControllers([recruitNV, communityNV, notiNV], animated: false)
   }
 }
