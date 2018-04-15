@@ -11,8 +11,18 @@
 		F51D221220767F03009D1B26 /* UIColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F51D221120767F03009D1B26 /* UIColor.swift */; };
 		F51D221520768B24009D1B26 /* UISearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F51D221420768B24009D1B26 /* UISearchBar.swift */; };
 		F51D221920768E8D009D1B26 /* ANIRecuruitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F51D221820768E8D009D1B26 /* ANIRecuruitView.swift */; };
+		F521184C207A4421000B12C2 /* ANIStoryImagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F521184B207A4421000B12C2 /* ANIStoryImagesView.swift */; };
+		F530AB1C207A45D900114E6B /* ANIStoryImagesViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F530AB1B207A45D900114E6B /* ANIStoryImagesViewCell.swift */; };
 		F566348320752656006CB81B /* ANIRecruitCategoriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F566348220752656006CB81B /* ANIRecruitCategoriesView.swift */; };
 		F56634862075285D006CB81B /* ANIRecruitCategoryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F56634852075285D006CB81B /* ANIRecruitCategoryCell.swift */; };
+		F57F7D4A2081F43F008A2645 /* ANINotiViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57F7D492081F43F008A2645 /* ANINotiViewController.swift */; };
+		F57F7D4F2081FC64008A2645 /* ANiNotiMenuBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57F7D4E2081FC64008A2645 /* ANiNotiMenuBar.swift */; };
+		F57F7D512081FC71008A2645 /* ANINotiMenuBarCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57F7D502081FC71008A2645 /* ANINotiMenuBarCell.swift */; };
+		F57F7D552081FEB2008A2645 /* ANINotiNotiCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57F7D542081FEB2008A2645 /* ANINotiNotiCell.swift */; };
+		F57F7D572081FEBF008A2645 /* ANINotiMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57F7D562081FEBF008A2645 /* ANINotiMessageCell.swift */; };
+		F57F7D59208311C1008A2645 /* ANINotiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57F7D58208311C1008A2645 /* ANINotiView.swift */; };
+		F57F7D5D208313F0008A2645 /* Noti.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57F7D5C208313F0008A2645 /* Noti.swift */; };
+		F57F7D5F208314DF008A2645 /* ANINotiViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57F7D5E208314DF008A2645 /* ANINotiViewCell.swift */; };
 		F5B1EF9120725964000CFB0B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B1EF9020725964000CFB0B /* AppDelegate.swift */; };
 		F5B1EF9320725964000CFB0B /* ANIRecruitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B1EF9220725964000CFB0B /* ANIRecruitViewController.swift */; };
 		F5B1EF9820725964000CFB0B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F5B1EF9720725964000CFB0B /* Assets.xcassets */; };
@@ -21,9 +31,24 @@
 		F5B1EFB120725964000CFB0B /* AniUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B1EFB020725964000CFB0B /* AniUITests.swift */; };
 		F5B1EFC220725BDC000CFB0B /* ANITabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B1EFC120725BDC000CFB0B /* ANITabBarController.swift */; };
 		F5B1EFC520726658000CFB0B /* TinyConstraints.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5B1EFC420726658000CFB0B /* TinyConstraints.framework */; };
+		F5B5149A207AEDC300366500 /* Qna.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B51499207AEDC300366500 /* Qna.swift */; };
+		F5C381FD2079F73F000BBB8C /* ANICommunityStoryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5C381FC2079F73F000BBB8C /* ANICommunityStoryCell.swift */; };
+		F5C381FF207A068D000BBB8C /* ANIQnaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5C381FE207A068D000BBB8C /* ANIQnaView.swift */; };
+		F5DF835D207A17C200EA7FBE /* ANICommunityQnaCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5DF835C207A17C200EA7FBE /* ANICommunityQnaCell.swift */; };
+		F5DF8361207A1D4A00EA7FBE /* Story.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5DF8360207A1D4A00EA7FBE /* Story.swift */; };
+		F5DF8365207A27DC00EA7FBE /* ANIStoryViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5DF8364207A27DC00EA7FBE /* ANIStoryViewCell.swift */; };
+		F5DF8367207A27E900EA7FBE /* ANIQnaViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5DF8366207A27E900EA7FBE /* ANIQnaViewCell.swift */; };
 		F5E9E221207692C60021D4CC /* ANIRecruitViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E220207692C60021D4CC /* ANIRecruitViewCell.swift */; };
 		F5E9E2242076961E0021D4CC /* Recruit.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E2232076961D0021D4CC /* Recruit.swift */; };
 		F5E9E22620769AD60021D4CC /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E22520769AD60021D4CC /* User.swift */; };
+		F5E9E2292076C6470021D4CC /* ScrollingNavbar+Sizes.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E2282076C6470021D4CC /* ScrollingNavbar+Sizes.swift */; };
+		F5E9E22B2076C64F0021D4CC /* ScrollingNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E22A2076C64F0021D4CC /* ScrollingNavigationController.swift */; };
+		F5E9E22D2076C65A0021D4CC /* ScrollingNavigationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E22C2076C65A0021D4CC /* ScrollingNavigationViewController.swift */; };
+		F5E9E22F2079AEC30021D4CC /* Orientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E22E2079AEC30021D4CC /* Orientation.swift */; };
+		F5E9E2332079AFF40021D4CC /* ANICommunityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E2322079AFF40021D4CC /* ANICommunityViewController.swift */; };
+		F5E9E2372079B1900021D4CC /* ANICommunityMenuBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E2362079B1900021D4CC /* ANICommunityMenuBar.swift */; };
+		F5E9E2392079B9D20021D4CC /* ANICommunityMenuBarCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E2382079B9D20021D4CC /* ANICommunityMenuBarCell.swift */; };
+		F5E9E23D2079C10C0021D4CC /* ANIStoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E23C2079C10C0021D4CC /* ANIStoryView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,8 +73,18 @@
 		F51D221120767F03009D1B26 /* UIColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColor.swift; sourceTree = "<group>"; };
 		F51D221420768B24009D1B26 /* UISearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UISearchBar.swift; sourceTree = "<group>"; };
 		F51D221820768E8D009D1B26 /* ANIRecuruitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecuruitView.swift; sourceTree = "<group>"; };
+		F521184B207A4421000B12C2 /* ANIStoryImagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIStoryImagesView.swift; sourceTree = "<group>"; };
+		F530AB1B207A45D900114E6B /* ANIStoryImagesViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIStoryImagesViewCell.swift; sourceTree = "<group>"; };
 		F566348220752656006CB81B /* ANIRecruitCategoriesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitCategoriesView.swift; sourceTree = "<group>"; };
 		F56634852075285D006CB81B /* ANIRecruitCategoryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitCategoryCell.swift; sourceTree = "<group>"; };
+		F57F7D492081F43F008A2645 /* ANINotiViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotiViewController.swift; sourceTree = "<group>"; };
+		F57F7D4E2081FC64008A2645 /* ANiNotiMenuBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANiNotiMenuBar.swift; sourceTree = "<group>"; };
+		F57F7D502081FC71008A2645 /* ANINotiMenuBarCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotiMenuBarCell.swift; sourceTree = "<group>"; };
+		F57F7D542081FEB2008A2645 /* ANINotiNotiCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotiNotiCell.swift; sourceTree = "<group>"; };
+		F57F7D562081FEBF008A2645 /* ANINotiMessageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotiMessageCell.swift; sourceTree = "<group>"; };
+		F57F7D58208311C1008A2645 /* ANINotiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotiView.swift; sourceTree = "<group>"; };
+		F57F7D5C208313F0008A2645 /* Noti.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Noti.swift; sourceTree = "<group>"; };
+		F57F7D5E208314DF008A2645 /* ANINotiViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotiViewCell.swift; sourceTree = "<group>"; };
 		F5B1EF8D20725963000CFB0B /* Ani.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Ani.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5B1EF9020725964000CFB0B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F5B1EF9220725964000CFB0B /* ANIRecruitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitViewController.swift; sourceTree = "<group>"; };
@@ -64,9 +99,24 @@
 		F5B1EFB220725964000CFB0B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F5B1EFC120725BDC000CFB0B /* ANITabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANITabBarController.swift; sourceTree = "<group>"; };
 		F5B1EFC420726658000CFB0B /* TinyConstraints.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TinyConstraints.framework; path = Carthage/Build/iOS/TinyConstraints.framework; sourceTree = "<group>"; };
+		F5B51499207AEDC300366500 /* Qna.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Qna.swift; sourceTree = "<group>"; };
+		F5C381FC2079F73F000BBB8C /* ANICommunityStoryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommunityStoryCell.swift; sourceTree = "<group>"; };
+		F5C381FE207A068D000BBB8C /* ANIQnaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIQnaView.swift; sourceTree = "<group>"; };
+		F5DF835C207A17C200EA7FBE /* ANICommunityQnaCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommunityQnaCell.swift; sourceTree = "<group>"; };
+		F5DF8360207A1D4A00EA7FBE /* Story.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Story.swift; sourceTree = "<group>"; };
+		F5DF8364207A27DC00EA7FBE /* ANIStoryViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIStoryViewCell.swift; sourceTree = "<group>"; };
+		F5DF8366207A27E900EA7FBE /* ANIQnaViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIQnaViewCell.swift; sourceTree = "<group>"; };
 		F5E9E220207692C60021D4CC /* ANIRecruitViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitViewCell.swift; sourceTree = "<group>"; };
 		F5E9E2232076961D0021D4CC /* Recruit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Recruit.swift; sourceTree = "<group>"; };
 		F5E9E22520769AD60021D4CC /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		F5E9E2282076C6470021D4CC /* ScrollingNavbar+Sizes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ScrollingNavbar+Sizes.swift"; sourceTree = "<group>"; };
+		F5E9E22A2076C64F0021D4CC /* ScrollingNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollingNavigationController.swift; sourceTree = "<group>"; };
+		F5E9E22C2076C65A0021D4CC /* ScrollingNavigationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollingNavigationViewController.swift; sourceTree = "<group>"; };
+		F5E9E22E2079AEC30021D4CC /* Orientation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Orientation.swift; sourceTree = "<group>"; };
+		F5E9E2322079AFF40021D4CC /* ANICommunityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommunityViewController.swift; sourceTree = "<group>"; };
+		F5E9E2362079B1900021D4CC /* ANICommunityMenuBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommunityMenuBar.swift; sourceTree = "<group>"; };
+		F5E9E2382079B9D20021D4CC /* ANICommunityMenuBarCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommunityMenuBarCell.swift; sourceTree = "<group>"; };
+		F5E9E23C2079C10C0021D4CC /* ANIStoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIStoryView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,8 +148,10 @@
 		F51D220E20767E49009D1B26 /* Utility */ = {
 			isa = PBXGroup;
 			children = (
+				F5E9E2272076C62E0021D4CC /* ScrollingNavBar */,
 				F51D220F20767E62009D1B26 /* ANIColor.swift */,
 				F51D221320768B01009D1B26 /* Extensioin */,
+				F5E9E22E2079AEC30021D4CC /* Orientation.swift */,
 			);
 			path = Utility;
 			sourceTree = "<group>";
@@ -131,13 +183,75 @@
 			path = Recruit;
 			sourceTree = "<group>";
 		};
+		F521184D207A4428000B12C2 /* ImagesView */ = {
+			isa = PBXGroup;
+			children = (
+				F521184B207A4421000B12C2 /* ANIStoryImagesView.swift */,
+				F530AB1B207A45D900114E6B /* ANIStoryImagesViewCell.swift */,
+			);
+			path = ImagesView;
+			sourceTree = "<group>";
+		};
 		F56634842075265E006CB81B /* RecruitView */ = {
 			isa = PBXGroup;
 			children = (
-				F51D221720768E5F009D1B26 /* Recruit */,
 				F51D221620768E53009D1B26 /* Category */,
+				F51D221720768E5F009D1B26 /* Recruit */,
 			);
 			path = RecruitView;
+			sourceTree = "<group>";
+		};
+		F57F7D482081F3A1008A2645 /* NotiViewController */ = {
+			isa = PBXGroup;
+			children = (
+				F57F7D492081F43F008A2645 /* ANINotiViewController.swift */,
+			);
+			path = NotiViewController;
+			sourceTree = "<group>";
+		};
+		F57F7D4B2081FC26008A2645 /* NotiView */ = {
+			isa = PBXGroup;
+			children = (
+				F57F7D4C2081FC3D008A2645 /* NotiMenuBar */,
+				F57F7D4D2081FC47008A2645 /* Noti */,
+			);
+			path = NotiView;
+			sourceTree = "<group>";
+		};
+		F57F7D4C2081FC3D008A2645 /* NotiMenuBar */ = {
+			isa = PBXGroup;
+			children = (
+				F57F7D4E2081FC64008A2645 /* ANiNotiMenuBar.swift */,
+				F57F7D502081FC71008A2645 /* ANINotiMenuBarCell.swift */,
+			);
+			path = NotiMenuBar;
+			sourceTree = "<group>";
+		};
+		F57F7D4D2081FC47008A2645 /* Noti */ = {
+			isa = PBXGroup;
+			children = (
+				F57F7D522081FC8B008A2645 /* Noti */,
+				F57F7D532081FC9A008A2645 /* Message */,
+			);
+			path = Noti;
+			sourceTree = "<group>";
+		};
+		F57F7D522081FC8B008A2645 /* Noti */ = {
+			isa = PBXGroup;
+			children = (
+				F57F7D542081FEB2008A2645 /* ANINotiNotiCell.swift */,
+				F57F7D58208311C1008A2645 /* ANINotiView.swift */,
+				F57F7D5E208314DF008A2645 /* ANINotiViewCell.swift */,
+			);
+			path = Noti;
+			sourceTree = "<group>";
+		};
+		F57F7D532081FC9A008A2645 /* Message */ = {
+			isa = PBXGroup;
+			children = (
+				F57F7D562081FEBF008A2645 /* ANINotiMessageCell.swift */,
+			);
+			path = Message;
 			sourceTree = "<group>";
 		};
 		F5B1EF8420725963000CFB0B = {
@@ -166,8 +280,8 @@
 			children = (
 				F5B1EFBE20725B6C000CFB0B /* Supporting */,
 				F5E9E222207696060021D4CC /* Model */,
-				F5B1EFBF20725B79000CFB0B /* RecruitViewController */,
-				F56634842075265E006CB81B /* RecruitView */,
+				F5E9E2302079AF8C0021D4CC /* ViewController */,
+				F5E9E2342079B1660021D4CC /* View */,
 				F5B1EFC020725B86000CFB0B /* TabbarController */,
 				F51D220E20767E49009D1B26 /* Utility */,
 				F5B1EF9C20725964000CFB0B /* Info.plist */,
@@ -227,13 +341,102 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		F5DF835E207A1CA300EA7FBE /* Story */ = {
+			isa = PBXGroup;
+			children = (
+				F5C381FC2079F73F000BBB8C /* ANICommunityStoryCell.swift */,
+				F5E9E23C2079C10C0021D4CC /* ANIStoryView.swift */,
+				F5DF8364207A27DC00EA7FBE /* ANIStoryViewCell.swift */,
+				F521184D207A4428000B12C2 /* ImagesView */,
+			);
+			path = Story;
+			sourceTree = "<group>";
+		};
+		F5DF835F207A1CB000EA7FBE /* Qna */ = {
+			isa = PBXGroup;
+			children = (
+				F5DF835C207A17C200EA7FBE /* ANICommunityQnaCell.swift */,
+				F5C381FE207A068D000BBB8C /* ANIQnaView.swift */,
+				F5DF8366207A27E900EA7FBE /* ANIQnaViewCell.swift */,
+			);
+			path = Qna;
+			sourceTree = "<group>";
+		};
 		F5E9E222207696060021D4CC /* Model */ = {
 			isa = PBXGroup;
 			children = (
 				F5E9E2232076961D0021D4CC /* Recruit.swift */,
 				F5E9E22520769AD60021D4CC /* User.swift */,
+				F5DF8360207A1D4A00EA7FBE /* Story.swift */,
+				F5B51499207AEDC300366500 /* Qna.swift */,
+				F57F7D5C208313F0008A2645 /* Noti.swift */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		F5E9E2272076C62E0021D4CC /* ScrollingNavBar */ = {
+			isa = PBXGroup;
+			children = (
+				F5E9E2282076C6470021D4CC /* ScrollingNavbar+Sizes.swift */,
+				F5E9E22A2076C64F0021D4CC /* ScrollingNavigationController.swift */,
+				F5E9E22C2076C65A0021D4CC /* ScrollingNavigationViewController.swift */,
+			);
+			path = ScrollingNavBar;
+			sourceTree = "<group>";
+		};
+		F5E9E2302079AF8C0021D4CC /* ViewController */ = {
+			isa = PBXGroup;
+			children = (
+				F5B1EFBF20725B79000CFB0B /* RecruitViewController */,
+				F5E9E2312079AFA40021D4CC /* CommunityViewController */,
+				F57F7D482081F3A1008A2645 /* NotiViewController */,
+			);
+			path = ViewController;
+			sourceTree = "<group>";
+		};
+		F5E9E2312079AFA40021D4CC /* CommunityViewController */ = {
+			isa = PBXGroup;
+			children = (
+				F5E9E2322079AFF40021D4CC /* ANICommunityViewController.swift */,
+			);
+			path = CommunityViewController;
+			sourceTree = "<group>";
+		};
+		F5E9E2342079B1660021D4CC /* View */ = {
+			isa = PBXGroup;
+			children = (
+				F56634842075265E006CB81B /* RecruitView */,
+				F5E9E2352079B16F0021D4CC /* CommunityView */,
+				F57F7D4B2081FC26008A2645 /* NotiView */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		F5E9E2352079B16F0021D4CC /* CommunityView */ = {
+			isa = PBXGroup;
+			children = (
+				F5E9E23A2079C0B00021D4CC /* CoummunityMenuBar */,
+				F5E9E23B2079C0BD0021D4CC /* Community */,
+			);
+			path = CommunityView;
+			sourceTree = "<group>";
+		};
+		F5E9E23A2079C0B00021D4CC /* CoummunityMenuBar */ = {
+			isa = PBXGroup;
+			children = (
+				F5E9E2362079B1900021D4CC /* ANICommunityMenuBar.swift */,
+				F5E9E2382079B9D20021D4CC /* ANICommunityMenuBarCell.swift */,
+			);
+			path = CoummunityMenuBar;
+			sourceTree = "<group>";
+		};
+		F5E9E23B2079C0BD0021D4CC /* Community */ = {
+			isa = PBXGroup;
+			children = (
+				F5DF835E207A1CA300EA7FBE /* Story */,
+				F5DF835F207A1CB000EA7FBE /* Qna */,
+			);
+			path = Community;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -388,17 +591,42 @@
 			buildActionMask = 2147483647;
 			files = (
 				F56634862075285D006CB81B /* ANIRecruitCategoryCell.swift in Sources */,
+				F5E9E22B2076C64F0021D4CC /* ScrollingNavigationController.swift in Sources */,
+				F57F7D4A2081F43F008A2645 /* ANINotiViewController.swift in Sources */,
 				F51D221220767F03009D1B26 /* UIColor.swift in Sources */,
+				F57F7D59208311C1008A2645 /* ANINotiView.swift in Sources */,
+				F5C381FD2079F73F000BBB8C /* ANICommunityStoryCell.swift in Sources */,
 				F5B1EFC220725BDC000CFB0B /* ANITabBarController.swift in Sources */,
+				F57F7D5D208313F0008A2645 /* Noti.swift in Sources */,
 				F5E9E2242076961E0021D4CC /* Recruit.swift in Sources */,
+				F5DF835D207A17C200EA7FBE /* ANICommunityQnaCell.swift in Sources */,
 				F51D221920768E8D009D1B26 /* ANIRecuruitView.swift in Sources */,
+				F5E9E2292076C6470021D4CC /* ScrollingNavbar+Sizes.swift in Sources */,
+				F5C381FF207A068D000BBB8C /* ANIQnaView.swift in Sources */,
+				F5DF8367207A27E900EA7FBE /* ANIQnaViewCell.swift in Sources */,
+				F57F7D5F208314DF008A2645 /* ANINotiViewCell.swift in Sources */,
+				F57F7D552081FEB2008A2645 /* ANINotiNotiCell.swift in Sources */,
+				F5B5149A207AEDC300366500 /* Qna.swift in Sources */,
+				F521184C207A4421000B12C2 /* ANIStoryImagesView.swift in Sources */,
+				F57F7D4F2081FC64008A2645 /* ANiNotiMenuBar.swift in Sources */,
+				F57F7D512081FC71008A2645 /* ANINotiMenuBarCell.swift in Sources */,
 				F566348320752656006CB81B /* ANIRecruitCategoriesView.swift in Sources */,
+				F5DF8365207A27DC00EA7FBE /* ANIStoryViewCell.swift in Sources */,
+				F5E9E22F2079AEC30021D4CC /* Orientation.swift in Sources */,
+				F5E9E2372079B1900021D4CC /* ANICommunityMenuBar.swift in Sources */,
 				F5B1EF9320725964000CFB0B /* ANIRecruitViewController.swift in Sources */,
 				F51D221520768B24009D1B26 /* UISearchBar.swift in Sources */,
+				F5E9E2392079B9D20021D4CC /* ANICommunityMenuBarCell.swift in Sources */,
+				F5E9E23D2079C10C0021D4CC /* ANIStoryView.swift in Sources */,
+				F5E9E22D2076C65A0021D4CC /* ScrollingNavigationViewController.swift in Sources */,
+				F57F7D572081FEBF008A2645 /* ANINotiMessageCell.swift in Sources */,
+				F530AB1C207A45D900114E6B /* ANIStoryImagesViewCell.swift in Sources */,
+				F5E9E2332079AFF40021D4CC /* ANICommunityViewController.swift in Sources */,
 				F5E9E22620769AD60021D4CC /* User.swift in Sources */,
 				F51D221020767E62009D1B26 /* ANIColor.swift in Sources */,
 				F5E9E221207692C60021D4CC /* ANIRecruitViewCell.swift in Sources */,
 				F5B1EF9120725964000CFB0B /* AppDelegate.swift in Sources */,
+				F5DF8361207A1D4A00EA7FBE /* Story.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
