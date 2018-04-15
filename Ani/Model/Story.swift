@@ -10,7 +10,6 @@ import UIKit
 
 struct Story {
   let storyImages: [UIImage]
-  let title: String
   let subTitle: String
   let user: User
   let loveCount: Int

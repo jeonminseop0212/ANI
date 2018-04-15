@@ -10,7 +10,6 @@ import UIKit
 
 class ANIStoryViewCell: UICollectionViewCell {
   var storyImagesView = ANIStoryImagesView()
-  var titleLabel = UILabel()
   var subTitleTextView = UITextView()
   var line = UIImageView()
   var profileImageView = UIImageView()
@@ -38,18 +37,6 @@ class ANIStoryViewCell: UICollectionViewCell {
     storyImagesView.rightToSuperview()
     storyImagesView.height(200.0 + ANIStoryImagesView.PAGE_CONTROL_HEIGHT)
     self.storyImagesView = storyImagesView
-    
-    //titleLabel
-    let titleLabel = UILabel()
-    titleLabel.font = UIFont.boldSystemFont(ofSize: 17.0)
-    titleLabel.textAlignment = .left
-    titleLabel.textColor = ANIColor.dark
-    addSubview(titleLabel)
-    titleLabel.topToBottom(of: storyImagesView, offset: 10.0)
-    titleLabel.leftToSuperview(offset: 10.0)
-    titleLabel.rightToSuperview(offset: 10.0)
-    titleLabel.height(20.0)
-    self.titleLabel = titleLabel
 
     //subTitleTextView
     let subTitleTextView = UITextView()
@@ -59,7 +46,7 @@ class ANIStoryViewCell: UICollectionViewCell {
     subTitleTextView.textColor = ANIColor.subTitle
     subTitleTextView.isEditable = false
     addSubview(subTitleTextView)
-    subTitleTextView.topToBottom(of: titleLabel, offset: 2.0)
+    subTitleTextView.topToBottom(of: storyImagesView, offset: 10.0)
     subTitleTextView.leftToSuperview(offset: 5.0)
     subTitleTextView.rightToSuperview(offset: 5.0)
     subTitleTextView.height(60.0)
