@@ -9,6 +9,9 @@
 import UIKit
 
 class ANINotiNotiCell: UICollectionViewCell {
+  
+  private weak var notiView: ANINotiView?
+  
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()
@@ -19,6 +22,9 @@ class ANINotiNotiCell: UICollectionViewCell {
   }
   
   private func setup() {
-    backgroundColor = .green
+    let notiView = ANINotiView()
+    addSubview(notiView)
+    notiView.edgesToSuperview()
+    self.notiView = notiView
   }
 }
