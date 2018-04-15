@@ -9,6 +9,9 @@
 import UIKit
 
 class ANINotiMessageCell: UICollectionViewCell {
+  
+  private weak var messageView: ANIMessageView?
+  
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()
@@ -19,6 +22,9 @@ class ANINotiMessageCell: UICollectionViewCell {
   }
   
   private func setup() {
-    backgroundColor = .yellow
+    let messageView = ANIMessageView()
+    addSubview(messageView)
+    messageView.edgesToSuperview()
+    self.messageView = messageView
   }
 }
