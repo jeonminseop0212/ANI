@@ -8,10 +8,10 @@
 
 import UIKit
 
-class ANIRecruitViewCell: UICollectionViewCell {
+class ANIRecruitViewCell: UITableViewCell {
   var recruitImageView = UIImageView()
   var titleLabel = UILabel()
-  var subTitleTextView = UITextView()
+  var subTitleLabel = UILabel()
   var profileImageView = UIImageView()
   var userNameLabel = UILabel()
   var supportCountLabel = UILabel()
@@ -21,8 +21,8 @@ class ANIRecruitViewCell: UICollectionViewCell {
   var clipButton = UIButton()
   var line = UIImageView()
   
-  override init(frame: CGRect) {
-    super.init(frame: frame)
+  override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+    super.init(style: style, reuseIdentifier: reuseIdentifier)
     setup()
   }
   
@@ -31,6 +31,7 @@ class ANIRecruitViewCell: UICollectionViewCell {
   }
   
   private func setup() {
+    self.selectionStyle = .none
     //recruitImageView
     let recruitImageView = UIImageView()
     recruitImageView.contentMode = .redraw
@@ -53,24 +54,21 @@ class ANIRecruitViewCell: UICollectionViewCell {
     titleLabel.height(20.0)
     self.titleLabel = titleLabel
     
-    //subTitleTextView
-    let subTitleTextView = UITextView()
-    subTitleTextView.font = UIFont.systemFont(ofSize: 14.0)
-    subTitleTextView.textAlignment = .left
-    subTitleTextView.isScrollEnabled = false
-    subTitleTextView.textColor = ANIColor.subTitle
-    subTitleTextView.isEditable = false
-    addSubview(subTitleTextView)
-    subTitleTextView.topToBottom(of: titleLabel, offset: 2.0)
-    subTitleTextView.leftToSuperview(offset: 5.0)
-    subTitleTextView.rightToSuperview(offset: 5.0)
-    subTitleTextView.height(80.0)
-    self.subTitleTextView = subTitleTextView
+    //subTitleLabel
+    let subTitleLabel = UILabel()
+    subTitleLabel.numberOfLines = 3
+    subTitleLabel.font = UIFont.systemFont(ofSize: 14.0)
+    subTitleLabel.textColor = ANIColor.subTitle
+    addSubview(subTitleLabel)
+    subTitleLabel.topToBottom(of: titleLabel, offset: 10.0)
+    subTitleLabel.leftToSuperview(offset: 10.0)
+    subTitleLabel.rightToSuperview(offset: 10.0)
+    self.subTitleLabel = subTitleLabel
     
     //profileImageView
     let profileImageView = UIImageView()
     addSubview(profileImageView)
-    profileImageView.topToBottom(of: subTitleTextView, offset: 10.0)
+    profileImageView.topToBottom(of: subTitleLabel, offset: 10.0)
     profileImageView.leftToSuperview(offset: 10.0)
     profileImageView.width(32.0)
     profileImageView.height(32.0)
@@ -145,6 +143,7 @@ class ANIRecruitViewCell: UICollectionViewCell {
     line.leftToSuperview()
     line.rightToSuperview()
     line.height(0.5)
+    line.bottomToSuperview()
     self.line = line
   }
 }

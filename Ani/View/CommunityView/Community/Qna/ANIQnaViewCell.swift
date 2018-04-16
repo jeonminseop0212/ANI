@@ -8,8 +8,8 @@
 
 import UIKit
 
-class ANIQnaViewCell: UICollectionViewCell {
-  var subTitleTextView = UITextView()
+class ANIQnaViewCell: UITableViewCell {
+  var subTitleLabel = UILabel()
   var profileImageView = UIImageView()
   var userNameLabel = UILabel()
   var qnaImageView = UIImageView()
@@ -18,8 +18,8 @@ class ANIQnaViewCell: UICollectionViewCell {
   var commentButton = UIButton()
   var commentCountLabel = UILabel()
   
-  override init(frame: CGRect) {
-    super.init(frame: frame)
+  override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+    super.init(style: style, reuseIdentifier: reuseIdentifier)
     setup()
   }
   
@@ -29,19 +29,16 @@ class ANIQnaViewCell: UICollectionViewCell {
   
   private func setup() {
     self.backgroundColor = .white
-    //subTitleTextView
-    let subTitleTextView = UITextView()
-    subTitleTextView.font = UIFont.systemFont(ofSize: 14.0)
-    subTitleTextView.textAlignment = .left
-    subTitleTextView.isScrollEnabled = false
-    subTitleTextView.textColor = ANIColor.subTitle
-    subTitleTextView.isEditable = false
-    addSubview(subTitleTextView)
-    subTitleTextView.topToSuperview(offset: 5.0)
-    subTitleTextView.leftToSuperview(offset: 5.0)
-    subTitleTextView.rightToSuperview(offset: 5.0)
-    subTitleTextView.height(50.0)
-    self.subTitleTextView = subTitleTextView
+    //subTitleLabel
+    let subTitleLabel = UILabel()
+    subTitleLabel.font = UIFont.systemFont(ofSize: 14.0)
+    subTitleLabel.textColor = ANIColor.subTitle
+    subTitleLabel.numberOfLines = 0
+    addSubview(subTitleLabel)
+    subTitleLabel.topToSuperview(offset: 10.0)
+    subTitleLabel.leftToSuperview(offset: 10.0)
+    subTitleLabel.rightToSuperview(offset: 10.0)
+    self.subTitleLabel = subTitleLabel
     
     //qnaImageView
     let qnaImageView = UIImageView()
@@ -49,7 +46,7 @@ class ANIQnaViewCell: UICollectionViewCell {
     qnaImageView.layer.masksToBounds = true
     qnaImageView.contentMode = .redraw
     addSubview(qnaImageView)
-    qnaImageView.topToBottom(of: subTitleTextView, offset: 5.0)
+    qnaImageView.topToBottom(of: subTitleLabel, offset: 10.0)
     qnaImageView.leftToSuperview(offset: 10.0)
     qnaImageView.rightToSuperview(offset: 10.0)
     qnaImageView.height(200.0)
@@ -65,6 +62,16 @@ class ANIQnaViewCell: UICollectionViewCell {
     profileImageView.layer.cornerRadius = profileImageView.constraints[0].constant / 2
     profileImageView.layer.masksToBounds = true
     self.profileImageView = profileImageView
+    
+    //bottomSpace
+    let spaceView = UIView()
+    spaceView.backgroundColor = ANIColor.bg
+    addSubview(spaceView)
+    spaceView.topToBottom(of: profileImageView, offset: 10)
+    spaceView.leftToSuperview()
+    spaceView.rightToSuperview()
+    spaceView.height(10.0)
+    spaceView.bottomToSuperview()
 
     //userNameLabel
     let userNameLabel = UILabel()

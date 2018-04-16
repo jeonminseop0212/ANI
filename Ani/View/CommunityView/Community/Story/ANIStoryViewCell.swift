@@ -8,9 +8,9 @@
 
 import UIKit
 
-class ANIStoryViewCell: UICollectionViewCell {
+class ANIStoryViewCell: UITableViewCell {
   var storyImagesView = ANIStoryImagesView()
-  var subTitleTextView = UITextView()
+  var subTitleLabel = UILabel()
   var line = UIImageView()
   var profileImageView = UIImageView()
   var userNameLabel = UILabel()
@@ -19,8 +19,8 @@ class ANIStoryViewCell: UICollectionViewCell {
   var commentButton = UIButton()
   var commentCountLabel = UILabel()
   
-  override init(frame: CGRect) {
-    super.init(frame: frame)
+  override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+    super.init(style: style, reuseIdentifier: reuseIdentifier)
     setup()
   }
   
@@ -29,6 +29,8 @@ class ANIStoryViewCell: UICollectionViewCell {
   }
   
   private func setup() {
+    self.selectionStyle = .none
+
     //storyImageView
     let storyImagesView = ANIStoryImagesView()
     addSubview(storyImagesView)
@@ -38,24 +40,22 @@ class ANIStoryViewCell: UICollectionViewCell {
     storyImagesView.height(200.0 + ANIStoryImagesView.PAGE_CONTROL_HEIGHT)
     self.storyImagesView = storyImagesView
 
-    //subTitleTextView
-    let subTitleTextView = UITextView()
-    subTitleTextView.font = UIFont.systemFont(ofSize: 14.0)
-    subTitleTextView.textAlignment = .left
-    subTitleTextView.isScrollEnabled = false
-    subTitleTextView.textColor = ANIColor.subTitle
-    subTitleTextView.isEditable = false
-    addSubview(subTitleTextView)
-    subTitleTextView.topToBottom(of: storyImagesView, offset: 10.0)
-    subTitleTextView.leftToSuperview(offset: 5.0)
-    subTitleTextView.rightToSuperview(offset: 5.0)
-    subTitleTextView.height(60.0)
-    self.subTitleTextView = subTitleTextView
+    //subTitleLabel
+    let subTitleLabel = UILabel()
+    subTitleLabel.font = UIFont.systemFont(ofSize: 14.0)
+    subTitleLabel.textAlignment = .left
+    subTitleLabel.textColor = ANIColor.subTitle
+    subTitleLabel.numberOfLines = 0
+    addSubview(subTitleLabel)
+    subTitleLabel.topToBottom(of: storyImagesView, offset: 10.0)
+    subTitleLabel.leftToSuperview(offset: 10.0)
+    subTitleLabel.rightToSuperview(offset: 10.0)
+    self.subTitleLabel = subTitleLabel
 
     //profileImageView
     let profileImageView = UIImageView()
     addSubview(profileImageView)
-    profileImageView.topToBottom(of: subTitleTextView, offset: 10.0)
+    profileImageView.topToBottom(of: subTitleLabel, offset: 10.0)
     profileImageView.leftToSuperview(offset: 10.0)
     profileImageView.width(32.0)
     profileImageView.height(32.0)
@@ -120,6 +120,7 @@ class ANIStoryViewCell: UICollectionViewCell {
     line.leftToSuperview()
     line.rightToSuperview()
     line.height(0.5)
+    line.bottomToSuperview()
     self.line = line
   }
 }
