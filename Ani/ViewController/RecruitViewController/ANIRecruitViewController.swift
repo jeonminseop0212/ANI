@@ -25,8 +25,8 @@ class ANIRecruitViewController: ScrollingNavigationViewController {
     if let navigationController = self.navigationController as? ScrollingNavigationController,
       let recruitView = self.recruitView,
       let categoriesView = self.categoriesView,
-      let recruitCollectionView = recruitView.recruitCollectionView {
-      navigationController.followScrollView(recruitCollectionView, delay: 0.0, followers: [categoriesView])
+      let recruitTableView = recruitView.recruitTableView {
+      navigationController.followScrollView(recruitTableView, delay: 0.0, followers: [categoriesView])
       navigationController.scrollingNavbarDelegate = self
     }
   }

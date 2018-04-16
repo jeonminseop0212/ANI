@@ -10,7 +10,7 @@ import UIKit
 
 class ANIStoryView: UIView {
   
-  var storyCollectionView: UICollectionView?
+  var storyTableView: UITableView?
   
   private var testStoryLists = [Story]()
   
@@ -25,21 +25,16 @@ class ANIStoryView: UIView {
   }
   
   private func setup() {
-    let flowLayout = UICollectionViewFlowLayout()
-    flowLayout.scrollDirection = .vertical
-    flowLayout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-    let collectionView = UICollectionView(frame: self.frame, collectionViewLayout: flowLayout)
-    collectionView.contentInset = UIEdgeInsets(top: ANICommunityViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: ANICommunityViewController.NAVIGATION_BAR_HEIGHT + ANICommunityViewController.STATUS_BAR_HEIGHT, right: 0)
-    collectionView.scrollIndicatorInsets  = UIEdgeInsets(top: ANICommunityViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: ANICommunityViewController.NAVIGATION_BAR_HEIGHT + ANICommunityViewController.STATUS_BAR_HEIGHT, right: 0)
+    let tableView = UITableView()
+    tableView.contentInset = UIEdgeInsets(top: ANICommunityViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: ANICommunityViewController.NAVIGATION_BAR_HEIGHT + ANICommunityViewController.STATUS_BAR_HEIGHT, right: 0)
+    tableView.scrollIndicatorInsets  = UIEdgeInsets(top: ANICommunityViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: ANICommunityViewController.NAVIGATION_BAR_HEIGHT + ANICommunityViewController.STATUS_BAR_HEIGHT, right: 0)
     let id = NSStringFromClass(ANIStoryViewCell.self)
-    collectionView.register(ANIStoryViewCell.self, forCellWithReuseIdentifier: id)
-    collectionView.backgroundColor = .white
-    collectionView.alwaysBounceVertical = true
-    collectionView.dataSource = self
-    collectionView.delegate = self
-    addSubview(collectionView)
-    collectionView.edgesToSuperview()
-    self.storyCollectionView = collectionView
+    tableView.register(ANIStoryViewCell.self, forCellReuseIdentifier: id)
+    tableView.separatorStyle = .none
+    tableView.dataSource = self
+    addSubview(tableView)
+    tableView.edgesToSuperview()
+    self.storyTableView = tableView
   }
   
   private func setupTestData() {
@@ -50,37 +45,29 @@ class ANIStoryView: UIView {
     let user1 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
     let user2 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki")
     let user3 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
-    let story1 = Story(storyImages: [cat1, cat2, cat3], subTitle: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user1, loveCount: 10, commentCount: 10)
+    let story1 = Story(storyImages: [cat1, cat2, cat3], subTitle: "あれこれ内容を書くところだよおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user1, loveCount: 10, commentCount: 10)
     let story2 = Story(storyImages: [cat2, cat1, cat3, cat4], subTitle: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user2, loveCount: 5, commentCount: 8)
     let story3 = Story(storyImages: [cat3, cat2, cat1], subTitle: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user3, loveCount: 15, commentCount: 20)
-    self.testStoryLists = [story1, story2, story3]
+    self.testStoryLists = [story1, story2, story3, story1, story2, story3]
   }
 }
 
-extension ANIStoryView: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
-  func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+extension ANIStoryView: UITableViewDataSource {
+  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     return testStoryLists.count
   }
   
-  func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let id = NSStringFromClass(ANIStoryViewCell.self)
-    let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! ANIStoryViewCell
+    let cell = tableView.dequeueReusableCell(withIdentifier: id, for: indexPath) as! ANIStoryViewCell
     cell.storyImagesView.images = testStoryLists[indexPath.item].storyImages
     cell.storyImagesView.pageControl?.numberOfPages = testStoryLists[indexPath.item].storyImages.count
-    cell.subTitleTextView.text = testStoryLists[indexPath.item].subTitle
+    cell.subTitleLabel.text = testStoryLists[indexPath.item].subTitle
     cell.profileImageView.image = testStoryLists[indexPath.item].user.profileImage
     cell.userNameLabel.text = testStoryLists[indexPath.item].user.name
     cell.loveCountLabel.text = "\(testStoryLists[indexPath.item].loveCount)"
     cell.commentCountLabel.text = "\(testStoryLists[indexPath.item].commentCount)"
     return cell
-  }
-  
-  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-    return CGSize(width: collectionView.frame.width, height: 400.0)
-  }
-  
-  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-    return 0.0
   }
 }
 
