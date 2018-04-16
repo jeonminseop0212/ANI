@@ -30,6 +30,11 @@ class ANITabBarController: UITabBarController {
     let notiVC = ANINotiViewController()
     notiVC.tabBarItem = UITabBarItem(tabBarSystemItem: .bookmarks, tag: 3)
     let notiNV = UINavigationController(rootViewController: notiVC)
-    setViewControllers([recruitNV, communityNV, notiNV], animated: false)
+    
+    let searchVC = ANISearchViewController()
+    searchVC.tabBarItem = UITabBarItem(tabBarSystemItem: .search, tag: 4)
+    let searchNV = ScrollingNavigationController(rootViewController: searchVC)
+    
+    setViewControllers([recruitNV, communityNV, notiNV, searchNV], animated: false)
   }
 }

@@ -10,7 +10,7 @@ import UIKit
 
 class ANIRecuruitView: UIView {
 
-  var recruitTableView: UITableView?
+  weak var recruitTableView: UITableView?
   
   private var testRecruitLists = [Recurit]()
 
