@@ -1,15 +1,15 @@
 //
-//  RecruitCategoriesView.swift
+//  ANISearchCategoriesView.swift
 //  Ani
 //
-//  Created by 전민섭 on 2018/04/05.
+//  Created by 전민섭 on 2018/04/16.
 //  Copyright © 2018年 JeonMinseop. All rights reserved.
 //
 
 import UIKit
 import TinyConstraints
 
-class ANIRecruitCategoriesView: UIView {
+class ANISearchCategoriesView: UIView {
   
   private weak var categoryCollectionView: UICollectionView?
   
@@ -30,8 +30,8 @@ class ANIRecruitCategoriesView: UIView {
     flowlayout.scrollDirection = .horizontal
     flowlayout.sectionInset = UIEdgeInsets(top: -10, left: 12, bottom: 0, right: 12)
     let collectionView = UICollectionView(frame: self.frame, collectionViewLayout: flowlayout)
-    let id = NSStringFromClass(ANIRecruitCategoryCell.self)
-    collectionView.register(ANIRecruitCategoryCell.self, forCellWithReuseIdentifier: id)
+    let id = NSStringFromClass(ANISearchCategoryCell.self)
+    collectionView.register(ANISearchCategoryCell.self, forCellWithReuseIdentifier: id)
     collectionView.backgroundColor = .white
     collectionView.showsHorizontalScrollIndicator = false
     collectionView.alwaysBounceHorizontal = true
@@ -43,19 +43,19 @@ class ANIRecruitCategoriesView: UIView {
   }
   
   private func setTestModel() {
-    let arr = ["シャム", "ペルシャ", "スコティッシュフォールド", "アメリカン・ショートヘア", "バーマン", "ブリティッシュショートヘア", "ミックス"]
+    let arr = ["ユーザー", "ストリー", "質問"]
     self.testArr = arr
   }
 }
 
-extension ANIRecruitCategoriesView: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+extension ANISearchCategoriesView: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
     return testArr.count
   }
   
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-    let id = NSStringFromClass(ANIRecruitCategoryCell.self)
-    let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! ANIRecruitCategoryCell
+    let id = NSStringFromClass(ANISearchCategoryCell.self)
+    let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! ANISearchCategoryCell
     cell.categoryLabel?.text = testArr[indexPath.item]
     cell.backgroundColor = ANIColor.lightGray
     cell.layer.cornerRadius = cell.frame.height / 2
@@ -64,7 +64,7 @@ extension ANIRecruitCategoriesView: UICollectionViewDataSource, UICollectionView
   }
   
   func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-    let size = ANIRecruitCategoryCell.sizeWithCategory(category: testArr[indexPath.item])
+    let size = ANISearchCategoryCell.sizeWithCategory(category: testArr[indexPath.item])
     return size
   }
 }
