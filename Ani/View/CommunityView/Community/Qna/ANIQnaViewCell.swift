@@ -28,6 +28,8 @@ class ANIQnaViewCell: UITableViewCell {
   }
   
   private func setup() {
+    self.selectionStyle = .none
+
     self.backgroundColor = .white
     //subTitleLabel
     let subTitleLabel = UILabel()
