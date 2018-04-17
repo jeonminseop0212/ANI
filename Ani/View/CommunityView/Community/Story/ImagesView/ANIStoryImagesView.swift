@@ -14,10 +14,17 @@ class ANIStoryImagesView: UIView {
   var pageControl: UIPageControl?
   static let PAGE_CONTROL_HEIGHT: CGFloat = 30.0
   
-  var images = [UIImage]()
+  var images = [UIImage]() {
+    didSet {
+      for subview in self.subviews{
+        subview.removeFromSuperview()
+      }
+      setup()
+    }
+  }
+  
   override init(frame: CGRect) {
     super.init(frame: frame)
-    setup()
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -70,7 +77,6 @@ extension ANIStoryImagesView: UICollectionViewDataSource, UICollectionViewDelega
     let id = NSStringFromClass(ANIStoryImagesViewCell.self)
     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! ANIStoryImagesViewCell
     cell.imageView?.image = images[indexPath.item]
-    cell.backgroundColor = .orange
     return cell
   }
   
