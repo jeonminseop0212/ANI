@@ -25,7 +25,7 @@ class ANISearchCategoryCell: UICollectionViewCell {
     let categoryLabel = UILabel()
     categoryLabel.textAlignment = .center
     categoryLabel.font = UIFont.boldSystemFont(ofSize: 14)
-    categoryLabel.textColor = ANIColor.dark
+    categoryLabel.textColor = ANIColor.subTitle
     addSubview(categoryLabel)
     categoryLabel.edgesToSuperview()
     self.categoryLabel = categoryLabel

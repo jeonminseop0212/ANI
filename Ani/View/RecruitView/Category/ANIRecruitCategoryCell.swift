@@ -25,7 +25,7 @@ class ANIRecruitCategoryCell: UICollectionViewCell {
     let categoryLabel = UILabel()
     categoryLabel.textAlignment = .center
     categoryLabel.font = UIFont.boldSystemFont(ofSize: 14.0)
-    categoryLabel.textColor = ANIColor.dark
+    categoryLabel.textColor = ANIColor.subTitle
     addSubview(categoryLabel)
     categoryLabel.edgesToSuperview()
     self.categoryLabel = categoryLabel
