@@ -15,6 +15,13 @@
 		F530AB1C207A45D900114E6B /* ANIStoryImagesViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F530AB1B207A45D900114E6B /* ANIStoryImagesViewCell.swift */; };
 		F53E87B72084608000B19A2F /* ANIUserSearchViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F53E87B62084608000B19A2F /* ANIUserSearchViewCell.swift */; };
 		F53E87BA208468DF00B19A2F /* ANIStorySearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F53E87B9208468DF00B19A2F /* ANIStorySearchView.swift */; };
+		F53E87BD2085AFC700B19A2F /* ANIProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F53E87BC2085AFC700B19A2F /* ANIProfileViewController.swift */; };
+		F53E87C12085B19700B19A2F /* ANIFamilyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F53E87C02085B19700B19A2F /* ANIFamilyView.swift */; };
+		F53E87C32085B50900B19A2F /* ANIFamilyViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F53E87C22085B50900B19A2F /* ANIFamilyViewCell.swift */; };
+		F53E87C62085F13800B19A2F /* ANIProfileMenuBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F53E87C52085F13800B19A2F /* ANIProfileMenuBar.swift */; };
+		F53E87C82085F5FA00B19A2F /* ANIProfileMenuBarCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F53E87C72085F5FA00B19A2F /* ANIProfileMenuBarCell.swift */; };
+		F53E87CC20861A7300B19A2F /* ANIProfileProfileCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F53E87CB20861A7300B19A2F /* ANIProfileProfileCell.swift */; };
+		F53E87D02086EF6600B19A2F /* profileTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F53E87CF2086EF6600B19A2F /* profileTableViewCell.swift */; };
 		F566348320752656006CB81B /* ANIRecruitCategoriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F566348220752656006CB81B /* ANIRecruitCategoriesView.swift */; };
 		F56634862075285D006CB81B /* ANIRecruitCategoryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F56634852075285D006CB81B /* ANIRecruitCategoryCell.swift */; };
 		F57F7D4A2081F43F008A2645 /* ANINotiViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57F7D492081F43F008A2645 /* ANINotiViewController.swift */; };
@@ -86,6 +93,13 @@
 		F530AB1B207A45D900114E6B /* ANIStoryImagesViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIStoryImagesViewCell.swift; sourceTree = "<group>"; };
 		F53E87B62084608000B19A2F /* ANIUserSearchViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIUserSearchViewCell.swift; sourceTree = "<group>"; };
 		F53E87B9208468DF00B19A2F /* ANIStorySearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIStorySearchView.swift; sourceTree = "<group>"; };
+		F53E87BC2085AFC700B19A2F /* ANIProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIProfileViewController.swift; sourceTree = "<group>"; };
+		F53E87C02085B19700B19A2F /* ANIFamilyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIFamilyView.swift; sourceTree = "<group>"; };
+		F53E87C22085B50900B19A2F /* ANIFamilyViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIFamilyViewCell.swift; sourceTree = "<group>"; };
+		F53E87C52085F13800B19A2F /* ANIProfileMenuBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIProfileMenuBar.swift; sourceTree = "<group>"; };
+		F53E87C72085F5FA00B19A2F /* ANIProfileMenuBarCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIProfileMenuBarCell.swift; sourceTree = "<group>"; };
+		F53E87CB20861A7300B19A2F /* ANIProfileProfileCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIProfileProfileCell.swift; sourceTree = "<group>"; };
+		F53E87CF2086EF6600B19A2F /* profileTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = profileTableViewCell.swift; sourceTree = "<group>"; };
 		F566348220752656006CB81B /* ANIRecruitCategoriesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitCategoriesView.swift; sourceTree = "<group>"; };
 		F56634852075285D006CB81B /* ANIRecruitCategoryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitCategoryCell.swift; sourceTree = "<group>"; };
 		F57F7D492081F43F008A2645 /* ANINotiViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotiViewController.swift; sourceTree = "<group>"; };
@@ -216,6 +230,59 @@
 				F53E87B9208468DF00B19A2F /* ANIStorySearchView.swift */,
 			);
 			path = StorySearch;
+			sourceTree = "<group>";
+		};
+		F53E87BB2085AF9D00B19A2F /* ProfileViewController */ = {
+			isa = PBXGroup;
+			children = (
+				F53E87BC2085AFC700B19A2F /* ANIProfileViewController.swift */,
+			);
+			path = ProfileViewController;
+			sourceTree = "<group>";
+		};
+		F53E87BE2085B14A00B19A2F /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				F53E87BF2085B15900B19A2F /* Family */,
+				F53E87C42085D0DF00B19A2F /* ProfileMenuBar */,
+				F53E87C920861A4D00B19A2F /* Contents */,
+			);
+			path = Profile;
+			sourceTree = "<group>";
+		};
+		F53E87BF2085B15900B19A2F /* Family */ = {
+			isa = PBXGroup;
+			children = (
+				F53E87C02085B19700B19A2F /* ANIFamilyView.swift */,
+				F53E87C22085B50900B19A2F /* ANIFamilyViewCell.swift */,
+			);
+			path = Family;
+			sourceTree = "<group>";
+		};
+		F53E87C42085D0DF00B19A2F /* ProfileMenuBar */ = {
+			isa = PBXGroup;
+			children = (
+				F53E87C52085F13800B19A2F /* ANIProfileMenuBar.swift */,
+				F53E87C72085F5FA00B19A2F /* ANIProfileMenuBarCell.swift */,
+			);
+			path = ProfileMenuBar;
+			sourceTree = "<group>";
+		};
+		F53E87C920861A4D00B19A2F /* Contents */ = {
+			isa = PBXGroup;
+			children = (
+				F53E87CA20861A5B00B19A2F /* Profile */,
+			);
+			path = Contents;
+			sourceTree = "<group>";
+		};
+		F53E87CA20861A5B00B19A2F /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				F53E87CB20861A7300B19A2F /* ANIProfileProfileCell.swift */,
+				F53E87CF2086EF6600B19A2F /* profileTableViewCell.swift */,
+			);
+			path = Profile;
 			sourceTree = "<group>";
 		};
 		F56634842075265E006CB81B /* RecruitView */ = {
@@ -456,6 +523,7 @@
 				F5E9E2312079AFA40021D4CC /* CommunityViewController */,
 				F57F7D482081F3A1008A2645 /* NotiViewController */,
 				F57F7D8620844A62008A2645 /* SearchViewController */,
+				F53E87BB2085AF9D00B19A2F /* ProfileViewController */,
 			);
 			path = ViewController;
 			sourceTree = "<group>";
@@ -475,6 +543,7 @@
 				F5E9E2352079B16F0021D4CC /* CommunityView */,
 				F57F7D4B2081FC26008A2645 /* NotiView */,
 				F57F7D8920844BD4008A2645 /* SearchView */,
+				F53E87BE2085B14A00B19A2F /* Profile */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -672,31 +741,38 @@
 				F57F7D652083250D008A2645 /* ANIMessageViewCell.swift in Sources */,
 				F51D221920768E8D009D1B26 /* ANIRecuruitView.swift in Sources */,
 				F5E9E2292076C6470021D4CC /* ScrollingNavbar+Sizes.swift in Sources */,
+				F53E87D02086EF6600B19A2F /* profileTableViewCell.swift in Sources */,
 				F57F7D8E20844C4E008A2645 /* ANISearchCategoryCell.swift in Sources */,
+				F53E87C12085B19700B19A2F /* ANIFamilyView.swift in Sources */,
 				F5C381FF207A068D000BBB8C /* ANIQnaView.swift in Sources */,
 				F5DF8367207A27E900EA7FBE /* ANIQnaViewCell.swift in Sources */,
 				F57F7D5F208314DF008A2645 /* ANINotiViewCell.swift in Sources */,
 				F57F7D552081FEB2008A2645 /* ANINotiNotiCell.swift in Sources */,
 				F5B5149A207AEDC300366500 /* Qna.swift in Sources */,
 				F521184C207A4421000B12C2 /* ANIStoryImagesView.swift in Sources */,
+				F53E87C32085B50900B19A2F /* ANIFamilyViewCell.swift in Sources */,
 				F57F7D4F2081FC64008A2645 /* ANiNotiMenuBar.swift in Sources */,
 				F57F7D512081FC71008A2645 /* ANINotiMenuBarCell.swift in Sources */,
 				F566348320752656006CB81B /* ANIRecruitCategoriesView.swift in Sources */,
 				F5DF8365207A27DC00EA7FBE /* ANIStoryViewCell.swift in Sources */,
 				F5E9E22F2079AEC30021D4CC /* Orientation.swift in Sources */,
 				F5E9E2372079B1900021D4CC /* ANICommunityMenuBar.swift in Sources */,
+				F53E87BD2085AFC700B19A2F /* ANIProfileViewController.swift in Sources */,
 				F5B1EF9320725964000CFB0B /* ANIRecruitViewController.swift in Sources */,
 				F51D221520768B24009D1B26 /* UISearchBar.swift in Sources */,
 				F5E9E2392079B9D20021D4CC /* ANICommunityMenuBarCell.swift in Sources */,
 				F5E9E23D2079C10C0021D4CC /* ANIStoryView.swift in Sources */,
 				F5E9E22D2076C65A0021D4CC /* ScrollingNavigationViewController.swift in Sources */,
+				F53E87C82085F5FA00B19A2F /* ANIProfileMenuBarCell.swift in Sources */,
 				F57F7D572081FEBF008A2645 /* ANINotiMessageCell.swift in Sources */,
 				F530AB1C207A45D900114E6B /* ANIStoryImagesViewCell.swift in Sources */,
+				F53E87CC20861A7300B19A2F /* ANIProfileProfileCell.swift in Sources */,
 				F57F7D8820844A90008A2645 /* ANISearchViewController.swift in Sources */,
 				F57F7D9120844DC2008A2645 /* ANIUserSearchView.swift in Sources */,
 				F5E9E2332079AFF40021D4CC /* ANICommunityViewController.swift in Sources */,
 				F5E9E22620769AD60021D4CC /* User.swift in Sources */,
 				F53E87BA208468DF00B19A2F /* ANIStorySearchView.swift in Sources */,
+				F53E87C62085F13800B19A2F /* ANIProfileMenuBar.swift in Sources */,
 				F57F7D61208322D3008A2645 /* ANIMessageView.swift in Sources */,
 				F51D221020767E62009D1B26 /* ANIColor.swift in Sources */,
 				F5E9E221207692C60021D4CC /* ANIRecruitViewCell.swift in Sources */,
