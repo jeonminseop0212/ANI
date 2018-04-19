@@ -35,6 +35,10 @@ class ANITabBarController: UITabBarController {
     searchVC.tabBarItem = UITabBarItem(tabBarSystemItem: .search, tag: 4)
     let searchNV = ScrollingNavigationController(rootViewController: searchVC)
     
-    setViewControllers([recruitNV, communityNV, notiNV, searchNV], animated: false)
+    let profileVC = ANIProfileViewController()
+    profileVC.tabBarItem = UITabBarItem(tabBarSystemItem: .search, tag: 5)
+    let profileNV = ScrollingNavigationController(rootViewController: profileVC)
+    
+    setViewControllers([recruitNV, communityNV, notiNV, searchNV, profileNV], animated: false)
   }
 }
