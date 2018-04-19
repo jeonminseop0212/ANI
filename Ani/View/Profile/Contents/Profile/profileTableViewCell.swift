@@ -75,7 +75,7 @@ class profileTableViewCell: UITableViewCell {
     let introductionLabel = UILabel()
     groupLabel.font = UIFont.systemFont(ofSize: 17.0)
     introductionLabel.numberOfLines = 0
-    introductionLabel.text = "私はどのこのここに初回文を書くよあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれ"
+    introductionLabel.text = "私はどのこのここに初回文を書くよあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれ私はどのこのここに初回文を書くよあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれ私はどのこのここに初回文を書くよあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれ"
     introductionLabel.textColor = ANIColor.dark
     addSubview(introductionLabel)
     introductionLabel.topToBottom(of: groupLabel, offset: 10.0)
