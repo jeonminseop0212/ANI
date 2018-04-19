@@ -13,8 +13,6 @@ class ANIProfileProfileCell: UICollectionViewCell {
   
   private weak var profileTableView: UITableView?
   
-  var profileDelegate: ProfileDelegate?
-  
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()
@@ -25,24 +23,22 @@ class ANIProfileProfileCell: UICollectionViewCell {
   }
   
   private func setup() {
+    self.backgroundColor = .yellow
     //profileTableView
     let profileTableView = UITableView()
     profileTableView.separatorStyle = .none
-    profileTableView.backgroundColor = .green
+    profileTableView.backgroundColor = .white
     profileTableView.dataSource = self
+    profileTableView.delegate = self
     let id = NSStringFromClass(profileTableViewCell.self)
     profileTableView.register(profileTableViewCell.self, forCellReuseIdentifier: id)
-    profileTableView.isScrollEnabled = false
     addSubview(profileTableView)
-    profileTableView.topToSuperview()
-    profileTableView.leftToSuperview()
-    profileTableView.rightToSuperview()
-    profileTableView.bottomToSuperview()
+    profileTableView.edgesToSuperview()
     self.profileTableView = profileTableView
   }
 }
 
-extension ANIProfileProfileCell: UITableViewDataSource {
+extension ANIProfileProfileCell: UITableViewDataSource, UITableViewDelegate {
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     return 1
   }
