@@ -8,10 +8,16 @@
 
 import UIKit
 
+protocol ANIProfileMenuBarDelegate:NSObjectProtocol {
+  func didSelecteMenuItem(selectedIndex: Int)
+}
+
 class ANIProfileMenuBar: UIView {
-  var menuCollectionView: UICollectionView?
+  
+  weak var delegate:ANIProfileMenuBarDelegate?
+
+  weak var menuCollectionView: UICollectionView?
   private let menus = ["profile", "love", "recruit", "clip"]
-  var aniProfileViewController: ANIProfileViewController?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -61,7 +67,6 @@ extension ANIProfileMenuBar: UICollectionViewDataSource, UICollectionViewDelegat
   }
   
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-    guard let aniProfileViewController = self.aniProfileViewController else { return }
-    aniProfileViewController.scrollToMenuIndex(menuIndex: indexPath.item)
+    self.delegate?.didSelecteMenuItem(selectedIndex: indexPath.item)
   }
 }
