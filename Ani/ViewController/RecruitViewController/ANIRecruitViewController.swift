@@ -16,9 +16,12 @@ class ANIRecruitViewController: ScrollingNavigationViewController {
   
   private weak var recruitView: ANIRecuruitView?
   
+  private weak var searchBar: UISearchBar?
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     setup()
+    setupNotifications()
   }
   
   override func viewWillAppear(_ animated: Bool) {
@@ -42,7 +45,8 @@ class ANIRecruitViewController: ScrollingNavigationViewController {
     searchBar.placeholder = "Search"
     searchBar.textField?.backgroundColor = ANIColor.lightGray
 //    searchBar.showsCancelButton = true
-//    searchBar.delegate = self
+    searchBar.delegate = self
+    self.searchBar = searchBar
     navigationItem.titleView = searchBar
     
     //navigation bar right item
@@ -73,10 +77,45 @@ class ANIRecruitViewController: ScrollingNavigationViewController {
   @objc func filter() {
     print("filtering")
   }
+  
+  
+  @objc private func hideKeyboard() {
+    guard let searchBar = self.searchBar,
+      let searchBarTextField = searchBar.textField else { return }
+    if searchBarTextField.isFirstResponder {
+      searchBarTextField.resignFirstResponder()
+      searchBar.setShowsCancelButton(false, animated: true)
+      
+      if let searchCancelButton = searchBar.cancelButton {
+        searchCancelButton.alpha = 0.0
+      }
+    }
+  }
+  
+  //MARK: - Notifications
+  private func setupNotifications() {
+    ANINotificationManager.receive(viewScrolled: self, selector: #selector(hideKeyboard))
+  }
 }
 
 extension ANIRecruitViewController: ScrollingNavigationControllerDelegate {
   func scrollingNavigationController(_ controller: ScrollingNavigationController, willChangeState state: NavigationBarState) {
     view.needsUpdateConstraints()
+  }
+}
+
+extension ANIRecruitViewController: UISearchBarDelegate {
+  func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+    guard let searchBarTextField = searchBar.textField else { return }
+    if searchBarTextField.isFirstResponder {
+      searchBarTextField.resignFirstResponder()
+    }
+  }
+  
+  func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+    guard let searchBarTextField = searchBar.textField else { return }
+    if searchBarTextField.isFirstResponder {
+      searchBarTextField.resignFirstResponder()
+    }
   }
 }
