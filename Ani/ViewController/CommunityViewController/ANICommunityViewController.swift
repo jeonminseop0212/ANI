@@ -15,6 +15,9 @@ class ANICommunityViewController: UIViewController {
   
   private weak var menuBar: ANICommunityMenuBar?
   private weak var containerCollectionView: UICollectionView?
+  
+  private let CONTRIBUTION_BUTTON_HEIGHT: CGFloat = 55.0
+  private weak var contributionButon: ANIImageButtonView?
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -57,6 +60,18 @@ class ANICommunityViewController: UIViewController {
     menuBar.rightToSuperview()
     menuBar.height(menuBarHeight)
     self.menuBar = menuBar
+    
+    //contributionButon
+    let contributionButon = ANIImageButtonView()
+    contributionButon.image = UIImage(named: "contributionButton")
+    contributionButon.superViewCornerRadius(radius: CONTRIBUTION_BUTTON_HEIGHT / 2)
+    contributionButon.superViewDropShadow(opacity: 0.13)
+    contributionButon.delegate = self
+    self.view.addSubview(contributionButon)
+    let tabBarHeight = UITabBarController().tabBar.frame.height
+    contributionButon.rightToSuperview(offset: 15.0)
+    contributionButon.bottomToSuperview(offset: -(15.0 + tabBarHeight))
+    self.contributionButon = contributionButon
   }
   
   func scrollToMenuIndex(menuIndex: Int) {
@@ -99,5 +114,13 @@ extension ANICommunityViewController: UICollectionViewDataSource, UICollectionVi
     guard let menuBar = self.menuBar else { return }
     let indexPath = IndexPath(item: Int(targetContentOffset.pointee.x / view.frame.width), section: 0)
     menuBar.menuCollectionView?.selectItem(at: indexPath, animated: true, scrollPosition: .left)
+  }
+}
+
+extension ANICommunityViewController:ANIButtonViewDelegate{
+  func buttonViewTapped(view: ANIButtonView) {
+    if view === self.contributionButon {
+      print("community contribution tapped")
+    }
   }
 }

@@ -18,6 +18,9 @@ class ANIRecruitViewController: ScrollingNavigationViewController {
   
   private weak var searchBar: UISearchBar?
   
+  private let CONTRIBUTION_BUTTON_HEIGHT:CGFloat = 55.0
+  private weak var contributionButon: ANIImageButtonView?
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     setup()
@@ -72,6 +75,18 @@ class ANIRecruitViewController: ScrollingNavigationViewController {
     categoriesView.rightToSuperview()
     categoriesView.height(ANIRecruitViewController.CATEGORIES_VIEW_HEIGHT)
     self.categoriesView = categoriesView
+    
+    //contributionButon
+    let contributionButon = ANIImageButtonView()
+    contributionButon.image = UIImage(named: "contributionButton")
+    contributionButon.superViewCornerRadius(radius: CONTRIBUTION_BUTTON_HEIGHT / 2)
+    contributionButon.superViewDropShadow(opacity: 0.13)
+    contributionButon.delegate = self
+    self.view.addSubview(contributionButon)
+    let tabBarHeight = UITabBarController().tabBar.frame.height
+    contributionButon.rightToSuperview(offset: 15.0)
+    contributionButon.bottomToSuperview(offset: -(15.0 + tabBarHeight))
+    self.contributionButon = contributionButon
   }
   
   @objc func filter() {
@@ -116,6 +131,14 @@ extension ANIRecruitViewController: UISearchBarDelegate {
     guard let searchBarTextField = searchBar.textField else { return }
     if searchBarTextField.isFirstResponder {
       searchBarTextField.resignFirstResponder()
+    }
+  }
+}
+
+extension ANIRecruitViewController:ANIButtonViewDelegate{
+  func buttonViewTapped(view: ANIButtonView) {
+    if view === self.contributionButon {
+      print("recruit contribution tapped")
     }
   }
 }
