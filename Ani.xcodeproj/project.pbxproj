@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CDF7F168208D772300254A0F /* ANINotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF7F167208D772300254A0F /* ANINotificationManager.swift */; };
 		F51D221020767E62009D1B26 /* ANIColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F51D220F20767E62009D1B26 /* ANIColor.swift */; };
 		F51D221220767F03009D1B26 /* UIColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F51D221120767F03009D1B26 /* UIColor.swift */; };
 		F51D221520768B24009D1B26 /* UISearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F51D221420768B24009D1B26 /* UISearchBar.swift */; };
@@ -89,6 +90,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		CDF7F167208D772300254A0F /* ANINotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotificationManager.swift; sourceTree = "<group>"; };
 		F51D220F20767E62009D1B26 /* ANIColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIColor.swift; sourceTree = "<group>"; };
 		F51D221120767F03009D1B26 /* UIColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColor.swift; sourceTree = "<group>"; };
 		F51D221420768B24009D1B26 /* UISearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UISearchBar.swift; sourceTree = "<group>"; };
@@ -192,6 +194,7 @@
 				F51D220F20767E62009D1B26 /* ANIColor.swift */,
 				F51D221320768B01009D1B26 /* Extensioin */,
 				F5E9E22E2079AEC30021D4CC /* Orientation.swift */,
+				CDF7F167208D772300254A0F /* ANINotificationManager.swift */,
 			);
 			path = Utility;
 			sourceTree = "<group>";
@@ -791,6 +794,7 @@
 				F5F530182088631A0076E938 /* ANIProfileClipCell.swift in Sources */,
 				F53E87C12085B19700B19A2F /* ANIFamilyView.swift in Sources */,
 				F5C381FF207A068D000BBB8C /* ANIQnaView.swift in Sources */,
+				CDF7F168208D772300254A0F /* ANINotificationManager.swift in Sources */,
 				F5DF8367207A27E900EA7FBE /* ANIQnaViewCell.swift in Sources */,
 				F57F7D5F208314DF008A2645 /* ANINotiViewCell.swift in Sources */,
 				F57F7D552081FEB2008A2645 /* ANINotiNotiCell.swift in Sources */,

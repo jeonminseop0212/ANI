@@ -17,4 +17,8 @@ extension UISearchBar {
     backgroundImage = UIImage()
     isTranslucent = true
   }
+  
+  var cancelButton: UIButton? {
+    return value(forKey: "_cancelButton") as? UIButton
+  }
 }

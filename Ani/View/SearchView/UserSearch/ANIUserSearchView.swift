@@ -29,6 +29,7 @@ class ANIUserSearchView: UIView {
     tableView.contentInset = UIEdgeInsets(top: ANISearchViewController.CATEGORIES_VIEW_HEIGHT, left: 0, bottom: 0, right: 0)
     tableView.scrollIndicatorInsets  = UIEdgeInsets(top: ANISearchViewController.CATEGORIES_VIEW_HEIGHT, left: 0, bottom: 0, right: 0)
     tableView.dataSource = self
+    tableView.delegate = self
     let id = NSStringFromClass(ANIUserSearchViewCell.self)
     tableView.register(ANIUserSearchViewCell.self, forCellReuseIdentifier: id)
     tableView.backgroundColor = .white
@@ -52,7 +53,7 @@ class ANIUserSearchView: UIView {
   }
 }
 
-extension ANIUserSearchView: UITableViewDataSource {
+extension ANIUserSearchView: UITableViewDataSource, UITableViewDelegate {
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     return testUserSearchResult.count
   }
@@ -63,5 +64,9 @@ extension ANIUserSearchView: UITableViewDataSource {
     cell.profileImageView.image = testUserSearchResult[indexPath.row].profileImage
     cell.userNameLabel.text = testUserSearchResult[indexPath.row].name
     return cell
+  }
+  
+  func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    ANINotificationManager.postViewScrolled()
   }
 }
