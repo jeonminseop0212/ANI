@@ -33,6 +33,7 @@ class ANIRecuruitView: UIView {
     let id = NSStringFromClass(ANIRecruitViewCell.self)
     tableView.register(ANIRecruitViewCell.self, forCellReuseIdentifier: id)
     tableView.dataSource = self
+    tableView.delegate = self
     addSubview(tableView)
     tableView.edgesToSuperview()
     self.recruitTableView = tableView
@@ -49,7 +50,7 @@ class ANIRecuruitView: UIView {
   }
 }
 
-extension ANIRecuruitView: UITableViewDataSource {
+extension ANIRecuruitView: UITableViewDataSource, UITableViewDelegate {
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     return testRecruitLists.count
   }
@@ -65,5 +66,9 @@ extension ANIRecuruitView: UITableViewDataSource {
     cell.supportCountLabel.text = "\(testRecruitLists[indexPath.item].supportCount)"
     cell.loveCountLabel.text = "\(testRecruitLists[indexPath.item].loveCount)"
     return cell
+  }
+  
+  func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    ANINotificationManager.postViewScrolled()
   }
 }
