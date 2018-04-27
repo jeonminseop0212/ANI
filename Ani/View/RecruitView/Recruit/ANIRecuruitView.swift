@@ -10,6 +10,7 @@ import UIKit
 
 protocol ANIRecruitViewDelegate {
   func recruitRowTap()
+  func recruitViewDidScroll(scrollY: CGFloat)
 }
 
 class ANIRecuruitView: UIView {
@@ -33,8 +34,9 @@ class ANIRecuruitView: UIView {
   private func setup() {
     let tableView = UITableView()
     tableView.separatorStyle = .none
-    tableView.contentInset = UIEdgeInsets(top: ANIRecruitViewController.CATEGORIES_VIEW_HEIGHT, left: 0, bottom: 0, right: 0)
-    tableView.scrollIndicatorInsets  = UIEdgeInsets(top: ANIRecruitViewController.CATEGORIES_VIEW_HEIGHT, left: 0, bottom: 0, right: 0)
+    let topInset = UIViewController.NAVIGATION_BAR_HEIGHT + ANIRecruitViewController.CATEGORIES_VIEW_HEIGHT
+    tableView.contentInset = UIEdgeInsets(top: topInset, left: 0, bottom: 0, right: 0)
+    tableView.scrollIndicatorInsets  = UIEdgeInsets(top: topInset, left: 0, bottom: 0, right: 0)
     tableView.backgroundColor = .white
     let id = NSStringFromClass(ANIRecruitViewCell.self)
     tableView.register(ANIRecruitViewCell.self, forCellReuseIdentifier: id)
@@ -80,5 +82,9 @@ extension ANIRecuruitView: UITableViewDataSource, UITableViewDelegate {
   
   func scrollViewDidScroll(_ scrollView: UIScrollView) {
     ANINotificationManager.postViewScrolled()
+    
+    //navigation bar animation
+    let scrollY = scrollView.contentOffset.y
+    self.delegate?.recruitViewDidScroll(scrollY: scrollY)
   }
 }

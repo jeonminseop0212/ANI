@@ -9,10 +9,13 @@
 import UIKit
 import TinyConstraints
 
-class ANISearchViewController: ScrollingNavigationViewController {
+class ANISearchViewController: UIViewController {
+  
+  private weak var myNavigationBar: UIView?
+  private weak var myNavigationBarTopConstroint: Constraint?
   
   private weak var categoriesView: ANISearchCategoriesView?
-  static let CATEGORIES_VIEW_HEIGHT: CGFloat = 45.0
+  static let CATEGORIES_VIEW_HEIGHT: CGFloat = 47.0
   
   private weak var searchBar: UISearchBar?
   private weak var userSearchView: ANIUserSearchView?
@@ -23,41 +26,48 @@ class ANISearchViewController: ScrollingNavigationViewController {
     setupNotifications()
   }
   
-  override func viewWillAppear(_ animated: Bool) {
-    if let navigationController = self.navigationController as? ScrollingNavigationController,
-      let userSearchView = self.userSearchView,
-      let categoriesView = self.categoriesView,
-      let userTableView = userSearchView.userTableView {
-      navigationController.followScrollView(userTableView, delay: 0.0, followers: [categoriesView])
-      navigationController.scrollingNavbarDelegate = self
-    }
-  }
-  
   private func setup() {
     Orientation.lockOrientation(.portrait)
     self.view.backgroundColor = .white
     //nav barの下からviewが開始するように
+    self.navigationController?.setNavigationBarHidden(true, animated: false)
     self.navigationController?.navigationBar.isTranslucent = false
+    
+    //userSearchView
+    let userSearchView = ANIUserSearchView()
+    userSearchView.delegate = self
+    self.view.addSubview(userSearchView)
+    userSearchView.edgesToSuperview()
+    self.userSearchView = userSearchView
+    
+    //myNavigationBar
+    let myNavigationBar = UIView()
+    myNavigationBar.backgroundColor = .white
+    self.view.addSubview(myNavigationBar)
+    myNavigationBarTopConstroint = myNavigationBar.topToSuperview()
+    myNavigationBar.leftToSuperview()
+    myNavigationBar.rightToSuperview()
+    myNavigationBar.height(UIViewController.STATUS_BAR_HEIGHT + UIViewController.NAVIGATION_BAR_HEIGHT)
+    self.myNavigationBar = myNavigationBar
     
     //searchBar
     let searchBar = UISearchBar()
     searchBar.placeholder = "Search"
     searchBar.textField?.backgroundColor = ANIColor.lightGray
+    //    searchBar.showsCancelButton = true
     searchBar.delegate = self
-    searchBar.backgroundColor = .white
+    searchBar.backgroundImage = UIImage()
+    myNavigationBar.addSubview(searchBar)
+    searchBar.topToSuperview(offset: UIViewController.STATUS_BAR_HEIGHT)
+    searchBar.leftToSuperview()
+    searchBar.rightToSuperview()
+    searchBar.bottomToSuperview()
     self.searchBar = searchBar
-    navigationItem.titleView = searchBar
-    
-    //userSearchView
-    let userSearchView = ANIUserSearchView()
-    self.view.addSubview(userSearchView)
-    userSearchView.edgesToSuperview()
-    self.userSearchView = userSearchView
     
     //categoriesView
     let categoriesView = ANISearchCategoriesView()
     self.view.addSubview(categoriesView)
-    categoriesView.topToSuperview()
+    categoriesView.topToBottom(of: myNavigationBar)
     categoriesView.leftToSuperview()
     categoriesView.rightToSuperview()
     categoriesView.height(ANIRecruitViewController.CATEGORIES_VIEW_HEIGHT)
@@ -80,12 +90,6 @@ class ANISearchViewController: ScrollingNavigationViewController {
   //MARK: - Notifications
   private func setupNotifications() {
     ANINotificationManager.receive(viewScrolled: self, selector: #selector(hideKeyboard))
-  }
-}
-
-extension ANISearchViewController: ScrollingNavigationControllerDelegate {
-  func scrollingNavigationController(_ controller: ScrollingNavigationController, willChangeState state: NavigationBarState) {
-    view.needsUpdateConstraints()
   }
 }
 
@@ -115,5 +119,35 @@ extension ANISearchViewController: UISearchBarDelegate {
       searchCancelButton.alpha = 1.0
     }
     return true
+  }
+}
+
+extension ANISearchViewController: ANIUserSearchViewDelegate {
+  func userSearchViewDidScroll(scrollY: CGFloat) {
+    guard let myNavigationBarTopConstroint = self.myNavigationBarTopConstroint else { return }
+    
+    let topHeight = UIViewController.NAVIGATION_BAR_HEIGHT + ANIRecruitViewController.CATEGORIES_VIEW_HEIGHT
+    let newScrollY = topHeight + scrollY + UIViewController.STATUS_BAR_HEIGHT
+    
+    //navigation animate
+    if topHeight < newScrollY {
+      if scrollY + UIViewController.STATUS_BAR_HEIGHT < topHeight {
+        myNavigationBarTopConstroint.constant = -scrollY - UIViewController.STATUS_BAR_HEIGHT
+        self.view.layoutIfNeeded()
+        
+        let alpha = 1 - ((scrollY + UIViewController.STATUS_BAR_HEIGHT) / topHeight)
+        searchBar?.alpha = alpha
+        categoriesView?.categoryCollectionView?.alpha = alpha
+      } else {
+        myNavigationBarTopConstroint.constant = -topHeight
+        self.view.layoutIfNeeded()
+      }
+    } else {
+      myNavigationBarTopConstroint.constant = 0.0
+      self.view.layoutIfNeeded()
+      
+      searchBar?.alpha = 1.0
+      categoriesView?.categoryCollectionView?.alpha = 1.0
+    }
   }
 }

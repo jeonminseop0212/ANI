@@ -30,8 +30,8 @@ class ANINotiView: UIView {
     let notiCollectionView = UICollectionView(frame: self.frame, collectionViewLayout: flowLayout)
     let id = NSStringFromClass(ANINotiViewCell.self)
     notiCollectionView.register(ANINotiViewCell.self, forCellWithReuseIdentifier: id)
-    notiCollectionView.contentInset = UIEdgeInsets(top: ANICommunityViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: ANICommunityViewController.NAVIGATION_BAR_HEIGHT + ANICommunityViewController.STATUS_BAR_HEIGHT, right: 0)
-    notiCollectionView.scrollIndicatorInsets  = UIEdgeInsets(top: ANICommunityViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: ANICommunityViewController.NAVIGATION_BAR_HEIGHT + ANICommunityViewController.STATUS_BAR_HEIGHT, right: 0)
+    notiCollectionView.contentInset = UIEdgeInsets(top: ANICommunityViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: ANICommunityViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT, right: 0)
+    notiCollectionView.scrollIndicatorInsets  = UIEdgeInsets(top: UIViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT, right: 0)
     notiCollectionView.backgroundColor = ANIColor.bg
     notiCollectionView.alwaysBounceVertical = true
     notiCollectionView.dataSource = self

@@ -9,10 +9,13 @@
 import UIKit
 import TinyConstraints
 
-class ANIRecruitViewController: ScrollingNavigationViewController {
+class ANIRecruitViewController: UIViewController {
   
+  private weak var myNavigationBar: UIView?
+  private weak var myNavigationBarTopConstroint: Constraint?
+
   private weak var categoriesView: ANIRecruitCategoriesView?
-  static let CATEGORIES_VIEW_HEIGHT: CGFloat = 45.0
+  static let CATEGORIES_VIEW_HEIGHT: CGFloat = 47.0
   
   private weak var recruitView: ANIRecuruitView?
   
@@ -27,31 +30,12 @@ class ANIRecruitViewController: ScrollingNavigationViewController {
     setupNotifications()
   }
   
-  override func viewWillAppear(_ animated: Bool) {
-    if let navigationController = self.navigationController as? ScrollingNavigationController,
-      let recruitView = self.recruitView,
-      let categoriesView = self.categoriesView,
-      let recruitTableView = recruitView.recruitTableView {
-      navigationController.followScrollView(recruitTableView, delay: 0.0, followers: [categoriesView])
-      navigationController.scrollingNavbarDelegate = self
-    }
-  }
-  
   private func setup() {
     Orientation.lockOrientation(.portrait)
     self.view.backgroundColor = .white
     //nav barの下からviewが開始するように
     self.navigationController?.setNavigationBarHidden(true, animated: false)
     self.navigationController?.navigationBar.isTranslucent = false
-    
-    //searchBar
-    let searchBar = UISearchBar()
-    searchBar.placeholder = "Search"
-    searchBar.textField?.backgroundColor = ANIColor.lightGray
-//    searchBar.showsCancelButton = true
-    searchBar.delegate = self
-    self.searchBar = searchBar
-    navigationItem.titleView = searchBar
     
     //navigation bar right item
     let filterImage = UIImage(named: "filter")?.withRenderingMode(.alwaysOriginal)
@@ -69,10 +53,34 @@ class ANIRecruitViewController: ScrollingNavigationViewController {
     recruitView.edgesToSuperview()
     self.recruitView = recruitView
     
+    //myNavigationBar
+    let myNavigationBar = UIView()
+    myNavigationBar.backgroundColor = .white
+    self.view.addSubview(myNavigationBar)
+    myNavigationBarTopConstroint = myNavigationBar.topToSuperview()
+    myNavigationBar.leftToSuperview()
+    myNavigationBar.rightToSuperview()
+    myNavigationBar.height(UIViewController.STATUS_BAR_HEIGHT + UIViewController.NAVIGATION_BAR_HEIGHT)
+    self.myNavigationBar = myNavigationBar
+    
+    //searchBar
+    let searchBar = UISearchBar()
+    searchBar.placeholder = "Search"
+    searchBar.textField?.backgroundColor = ANIColor.lightGray
+    //    searchBar.showsCancelButton = true
+    searchBar.delegate = self
+    searchBar.backgroundImage = UIImage()
+    myNavigationBar.addSubview(searchBar)
+    searchBar.topToSuperview(offset: UIViewController.STATUS_BAR_HEIGHT)
+    searchBar.leftToSuperview()
+    searchBar.rightToSuperview()
+    searchBar.bottomToSuperview()
+    self.searchBar = searchBar
+    
     //categoriesView
     let categoriesView = ANIRecruitCategoriesView()
     self.view.addSubview(categoriesView)
-    categoriesView.topToSuperview()
+    categoriesView.topToBottom(of: myNavigationBar)
     categoriesView.leftToSuperview()
     categoriesView.rightToSuperview()
     categoriesView.height(ANIRecruitViewController.CATEGORIES_VIEW_HEIGHT)
@@ -115,12 +123,6 @@ class ANIRecruitViewController: ScrollingNavigationViewController {
   }
 }
 
-extension ANIRecruitViewController: ScrollingNavigationControllerDelegate {
-  func scrollingNavigationController(_ controller: ScrollingNavigationController, willChangeState state: NavigationBarState) {
-    view.needsUpdateConstraints()
-  }
-}
-
 extension ANIRecruitViewController: UISearchBarDelegate {
   func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
     guard let searchBarTextField = searchBar.textField else { return }
@@ -149,5 +151,33 @@ extension ANIRecruitViewController: ANIRecruitViewDelegate {
   func recruitRowTap() {
     let recruitDetailViewController = ANIRecruitDetailViewController()
     self.navigationController?.pushViewController(recruitDetailViewController, animated: true)
+  }
+  
+  func recruitViewDidScroll(scrollY: CGFloat) {
+    guard let myNavigationBarTopConstroint = self.myNavigationBarTopConstroint else { return }
+    
+    let topHeight = UIViewController.NAVIGATION_BAR_HEIGHT + ANIRecruitViewController.CATEGORIES_VIEW_HEIGHT
+    let newScrollY = topHeight + scrollY + UIViewController.STATUS_BAR_HEIGHT
+    
+    //navigation animate
+    if topHeight < newScrollY {
+      if scrollY + UIViewController.STATUS_BAR_HEIGHT < topHeight {
+        myNavigationBarTopConstroint.constant = -scrollY - UIViewController.STATUS_BAR_HEIGHT
+        self.view.layoutIfNeeded()
+        
+        let alpha = 1 - ((scrollY + UIViewController.STATUS_BAR_HEIGHT) / topHeight)
+        searchBar?.alpha = alpha
+        categoriesView?.categoryCollectionView?.alpha = alpha
+      } else {
+        myNavigationBarTopConstroint.constant = -topHeight
+        self.view.layoutIfNeeded()
+      }
+    } else {
+      myNavigationBarTopConstroint.constant = 0.0
+      self.view.layoutIfNeeded()
+      
+      searchBar?.alpha = 1.0
+      categoriesView?.categoryCollectionView?.alpha = 1.0
+    }
   }
 }

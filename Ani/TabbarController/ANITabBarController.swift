@@ -21,7 +21,7 @@ class ANITabBarController: UITabBarController {
     
     let recruitVC = ANIRecruitViewController()
     recruitVC.tabBarItem = UITabBarItem(tabBarSystemItem: .downloads, tag: 1)
-    let recruitNV = ScrollingNavigationController(rootViewController: recruitVC)
+    let recruitNV = UINavigationController(rootViewController: recruitVC)
     
     let communityVC = ANICommunityViewController()
     communityVC.tabBarItem = UITabBarItem(tabBarSystemItem: .bookmarks, tag: 2)
@@ -33,11 +33,11 @@ class ANITabBarController: UITabBarController {
     
     let searchVC = ANISearchViewController()
     searchVC.tabBarItem = UITabBarItem(tabBarSystemItem: .search, tag: 4)
-    let searchNV = ScrollingNavigationController(rootViewController: searchVC)
+    let searchNV = UINavigationController(rootViewController: searchVC)
     
     let profileVC = ANIProfileViewController()
     profileVC.tabBarItem = UITabBarItem(tabBarSystemItem: .search, tag: 5)
-    let profileNV = ScrollingNavigationController(rootViewController: profileVC)
+    let profileNV = UINavigationController(rootViewController: profileVC)
     
     setViewControllers([recruitNV, communityNV, notiNV, searchNV, profileNV], animated: false)
   }

@@ -37,10 +37,10 @@ class ANICommunityMenuBar: UIView {
     let selectedIndexPath = IndexPath(item: 0, section: 0)
     collectionView.selectItem(at: selectedIndexPath, animated: false, scrollPosition: .left)
     addSubview(collectionView)
-    collectionView.topToSuperview(offset: ANICommunityViewController.STATUS_BAR_HEIGHT)
+    collectionView.topToSuperview(offset: UIViewController.STATUS_BAR_HEIGHT)
     collectionView.leftToSuperview()
     collectionView.rightToSuperview()
-    collectionView.height(ANICommunityViewController.NAVIGATION_BAR_HEIGHT)
+    collectionView.height(UIViewController.NAVIGATION_BAR_HEIGHT)
     self.menuCollectionView = collectionView
   }
   

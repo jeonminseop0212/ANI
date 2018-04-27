@@ -23,7 +23,7 @@ class ANIRecruitDetailView: UIView {
   private weak var scrollView: UIScrollView?
   private weak var contentView: UIView?
   
-  var delegete: ANIRecruitDetailViewDelegate?
+  var delegate: ANIRecruitDetailViewDelegate?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -87,10 +87,10 @@ extension ANIRecruitDetailView: UIScrollViewDelegate {
         self.layoutIfNeeded()
       }
     }
-    print("scrollY \(scrollY)")
+    
     //navigation bar animation
     let offset = scrollY / (HEADER_IMAGE_VIEW_HEIGHT - headerMinHeight)
-    self.delegete?.recruitDetailViewDidScroll(offset: offset)
+    self.delegate?.recruitDetailViewDidScroll(offset: offset)
   }
 }
 
