@@ -26,9 +26,15 @@ class ANISearchViewController: UIViewController {
     setupNotifications()
   }
   
+  override func viewWillAppear(_ animated: Bool) {
+    UIApplication.shared.statusBarStyle = .default
+  }
+  
   private func setup() {
+    //basic
     Orientation.lockOrientation(.portrait)
     self.view.backgroundColor = .white
+
     //nav barの下からviewが開始するように
     self.navigationController?.setNavigationBarHidden(true, animated: false)
     self.navigationController?.navigationBar.isTranslucent = false

@@ -24,16 +24,23 @@ class ANIRecruitViewController: UIViewController {
   private let CONTRIBUTION_BUTTON_HEIGHT:CGFloat = 55.0
   private weak var contributionButon: ANIImageButtonView?
   
+  private var testRecruitLists = [Recruit]()
+  
   override func viewDidLoad() {
     super.viewDidLoad()
+    setupTestData()
     setup()
     setupNotifications()
   }
   
+  override func viewWillAppear(_ animated: Bool) {
+    UIApplication.shared.statusBarStyle = .default
+  }
+  
   private func setup() {
+    //basic
     Orientation.lockOrientation(.portrait)
     self.view.backgroundColor = .white
-    //nav barの下からviewが開始するように
     self.navigationController?.setNavigationBarHidden(true, animated: false)
     self.navigationController?.navigationBar.isTranslucent = false
     
@@ -49,6 +56,7 @@ class ANIRecruitViewController: UIViewController {
     //rcruitView
     let recruitView = ANIRecuruitView()
     recruitView.delegate = self
+    recruitView.testRecruitLists = testRecruitLists
     self.view.addSubview(recruitView)
     recruitView.edgesToSuperview()
     self.recruitView = recruitView
@@ -94,6 +102,8 @@ class ANIRecruitViewController: UIViewController {
     contributionButon.delegate = self
     self.view.addSubview(contributionButon)
     let tabBarHeight = UITabBarController().tabBar.frame.height
+    contributionButon.width(CONTRIBUTION_BUTTON_HEIGHT)
+    contributionButon.height(CONTRIBUTION_BUTTON_HEIGHT)
     contributionButon.rightToSuperview(offset: 15.0)
     contributionButon.bottomToSuperview(offset: -(15.0 + tabBarHeight))
     self.contributionButon = contributionButon
@@ -115,6 +125,16 @@ class ANIRecruitViewController: UIViewController {
         searchCancelButton.alpha = 0.0
       }
     }
+  }
+  
+  private func setupTestData() {
+    let user1 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
+    let user2 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki")
+    let user3 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
+    let recruit1 = Recruit(recruitImage: UIImage(named: "cat1")!, title: "かわいい猫ちゃんの里親になって >_<", subTitle: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおお", user: user1, supportCount: 10, loveCount: 10)
+    let recruit2 = Recruit(recruitImage: UIImage(named: "cat2")!, title: "かわいい猫ちゃんの里親になって >_<", subTitle: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user2, supportCount: 5, loveCount: 15)
+    let recruit3 = Recruit(recruitImage: UIImage(named: "cat1")!, title: "かわいい猫ちゃんの里親になって >_<", subTitle: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user3, supportCount: 10, loveCount: 10)
+    self.testRecruitLists = [recruit1, recruit2, recruit3, recruit1, recruit2, recruit3]
   }
   
   //MARK: - Notifications
@@ -148,8 +168,10 @@ extension ANIRecruitViewController:ANIButtonViewDelegate{
 }
 
 extension ANIRecruitViewController: ANIRecruitViewDelegate {
-  func recruitRowTap() {
+  func recruitRowTap(tapRowIndex: Int) {
     let recruitDetailViewController = ANIRecruitDetailViewController()
+    recruitDetailViewController.hidesBottomBarWhenPushed = true
+    recruitDetailViewController.testRecruit = testRecruitLists[tapRowIndex]
     self.navigationController?.pushViewController(recruitDetailViewController, animated: true)
   }
   

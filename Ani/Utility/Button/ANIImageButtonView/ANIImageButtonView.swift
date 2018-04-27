@@ -15,16 +15,6 @@ class ANIImageButtonView:ANIButtonView{
   var imageView:UIImageView?
   private var imageWidthConst:Constraint?
   private var imageHeightConst:Constraint?
-  private var buttonWidthConst:Constraint?
-  private var buttonHeightConst:Constraint?
-  
-  var buttonMargin:CGSize = .zero{
-    didSet{
-      self.buttonWidthConst?.constant = buttonMargin.width
-      self.buttonHeightConst?.constant = buttonMargin.height
-      self.layoutIfNeeded()
-    }
-  }
   
   var imageSize:CGSize = .zero{
     didSet{
@@ -97,8 +87,6 @@ class ANIImageButtonView:ANIButtonView{
     self.imageView = iv
     iv.contentMode = .scaleAspectFit
     iv.centerInSuperview()
-    self.buttonWidthConst = self.width(to: iv, offset:0)
-    self.buttonHeightConst = self.height(to: iv, offset:0)
   }
   
   override func touchDown(_ contain: Bool) {

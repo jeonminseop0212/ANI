@@ -19,6 +19,10 @@ class ANINotiViewController: UIViewController {
     setup()
   }
   
+  override func viewWillAppear(_ animated: Bool) {
+    UIApplication.shared.statusBarStyle = .default
+  }
+  
   private func setup() {
     //basic
     Orientation.lockOrientation(.portrait)

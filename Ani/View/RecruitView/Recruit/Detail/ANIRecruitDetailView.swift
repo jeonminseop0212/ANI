@@ -21,9 +21,18 @@ class ANIRecruitDetailView: UIView {
   var headerMinHeight: CGFloat?
 
   private weak var scrollView: UIScrollView?
+  
   private weak var contentView: UIView?
   
+  private weak var titleLabel: UILabel?
+  
   var delegate: ANIRecruitDetailViewDelegate?
+  
+  var testRecruit: Recruit? {
+    didSet {
+      reloadLayout()
+    }
+  }
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -38,7 +47,6 @@ class ANIRecruitDetailView: UIView {
     self.backgroundColor = .white
     
     let headerImageView = UIImageView()
-    headerImageView.image = UIImage(named: "cat1")
     addSubview(headerImageView)
     headerImageViewTopConstraint = headerImageView.topToSuperview()
     headerImageView.leftToSuperview()
@@ -48,19 +56,41 @@ class ANIRecruitDetailView: UIView {
     
     let scrollView = UIScrollView()
     scrollView.delegate = self
+    let topInset = HEADER_IMAGE_VIEW_HEIGHT
+    scrollView.contentInset = UIEdgeInsets(top: topInset, left: 0, bottom: 0, right: 0)
+    scrollView.scrollIndicatorInsets = UIEdgeInsets(top: topInset, left: 0, bottom: 0, right: 0)
     addSubview(scrollView)
-    scrollView.topToBottom(of: headerImageView)
-    scrollView.leftToSuperview()
-    scrollView.rightToSuperview()
-    scrollView.bottomToSuperview()
+    scrollView.edgesToSuperview()
     self.scrollView = scrollView
     
     let contentView = UIView()
     scrollView.addSubview(contentView)
-    contentView.edgesToSuperview()
+    contentView.topToSuperview()
+    contentView.leftToSuperview()
+    contentView.rightToSuperview()
+    contentView.bottomToSuperview()
     contentView.width(to: scrollView)
     contentView.height(1000)
     self.contentView = contentView
+    
+    let titleLabel = UILabel()
+    titleLabel.numberOfLines = 0
+    titleLabel.font = UIFont.boldSystemFont(ofSize: 20.0)
+    titleLabel.textColor = ANIColor.dark
+    contentView.addSubview(titleLabel)
+    titleLabel.topToSuperview(offset: 10.0)
+    titleLabel.leftToSuperview(offset: 10.0)
+    titleLabel.rightToSuperview(offset: 10.0)
+    self.titleLabel = titleLabel
+  }
+  
+  private func reloadLayout() {
+    guard let testRecruit = self.testRecruit,
+          let headerImageView = self.headerImageView,
+          let titleLabel = self.titleLabel else { return }
+    
+    headerImageView.image = testRecruit.recruitImage
+    titleLabel.text = testRecruit.title
   }
 }
 
@@ -72,15 +102,18 @@ extension ANIRecruitDetailView: UIScrollViewDelegate {
           else { return }
     
     let scrollY = scrollView.contentOffset.y
+    let newScrollY = scrollY + HEADER_IMAGE_VIEW_HEIGHT
     
     //imageView animation
-    if scrollY <= 0 {
-      let scaleRatio = 1 - scrollY / HEADER_IMAGE_VIEW_HEIGHT
+    if newScrollY < 0 {
+      let scaleRatio = 1 - newScrollY / HEADER_IMAGE_VIEW_HEIGHT
       imageView.transform = CGAffineTransform(scaleX: scaleRatio, y: scaleRatio)
       imageViewTopConstraint.constant = 0
-    } else {
-      if HEADER_IMAGE_VIEW_HEIGHT - scrollY > headerMinHeight {
-        imageViewTopConstraint.constant = -scrollY
+    }
+    else {
+      imageView.transform = CGAffineTransform.identity
+      if HEADER_IMAGE_VIEW_HEIGHT - newScrollY > headerMinHeight {
+        imageViewTopConstraint.constant = -newScrollY
         self.layoutIfNeeded()
       } else {
         imageViewTopConstraint.constant = -(HEADER_IMAGE_VIEW_HEIGHT - headerMinHeight)
@@ -89,7 +122,7 @@ extension ANIRecruitDetailView: UIScrollViewDelegate {
     }
     
     //navigation bar animation
-    let offset = scrollY / (HEADER_IMAGE_VIEW_HEIGHT - headerMinHeight)
+    let offset = newScrollY / (HEADER_IMAGE_VIEW_HEIGHT - headerMinHeight)
     self.delegate?.recruitDetailViewDidScroll(offset: offset)
   }
 }

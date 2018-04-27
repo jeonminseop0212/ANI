@@ -22,10 +22,13 @@ class ANIProfileViewController: UIViewController {
   private weak var profileBasicView: ANIProfileBasicView?
   
   override func viewDidLoad() {
-        super.viewDidLoad()
-
-      setup()
-    }
+    super.viewDidLoad()
+    setup()
+  }
+  
+  override func viewWillAppear(_ animated: Bool) {
+    UIApplication.shared.statusBarStyle = .default
+  }
   
   private func setup() {
     //basic
