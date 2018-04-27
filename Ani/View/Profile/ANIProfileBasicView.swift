@@ -22,7 +22,7 @@ class ANIProfileBasicView: UIView {
   
   private weak var basicTableView: UITableView?
   
-  private var testRecruitLists = [Recurit]()
+  private var testRecruitLists = [Recruit]()
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -57,9 +57,9 @@ class ANIProfileBasicView: UIView {
     let user1 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
     let user2 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki")
     let user3 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
-    let recruit1 = Recurit(recruitImage: UIImage(named: "cat1")!, title: "かわいい猫ちゃんの里親になって >_<", subTitle: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおお", user: user1, supportCount: 10, loveCount: 10)
-    let recruit2 = Recurit(recruitImage: UIImage(named: "cat2")!, title: "かわいい猫ちゃんの里親になって >_<", subTitle: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user2, supportCount: 5, loveCount: 15)
-    let recruit3 = Recurit(recruitImage: UIImage(named: "cat1")!, title: "かわいい猫ちゃんの里親になって >_<", subTitle: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user3, supportCount: 10, loveCount: 10)
+    let recruit1 = Recruit(recruitImage: UIImage(named: "cat1")!, title: "かわいい猫ちゃんの里親になって >_<", subTitle: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおお", user: user1, supportCount: 10, loveCount: 10)
+    let recruit2 = Recruit(recruitImage: UIImage(named: "cat2")!, title: "かわいい猫ちゃんの里親になって >_<", subTitle: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user2, supportCount: 5, loveCount: 15)
+    let recruit3 = Recruit(recruitImage: UIImage(named: "cat1")!, title: "かわいい猫ちゃんの里親になって >_<", subTitle: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user3, supportCount: 10, loveCount: 10)
     self.testRecruitLists = [recruit1, recruit2, recruit3, recruit1, recruit2, recruit3]
   }
 }

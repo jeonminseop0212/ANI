@@ -22,6 +22,10 @@ class ANICommunityViewController: UIViewController {
     setup()
   }
   
+  override func viewWillAppear(_ animated: Bool) {
+    UIApplication.shared.statusBarStyle = .default
+  }
+  
   private func setup() {
     //basic
     Orientation.lockOrientation(.portrait)
@@ -67,6 +71,8 @@ class ANICommunityViewController: UIViewController {
     contributionButon.delegate = self
     self.view.addSubview(contributionButon)
     let tabBarHeight = UITabBarController().tabBar.frame.height
+    contributionButon.width(CONTRIBUTION_BUTTON_HEIGHT)
+    contributionButon.height(CONTRIBUTION_BUTTON_HEIGHT)
     contributionButon.rightToSuperview(offset: 15.0)
     contributionButon.bottomToSuperview(offset: -(15.0 + tabBarHeight))
     self.contributionButon = contributionButon
