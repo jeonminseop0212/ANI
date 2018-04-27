@@ -10,8 +10,6 @@ import UIKit
 import TinyConstraints
 
 class ANICommunityViewController: UIViewController {
-  static let STATUS_BAR_HEIGHT: CGFloat = 20.0
-  static let NAVIGATION_BAR_HEIGHT: CGFloat = 44.0
   
   private weak var menuBar: ANICommunityMenuBar?
   private weak var containerCollectionView: UICollectionView?
@@ -54,7 +52,7 @@ class ANICommunityViewController: UIViewController {
     let menuBar = ANICommunityMenuBar()
     menuBar.aniCoummunityViewController = self
     self.view.addSubview(menuBar)
-    let menuBarHeight = ANICommunityViewController.STATUS_BAR_HEIGHT + ANICommunityViewController.NAVIGATION_BAR_HEIGHT
+    let menuBarHeight = UIViewController.STATUS_BAR_HEIGHT + UIViewController.NAVIGATION_BAR_HEIGHT
     menuBar.topToSuperview()
     menuBar.leftToSuperview()
     menuBar.rightToSuperview()
