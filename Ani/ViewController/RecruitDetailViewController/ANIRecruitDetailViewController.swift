@@ -26,7 +26,7 @@ class ANIRecruitDetailViewController: UIViewController {
     //recruitDetailView
     let recruitDetailView = ANIRecruitDetailView()
     recruitDetailView.headerMinHeight = UIViewController.STATUS_BAR_HEIGHT + UIViewController.NAVIGATION_BAR_HEIGHT
-    recruitDetailView.delegete = self
+    recruitDetailView.delegate = self
     self.view.addSubview(recruitDetailView)
     recruitDetailView.edgesToSuperview()
     self.recruitDetailView = recruitDetailView

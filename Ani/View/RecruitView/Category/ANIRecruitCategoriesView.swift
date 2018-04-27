@@ -11,7 +11,7 @@ import TinyConstraints
 
 class ANIRecruitCategoriesView: UIView {
   
-  private weak var categoryCollectionView: UICollectionView?
+  weak var categoryCollectionView: UICollectionView?
   
   private var testArr = [String]()
   
@@ -26,9 +26,11 @@ class ANIRecruitCategoriesView: UIView {
   }
   
   private func setup() {
+    self.backgroundColor = .white
+    
     let flowlayout = UICollectionViewFlowLayout()
     flowlayout.scrollDirection = .horizontal
-    flowlayout.sectionInset = UIEdgeInsets(top: -10, left: 12, bottom: 0, right: 12)
+    flowlayout.sectionInset = UIEdgeInsets(top: -2, left: 12, bottom: 0, right: 12)
     let collectionView = UICollectionView(frame: self.frame, collectionViewLayout: flowlayout)
     let id = NSStringFromClass(ANIRecruitCategoryCell.self)
     collectionView.register(ANIRecruitCategoryCell.self, forCellWithReuseIdentifier: id)

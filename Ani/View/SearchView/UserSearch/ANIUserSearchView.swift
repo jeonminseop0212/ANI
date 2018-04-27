@@ -8,10 +8,16 @@
 
 import UIKit
 
+protocol ANIUserSearchViewDelegate {
+  func userSearchViewDidScroll(scrollY: CGFloat)
+}
+
 class ANIUserSearchView: UIView {
   
   weak var userTableView: UITableView?
   private var testUserSearchResult = [User]()
+  
+  var delegate: ANIUserSearchViewDelegate?
 
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -26,8 +32,9 @@ class ANIUserSearchView: UIView {
   private func setup() {
     let tableView = UITableView()
     tableView.separatorStyle = .none
-    tableView.contentInset = UIEdgeInsets(top: ANISearchViewController.CATEGORIES_VIEW_HEIGHT, left: 0, bottom: 0, right: 0)
-    tableView.scrollIndicatorInsets  = UIEdgeInsets(top: ANISearchViewController.CATEGORIES_VIEW_HEIGHT, left: 0, bottom: 0, right: 0)
+    let topInset = UIViewController.NAVIGATION_BAR_HEIGHT + ANIRecruitViewController.CATEGORIES_VIEW_HEIGHT
+    tableView.contentInset = UIEdgeInsets(top: topInset, left: 0, bottom: 0, right: 0)
+    tableView.scrollIndicatorInsets  = UIEdgeInsets(top: topInset, left: 0, bottom: 0, right: 0)
     tableView.dataSource = self
     tableView.delegate = self
     let id = NSStringFromClass(ANIUserSearchViewCell.self)
@@ -68,5 +75,9 @@ extension ANIUserSearchView: UITableViewDataSource, UITableViewDelegate {
   
   func scrollViewDidScroll(_ scrollView: UIScrollView) {
     ANINotificationManager.postViewScrolled()
+    
+    //navigation bar animation
+    let scrollY = scrollView.contentOffset.y
+    self.delegate?.userSearchViewDidScroll(scrollY: scrollY)
   }
 }

@@ -28,8 +28,8 @@ class ANIMessageView: UIView {
     let messageCollectionView = UICollectionView(frame: self.frame, collectionViewLayout: flowLayout)
     let id = NSStringFromClass(ANIMessageViewCell.self)
     messageCollectionView.register(ANIMessageViewCell.self, forCellWithReuseIdentifier: id)
-    messageCollectionView.contentInset = UIEdgeInsets(top: ANICommunityViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: ANICommunityViewController.NAVIGATION_BAR_HEIGHT + ANICommunityViewController.STATUS_BAR_HEIGHT, right: 0)
-    messageCollectionView.scrollIndicatorInsets  = UIEdgeInsets(top: ANICommunityViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: ANICommunityViewController.NAVIGATION_BAR_HEIGHT + ANICommunityViewController.STATUS_BAR_HEIGHT, right: 0)
+    messageCollectionView.contentInset = UIEdgeInsets(top: UIViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT, right: 0)
+    messageCollectionView.scrollIndicatorInsets  = UIEdgeInsets(top: UIViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT, right: 0)
     messageCollectionView.backgroundColor = ANIColor.bg
     messageCollectionView.alwaysBounceVertical = true
     messageCollectionView.dataSource = self
