@@ -8,12 +8,18 @@
 
 import UIKit
 
+protocol ANIRecruitViewDelegate {
+  func recruitRowTap()
+}
+
 class ANIRecuruitView: UIView {
 
   weak var recruitTableView: UITableView?
   
   private var testRecruitLists = [Recurit]()
 
+  var delegate:ANIRecruitViewDelegate?
+  
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()
@@ -66,6 +72,10 @@ extension ANIRecuruitView: UITableViewDataSource, UITableViewDelegate {
     cell.supportCountLabel.text = "\(testRecruitLists[indexPath.item].supportCount)"
     cell.loveCountLabel.text = "\(testRecruitLists[indexPath.item].loveCount)"
     return cell
+  }
+  
+  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    self.delegate?.recruitRowTap()
   }
   
   func scrollViewDidScroll(_ scrollView: UIScrollView) {

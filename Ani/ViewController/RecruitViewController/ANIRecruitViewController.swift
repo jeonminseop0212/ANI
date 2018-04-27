@@ -41,6 +41,7 @@ class ANIRecruitViewController: ScrollingNavigationViewController {
     Orientation.lockOrientation(.portrait)
     self.view.backgroundColor = .white
     //nav barの下からviewが開始するように
+    self.navigationController?.setNavigationBarHidden(true, animated: false)
     self.navigationController?.navigationBar.isTranslucent = false
     
     //searchBar
@@ -63,6 +64,7 @@ class ANIRecruitViewController: ScrollingNavigationViewController {
     
     //rcruitView
     let recruitView = ANIRecuruitView()
+    recruitView.delegate = self
     self.view.addSubview(recruitView)
     recruitView.edgesToSuperview()
     self.recruitView = recruitView
@@ -140,5 +142,12 @@ extension ANIRecruitViewController:ANIButtonViewDelegate{
     if view === self.contributionButon {
       print("recruit contribution tapped")
     }
+  }
+}
+
+extension ANIRecruitViewController: ANIRecruitViewDelegate {
+  func recruitRowTap() {
+    let recruitDetailViewController = ANIRecruitDetailViewController()
+    self.navigationController?.pushViewController(recruitDetailViewController, animated: true)
   }
 }
