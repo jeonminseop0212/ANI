@@ -93,7 +93,7 @@ class ANISearchViewController: UIViewController {
     }
   }
   
-  //MARK: - Notifications
+  //MARK: Notifications
   private func setupNotifications() {
     ANINotificationManager.receive(viewScrolled: self, selector: #selector(hideKeyboard))
   }

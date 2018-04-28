@@ -16,6 +16,10 @@ class ANIRecruitDetailViewController: UIViewController {
   
   private weak var recruitDetailView: ANIRecruitDetailView?
   
+  static let APPLY_BUTTON_HEIGHT: CGFloat = 45.0
+  private weak var applyButton: ANIAreaButtonView?
+  private weak var applyButtonLabel: UILabel?
+  
   var testRecruit: Recruit?
 
   override func viewDidLoad() {
@@ -77,11 +81,38 @@ class ANIRecruitDetailViewController: UIViewController {
     clipButton.rightToSuperview()
     clipButton.bottomToSuperview()
     self.clipButton = clipButton
+    
+    //applyButton
+    let applyButton = ANIAreaButtonView()
+    applyButton.base?.backgroundColor = ANIColor.green
+    applyButton.baseCornerRadius = ANIRecruitDetailViewController.APPLY_BUTTON_HEIGHT / 2
+    applyButton.dropShadow(opacity: 0.2)
+    applyButton.delegate = self
+    self.view.addSubview(applyButton)
+    applyButton.bottomToSuperview(offset: -10.0)
+    applyButton.leftToSuperview(offset: 100.0)
+    applyButton.rightToSuperview(offset: 100.0)
+    applyButton.height(ANIRecruitDetailViewController.APPLY_BUTTON_HEIGHT)
+    self.applyButton = applyButton
+    
+    //applyButtonLabel
+    let applyButtonLabel = UILabel()
+    applyButtonLabel.text = "お話ししたい"
+    applyButtonLabel.textAlignment = .center
+    applyButtonLabel.font = UIFont.boldSystemFont(ofSize: 17.0)
+    applyButtonLabel.textColor = .white
+    applyButton.addContent(applyButtonLabel)
+    applyButtonLabel.edgesToSuperview()
+    self.applyButtonLabel = applyButtonLabel
   }
   
   //MARK: Action
   @objc private func back() {
     self.navigationController?.popViewController(animated: true)
+  }
+  
+  @objc private func apply() {
+    print("apply")
   }
 }
 
@@ -118,6 +149,9 @@ extension ANIRecruitDetailViewController: ANIButtonViewDelegate {
   func buttonViewTapped(view: ANIButtonView) {
     if view === self.clipButton {
       print("clip button tapped")
+    }
+    if view === self.applyButton {
+      print("apply button tapped")
     }
   }
 }

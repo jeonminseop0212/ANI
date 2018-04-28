@@ -9,28 +9,24 @@
 import UIKit
 import TinyConstraints
 
-class ANIImageButtonView:ANIButtonView{
-  required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+class ANIImageButtonView: ANIButtonView{
   
-  var imageView:UIImageView?
-  private var imageWidthConst:Constraint?
-  private var imageHeightConst:Constraint?
+  var imageView: UIImageView?
+  private var imageWidthConst: Constraint?
+  private var imageHeightConst: Constraint?
   
   var imageSize:CGSize = .zero{
-    didSet{
+    didSet {
       if self.imageWidthConst == nil {
         if imageSize == .zero, let size = self.imageView?.image?.size {
           self.imageWidthConst = self.imageView?.width(size.width, priority: LayoutPriority.defaultHigh)
-        }
-        else{
+        } else {
           self.imageWidthConst = self.imageView?.width(imageSize.width, priority: LayoutPriority.defaultHigh)
         }
-      }
-      else{
+      } else {
         if imageSize == .zero, let size = self.imageView?.image?.size {
           self.imageWidthConst?.constant = size.width
-        }
-        else{
+        } else {
           self.imageWidthConst?.constant = imageSize.width
         }
       }
@@ -38,16 +34,13 @@ class ANIImageButtonView:ANIButtonView{
       if self.imageHeightConst == nil {
         if imageSize == .zero, let size = self.imageView?.image?.size {
           self.imageHeightConst = self.imageView?.height(size.height, priority: LayoutPriority.defaultHigh)
-        }
-        else{
+        } else {
           self.imageHeightConst = self.imageView?.height(imageSize.height, priority: LayoutPriority.defaultHigh)
         }
-      }
-      else{
+      } else {
         if imageSize == .zero, let size = self.imageView?.image?.size {
           self.imageHeightConst?.constant = size.height
-        }
-        else{
+        } else {
           self.imageHeightConst?.constant = imageSize.height
         }
       }
@@ -56,10 +49,10 @@ class ANIImageButtonView:ANIButtonView{
   }
   
   var image:UIImage?{
-    get{
+    get {
       return self.imageView?.image
     }
-    set(v){
+    set(v) {
       self.imageView?.image = v
       if imageSize == .zero, let size = v?.size{
         self.imageSize = size
@@ -68,10 +61,10 @@ class ANIImageButtonView:ANIButtonView{
   }
   
   override var tintColor: UIColor!{
-    get{
+    get {
       return self.imageView?.tintColor
     }
-    set(v){
+    set(v) {
       self.imageView?.tintColor = v
     }
   }
@@ -79,6 +72,10 @@ class ANIImageButtonView:ANIButtonView{
   override init(frame: CGRect = .zero) {
     super.init(frame: frame)
     self.setup()
+  }
+  
+  required init?(coder aDecoder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
   }
   
   private func setup(){
@@ -91,7 +88,7 @@ class ANIImageButtonView:ANIButtonView{
   
   override func touchDown(_ contain: Bool) {
     super.touchDown(contain)
-    if isAnimation{
+    if isAnimation {
       UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseInOut, animations: {
         self.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
       })
@@ -100,7 +97,7 @@ class ANIImageButtonView:ANIButtonView{
   
   override func touchUp(_ contain: Bool) {
     super.touchUp(contain)
-    if isAnimation{
+    if isAnimation {
       UIView.animate(withDuration: 0.2, delay: 0.2, options: .curveEaseInOut, animations: {
         self.transform = .identity
       })

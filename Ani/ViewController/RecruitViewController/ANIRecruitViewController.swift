@@ -109,10 +109,11 @@ class ANIRecruitViewController: UIViewController {
     self.contributionButon = contributionButon
   }
   
+  
+  //MARK: Action
   @objc func filter() {
     print("filtering")
   }
-  
   
   @objc private func hideKeyboard() {
     guard let searchBar = self.searchBar,
@@ -137,7 +138,7 @@ class ANIRecruitViewController: UIViewController {
     self.testRecruitLists = [recruit1, recruit2, recruit3, recruit1, recruit2, recruit3]
   }
   
-  //MARK: - Notifications
+  //MARK: Notifications
   private func setupNotifications() {
     ANINotificationManager.receive(viewScrolled: self, selector: #selector(hideKeyboard))
   }

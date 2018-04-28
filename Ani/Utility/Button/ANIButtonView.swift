@@ -8,15 +8,15 @@
 
 import UIKit
 
-protocol ANIButtonViewDelegate : NSObjectProtocol {
-  func buttonViewTapped(view:ANIButtonView)
+protocol ANIButtonViewDelegate: NSObjectProtocol {
+  func buttonViewTapped(view: ANIButtonView)
 }
 
 class ANIButtonView: UIView {
-  weak var delegate:ANIButtonViewDelegate?
-  var e:CGFloat = 0.9
-  private var isDown:Bool = false
-  var isAnimation:Bool = true
+  weak var delegate: ANIButtonViewDelegate?
+  var e: CGFloat = 0.9
+  private var isDown: Bool = false
+  var isAnimation: Bool = true
   
   convenience init() { self.init(frame: CGRect.zero) }
   override init(frame: CGRect) {

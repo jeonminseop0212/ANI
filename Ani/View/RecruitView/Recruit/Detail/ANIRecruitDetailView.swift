@@ -311,7 +311,7 @@ class ANIRecruitDetailView: UIView {
     passingBG.topToBottom(of: passingTitleLabel, offset: 10.0)
     passingBG.leftToSuperview(offset: 10.0)
     passingBG.rightToSuperview(offset: 10.0)
-    passingBG.bottomToSuperview(offset: -10.0)
+    passingBG.bottomToSuperview(offset: -10.0 - 10.0 - ANIRecruitDetailViewController.APPLY_BUTTON_HEIGHT)
     self.passingBG = passingBG
     
     let passingLabel = UILabel()
