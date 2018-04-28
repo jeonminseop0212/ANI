@@ -21,4 +21,29 @@ extension UIView {
     self.layer.shouldRasterize = true
     self.layer.rasterizationScale = UIScreen.main.scale
   }
+  
+  var x:CGFloat {
+    get { return self.frame.origin.x }
+    set(v) { self.frame.origin.x = v }
+  }
+  var y:CGFloat {
+    get { return self.frame.origin.y }
+    set(v) { self.frame.origin.y = v }
+  }
+  var width:CGFloat {
+    get { return self.frame.size.width }
+    set(v) { self.frame.size.width = v }
+  }
+  var height:CGFloat {
+    get { return self.frame.size.height }
+    set(v) { self.frame.size.height = v }
+  }
+  var right:CGFloat {
+    get { return self.x + self.width }
+    set(v) { self.x = v - self.width }
+  }
+  var bottom:CGFloat {
+    get { return self.y + self.height }
+    set(v) { self.y = v - self.height }
+  }
 }

@@ -12,6 +12,7 @@ class ANIRecruitViewCell: UITableViewCell {
   var recruitImageView = UIImageView()
   var titleLabel = UILabel()
   var subTitleLabel = UILabel()
+  private let PROFILE_IMAGE_HEIGHT: CGFloat = 32.0
   var profileImageView = UIImageView()
   var userNameLabel = UILabel()
   var supportCountLabel = UILabel()
@@ -70,9 +71,9 @@ class ANIRecruitViewCell: UITableViewCell {
     addSubview(profileImageView)
     profileImageView.topToBottom(of: subTitleLabel, offset: 10.0)
     profileImageView.leftToSuperview(offset: 10.0)
-    profileImageView.width(32.0)
-    profileImageView.height(32.0)
-    profileImageView.layer.cornerRadius = profileImageView.constraints[0].constant / 2
+    profileImageView.width(PROFILE_IMAGE_HEIGHT)
+    profileImageView.height(PROFILE_IMAGE_HEIGHT)
+    profileImageView.layer.cornerRadius = PROFILE_IMAGE_HEIGHT / 2
     profileImageView.layer.masksToBounds = true
     self.profileImageView = profileImageView
     
