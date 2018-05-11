@@ -160,10 +160,13 @@ extension ANIRecruitViewController: UISearchBarDelegate {
   }
 }
 
+//MARK: ButtonViewDelegate
 extension ANIRecruitViewController:ANIButtonViewDelegate{
   func buttonViewTapped(view: ANIButtonView) {
     if view === self.contributionButon {
-      print("recruit contribution tapped")
+      let recruitContribtionViewController = RecruitContributionViewController()
+      let recruitContributionNV = UINavigationController(rootViewController: recruitContribtionViewController)
+      self.navigationController?.present(recruitContributionNV, animated: true, completion: nil)
     }
   }
 }

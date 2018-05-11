@@ -1,0 +1,749 @@
+import UIKit
+import Photos
+
+protocol GridViewDelegate {
+  func previewImageDidScroll(offset: CGPoint)
+  func previewImageDidZoom(scale: CGFloat)
+}
+
+class GridView: UIView {
+  
+  // MARK: - Initialization
+  
+  //修正
+  var topViewTopConstraint: NSLayoutConstraint?
+  
+  lazy var topView: UIView = self.makeTopView()
+  lazy var bottomView: UIView = self.makeBottomView()
+  //修正
+  //  lazy var bottomBlurView: UIVisualEffectView = self.makeBottomBlurView()
+  
+  lazy var arrowButton: ArrowButton = self.makeArrowButton()
+  //修正
+  lazy var previewScollView: UIScrollView = self.makePreviewScrollView()
+  lazy var previewImageView: UIImageView = self.makePreviewImageView()
+  lazy var fitButton: UIButton = self.makeFitButton()
+  
+  //修正
+  lazy var videoPreviewView: UIView = self.makeVideoPreviewView()
+  var player: AVPlayer?
+  //  var playerLayer: AVPlayerLayer?
+  var paused: Bool = false
+  var videoPlayerItem: AVPlayerItem? {
+    didSet {
+      let asset = self.videoPlayerItem?.asset
+      let track = asset?.tracks(withMediaType: .video).first
+      guard let trackUnrap = track else { return }
+      let size = __CGSizeApplyAffineTransform(trackUnrap.naturalSize, trackUnrap.preferredTransform)
+      let videoSize = CGSize(width: fabs(size.width), height: fabs(size.height))
+      
+      setVideoPlayer(size: videoSize)
+    }
+  }
+  
+  lazy var collectionView: UICollectionView = self.makeCollectionView()
+  lazy var closeButton: UIButton = self.makeCloseButton()
+  lazy var doneButton: UIButton = self.makeDoneButton()
+  lazy var emptyView: UIView = self.makeEmptyView()
+  lazy var loadingIndicator: UIActivityIndicatorView = self.makeLoadingIndicator()
+  
+  //修正
+  var delegate: GridViewDelegate?
+  var isShown = true
+  let imageCropViewMinimalVisibleHeight: CGFloat  = 50.0
+  internal let panGestureHelper = PanGestureHelper()
+  
+  //修正
+  var squaredZoomScale: CGFloat = 1.0
+  var offset: CGPoint = CGPoint(x: 0.0, y: 0.0)
+  var isSelectedImage = false
+  var image: UIImage? = nil {
+    didSet {
+      guard let image = self.image else { return }
+      self.previewScollView.minimumZoomScale = 1.0
+      self.previewScollView.setZoomScale(1.0, animated: false)
+      if Config.Camera.oneImageMode {
+        self.previewScollView.contentOffset = CGPoint(x: 0, y: 0)
+      }
+      
+      let screenSize: CGFloat = UIScreen.main.bounds.width
+      //      self.previewImageView.frame.size.width = screenSize
+      //      self.previewImageView.frame.size.height = screenSize
+      
+      var squareZoomScale: CGFloat = 1.0
+      let w = image.size.width
+      let h = image.size.height
+      
+      //修正
+      if w >= h { // Landscape
+        squareZoomScale = (1.0 / (w / h))
+        self.previewImageView.frame.size.width = screenSize
+        self.previewImageView.frame.size.height = screenSize*squareZoomScale
+        
+      } else if h > w { // Portrait
+        squareZoomScale = (1.0 / (h / w))
+        self.previewImageView.frame.size.width = screenSize*squareZoomScale
+        self.previewImageView.frame.size.height = screenSize
+      }
+      self.previewImageView.center = self.previewScollView.center
+      //      self.previewImageView.frame.origin.y = self.previewImageView.frame.origin.y - self.topView.frame.height - 1
+      
+      self.previewImageView.image = self.image
+      previewImageView.clipsToBounds = true
+      refreshZoomScale()
+      
+      //修正
+      previewScollView.setZoomScale(squaredZoomScale, animated: false)
+      
+      if Config.Camera.oneImageMode {
+        self.previewScollView.minimumZoomScale = squaredZoomScale
+      }
+    }
+  }
+  var selectedImage: UIImage! = nil {
+    didSet {
+      previewScollView.setZoomScale(1.0, animated: false)
+      
+      let screenSize: CGFloat = UIScreen.main.bounds.width
+      //      self.previewImageView.frame.size.width = screenSize
+      //      self.previewImageView.frame.size.height = screenSize
+      
+      var squareZoomScale: CGFloat = 1.0
+      let w = selectedImage.size.width
+      let h = selectedImage.size.height
+      
+      //修正
+      if w >= h { // Landscape
+        squareZoomScale = (1.0 / (w / h))
+        self.previewImageView.frame.size.width = screenSize
+        self.previewImageView.frame.size.height = screenSize*squareZoomScale
+        
+      } else if h > w { // Portrait
+        squareZoomScale = (1.0 / (h / w))
+        self.previewImageView.frame.size.width = screenSize*squareZoomScale
+        self.previewImageView.frame.size.height = screenSize
+      }
+      
+      self.previewImageView.center = self.previewScollView.center
+      self.previewImageView.frame.origin.y = self.previewImageView.frame.origin.y - self.topView.frame.height - 1
+      
+      self.previewImageView.image = selectedImage
+      previewImageView.clipsToBounds = true
+      
+      previewScollView.setZoomScale(squaredZoomScale, animated: false)
+      previewScollView.contentOffset = offset
+    }
+  }
+  var shouldCropToSquare = false
+  
+  // MARK: - Initialization
+  
+  override init(frame: CGRect) {
+    super.init(frame: frame)
+    
+    setup()
+    loadingIndicator.startAnimating()
+  }
+  
+  required init?(coder aDecoder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+  
+  // MARK: - Setup
+  
+  private func setup() {
+    panGestureHelper.registerForPanGesture(on: self)
+    
+    [previewScollView, fitButton, collectionView, bottomView, topView, emptyView, loadingIndicator].forEach {
+      addSubview($0)
+    }
+    
+    //修正
+    [previewImageView, videoPreviewView].forEach {
+      previewScollView.addSubview($0)
+    }
+    
+    //修正
+    [closeButton, arrowButton, doneButton].forEach {
+      topView.addSubview($0)
+    }
+    //    [closeButton, arrowButton].forEach {
+    //      topView.addSubview($0)
+    //    }
+    
+    //修正
+    //    [bottomBlurView, doneButton].forEach {
+    //      bottomView.addSubview($0)
+    //    }
+    
+    Constraint.on(
+      topView.leftAnchor.constraint(equalTo: topView.superview!.leftAnchor),
+      topView.rightAnchor.constraint(equalTo: topView.superview!.rightAnchor),
+      topView.heightAnchor.constraint(equalToConstant: 40),
+      
+      loadingIndicator.centerXAnchor.constraint(equalTo: loadingIndicator.superview!.centerXAnchor),
+      loadingIndicator.centerYAnchor.constraint(equalTo: loadingIndicator.superview!.centerYAnchor)
+    )
+    
+    //修正
+    //    topViewTopConstraint = topView.g_pin(on: .top, view: topView.superview!, on: .top)
+    //    if topViewTopConstraint != nil {
+    //      topViewTopConstraint?.constant = -100
+    //    }
+    
+    //修正
+    if #available(iOS 11, *) {
+      topViewTopConstraint = topView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor)
+      topViewTopConstraint?.isActive = true
+    } else {
+      topViewTopConstraint =  topView.topAnchor.constraint(equalTo: topView.superview!.topAnchor)
+      topViewTopConstraint?.isActive = true
+    }
+    //    if #available(iOS 11, *) {
+    //      Constraint.on(
+    //        topView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor)
+    //      )
+    //    } else {
+    //      Constraint.on(
+    //        topView.topAnchor.constraint(equalTo: topView.superview!.topAnchor)
+    //      )
+    //    }
+    
+    bottomView.g_pinDownward()
+    bottomView.g_pin(height: 80)
+    
+    emptyView.g_pinEdges(view: collectionView)
+    
+    //修正
+    let previewScrollViewHeight: CGFloat = UIScreen.main.bounds.width * Config.Grid.previewRatio
+    previewScollView.g_pin(height: previewScrollViewHeight)
+    previewScollView.g_pin(on: .left)
+    previewScollView.g_pin(on: .right)
+    previewScollView.g_pin(on: .top, view: topView, on: .bottom, constant: 1)
+    
+    //修正
+    previewImageView.frame = CGRect(origin: CGPoint.zero, size: CGSize.zero)
+    
+    //修正
+    fitButton.g_pin(size: CGSize(width: 40, height: 40))
+    fitButton.g_pin(on: .bottom, view: collectionView, on: .top, constant: -10)
+    fitButton.g_pin(on: .left, constant: 10)
+    
+    collectionView.g_pinDownward()
+    collectionView.g_pin(on: .top, view: previewScollView, on: .bottom, constant: 1)
+    
+    //修正
+    //    bottomBlurView.g_pinEdges()
+    
+    closeButton.g_pin(on: .top)
+    closeButton.g_pin(on: .left)
+    closeButton.g_pin(size: CGSize(width: 40, height: 40))
+    
+    arrowButton.g_pinCenter()
+    arrowButton.g_pin(height: 40)
+    
+    //修正
+    doneButton.g_pin(on: .top)
+    doneButton.g_pin(on: .right)
+    doneButton.g_pin(size: CGSize(width: 60, height: 40))
+    //    doneButton.g_pin(on: .centerY)
+    //    doneButton.g_pin(on: .right, constant: -38)
+  }
+  
+  // MARK: - Controls
+  
+  private func makeTopView() -> UIView {
+    let view = UIView()
+    view.backgroundColor = UIColor.white
+    
+    return view
+  }
+  
+  private func makeBottomView() -> UIView {
+    let view = UIView()
+    
+    return view
+  }
+  
+  //修正
+  //  private func makeBottomBlurView() -> UIVisualEffectView {
+  //    let view = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
+  //
+  //    return view
+  //  }
+  
+  private func makeArrowButton() -> ArrowButton {
+    let button = ArrowButton()
+    button.layoutSubviews()
+    
+    return button
+  }
+  
+  private func makeGridView() -> GridView {
+    let view = GridView()
+    
+    return view
+  }
+  
+  private func makeCloseButton() -> UIButton {
+    let button = UIButton(type: .custom)
+    button.setImage(GalleryBundle.image("gallery_close")?.withRenderingMode(.alwaysTemplate), for: UIControlState())
+    button.tintColor = Config.Grid.CloseButton.tintColor
+    
+    return button
+  }
+  
+  private func makeDoneButton() -> UIButton {
+    let button = UIButton(type: .system)
+    //修正
+    button.setTitleColor(UIColor.green, for: UIControlState())
+    button.isEnabled = false
+    //    button.setTitleColor(UIColor.white, for: UIControlState())
+    
+    button.setTitleColor(UIColor.lightGray, for: .disabled)
+    button.titleLabel?.font = Config.Font.Text.regular.withSize(16)
+    button.setTitle("Gallery.Done".g_localize(fallback: "Done"), for: UIControlState())
+    
+    return button
+  }
+  
+  private func makeCollectionView() -> UICollectionView {
+    let layout = UICollectionViewFlowLayout()
+    layout.minimumInteritemSpacing = 2
+    layout.minimumLineSpacing = 2
+    
+    let view = UICollectionView(frame: .zero, collectionViewLayout: layout)
+    view.backgroundColor = UIColor.white
+    
+    return view
+  }
+  
+  private func makeFitButton() -> UIButton {
+    let view = UIButton()
+    //修正
+    view.backgroundColor = .white
+    view.backgroundColor = .black
+    
+    view.addTarget(self, action: #selector(squareCropButtonTapped), for: .touchUpInside)
+    
+    if Config.Camera.oneImageMode {
+      view.alpha = 0.0
+    } else {
+      view.alpha = 0.5
+    }
+    
+    return view
+  }
+  
+  @objc func squareCropButtonTapped() {
+    let z = previewScollView.zoomScale
+    if z >= 1 && z < squaredZoomScale {
+      shouldCropToSquare = true
+    } else {
+      shouldCropToSquare = false
+    }
+    setFitImage(shouldCropToSquare)
+  }
+  
+  private func setFitImage(_ fit: Bool, animated isAnimated: Bool = true) {
+    let animated = isAnimated
+    refreshZoomScale()
+    if fit {
+      self.previewScollView.setZoomScale(squaredZoomScale, animated: animated)
+    } else {
+      self.previewScollView.setZoomScale(1, animated: animated)
+    }
+  }
+  
+  //修正
+  private func makePreviewScrollView() -> UIScrollView {
+    let view = UIScrollView()
+    view.delegate = self
+    view.maximumZoomScale = 6.0
+    view.minimumZoomScale = 1
+    view.showsHorizontalScrollIndicator = false
+    view.showsVerticalScrollIndicator   = false
+    view.alwaysBounceHorizontal = false
+    view.alwaysBounceVertical = false
+    view.isScrollEnabled = true
+    view.bouncesZoom = false
+    view.bounces = false
+    
+    return view
+  }
+  
+  //修正
+  private func makePreviewImageView() -> UIImageView {
+    let view = UIImageView()
+    view.contentMode = .scaleAspectFit
+    
+    return view
+  }
+  
+  //修正
+  private func makeVideoPreviewView() -> UIView {
+    let view = UIView()
+    
+    return view
+  }
+  
+  //修正
+  private func setVideoPlayer(size: CGSize) {
+    videoPreviewView.layer.sublayers?.forEach { $0.removeFromSuperlayer() }
+    
+    player = AVPlayer.init(playerItem: self.videoPlayerItem)
+    let playerLayer = AVPlayerLayer(player: player)
+    playerLayer.videoGravity = .resizeAspect
+    videoPreviewView.layer.insertSublayer(playerLayer, at: 0)
+    
+    previewScollView.setZoomScale(1.0, animated: false)
+    
+    let screenSize: CGFloat = UIScreen.main.bounds.width
+    self.videoPreviewView.frame.size.width = screenSize
+    self.videoPreviewView.frame.size.height = screenSize
+    
+    var squareZoomScale: CGFloat = 1.0
+    
+    let w = size.width
+    let h = size.height
+    
+    if w >= h { // Landscape
+      squareZoomScale = (1.0 / (w / h))
+      self.videoPreviewView.frame.size.width = screenSize
+      self.videoPreviewView.frame.size.height = screenSize*squareZoomScale
+      
+    } else if h > w { // Portrait
+      squareZoomScale = (1.0 / (h / w))
+      self.videoPreviewView.frame.size.width = screenSize*squareZoomScale
+      self.videoPreviewView.frame.size.height = screenSize
+    }
+    self.videoPreviewView.center = self.previewScollView.center
+    self.videoPreviewView.frame.origin.y = self.videoPreviewView.frame.origin.y - self.topView.frame.height - 1
+    playerLayer.frame = CGRect(x: 0, y: 0, width: videoPreviewView.frame.width, height: videoPreviewView.frame.height)
+    
+    refreshZoomScale()
+    
+    previewScollView.setZoomScale(squaredZoomScale, animated: false)
+    
+    player?.play()
+  }
+  
+  private func updateVideoPreviewViewFrame(size: CGSize) {
+    previewScollView.setZoomScale(1.0, animated: false)
+    
+    let screenSize: CGFloat = UIScreen.main.bounds.width
+    self.videoPreviewView.frame.size.width = screenSize
+    self.videoPreviewView.frame.size.height = screenSize
+    
+    var squareZoomScale: CGFloat = 1.0
+    
+    let w = size.width
+    let h = size.height
+    
+    if w >= h { // Landscape
+      squareZoomScale = (1.0 / (w / h))
+      self.videoPreviewView.frame.size.width = screenSize
+      self.videoPreviewView.frame.size.height = screenSize*squareZoomScale
+      
+    } else if h > w { // Portrait
+      squareZoomScale = (1.0 / (h / w))
+      self.videoPreviewView.frame.size.width = screenSize*squareZoomScale
+      self.videoPreviewView.frame.size.height = screenSize
+    }
+    self.videoPreviewView.center = self.previewScollView.center
+    self.videoPreviewView.frame.origin.y = self.videoPreviewView.frame.origin.y - self.topView.frame.height - 1
+    //    playerLayer?.frame = CGRect(x: 0, y: 0, width: videoPreviewView.frame.width, height: videoPreviewView.frame.height)
+    
+    refreshZoomScale()
+    
+    previewScollView.setZoomScale(squaredZoomScale, animated: false)
+  }
+  
+  private func makeEmptyView() -> EmptyView {
+    let view = EmptyView()
+    view.isHidden = true
+    
+    return view
+  }
+  
+  private func makeLoadingIndicator() -> UIActivityIndicatorView {
+    let view = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
+    view.color = .gray
+    view.hidesWhenStopped = true
+    
+    return view
+  }
+  
+  //修正
+  func refreshZoomScale() {
+    var squareZoomScale: CGFloat = 1.0
+    var w: CGFloat = 0.0
+    var h: CGFloat = 0.0
+    
+    if let image = self.image {
+      if !isSelectedImage {
+        w = image.size.width
+        h = image.size.height
+      } else {
+        if let selectedImage = self.selectedImage {
+          w = selectedImage.size.width
+          h = selectedImage.size.height
+        }
+      }
+    }
+    
+    if let videoPlayerItem = self.videoPlayerItem {
+      let asset = videoPlayerItem.asset
+      let track = asset.tracks(withMediaType: .video).first
+      let size = track?.naturalSize
+      
+      guard let sizeUnrap = size else { return }
+      
+      w = sizeUnrap.width
+      h = sizeUnrap.height
+    }
+    
+    if w >= h { // Landscape
+      if h >= w * Config.Grid.previewRatio {
+        squareZoomScale = 1.0
+        
+        
+        let boundsSize = previewScollView.bounds.size //CGSize(width: screenWidth, height: screenWidth)
+        var contentsFrame = previewImageView.frame
+        
+        if contentsFrame.size.height < boundsSize.height {
+          contentsFrame.origin.y = (boundsSize.height - contentsFrame.size.height) / 2.0
+        } else {
+          contentsFrame.origin.y = 0.0
+          previewScollView.contentOffset.y = (contentsFrame.size.height - boundsSize.height) / 2.0
+        }
+        previewImageView.frame = contentsFrame
+        
+        
+        
+      } else {
+        squareZoomScale = (w / h)
+      }
+    } else if h > w { // Portrait
+      squareZoomScale = (h / w)
+      previewScollView.contentOffset.y = (previewImageView.frame.size.height - previewScollView.bounds.size.height) / 2.0
+    }
+    squaredZoomScale = squareZoomScale
+  }
+}
+
+enum DragDirection {
+  case scroll
+  case stop
+  case up
+  case down
+}
+
+public class PanGestureHelper: NSObject, UIGestureRecognizerDelegate {
+  
+  var v: GridView!
+  private let topViewOriginalConstraintTop: CGFloat = 0
+  private var dragDirection = DragDirection.up
+  private var imaginaryCollectionViewOffsetStartPosY: CGFloat = 0.0
+  private var bottomY: CGFloat  = 0.0
+  private var dragStartPos: CGPoint = .zero
+  private let dragDiff: CGFloat = 0
+  private var _isImageShown = true
+  
+  var isImageShown: Bool {
+    get { return self._isImageShown }
+    set {
+      if newValue != isImageShown {
+        self._isImageShown = newValue
+        v.isShown = newValue
+        // Update imageCropContainer
+        //        v.imageCropView.isScrollEnabled = isImageShown
+      }
+    }
+  }
+  
+  func registerForPanGesture(on view: GridView) {
+    v = view
+    let panGesture = UIPanGestureRecognizer(target: self, action: #selector(panned(_:)))
+    panGesture.delegate = self
+    view.addGestureRecognizer(panGesture)
+    v.topViewTopConstraint?.constant = 0
+  }
+  
+  func resetToOriginalState() {
+    v.topViewTopConstraint?.constant = topViewOriginalConstraintTop
+    UIView.animate(withDuration: 0.3,
+                   delay: 0.0,
+                   options: .curveEaseOut,
+                   animations: v.layoutIfNeeded,
+                   completion: nil)
+    dragDirection = .up
+  }
+  
+  //修正
+  func resetToOriginalStateTappedCell(index: IndexPath) {
+    if v.topViewTopConstraint?.constant != topViewOriginalConstraintTop {
+      v.topViewTopConstraint?.constant = topViewOriginalConstraintTop
+      UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseOut, animations: {
+        self.v.collectionView.scrollToItem(at: index, at: .top, animated: false)
+        self.v.layoutIfNeeded()
+      }, completion: nil)
+      dragDirection = .up
+    } else {
+      self.v.collectionView.scrollToItem(at: index, at: .top, animated: true)
+    }
+  }
+  
+  public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith
+    otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+    return true
+  }
+  
+  public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+    let p = gestureRecognizer.location(ofTouch: 0, in: v)
+    // Desactivate pan on image when it is shown.
+    if isImageShown {
+      if p.y < v.previewImageView.bounds.maxY {
+        return false
+      }
+    }
+    return true
+  }
+  
+  @objc
+  func panned(_ sender: UIPanGestureRecognizer) {
+    
+    let preViewHeight = v.topView.frame.height + v.previewScollView.frame.height
+    if sender.state == UIGestureRecognizerState.began {
+      let view    = sender.view
+      let loc     = sender.location(in: view)
+      let subview = view?.hitTest(loc, with: nil)
+      
+      if subview == v.previewImageView
+        && v.topViewTopConstraint?.constant == topViewOriginalConstraintTop {
+        return
+      }
+      
+      dragStartPos = sender.location(in: v)
+      bottomY = v.topView.frame.origin.y + preViewHeight
+      
+      // Move
+      if dragDirection == .stop {
+        dragDirection = (v.topViewTopConstraint?.constant == topViewOriginalConstraintTop)
+          ? .up
+          : .down
+      }
+      
+      // Scroll event of CollectionView is preferred.
+      if (dragDirection == .up && dragStartPos.y < bottomY + dragDiff) ||
+        (dragDirection == .down && dragStartPos.y > bottomY) {
+        dragDirection = .stop
+      }
+    } else if sender.state == UIGestureRecognizerState.changed {
+      let currentPos = sender.location(in: v)
+      if dragDirection == .up && currentPos.y < bottomY - dragDiff {
+        v.topViewTopConstraint?.constant =
+          max(v.imageCropViewMinimalVisibleHeight - preViewHeight,
+              currentPos.y + dragDiff - preViewHeight)
+      } else if dragDirection == .down && currentPos.y > bottomY {
+        v.topViewTopConstraint?.constant =
+          min(topViewOriginalConstraintTop, currentPos.y - preViewHeight)
+      } else if dragDirection == .stop && v.collectionView.contentOffset.y < 0 {
+        dragDirection = .scroll
+        imaginaryCollectionViewOffsetStartPosY = currentPos.y
+      } else if dragDirection == .scroll {
+        v.topViewTopConstraint?.constant =
+          v.imageCropViewMinimalVisibleHeight - preViewHeight
+          + currentPos.y - imaginaryCollectionViewOffsetStartPosY
+      }
+    } else {
+      imaginaryCollectionViewOffsetStartPosY = 0.0
+      if sender.state == UIGestureRecognizerState.ended && dragDirection == .stop {
+        return
+      }
+      let currentPos = sender.location(in: v)
+      if currentPos.y < bottomY - dragDiff
+        && v.topViewTopConstraint?.constant != topViewOriginalConstraintTop {
+        // The largest movement
+        v.topViewTopConstraint?.constant =
+          v.imageCropViewMinimalVisibleHeight - preViewHeight
+        UIView.animate(withDuration: 0.3,
+                       delay: 0.0,
+                       options: .curveEaseOut,
+                       animations: v.layoutIfNeeded,
+                       completion: nil)
+        dragDirection = .down
+      } else {
+        // Get back to the original position
+        resetToOriginalState()
+      }
+    }
+    
+    // Update isImageShown
+    isImageShown = v.topViewTopConstraint?.constant == 0
+    
+    //    v.refreshImageCurtainAlpha()
+  }
+}
+
+//修正
+extension GridView: UIScrollViewDelegate {
+  func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+    if self.image != nil {
+      return previewImageView
+    } else {
+      return videoPreviewView
+    }
+  }
+  
+  func scrollViewDidZoom(_ scrollView: UIScrollView) {
+    if self.image != nil {
+      //      let screenWidth = UIScreen.main.bounds.width
+      let boundsSize = scrollView.bounds.size //CGSize(width: screenWidth, height: screenWidth)
+      var contentsFrame = previewImageView.frame
+      if contentsFrame.size.width < boundsSize.width {
+        contentsFrame.origin.x = (boundsSize.width - contentsFrame.size.width) / 2.0
+      } else {
+        contentsFrame.origin.x = 0.0
+      }
+      
+      if contentsFrame.size.height < boundsSize.height {
+        contentsFrame.origin.y = (boundsSize.height - contentsFrame.size.height) / 2.0
+      } else {
+        contentsFrame.origin.y = 0.0
+      }
+      previewImageView.frame = contentsFrame
+      
+      self.delegate?.previewImageDidZoom(scale: scrollView.zoomScale)
+    } else {
+      let boundsSize = scrollView.bounds.size
+      var contentsFrame = videoPreviewView.frame
+      if contentsFrame.size.width < boundsSize.width {
+        contentsFrame.origin.x = (boundsSize.width - contentsFrame.size.width) / 2.0
+      } else {
+        contentsFrame.origin.x = 0.0
+      }
+      
+      if contentsFrame.size.height < boundsSize.height {
+        contentsFrame.origin.y = (boundsSize.height - contentsFrame.size.height) / 2.0
+      } else {
+        contentsFrame.origin.y = 0.0
+      }
+      videoPreviewView.frame = contentsFrame
+    }
+  }
+  
+  func scrollViewDidEndZooming(_ scrollView: UIScrollView, with view: UIView?, atScale scale: CGFloat) {
+    if self.image != nil {
+      previewScollView.contentSize = CGSize(width: previewImageView.frame.width, height: previewImageView.frame.height)
+    } else {
+      previewScollView.contentSize = CGSize(width: videoPreviewView.frame.width, height: videoPreviewView.frame.height)
+    }
+  }
+  
+  func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    if self.image != nil {
+      self.delegate?.previewImageDidScroll(offset: scrollView.contentOffset)
+    }
+  }
+}
