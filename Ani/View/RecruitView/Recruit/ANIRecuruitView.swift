@@ -15,7 +15,13 @@ protocol ANIRecruitViewDelegate {
 
 class ANIRecuruitView: UIView {
 
-  weak var recruitTableView: UITableView?
+  weak var recruitTableView: UITableView? {
+    didSet {
+      guard let recruitTableView = self.recruitTableView else { return }
+      let topInset = UIViewController.NAVIGATION_BAR_HEIGHT + ANIRecruitViewController.CATEGORIES_VIEW_HEIGHT
+      recruitTableView.setContentOffset(CGPoint(x: 0, y: -topInset), animated: false)
+    }
+  }
   
   var testRecruitLists = [Recruit]()
 

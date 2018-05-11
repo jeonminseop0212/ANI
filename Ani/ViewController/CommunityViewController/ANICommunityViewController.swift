@@ -70,11 +70,10 @@ class ANICommunityViewController: UIViewController {
     contributionButon.superViewDropShadow(opacity: 0.13)
     contributionButon.delegate = self
     self.view.addSubview(contributionButon)
-    let tabBarHeight = UITabBarController().tabBar.frame.height
     contributionButon.width(CONTRIBUTION_BUTTON_HEIGHT)
     contributionButon.height(CONTRIBUTION_BUTTON_HEIGHT)
     contributionButon.rightToSuperview(offset: 15.0)
-    contributionButon.bottomToSuperview(offset: -(15.0 + tabBarHeight))
+    contributionButon.bottomToSuperview(offset: -15.0, usingSafeArea: true)
     self.contributionButon = contributionButon
   }
   

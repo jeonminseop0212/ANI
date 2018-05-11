@@ -25,13 +25,18 @@ class ANINotiView: UIView {
   }
   
   private func setup() {
+    let window = UIApplication.shared.keyWindow
+    var bottomSafeArea: CGFloat = 0.0
+    if let windowUnrap = window {
+      bottomSafeArea = windowUnrap.safeAreaInsets.bottom
+    }
     let flowLayout = UICollectionViewFlowLayout()
     flowLayout.minimumLineSpacing = 10.0
     let notiCollectionView = UICollectionView(frame: self.frame, collectionViewLayout: flowLayout)
     let id = NSStringFromClass(ANINotiViewCell.self)
     notiCollectionView.register(ANINotiViewCell.self, forCellWithReuseIdentifier: id)
-    notiCollectionView.contentInset = UIEdgeInsets(top: ANICommunityViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: ANICommunityViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT, right: 0)
-    notiCollectionView.scrollIndicatorInsets  = UIEdgeInsets(top: UIViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT, right: 0)
+    notiCollectionView.contentInset = UIEdgeInsets(top: ANICommunityViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: ANICommunityViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT + bottomSafeArea, right: 0)
+    notiCollectionView.scrollIndicatorInsets  = UIEdgeInsets(top: UIViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT + bottomSafeArea, right: 0)
     notiCollectionView.backgroundColor = ANIColor.bg
     notiCollectionView.alwaysBounceVertical = true
     notiCollectionView.dataSource = self
@@ -51,8 +56,14 @@ class ANINotiView: UIView {
     let noti4 = Noti(subtitle: "あなたの投稿に『いいね』しました", user: user1)
     let noti5 = Noti(subtitle: "あなたの投稿に『いいね』しました", user: user2)
     let noti6 = Noti(subtitle: "あなたの投稿に『いいね』しました", user: user3)
+    let noti7 = Noti(subtitle: "あなたの投稿に『いいね』しました", user: user1)
+    let noti8 = Noti(subtitle: "あなたの投稿に『いいね』しました", user: user2)
+    let noti9 = Noti(subtitle: "あなたの投稿に『いいね』しました", user: user3)
+    let noti10 = Noti(subtitle: "あなたの投稿に『いいね』しました", user: user1)
+    let noti11 = Noti(subtitle: "あなたの投稿に『いいね』しました", user: user2)
+    let noti12 = Noti(subtitle: "あなたの投稿に『いいね』しました", user: user3)
     
-    self.testNotiData = [noti1, noti2, noti3, noti4, noti5, noti6]
+    self.testNotiData = [noti1, noti2, noti3, noti4, noti5, noti6, noti7, noti8, noti9, noti10, noti11, noti12]
   }
 }
 

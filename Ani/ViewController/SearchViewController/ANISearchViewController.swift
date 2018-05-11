@@ -34,8 +34,6 @@ class ANISearchViewController: UIViewController {
     //basic
     Orientation.lockOrientation(.portrait)
     self.view.backgroundColor = .white
-
-    //nav barの下からviewが開始するように
     self.navigationController?.setNavigationBarHidden(true, animated: false)
     self.navigationController?.navigationBar.isTranslucent = false
     
@@ -43,17 +41,18 @@ class ANISearchViewController: UIViewController {
     let userSearchView = ANIUserSearchView()
     userSearchView.delegate = self
     self.view.addSubview(userSearchView)
-    userSearchView.edgesToSuperview()
+    userSearchView.topToSuperview(usingSafeArea: true)
+    userSearchView.edgesToSuperview(excluding: .top)
     self.userSearchView = userSearchView
     
     //myNavigationBar
     let myNavigationBar = UIView()
     myNavigationBar.backgroundColor = .white
     self.view.addSubview(myNavigationBar)
-    myNavigationBarTopConstroint = myNavigationBar.topToSuperview()
+    myNavigationBarTopConstroint = myNavigationBar.topToSuperview(usingSafeArea: true)
     myNavigationBar.leftToSuperview()
     myNavigationBar.rightToSuperview()
-    myNavigationBar.height(UIViewController.STATUS_BAR_HEIGHT + UIViewController.NAVIGATION_BAR_HEIGHT)
+    myNavigationBar.height(UIViewController.NAVIGATION_BAR_HEIGHT)
     self.myNavigationBar = myNavigationBar
     
     //searchBar
@@ -64,7 +63,7 @@ class ANISearchViewController: UIViewController {
     searchBar.delegate = self
     searchBar.backgroundImage = UIImage()
     myNavigationBar.addSubview(searchBar)
-    searchBar.topToSuperview(offset: UIViewController.STATUS_BAR_HEIGHT)
+    searchBar.topToSuperview()
     searchBar.leftToSuperview()
     searchBar.rightToSuperview()
     searchBar.bottomToSuperview()
@@ -133,19 +132,21 @@ extension ANISearchViewController: ANIUserSearchViewDelegate {
     guard let myNavigationBarTopConstroint = self.myNavigationBarTopConstroint else { return }
     
     let topHeight = UIViewController.NAVIGATION_BAR_HEIGHT + ANIRecruitViewController.CATEGORIES_VIEW_HEIGHT
-    let newScrollY = topHeight + scrollY + UIViewController.STATUS_BAR_HEIGHT
+    let newScrollY = topHeight + scrollY
     
     //navigation animate
     if topHeight < newScrollY {
-      if scrollY + UIViewController.STATUS_BAR_HEIGHT < topHeight {
-        myNavigationBarTopConstroint.constant = -scrollY - UIViewController.STATUS_BAR_HEIGHT
+      if scrollY < topHeight {
+        myNavigationBarTopConstroint.constant = -scrollY
         self.view.layoutIfNeeded()
         
-        let alpha = 1 - ((scrollY + UIViewController.STATUS_BAR_HEIGHT) / topHeight)
+        let alpha = 1 - (scrollY / topHeight)
         searchBar?.alpha = alpha
         categoriesView?.categoryCollectionView?.alpha = alpha
       } else {
         myNavigationBarTopConstroint.constant = -topHeight
+        searchBar?.alpha = 0.0
+        categoriesView?.categoryCollectionView?.alpha = 0.0
         self.view.layoutIfNeeded()
       }
     } else {

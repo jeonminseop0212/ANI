@@ -9,6 +9,6 @@
 import UIKit
 
 extension UIViewController {
-  static let STATUS_BAR_HEIGHT: CGFloat = 20.0
+  static let STATUS_BAR_HEIGHT: CGFloat = UIApplication.shared.statusBarFrame.height
   static let NAVIGATION_BAR_HEIGHT: CGFloat = 44.0
 }
