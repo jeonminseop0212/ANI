@@ -23,13 +23,18 @@ class ANIMessageView: UIView {
   }
   
   private func setup() {
+    let window = UIApplication.shared.keyWindow
+    var bottomSafeArea: CGFloat = 0.0
+    if let windowUnrap = window {
+      bottomSafeArea = windowUnrap.safeAreaInsets.bottom
+    }
     let flowLayout = UICollectionViewFlowLayout()
     flowLayout.minimumLineSpacing = 10.0
     let messageCollectionView = UICollectionView(frame: self.frame, collectionViewLayout: flowLayout)
     let id = NSStringFromClass(ANIMessageViewCell.self)
     messageCollectionView.register(ANIMessageViewCell.self, forCellWithReuseIdentifier: id)
-    messageCollectionView.contentInset = UIEdgeInsets(top: UIViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT, right: 0)
-    messageCollectionView.scrollIndicatorInsets  = UIEdgeInsets(top: UIViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT, right: 0)
+    messageCollectionView.contentInset = UIEdgeInsets(top: UIViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT + bottomSafeArea, right: 0)
+    messageCollectionView.scrollIndicatorInsets  = UIEdgeInsets(top: UIViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT + bottomSafeArea, right: 0)
     messageCollectionView.backgroundColor = ANIColor.bg
     messageCollectionView.alwaysBounceVertical = true
     messageCollectionView.dataSource = self
@@ -49,8 +54,14 @@ class ANIMessageView: UIView {
     let message4 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user1)
     let message5 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user2)
     let message6 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user3)
+    let message7 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user1)
+    let message8 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user2)
+    let message9 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user3)
+    let message10 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user1)
+    let message11 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user2)
+    let message12 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user3)
     
-    self.testMessageData = [message1, message2, message3, message4, message5, message6]
+    self.testMessageData = [message1, message2, message3, message4, message5, message6, message7, message8, message9, message10, message11, message12]
   }
 }
 

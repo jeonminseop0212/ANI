@@ -14,7 +14,13 @@ protocol ANIUserSearchViewDelegate {
 
 class ANIUserSearchView: UIView {
   
-  weak var userTableView: UITableView?
+  weak var userTableView: UITableView? {
+    didSet {
+      guard let userTableView = self.userTableView else { return }
+      let topInset = UIViewController.NAVIGATION_BAR_HEIGHT + ANIRecruitViewController.CATEGORIES_VIEW_HEIGHT
+      userTableView.setContentOffset(CGPoint(x: 0, y: -topInset), animated: false)
+    }
+  }
   private var testUserSearchResult = [User]()
   
   var delegate: ANIUserSearchViewDelegate?
@@ -35,11 +41,11 @@ class ANIUserSearchView: UIView {
     let topInset = UIViewController.NAVIGATION_BAR_HEIGHT + ANIRecruitViewController.CATEGORIES_VIEW_HEIGHT
     tableView.contentInset = UIEdgeInsets(top: topInset, left: 0, bottom: 0, right: 0)
     tableView.scrollIndicatorInsets  = UIEdgeInsets(top: topInset, left: 0, bottom: 0, right: 0)
-    tableView.dataSource = self
-    tableView.delegate = self
+    tableView.backgroundColor = .white
     let id = NSStringFromClass(ANIUserSearchViewCell.self)
     tableView.register(ANIUserSearchViewCell.self, forCellReuseIdentifier: id)
-    tableView.backgroundColor = .white
+    tableView.dataSource = self
+    tableView.delegate = self
     addSubview(tableView)
     tableView.edgesToSuperview()
     self.userTableView = tableView
@@ -55,8 +61,17 @@ class ANIUserSearchView: UIView {
     let user7 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
     let user8 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki")
     let user9 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
+    let user10 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
+    let user11 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki")
+    let user12 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
+    let user13 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
+    let user14 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki")
+    let user15 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
+    let user16 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
+    let user17 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki")
+    let user18 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
     
-    testUserSearchResult = [user1, user2, user3, user4, user5, user6, user7, user8, user9]
+    testUserSearchResult = [user1, user2, user3, user4, user5, user6, user7, user8, user9, user10, user11, user12, user13, user14, user15, user16, user17, user18]
   }
 }
 

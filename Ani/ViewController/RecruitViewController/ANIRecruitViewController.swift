@@ -58,17 +58,18 @@ class ANIRecruitViewController: UIViewController {
     recruitView.delegate = self
     recruitView.testRecruitLists = testRecruitLists
     self.view.addSubview(recruitView)
-    recruitView.edgesToSuperview()
+    recruitView.topToSuperview(usingSafeArea: true)
+    recruitView.edgesToSuperview(excluding: .top)
     self.recruitView = recruitView
     
     //myNavigationBar
     let myNavigationBar = UIView()
     myNavigationBar.backgroundColor = .white
     self.view.addSubview(myNavigationBar)
-    myNavigationBarTopConstroint = myNavigationBar.topToSuperview()
+    myNavigationBarTopConstroint = myNavigationBar.topToSuperview(usingSafeArea: true)
     myNavigationBar.leftToSuperview()
     myNavigationBar.rightToSuperview()
-    myNavigationBar.height(UIViewController.STATUS_BAR_HEIGHT + UIViewController.NAVIGATION_BAR_HEIGHT)
+    myNavigationBar.height(UIViewController.NAVIGATION_BAR_HEIGHT)
     self.myNavigationBar = myNavigationBar
     
     //searchBar
@@ -79,7 +80,7 @@ class ANIRecruitViewController: UIViewController {
     searchBar.delegate = self
     searchBar.backgroundImage = UIImage()
     myNavigationBar.addSubview(searchBar)
-    searchBar.topToSuperview(offset: UIViewController.STATUS_BAR_HEIGHT)
+    searchBar.topToSuperview()
     searchBar.leftToSuperview()
     searchBar.rightToSuperview()
     searchBar.bottomToSuperview()
@@ -101,11 +102,10 @@ class ANIRecruitViewController: UIViewController {
     contributionButon.superViewDropShadow(opacity: 0.13)
     contributionButon.delegate = self
     self.view.addSubview(contributionButon)
-    let tabBarHeight = UITabBarController().tabBar.frame.height
     contributionButon.width(CONTRIBUTION_BUTTON_HEIGHT)
     contributionButon.height(CONTRIBUTION_BUTTON_HEIGHT)
     contributionButon.rightToSuperview(offset: 15.0)
-    contributionButon.bottomToSuperview(offset: -(15.0 + tabBarHeight))
+    contributionButon.bottomToSuperview(offset: -15, usingSafeArea: true)
     self.contributionButon = contributionButon
   }
   
@@ -183,19 +183,21 @@ extension ANIRecruitViewController: ANIRecruitViewDelegate {
     guard let myNavigationBarTopConstroint = self.myNavigationBarTopConstroint else { return }
     
     let topHeight = UIViewController.NAVIGATION_BAR_HEIGHT + ANIRecruitViewController.CATEGORIES_VIEW_HEIGHT
-    let newScrollY = topHeight + scrollY + UIViewController.STATUS_BAR_HEIGHT
+    let newScrollY = topHeight + scrollY
     
     //navigation animate
     if topHeight < newScrollY {
-      if scrollY + UIViewController.STATUS_BAR_HEIGHT < topHeight {
-        myNavigationBarTopConstroint.constant = -scrollY - UIViewController.STATUS_BAR_HEIGHT
+      if scrollY < topHeight {
+        myNavigationBarTopConstroint.constant = -scrollY
         self.view.layoutIfNeeded()
         
-        let alpha = 1 - ((scrollY + UIViewController.STATUS_BAR_HEIGHT) / topHeight)
+        let alpha = 1 - (scrollY / topHeight)
         searchBar?.alpha = alpha
         categoriesView?.categoryCollectionView?.alpha = alpha
       } else {
         myNavigationBarTopConstroint.constant = -topHeight
+        searchBar?.alpha = 0.0
+        categoriesView?.categoryCollectionView?.alpha = 0.0
         self.view.layoutIfNeeded()
       }
     } else {

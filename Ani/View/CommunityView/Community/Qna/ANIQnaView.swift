@@ -25,9 +25,14 @@ class ANIQnaView: UIView {
   }
   
   private func setup() {
+    let window = UIApplication.shared.keyWindow
+    var bottomSafeArea: CGFloat = 0.0
+    if let windowUnrap = window {
+      bottomSafeArea = windowUnrap.safeAreaInsets.bottom
+    }
     let tableView = UITableView()
-    tableView.contentInset = UIEdgeInsets(top: ANICommunityViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: ANICommunityViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT, right: 0)
-    tableView.scrollIndicatorInsets  = UIEdgeInsets(top: ANICommunityViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: ANICommunityViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT, right: 0)
+    tableView.contentInset = UIEdgeInsets(top: ANICommunityViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: ANICommunityViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT + bottomSafeArea, right: 0)
+    tableView.scrollIndicatorInsets  = UIEdgeInsets(top: ANICommunityViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: ANICommunityViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT + bottomSafeArea, right: 0)
     tableView.backgroundColor = ANIColor.bg
     let id = NSStringFromClass(ANIQnaViewCell.self)
     tableView.register(ANIQnaViewCell.self, forCellReuseIdentifier: id)
