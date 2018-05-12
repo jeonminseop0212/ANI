@@ -9,10 +9,13 @@
 import UIKit
 import Gallery
 
-class RecruitContributionViewController: UIViewController {
+class ANIRecruitContributionViewController: UIViewController {
   
   var gallery: GalleryController!
   var myImages = [UIImage]()
+  
+  private weak var myNavigationBar: UIView?
+  private weak var dismissButton: UIButton?
   
   private weak var pickupButton: UIButton?
   
@@ -28,9 +31,33 @@ class RecruitContributionViewController: UIViewController {
   
   private func setup() {
     //basic
-    self.navigationController?.setNavigationBarHidden(false, animated: false)
+    self.navigationController?.setNavigationBarHidden(true, animated: false)
     self.navigationController?.navigationBar.isTranslucent = true
     self.view.backgroundColor = .white
+    
+    //myNavigationBar
+    let myNavigationBar = UIView()
+//    myNavigationBar.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0)
+    myNavigationBar.backgroundColor = .orange
+    self.view.addSubview(myNavigationBar)
+    myNavigationBar.topToSuperview()
+    myNavigationBar.leftToSuperview()
+    myNavigationBar.rightToSuperview()
+    myNavigationBar.height(UIViewController.STATUS_BAR_HEIGHT + UIViewController.NAVIGATION_BAR_HEIGHT)
+    self.myNavigationBar = myNavigationBar
+    
+    //dismissButton
+    let dismissButton = UIButton()
+    let dismissButtonImage = UIImage(named: "dismissButton")?.withRenderingMode(.alwaysTemplate)
+    dismissButton.setImage(dismissButtonImage, for: .normal)
+    dismissButton.tintColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
+    dismissButton.addTarget(self, action: #selector(imagePickerDismiss), for: .touchUpInside)
+    myNavigationBar.addSubview(dismissButton)
+    dismissButton.width(44.0)
+    dismissButton.height(44.0)
+    dismissButton.leftToSuperview()
+    dismissButton.bottomToSuperview()
+    self.dismissButton = dismissButton
     
     //puckupButton
     let pickupButton = UIButton(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
@@ -41,7 +68,7 @@ class RecruitContributionViewController: UIViewController {
     self.view.addSubview(pickupButton)
     self.pickupButton = pickupButton
     
-    galleryControllerOn(animation: false)
+//    galleryControllerOn(animation: false)
   }
   
   private func galleryControllerOn(animation: Bool) {
@@ -50,17 +77,16 @@ class RecruitContributionViewController: UIViewController {
     Gallery.Config.initialTab = .imageTab
     Gallery.Config.PageIndicator.backgroundColor = .white
     Gallery.Config.Camera.imageLimit = 10
-    Gallery.Config.Camera.oneImageMode = true
+    Gallery.Config.Camera.oneImageMode = false
+    Gallery.Config.Font.Main.regular = UIFont.boldSystemFont(ofSize: 17)
+    Gallery.Config.Grid.ArrowButton.tintColor = ANIColor.dark
+    Gallery.Config.Grid.FrameView.borderColor = ANIColor.green
     if Gallery.Config.Camera.oneImageMode {
       Gallery.Config.Grid.previewRatio = 0.5
       Config.tabsToShow = [.imageTab]
     }
     let galleryNV = UINavigationController(rootViewController: gallery)
     present(galleryNV, animated: animation, completion: nil)
-  }
-  
-  @objc private func pickupImage() {
-    galleryControllerOn(animation: true)
   }
   
   func getCropImages(images: [UIImage?], items: [Image]) -> [UIImage] {
@@ -81,15 +107,26 @@ class RecruitContributionViewController: UIViewController {
     }
     return croppedImages
   }
+  
+  //MARK: Action
+  @objc private func imagePickerDismiss() {
+    print("dismiss")
+    self.navigationController?.dismiss(animated: true, completion: nil)
+  }
+  
+  @objc private func pickupImage() {
+    galleryControllerOn(animation: true)
+  }
 }
 
-extension RecruitContributionViewController: GalleryControllerDelegate {
+extension ANIRecruitContributionViewController: GalleryControllerDelegate {
   func galleryController(_ controller: GalleryController, didSelectImages images: [Image]) {
     
     Image.resolve(images: images) { (myImages) in
-//      let filterViewController = FilterViewController()
-//      filterViewController.images = self.getCropImages(images: myImages, items: images)
-//      controller.navigationController?.pushViewController(filterViewController, animated: true)
+      let imageFilteriewController = ANIImageFilterViewController()
+      imageFilteriewController.images = self.getCropImages(images: myImages, items: images)
+      imageFilteriewController.delegate = self
+      controller.navigationController?.pushViewController(imageFilteriewController, animated: true)
     }
     
     gallery = nil
@@ -109,5 +146,11 @@ extension RecruitContributionViewController: GalleryControllerDelegate {
   func galleryControllerDidCancel(_ controller: GalleryController) {
     controller.dismiss(animated: true, completion: nil)
     gallery = nil
+  }
+}
+
+extension ANIRecruitContributionViewController: ANIImageFilterViewControllerDelegate {
+  func doneFilterImages(filteredImages: [UIImage?]) {
+    print(filteredImages.count)
   }
 }

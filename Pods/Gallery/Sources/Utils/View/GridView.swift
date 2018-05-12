@@ -179,7 +179,7 @@ class GridView: UIView {
     Constraint.on(
       topView.leftAnchor.constraint(equalTo: topView.superview!.leftAnchor),
       topView.rightAnchor.constraint(equalTo: topView.superview!.rightAnchor),
-      topView.heightAnchor.constraint(equalToConstant: 40),
+      topView.heightAnchor.constraint(equalToConstant: 44),
       
       loadingIndicator.centerXAnchor.constraint(equalTo: loadingIndicator.superview!.centerXAnchor),
       loadingIndicator.centerYAnchor.constraint(equalTo: loadingIndicator.superview!.centerYAnchor)
@@ -237,15 +237,15 @@ class GridView: UIView {
     
     closeButton.g_pin(on: .top)
     closeButton.g_pin(on: .left)
-    closeButton.g_pin(size: CGSize(width: 40, height: 40))
+    closeButton.g_pin(size: CGSize(width: 44, height: 44))
     
     arrowButton.g_pinCenter()
-    arrowButton.g_pin(height: 40)
+    arrowButton.g_pin(height: 44)
     
     //修正
     doneButton.g_pin(on: .top)
     doneButton.g_pin(on: .right)
-    doneButton.g_pin(size: CGSize(width: 60, height: 40))
+    doneButton.g_pin(size: CGSize(width: 60, height: 44))
     //    doneButton.g_pin(on: .centerY)
     //    doneButton.g_pin(on: .right, constant: -38)
   }
@@ -287,8 +287,9 @@ class GridView: UIView {
   
   private func makeCloseButton() -> UIButton {
     let button = UIButton(type: .custom)
-    button.setImage(GalleryBundle.image("gallery_close")?.withRenderingMode(.alwaysTemplate), for: UIControlState())
-    button.tintColor = Config.Grid.CloseButton.tintColor
+    let buttonImage = UIImage(named: "dismissButton")?.withRenderingMode(.alwaysTemplate)
+    button.setImage(buttonImage, for: .normal)
+    button.tintColor = UIColor(red: 48/255, green: 48/255, blue: 48/255, alpha: 1)
     
     return button
   }
@@ -296,13 +297,13 @@ class GridView: UIView {
   private func makeDoneButton() -> UIButton {
     let button = UIButton(type: .system)
     //修正
-    button.setTitleColor(UIColor.green, for: UIControlState())
+    button.setTitleColor(UIColor(red: 103/255, green: 219/255, blue: 64/255, alpha: 1), for: UIControlState())
     button.isEnabled = false
     //    button.setTitleColor(UIColor.white, for: UIControlState())
     
     button.setTitleColor(UIColor.lightGray, for: .disabled)
-    button.titleLabel?.font = Config.Font.Text.regular.withSize(16)
-    button.setTitle("Gallery.Done".g_localize(fallback: "Done"), for: UIControlState())
+    button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 17)
+    button.setTitle("Gallery.Done".g_localize(fallback: "選択"), for: UIControlState())
     
     return button
   }
@@ -320,16 +321,14 @@ class GridView: UIView {
   
   private func makeFitButton() -> UIButton {
     let view = UIButton()
-    //修正
-    view.backgroundColor = .white
-    view.backgroundColor = .black
     
+    view.setImage(UIImage(named: "fitButton"), for: .normal)
     view.addTarget(self, action: #selector(squareCropButtonTapped), for: .touchUpInside)
     
     if Config.Camera.oneImageMode {
       view.alpha = 0.0
     } else {
-      view.alpha = 0.5
+      view.alpha = 1.0
     }
     
     return view

@@ -36,6 +36,7 @@ class ANIProfileViewController: UIViewController {
     self.view.backgroundColor = .white
     self.navigationController?.navigationBar.isTranslucent = false
     self.navigationItem.title = "PROFILE"
+    self.navigationController?.navigationBar.tintColor = ANIColor.dark
     
     //profileBasicView
     let profileBasicView = ANIProfileBasicView()
