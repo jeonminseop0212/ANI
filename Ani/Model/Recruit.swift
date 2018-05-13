@@ -8,7 +8,7 @@
 
 import UIKit
 
-struct Recurit {
+struct Recruit {
   let recruitImage: UIImage
   let title: String
   let subTitle: String
