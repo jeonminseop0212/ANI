@@ -10,19 +10,15 @@ class GridView: UIView {
   
   // MARK: - Initialization
   
-  //修正
   var topViewTopConstraint: NSLayoutConstraint?
-  
   lazy var topView: UIView = self.makeTopView()
   lazy var bottomView: UIView = self.makeBottomView()
-  
   lazy var arrowButton: ArrowButton = self.makeArrowButton()
-  //修正
+  
   lazy var previewScollView: UIScrollView = self.makePreviewScrollView()
   lazy var previewImageView: UIImageView = self.makePreviewImageView()
   lazy var fitButton: UIButton = self.makeFitButton()
   
-  //修正
   lazy var videoPreviewView: UIView = self.makeVideoPreviewView()
   var player: AVPlayer?
   var paused: Bool = false
@@ -67,7 +63,6 @@ class GridView: UIView {
       let w = image.size.width
       let h = image.size.height
       
-      //修正
       if w >= h { // Landscape
         squareZoomScale = (1.0 / (w / h))
         self.previewImageView.frame.size.width = screenSize
@@ -165,7 +160,6 @@ class GridView: UIView {
       loadingIndicator.centerYAnchor.constraint(equalTo: loadingIndicator.superview!.centerYAnchor)
     )
     
-    //修正
     if #available(iOS 11, *) {
       topViewTopConstraint = topView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor)
       topViewTopConstraint?.isActive = true
@@ -179,17 +173,14 @@ class GridView: UIView {
     
     emptyView.g_pinEdges(view: collectionView)
     
-    //修正
     let previewScrollViewHeight: CGFloat = UIScreen.main.bounds.width * Config.Grid.previewRatio
     previewScollView.g_pin(height: previewScrollViewHeight)
     previewScollView.g_pin(on: .left)
     previewScollView.g_pin(on: .right)
     previewScollView.g_pin(on: .top, view: topView, on: .bottom, constant: 1)
     
-    //修正
     previewImageView.frame = CGRect(origin: CGPoint.zero, size: CGSize.zero)
     
-    //修正
     fitButton.g_pin(size: CGSize(width: 40, height: 40))
     fitButton.g_pin(on: .bottom, view: collectionView, on: .top, constant: -10)
     fitButton.g_pin(on: .left, constant: 10)
@@ -248,7 +239,6 @@ class GridView: UIView {
   
   private func makeDoneButton() -> UIButton {
     let button = UIButton(type: .system)
-    //修正
     button.setTitleColor(UIColor(red: 103/255, green: 219/255, blue: 64/255, alpha: 1), for: UIControlState())
     button.isEnabled = false
     button.setTitleColor(UIColor.lightGray, for: .disabled)
@@ -321,7 +311,6 @@ class GridView: UIView {
     return view
   }
   
-  //修正
   private func makePreviewImageView() -> UIImageView {
     let view = UIImageView()
     view.contentMode = .scaleAspectFit
@@ -329,14 +318,14 @@ class GridView: UIView {
     return view
   }
   
-  //修正
   private func makeVideoPreviewView() -> UIView {
     let view = UIView()
+    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(videoPreviewViewTapped))
+    view.addGestureRecognizer(tapGesture)
     
     return view
   }
   
-  //修正
   private func setVideoPlayer(size: CGSize) {
     videoPreviewView.layer.sublayers?.forEach { $0.removeFromSuperlayer() }
     
@@ -423,7 +412,6 @@ class GridView: UIView {
     return view
   }
   
-  //修正
   func refreshZoomScale() {
     var squareZoomScale: CGFloat = 1.0
     var w: CGFloat = 0.0
@@ -457,7 +445,7 @@ class GridView: UIView {
         squareZoomScale = 1.0
         
         
-        let boundsSize = previewScollView.bounds.size //CGSize(width: screenWidth, height: screenWidth)
+        let boundsSize = previewScollView.bounds.size
         var contentsFrame = previewImageView.frame
         
         if contentsFrame.size.height < boundsSize.height {
@@ -478,6 +466,15 @@ class GridView: UIView {
       previewScollView.contentOffset.y = (previewImageView.frame.size.height - previewScollView.bounds.size.height) / 2.0
     }
     squaredZoomScale = squareZoomScale
+  }
+  
+  @objc private func videoPreviewViewTapped() {
+    guard let player = self.player else { return }
+    if player.rate != 0 {
+      player.pause()
+    } else {
+      player.play()
+    }
   }
 }
 
@@ -505,8 +502,6 @@ public class PanGestureHelper: NSObject, UIGestureRecognizerDelegate {
       if newValue != isImageShown {
         self._isImageShown = newValue
         v.isShown = newValue
-        // Update imageCropContainer
-        //        v.imageCropView.isScrollEnabled = isImageShown
       }
     }
   }
@@ -529,7 +524,6 @@ public class PanGestureHelper: NSObject, UIGestureRecognizerDelegate {
     dragDirection = .up
   }
   
-  //修正
   func resetToOriginalStateTappedCell(index: IndexPath) {
     if v.topViewTopConstraint?.constant != topViewOriginalConstraintTop {
       v.topViewTopConstraint?.constant = topViewOriginalConstraintTop
@@ -559,8 +553,7 @@ public class PanGestureHelper: NSObject, UIGestureRecognizerDelegate {
     return true
   }
   
-  @objc
-  func panned(_ sender: UIPanGestureRecognizer) {
+  @objc func panned(_ sender: UIPanGestureRecognizer) {
     
     let preViewHeight = v.topView.frame.height + v.previewScollView.frame.height
     if sender.state == UIGestureRecognizerState.began {
@@ -630,12 +623,9 @@ public class PanGestureHelper: NSObject, UIGestureRecognizerDelegate {
     
     // Update isImageShown
     isImageShown = v.topViewTopConstraint?.constant == 0
-    
-    //    v.refreshImageCurtainAlpha()
   }
 }
 
-//修正
 extension GridView: UIScrollViewDelegate {
   func viewForZooming(in scrollView: UIScrollView) -> UIView? {
     if self.image != nil {
