@@ -15,8 +15,6 @@ class GridView: UIView {
   
   lazy var topView: UIView = self.makeTopView()
   lazy var bottomView: UIView = self.makeBottomView()
-  //修正
-  //  lazy var bottomBlurView: UIVisualEffectView = self.makeBottomBlurView()
   
   lazy var arrowButton: ArrowButton = self.makeArrowButton()
   //修正
@@ -27,7 +25,6 @@ class GridView: UIView {
   //修正
   lazy var videoPreviewView: UIView = self.makeVideoPreviewView()
   var player: AVPlayer?
-  //  var playerLayer: AVPlayerLayer?
   var paused: Bool = false
   var videoPlayerItem: AVPlayerItem? {
     didSet {
@@ -47,13 +44,11 @@ class GridView: UIView {
   lazy var emptyView: UIView = self.makeEmptyView()
   lazy var loadingIndicator: UIActivityIndicatorView = self.makeLoadingIndicator()
   
-  //修正
   var delegate: GridViewDelegate?
   var isShown = true
   let imageCropViewMinimalVisibleHeight: CGFloat  = 50.0
   internal let panGestureHelper = PanGestureHelper()
   
-  //修正
   var squaredZoomScale: CGFloat = 1.0
   var offset: CGPoint = CGPoint(x: 0.0, y: 0.0)
   var isSelectedImage = false
@@ -67,8 +62,6 @@ class GridView: UIView {
       }
       
       let screenSize: CGFloat = UIScreen.main.bounds.width
-      //      self.previewImageView.frame.size.width = screenSize
-      //      self.previewImageView.frame.size.height = screenSize
       
       var squareZoomScale: CGFloat = 1.0
       let w = image.size.width
@@ -86,18 +79,18 @@ class GridView: UIView {
         self.previewImageView.frame.size.height = screenSize
       }
       self.previewImageView.center = self.previewScollView.center
-      //      self.previewImageView.frame.origin.y = self.previewImageView.frame.origin.y - self.topView.frame.height - 1
       
       self.previewImageView.image = self.image
       previewImageView.clipsToBounds = true
       refreshZoomScale()
       
-      //修正
       previewScollView.setZoomScale(squaredZoomScale, animated: false)
       
       if Config.Camera.oneImageMode {
         self.previewScollView.minimumZoomScale = squaredZoomScale
       }
+      
+      refreshZoomScale()
     }
   }
   var selectedImage: UIImage! = nil {
@@ -105,14 +98,11 @@ class GridView: UIView {
       previewScollView.setZoomScale(1.0, animated: false)
       
       let screenSize: CGFloat = UIScreen.main.bounds.width
-      //      self.previewImageView.frame.size.width = screenSize
-      //      self.previewImageView.frame.size.height = screenSize
       
       var squareZoomScale: CGFloat = 1.0
       let w = selectedImage.size.width
       let h = selectedImage.size.height
       
-      //修正
       if w >= h { // Landscape
         squareZoomScale = (1.0 / (w / h))
         self.previewImageView.frame.size.width = screenSize
@@ -158,23 +148,13 @@ class GridView: UIView {
       addSubview($0)
     }
     
-    //修正
     [previewImageView, videoPreviewView].forEach {
       previewScollView.addSubview($0)
     }
     
-    //修正
     [closeButton, arrowButton, doneButton].forEach {
       topView.addSubview($0)
     }
-    //    [closeButton, arrowButton].forEach {
-    //      topView.addSubview($0)
-    //    }
-    
-    //修正
-    //    [bottomBlurView, doneButton].forEach {
-    //      bottomView.addSubview($0)
-    //    }
     
     Constraint.on(
       topView.leftAnchor.constraint(equalTo: topView.superview!.leftAnchor),
@@ -186,12 +166,6 @@ class GridView: UIView {
     )
     
     //修正
-    //    topViewTopConstraint = topView.g_pin(on: .top, view: topView.superview!, on: .top)
-    //    if topViewTopConstraint != nil {
-    //      topViewTopConstraint?.constant = -100
-    //    }
-    
-    //修正
     if #available(iOS 11, *) {
       topViewTopConstraint = topView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor)
       topViewTopConstraint?.isActive = true
@@ -199,15 +173,6 @@ class GridView: UIView {
       topViewTopConstraint =  topView.topAnchor.constraint(equalTo: topView.superview!.topAnchor)
       topViewTopConstraint?.isActive = true
     }
-    //    if #available(iOS 11, *) {
-    //      Constraint.on(
-    //        topView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor)
-    //      )
-    //    } else {
-    //      Constraint.on(
-    //        topView.topAnchor.constraint(equalTo: topView.superview!.topAnchor)
-    //      )
-    //    }
     
     bottomView.g_pinDownward()
     bottomView.g_pin(height: 80)
@@ -232,9 +197,6 @@ class GridView: UIView {
     collectionView.g_pinDownward()
     collectionView.g_pin(on: .top, view: previewScollView, on: .bottom, constant: 1)
     
-    //修正
-    //    bottomBlurView.g_pinEdges()
-    
     closeButton.g_pin(on: .top)
     closeButton.g_pin(on: .left)
     closeButton.g_pin(size: CGSize(width: 44, height: 44))
@@ -242,12 +204,9 @@ class GridView: UIView {
     arrowButton.g_pinCenter()
     arrowButton.g_pin(height: 44)
     
-    //修正
     doneButton.g_pin(on: .top)
     doneButton.g_pin(on: .right)
     doneButton.g_pin(size: CGSize(width: 60, height: 44))
-    //    doneButton.g_pin(on: .centerY)
-    //    doneButton.g_pin(on: .right, constant: -38)
   }
   
   // MARK: - Controls
@@ -264,13 +223,6 @@ class GridView: UIView {
     
     return view
   }
-  
-  //修正
-  //  private func makeBottomBlurView() -> UIVisualEffectView {
-  //    let view = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
-  //
-  //    return view
-  //  }
   
   private func makeArrowButton() -> ArrowButton {
     let button = ArrowButton()
@@ -299,8 +251,6 @@ class GridView: UIView {
     //修正
     button.setTitleColor(UIColor(red: 103/255, green: 219/255, blue: 64/255, alpha: 1), for: UIControlState())
     button.isEnabled = false
-    //    button.setTitleColor(UIColor.white, for: UIControlState())
-    
     button.setTitleColor(UIColor.lightGray, for: .disabled)
     button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 17)
     button.setTitle("Gallery.Done".g_localize(fallback: "選択"), for: UIControlState())
@@ -336,7 +286,8 @@ class GridView: UIView {
   
   @objc func squareCropButtonTapped() {
     let z = previewScollView.zoomScale
-    if z >= 1 && z < squaredZoomScale {
+//    if z >= 1 && z < squaredZoomScale {
+    if z <= 1 {
       shouldCropToSquare = true
     } else {
       shouldCropToSquare = false
@@ -354,7 +305,6 @@ class GridView: UIView {
     }
   }
   
-  //修正
   private func makePreviewScrollView() -> UIScrollView {
     let view = UIScrollView()
     view.delegate = self
