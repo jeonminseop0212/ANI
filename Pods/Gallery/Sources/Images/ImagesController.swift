@@ -7,7 +7,6 @@ class ImagesController: UIViewController {
   lazy var gridView: GridView = self.makeGridView()
   lazy var stackView: StackView = self.makeStackView()
   
-  //修正
   var items: [Image] = [] {
     didSet {
       if !items.isEmpty {
@@ -21,7 +20,6 @@ class ImagesController: UIViewController {
   let once = Once()
   let cart: Cart
   
-  //修正
   private var selectedItemIndex: Int?
   private var selectedItem: Image?
   
@@ -167,7 +165,6 @@ class ImagesController: UIViewController {
   func makeGridView() -> GridView {
     let view = GridView()
     view.bottomView.alpha = 0
-    //修正
     view.delegate = self
     
     return view
