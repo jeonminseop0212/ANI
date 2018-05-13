@@ -167,6 +167,14 @@ class PagesController: UIViewController {
   }
   
   func notify() {
+    //videoviewから出るとき動画を止める
+    if controllers[selectedIndex] as? VideosController == nil {
+      if controllers.count > 2 {
+        if let videosController = controllers[2] as? VideosController {
+          videosController.gridView.player?.pause()
+        }
+      }
+    }
     if let controller = controllers[selectedIndex] as? PageAware {
       controller.pageDidShow()
     }

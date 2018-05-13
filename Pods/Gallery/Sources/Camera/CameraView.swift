@@ -166,7 +166,9 @@ class CameraView: UIView, UIGestureRecognizerDelegate {
   
   func makeCloseButton() -> UIButton {
     let button = UIButton(type: .custom)
-    button.setImage(GalleryBundle.image("gallery_close"), for: UIControlState())
+    let buttonImage = UIImage(named: "dismissButton")?.withRenderingMode(.alwaysTemplate)
+    button.setImage(buttonImage, for: .normal)
+    button.tintColor = .white
     
     return button
   }

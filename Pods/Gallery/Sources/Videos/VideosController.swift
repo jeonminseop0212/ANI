@@ -41,6 +41,10 @@ class VideosController: UIViewController {
     setup()
   }
   
+  override func viewWillDisappear(_ animated: Bool) {
+    self.gridView.player?.pause()
+  }
+  
   // MARK: - Setup
   
   func setup() {
@@ -69,7 +73,7 @@ class VideosController: UIViewController {
     gridView.collectionView.delegate = self
     gridView.collectionView.register(VideoCell.self, forCellWithReuseIdentifier: String(describing: VideoCell.self))
     
-    gridView.arrowButton.updateText("Gallery.AllVideos".g_localize(fallback: "ALL VIDEOS"))
+    gridView.arrowButton.updateText("Gallery.AllVideos".g_localize(fallback: "ビデオ"))
     gridView.arrowButton.arrow.isHidden = true
     
     //修正

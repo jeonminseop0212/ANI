@@ -164,7 +164,7 @@ extension ANIRecruitViewController: UISearchBarDelegate {
 extension ANIRecruitViewController:ANIButtonViewDelegate{
   func buttonViewTapped(view: ANIButtonView) {
     if view === self.contributionButon {
-      let recruitContribtionViewController = RecruitContributionViewController()
+      let recruitContribtionViewController = ANIRecruitContributionViewController()
       let recruitContributionNV = UINavigationController(rootViewController: recruitContribtionViewController)
       self.navigationController?.present(recruitContributionNV, animated: true, completion: nil)
     }
