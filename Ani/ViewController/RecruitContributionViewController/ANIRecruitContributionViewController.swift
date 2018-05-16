@@ -42,6 +42,8 @@ class ANIRecruitContributionViewController: UIViewController {
       recruitContributeView.pickMode = pickMode
     }
   }
+  
+  private var isHaderImagePick: Bool = false
     
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -154,7 +156,7 @@ class ANIRecruitContributionViewController: UIViewController {
     })
   }
   
-  private func recruitImagePick(animation: Bool) {
+  private func recruitHeaderImagePick(animation: Bool) {
     gallery = GalleryController()
     
     if let galleryUnrap = gallery {
@@ -172,6 +174,27 @@ class ANIRecruitContributionViewController: UIViewController {
       }
       let galleryNV = UINavigationController(rootViewController: galleryUnrap)
       present(galleryNV, animated: animation, completion: nil)
+      
+      isHaderImagePick = true
+    }
+  }
+  
+  private func recruitIntroduceImagesPick(animation: Bool) {
+    gallery = GalleryController()
+    
+    if let galleryUnrap = gallery {
+      galleryUnrap.delegate = self
+      Gallery.Config.initialTab = .imageTab
+      Gallery.Config.PageIndicator.backgroundColor = .white
+      Gallery.Config.Camera.oneImageMode = false
+      Gallery.Config.Font.Main.regular = UIFont.boldSystemFont(ofSize: 17)
+      Gallery.Config.Grid.ArrowButton.tintColor = ANIColor.dark
+      Gallery.Config.Grid.FrameView.borderColor = ANIColor.green
+      Gallery.Config.Grid.previewRatio = 1.0
+      let galleryNV = UINavigationController(rootViewController: galleryUnrap)
+      present(galleryNV, animated: animation, completion: nil)
+      
+      isHaderImagePick = false
     }
   }
   
@@ -235,9 +258,21 @@ extension ANIRecruitContributionViewController: GalleryControllerDelegate {
 extension ANIRecruitContributionViewController: ANIImageFilterViewControllerDelegate {
   func doneFilterImages(filteredImages: [UIImage?]) {
     guard let recruitContributeView = self.recruitContributeView,
-          !filteredImages.isEmpty,
-          let filteredImage = filteredImages[0] else { return }
-    recruitContributeView.headerImage = filteredImage
+          !filteredImages.isEmpty else { return }
+    
+    if isHaderImagePick {
+      if let filteredImage = filteredImages[0] {
+        recruitContributeView.headerImage = filteredImage
+      }
+    } else {
+      if recruitContributeView.introduceImages.isEmpty {
+        recruitContributeView.introduceImages = filteredImages
+      } else {
+        for filteredImage in filteredImages {
+          recruitContributeView.introduceImages.append(filteredImage)
+        }
+      }
+    }
   }
 }
 
@@ -268,7 +303,7 @@ extension ANIRecruitContributionViewController: ANIRecruitContributeViewDelegate
   }
   
   func imagePickButtonTapped() {
-    recruitImagePick(animation: true)
+    recruitHeaderImagePick(animation: true)
   }
   
   func kindSelectButtonTapped() {
@@ -321,6 +356,12 @@ extension ANIRecruitContributionViewController: ANIRecruitContributeViewDelegate
     pickMode = BasicInfoPickMode.castration
     popupPickerViewController.modalPresentationStyle = .overCurrentContext
     present(popupPickerViewController, animated: false, completion: nil)
+  }
+  
+  func imagesPickCellTapped() {
+    print("pick")
+    
+    recruitIntroduceImagesPick(animation: true)
   }
 }
 
