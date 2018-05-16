@@ -8,9 +8,16 @@
 
 import UIKit
 
+protocol ANIRecruitContributeImagesCellDelegate {
+  func deleteButtonTapped(index: Int)
+}
+
 class ANIRecruitContributeImagesCell: UICollectionViewCell {
   
   weak var imageView: UIImageView?
+  weak var deleteButton: UIButton?
+  
+  var delegate: ANIRecruitContributeImagesCellDelegate?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -22,6 +29,7 @@ class ANIRecruitContributeImagesCell: UICollectionViewCell {
   }
   
   private func setup() {
+    //imageView
     let imageView = UIImageView()
     imageView.layer.cornerRadius = 10.0
     imageView.layer.masksToBounds = true
@@ -29,5 +37,21 @@ class ANIRecruitContributeImagesCell: UICollectionViewCell {
     addSubview(imageView)
     imageView.edgesToSuperview()
     self.imageView = imageView
+    
+    //deleteButton
+    let deleteButton = UIButton()
+    deleteButton.setImage(UIImage(named: "imageDeleteButton"), for: .normal)
+    deleteButton.addTarget(self, action: #selector(imageDelegate), for: .touchUpInside)
+    addSubview(deleteButton)
+    deleteButton.width(30.0)
+    deleteButton.height(30.0)
+    deleteButton.top(to: imageView, offset: 10.0)
+    deleteButton.right(to: imageView, offset: -10.0)
+    self.deleteButton = deleteButton
+  }
+  
+  @objc private func imageDelegate() {
+    guard let deleteButton = self.deleteButton else { return }
+    delegate?.deleteButtonTapped(index: deleteButton.tag)
   }
 }
