@@ -89,7 +89,7 @@ class ANIImageFilterViewController: UIViewController {
     previewView.topToBottom(of: myNavigationBar)
     previewView.leftToSuperview()
     previewView.rightToSuperview()
-    previewView.height(self.view.frame.width)
+    previewView.height(self.view.frame.width + ANIImageFilterPreviewView.PAGE_CONTROL_HEIGHT)
     self.previewView = previewView
     
     //filterViewBG

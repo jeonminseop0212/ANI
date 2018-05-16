@@ -17,14 +17,23 @@ class ANIImageFilterPreviewView: UIView {
   private weak var previewCollectionView: UICollectionView?
   var images = [UIImage?]() {
     didSet {
+      guard let pageControl = self.pageControl else { return }
       filteredImages = images
       
       selectedFilterIndexs.removeAll()
       for _ in images {
         selectedFilterIndexs.append(0)
       }
+      
+      if images.count > 1 {
+        pageControl.numberOfPages = images.count
+        pageControl.alpha = 1.0
+      }
     }
   }
+  
+  static let PAGE_CONTROL_HEIGHT: CGFloat = 20.0
+  private weak var pageControl: UIPageControl?
   
   var filteredImages = [UIImage?]() {
     didSet {
@@ -82,8 +91,23 @@ class ANIImageFilterPreviewView: UIView {
     let id = NSStringFromClass(ANIImageFilterPreviewCell.self)
     previewCollectionView.register(ANIImageFilterPreviewCell.self, forCellWithReuseIdentifier: id)
     addSubview(previewCollectionView)
-    previewCollectionView.edgesToSuperview()
+    previewCollectionView.edgesToSuperview(excluding: .bottom)
+    previewCollectionView.bottomToSuperview(offset: -ANIStoryImagesView.PAGE_CONTROL_HEIGHT)
     self.previewCollectionView = previewCollectionView
+    
+    //pageCotrol
+    let pageControl = UIPageControl()
+    pageControl.pageIndicatorTintColor = ANIColor.gray
+    pageControl.currentPageIndicatorTintColor = ANIColor.green
+    pageControl.currentPage = 0
+    pageControl.alpha = 0.0
+    pageControl.isUserInteractionEnabled = false
+    addSubview(pageControl)
+    pageControl.topToBottom(of: previewCollectionView, offset: 8.0)
+    pageControl.leftToSuperview()
+    pageControl.rightToSuperview()
+    pageControl.height(ANIImageFilterPreviewView.PAGE_CONTROL_HEIGHT)
+    self.pageControl = pageControl
   }
 }
 
@@ -102,10 +126,14 @@ extension ANIImageFilterPreviewView: UICollectionViewDataSource {
 
 extension ANIImageFilterPreviewView: UICollectionViewDelegate {
   func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+    guard let pageControl = self.pageControl else { return }
+
     let selectedIndexPath = IndexPath(item: Int(targetContentOffset.pointee.x / self.frame.width), section: 0)
     selectedItemIndex = selectedIndexPath.item
     
     self.delegate?.selectedPreviewItem(selectedFilterIndex: selectedFilterIndexs[selectedItemIndex])
+    
+    pageControl.currentPage = Int(targetContentOffset.pointee.x / pageControl.frame.width)
   }
 }
 
