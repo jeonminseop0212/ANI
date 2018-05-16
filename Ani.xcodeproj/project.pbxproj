@@ -25,6 +25,8 @@
 		CDA32A1320A93422008A2AC1 /* ANIScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A1220A93422008A2AC1 /* ANIScrollView.swift */; };
 		CDA32A2320AA6041008A2AC1 /* ANIPopupPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A2220AA6041008A2AC1 /* ANIPopupPickerViewController.swift */; };
 		CDA32A2720AA6652008A2AC1 /* ANIPopupPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A2620AA6652008A2AC1 /* ANIPopupPickerView.swift */; };
+		CDA32A2920ABBA21008A2AC1 /* ANIRecruitContributeImagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A2820ABBA21008A2AC1 /* ANIRecruitContributeImagesView.swift */; };
+		CDA32A2B20ABBC20008A2AC1 /* ANIRecruitContributeImagesCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A2A20ABBC20008A2AC1 /* ANIRecruitContributeImagesCell.swift */; };
 		CDD0550620A5CF2200BEF482 /* ANIImageFilterPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD0550520A5CF2200BEF482 /* ANIImageFilterPreviewView.swift */; };
 		CDD0550820A5D07600BEF482 /* ANIImageFilterPreviewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD0550720A5D07600BEF482 /* ANIImageFilterPreviewCell.swift */; };
 		CDD0550C20A5D29900BEF482 /* ANIImageFilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD0550B20A5D29900BEF482 /* ANIImageFilterView.swift */; };
@@ -133,6 +135,8 @@
 		CDA32A1220A93422008A2AC1 /* ANIScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIScrollView.swift; sourceTree = "<group>"; };
 		CDA32A2220AA6041008A2AC1 /* ANIPopupPickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIPopupPickerViewController.swift; sourceTree = "<group>"; };
 		CDA32A2620AA6652008A2AC1 /* ANIPopupPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIPopupPickerView.swift; sourceTree = "<group>"; };
+		CDA32A2820ABBA21008A2AC1 /* ANIRecruitContributeImagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitContributeImagesView.swift; sourceTree = "<group>"; };
+		CDA32A2A20ABBC20008A2AC1 /* ANIRecruitContributeImagesCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitContributeImagesCell.swift; sourceTree = "<group>"; };
 		CDD0550520A5CF2200BEF482 /* ANIImageFilterPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIImageFilterPreviewView.swift; sourceTree = "<group>"; };
 		CDD0550720A5D07600BEF482 /* ANIImageFilterPreviewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIImageFilterPreviewCell.swift; sourceTree = "<group>"; };
 		CDD0550B20A5D29900BEF482 /* ANIImageFilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIImageFilterView.swift; sourceTree = "<group>"; };
@@ -294,6 +298,8 @@
 			isa = PBXGroup;
 			children = (
 				CD6B675020A8844B009BF63D /* ANIRecruitContributeView.swift */,
+				CDA32A2820ABBA21008A2AC1 /* ANIRecruitContributeImagesView.swift */,
+				CDA32A2A20ABBC20008A2AC1 /* ANIRecruitContributeImagesCell.swift */,
 			);
 			path = RecruitContributeView;
 			sourceTree = "<group>";
@@ -1095,6 +1101,7 @@
 				CDD0550E20A6B23B00BEF482 /* ANIImageFilterCell.swift in Sources */,
 				CDA32A2320AA6041008A2AC1 /* ANIPopupPickerViewController.swift in Sources */,
 				F566348320752656006CB81B /* ANIRecruitCategoriesView.swift in Sources */,
+				CDA32A2B20ABBC20008A2AC1 /* ANIRecruitContributeImagesCell.swift in Sources */,
 				CDF7F174208F658E00254A0F /* ANIImageButtonView.swift in Sources */,
 				CD08A72E20915BD700F0B72D /* ANIRecruitDetailView.swift in Sources */,
 				F5DF8365207A27DC00EA7FBE /* ANIStoryViewCell.swift in Sources */,
@@ -1121,6 +1128,7 @@
 				F5E9E22620769AD60021D4CC /* User.swift in Sources */,
 				CD9E52BB2094614400715F50 /* ANIAreaButtonView.swift in Sources */,
 				F53E87BA208468DF00B19A2F /* ANIStorySearchView.swift in Sources */,
+				CDA32A2920ABBA21008A2AC1 /* ANIRecruitContributeImagesView.swift in Sources */,
 				CD08A73120915C2A00F0B72D /* ANIRecruitDetailViewController.swift in Sources */,
 				F53E87C62085F13800B19A2F /* ANIProfileMenuBar.swift in Sources */,
 				F5F530142088624E0076E938 /* ANIProfileRecruitCell.swift in Sources */,

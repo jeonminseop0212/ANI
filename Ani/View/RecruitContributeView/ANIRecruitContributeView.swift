@@ -18,23 +18,16 @@ protocol ANIRecruitContributeViewDelegate {
   func homeSelectButtonTapped()
   func vaccineSelectButtonTapped()
   func castrationSelectButtonTapped()
+  func imagesPickCellTapped()
 }
 
 class ANIRecruitContributeView: UIView {
   
   private weak var headerImageView: UIImageView?
   private var headerImageViewTopConstraint: Constraint?
-  var headerMinHeight: CGFloat?
-  var headerImage: UIImage? {
-    didSet {
-      headerImageView?.image = headerImage
-    }
-  }
-  
-  private weak var imagePickupButton: ANIImageButtonView?
+  private weak var headerImagePickupButton: ANIImageButtonView?
   
   private weak var scrollView: ANIScrollView?
-  
   private let CONTENT_SPACE: CGFloat = 25.0
   private weak var contentView: UIView?
   
@@ -65,7 +58,7 @@ class ANIRecruitContributeView: UIView {
   private weak var introduceBG: UIView?
   private weak var introduceTextView: ANIPlaceHolderTextView?
   private let INTRODUCE_IMAGES_VIEW_RATIO: CGFloat = 0.5
-  private weak var introduceImagesView: ANIRecruitDetailImagesView?
+  private weak var introduceImagesView: ANIRecruitContributeImagesView?
   
   private weak var passingTitleLabel: UILabel?
   private weak var passingSubTitleLabel: UILabel?
@@ -74,7 +67,19 @@ class ANIRecruitContributeView: UIView {
   
   private let KEYBOARD_HIDE_TOOL_BAR_HEIGHT: CGFloat = 40.0
   
-  private var testIntroduceImages = [UIImage]()
+  var headerMinHeight: CGFloat?
+  var headerImage: UIImage? {
+    didSet {
+      headerImageView?.image = headerImage
+    }
+  }
+  
+  var introduceImages = [UIImage?]() {
+    didSet {
+      guard let introduceImagesView = self.introduceImagesView else { return }
+      introduceImagesView.introduceImages = introduceImages
+    }
+  }
   
   var pickMode: BasicInfoPickMode?
   private var selectedTextViewMaxY: CGFloat?
@@ -83,7 +88,6 @@ class ANIRecruitContributeView: UIView {
   
   override init(frame: CGRect) {
     super.init(frame: frame)
-    setTestIntroduceImages()
     setup()
     setNotification()
   }
@@ -127,16 +131,16 @@ class ANIRecruitContributeView: UIView {
     contentView.width(to: scrollView)
     self.contentView = contentView
     
-    //imagePickupButton
-    let imagePickupButton = ANIImageButtonView()
-    imagePickupButton.image = UIImage(named: "imagePickButton")
-    imagePickupButton.delegate = self
-    addSubview(imagePickupButton)
-    imagePickupButton.width(40.0)
-    imagePickupButton.height(40.0)
-    imagePickupButton.right(to: headerImageView, offset: -10.0)
-    imagePickupButton.bottom(to: headerImageView, offset: -10.0)
-    self.imagePickupButton = imagePickupButton
+    //headerImagePickupButton
+    let headerImagePickupButton = ANIImageButtonView()
+    headerImagePickupButton.image = UIImage(named: "imagePickButton")
+    headerImagePickupButton.delegate = self
+    addSubview(headerImagePickupButton)
+    headerImagePickupButton.width(40.0)
+    headerImagePickupButton.height(40.0)
+    headerImagePickupButton.right(to: headerImageView, offset: -10.0)
+    headerImagePickupButton.bottom(to: headerImageView, offset: -10.0)
+    self.headerImagePickupButton = headerImagePickupButton
     
     //titleBG
     let titleBG = UIView()
@@ -426,8 +430,8 @@ class ANIRecruitContributeView: UIView {
     setHideButtonOnKeyboard(textView: introduceTextView)
     
     //introduceImagesView
-    let introduceImagesView = ANIRecruitDetailImagesView()
-    introduceImagesView.testIntroduceImages = testIntroduceImages
+    let introduceImagesView = ANIRecruitContributeImagesView()
+    introduceImagesView.delegate = self
     contentView.addSubview(introduceImagesView)
     introduceImagesView.topToBottom(of: introduceBG, offset: 10.0)
     introduceImagesView.leftToSuperview()
@@ -482,14 +486,6 @@ class ANIRecruitContributeView: UIView {
     setHideButtonOnKeyboard(textView: passingTextView)
   }
   
-  private func setTestIntroduceImages() {
-    let image1 = UIImage(named: "detailCat1")!
-    let image2 = UIImage(named: "detailCat2")!
-    let image3 = UIImage(named: "detailCat3")!
-    let image4 = UIImage(named: "detailCat4")!
-    
-    testIntroduceImages = [image1, image2, image3, image4]
-  }
   
   private func setNotification() {
     ANINotificationManager.receive(undateBasicInfo: self, selector: #selector(updateBasicInfo))
@@ -614,7 +610,7 @@ extension ANIRecruitContributeView: UIScrollViewDelegate {
 //MARK: ANIButtonViewDelegate
 extension ANIRecruitContributeView: ANIButtonViewDelegate {
   func buttonViewTapped(view: ANIButtonView) {
-    if view === self.imagePickupButton {
+    if view === self.headerImagePickupButton {
       self.delegate?.imagePickButtonTapped()
     }
     if view === self.basicInfoKindSelectButton {
@@ -638,6 +634,7 @@ extension ANIRecruitContributeView: ANIButtonViewDelegate {
   }
 }
 
+//MARK: UITextViewDelegate
 extension ANIRecruitContributeView: UITextViewDelegate {
   func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
     guard let selectedTextViewSuperView = textView.superview else { return false }
@@ -648,5 +645,11 @@ extension ANIRecruitContributeView: UITextViewDelegate {
   
   func textViewDidEndEditing(_ textView: UITextView) {
     selectedTextViewMaxY = nil
+  }
+}
+
+extension ANIRecruitContributeView: ANIRecruitContributeImagesViewDelegate {
+  func imagesPickCellTapped() {
+    self.delegate?.imagesPickCellTapped()
   }
 }

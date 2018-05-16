@@ -1,14 +1,14 @@
 //
-//  ANIRecruitDetailImagesViewCell.swift
+//  ANIRecruitContributeImagesCell.swift
 //  Ani
 //
-//  Created by jeonminseop on 2018/04/28.
+//  Created by jeonminseop on 2018/05/16.
 //  Copyright © 2018年 JeonMinseop. All rights reserved.
 //
 
 import UIKit
 
-class ANIRecruitDetailImagesViewCell: UICollectionViewCell {
+class ANIRecruitContributeImagesCell: UICollectionViewCell {
   
   weak var imageView: UIImageView?
   
