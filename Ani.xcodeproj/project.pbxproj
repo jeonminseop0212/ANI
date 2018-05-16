@@ -27,6 +27,8 @@
 		CDA32A2720AA6652008A2AC1 /* ANIPopupPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A2620AA6652008A2AC1 /* ANIPopupPickerView.swift */; };
 		CDA32A2920ABBA21008A2AC1 /* ANIRecruitContributeImagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A2820ABBA21008A2AC1 /* ANIRecruitContributeImagesView.swift */; };
 		CDA32A2B20ABBC20008A2AC1 /* ANIRecruitContributeImagesCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A2A20ABBC20008A2AC1 /* ANIRecruitContributeImagesCell.swift */; };
+		CDA32A2D20ABCE5F008A2AC1 /* RecruitInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A2C20ABCE5F008A2AC1 /* RecruitInfo.swift */; };
+		CDA32A2F20ABD941008A2AC1 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A2E20ABD941008A2AC1 /* String.swift */; };
 		CDD0550620A5CF2200BEF482 /* ANIImageFilterPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD0550520A5CF2200BEF482 /* ANIImageFilterPreviewView.swift */; };
 		CDD0550820A5D07600BEF482 /* ANIImageFilterPreviewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD0550720A5D07600BEF482 /* ANIImageFilterPreviewCell.swift */; };
 		CDD0550C20A5D29900BEF482 /* ANIImageFilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD0550B20A5D29900BEF482 /* ANIImageFilterView.swift */; };
@@ -137,6 +139,8 @@
 		CDA32A2620AA6652008A2AC1 /* ANIPopupPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIPopupPickerView.swift; sourceTree = "<group>"; };
 		CDA32A2820ABBA21008A2AC1 /* ANIRecruitContributeImagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitContributeImagesView.swift; sourceTree = "<group>"; };
 		CDA32A2A20ABBC20008A2AC1 /* ANIRecruitContributeImagesCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitContributeImagesCell.swift; sourceTree = "<group>"; };
+		CDA32A2C20ABCE5F008A2AC1 /* RecruitInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecruitInfo.swift; sourceTree = "<group>"; };
+		CDA32A2E20ABD941008A2AC1 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
 		CDD0550520A5CF2200BEF482 /* ANIImageFilterPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIImageFilterPreviewView.swift; sourceTree = "<group>"; };
 		CDD0550720A5D07600BEF482 /* ANIImageFilterPreviewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIImageFilterPreviewCell.swift; sourceTree = "<group>"; };
 		CDD0550B20A5D29900BEF482 /* ANIImageFilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIImageFilterView.swift; sourceTree = "<group>"; };
@@ -412,6 +416,7 @@
 				CDF7F16D208F2BEF00254A0F /* UIView.swift */,
 				CD08A7702091975500F0B72D /* UIApplication.swift */,
 				CD9E52B020921EB400715F50 /* UIViewController.swift */,
+				CDA32A2E20ABD941008A2AC1 /* String.swift */,
 			);
 			path = Extensioin;
 			sourceTree = "<group>";
@@ -723,6 +728,7 @@
 			isa = PBXGroup;
 			children = (
 				F5E9E2232076961D0021D4CC /* Recruit.swift */,
+				CDA32A2C20ABCE5F008A2AC1 /* RecruitInfo.swift */,
 				F5E9E22520769AD60021D4CC /* User.swift */,
 				F5DF8360207A1D4A00EA7FBE /* Story.swift */,
 				F5B51499207AEDC300366500 /* Qna.swift */,
@@ -1113,6 +1119,7 @@
 				F51D221520768B24009D1B26 /* UISearchBar.swift in Sources */,
 				F5E9E2392079B9D20021D4CC /* ANICommunityMenuBarCell.swift in Sources */,
 				F5E9E23D2079C10C0021D4CC /* ANIStoryView.swift in Sources */,
+				CDA32A2D20ABCE5F008A2AC1 /* RecruitInfo.swift in Sources */,
 				F53E87C82085F5FA00B19A2F /* ANIProfileMenuBarCell.swift in Sources */,
 				F57F7D572081FEBF008A2645 /* ANINotiMessageCell.swift in Sources */,
 				F530AB1C207A45D900114E6B /* ANIStoryImagesViewCell.swift in Sources */,
@@ -1134,6 +1141,7 @@
 				F5F530142088624E0076E938 /* ANIProfileRecruitCell.swift in Sources */,
 				F57F7D61208322D3008A2645 /* ANIMessageView.swift in Sources */,
 				CD9E52B120921EB400715F50 /* UIViewController.swift in Sources */,
+				CDA32A2F20ABD941008A2AC1 /* String.swift in Sources */,
 				F51D221020767E62009D1B26 /* ANIColor.swift in Sources */,
 				F5E9E221207692C60021D4CC /* ANIRecruitViewCell.swift in Sources */,
 				F5B1EF9120725964000CFB0B /* AppDelegate.swift in Sources */,

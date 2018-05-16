@@ -501,6 +501,37 @@ class ANIRecruitContributeView: UIView {
     textView.inputAccessoryView = tools
   }
   
+  func getRecruitInfo() -> RecruitInfo? {
+    guard let headerImage = self.headerImage,
+    let titleTextView = self.titleTextView,
+    let basicInfoKindLabel = self.basicInfoKindLabel,
+    let kindText = basicInfoKindLabel.text,
+    let basicInfoAgeLabel = self.basicInfoAgeLabel,
+    let ageText = basicInfoAgeLabel.text,
+    let basicInfoSexLabel = self.basicInfoSexLabel,
+    let sexText = basicInfoSexLabel.text,
+    let basicInfoHomeLabel = self.basicInfoHomeLabel,
+    let homeText = basicInfoHomeLabel.text,
+    let basicInfoVaccineLabel = self.basicInfoVaccineLabel,
+    let vaccineText = basicInfoVaccineLabel.text,
+    let basicInfoCastrationLabel = self.basicInfoCastrationLabel,
+    let castrationText = basicInfoCastrationLabel.text,
+    let resonTextView = self.reasonTextView,
+    let introduceTextView = self.introduceTextView,
+    let passingTextView = self.passingTextView else { return nil }
+    
+    let kind = kindText.substring(3...)
+    let age = ageText.substring(3...)
+    let sex = sexText.substring(3...)
+    let home = homeText.substring(3...)
+    let vaccine = vaccineText.substring(5...)
+    let castration = castrationText.substring(3...)
+    
+    let recruitInfo = RecruitInfo(headerImage: headerImage, title: titleTextView.text, kind: kind, age: age, sex: sex, home: home, vaccine: vaccine, castration: castration, reason: resonTextView.text, introduce: introduceTextView.text, introduceImages: introduceImages, passing: passingTextView.text)
+    
+    return recruitInfo
+  }
+  
   //MARK: action
   @objc private func kindSelectButtonTapped() {
     self.delegate?.kindSelectButtonTapped()

@@ -19,6 +19,10 @@ enum BasicInfoPickMode: String {
   case castration
 }
 
+protocol ANIRecruitContributionViewControllerDelegate {
+  func contributionButtonTapped(recruitInfo: RecruitInfo)
+}
+
 class ANIRecruitContributionViewController: UIViewController {
   
   private var gallery: GalleryController?
@@ -44,6 +48,8 @@ class ANIRecruitContributionViewController: UIViewController {
   }
   
   private var isHaderImagePick: Bool = false
+  
+  var delegate: ANIRecruitContributionViewControllerDelegate?
     
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -359,8 +365,6 @@ extension ANIRecruitContributionViewController: ANIRecruitContributeViewDelegate
   }
   
   func imagesPickCellTapped() {
-    print("pick")
-    
     recruitIntroduceImagesPick(animation: true)
   }
 }
@@ -369,7 +373,12 @@ extension ANIRecruitContributionViewController: ANIRecruitContributeViewDelegate
 extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
   func buttonViewTapped(view: ANIButtonView) {
     if view === self.contributeButton {
-      print("contribute button tapped")
+      guard let recruitContributeView = self.recruitContributeView,
+            let recruitInfo = recruitContributeView.getRecruitInfo() else { return }
+      
+      self.delegate?.contributionButtonTapped(recruitInfo: recruitInfo)
+      
+      self.dismiss(animated: true, completion: nil)
     }
   }
 }

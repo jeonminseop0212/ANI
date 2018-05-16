@@ -55,8 +55,12 @@ class ANIRecruitDetailView: UIView {
   private weak var passingBG: UIView?
   private weak var passingLabel: UILabel?
   
-  private var testBasicInfo = [String: String]()
-  private var testIntroduceImages = [UIImage]()
+  private var introduceImages = [UIImage?]() {
+    didSet {
+      guard let introduceImagesView = self.introduceImagesView else { return }
+      introduceImagesView.testIntroduceImages = introduceImages
+    }
+  }
   
   var delegate: ANIRecruitDetailViewDelegate?
   
@@ -68,8 +72,6 @@ class ANIRecruitDetailView: UIView {
   
   override init(frame: CGRect) {
     super.init(frame: frame)
-    setTestIntroduceImages()
-    setTestBasicInfo()
     setup()
   }
   
@@ -306,7 +308,7 @@ class ANIRecruitDetailView: UIView {
     
     //introduceImagesView
     let introduceImagesView = ANIRecruitDetailImagesView()
-    introduceImagesView.testIntroduceImages = testIntroduceImages
+    introduceImagesView.testIntroduceImages = introduceImages
     contentView.addSubview(introduceImagesView)
     introduceImagesView.topToBottom(of: introduceBG, offset: 10.0)
     introduceImagesView.leftToSuperview()
@@ -362,45 +364,27 @@ class ANIRecruitDetailView: UIView {
           let introduceLabel = self.introduceLabel,
           let passingLabel = self.passingLabel else { return }
     
-    headerImageView.image = testRecruit.recruitImage
+    headerImageView.image = testRecruit.recruitInfo.headerImage
     
-    titleLabel.text = testRecruit.title
+    titleLabel.text = testRecruit.recruitInfo.title
     
     profileImageView.image = testRecruit.user.profileImage
     
     userNameLabel?.text = testRecruit.user.name
     
-    basicInfoKindLabel.text = "種類：\(testBasicInfo["kind"] ?? "")"
-    basicInfoAgeLabel.text = "年齢：\(testBasicInfo["age"] ?? "")"
-    basicInfoSexLabel.text = "性別：\(testBasicInfo["sex"] ?? "")"
-    basicInfoHomeLabel.text = "お家：\(testBasicInfo["home"] ?? "")"
-    basicInfoVaccineLabel.text = "ワクチン：\(testBasicInfo["vaccine"] ?? "")"
-    basicInfoCastrationLabel.text = "去勢生：\(testBasicInfo["castration"] ?? "")"
+    basicInfoKindLabel.text = "種類：\(testRecruit.recruitInfo.kind)"
+    basicInfoAgeLabel.text = "年齢：\(testRecruit.recruitInfo.age)"
+    basicInfoSexLabel.text = "性別：\(testRecruit.recruitInfo.sex)"
+    basicInfoHomeLabel.text = "お家：\(testRecruit.recruitInfo.home)"
+    basicInfoVaccineLabel.text = "ワクチン：\(testRecruit.recruitInfo.vaccine)"
+    basicInfoCastrationLabel.text = "去勢生：\(testRecruit.recruitInfo.castration)"
     
-    reasonLabel.text = testRecruit.subTitle
-    introduceLabel.text = "人懐こくて甘えん坊の可愛い子猫です。\n元気よくご飯もいっぱいたべます😍\n遊ぶのが大好きであっちこっち走り回る姿がたまらなく可愛いです。"
+    reasonLabel.text = testRecruit.recruitInfo.reason
     
-    passingLabel.text = "ご自宅までお届けします。"
-  }
-  
-  private func setTestBasicInfo() {
-    let kind = "ミックス"
-    let age = "6ヶ月"
-    let sex = "男の子"
-    let home = "東京都"
-    let vaccine = "済み"
-    let castration = "済み"
+    introduceLabel.text = testRecruit.recruitInfo.introduce
+    introduceImages = testRecruit.recruitInfo.introduceImages
     
-    testBasicInfo = ["kind":kind, "age":age, "sex":sex, "home":home, "vaccine":vaccine, "castration":castration]
-  }
-  
-  private func setTestIntroduceImages() {
-    let image1 = UIImage(named: "detailCat1")!
-    let image2 = UIImage(named: "detailCat2")!
-    let image3 = UIImage(named: "detailCat3")!
-    let image4 = UIImage(named: "detailCat4")!
-
-    testIntroduceImages = [image1, image2, image3, image4]
+    passingLabel.text = testRecruit.recruitInfo.passing
   }
 }
 
