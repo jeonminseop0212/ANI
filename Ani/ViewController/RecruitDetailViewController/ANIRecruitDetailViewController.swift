@@ -119,13 +119,14 @@ class ANIRecruitDetailViewController: UIViewController {
 extension ANIRecruitDetailViewController: ANIRecruitDetailViewDelegate {
   func recruitDetailViewDidScroll(offset: CGFloat) {
     guard let myNavigationBar = self.myNavigationBar,
-          let backButton = self.backButton else { return }
+          let backButton = self.backButton,
+          let clipButton = self.clipButton else { return }
     
       if offset > 1 {
         let backGroundColorOffset: CGFloat = 1.0
         let tintColorOffset = 1.0 - offset
         backButton.tintColor = UIColor(hue: 0, saturation: 0, brightness: tintColorOffset, alpha: 1)
-        clipButton?.tintColor = UIColor(hue: 0, saturation: 0, brightness: tintColorOffset, alpha: 1)
+        clipButton.tintColor = UIColor(hue: 0, saturation: 0, brightness: tintColorOffset, alpha: 1)
         myNavigationBar.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: backGroundColorOffset)
         UIApplication.shared.statusBarStyle = .default
       } else {
@@ -133,10 +134,10 @@ extension ANIRecruitDetailViewController: ANIRecruitDetailViewDelegate {
         let ANIColorDarkBrightness: CGFloat = 0.18
         if tintColorOffset > ANIColorDarkBrightness {
           backButton.tintColor = UIColor(hue: 0, saturation: 0, brightness: tintColorOffset, alpha: 1)
-          clipButton?.tintColor = UIColor(hue: 0, saturation: 0, brightness: tintColorOffset, alpha: 1)
+          clipButton.tintColor = UIColor(hue: 0, saturation: 0, brightness: tintColorOffset, alpha: 1)
         } else {
           backButton.tintColor = UIColor(hue: 0, saturation: 0, brightness: ANIColorDarkBrightness, alpha: 1)
-          clipButton?.tintColor = UIColor(hue: 0, saturation: 0, brightness: ANIColorDarkBrightness, alpha: 1)
+          clipButton.tintColor = UIColor(hue: 0, saturation: 0, brightness: ANIColorDarkBrightness, alpha: 1)
         }
        
         myNavigationBar.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: offset)
