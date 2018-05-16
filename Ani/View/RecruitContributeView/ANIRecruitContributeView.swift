@@ -101,7 +101,6 @@ class ANIRecruitContributeView: UIView {
     
     //headerImageView
     let headerImageView = UIImageView()
-    headerImageView.backgroundColor = ANIColor.lightGray
     addSubview(headerImageView)
     let headerImageViewHeight: CGFloat = UIScreen.main.bounds.width * UIViewController.HEADER_IMAGE_VIEW_RATIO
     headerImageViewTopConstraint = headerImageView.topToSuperview()
@@ -109,6 +108,7 @@ class ANIRecruitContributeView: UIView {
     headerImageView.rightToSuperview()
     headerImageView.height(headerImageViewHeight)
     self.headerImageView = headerImageView
+    headerImage = UIImage(named: "headerDefault")
     
     //scrollView
     let scrollView = ANIScrollView()
@@ -520,12 +520,12 @@ class ANIRecruitContributeView: UIView {
     let introduceTextView = self.introduceTextView,
     let passingTextView = self.passingTextView else { return nil }
     
-    let kind = kindText.substring(3...)
-    let age = ageText.substring(3...)
-    let sex = sexText.substring(3...)
-    let home = homeText.substring(3...)
-    let vaccine = vaccineText.substring(5...)
-    let castration = castrationText.substring(3...)
+    let kind = kindText.substring(3...) == "選択" ? "" : kindText.substring(3...)
+    let age = ageText.substring(3...) == "選択" ? "" : ageText.substring(3...)
+    let sex = sexText.substring(3...) == "選択" ? "" : sexText.substring(3...)
+    let home = homeText.substring(3...) == "選択" ? "" : homeText.substring(3...)
+    let vaccine = vaccineText.substring(5...) == "選択" ? "" : vaccineText.substring(3...)
+    let castration = castrationText.substring(3...) == "選択" ? "" : castrationText.substring(3...)
     
     let recruitInfo = RecruitInfo(headerImage: headerImage, title: titleTextView.text, kind: kind, age: age, sex: sex, home: home, vaccine: vaccine, castration: castration, reason: resonTextView.text, introduce: introduceTextView.text, introduceImages: introduceImages, passing: passingTextView.text)
     
