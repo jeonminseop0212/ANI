@@ -88,6 +88,13 @@ extension ANIRecruitContributeImagesView: UICollectionViewDelegate {
 
 extension ANIRecruitContributeImagesView: UICollectionViewDelegateFlowLayout {
   func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-    return CGSize(width: collectionView.frame.height, height: collectionView.frame.height)
+    if introduceImages.isEmpty {
+      let sideInset: CGFloat = 20.0
+      collectionView.isScrollEnabled = false
+      return CGSize(width: collectionView.frame.width - sideInset, height: collectionView.frame.height)
+    } else {
+      collectionView.isScrollEnabled = true
+      return CGSize(width: collectionView.frame.height, height: collectionView.frame.height)
+    }
   }
 }
