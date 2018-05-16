@@ -13,7 +13,7 @@ class ANIRecruitDetailImagesView: UIView {
   
   private weak var imagesViewCollectionView: UICollectionView?
   
-  var testIntroduceImages = [UIImage]() {
+  var testIntroduceImages = [UIImage?]() {
     didSet {
       reloadLayout()
     }

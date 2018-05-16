@@ -40,7 +40,8 @@ class ANIProfileClipCell: UITableViewCell {
     recruitImageView.topToSuperview()
     recruitImageView.leftToSuperview()
     recruitImageView.rightToSuperview()
-    recruitImageView.height(150.0)
+    let headerImageViewHeight: CGFloat = UIScreen.main.bounds.width * UIViewController.HEADER_IMAGE_VIEW_RATIO
+    recruitImageView.height(headerImageViewHeight)
     self.recruitImageView = recruitImageView
     
     //titleLabel

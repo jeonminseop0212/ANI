@@ -9,9 +9,7 @@
 import UIKit
 
 struct Recruit {
-  let recruitImage: UIImage
-  let title: String
-  let subTitle: String
+  let recruitInfo: RecruitInfo
   let user: User
   let supportCount: Int
   let loveCount: Int

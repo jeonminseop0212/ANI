@@ -24,12 +24,17 @@ class ANIRecruitViewController: UIViewController {
   private let CONTRIBUTION_BUTTON_HEIGHT:CGFloat = 55.0
   private weak var contributionButon: ANIImageButtonView?
   
-  private var testRecruitLists = [Recruit]()
+  private var testRecruitLists = [Recruit]() {
+    didSet {
+      guard let recruitView = self.recruitView else { return }
+      recruitView.testRecruitLists = testRecruitLists
+    }
+  }
   
   override func viewDidLoad() {
     super.viewDidLoad()
-    setupTestData()
     setup()
+    setupTestData()
     setupNotifications()
   }
   
@@ -56,7 +61,6 @@ class ANIRecruitViewController: UIViewController {
     //rcruitView
     let recruitView = ANIRecuruitView()
     recruitView.delegate = self
-    recruitView.testRecruitLists = testRecruitLists
     self.view.addSubview(recruitView)
     recruitView.topToSuperview(usingSafeArea: true)
     recruitView.edgesToSuperview(excluding: .top)
@@ -132,9 +136,18 @@ class ANIRecruitViewController: UIViewController {
     let user1 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
     let user2 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki")
     let user3 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
-    let recruit1 = Recruit(recruitImage: UIImage(named: "cat1")!, title: "かわいい猫ちゃんの里親になって >_<", subTitle: "親がいない子猫を保護しました。\n家ではすでに猫を飼えないので親になってくれる方を探しています。\nよろしくお願いします。", user: user1, supportCount: 10, loveCount: 10)
-    let recruit2 = Recruit(recruitImage: UIImage(named: "cat2")!, title: "かわいい猫ちゃんの里親になって >_<", subTitle: "親がいない子猫を保護しました。\n家ではすでに猫を飼えないので親になってくれる方を探しています。\nよろしくお願いします。", user: user2, supportCount: 5, loveCount: 15)
-    let recruit3 = Recruit(recruitImage: UIImage(named: "cat1")!, title: "かわいい猫ちゃんの里親になって >_<", subTitle: "親がいない子猫を保護しました。\n家ではすでに猫を飼えないので親になってくれる方を探しています。\nよろしくお願いします。", user: user3, supportCount: 10, loveCount: 10)
+    
+    let image1 = UIImage(named: "detailCat1")!
+    let image2 = UIImage(named: "detailCat2")!
+    let image3 = UIImage(named: "detailCat3")!
+    let image4 = UIImage(named: "detailCat4")!
+    
+    let introduceImages = [image1, image2, image3, image4]
+    let recruitInfo = RecruitInfo(headerImage: UIImage(named: "cat1")!, title: "かわいい猫ちゃんの里親になって >_<", kind: "ミックス", age: "１歳以下", sex: "男の子", home: "東京都", vaccine: "１回", castration: "済み", reason: "親がいない子猫を保護しました。\n家ではすでに猫を飼えないので親になってくれる方を探しています。\nよろしくお願いします。", introduce: "人懐こくて甘えん坊の可愛い子猫です。\n元気よくご飯もいっぱいたべます😍\n遊ぶのが大好きであっちこっち走り回る姿がたまらなく可愛いです。", introduceImages: introduceImages, passing: "ご自宅までお届けします！")
+    let recruit1 = Recruit(recruitInfo: recruitInfo, user: user1, supportCount: 10, loveCount: 10)
+    let recruit2 = Recruit(recruitInfo: recruitInfo, user: user2, supportCount: 5, loveCount: 8)
+    let recruit3 = Recruit(recruitInfo: recruitInfo, user: user3, supportCount: 14, loveCount: 20)
+
     self.testRecruitLists = [recruit1, recruit2, recruit3, recruit1, recruit2, recruit3]
   }
   
@@ -165,12 +178,14 @@ extension ANIRecruitViewController:ANIButtonViewDelegate{
   func buttonViewTapped(view: ANIButtonView) {
     if view === self.contributionButon {
       let recruitContribtionViewController = ANIRecruitContributionViewController()
+      recruitContribtionViewController.delegate = self
       let recruitContributionNV = UINavigationController(rootViewController: recruitContribtionViewController)
       self.navigationController?.present(recruitContributionNV, animated: true, completion: nil)
     }
   }
 }
 
+//ANIRecruitViewDelegate
 extension ANIRecruitViewController: ANIRecruitViewDelegate {
   func recruitRowTap(tapRowIndex: Int) {
     let recruitDetailViewController = ANIRecruitDetailViewController()
@@ -207,5 +222,14 @@ extension ANIRecruitViewController: ANIRecruitViewDelegate {
       searchBar?.alpha = 1.0
       categoriesView?.categoryCollectionView?.alpha = 1.0
     }
+  }
+}
+
+extension ANIRecruitViewController: ANIRecruitContributionViewControllerDelegate {
+  func contributionButtonTapped(recruitInfo: RecruitInfo) {
+    let user = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
+    let recruit = Recruit(recruitInfo: recruitInfo, user: user, supportCount: 10, loveCount: 10)
+    
+    self.testRecruitLists.insert(recruit, at: 0)
   }
 }

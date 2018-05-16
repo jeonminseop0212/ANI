@@ -15,7 +15,7 @@ protocol ANIRecruitViewDelegate {
 
 class ANIRecuruitView: UIView {
 
-  weak var recruitTableView: UITableView? {
+  private weak var recruitTableView: UITableView? {
     didSet {
       guard let recruitTableView = self.recruitTableView else { return }
       let topInset = UIViewController.NAVIGATION_BAR_HEIGHT + ANIRecruitViewController.CATEGORIES_VIEW_HEIGHT
@@ -23,7 +23,12 @@ class ANIRecuruitView: UIView {
     }
   }
   
-  var testRecruitLists = [Recruit]()
+  var testRecruitLists = [Recruit]() {
+    didSet {
+      guard let recruitTableView = self.recruitTableView else { return }
+      recruitTableView.reloadData()
+    }
+  }
 
   var delegate:ANIRecruitViewDelegate?
   
@@ -61,9 +66,9 @@ extension ANIRecuruitView: UITableViewDataSource, UITableViewDelegate {
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let id = NSStringFromClass(ANIRecruitViewCell.self)
     let cell = tableView.dequeueReusableCell(withIdentifier: id, for: indexPath) as! ANIRecruitViewCell
-    cell.recruitImageView.image = testRecruitLists[indexPath.item].recruitImage
-    cell.titleLabel.text = testRecruitLists[indexPath.item].title
-    cell.subTitleLabel.text = testRecruitLists[indexPath.item].subTitle
+    cell.recruitImageView.image = testRecruitLists[indexPath.item].recruitInfo.headerImage
+    cell.titleLabel.text = testRecruitLists[indexPath.item].recruitInfo.title
+    cell.subTitleLabel.text = testRecruitLists[indexPath.item].recruitInfo.reason
     cell.profileImageView.image = testRecruitLists[indexPath.item].user.profileImage
     cell.userNameLabel.text = testRecruitLists[indexPath.item].user.name
     cell.supportCountLabel.text = "\(testRecruitLists[indexPath.item].supportCount)"
