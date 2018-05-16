@@ -11,7 +11,7 @@ import UIKit
 class ANIStoryImagesView: UIView {
   
   private weak var imagesCollectionView: UICollectionView?
-  var pageControl: UIPageControl?
+  weak var pageControl: UIPageControl?
   static let PAGE_CONTROL_HEIGHT: CGFloat = 30.0
   
   var images = [UIImage]() {
