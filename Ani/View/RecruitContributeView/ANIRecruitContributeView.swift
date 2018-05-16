@@ -683,4 +683,8 @@ extension ANIRecruitContributeView: ANIRecruitContributeImagesViewDelegate {
   func imagesPickCellTapped() {
     self.delegate?.imagesPickCellTapped()
   }
+  
+  func imageDelete(index: Int) {
+    introduceImages.remove(at: index)
+  }
 }

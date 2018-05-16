@@ -10,6 +10,7 @@ import UIKit
 
 protocol ANIRecruitContributeImagesViewDelegate {
   func imagesPickCellTapped()
+  func imageDelete(index: Int)
 }
 
 class ANIRecruitContributeImagesView: UIView {
@@ -68,16 +69,21 @@ extension ANIRecruitContributeImagesView: UICollectionViewDataSource {
     if indexPath.item < introduceImages.count {
       cell.imageView?.contentMode = .scaleAspectFill
       cell.imageView?.image = introduceImages[indexPath.item]
+      cell.deleteButton?.alpha = 1.0
+      cell.deleteButton?.tag = indexPath.row
+      cell.delegate = self
     } else {
       cell.imageView?.backgroundColor = ANIColor.bg
       cell.imageView?.contentMode = .center
       cell.imageView?.image = UIImage(named: "imagesPickButton")
+      cell.deleteButton?.alpha = 0.0
     }
     
     return cell
   }
 }
 
+//MARK: UICollectionViewDelegate
 extension ANIRecruitContributeImagesView: UICollectionViewDelegate {
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
     if indexPath.item == introduceImages.count {
@@ -86,6 +92,7 @@ extension ANIRecruitContributeImagesView: UICollectionViewDelegate {
   }
 }
 
+//MARK: UICollectionViewDelegateFlowLayout
 extension ANIRecruitContributeImagesView: UICollectionViewDelegateFlowLayout {
   func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
     if introduceImages.isEmpty {
@@ -96,5 +103,11 @@ extension ANIRecruitContributeImagesView: UICollectionViewDelegateFlowLayout {
       collectionView.isScrollEnabled = true
       return CGSize(width: collectionView.frame.height, height: collectionView.frame.height)
     }
+  }
+}
+
+extension ANIRecruitContributeImagesView: ANIRecruitContributeImagesCellDelegate {
+  func deleteButtonTapped(index: Int) {
+    self.delegate?.imageDelete(index: index)
   }
 }
