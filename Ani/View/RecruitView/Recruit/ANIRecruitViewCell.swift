@@ -37,10 +37,11 @@ class ANIRecruitViewCell: UITableViewCell {
     let recruitImageView = UIImageView()
     recruitImageView.contentMode = .redraw
     addSubview(recruitImageView)
+    let recruitImageViewHeight: CGFloat = UIScreen.main.bounds.width * UIViewController.HEADER_IMAGE_VIEW_RATIO
     recruitImageView.topToSuperview()
     recruitImageView.leftToSuperview()
     recruitImageView.rightToSuperview()
-    recruitImageView.height(150.0)
+    recruitImageView.height(recruitImageViewHeight)
     self.recruitImageView = recruitImageView
     
     //titleLabel

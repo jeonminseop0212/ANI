@@ -15,7 +15,6 @@ protocol ANIRecruitDetailViewDelegate {
 
 class ANIRecruitDetailView: UIView {
   
-  private let HEADER_IMAGE_VIEW_HEIGHT: CGFloat = 150.0
   private weak var headerImageView: UIImageView?
   private var headerImageViewTopConstraint: Constraint?
   var headerMinHeight: CGFloat?
@@ -81,17 +80,20 @@ class ANIRecruitDetailView: UIView {
   private func setup() {
     self.backgroundColor = .white
     
+    //headerImageView
     let headerImageView = UIImageView()
     addSubview(headerImageView)
     headerImageViewTopConstraint = headerImageView.topToSuperview()
+    let headerImageViewHeight: CGFloat = UIScreen.main.bounds.width * UIViewController.HEADER_IMAGE_VIEW_RATIO
     headerImageView.leftToSuperview()
     headerImageView.rightToSuperview()
-    headerImageView.height(HEADER_IMAGE_VIEW_HEIGHT)
+    headerImageView.height(headerImageViewHeight)
     self.headerImageView = headerImageView
     
+    //scrollView
     let scrollView = UIScrollView()
     scrollView.delegate = self
-    let topInset = HEADER_IMAGE_VIEW_HEIGHT
+    let topInset = headerImageViewHeight
     scrollView.contentInsetAdjustmentBehavior = .never
     scrollView.contentInset = UIEdgeInsets(top: topInset, left: 0, bottom: 0, right: 0)
     scrollView.scrollIndicatorInsets = UIEdgeInsets(top: topInset, left: 0, bottom: 0, right: 0)
@@ -99,6 +101,7 @@ class ANIRecruitDetailView: UIView {
     scrollView.edgesToSuperview()
     self.scrollView = scrollView
     
+    //contentView
     let contentView = UIView()
     scrollView.addSubview(contentView)
     contentView.topToSuperview()
@@ -108,6 +111,7 @@ class ANIRecruitDetailView: UIView {
     contentView.width(to: scrollView)
     self.contentView = contentView
     
+    //titleLabel
     let titleLabel = UILabel()
     titleLabel.numberOfLines = 0
     titleLabel.font = UIFont.boldSystemFont(ofSize: 20.0)
@@ -118,6 +122,7 @@ class ANIRecruitDetailView: UIView {
     titleLabel.rightToSuperview(offset: 10.0)
     self.titleLabel = titleLabel
     
+    //profileImageView
     let profileImageView = UIImageView()
     contentView.addSubview(profileImageView)
     profileImageView.width(PROFILE_IMAGE_HEIGHT)
@@ -126,6 +131,7 @@ class ANIRecruitDetailView: UIView {
     profileImageView.leftToSuperview(offset: 10.0)
     self.profileImageView = profileImageView
     
+    //userNameLabel
     let userNameLabel = UILabel()
     userNameLabel.numberOfLines = 1
     userNameLabel.font = UIFont.systemFont(ofSize: 13.0)
@@ -136,6 +142,7 @@ class ANIRecruitDetailView: UIView {
     userNameLabel.rightToSuperview(offset: 10.0)
     self.userNameLabel = userNameLabel
     
+    //basicInfoTitleLabel
     let basicInfoTitleLabel = UILabel()
     basicInfoTitleLabel.font = UIFont.boldSystemFont(ofSize: 20.0)
     basicInfoTitleLabel.textColor = ANIColor.dark
@@ -146,6 +153,7 @@ class ANIRecruitDetailView: UIView {
     basicInfoTitleLabel.rightToSuperview(offset: 10.0)
     self.basicInfoTitleLabel = basicInfoTitleLabel
     
+    //basicInfoBG
     let basicInfoBG = UIView()
     basicInfoBG.backgroundColor = ANIColor.lightGray
     basicInfoBG.layer.cornerRadius = 10.0
@@ -156,6 +164,7 @@ class ANIRecruitDetailView: UIView {
     basicInfoBG.rightToSuperview(offset: 10.0)
     self.basicInfoBG = basicInfoBG
     
+    //basicInfoLine
     let basicInfoLine = UIImageView()
     basicInfoLine.image = UIImage(named: "basicInfoLine")
     basicInfoBG.addSubview(basicInfoLine)
@@ -165,6 +174,7 @@ class ANIRecruitDetailView: UIView {
     basicInfoLine.bottomToSuperview(offset: -10.0)
     self.basicInfoLine = basicInfoLine
     
+    //basicInfoKindLabel
     let basicInfoKindLabel = UILabel()
     basicInfoKindLabel.font = UIFont.systemFont(ofSize: 15.0)
     basicInfoKindLabel.textColor = ANIColor.dark
@@ -175,6 +185,7 @@ class ANIRecruitDetailView: UIView {
     basicInfoKindLabel.rightToLeft(of: basicInfoLine, offset: 10.0)
     self.basicInfoKindLabel = basicInfoKindLabel
     
+    //basicInfoAgeLabel
     let basicInfoAgeLabel = UILabel()
     basicInfoAgeLabel.font = UIFont.systemFont(ofSize: 15.0)
     basicInfoAgeLabel.textColor = ANIColor.dark
@@ -185,6 +196,7 @@ class ANIRecruitDetailView: UIView {
     basicInfoAgeLabel.rightToSuperview(offset: 10.0)
     self.basicInfoAgeLabel = basicInfoAgeLabel
     
+    //basicInfoSexLabel
     let basicInfoSexLabel = UILabel()
     basicInfoSexLabel.font = UIFont.systemFont(ofSize: 15.0)
     basicInfoSexLabel.textColor = ANIColor.dark
@@ -195,6 +207,7 @@ class ANIRecruitDetailView: UIView {
     basicInfoSexLabel.rightToLeft(of: basicInfoLine, offset: 10.0)
     self.basicInfoSexLabel = basicInfoSexLabel
 
+    //basicInfoHomeLabel
     let basicInfoHomeLabel = UILabel()
     basicInfoHomeLabel.font = UIFont.systemFont(ofSize: 15.0)
     basicInfoHomeLabel.textColor = ANIColor.dark
@@ -205,6 +218,7 @@ class ANIRecruitDetailView: UIView {
     basicInfoHomeLabel.rightToSuperview(offset: 10.0)
     self.basicInfoHomeLabel = basicInfoHomeLabel
     
+    //basicInfoVaccineLabel
     let basicInfoVaccineLabel = UILabel()
     basicInfoVaccineLabel.font = UIFont.systemFont(ofSize: 15.0)
     basicInfoVaccineLabel.textColor = ANIColor.dark
@@ -216,6 +230,7 @@ class ANIRecruitDetailView: UIView {
     basicInfoVaccineLabel.bottomToSuperview(offset: -10)
     self.basicInfoVaccineLabel = basicInfoVaccineLabel
     
+    //basicInfoCastrationLabel
     let basicInfoCastrationLabel = UILabel()
     basicInfoCastrationLabel.font = UIFont.systemFont(ofSize: 15.0)
     basicInfoCastrationLabel.textColor = ANIColor.dark
@@ -226,6 +241,7 @@ class ANIRecruitDetailView: UIView {
     basicInfoCastrationLabel.rightToSuperview(offset: 10.0)
     self.basicInfoCastrationLabel = basicInfoCastrationLabel
     
+    //reasonTitleLabel
     let reasonTitleLabel = UILabel()
     reasonTitleLabel.font = UIFont.boldSystemFont(ofSize: 20.0)
     reasonTitleLabel.textColor = ANIColor.dark
@@ -236,6 +252,7 @@ class ANIRecruitDetailView: UIView {
     reasonTitleLabel.rightToSuperview(offset: 10.0)
     self.reasonTitleLabel = reasonTitleLabel
     
+    //reasonBG
     let reasonBG = UIView()
     reasonBG.backgroundColor = ANIColor.lightGray
     reasonBG.layer.cornerRadius = 10.0
@@ -244,9 +261,9 @@ class ANIRecruitDetailView: UIView {
     reasonBG.topToBottom(of: reasonTitleLabel, offset: 10.0)
     reasonBG.leftToSuperview(offset: 10.0)
     reasonBG.rightToSuperview(offset: 10.0)
-    reasonBG.height(100)
     self.reasonBG = reasonBG
     
+    //reasonLabel
     let reasonLabel = UILabel()
     reasonLabel.font = UIFont.systemFont(ofSize: 15.0)
     reasonLabel.textColor = ANIColor.dark
@@ -256,6 +273,7 @@ class ANIRecruitDetailView: UIView {
     reasonLabel.edgesToSuperview(insets: insets)
     self.reasonLabel = reasonLabel
     
+    //introduceTitleLabel
     let introduceTitleLabel = UILabel()
     introduceTitleLabel.font = UIFont.boldSystemFont(ofSize: 20.0)
     introduceTitleLabel.textColor = ANIColor.dark
@@ -266,6 +284,7 @@ class ANIRecruitDetailView: UIView {
     introduceTitleLabel.rightToSuperview(offset: 10.0)
     self.introduceTitleLabel = introduceTitleLabel
     
+    //introduceBG
     let introduceBG = UIView()
     introduceBG.backgroundColor = ANIColor.lightGray
     introduceBG.layer.cornerRadius = 10.0
@@ -276,6 +295,7 @@ class ANIRecruitDetailView: UIView {
     introduceBG.rightToSuperview(offset: 10.0)
     self.introduceBG = introduceBG
     
+    //introduceLabel
     let introduceLabel = UILabel()
     introduceLabel.font = UIFont.systemFont(ofSize: 15.0)
     introduceLabel.textColor = ANIColor.dark
@@ -284,6 +304,7 @@ class ANIRecruitDetailView: UIView {
     introduceLabel.edgesToSuperview(insets: insets)
     self.introduceLabel = introduceLabel
     
+    //introduceImagesView
     let introduceImagesView = ANIRecruitDetailImagesView()
     introduceImagesView.testIntroduceImages = testIntroduceImages
     contentView.addSubview(introduceImagesView)
@@ -293,6 +314,7 @@ class ANIRecruitDetailView: UIView {
     introduceImagesView.height(UIScreen.main.bounds.width * INTRODUCE_IMAGES_VIEW_RATIO)
     self.introduceImagesView = introduceImagesView
     
+    //passingTitleLabel
     let passingTitleLabel = UILabel()
     passingTitleLabel.font = UIFont.boldSystemFont(ofSize: 20.0)
     passingTitleLabel.textColor = ANIColor.dark
@@ -303,6 +325,7 @@ class ANIRecruitDetailView: UIView {
     passingTitleLabel.rightToSuperview(offset: 10.0)
     self.passingTitleLabel = passingTitleLabel
     
+    //passingBG
     let passingBG = UIView()
     passingBG.backgroundColor = ANIColor.lightGray
     passingBG.layer.cornerRadius = 10.0
@@ -314,6 +337,7 @@ class ANIRecruitDetailView: UIView {
     passingBG.bottomToSuperview(offset: -10.0 - 10.0 - ANIRecruitDetailViewController.APPLY_BUTTON_HEIGHT)
     self.passingBG = passingBG
     
+    //passingLabel
     let passingLabel = UILabel()
     passingLabel.font = UIFont.systemFont(ofSize: 15.0)
     passingLabel.textColor = ANIColor.dark
@@ -387,28 +411,30 @@ extension ANIRecruitDetailView: UIScrollViewDelegate {
           let headerMinHeight = self.headerMinHeight
           else { return }
     
+    let headerImageViewHeight: CGFloat = UIScreen.main.bounds.width * UIViewController.HEADER_IMAGE_VIEW_RATIO
+
     let scrollY = scrollView.contentOffset.y
-    let newScrollY = scrollY + HEADER_IMAGE_VIEW_HEIGHT
+    let newScrollY = scrollY + headerImageViewHeight
     
     //imageView animation
     if newScrollY < 0 {
-      let scaleRatio = 1 - newScrollY / HEADER_IMAGE_VIEW_HEIGHT
+      let scaleRatio = 1 - newScrollY / headerImageViewHeight
       imageView.transform = CGAffineTransform(scaleX: scaleRatio, y: scaleRatio)
       imageViewTopConstraint.constant = 0
     }
     else {
       imageView.transform = CGAffineTransform.identity
-      if HEADER_IMAGE_VIEW_HEIGHT - newScrollY > headerMinHeight {
+      if headerImageViewHeight - newScrollY > headerMinHeight {
         imageViewTopConstraint.constant = -newScrollY
         self.layoutIfNeeded()
       } else {
-        imageViewTopConstraint.constant = -(HEADER_IMAGE_VIEW_HEIGHT - headerMinHeight)
+        imageViewTopConstraint.constant = -(headerImageViewHeight - headerMinHeight)
         self.layoutIfNeeded()
       }
     }
     
     //navigation bar animation
-    let offset = newScrollY / (HEADER_IMAGE_VIEW_HEIGHT - headerMinHeight)
+    let offset = newScrollY / (headerImageViewHeight - headerMinHeight)
     self.delegate?.recruitDetailViewDidScroll(offset: offset)
   }
 }
