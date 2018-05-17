@@ -1,23 +1,23 @@
 //
-//  ANIRecruitContributeImagesCell.swift
+//  ANIContributionImagesCell.swift
 //  Ani
 //
-//  Created by jeonminseop on 2018/05/16.
+//  Created by jeonminseop on 2018/05/17.
 //  Copyright © 2018年 JeonMinseop. All rights reserved.
 //
 
 import UIKit
 
-protocol ANIRecruitContributeImagesCellDelegate {
+protocol ANIContributionImagesCellDelegate {
   func deleteButtonTapped(index: Int)
 }
 
-class ANIRecruitContributeImagesCell: UICollectionViewCell {
+class ANIContributionImagesCell: UICollectionViewCell {
   
   weak var imageView: UIImageView?
   weak var deleteButton: UIButton?
   
-  var delegate: ANIRecruitContributeImagesCellDelegate?
+  var delegate: ANIContributionImagesCellDelegate?
   
   override init(frame: CGRect) {
     super.init(frame: frame)

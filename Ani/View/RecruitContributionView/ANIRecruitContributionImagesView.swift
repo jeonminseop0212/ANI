@@ -8,12 +8,12 @@
 
 import UIKit
 
-protocol ANIRecruitContributeImagesViewDelegate {
+protocol ANIRecruitContributionImagesViewDelegate {
   func imagesPickCellTapped()
   func imageDelete(index: Int)
 }
 
-class ANIRecruitContributeImagesView: UIView {
+class ANIRecruitContributionImagesView: UIView {
   
   private weak var imagesViewCollectionView: UICollectionView?
   
@@ -23,7 +23,7 @@ class ANIRecruitContributeImagesView: UIView {
     }
   }
   
-  var delegate: ANIRecruitContributeImagesViewDelegate?
+  var delegate: ANIRecruitContributionImagesViewDelegate?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -44,8 +44,8 @@ class ANIRecruitContributeImagesView: UIView {
     imagesViewCollectionView.dataSource = self
     imagesViewCollectionView.backgroundColor = .white
     imagesViewCollectionView.contentInset = UIEdgeInsets(top: 0.0, left: 10.0, bottom: 0.0, right: 10.0)
-    let id = NSStringFromClass(ANIRecruitContributeImagesCell.self)
-    imagesViewCollectionView.register(ANIRecruitContributeImagesCell.self, forCellWithReuseIdentifier: id)
+    let id = NSStringFromClass(ANIRecruitContributionImagesCell.self)
+    imagesViewCollectionView.register(ANIRecruitContributionImagesCell.self, forCellWithReuseIdentifier: id)
     addSubview(imagesViewCollectionView)
     imagesViewCollectionView.edgesToSuperview()
     self.imagesViewCollectionView = imagesViewCollectionView
@@ -57,14 +57,14 @@ class ANIRecruitContributeImagesView: UIView {
   }
 }
 
-extension ANIRecruitContributeImagesView: UICollectionViewDataSource {
+extension ANIRecruitContributionImagesView: UICollectionViewDataSource {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
     return introduceImages.count + 1
   }
   
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-    let id = NSStringFromClass(ANIRecruitContributeImagesCell.self)
-    let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! ANIRecruitContributeImagesCell
+    let id = NSStringFromClass(ANIRecruitContributionImagesCell.self)
+    let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! ANIRecruitContributionImagesCell
     
     if indexPath.item < introduceImages.count {
       cell.imageView?.contentMode = .scaleAspectFill
@@ -84,7 +84,7 @@ extension ANIRecruitContributeImagesView: UICollectionViewDataSource {
 }
 
 //MARK: UICollectionViewDelegate
-extension ANIRecruitContributeImagesView: UICollectionViewDelegate {
+extension ANIRecruitContributionImagesView: UICollectionViewDelegate {
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
     if indexPath.item == introduceImages.count {
       self.delegate?.imagesPickCellTapped()
@@ -93,7 +93,7 @@ extension ANIRecruitContributeImagesView: UICollectionViewDelegate {
 }
 
 //MARK: UICollectionViewDelegateFlowLayout
-extension ANIRecruitContributeImagesView: UICollectionViewDelegateFlowLayout {
+extension ANIRecruitContributionImagesView: UICollectionViewDelegateFlowLayout {
   func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
     if introduceImages.isEmpty {
       let sideInset: CGFloat = 20.0
@@ -106,7 +106,7 @@ extension ANIRecruitContributeImagesView: UICollectionViewDelegateFlowLayout {
   }
 }
 
-extension ANIRecruitContributeImagesView: ANIRecruitContributeImagesCellDelegate {
+extension ANIRecruitContributionImagesView: ANIRecruitContributionImagesCellDelegate {
   func deleteButtonTapped(index: Int) {
     self.delegate?.imageDelete(index: index)
   }

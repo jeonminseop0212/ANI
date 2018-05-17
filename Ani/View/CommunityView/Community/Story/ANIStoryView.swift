@@ -50,9 +50,9 @@ class ANIStoryView: UIView {
     let user1 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
     let user2 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki")
     let user3 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
-    let story1 = Story(storyImages: [cat1, cat2, cat3], subTitle: "あれこれ内容を書くところだよおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user1, loveCount: 10, commentCount: 10)
-    let story2 = Story(storyImages: [cat2, cat1, cat3, cat4], subTitle: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user2, loveCount: 5, commentCount: 8)
-    let story3 = Story(storyImages: [cat3, cat2, cat1], subTitle: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user3, loveCount: 15, commentCount: 20)
+    let story1 = Story(storyImages: [cat1, cat2, cat3], story: "あれこれ内容を書くところだよおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user1, loveCount: 10, commentCount: 10)
+    let story2 = Story(storyImages: [cat2, cat1, cat3, cat4], story: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user2, loveCount: 5, commentCount: 8)
+    let story3 = Story(storyImages: [cat3, cat2, cat1], story: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user3, loveCount: 15, commentCount: 20)
     self.testStoryLists = [story1, story2, story3, story1, story2, story3]
   }
 }
@@ -67,7 +67,7 @@ extension ANIStoryView: UITableViewDataSource {
     let cell = tableView.dequeueReusableCell(withIdentifier: id, for: indexPath) as! ANIStoryViewCell
     cell.storyImagesView.images = testStoryLists[indexPath.item].storyImages
     cell.storyImagesView.pageControl?.numberOfPages = testStoryLists[indexPath.item].storyImages.count
-    cell.subTitleLabel.text = testStoryLists[indexPath.item].subTitle
+    cell.subTitleLabel.text = testStoryLists[indexPath.item].story
     cell.profileImageView.image = testStoryLists[indexPath.item].user.profileImage
     cell.userNameLabel.text = testStoryLists[indexPath.item].user.name
     cell.loveCountLabel.text = "\(testStoryLists[indexPath.item].loveCount)"

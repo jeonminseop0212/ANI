@@ -31,13 +31,13 @@ class ANIStoryViewCell: UITableViewCell {
   private func setup() {
     self.selectionStyle = .none
 
-    //storyImageView
+    //storyImagesView
     let storyImagesView = ANIStoryImagesView()
     addSubview(storyImagesView)
     storyImagesView.topToSuperview()
     storyImagesView.leftToSuperview()
     storyImagesView.rightToSuperview()
-    storyImagesView.height(200.0 + ANIStoryImagesView.PAGE_CONTROL_HEIGHT)
+    storyImagesView.height(UIScreen.main.bounds.width + ANIStoryImagesView.PAGE_CONTROL_HEIGHT + ANIStoryImagesView.PAGE_CONTROL_TOP_MARGIN)
     self.storyImagesView = storyImagesView
 
     //subTitleLabel
@@ -47,7 +47,7 @@ class ANIStoryViewCell: UITableViewCell {
     subTitleLabel.textColor = ANIColor.subTitle
     subTitleLabel.numberOfLines = 0
     addSubview(subTitleLabel)
-    subTitleLabel.topToBottom(of: storyImagesView, offset: 10.0)
+    subTitleLabel.topToBottom(of: storyImagesView, offset: 5.0)
     subTitleLabel.leftToSuperview(offset: 10.0)
     subTitleLabel.rightToSuperview(offset: 10.0)
     self.subTitleLabel = subTitleLabel

@@ -21,7 +21,7 @@ class ANIStoryImagesViewCell: UICollectionViewCell {
   
   private func setup() {
     let imageView = UIImageView()
-    imageView.contentMode = .redraw
+    imageView.contentMode = .scaleAspectFit
     addSubview(imageView)
     imageView.edgesToSuperview()
     self.imageView = imageView

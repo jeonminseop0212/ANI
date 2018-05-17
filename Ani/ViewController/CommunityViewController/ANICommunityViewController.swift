@@ -16,6 +16,8 @@ class ANICommunityViewController: UIViewController {
   
   private let CONTRIBUTION_BUTTON_HEIGHT: CGFloat = 55.0
   private weak var contributionButon: ANIImageButtonView?
+  
+  private var selectedIndex: Int = 0
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -117,13 +119,27 @@ extension ANICommunityViewController: UICollectionViewDataSource, UICollectionVi
     guard let menuBar = self.menuBar else { return }
     let indexPath = IndexPath(item: Int(targetContentOffset.pointee.x / view.frame.width), section: 0)
     menuBar.menuCollectionView?.selectItem(at: indexPath, animated: true, scrollPosition: .left)
+    
+    selectedIndex = indexPath.item
   }
 }
 
 extension ANICommunityViewController:ANIButtonViewDelegate{
   func buttonViewTapped(view: ANIButtonView) {
     if view === self.contributionButon {
-      print("community contribution tapped")
+      if selectedIndex == 0 {
+        let contributionViewController = ANIContributionViewController()
+        contributionViewController.navigationTitle = "STORY"
+        contributionViewController.selectedContributionMode = ContributionMode.story
+        let contributionNV = UINavigationController(rootViewController: contributionViewController)
+        self.present(contributionNV, animated: true, completion: nil)
+      } else {
+        let contributionViewController = ANIContributionViewController()
+        contributionViewController.navigationTitle = "Q&A"
+        contributionViewController.selectedContributionMode = ContributionMode.qna
+        let contributionNV = UINavigationController(rootViewController: contributionViewController)
+        self.present(contributionNV, animated: true, completion: nil)
+      }
     }
   }
 }

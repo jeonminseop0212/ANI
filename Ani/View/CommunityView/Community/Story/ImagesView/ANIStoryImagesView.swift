@@ -13,6 +13,7 @@ class ANIStoryImagesView: UIView {
   private weak var imagesCollectionView: UICollectionView?
   weak var pageControl: UIPageControl?
   static let PAGE_CONTROL_HEIGHT: CGFloat = 30.0
+  static let PAGE_CONTROL_TOP_MARGIN: CGFloat = 5.0
   
   var images = [UIImage]() {
     didSet {
@@ -50,7 +51,7 @@ class ANIStoryImagesView: UIView {
     imagesCollectionView.topToSuperview()
     imagesCollectionView.leftToSuperview()
     imagesCollectionView.rightToSuperview()
-    imagesCollectionView.bottomToSuperview(offset: -ANIStoryImagesView.PAGE_CONTROL_HEIGHT)
+    imagesCollectionView.bottomToSuperview(offset: -(ANIStoryImagesView.PAGE_CONTROL_HEIGHT + ANIStoryImagesView.PAGE_CONTROL_TOP_MARGIN))
     self.imagesCollectionView = imagesCollectionView
     
     //pageControl
@@ -60,7 +61,7 @@ class ANIStoryImagesView: UIView {
     pageControl.currentPage = 0
     pageControl.isUserInteractionEnabled = false
     addSubview(pageControl)
-    pageControl.topToBottom(of: imagesCollectionView, offset: 8.0)
+    pageControl.topToBottom(of: imagesCollectionView, offset: ANIStoryImagesView.PAGE_CONTROL_TOP_MARGIN)
     pageControl.leftToSuperview()
     pageControl.rightToSuperview()
     pageControl.height(ANIStoryImagesView.PAGE_CONTROL_HEIGHT)
@@ -81,7 +82,7 @@ extension ANIStoryImagesView: UICollectionViewDataSource, UICollectionViewDelega
   }
   
   func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-    let size = CGSize(width: collectionView.frame.width, height: collectionView.frame.height)
+    let size = CGSize(width: collectionView.frame.width, height: collectionView.frame.width)
     return size
   }
   

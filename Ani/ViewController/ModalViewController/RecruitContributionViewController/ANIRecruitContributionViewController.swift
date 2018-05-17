@@ -10,7 +10,7 @@ import UIKit
 import Gallery
 import TinyConstraints
 
-enum BasicInfoPickMode: String {
+enum BasicInfoPickMode {
   case kind
   case age
   case sex
@@ -31,9 +31,9 @@ class ANIRecruitContributionViewController: UIViewController {
   private weak var myNavigationBar: UIView?
   private weak var dismissButton: UIButton?
   
-  private var recruitContributeViewOriginalBottomConstraintConstant: CGFloat?
-  private var recruitContributeViewBottomConstraint: Constraint?
-  private weak var recruitContributeView: ANIRecruitContributeView?
+  private var recruitContributionViewOriginalBottomConstraintConstant: CGFloat?
+  private var recruitContributionViewBottomConstraint: Constraint?
+  private weak var recruitContributionView: ANIRecruitContributionView?
   
   static let CONTRIBUTE_BUTTON_HEIGHT: CGFloat = 45.0
   private weak var contributeButton: ANIAreaButtonView?
@@ -46,9 +46,9 @@ class ANIRecruitContributionViewController: UIViewController {
   
   var pickMode: BasicInfoPickMode? {
     didSet {
-      guard let recruitContributeView = self.recruitContributeView else { return }
+      guard let recruitContributionView = self.recruitContributionView else { return }
       
-      recruitContributeView.pickMode = pickMode
+      recruitContributionView.pickMode = pickMode
     }
   }
   
@@ -73,15 +73,15 @@ class ANIRecruitContributionViewController: UIViewController {
     self.navigationController?.setNavigationBarHidden(true, animated: false)
     self.navigationController?.navigationBar.isTranslucent = false
     
-    //recruitContributeView
-    let recruitContributeView = ANIRecruitContributeView()
-    recruitContributeView.headerMinHeight = UIViewController.STATUS_BAR_HEIGHT + UIViewController.NAVIGATION_BAR_HEIGHT
-    recruitContributeView.delegate = self
-    self.view.addSubview(recruitContributeView)
-    recruitContributeViewBottomConstraint = recruitContributeView.bottomToSuperview()
-    recruitContributeViewOriginalBottomConstraintConstant = recruitContributeViewBottomConstraint?.constant
-    recruitContributeView.edgesToSuperview(excluding: .bottom)
-    self.recruitContributeView = recruitContributeView
+    //recruitContributionView
+    let recruitContributionView = ANIRecruitContributionView()
+    recruitContributionView.headerMinHeight = UIViewController.STATUS_BAR_HEIGHT + UIViewController.NAVIGATION_BAR_HEIGHT
+    recruitContributionView.delegate = self
+    self.view.addSubview(recruitContributionView)
+    recruitContributionViewBottomConstraint = recruitContributionView.bottomToSuperview()
+    recruitContributionViewOriginalBottomConstraintConstant = recruitContributionViewBottomConstraint?.constant
+    recruitContributionView.edgesToSuperview(excluding: .bottom)
+    self.recruitContributionView = recruitContributionView
     
     //myNavigationBar
     let myNavigationBar = UIView()
@@ -162,11 +162,9 @@ class ANIRecruitContributionViewController: UIViewController {
     guard let keyboardFrame = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
           let duration = notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as? TimeInterval,
           let curve = notification.userInfo?[UIKeyboardAnimationCurveUserInfoKey] as? UInt,
-          let window = UIApplication.shared.keyWindow,
-          let recruitContributeViewBottomConstraint = self.recruitContributeViewBottomConstraint else { return }
+          let recruitContributeViewBottomConstraint = self.recruitContributionViewBottomConstraint else { return }
     
-    let bottomSafeArea = window.safeAreaInsets.bottom
-    let h = keyboardFrame.height - bottomSafeArea
+    let h = keyboardFrame.height
     
     recruitContributeViewBottomConstraint.constant = -h  + 10.0 + ANIRecruitContributionViewController.CONTRIBUTE_BUTTON_HEIGHT
 
@@ -178,10 +176,10 @@ class ANIRecruitContributionViewController: UIViewController {
   @objc private func keyboardWillHide(_ notification: Notification) {
     guard let duration = notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as? TimeInterval,
           let curve = notification.userInfo?[UIKeyboardAnimationCurveUserInfoKey] as? UInt,
-          let recruitContributeViewOriginalBottomConstraintConstant = self.recruitContributeViewOriginalBottomConstraintConstant,
-          let recruitContributeViewBottomConstraint = self.recruitContributeViewBottomConstraint else { return }
+      let recruitContributionViewOriginalBottomConstraintConstant = self.recruitContributionViewOriginalBottomConstraintConstant,
+      let recruitContributionViewBottomConstraint = self.recruitContributionViewBottomConstraint else { return }
     
-    recruitContributeViewBottomConstraint.constant = recruitContributeViewOriginalBottomConstraintConstant
+    recruitContributionViewBottomConstraint.constant = recruitContributionViewOriginalBottomConstraintConstant
     
     UIView.animate(withDuration: duration, delay: 0, options: UIViewAnimationOptions(rawValue: curve), animations: {
       self.view.layoutIfNeeded()
@@ -289,19 +287,19 @@ extension ANIRecruitContributionViewController: GalleryControllerDelegate {
 //MARK: ANIImageFilterViewControllerDelegate
 extension ANIRecruitContributionViewController: ANIImageFilterViewControllerDelegate {
   func doneFilterImages(filteredImages: [UIImage?]) {
-    guard let recruitContributeView = self.recruitContributeView,
+    guard let recruitContributionView = self.recruitContributionView,
           !filteredImages.isEmpty else { return }
     
     if isHaderImagePick {
       if let filteredImage = filteredImages[0] {
-        recruitContributeView.headerImage = filteredImage
+        recruitContributionView.headerImage = filteredImage
       }
     } else {
-      if recruitContributeView.introduceImages.isEmpty {
-        recruitContributeView.introduceImages = filteredImages
+      if recruitContributionView.introduceImages.isEmpty {
+        recruitContributionView.introduceImages = filteredImages
       } else {
         for filteredImage in filteredImages {
-          recruitContributeView.introduceImages.append(filteredImage)
+          recruitContributionView.introduceImages.append(filteredImage)
         }
       }
     }
@@ -309,7 +307,7 @@ extension ANIRecruitContributionViewController: ANIImageFilterViewControllerDele
 }
 
 //MARK: ANIRecruitContributeViewDelegate
-extension ANIRecruitContributionViewController: ANIRecruitContributeViewDelegate {
+extension ANIRecruitContributionViewController: ANIRecruitContributionViewDelegate {
   func recruitContributeViewDidScroll(offset: CGFloat) {
     guard let myNavigationBar = self.myNavigationBar,
       let dismissButton = self.dismissButton else { return }
@@ -399,8 +397,8 @@ extension ANIRecruitContributionViewController: ANIRecruitContributeViewDelegate
 extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
   func buttonViewTapped(view: ANIButtonView) {
     if view === self.contributeButton {
-      guard let recruitContributeView = self.recruitContributeView,
-            let recruitInfo = recruitContributeView.getRecruitInfo(),
+      guard let recruitContributionView = self.recruitContributionView,
+            let recruitInfo = recruitContributionView.getRecruitInfo(),
             let rejectViewBottomConstraint = self.rejectViewBottomConstraint else { return }
       
       if recruitInfo.headerImage != UIImage(named: "headerDefault") && recruitInfo.title.count > 0 && recruitInfo.kind.count > 0 && recruitInfo.age.count > 0 && recruitInfo.age.count > 0 && recruitInfo.sex.count > 0 && recruitInfo.home.count > 0 && recruitInfo.vaccine.count > 0 && recruitInfo.castration.count > 0 && recruitInfo.reason.count > 0 && recruitInfo.introduce.count > 0 && recruitInfo.passing.count > 0 && !recruitInfo.introduceImages.isEmpty {
