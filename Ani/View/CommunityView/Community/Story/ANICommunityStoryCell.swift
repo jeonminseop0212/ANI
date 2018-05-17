@@ -11,6 +11,14 @@ import UIKit
 class ANICommunityStoryCell: UICollectionViewCell {
   private weak var storyView: ANIStoryView?
   
+  var storys: [Story]? {
+    didSet {
+      guard let storyView = self.storyView,
+            let storys = self.storys else { return }
+      storyView.storys = storys
+    }
+  }
+  
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()

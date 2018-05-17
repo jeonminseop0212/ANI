@@ -15,6 +15,11 @@ enum ContributionMode {
   case qna
 }
 
+protocol ANIContributionViewControllerDelegate {
+  func contributionButtonTapped(story: Story)
+  func contributionButtonTapped(qna: Qna)
+}
+
 class ANIContributionViewController: UIViewController {
   
   private weak var myNavigationBar: UIView?
@@ -33,6 +38,8 @@ class ANIContributionViewController: UIViewController {
   var navigationTitle: String?
   
   var selectedContributionMode: ContributionMode?
+  
+  var delegate: ANIContributionViewControllerDelegate?
 
   override func viewDidLoad() {
     setup()
@@ -197,13 +204,25 @@ class ANIContributionViewController: UIViewController {
   }
   
   @objc private func contribute() {
-    guard let selectedContributionMode = self.selectedContributionMode else { return }
+    guard let selectedContributionMode = self.selectedContributionMode,
+          let contriButionView = self.contriButionView,
+          let contentTextView = contriButionView.contentTextView else { return }
     
     switch selectedContributionMode {
     case ContributionMode.story:
-      print("story")
+      let user = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
+
+      let story = Story(storyImages: contriButionView.contentImages, story: contentTextView.text, user: user, loveCount: 0, commentCount: 0)
+      self.delegate?.contributionButtonTapped(story: story)
+      
+      self.dismiss(animated: true, completion: nil)
     case ContributionMode.qna:
-      print("qna")
+      let user = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
+
+      let qna = Qna(qnaImages: contriButionView.contentImages, subTitle: contentTextView.text, user: user, loveCount: 0, commentCount: 0)
+      self.delegate?.contributionButtonTapped(qna: qna)
+      
+      self.dismiss(animated: true, completion: nil)
     }
   }
 }

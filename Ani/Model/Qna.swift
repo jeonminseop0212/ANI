@@ -9,7 +9,7 @@
 import UIKit
 
 struct Qna {
-  let qnaImages: [UIImage]
+  let qnaImages: [UIImage?]
   let subTitle: String
   let user: User
   let loveCount: Int

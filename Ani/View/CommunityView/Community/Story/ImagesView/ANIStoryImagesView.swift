@@ -15,7 +15,7 @@ class ANIStoryImagesView: UIView {
   static let PAGE_CONTROL_HEIGHT: CGFloat = 30.0
   static let PAGE_CONTROL_TOP_MARGIN: CGFloat = 5.0
   
-  var images = [UIImage]() {
+  var images = [UIImage?]() {
     didSet {
       for subview in self.subviews{
         subview.removeFromSuperview()
