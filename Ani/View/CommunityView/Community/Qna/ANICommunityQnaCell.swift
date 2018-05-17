@@ -11,6 +11,14 @@ import UIKit
 class ANICommunityQnaCell: UICollectionViewCell {
   private weak var qnaView: ANIQnaView?
   
+  var qnas: [Qna]? {
+    didSet {
+      guard let qnaView = self.qnaView,
+        let qnas = self.qnas else { return }
+      qnaView.qnas = qnas
+    }
+  }
+  
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()

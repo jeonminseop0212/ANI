@@ -18,7 +18,7 @@ class ANIContributionView: UIView {
   private weak var scrollView: ANIScrollView?
   private weak var contentView: UIView?
   
-  private weak var contentTextView: ANIPlaceHolderTextView?
+  weak var contentTextView: ANIPlaceHolderTextView?
   private let CONTENT_IMAGES_VIEW_RATIO: CGFloat = 0.5
   private weak var contentImagesView: ANIContributionImagesView?
   

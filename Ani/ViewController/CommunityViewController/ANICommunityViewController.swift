@@ -18,10 +18,26 @@ class ANICommunityViewController: UIViewController {
   private weak var contributionButon: ANIImageButtonView?
   
   private var selectedIndex: Int = 0
+  
+  private var storys: [Story]? {
+    didSet {
+      guard let containerCollectionView = self.containerCollectionView else { return }
+      containerCollectionView.reloadData()
+    }
+  }
+  
+  private var qnas: [Qna]? {
+    didSet {
+      guard let containerCollectionView = self.containerCollectionView else { return }
+      containerCollectionView.reloadData()
+    }
+  }
 
   override func viewDidLoad() {
     super.viewDidLoad()
     setup()
+    setupTestStoryData()
+    setupTestQnaData()
   }
   
   override func viewWillAppear(_ animated: Bool) {
@@ -84,6 +100,35 @@ class ANICommunityViewController: UIViewController {
     let indexPath = IndexPath(item: menuIndex, section: 0)
     containerCollectionView.scrollToItem(at: indexPath, at: .left, animated: true)
   }
+  
+  private func setupTestStoryData() {
+    let cat1 = UIImage(named: "storyCat1")!
+    let cat2 = UIImage(named: "storyCat2")!
+    let cat3 = UIImage(named: "storyCat3")!
+    let cat4 = UIImage(named: "storyCat1")!
+    let user1 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
+    let user2 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki")
+    let user3 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
+    let story1 = Story(storyImages: [cat1, cat2, cat3], story: "あれこれ内容を書くところだよおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user1, loveCount: 10, commentCount: 10)
+    let story2 = Story(storyImages: [cat2, cat1, cat3, cat4], story: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user2, loveCount: 5, commentCount: 8)
+    let story3 = Story(storyImages: [cat3, cat2, cat1], story: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user3, loveCount: 15, commentCount: 20)
+    self.storys = [story1, story2, story3, story1, story2, story3]
+  }
+  
+  private func setupTestQnaData() {
+    let cat1 = UIImage(named: "storyCat1")!
+    let cat2 = UIImage(named: "storyCat2")!
+    let cat3 = UIImage(named: "storyCat3")!
+    let cat4 = UIImage(named: "storyCat1")!
+    let user1 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
+    let user2 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki")
+    let user3 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
+    let qna1 = Qna(qnaImages: [cat1, cat2, cat3], subTitle: "あれこれ内容を書くところだよおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user1, loveCount: 10, commentCount: 5)
+    let qna2 = Qna(qnaImages: [cat2, cat1, cat3, cat4], subTitle: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user2, loveCount: 5, commentCount: 5)
+    let qna3 = Qna(qnaImages: [cat3, cat2, cat1], subTitle: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user3, loveCount: 15, commentCount: 10)
+    
+    self.qnas = [qna1, qna2, qna3, qna1, qna2, qna3]
+  }
 }
 
 extension ANICommunityViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
@@ -96,11 +141,13 @@ extension ANICommunityViewController: UICollectionViewDataSource, UICollectionVi
       let storyId = NSStringFromClass(ANICommunityStoryCell.self)
       let cell = collectionView.dequeueReusableCell(withReuseIdentifier: storyId, for: indexPath) as! ANICommunityStoryCell
       cell.frame.origin.y = collectionView.frame.origin.y
+      cell.storys = storys
       return cell
     } else {
       let qnaId = NSStringFromClass(ANICommunityQnaCell.self)
       let cell = collectionView.dequeueReusableCell(withReuseIdentifier: qnaId, for: indexPath) as! ANICommunityQnaCell
       cell.frame.origin.y = collectionView.frame.origin.y
+      cell.qnas = qnas
       return cell
     }
   }
@@ -124,22 +171,43 @@ extension ANICommunityViewController: UICollectionViewDataSource, UICollectionVi
   }
 }
 
-extension ANICommunityViewController:ANIButtonViewDelegate{
+//MARK: ANIButtonViewDelegate
+extension ANICommunityViewController: ANIButtonViewDelegate{
   func buttonViewTapped(view: ANIButtonView) {
     if view === self.contributionButon {
       if selectedIndex == 0 {
         let contributionViewController = ANIContributionViewController()
         contributionViewController.navigationTitle = "STORY"
         contributionViewController.selectedContributionMode = ContributionMode.story
+        contributionViewController.delegate = self
         let contributionNV = UINavigationController(rootViewController: contributionViewController)
         self.present(contributionNV, animated: true, completion: nil)
       } else {
         let contributionViewController = ANIContributionViewController()
         contributionViewController.navigationTitle = "Q&A"
         contributionViewController.selectedContributionMode = ContributionMode.qna
+        contributionViewController.delegate = self
         let contributionNV = UINavigationController(rootViewController: contributionViewController)
         self.present(contributionNV, animated: true, completion: nil)
       }
+    }
+  }
+}
+
+extension ANICommunityViewController: ANIContributionViewControllerDelegate {
+  func contributionButtonTapped(story: Story) {
+    if self.storys != nil {
+      storys?.insert(story, at: 0)
+    } else {
+      storys = [story]
+    }
+  }
+  
+  func contributionButtonTapped(qna: Qna) {
+    if self.qnas != nil {
+      qnas?.insert(qna, at: 0)
+    } else {
+      qnas = [qna]
     }
   }
 }
