@@ -31,16 +31,22 @@ public class GalleryController: UIViewController, PermissionControllerDelegate {
     super.viewDidLoad()
     
     setup()
-    
-    UIApplication.shared.isStatusBarHidden = true
-    navigationController?.setNavigationBarHidden(true, animated: false)
-    
+
     if let pagesController = makePagesController() {
       g_addChildController(pagesController)
     } else {
       let permissionController = makePermissionController()
       g_addChildController(permissionController)
     }
+  }
+  
+  public override func viewWillAppear(_ animated: Bool) {
+    UIApplication.shared.isStatusBarHidden = true
+    navigationController?.setNavigationBarHidden(true, animated: false)
+  }
+  
+  public override func viewWillDisappear(_ animated: Bool) {
+    UIApplication.shared.isStatusBarHidden = false
   }
   
   public override var supportedInterfaceOrientations: UIInterfaceOrientationMask {

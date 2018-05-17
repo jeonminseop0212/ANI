@@ -9,7 +9,7 @@
 import UIKit
 import TinyConstraints
 
-protocol ANIRecruitContributeViewDelegate {
+protocol ANIRecruitContributionViewDelegate {
   func recruitContributeViewDidScroll(offset: CGFloat)
   func imagePickButtonTapped()
   func kindSelectButtonTapped()
@@ -21,7 +21,7 @@ protocol ANIRecruitContributeViewDelegate {
   func imagesPickCellTapped()
 }
 
-class ANIRecruitContributeView: UIView {
+class ANIRecruitContributionView: UIView {
   
   private weak var headerImageView: UIImageView?
   private var headerImageViewTopConstraint: Constraint?
@@ -58,7 +58,7 @@ class ANIRecruitContributeView: UIView {
   private weak var introduceBG: UIView?
   private weak var introduceTextView: ANIPlaceHolderTextView?
   private let INTRODUCE_IMAGES_VIEW_RATIO: CGFloat = 0.5
-  private weak var introduceImagesView: ANIRecruitContributeImagesView?
+  private weak var introduceImagesView: ANIRecruitContributionImagesView?
   
   private weak var passingTitleLabel: UILabel?
   private weak var passingSubTitleLabel: UILabel?
@@ -84,7 +84,7 @@ class ANIRecruitContributeView: UIView {
   var pickMode: BasicInfoPickMode?
   private var selectedTextViewMaxY: CGFloat?
   
-  var delegate: ANIRecruitContributeViewDelegate?
+  var delegate: ANIRecruitContributionViewDelegate?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -124,10 +124,7 @@ class ANIRecruitContributeView: UIView {
     //contentView
     let contentView = UIView()
     scrollView.addSubview(contentView)
-    contentView.topToSuperview()
-    contentView.leftToSuperview()
-    contentView.rightToSuperview()
-    contentView.bottomToSuperview()
+    contentView.edgesToSuperview()
     contentView.width(to: scrollView)
     self.contentView = contentView
     
@@ -430,7 +427,7 @@ class ANIRecruitContributeView: UIView {
     setHideButtonOnKeyboard(textView: introduceTextView)
     
     //introduceImagesView
-    let introduceImagesView = ANIRecruitContributeImagesView()
+    let introduceImagesView = ANIRecruitContributionImagesView()
     introduceImagesView.delegate = self
     contentView.addSubview(introduceImagesView)
     introduceImagesView.topToBottom(of: introduceBG, offset: 10.0)
@@ -604,7 +601,7 @@ class ANIRecruitContributeView: UIView {
 }
 
 //MARK: UIScrollViewDelegate
-extension ANIRecruitContributeView: UIScrollViewDelegate {
+extension ANIRecruitContributionView: UIScrollViewDelegate {
   func scrollViewDidScroll(_ scrollView: UIScrollView) {
     guard let imageView = self.headerImageView,
       let imageViewTopConstraint = self.headerImageViewTopConstraint,
@@ -639,7 +636,7 @@ extension ANIRecruitContributeView: UIScrollViewDelegate {
 }
 
 //MARK: ANIButtonViewDelegate
-extension ANIRecruitContributeView: ANIButtonViewDelegate {
+extension ANIRecruitContributionView: ANIButtonViewDelegate {
   func buttonViewTapped(view: ANIButtonView) {
     if view === self.headerImagePickupButton {
       self.delegate?.imagePickButtonTapped()
@@ -666,7 +663,7 @@ extension ANIRecruitContributeView: ANIButtonViewDelegate {
 }
 
 //MARK: UITextViewDelegate
-extension ANIRecruitContributeView: UITextViewDelegate {
+extension ANIRecruitContributionView: UITextViewDelegate {
   func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
     guard let selectedTextViewSuperView = textView.superview else { return false }
     selectedTextViewMaxY = selectedTextViewSuperView.frame.maxY
@@ -679,7 +676,8 @@ extension ANIRecruitContributeView: UITextViewDelegate {
   }
 }
 
-extension ANIRecruitContributeView: ANIRecruitContributeImagesViewDelegate {
+//MARK: ANIRecruitContributionImagesViewDelegate
+extension ANIRecruitContributionView: ANIRecruitContributionImagesViewDelegate {
   func imagesPickCellTapped() {
     self.delegate?.imagesPickCellTapped()
   }

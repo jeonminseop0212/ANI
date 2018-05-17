@@ -42,6 +42,10 @@ class ImagesController: UIViewController {
     
     setup()
   }
+  
+  override func viewWillAppear(_ animated: Bool) {
+    gridView.collectionView.reloadData()
+  }
 
   // MARK: - Setup
   
