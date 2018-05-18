@@ -12,10 +12,10 @@ class ANIQnaViewCell: UITableViewCell {
   var subTitleLabel = UILabel()
   var profileImageView = UIImageView()
   var userNameLabel = UILabel()
-  var qnaImageView = UIImageView()
-  var loveButton = UIButton()
+  var qnaImagesView = ANIQnaImagesView()
+  private weak var loveButton = UIButton()
   var loveCountLabel = UILabel()
-  var commentButton = UIButton()
+  private weak var commentButton = UIButton()
   var commentCountLabel = UILabel()
   
   override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
@@ -42,22 +42,19 @@ class ANIQnaViewCell: UITableViewCell {
     subTitleLabel.rightToSuperview(offset: 10.0)
     self.subTitleLabel = subTitleLabel
     
-    //qnaImageView
-    let qnaImageView = UIImageView()
-    qnaImageView.layer.cornerRadius = 10.0
-    qnaImageView.layer.masksToBounds = true
-    qnaImageView.contentMode = .redraw
-    addSubview(qnaImageView)
-    qnaImageView.topToBottom(of: subTitleLabel, offset: 10.0)
-    qnaImageView.leftToSuperview(offset: 10.0)
-    qnaImageView.rightToSuperview(offset: 10.0)
-    qnaImageView.height(200.0)
-    self.qnaImageView = qnaImageView
-
+    //qnaImagesView
+    let qnaImagesView = ANIQnaImagesView()
+    addSubview(qnaImagesView)
+    qnaImagesView.topToBottom(of: subTitleLabel, offset: 10.0)
+    qnaImagesView.leftToSuperview()
+    qnaImagesView.rightToSuperview()
+    qnaImagesView.height(UIScreen.main.bounds.width / 2 - 30)
+    self.qnaImagesView = qnaImagesView
+    
     //profileImageView
     let profileImageView = UIImageView()
     addSubview(profileImageView)
-    profileImageView.topToBottom(of: qnaImageView, offset: 10.0)
+    profileImageView.topToBottom(of: qnaImagesView, offset: 10.0)
     profileImageView.leftToSuperview(offset: 10.0)
     profileImageView.width(32.0)
     profileImageView.height(32.0)
