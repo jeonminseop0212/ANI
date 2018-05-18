@@ -11,6 +11,7 @@ import UIKit
 protocol ANIContributionViewDelegate {
   func imagesPickCellTapped()
   func imageDeleteButtonTapped(index: Int)
+  func contributionButtonOn(on: Bool)
 }
 
 class ANIContributionView: UIView {
@@ -24,8 +25,15 @@ class ANIContributionView: UIView {
   
   var contentImages = [UIImage?]() {
     didSet {
-      guard let contentImagesView = self.contentImagesView else { return }
+      guard let contentImagesView = self.contentImagesView,
+            let contentTextView = self.contentTextView else { return }
       contentImagesView.contentImages = contentImages
+      
+      if contentTextView.text.count > 0 && !contentImages.isEmpty {
+        self.delegate?.contributionButtonOn(on: true)
+      } else {
+        self.delegate?.contributionButtonOn(on: false)
+      }
     }
   }
   
@@ -63,6 +71,7 @@ class ANIContributionView: UIView {
     contentTextView.font = UIFont.systemFont(ofSize: 17.0)
     contentTextView.placeHolder = "どんな話でも構いません*^_^*"
     contentTextView.isScrollEnabled = false
+    contentTextView.delegate = self
     contentView.addSubview(contentTextView)
     let insets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: -10.0, right: -10.0)
     contentTextView.edgesToSuperview(excluding: .bottom, insets: insets)
@@ -106,5 +115,15 @@ extension ANIContributionView: ANIContributionImagesViewDelegate {
   func imageDelete(index: Int) {
     contentImages.remove(at: index)
     self.delegate?.imageDeleteButtonTapped(index: index)
+  }
+}
+
+extension ANIContributionView: UITextViewDelegate {
+  func textViewDidChange(_ textView: UITextView) {
+    if textView.text.count > 0 && !contentImages.isEmpty {
+      self.delegate?.contributionButtonOn(on: true)
+    } else {
+      self.delegate?.contributionButtonOn(on: false)
+    }
   }
 }
