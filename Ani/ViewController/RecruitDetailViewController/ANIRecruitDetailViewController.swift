@@ -20,15 +20,14 @@ class ANIRecruitDetailViewController: UIViewController {
   private weak var applyButton: ANIAreaButtonView?
   private weak var applyButtonLabel: UILabel?
   
+  private var statusBarStyle: UIStatusBarStyle = .default
+  
   var testRecruit: Recruit?
 
   override func viewDidLoad() {
     super.viewDidLoad()
     setup()
-  }
-  
-  override func viewWillAppear(_ animated: Bool) {
-    UIApplication.shared.statusBarStyle = .lightContent
+    setNotification()
   }
   
   private func setup() {
@@ -36,6 +35,8 @@ class ANIRecruitDetailViewController: UIViewController {
     self.navigationController?.navigationBar.tintColor = .white
     self.navigationController?.setNavigationBarHidden(true, animated: false)
     self.navigationController?.navigationBar.isTranslucent = false
+    UIApplication.shared.statusBarStyle = .lightContent
+    statusBarStyle = .lightContent
 
     //recruitDetailView
     let recruitDetailView = ANIRecruitDetailView()
@@ -106,6 +107,10 @@ class ANIRecruitDetailViewController: UIViewController {
     self.applyButtonLabel = applyButtonLabel
   }
   
+  private func setNotification() {
+    ANINotificationManager.receive(imageCellTapped: self, selector: #selector(presentImageBrowser(_:)))
+  }
+  
   //MARK: Action
   @objc private func back() {
     self.navigationController?.popViewController(animated: true)
@@ -113,6 +118,18 @@ class ANIRecruitDetailViewController: UIViewController {
   
   @objc private func apply() {
     print("apply")
+  }
+  
+  @objc private func presentImageBrowser(_ notification: NSNotification) {
+    guard let item = notification.object as? (Int, [UIImage?]) else { return }
+    let selectedIndex = item.0
+    let images = item.1
+    let imageBrowserViewController = ANIImageBrowserViewController()
+    imageBrowserViewController.selectedIndex = selectedIndex
+    imageBrowserViewController.images = images
+    imageBrowserViewController.modalPresentationStyle = .overCurrentContext
+    imageBrowserViewController.delegate = self
+    self.present(imageBrowserViewController, animated: false, completion: nil)
   }
 }
 
@@ -129,6 +146,7 @@ extension ANIRecruitDetailViewController: ANIRecruitDetailViewDelegate {
         clipButton.tintColor = UIColor(hue: 0, saturation: 0, brightness: tintColorOffset, alpha: 1)
         myNavigationBar.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: backGroundColorOffset)
         UIApplication.shared.statusBarStyle = .default
+        statusBarStyle = .default
       } else {
         let tintColorOffset = 1.0 - offset
         let ANIColorDarkBrightness: CGFloat = 0.18
@@ -142,10 +160,12 @@ extension ANIRecruitDetailViewController: ANIRecruitDetailViewDelegate {
        
         myNavigationBar.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: offset)
         UIApplication.shared.statusBarStyle = .lightContent
+        statusBarStyle = .lightContent
       }
   }
 }
 
+//MARK: ANIButtonViewDelegate
 extension ANIRecruitDetailViewController: ANIButtonViewDelegate {
   func buttonViewTapped(view: ANIButtonView) {
     if view === self.clipButton {
@@ -154,5 +174,11 @@ extension ANIRecruitDetailViewController: ANIButtonViewDelegate {
     if view === self.applyButton {
       print("apply button tapped")
     }
+  }
+}
+
+extension ANIRecruitDetailViewController: ANIImageBrowserViewControllerDelegate {
+  func imageBrowserDidDissmiss() {
+    UIApplication.shared.statusBarStyle = statusBarStyle
   }
 }

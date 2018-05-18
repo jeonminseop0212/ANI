@@ -67,4 +67,9 @@ class ANINotificationManager: NSObject {
   private static let N_UPDATE_BASIC_INFO = "N_UPDATE_BASIC_INFO"
   static func postUpdateBasicInfo(pickItem: String) { self.post(name: N_UPDATE_BASIC_INFO, object: pickItem, userInfo:nil) }
   static func receive(undateBasicInfo observer:Any, selector:Selector) { receive(name: N_UPDATE_BASIC_INFO, observer: observer, selector: selector) }
+  
+  //MARK: image view tapped
+  private static let N_IMAGE_CELL_TAPPED = "N_IMAGE_CELL_TAPPED"
+  static func postImageCellTapped(tapCellItem: (Int, [UIImage?])) { self.post(name: N_IMAGE_CELL_TAPPED, object: tapCellItem, userInfo:nil) }
+  static func receive(imageCellTapped observer:Any, selector:Selector) { receive(name: N_IMAGE_CELL_TAPPED, observer: observer, selector: selector) }
 }

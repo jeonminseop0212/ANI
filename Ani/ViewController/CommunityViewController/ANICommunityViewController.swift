@@ -124,7 +124,9 @@ class ANICommunityViewController: UIViewController {
   }
 }
 
-extension ANICommunityViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+
+//MARK: UICollectionViewDataSource
+extension ANICommunityViewController: UICollectionViewDataSource {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
     return 2
   }
@@ -144,12 +146,18 @@ extension ANICommunityViewController: UICollectionViewDataSource, UICollectionVi
       return cell
     }
   }
-  
+}
+
+//MARK: UICollectionViewDelegateFlowLayout
+extension ANICommunityViewController: UICollectionViewDelegateFlowLayout {
   func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
     let size = CGSize(width: self.view.frame.width, height: self.view.frame.height)
     return size
   }
-  
+}
+
+//MARK: UICollectionViewDelegate
+extension ANICommunityViewController: UICollectionViewDelegate {
   func scrollViewDidScroll(_ scrollView: UIScrollView) {
     guard let menuBar = self.menuBar, let horizontalBarleftConstraint = menuBar.horizontalBarleftConstraint else { return }
     horizontalBarleftConstraint.constant = scrollView.contentOffset.x / 2

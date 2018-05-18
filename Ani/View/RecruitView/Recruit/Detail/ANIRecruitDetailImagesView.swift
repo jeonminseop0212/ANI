@@ -13,7 +13,7 @@ class ANIRecruitDetailImagesView: UIView {
   
   private weak var imagesViewCollectionView: UICollectionView?
   
-  var testIntroduceImages = [UIImage?]() {
+  var introduceImages = [UIImage?]() {
     didSet {
       reloadLayout()
     }
@@ -51,23 +51,32 @@ class ANIRecruitDetailImagesView: UIView {
   }
 }
 
+//MARK: UICollectionViewDataSource
 extension ANIRecruitDetailImagesView: UICollectionViewDataSource {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-    return testIntroduceImages.count
+    return introduceImages.count
   }
   
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     let id = NSStringFromClass(ANIRecruitDetailImagesViewCell.self)
     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! ANIRecruitDetailImagesViewCell
     
-    cell.imageView?.image = testIntroduceImages[indexPath.item]
+    cell.imageView?.image = introduceImages[indexPath.item]
     
     return cell
   }
 }
 
+//MARK: UICollectionViewDelegateFlowLayout
 extension ANIRecruitDetailImagesView: UICollectionViewDelegateFlowLayout {
   func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
     return CGSize(width: collectionView.frame.height, height: collectionView.frame.height)
+  }
+}
+
+//MARK: UICollectionViewDelegate
+extension ANIRecruitDetailImagesView: UICollectionViewDelegate {
+  func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    ANINotificationManager.postImageCellTapped(tapCellItem: (indexPath.item, introduceImages))
   }
 }

@@ -58,7 +58,7 @@ class ANIRecruitDetailView: UIView {
   private var introduceImages = [UIImage?]() {
     didSet {
       guard let introduceImagesView = self.introduceImagesView else { return }
-      introduceImagesView.testIntroduceImages = introduceImages
+      introduceImagesView.introduceImages = introduceImages
     }
   }
   
@@ -308,7 +308,7 @@ class ANIRecruitDetailView: UIView {
     
     //introduceImagesView
     let introduceImagesView = ANIRecruitDetailImagesView()
-    introduceImagesView.testIntroduceImages = introduceImages
+    introduceImagesView.introduceImages = introduceImages
     contentView.addSubview(introduceImagesView)
     introduceImagesView.topToBottom(of: introduceBG, offset: 10.0)
     introduceImagesView.leftToSuperview()
