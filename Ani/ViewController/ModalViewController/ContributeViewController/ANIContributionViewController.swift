@@ -99,6 +99,7 @@ class ANIContributionViewController: UIViewController {
     contributionButtonBG.layer.cornerRadius = (UIViewController.NAVIGATION_BAR_HEIGHT - 10.0) / 2
     contributionButtonBG.layer.masksToBounds = true
     contributionButtonBG.backgroundColor = ANIColor.green
+    contributionButtonBG.alpha = 0.5
     myNavigationBarBase.addSubview(contributionButtonBG)
     contributionButtonBG.centerYToSuperview()
     contributionButtonBG.rightToSuperview(offset: 10.0)
@@ -112,6 +113,7 @@ class ANIContributionViewController: UIViewController {
     contributionButton.setTitleColor(.white, for: .normal)
     contributionButton.addTarget(self, action: #selector(contribute), for: .touchUpInside)
     contributionButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 16.0)
+    contributionButton.isEnabled = false
     contributionButtonBG.addSubview(contributionButton)
     contributionButton.centerInSuperview()
     contributionButton.size(to: contributionButtonBG)
@@ -270,5 +272,17 @@ extension ANIContributionViewController: ANIContributionViewDelegate {
   
   func imageDeleteButtonTapped(index: Int) {
     imagePickGallery.cart.images.remove(at: index)
+  }
+  
+  func contributionButtonOn(on: Bool) {
+    guard let contributionButton = self.contributionButton,
+      let contributionButtonBG = self.contributionButtonBG else { return }
+    if on {
+      contributionButton.isEnabled = true
+      contributionButtonBG.alpha = 1.0
+    } else {
+      contributionButton.isEnabled = false
+      contributionButtonBG.alpha = 0.5
+    }
   }
 }
