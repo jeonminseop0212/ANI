@@ -38,6 +38,7 @@ class ANICommunityViewController: UIViewController {
     setup()
     setupTestStoryData()
     setupTestQnaData()
+    setupNotification()
   }
   
   override func viewWillAppear(_ animated: Bool) {
@@ -94,6 +95,10 @@ class ANICommunityViewController: UIViewController {
     self.contributionButon = contributionButon
   }
   
+  private func setupNotification() {
+    ANINotificationManager.receive(imageCellTapped: self, selector: #selector(presentImageBrowser(_:)))
+  }
+  
   private func setupTestStoryData() {
     let cat1 = UIImage(named: "storyCat1")!
     let cat2 = UIImage(named: "storyCat2")!
@@ -121,6 +126,19 @@ class ANICommunityViewController: UIViewController {
     let qna3 = Qna(qnaImages: [cat3, cat2, cat1], subTitle: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user3, loveCount: 15, commentCount: 10)
     
     self.qnas = [qna1, qna2, qna3, qna1, qna2, qna3]
+  }
+  
+  //MARK: action
+  @objc private func presentImageBrowser(_ notification: NSNotification) {
+    guard let item = notification.object as? (Int, [UIImage?]) else { return }
+    let selectedIndex = item.0
+    let images = item.1
+    let imageBrowserViewController = ANIImageBrowserViewController()
+    imageBrowserViewController.selectedIndex = selectedIndex
+    imageBrowserViewController.images = images
+    imageBrowserViewController.modalPresentationStyle = .overCurrentContext
+    //overCurrentContextだとtabBarが消えないのでtabBarからpresentする
+    self.tabBarController?.present(imageBrowserViewController, animated: false, completion: nil)
   }
 }
 
@@ -195,6 +213,7 @@ extension ANICommunityViewController: ANIButtonViewDelegate{
   }
 }
 
+//MARK: ANIContributionViewControllerDelegate
 extension ANICommunityViewController: ANIContributionViewControllerDelegate {
   func contributionButtonTapped(story: Story) {
     if self.storys != nil {
@@ -213,6 +232,7 @@ extension ANICommunityViewController: ANIContributionViewControllerDelegate {
   }
 }
 
+//MARK: ANICommunityMenuBarDelegate
 extension ANICommunityViewController: ANICommunityMenuBarDelegate {
   func didSelectCell(index: IndexPath) {
     guard let containerCollectionView = self.containerCollectionView else { return }
