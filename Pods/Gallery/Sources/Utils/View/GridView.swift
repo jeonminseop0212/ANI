@@ -85,7 +85,6 @@ class GridView: UIView {
         self.previewScollView.minimumZoomScale = squaredZoomScale
       }
       
-      refreshZoomScale()
     }
   }
   var selectedImage: UIImage! = nil {

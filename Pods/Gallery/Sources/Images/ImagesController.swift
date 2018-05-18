@@ -265,7 +265,8 @@ extension ImagesController: UICollectionViewDataSource, UICollectionViewDelegate
   //修正
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
     let item = items[(indexPath as NSIndexPath).item]
-    
+    selectedItem = item
+
     if Config.Camera.oneImageMode {
       if !cart.images.contains(item) {
         cart.images.removeAll()
@@ -293,8 +294,6 @@ extension ImagesController: UICollectionViewDataSource, UICollectionViewDelegate
       }
     }
     
-    //修正
-    selectedItem = item
     //    gridView.panGestureHelper.resetToOriginalState()
     gridView.panGestureHelper.resetToOriginalStateTappedCell(index: indexPath)
     
@@ -361,17 +360,17 @@ class ImageManager: NSObject {
 //修正
 extension ImagesController: GridViewDelegate {
   func previewImageDidScroll(offset: CGPoint) {
-    for (index, item) in items.enumerated() {
+    for (index, item) in cart.images.enumerated() {
       if item == selectedItem {
-        items[index].offset = offset
+        cart.images[index].offset = offset
       }
     }
   }
   
   func previewImageDidZoom(scale: CGFloat) {
-    for (index, item) in items.enumerated() {
+    for (index, item) in cart.images.enumerated() {
       if item == selectedItem {
-        items[index].scale = scale
+        cart.images[index].scale = scale
       }
     }
   }
