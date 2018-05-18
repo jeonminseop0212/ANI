@@ -11,12 +11,12 @@ import UIKit
 class ANIStoryViewCell: UITableViewCell {
   var storyImagesView = ANIStoryImagesView()
   var subTitleLabel = UILabel()
-  var line = UIImageView()
+  private weak var line = UIImageView()
   var profileImageView = UIImageView()
   var userNameLabel = UILabel()
-  var loveButton = UIButton()
+  private weak var loveButton = UIButton()
   var loveCountLabel = UILabel()
-  var commentButton = UIButton()
+  private weak var commentButton = UIButton()
   var commentCountLabel = UILabel()
   
   override init(style: UITableViewCellStyle, reuseIdentifier: String?) {

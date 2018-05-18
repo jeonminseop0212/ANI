@@ -57,7 +57,7 @@ extension ANIQnaView: UITableViewDataSource {
     let id = NSStringFromClass(ANIQnaViewCell.self)
     let cell = tableView.dequeueReusableCell(withIdentifier: id, for: indexPath) as! ANIQnaViewCell
     cell.subTitleLabel.text = qnas[indexPath.item].subTitle
-    cell.qnaImageView.image = qnas[indexPath.item].qnaImages[0]
+    cell.qnaImagesView.images = qnas[indexPath.item].qnaImages
     cell.profileImageView.image = qnas[indexPath.item].user.profileImage
     cell.userNameLabel.text = qnas[indexPath.item].user.name
     cell.loveCountLabel.text = "\(qnas[indexPath.item].loveCount)"
