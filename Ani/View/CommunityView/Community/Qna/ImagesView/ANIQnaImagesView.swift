@@ -48,6 +48,7 @@ class ANIQnaImagesView: UIView {
   }
 }
 
+//MARK: UICollectionViewDataSource
 extension ANIQnaImagesView: UICollectionViewDataSource {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
     return images.count
@@ -61,6 +62,14 @@ extension ANIQnaImagesView: UICollectionViewDataSource {
   }
 }
 
+//MARK: UICollectionViewDelegate
+extension ANIQnaImagesView: UICollectionViewDelegate {
+  func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    ANINotificationManager.postImageCellTapped(tapCellItem: (indexPath.item, images))
+  }
+}
+
+//MARK: UICollectionViewDelegateFlowLayout
 extension ANIQnaImagesView: UICollectionViewDelegateFlowLayout {
   func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
     return CGSize(width: collectionView.frame.height, height: collectionView.frame.height)

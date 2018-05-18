@@ -177,6 +177,7 @@ extension ANIRecruitDetailViewController: ANIButtonViewDelegate {
   }
 }
 
+//MARK: ANIImageBrowserViewControllerDelegate
 extension ANIRecruitDetailViewController: ANIImageBrowserViewControllerDelegate {
   func imageBrowserDidDissmiss() {
     UIApplication.shared.statusBarStyle = statusBarStyle
