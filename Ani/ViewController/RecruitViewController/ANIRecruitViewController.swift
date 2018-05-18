@@ -137,10 +137,10 @@ class ANIRecruitViewController: UIViewController {
     let user2 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki")
     let user3 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
     
-    let image1 = UIImage(named: "detailCat1")!
-    let image2 = UIImage(named: "detailCat2")!
-    let image3 = UIImage(named: "detailCat3")!
-    let image4 = UIImage(named: "detailCat4")!
+    let image1 = UIImage(named: "storyCat1")!
+    let image2 = UIImage(named: "storyCat2")!
+    let image3 = UIImage(named: "storyCat3")!
+    let image4 = UIImage(named: "storyCat1")!
     
     let introduceImages = [image1, image2, image3, image4]
     let recruitInfo = RecruitInfo(headerImage: UIImage(named: "cat1")!, title: "かわいい猫ちゃんの里親になって >_<", kind: "ミックス", age: "１歳以下", sex: "男の子", home: "東京都", vaccine: "１回", castration: "済み", reason: "親がいない子猫を保護しました。\n家ではすでに猫を飼えないので親になってくれる方を探しています。\nよろしくお願いします。", introduce: "人懐こくて甘えん坊の可愛い子猫です。\n元気よくご飯もいっぱいたべます😍\n遊ぶのが大好きであっちこっち走り回る姿がたまらなく可愛いです。", introduceImages: introduceImages, passing: "ご自宅までお届けします！")
