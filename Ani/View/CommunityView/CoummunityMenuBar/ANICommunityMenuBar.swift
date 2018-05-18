@@ -9,11 +9,16 @@
 import UIKit
 import TinyConstraints
 
+protocol ANICommunityMenuBarDelegate {
+  func didSelectCell(index: IndexPath)
+}
+
 class ANICommunityMenuBar: UIView {
   var menuCollectionView: UICollectionView?
   private let menus = ["STORY", "Q&A"]
   var horizontalBarleftConstraint:Constraint?
-  var aniCoummunityViewController: ANICommunityViewController?
+  
+  var delegate: ANICommunityMenuBarDelegate?
     
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -77,7 +82,6 @@ extension ANICommunityMenuBar: UICollectionViewDataSource, UICollectionViewDeleg
   }
   
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-    guard let aniCoummunityViewController = self.aniCoummunityViewController else { return }
-    aniCoummunityViewController.scrollToMenuIndex(menuIndex: indexPath.item)
+    self.delegate?.didSelectCell(index: indexPath)
   }
 }

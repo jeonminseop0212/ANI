@@ -65,14 +65,13 @@ class ANICommunityViewController: UIViewController {
     containerCollectionView.register(ANICommunityStoryCell.self, forCellWithReuseIdentifier: storyId)
     let qnaId = NSStringFromClass(ANICommunityQnaCell.self)
     containerCollectionView.register(ANICommunityQnaCell.self, forCellWithReuseIdentifier: qnaId)
-
     self.view.addSubview(containerCollectionView)
     containerCollectionView.edgesToSuperview()
     self.containerCollectionView = containerCollectionView
     
     //menuBar
     let menuBar = ANICommunityMenuBar()
-    menuBar.aniCoummunityViewController = self
+    menuBar.delegate = self
     self.view.addSubview(menuBar)
     let menuBarHeight = UIViewController.STATUS_BAR_HEIGHT + UIViewController.NAVIGATION_BAR_HEIGHT
     menuBar.topToSuperview()
@@ -93,12 +92,6 @@ class ANICommunityViewController: UIViewController {
     contributionButon.rightToSuperview(offset: 15.0)
     contributionButon.bottomToSuperview(offset: -15.0, usingSafeArea: true)
     self.contributionButon = contributionButon
-  }
-  
-  func scrollToMenuIndex(menuIndex: Int) {
-    guard let containerCollectionView = self.containerCollectionView else { return }
-    let indexPath = IndexPath(item: menuIndex, section: 0)
-    containerCollectionView.scrollToItem(at: indexPath, at: .left, animated: true)
   }
   
   private func setupTestStoryData() {
@@ -209,5 +202,13 @@ extension ANICommunityViewController: ANIContributionViewControllerDelegate {
     } else {
       qnas = [qna]
     }
+  }
+}
+
+extension ANICommunityViewController: ANICommunityMenuBarDelegate {
+  func didSelectCell(index: IndexPath) {
+    guard let containerCollectionView = self.containerCollectionView else { return }
+    containerCollectionView.scrollToItem(at: index, at: .left, animated: true)
+    selectedIndex = index.item
   }
 }
