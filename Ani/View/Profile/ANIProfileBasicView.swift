@@ -11,7 +11,7 @@ import UIKit
 class ANIProfileBasicView: UIView {
   
   enum SectionType:Int { case top = 0; case content = 1 }
-  enum ContentType:Int { case profile; case recruit; case love; case clip;}
+  enum ContentType:Int { case profile; case recruit; case story; case qna;}
   
   private var contentType:ContentType = .profile {
     didSet {
@@ -22,12 +22,18 @@ class ANIProfileBasicView: UIView {
   
   private weak var basicTableView: UITableView?
   
-  private var testRecruitLists = [Recruit]()
+  private var recruits = [Recruit]()
+  
+  private var storys = [Story]()
+  
+  private var qnas = [Qna]()
   
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()
-    setupRecruitTestData()
+    setupTestRecruitData()
+    setupTestStoryData()
+    setupTestQnaData()
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -44,16 +50,16 @@ class ANIProfileBasicView: UIView {
     basicTableView.register(ANIProfileProfileCell.self, forCellReuseIdentifier: profileCellid)
     let recruitCellid = NSStringFromClass(ANIProfileRecruitCell.self)
     basicTableView.register(ANIProfileRecruitCell.self, forCellReuseIdentifier: recruitCellid)
-    let loveCellid = NSStringFromClass(ANIProfileLoveCell.self)
-    basicTableView.register(ANIProfileLoveCell.self, forCellReuseIdentifier: loveCellid)
-    let clipCellid = NSStringFromClass(ANIProfileClipCell.self)
-    basicTableView.register(ANIProfileClipCell.self, forCellReuseIdentifier: clipCellid)
+    let storyCellid = NSStringFromClass(ANIProfileStoryCell.self)
+    basicTableView.register(ANIProfileStoryCell.self, forCellReuseIdentifier: storyCellid)
+    let qnaCellid = NSStringFromClass(ANIProfileQnaCell.self)
+    basicTableView.register(ANIProfileQnaCell.self, forCellReuseIdentifier: qnaCellid)
     addSubview(basicTableView)
     basicTableView.edgesToSuperview()
     self.basicTableView = basicTableView
   }
   
-  private func setupRecruitTestData() {
+  private func setupTestRecruitData() {
     let user1 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
     let user2 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki")
     let user3 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
@@ -69,10 +75,40 @@ class ANIProfileBasicView: UIView {
     let recruit2 = Recruit(recruitInfo: recruitInfo, user: user2, supportCount: 5, loveCount: 8)
     let recruit3 = Recruit(recruitInfo: recruitInfo, user: user3, supportCount: 14, loveCount: 20)
     
-    self.testRecruitLists = [recruit1, recruit2, recruit3, recruit1, recruit2, recruit3]
+    self.recruits = [recruit1, recruit2, recruit3, recruit1, recruit2, recruit3]
+  }
+  
+  private func setupTestStoryData() {
+    let cat1 = UIImage(named: "storyCat1")!
+    let cat2 = UIImage(named: "storyCat2")!
+    let cat3 = UIImage(named: "storyCat3")!
+    let cat4 = UIImage(named: "storyCat1")!
+    let user1 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
+    let user2 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki")
+    let user3 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
+    let story1 = Story(storyImages: [cat1, cat2, cat3], story: "あれこれ内容を書くところだよおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user1, loveCount: 10, commentCount: 10)
+    let story2 = Story(storyImages: [cat2, cat1, cat3, cat4], story: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user2, loveCount: 5, commentCount: 8)
+    let story3 = Story(storyImages: [cat3, cat2, cat1], story: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user3, loveCount: 15, commentCount: 20)
+    self.storys = [story1, story2, story3, story1, story2, story3]
+  }
+  
+  private func setupTestQnaData() {
+    let cat1 = UIImage(named: "storyCat1")!
+    let cat2 = UIImage(named: "storyCat2")!
+    let cat3 = UIImage(named: "storyCat3")!
+    let cat4 = UIImage(named: "storyCat1")!
+    let user1 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
+    let user2 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki")
+    let user3 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
+    let qna1 = Qna(qnaImages: [cat1, cat2, cat3], subTitle: "あれこれ内容を書くところだよおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user1, loveCount: 10, commentCount: 5)
+    let qna2 = Qna(qnaImages: [cat2, cat1, cat3, cat4], subTitle: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user2, loveCount: 5, commentCount: 5)
+    let qna3 = Qna(qnaImages: [cat3, cat2, cat1], subTitle: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user3, loveCount: 15, commentCount: 10)
+    
+    self.qnas = [qna1, qna2, qna3, qna1, qna2, qna3]
   }
 }
 
+//MARK: UITableViewDataSource
 extension ANIProfileBasicView: UITableViewDataSource {
   func numberOfSections(in tableView: UITableView) -> Int {
     return 2
@@ -84,11 +120,11 @@ extension ANIProfileBasicView: UITableViewDataSource {
       if contentType == .profile {
         return 1
       } else if contentType == .recruit {
-        return testRecruitLists.count
-      } else if contentType == .love {
-        return 1
+        return recruits.count
+      } else if contentType == .story {
+        return storys.count
       } else {
-        return testRecruitLists.count
+        return qnas.count
       }
     }
   }
@@ -110,34 +146,41 @@ extension ANIProfileBasicView: UITableViewDataSource {
       } else if contentType == .recruit {
         let recruitCellid = NSStringFromClass(ANIProfileRecruitCell.self)
         let cell = tableView.dequeueReusableCell(withIdentifier: recruitCellid, for: indexPath) as! ANIProfileRecruitCell
-        cell.recruitImageView.image = testRecruitLists[indexPath.item].recruitInfo.headerImage
-        cell.titleLabel.text = testRecruitLists[indexPath.item].recruitInfo.title
-        cell.subTitleLabel.text = testRecruitLists[indexPath.item].recruitInfo.reason
-        cell.profileImageView.image = testRecruitLists[indexPath.item].user.profileImage
-        cell.userNameLabel.text = testRecruitLists[indexPath.item].user.name
-        cell.supportCountLabel.text = "\(testRecruitLists[indexPath.item].supportCount)"
-        cell.loveCountLabel.text = "\(testRecruitLists[indexPath.item].loveCount)"
+        cell.recruitImageView.image = recruits[indexPath.item].recruitInfo.headerImage
+        cell.titleLabel.text = recruits[indexPath.item].recruitInfo.title
+        cell.subTitleLabel.text = recruits[indexPath.item].recruitInfo.reason
+        cell.profileImageView.image = recruits[indexPath.item].user.profileImage
+        cell.userNameLabel.text = recruits[indexPath.item].user.name
+        cell.supportCountLabel.text = "\(recruits[indexPath.item].supportCount)"
+        cell.loveCountLabel.text = "\(recruits[indexPath.item].loveCount)"
         return cell
-      } else if contentType == .love {
-        let loveCellid = NSStringFromClass(ANIProfileLoveCell.self)
-        let cell = tableView.dequeueReusableCell(withIdentifier: loveCellid, for: indexPath) as! ANIProfileLoveCell
+      } else if contentType == .story {
+        let storyCellid = NSStringFromClass(ANIProfileStoryCell.self)
+        let cell = tableView.dequeueReusableCell(withIdentifier: storyCellid, for: indexPath) as! ANIProfileStoryCell
+        cell.storyImagesView.images = storys[indexPath.item].storyImages
+        cell.storyImagesView.pageControl?.numberOfPages = storys[indexPath.item].storyImages.count
+        cell.subTitleLabel.text = storys[indexPath.item].story
+        cell.profileImageView.image = storys[indexPath.item].user.profileImage
+        cell.userNameLabel.text = storys[indexPath.item].user.name
+        cell.loveCountLabel.text = "\(storys[indexPath.item].loveCount)"
+        cell.commentCountLabel.text = "\(storys[indexPath.item].commentCount)"
         return cell
       } else {
-        let clipCellid = NSStringFromClass(ANIProfileClipCell.self)
-        let cell = tableView.dequeueReusableCell(withIdentifier: clipCellid, for: indexPath) as! ANIProfileClipCell
-        cell.recruitImageView.image = testRecruitLists[indexPath.item].recruitInfo.headerImage
-        cell.titleLabel.text = testRecruitLists[indexPath.item].recruitInfo.title
-        cell.subTitleLabel.text = testRecruitLists[indexPath.item].recruitInfo.reason
-        cell.profileImageView.image = testRecruitLists[indexPath.item].user.profileImage
-        cell.userNameLabel.text = testRecruitLists[indexPath.item].user.name
-        cell.supportCountLabel.text = "\(testRecruitLists[indexPath.item].supportCount)"
-        cell.loveCountLabel.text = "\(testRecruitLists[indexPath.item].loveCount)"
+        let qnaCellid = NSStringFromClass(ANIProfileQnaCell.self)
+        let cell = tableView.dequeueReusableCell(withIdentifier: qnaCellid, for: indexPath) as! ANIProfileQnaCell
+        cell.subTitleLabel.text = qnas[indexPath.item].subTitle
+        cell.qnaImagesView.images = qnas[indexPath.item].qnaImages
+        cell.profileImageView.image = qnas[indexPath.item].user.profileImage
+        cell.userNameLabel.text = qnas[indexPath.item].user.name
+        cell.loveCountLabel.text = "\(qnas[indexPath.item].loveCount)"
+        cell.commentCountLabel.text = "\(qnas[indexPath.item].commentCount)"
         return cell
       }
     }
   }
 }
 
+//MARK: ANIProfileMenuBarDelegate
 extension ANIProfileBasicView: ANIProfileMenuBarDelegate {
   func didSelecteMenuItem(selectedIndex: Int) {
     guard let basicTableView = self.basicTableView else { return }
@@ -145,12 +188,12 @@ extension ANIProfileBasicView: ANIProfileMenuBarDelegate {
     switch selectedIndex {
     case ContentType.profile.rawValue:
       contentType = .profile
-    case ContentType.love.rawValue:
-      contentType = .love
+    case ContentType.story.rawValue:
+      contentType = .story
     case ContentType.recruit.rawValue:
       contentType = .recruit
-    case ContentType.clip.rawValue:
-      contentType = .clip
+    case ContentType.qna.rawValue:
+      contentType = .qna
     default:
       print("default")
     }

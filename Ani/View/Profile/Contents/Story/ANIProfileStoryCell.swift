@@ -1,5 +1,5 @@
 //
-//  ANIProfileClipCell.swift
+//  ANIProfileLoveCell.swift
 //  Ani
 //
 //  Created by 전민섭 on 2018/04/19.
@@ -8,19 +8,16 @@
 
 import UIKit
 
-class ANIProfileClipCell: UITableViewCell {
-  
-  var recruitImageView = UIImageView()
-  var titleLabel = UILabel()
+class ANIProfileStoryCell: UITableViewCell {
+  var storyImagesView = ANIStoryImagesView()
   var subTitleLabel = UILabel()
+  private weak var line = UIImageView()
   var profileImageView = UIImageView()
   var userNameLabel = UILabel()
-  var supportCountLabel = UILabel()
-  var supportButton = UIButton()
-  var loveButton = UIButton()
+  private weak var loveButton = UIButton()
   var loveCountLabel = UILabel()
-  var clipButton = UIButton()
-  var line = UIImageView()
+  private weak var commentButton = UIButton()
+  var commentCountLabel = UILabel()
   
   override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -33,36 +30,24 @@ class ANIProfileClipCell: UITableViewCell {
   
   private func setup() {
     self.selectionStyle = .none
-    //recruitImageView
-    let recruitImageView = UIImageView()
-    recruitImageView.contentMode = .redraw
-    addSubview(recruitImageView)
-    recruitImageView.topToSuperview()
-    recruitImageView.leftToSuperview()
-    recruitImageView.rightToSuperview()
-    let headerImageViewHeight: CGFloat = UIScreen.main.bounds.width * UIViewController.HEADER_IMAGE_VIEW_RATIO
-    recruitImageView.height(headerImageViewHeight)
-    self.recruitImageView = recruitImageView
     
-    //titleLabel
-    let titleLabel = UILabel()
-    titleLabel.font = UIFont.boldSystemFont(ofSize: 17.0)
-    titleLabel.textAlignment = .left
-    titleLabel.textColor = ANIColor.dark
-    addSubview(titleLabel)
-    titleLabel.topToBottom(of: recruitImageView, offset: 10.0)
-    titleLabel.leftToSuperview(offset: 10.0)
-    titleLabel.rightToSuperview(offset: 10.0)
-    titleLabel.height(20.0)
-    self.titleLabel = titleLabel
+    //storyImagesView
+    let storyImagesView = ANIStoryImagesView()
+    addSubview(storyImagesView)
+    storyImagesView.topToSuperview()
+    storyImagesView.leftToSuperview()
+    storyImagesView.rightToSuperview()
+    storyImagesView.height(UIScreen.main.bounds.width + ANIProfileStoryImagesView.PAGE_CONTROL_HEIGHT + ANIStoryImagesView.PAGE_CONTROL_TOP_MARGIN)
+    self.storyImagesView = storyImagesView
     
     //subTitleLabel
     let subTitleLabel = UILabel()
-    subTitleLabel.numberOfLines = 3
     subTitleLabel.font = UIFont.systemFont(ofSize: 14.0)
+    subTitleLabel.textAlignment = .left
     subTitleLabel.textColor = ANIColor.subTitle
+    subTitleLabel.numberOfLines = 0
     addSubview(subTitleLabel)
-    subTitleLabel.topToBottom(of: titleLabel, offset: 10.0)
+    subTitleLabel.topToBottom(of: storyImagesView, offset: 5.0)
     subTitleLabel.leftToSuperview(offset: 10.0)
     subTitleLabel.rightToSuperview(offset: 10.0)
     self.subTitleLabel = subTitleLabel
@@ -78,21 +63,30 @@ class ANIProfileClipCell: UITableViewCell {
     profileImageView.layer.masksToBounds = true
     self.profileImageView = profileImageView
     
-    //clipButton
-    let clipButton = UIButton()
-    clipButton.setImage(UIImage(named: "clip"), for: .normal)
-    addSubview(clipButton)
-    clipButton.centerY(to: profileImageView)
-    clipButton.rightToSuperview(offset: 20.0)
-    clipButton.width(21.0)
-    clipButton.height(21.0)
-    self.clipButton = clipButton
+    //commentCountLabel
+    let commentCountLabel = UILabel()
+    addSubview(commentCountLabel)
+    commentCountLabel.centerY(to: profileImageView)
+    commentCountLabel.rightToSuperview(offset: 20.0)
+    commentCountLabel.width(30.0)
+    commentCountLabel.height(20.0)
+    self.commentCountLabel = commentCountLabel
+    
+    //commentButton
+    let commentButton = UIButton()
+    commentButton.setImage(UIImage(named: "comment"), for: .normal)
+    addSubview(commentButton)
+    commentButton.centerY(to: profileImageView)
+    commentButton.rightToLeft(of: commentCountLabel, offset: -10.0)
+    commentButton.width(25.0)
+    commentButton.height(24.0)
+    self.commentButton = commentButton
     
     //loveCountLabel
     let loveCountLabel = UILabel()
     addSubview(loveCountLabel)
     loveCountLabel.centerY(to: profileImageView)
-    loveCountLabel.rightToLeft(of: clipButton, offset: -10.0)
+    loveCountLabel.rightToLeft(of: commentButton, offset: -10.0)
     loveCountLabel.width(30.0)
     loveCountLabel.height(20.0)
     self.loveCountLabel = loveCountLabel
@@ -107,32 +101,13 @@ class ANIProfileClipCell: UITableViewCell {
     loveButton.height(21.0)
     self.loveButton = loveButton
     
-    //supportCountLabel
-    let supportCountLabel = UILabel()
-    addSubview(supportCountLabel)
-    supportCountLabel.centerY(to: profileImageView)
-    supportCountLabel.rightToLeft(of: loveButton, offset: -10.0)
-    supportCountLabel.width(30.0)
-    supportCountLabel.height(20.0)
-    self.supportCountLabel = supportCountLabel
-    
-    //supportButton
-    let supportButton = UIButton()
-    supportButton.setImage(UIImage(named: "support"), for: .normal)
-    addSubview(supportButton)
-    supportButton.centerY(to: profileImageView)
-    supportButton.rightToLeft(of: supportCountLabel, offset: -10.0)
-    supportButton.width(21.0)
-    supportButton.height(21.0)
-    self.supportButton = supportButton
-    
     //userNameLabel
     let userNameLabel = UILabel()
     userNameLabel.font = UIFont.systemFont(ofSize: 13.0)
     userNameLabel.textColor = ANIColor.subTitle
     addSubview(userNameLabel)
     userNameLabel.leftToRight(of: profileImageView, offset: 10.0)
-    userNameLabel.rightToLeft(of: supportButton, offset: 10.0)
+    userNameLabel.rightToLeft(of: loveButton, offset: 10.0)
     userNameLabel.centerY(to: profileImageView)
     userNameLabel.height(20.0)
     self.userNameLabel = userNameLabel
