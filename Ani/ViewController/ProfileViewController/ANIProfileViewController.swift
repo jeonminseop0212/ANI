@@ -24,6 +24,7 @@ class ANIProfileViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     setup()
+    setupNotification()
   }
   
   override func viewWillAppear(_ animated: Bool) {
@@ -43,5 +44,22 @@ class ANIProfileViewController: UIViewController {
     self.view.addSubview(profileBasicView)
     profileBasicView.edgesToSuperview()
     self.profileBasicView = profileBasicView
+  }
+  
+  private func setupNotification() {
+    ANINotificationManager.receive(imageCellTapped: self, selector: #selector(presentImageBrowser(_:)))
+  }
+  
+  //MARK: action
+  @objc private func presentImageBrowser(_ notification: NSNotification) {
+    guard let item = notification.object as? (Int, [UIImage?]) else { return }
+    let selectedIndex = item.0
+    let images = item.1
+    let imageBrowserViewController = ANIImageBrowserViewController()
+    imageBrowserViewController.selectedIndex = selectedIndex
+    imageBrowserViewController.images = images
+    imageBrowserViewController.modalPresentationStyle = .overCurrentContext
+    //overCurrentContextだとtabBarが消えないのでtabBarからpresentする
+    self.tabBarController?.present(imageBrowserViewController, animated: false, completion: nil)
   }
 }

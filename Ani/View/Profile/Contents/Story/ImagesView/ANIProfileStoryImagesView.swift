@@ -1,14 +1,14 @@
 //
-//  ANIStoryImagesView.swift
+//  ANIProfileStoryImagesView.swift
 //  Ani
 //
-//  Created by 전민섭 on 2018/04/08.
+//  Created by jeonminseop on 2018/05/19.
 //  Copyright © 2018年 JeonMinseop. All rights reserved.
 //
 
 import UIKit
 
-class ANIStoryImagesView: UIView {
+class ANIProfileStoryImagesView: UIView {
   
   private weak var imagesCollectionView: UICollectionView?
   weak var pageControl: UIPageControl?
@@ -45,13 +45,13 @@ class ANIStoryImagesView: UIView {
     imagesCollectionView.isPagingEnabled = true
     imagesCollectionView.showsHorizontalScrollIndicator = false
     imagesCollectionView.backgroundColor = .white
-    let id = NSStringFromClass(ANIStoryImagesCell.self)
-    imagesCollectionView.register(ANIStoryImagesCell.self, forCellWithReuseIdentifier: id)
+    let id = NSStringFromClass(ANIProfileStoryImagesCell.self)
+    imagesCollectionView.register(ANIProfileStoryImagesCell.self, forCellWithReuseIdentifier: id)
     addSubview(imagesCollectionView)
     imagesCollectionView.topToSuperview()
     imagesCollectionView.leftToSuperview()
     imagesCollectionView.rightToSuperview()
-    imagesCollectionView.bottomToSuperview(offset: -(ANIStoryImagesView.PAGE_CONTROL_HEIGHT + ANIStoryImagesView.PAGE_CONTROL_TOP_MARGIN))
+    imagesCollectionView.bottomToSuperview(offset: -(ANIProfileStoryImagesView.PAGE_CONTROL_HEIGHT + ANIStoryImagesView.PAGE_CONTROL_TOP_MARGIN))
     self.imagesCollectionView = imagesCollectionView
     
     //pageControl
@@ -61,7 +61,7 @@ class ANIStoryImagesView: UIView {
     pageControl.currentPage = 0
     pageControl.isUserInteractionEnabled = false
     addSubview(pageControl)
-    pageControl.topToBottom(of: imagesCollectionView, offset: ANIStoryImagesView.PAGE_CONTROL_TOP_MARGIN)
+    pageControl.topToBottom(of: imagesCollectionView, offset: ANIProfileStoryImagesView.PAGE_CONTROL_TOP_MARGIN)
     pageControl.leftToSuperview()
     pageControl.rightToSuperview()
     pageControl.height(ANIStoryImagesView.PAGE_CONTROL_HEIGHT)
@@ -69,14 +69,14 @@ class ANIStoryImagesView: UIView {
   }
 }
 
-extension ANIStoryImagesView: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+extension ANIProfileStoryImagesView: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
     return images.count
   }
   
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-    let id = NSStringFromClass(ANIStoryImagesCell.self)
-    let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! ANIStoryImagesCell
+    let id = NSStringFromClass(ANIProfileStoryImagesCell.self)
+    let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! ANIProfileStoryImagesCell
     cell.imageView?.image = images[indexPath.item]
     return cell
   }

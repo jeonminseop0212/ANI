@@ -1,14 +1,14 @@
 //
-//  ANIStoryImagesViewCell.swift
+//  ANIProfileStoryImagesViewCell.swift
 //  Ani
 //
-//  Created by 전민섭 on 2018/04/08.
+//  Created by jeonminseop on 2018/05/19.
 //  Copyright © 2018年 JeonMinseop. All rights reserved.
 //
 
 import UIKit
 
-class ANIStoryImagesViewCell: UICollectionViewCell {
+class ANIProfileStoryImagesCell: UICollectionViewCell {
   var imageView: UIImageView?
   override init(frame: CGRect) {
     super.init(frame: frame)
