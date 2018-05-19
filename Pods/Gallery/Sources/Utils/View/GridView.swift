@@ -275,7 +275,6 @@ class GridView: UIView {
   
   @objc func squareCropButtonTapped() {
     let z = previewScollView.zoomScale
-//    if z >= 1 && z < squaredZoomScale {
     if z <= 1 {
       shouldCropToSquare = true
     } else {
@@ -286,7 +285,6 @@ class GridView: UIView {
   
   private func setFitImage(_ fit: Bool, animated isAnimated: Bool = true) {
     let animated = isAnimated
-    refreshZoomScale()
     if fit {
       self.previewScollView.setZoomScale(squaredZoomScale, animated: animated)
     } else {
