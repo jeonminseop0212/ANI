@@ -23,6 +23,8 @@ class ANIRecruitDetailViewController: UIViewController {
   private var statusBarStyle: UIStatusBarStyle = .default
   
   var testRecruit: Recruit?
+  
+  var isBack: Bool = false
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -113,6 +115,7 @@ class ANIRecruitDetailViewController: UIViewController {
   
   //MARK: Action
   @objc private func back() {
+    isBack = true
     self.navigationController?.popViewController(animated: true)
   }
   
@@ -137,7 +140,8 @@ extension ANIRecruitDetailViewController: ANIRecruitDetailViewDelegate {
   func recruitDetailViewDidScroll(offset: CGFloat) {
     guard let myNavigationBar = self.myNavigationBar,
           let backButton = self.backButton,
-          let clipButton = self.clipButton else { return }
+          let clipButton = self.clipButton,
+          !isBack else { return }
     
       if offset > 1 {
         let backGroundColorOffset: CGFloat = 1.0
