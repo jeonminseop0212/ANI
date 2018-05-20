@@ -11,14 +11,6 @@ import TinyConstraints
 
 class ANIProfileViewController: UIViewController {
   
-//  private weak var familyView: ANIFamilyView?
-//  private let FAMILY_VIEW_HEIGHT: CGFloat = 95.0
-//
-//  private weak var menuBar: ANIProfileMenuBar?
-//  private let MENU_BAR_HEIGHT: CGFloat = 60.0
-//
-//  private weak var containerCollectionView: UICollectionView?
-  
   private weak var profileBasicView: ANIProfileBasicView?
   
   override func viewDidLoad() {
@@ -48,6 +40,7 @@ class ANIProfileViewController: UIViewController {
   
   private func setupNotification() {
     ANINotificationManager.receive(imageCellTapped: self, selector: #selector(presentImageBrowser(_:)))
+    ANINotificationManager.receive(profileEditButtonTapped: self, selector: #selector(openProfileEdit))
   }
   
   //MARK: action
@@ -61,5 +54,13 @@ class ANIProfileViewController: UIViewController {
     imageBrowserViewController.modalPresentationStyle = .overCurrentContext
     //overCurrentContextだとtabBarが消えないのでtabBarからpresentする
     self.tabBarController?.present(imageBrowserViewController, animated: false, completion: nil)
+  }
+  
+  @objc private func openProfileEdit() {
+    guard let profileBasicView = self.profileBasicView else { return }
+    
+    let profileEditViewController = ANIProfileEditViewController()
+    profileEditViewController.user = profileBasicView.user
+    self.present(profileEditViewController, animated: true, completion: nil)
   }
 }

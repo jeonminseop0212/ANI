@@ -76,7 +76,7 @@ class ANIPopupPickerView: UIView {
     self.pickerView = pickerView
     
     if !pickerItem.isEmpty {
-      ANINotificationManager.postUpdateBasicInfo(pickItem: pickerItem[0])
+      ANINotificationManager.postPickerViewDidSelect(pickItem: pickerItem[0])
     }
   }
   
@@ -118,6 +118,6 @@ extension ANIPopupPickerView: UIPickerViewDelegate {
   func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
     guard let pickerItem = self.pickerItem else { return }
 
-    ANINotificationManager.postUpdateBasicInfo(pickItem: pickerItem[row])
+    ANINotificationManager.postPickerViewDidSelect(pickItem: pickerItem[row])
   }
 }

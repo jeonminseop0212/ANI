@@ -133,9 +133,10 @@ class ANIRecruitViewController: UIViewController {
   }
   
   private func setupTestData() {
-    let user1 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
-    let user2 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki")
-    let user3 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
+    let familyImages = [UIImage(named: "family1")!, UIImage(named: "family2")!, UIImage(named: "family3")!]
+    let user1 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
+    let user2 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
+    let user3 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "団体", introduce: "団体で猫たちのためにボランティア活動をしています")
     
     let image1 = UIImage(named: "storyCat1")!
     let image2 = UIImage(named: "storyCat2")!
@@ -174,7 +175,7 @@ extension ANIRecruitViewController: UISearchBarDelegate {
 }
 
 //MARK: ButtonViewDelegate
-extension ANIRecruitViewController:ANIButtonViewDelegate{
+extension ANIRecruitViewController:ANIButtonViewDelegate {
   func buttonViewTapped(view: ANIButtonView) {
     if view === self.contributionButon {
       let recruitContribtionViewController = ANIRecruitContributionViewController()
@@ -227,7 +228,8 @@ extension ANIRecruitViewController: ANIRecruitViewDelegate {
 
 extension ANIRecruitViewController: ANIRecruitContributionViewControllerDelegate {
   func contributionButtonTapped(recruitInfo: RecruitInfo) {
-    let user = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
+    let familyImages = [UIImage(named: "family1")!, UIImage(named: "family2")!, UIImage(named: "family3")!]
+    let user = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
     let recruit = Recruit(recruitInfo: recruitInfo, user: user, supportCount: 10, loveCount: 10)
     
     self.testRecruitLists.insert(recruit, at: 0)

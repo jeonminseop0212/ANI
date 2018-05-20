@@ -64,12 +64,17 @@ class ANINotificationManager: NSObject {
   }
   
   //MARK: update basic info
-  private static let N_UPDATE_BASIC_INFO = "N_UPDATE_BASIC_INFO"
-  static func postUpdateBasicInfo(pickItem: String) { self.post(name: N_UPDATE_BASIC_INFO, object: pickItem, userInfo:nil) }
-  static func receive(undateBasicInfo observer:Any, selector:Selector) { receive(name: N_UPDATE_BASIC_INFO, observer: observer, selector: selector) }
+  private static let N_PICKER_VIEW_DID_SELECT = "N_PICKER_VIEW_DID_SELECT"
+  static func postPickerViewDidSelect(pickItem: String) { self.post(name: N_PICKER_VIEW_DID_SELECT, object: pickItem, userInfo:nil) }
+  static func receive(pickerViewDidSelect observer:Any, selector:Selector) { receive(name: N_PICKER_VIEW_DID_SELECT, observer: observer, selector: selector) }
   
   //MARK: image view tapped
   private static let N_IMAGE_CELL_TAPPED = "N_IMAGE_CELL_TAPPED"
   static func postImageCellTapped(tapCellItem: (Int, [UIImage?])) { self.post(name: N_IMAGE_CELL_TAPPED, object: tapCellItem, userInfo:nil) }
   static func receive(imageCellTapped observer:Any, selector:Selector) { receive(name: N_IMAGE_CELL_TAPPED, observer: observer, selector: selector) }
+  
+  //MARK: profile edit button tapped
+  private static let N_PROFILE_EDIT_BUTTON_TAPPED = "N_PROFILE_EDIT_BUTTON_TAPPED"
+  static func postProfileEditButtonTapped() { self.post(name: N_PROFILE_EDIT_BUTTON_TAPPED, object: nil, userInfo:nil) }
+  static func receive(profileEditButtonTapped observer:Any, selector:Selector) { receive(name: N_PROFILE_EDIT_BUTTON_TAPPED, observer: observer, selector: selector) }
 }

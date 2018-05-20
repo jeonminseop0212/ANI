@@ -16,7 +16,16 @@ class ANIProfileTopCell: UITableViewCell {
   private weak var menuBar: ANIProfileMenuBar?
   private let MENU_BAR_HEIGHT: CGFloat = 60.0
   
-  weak var delegate:ANIProfileMenuBarDelegate? {
+  var user: User? {
+    didSet {
+      guard let familyView = self.familyView,
+            let user = self.user else { return }
+      
+      familyView.user = user
+    }
+  }
+  
+  var delegate: ANIProfileMenuBarDelegate? {
     get { return self.menuBar?.delegate }
     set(v) { self.menuBar?.delegate = v }
   }

@@ -212,14 +212,16 @@ class ANIContributionViewController: UIViewController {
     
     switch selectedContributionMode {
     case ContributionMode.story:
-      let user = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
-
+      let familyImages = [UIImage(named: "family1")!, UIImage(named: "family2")!, UIImage(named: "family3")!]
+      let user = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
+      
       let story = Story(storyImages: contriButionView.contentImages, story: contentTextView.text, user: user, loveCount: 0, commentCount: 0)
       self.delegate?.contributionButtonTapped(story: story)
       
       self.dismiss(animated: true, completion: nil)
     case ContributionMode.qna:
-      let user = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
+      let familyImages = [UIImage(named: "family1")!, UIImage(named: "family2")!, UIImage(named: "family3")!]
+      let user = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
 
       let qna = Qna(qnaImages: contriButionView.contentImages, subTitle: contentTextView.text, user: user, loveCount: 0, commentCount: 0)
       self.delegate?.contributionButtonTapped(qna: qna)

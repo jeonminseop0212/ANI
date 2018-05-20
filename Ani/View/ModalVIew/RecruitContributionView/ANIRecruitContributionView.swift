@@ -377,7 +377,7 @@ class ANIRecruitContributionView: UIView {
     reasonBG.rightToSuperview(offset: 10.0)
     self.reasonBG = reasonBG
     
-    //reasonLabel
+    //reasonTextView
     let reasonTextView = ANIPlaceHolderTextView()
     reasonTextView.font = UIFont.systemFont(ofSize: 15.0)
     reasonTextView.textColor = ANIColor.dark
@@ -413,7 +413,7 @@ class ANIRecruitContributionView: UIView {
     introduceBG.rightToSuperview(offset: 10.0)
     self.introduceBG = introduceBG
     
-    //introduceLabel
+    //introduceTextView
     let introduceTextView = ANIPlaceHolderTextView()
     introduceTextView.font = UIFont.systemFont(ofSize: 15.0)
     introduceTextView.textColor = ANIColor.dark
@@ -469,7 +469,7 @@ class ANIRecruitContributionView: UIView {
     passingBG.bottomToSuperview(offset: -10.0 - 10.0 - ANIRecruitContributionViewController.CONTRIBUTE_BUTTON_HEIGHT)
     self.passingBG = passingBG
     
-    //passingLabel
+    //passingTextView
     let passingTextView = ANIPlaceHolderTextView()
     passingTextView.font = UIFont.systemFont(ofSize: 15.0)
     passingTextView.textColor = ANIColor.dark
@@ -485,7 +485,7 @@ class ANIRecruitContributionView: UIView {
   
   
   private func setNotification() {
-    ANINotificationManager.receive(undateBasicInfo: self, selector: #selector(updateBasicInfo))
+    ANINotificationManager.receive(pickerViewDidSelect: self, selector: #selector(updateBasicInfo))
     ANINotificationManager.receive(keyboardWillChangeFrame: self, selector: #selector(keyboardWillChangeFrame))
   }
   
