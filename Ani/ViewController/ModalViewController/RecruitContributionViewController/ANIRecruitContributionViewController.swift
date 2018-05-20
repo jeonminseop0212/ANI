@@ -199,7 +199,7 @@ class ANIRecruitContributionViewController: UIViewController {
       Gallery.Config.Grid.FrameView.borderColor = ANIColor.green
       if Gallery.Config.Camera.oneImageMode {
         Gallery.Config.Grid.previewRatio = UIViewController.HEADER_IMAGE_VIEW_RATIO
-        Config.tabsToShow = [.imageTab]
+        Config.tabsToShow = [.imageTab, .cameraTab]
       }
       let galleryNV = UINavigationController(rootViewController: galleryUnrap)
       present(galleryNV, animated: animation, completion: nil)
@@ -220,6 +220,7 @@ class ANIRecruitContributionViewController: UIViewController {
       Gallery.Config.Grid.ArrowButton.tintColor = ANIColor.dark
       Gallery.Config.Grid.FrameView.borderColor = ANIColor.green
       Gallery.Config.Grid.previewRatio = 1.0
+      Config.tabsToShow = [.imageTab, .cameraTab]
       let galleryNV = UINavigationController(rootViewController: galleryUnrap)
       present(galleryNV, animated: animation, completion: nil)
       
