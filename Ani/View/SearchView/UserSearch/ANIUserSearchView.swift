@@ -52,24 +52,25 @@ class ANIUserSearchView: UIView {
   }
   
   private func setupTestUser() {
-    let user1 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
-    let user2 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki")
-    let user3 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
-    let user4 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
-    let user5 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki")
-    let user6 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
-    let user7 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
-    let user8 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki")
-    let user9 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
-    let user10 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
-    let user11 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki")
-    let user12 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
-    let user13 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
-    let user14 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki")
-    let user15 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
-    let user16 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
-    let user17 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki")
-    let user18 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
+    let familyImages = [UIImage(named: "family1")!, UIImage(named: "family2")!, UIImage(named: "family3")!]
+    let user1 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
+    let user2 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
+    let user3 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "団体", introduce: "団体で猫たちのためにボランティア活動をしています")
+    let user4 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
+    let user5 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
+    let user6 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "団体", introduce: "団体で猫たちのためにボランティア活動をしています")
+    let user7 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
+    let user8 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
+    let user9 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "団体", introduce: "団体で猫たちのためにボランティア活動をしています")
+    let user10 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
+    let user11 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
+    let user12 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "団体", introduce: "団体で猫たちのためにボランティア活動をしています")
+    let user13 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
+    let user14 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
+    let user15 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "団体", introduce: "団体で猫たちのためにボランティア活動をしています")
+    let user16 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
+    let user17 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
+    let user18 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "団体", introduce: "団体で猫たちのためにボランティア活動をしています")
     
     testUserSearchResult = [user1, user2, user3, user4, user5, user6, user7, user8, user9, user10, user11, user12, user13, user14, user15, user16, user17, user18]
   }

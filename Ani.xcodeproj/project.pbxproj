@@ -42,6 +42,10 @@
 		CDA32A8F20AFE5A9008A2AC1 /* ANIProfileStoryImagesCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A8E20AFE5A9008A2AC1 /* ANIProfileStoryImagesCell.swift */; };
 		CDA32A9220AFE803008A2AC1 /* ANIProfileQnaImagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A9120AFE803008A2AC1 /* ANIProfileQnaImagesView.swift */; };
 		CDA32A9420AFE82E008A2AC1 /* ANIProfileQnaImagesCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A9320AFE82E008A2AC1 /* ANIProfileQnaImagesCell.swift */; };
+		CDA97AC620AFF34C00F46DA4 /* ANIProfileEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA97AC520AFF34C00F46DA4 /* ANIProfileEditViewController.swift */; };
+		CDA97AC920AFFFEC00F46DA4 /* ANIProfileEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA97AC820AFFFEC00F46DA4 /* ANIProfileEditView.swift */; };
+		CDA97ACC20B000FF00F46DA4 /* ANIProfileEditFamilyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA97ACB20B000FF00F46DA4 /* ANIProfileEditFamilyView.swift */; };
+		CDA97ACE20B0018600F46DA4 /* ANIProfileEditFamilyCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA97ACD20B0018600F46DA4 /* ANIProfileEditFamilyCell.swift */; };
 		CDD0550620A5CF2200BEF482 /* ANIImageFilterPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD0550520A5CF2200BEF482 /* ANIImageFilterPreviewView.swift */; };
 		CDD0550820A5D07600BEF482 /* ANIImageFilterPreviewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD0550720A5D07600BEF482 /* ANIImageFilterPreviewCell.swift */; };
 		CDD0550C20A5D29900BEF482 /* ANIImageFilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD0550B20A5D29900BEF482 /* ANIImageFilterView.swift */; };
@@ -167,6 +171,10 @@
 		CDA32A8E20AFE5A9008A2AC1 /* ANIProfileStoryImagesCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIProfileStoryImagesCell.swift; sourceTree = "<group>"; };
 		CDA32A9120AFE803008A2AC1 /* ANIProfileQnaImagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIProfileQnaImagesView.swift; sourceTree = "<group>"; };
 		CDA32A9320AFE82E008A2AC1 /* ANIProfileQnaImagesCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIProfileQnaImagesCell.swift; sourceTree = "<group>"; };
+		CDA97AC520AFF34C00F46DA4 /* ANIProfileEditViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIProfileEditViewController.swift; sourceTree = "<group>"; };
+		CDA97AC820AFFFEC00F46DA4 /* ANIProfileEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIProfileEditView.swift; sourceTree = "<group>"; };
+		CDA97ACB20B000FF00F46DA4 /* ANIProfileEditFamilyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIProfileEditFamilyView.swift; sourceTree = "<group>"; };
+		CDA97ACD20B0018600F46DA4 /* ANIProfileEditFamilyCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIProfileEditFamilyCell.swift; sourceTree = "<group>"; };
 		CDD0550520A5CF2200BEF482 /* ANIImageFilterPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIImageFilterPreviewView.swift; sourceTree = "<group>"; };
 		CDD0550720A5D07600BEF482 /* ANIImageFilterPreviewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIImageFilterPreviewCell.swift; sourceTree = "<group>"; };
 		CDD0550B20A5D29900BEF482 /* ANIImageFilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIImageFilterView.swift; sourceTree = "<group>"; };
@@ -365,6 +373,7 @@
 				CDA32A2020AA6029008A2AC1 /* PopupPickerViewController */,
 				CDA32A3320AC1491008A2AC1 /* ContributeViewController */,
 				CDA32A8120AE7AE2008A2AC1 /* ImageBrowserViewController */,
+				CDA97AC420AFF33200F46DA4 /* ProfileEditViewController */,
 			);
 			path = ModalViewController;
 			sourceTree = "<group>";
@@ -376,6 +385,7 @@
 				CDA32A2520AA6630008A2AC1 /* PopupPickerView */,
 				CDA32A3620AD1E8F008A2AC1 /* ContributionView */,
 				CDA32A8420AE8DBC008A2AC1 /* ImageBrowserView */,
+				CDA97AC720AFFFD200F46DA4 /* ProfileEditView */,
 			);
 			path = ModalVIew;
 			sourceTree = "<group>";
@@ -449,6 +459,32 @@
 				CDA32A9320AFE82E008A2AC1 /* ANIProfileQnaImagesCell.swift */,
 			);
 			path = imagesView;
+			sourceTree = "<group>";
+		};
+		CDA97AC420AFF33200F46DA4 /* ProfileEditViewController */ = {
+			isa = PBXGroup;
+			children = (
+				CDA97AC520AFF34C00F46DA4 /* ANIProfileEditViewController.swift */,
+			);
+			path = ProfileEditViewController;
+			sourceTree = "<group>";
+		};
+		CDA97AC720AFFFD200F46DA4 /* ProfileEditView */ = {
+			isa = PBXGroup;
+			children = (
+				CDA97AC820AFFFEC00F46DA4 /* ANIProfileEditView.swift */,
+				CDA97ACA20B000D800F46DA4 /* ProfileEditFamilyView */,
+			);
+			path = ProfileEditView;
+			sourceTree = "<group>";
+		};
+		CDA97ACA20B000D800F46DA4 /* ProfileEditFamilyView */ = {
+			isa = PBXGroup;
+			children = (
+				CDA97ACB20B000FF00F46DA4 /* ANIProfileEditFamilyView.swift */,
+				CDA97ACD20B0018600F46DA4 /* ANIProfileEditFamilyCell.swift */,
+			);
+			path = ProfileEditFamilyView;
 			sourceTree = "<group>";
 		};
 		CDD0550420A5CF0100BEF482 /* ImageFilter */ = {
@@ -1177,6 +1213,7 @@
 				F5E9E2242076961E0021D4CC /* Recruit.swift in Sources */,
 				CDA32A9420AFE82E008A2AC1 /* ANIProfileQnaImagesCell.swift in Sources */,
 				F57F7D63208323F9008A2645 /* Message.swift in Sources */,
+				CDA97AC620AFF34C00F46DA4 /* ANIProfileEditViewController.swift in Sources */,
 				F5DF835D207A17C200EA7FBE /* ANICommunityQnaCell.swift in Sources */,
 				CDD0550C20A5D29900BEF482 /* ANIImageFilterView.swift in Sources */,
 				CD2C414520A556AE00581267 /* ANIRecruitContributionViewController.swift in Sources */,
@@ -1184,6 +1221,7 @@
 				F57F7D652083250D008A2645 /* ANIMessageViewCell.swift in Sources */,
 				F51D221920768E8D009D1B26 /* ANIRecuruitView.swift in Sources */,
 				F53E87D02086EF6600B19A2F /* ANIProfileProfileCell.swift in Sources */,
+				CDA97ACE20B0018600F46DA4 /* ANIProfileEditFamilyCell.swift in Sources */,
 				CDA32A8620AE8DD4008A2AC1 /* ANIImageBrowserCell.swift in Sources */,
 				CDF7F171208F651E00254A0F /* ANIButtonView.swift in Sources */,
 				F57F7D8E20844C4E008A2645 /* ANISearchCategoryCell.swift in Sources */,
@@ -1227,6 +1265,7 @@
 				CDA32A2D20ABCE5F008A2AC1 /* RecruitInfo.swift in Sources */,
 				F53E87C82085F5FA00B19A2F /* ANIProfileMenuBarCell.swift in Sources */,
 				F57F7D572081FEBF008A2645 /* ANINotiMessageCell.swift in Sources */,
+				CDA97ACC20B000FF00F46DA4 /* ANIProfileEditFamilyView.swift in Sources */,
 				F530AB1C207A45D900114E6B /* ANIStoryImagesCell.swift in Sources */,
 				CDA32A8D20AFE594008A2AC1 /* ANIProfileStoryImagesView.swift in Sources */,
 				CDF7F16E208F2BEF00254A0F /* UIView.swift in Sources */,
@@ -1247,6 +1286,7 @@
 				F53E87C62085F13800B19A2F /* ANIProfileMenuBar.swift in Sources */,
 				CDA32A9220AFE803008A2AC1 /* ANIProfileQnaImagesView.swift in Sources */,
 				F5F530142088624E0076E938 /* ANIProfileRecruitCell.swift in Sources */,
+				CDA97AC920AFFFEC00F46DA4 /* ANIProfileEditView.swift in Sources */,
 				F57F7D61208322D3008A2645 /* ANIMessageView.swift in Sources */,
 				CD9E52B120921EB400715F50 /* UIViewController.swift in Sources */,
 				CDA32A2F20ABD941008A2AC1 /* String.swift in Sources */,

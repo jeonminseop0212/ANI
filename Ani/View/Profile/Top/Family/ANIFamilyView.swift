@@ -11,11 +11,12 @@ import UIKit
 class ANIFamilyView: UIView {
   
   private weak var familyCollectionView: UICollectionView?
-  private var testFamily = [UIImage]()
+  
+  var user: User?
+  
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()
-    setTestFamily()
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -40,25 +41,19 @@ class ANIFamilyView: UIView {
     collectionView.edgesToSuperview()
     self.familyCollectionView = collectionView
   }
-  
-  private func setTestFamily() {
-    let family1 = UIImage(named: "family1")!
-    let family2 = UIImage(named: "family2")!
-    let family3 = UIImage(named: "family3")!
-
-    testFamily = [family1, family2, family3]
-  }
 }
 
 extension ANIFamilyView: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-    return testFamily.count
+    guard let user = self.user else { return 0 }
+    return user.familyImages.count
   }
   
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    guard let user = self.user else { return UICollectionViewCell() }
     let id = NSStringFromClass(ANIFamilyViewCell.self)
     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! ANIFamilyViewCell
-    cell.familyImageView?.image = testFamily[indexPath.item]
+    cell.familyImageView?.image = user.familyImages[indexPath.item]
     return cell
   }
   

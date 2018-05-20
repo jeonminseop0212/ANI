@@ -1,19 +1,19 @@
 //
-//  ANIFamilyViewCell.swift
+//  ANIProfileEditFamilyCell.swift
 //  Ani
 //
-//  Created by 전민섭 on 2018/04/17.
+//  Created by jeonminseop on 2018/05/19.
 //  Copyright © 2018年 JeonMinseop. All rights reserved.
 //
 
 import UIKit
 
-class ANIFamilyViewCell: UICollectionViewCell {
+class ANIProfileEditFamilyCell: UICollectionViewCell {
   
   private let FAMILY_IMAGE_VIEW_BG_HEIGHT: CGFloat = 80.0
   private weak var familyImageViewBG: UIView?
-  
   weak var familyImageView: UIImageView?
+  weak var imagePickImageView: UIImageView?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -25,6 +25,7 @@ class ANIFamilyViewCell: UICollectionViewCell {
   }
   
   private func setup() {
+    //imageViewBG
     let imageViewBG = UIView()
     addSubview(imageViewBG)
     imageViewBG.width(FAMILY_IMAGE_VIEW_BG_HEIGHT)
@@ -32,11 +33,24 @@ class ANIFamilyViewCell: UICollectionViewCell {
     imageViewBG.centerInSuperview()
     self.familyImageViewBG = imageViewBG
     
+    //imageView
     let imageView = UIImageView()
+    imageView.contentMode = .scaleAspectFit
     imageViewBG.addSubview(imageView)
     imageView.layer.cornerRadius = FAMILY_IMAGE_VIEW_BG_HEIGHT / 2
     imageView.layer.masksToBounds = true
     imageView.edgesToSuperview()
     self.familyImageView = imageView
+    
+    //imagePickImageView
+    let imagePickImageView = UIImageView()
+    imagePickImageView.contentMode = .scaleAspectFit
+    imagePickImageView.image = UIImage(named: "imagePickButton")
+    imageViewBG.addSubview(imagePickImageView)
+    imagePickImageView.width(25.0)
+    imagePickImageView.height(25.0)
+    imagePickImageView.rightToSuperview()
+    imagePickImageView.bottomToSuperview()
+    self.imagePickImageView = imagePickImageView
   }
 }

@@ -47,9 +47,10 @@ class ANINotiView: UIView {
   }
   
   private func setupTestData() {
-    let user1 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
-    let user2 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki")
-    let user3 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
+    let familyImages = [UIImage(named: "family1")!, UIImage(named: "family2")!, UIImage(named: "family3")!]
+    let user1 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
+    let user2 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
+    let user3 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "団体", introduce: "団体で猫たちのためにボランティア活動をしています")
     let noti1 = Noti(subtitle: "あなたの投稿に『いいね』しました", user: user1)
     let noti2 = Noti(subtitle: "あなたの投稿に『いいね』しました", user: user2)
     let noti3 = Noti(subtitle: "あなたの投稿に『いいね』しました", user: user3)

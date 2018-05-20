@@ -14,7 +14,7 @@ protocol ANIProfileMenuBarDelegate:NSObjectProtocol {
 
 class ANIProfileMenuBar: UIView {
   
-  weak var delegate:ANIProfileMenuBarDelegate?
+  var delegate: ANIProfileMenuBarDelegate?
 
   weak var menuCollectionView: UICollectionView?
   private let menus = ["profile", "recruit", "story", "qna"]

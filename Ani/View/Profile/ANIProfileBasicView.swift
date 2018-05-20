@@ -28,9 +28,12 @@ class ANIProfileBasicView: UIView {
   
   private var qnas = [Qna]()
   
+  var user: User?
+  
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()
+    setupTestUser()
     setupTestRecruitData()
     setupTestStoryData()
     setupTestQnaData()
@@ -59,10 +62,18 @@ class ANIProfileBasicView: UIView {
     self.basicTableView = basicTableView
   }
   
+  private func setupTestUser() {
+    let familyImages = [UIImage(named: "family1")!, UIImage(named: "family2")!, UIImage(named: "family3")!]
+    let user = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
+    
+    self.user = user
+  }
+  
   private func setupTestRecruitData() {
-    let user1 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
-    let user2 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki")
-    let user3 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
+    let familyImages = [UIImage(named: "family1")!, UIImage(named: "family2")!, UIImage(named: "family3")!]
+    let user1 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
+    let user2 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
+    let user3 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "団体", introduce: "団体で猫たちのためにボランティア活動をしています")
     
     let image1 = UIImage(named: "storyCat1")!
     let image2 = UIImage(named: "storyCat2")!
@@ -83,9 +94,10 @@ class ANIProfileBasicView: UIView {
     let cat2 = UIImage(named: "storyCat2")!
     let cat3 = UIImage(named: "storyCat3")!
     let cat4 = UIImage(named: "storyCat1")!
-    let user1 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
-    let user2 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki")
-    let user3 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
+    let familyImages = [UIImage(named: "family1")!, UIImage(named: "family2")!, UIImage(named: "family3")!]
+    let user1 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
+    let user2 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
+    let user3 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "団体", introduce: "団体で猫たちのためにボランティア活動をしています")
     let story1 = Story(storyImages: [cat1, cat2, cat3], story: "あれこれ内容を書くところだよおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user1, loveCount: 10, commentCount: 10)
     let story2 = Story(storyImages: [cat2, cat1, cat3, cat4], story: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user2, loveCount: 5, commentCount: 8)
     let story3 = Story(storyImages: [cat3, cat2, cat1], story: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user3, loveCount: 15, commentCount: 20)
@@ -97,9 +109,10 @@ class ANIProfileBasicView: UIView {
     let cat2 = UIImage(named: "storyCat2")!
     let cat3 = UIImage(named: "storyCat3")!
     let cat4 = UIImage(named: "storyCat1")!
-    let user1 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
-    let user2 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki")
-    let user3 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop")
+    let familyImages = [UIImage(named: "family1")!, UIImage(named: "family2")!, UIImage(named: "family3")!]
+    let user1 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
+    let user2 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
+    let user3 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "団体", introduce: "団体で猫たちのためにボランティア活動をしています")
     let qna1 = Qna(qnaImages: [cat1, cat2, cat3], subTitle: "あれこれ内容を書くところだよおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user1, loveCount: 10, commentCount: 5)
     let qna2 = Qna(qnaImages: [cat2, cat1, cat3, cat4], subTitle: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user2, loveCount: 5, commentCount: 5)
     let qna3 = Qna(qnaImages: [cat3, cat2, cat1], subTitle: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user3, loveCount: 15, commentCount: 10)
@@ -133,15 +146,21 @@ extension ANIProfileBasicView: UITableViewDataSource {
     let section = indexPath.section
 
     if section == 0 {
+      guard let user = self.user else { return UITableViewCell() }
+
       let topCellId = NSStringFromClass(ANIProfileTopCell.self)
       let cell = tableView.dequeueReusableCell(withIdentifier: topCellId, for: indexPath) as! ANIProfileTopCell
       cell.delegate = self
       cell.selectedIndex = contentType.rawValue
+      cell.user = user
       return cell
     } else {
       if contentType == .profile {
+        guard let user = self.user else { return UITableViewCell() }
+        
         let profileCellid = NSStringFromClass(ANIProfileProfileCell.self)
         let cell = tableView.dequeueReusableCell(withIdentifier: profileCellid, for: indexPath) as! ANIProfileProfileCell
+        cell.user = user
         return cell
       } else if contentType == .recruit {
         let recruitCellid = NSStringFromClass(ANIProfileRecruitCell.self)

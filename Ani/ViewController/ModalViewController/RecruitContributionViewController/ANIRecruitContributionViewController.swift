@@ -193,7 +193,6 @@ class ANIRecruitContributionViewController: UIViewController {
       galleryUnrap.delegate = self
       Gallery.Config.initialTab = .imageTab
       Gallery.Config.PageIndicator.backgroundColor = .white
-      //    Gallery.Config.Camera.imageLimit = 10
       Gallery.Config.Camera.oneImageMode = true
       Gallery.Config.Font.Main.regular = UIFont.boldSystemFont(ofSize: 17)
       Gallery.Config.Grid.ArrowButton.tintColor = ANIColor.dark

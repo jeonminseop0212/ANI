@@ -11,12 +11,18 @@ import UIKit
 class ANIProfileProfileCell: UITableViewCell {
   
   private weak var nameLabel: UILabel?
-  private weak var updateButton: UIButton?
+  private let PROFILE_EDIT_BUTTON_HEIGHT: CGFloat = 30.0
+  private weak var profileEditButton: ANIAreaButtonView?
+  private weak var profileEditLabel: UILabel?
   private weak var groupLabel: UILabel?
   private weak var introductionLabel: UILabel?
-  private weak var twitterURLLabel: UILabel?
-  private weak var instaURLLabel: UILabel?
   
+  var user: User? {
+    didSet {
+      reloadLayout()
+    }
+  }
+    
   override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     setup()
@@ -30,41 +36,44 @@ class ANIProfileProfileCell: UITableViewCell {
     backgroundColor = .clear
     self.selectionStyle = .none
     
+    //profileEditButton
+    let profileEditButton = ANIAreaButtonView()
+    profileEditButton.base?.backgroundColor = ANIColor.green
+    profileEditButton.baseCornerRadius = PROFILE_EDIT_BUTTON_HEIGHT / 2
+    profileEditButton.delegate = self
+    addSubview(profileEditButton)
+    profileEditButton.topToSuperview(offset: 10.0)
+    profileEditButton.rightToSuperview(offset: 10.0)
+    profileEditButton.width(60.0)
+    profileEditButton.height(PROFILE_EDIT_BUTTON_HEIGHT)
+    self.profileEditButton = profileEditButton
+    
+    //profileEditLabel
+    let profileEditLabel = UILabel()
+    profileEditLabel.textColor = .white
+    profileEditLabel.text = "更新"
+    profileEditLabel.textAlignment = .center
+    profileEditLabel.font = UIFont.boldSystemFont(ofSize: 15)
+    profileEditButton.addSubview(profileEditLabel)
+    profileEditLabel.edgesToSuperview()
+    self.profileEditLabel = profileEditLabel
+    
     //nameLabel
     let nameLabel = UILabel()
     nameLabel.font = UIFont.boldSystemFont(ofSize: 17.0)
     nameLabel.textColor = ANIColor.dark
     nameLabel.numberOfLines = 0
-    nameLabel.text = "jeonminseop"
     addSubview(nameLabel)
     nameLabel.topToSuperview(offset: 10.0)
     nameLabel.leftToSuperview(offset: 10.0)
+    nameLabel.rightToLeft(of: profileEditButton, offset: -10.0)
     self.nameLabel = nameLabel
 
-    //updateButton
-    let updateButton = UIButton()
-    updateButton.setTitle("更新", for: .normal)
-    updateButton.setTitleColor(ANIColor.green, for: .normal)
-    updateButton.addTarget(self, action: #selector(updateProfile), for: .touchUpInside)
-    updateButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 13.0)
-    updateButton.layer.cornerRadius = 5.0
-    updateButton.layer.masksToBounds = true
-    updateButton.layer.borderWidth = 1.0
-    updateButton.layer.borderColor = ANIColor.green.cgColor
-    updateButton.backgroundColor = .clear
-    addSubview(updateButton)
-    updateButton.topToSuperview(offset: 10.0)
-    updateButton.rightToSuperview(offset: 10.0)
-    updateButton.width(40.0)
-    updateButton.height(20.0)
-    self.updateButton = updateButton
-
-    nameLabel.rightToLeft(of: updateButton, offset: 10.0)
 
     //groupLabel
     let groupLabel = UILabel()
     groupLabel.font = UIFont.systemFont(ofSize: 17.0)
-    groupLabel.text = "個人"
+    groupLabel.textAlignment = .center
     groupLabel.textColor = ANIColor.dark
     addSubview(groupLabel)
     groupLabel.topToBottom(of: nameLabel, offset: 10.0)
@@ -75,39 +84,33 @@ class ANIProfileProfileCell: UITableViewCell {
     let introductionLabel = UILabel()
     groupLabel.font = UIFont.systemFont(ofSize: 17.0)
     introductionLabel.numberOfLines = 0
-    introductionLabel.text = "私はどのこのここに初回文を書くよあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれ私はどのこのここに初回文を書くよあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれ私はどのこのここに初回文を書くよあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれあれこれ"
     introductionLabel.textColor = ANIColor.dark
     addSubview(introductionLabel)
     introductionLabel.topToBottom(of: groupLabel, offset: 10.0)
     introductionLabel.leftToSuperview(offset: 10.0)
     introductionLabel.rightToSuperview(offset: 10.0)
     self.introductionLabel = introductionLabel
-
-    //twitterURLLabel
-    let twitterURLLabel = UILabel()
-    twitterURLLabel.numberOfLines = 0
-    twitterURLLabel.text = "www.twitter.com"
-    twitterURLLabel.textColor = ANIColor.dark
-    addSubview(twitterURLLabel)
-    twitterURLLabel.topToBottom(of: introductionLabel, offset: 10.0)
-    twitterURLLabel.leftToSuperview(offset: 10.0)
-    twitterURLLabel.rightToSuperview(offset: 10.0)
-    self.twitterURLLabel = twitterURLLabel
-    
-    //instaURLLabel
-    let instaURLLabel = UILabel()
-    instaURLLabel.numberOfLines = 0
-    instaURLLabel.text = "www.insta.com"
-    instaURLLabel.textColor = ANIColor.dark
-    addSubview(instaURLLabel)
-    instaURLLabel.topToBottom(of: twitterURLLabel, offset: 10.0)
-    instaURLLabel.leftToSuperview(offset: 10.0)
-    instaURLLabel.rightToSuperview(offset: 10.0)
-    instaURLLabel.bottomToSuperview()
-    self.instaURLLabel = instaURLLabel
   }
   
-  @objc private func updateProfile() {
-    print("update profile")
+  private func reloadLayout() {
+    guard let nameLabel = self.nameLabel,
+          let groupLabel = self.groupLabel,
+          let introductionLabel = self.introductionLabel,
+          let user = self.user else { return }
+    
+    nameLabel.text = user.name
+    
+    groupLabel.text = user.kind
+    
+    introductionLabel.text = user.introduce
+  }
+}
+
+//MARK: ANIButtonViewDelegate
+extension ANIProfileProfileCell: ANIButtonViewDelegate {
+  func buttonViewTapped(view: ANIButtonView) {
+    if view === self.profileEditButton {
+      ANINotificationManager.postProfileEditButtonTapped()
+    }
   }
 }
