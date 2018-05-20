@@ -24,10 +24,10 @@ class ANIRecruitViewController: UIViewController {
   private let CONTRIBUTION_BUTTON_HEIGHT:CGFloat = 55.0
   private weak var contributionButon: ANIImageButtonView?
   
-  private var testRecruitLists = [Recruit]() {
+  private var recruits = [Recruit]() {
     didSet {
       guard let recruitView = self.recruitView else { return }
-      recruitView.testRecruitLists = testRecruitLists
+      recruitView.recruits = recruits
     }
   }
   
@@ -144,12 +144,12 @@ class ANIRecruitViewController: UIViewController {
     let image4 = UIImage(named: "storyCat1")!
     
     let introduceImages = [image1, image2, image3, image4]
-    let recruitInfo = RecruitInfo(headerImage: UIImage(named: "cat1")!, title: "かわいい猫ちゃんの里親になって >_<", kind: "ミックス", age: "１歳以下", sex: "男の子", home: "東京都", vaccine: "１回", castration: "済み", reason: "親がいない子猫を保護しました。\n家ではすでに猫を飼えないので親になってくれる方を探しています。\nよろしくお願いします。", introduce: "人懐こくて甘えん坊の可愛い子猫です。\n元気よくご飯もいっぱいたべます😍\n遊ぶのが大好きであっちこっち走り回る姿がたまらなく可愛いです。", introduceImages: introduceImages, passing: "ご自宅までお届けします！")
+    let recruitInfo = RecruitInfo(headerImage: UIImage(named: "cat1")!, title: "かわいい猫ちゃんの里親になって >_<", kind: "ミックス", age: "１歳以下", sex: "男の子", home: "東京都", vaccine: "１回", castration: "済み", reason: "親がいない子猫を保護しました。\n家ではすでに猫を飼えないので親になってくれる方を探しています。\nよろしくお願いします。", introduce: "人懐こくて甘えん坊の可愛い子猫です。\n元気よくご飯もいっぱいたべます😍\n遊ぶのが大好きであっちこっち走り回る姿がたまらなく可愛いです。", introduceImages: introduceImages, passing: "ご自宅までお届けします！", isRecruit: true)
     let recruit1 = Recruit(recruitInfo: recruitInfo, user: user1, supportCount: 10, loveCount: 10)
     let recruit2 = Recruit(recruitInfo: recruitInfo, user: user2, supportCount: 5, loveCount: 8)
     let recruit3 = Recruit(recruitInfo: recruitInfo, user: user3, supportCount: 14, loveCount: 20)
 
-    self.testRecruitLists = [recruit1, recruit2, recruit3, recruit1, recruit2, recruit3]
+    self.recruits = [recruit1, recruit2, recruit3, recruit1, recruit2, recruit3]
   }
   
   //MARK: Notifications
@@ -191,7 +191,7 @@ extension ANIRecruitViewController: ANIRecruitViewDelegate {
   func recruitRowTap(tapRowIndex: Int) {
     let recruitDetailViewController = ANIRecruitDetailViewController()
     recruitDetailViewController.hidesBottomBarWhenPushed = true
-    recruitDetailViewController.testRecruit = testRecruitLists[tapRowIndex]
+    recruitDetailViewController.testRecruit = recruits[tapRowIndex]
     self.navigationController?.pushViewController(recruitDetailViewController, animated: true)
   }
   
@@ -232,6 +232,6 @@ extension ANIRecruitViewController: ANIRecruitContributionViewControllerDelegate
     let user = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
     let recruit = Recruit(recruitInfo: recruitInfo, user: user, supportCount: 10, loveCount: 10)
     
-    self.testRecruitLists.insert(recruit, at: 0)
+    self.recruits.insert(recruit, at: 0)
   }
 }

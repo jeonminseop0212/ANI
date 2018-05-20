@@ -23,7 +23,7 @@ class ANIRecuruitView: UIView {
     }
   }
   
-  var testRecruitLists = [Recruit]() {
+  var recruits = [Recruit]() {
     didSet {
       guard let recruitTableView = self.recruitTableView else { return }
       recruitTableView.reloadData()
@@ -60,19 +60,15 @@ class ANIRecuruitView: UIView {
 
 extension ANIRecuruitView: UITableViewDataSource, UITableViewDelegate {
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return testRecruitLists.count
+    return recruits.count
   }
   
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let id = NSStringFromClass(ANIRecruitViewCell.self)
     let cell = tableView.dequeueReusableCell(withIdentifier: id, for: indexPath) as! ANIRecruitViewCell
-    cell.recruitImageView.image = testRecruitLists[indexPath.item].recruitInfo.headerImage
-    cell.titleLabel.text = testRecruitLists[indexPath.item].recruitInfo.title
-    cell.subTitleLabel.text = testRecruitLists[indexPath.item].recruitInfo.reason
-    cell.profileImageView.image = testRecruitLists[indexPath.item].user.profileImage
-    cell.userNameLabel.text = testRecruitLists[indexPath.item].user.name
-    cell.supportCountLabel.text = "\(testRecruitLists[indexPath.item].supportCount)"
-    cell.loveCountLabel.text = "\(testRecruitLists[indexPath.item].loveCount)"
+    
+    cell.recruit = recruits[indexPath.row]
+    
     return cell
   }
   

@@ -9,18 +9,29 @@
 import UIKit
 
 class ANIRecruitViewCell: UITableViewCell {
-  var recruitImageView = UIImageView()
-  var titleLabel = UILabel()
-  var subTitleLabel = UILabel()
+  private weak var recruitImageView: UIImageView?
+  private weak var basicInfoStackView: UIStackView?
+  private weak var isRecruitLabel: UILabel?
+  private weak var homeLabel: UILabel?
+  private weak var ageLabel: UILabel?
+  private weak var sexLabel: UILabel?
+  private weak var titleLabel: UILabel?
+  private weak var subTitleLabel: UILabel?
   private let PROFILE_IMAGE_HEIGHT: CGFloat = 32.0
-  var profileImageView = UIImageView()
-  var userNameLabel = UILabel()
-  var supportCountLabel = UILabel()
-  var supportButton = UIButton()
-  var loveButton = UIButton()
-  var loveCountLabel = UILabel()
-  var clipButton = UIButton()
-  var line = UIImageView()
+  private weak var profileImageView: UIImageView?
+  private weak var userNameLabel: UILabel?
+  private weak var supportCountLabel: UILabel?
+  private weak var supportButton: UIButton?
+  private weak var loveButton: UIButton?
+  private weak var loveCountLabel: UILabel?
+  private weak var clipButton: UIButton?
+  private weak var line: UIImageView?
+  
+  var recruit: Recruit? {
+    didSet {
+      reloadLayout()
+    }
+  }
   
   override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -44,13 +55,76 @@ class ANIRecruitViewCell: UITableViewCell {
     recruitImageView.height(recruitImageViewHeight)
     self.recruitImageView = recruitImageView
     
+    //basicInfoStackView
+    let basicInfoStackView = UIStackView()
+    basicInfoStackView.axis = .horizontal
+    basicInfoStackView.distribution = .fillEqually
+    basicInfoStackView.alignment = .center
+    basicInfoStackView.spacing = 8.0
+    addSubview(basicInfoStackView)
+    basicInfoStackView.topToBottom(of: recruitImageView, offset: 10.0)
+    basicInfoStackView.leftToSuperview(offset: 10.0)
+    basicInfoStackView.rightToSuperview(offset: 10.0)
+    self.basicInfoStackView = basicInfoStackView
+    
+    //isRecruitLabel
+    let isRecruitLabel = UILabel()
+    isRecruitLabel.textColor = .white
+    isRecruitLabel.textAlignment = .center
+    isRecruitLabel.font = UIFont.boldSystemFont(ofSize: 13.0)
+    isRecruitLabel.layer.cornerRadius = 5.0
+    isRecruitLabel.layer.masksToBounds = true
+    isRecruitLabel.backgroundColor = ANIColor.green
+    basicInfoStackView.addArrangedSubview(isRecruitLabel)
+    isRecruitLabel.height(24.0)
+    self.isRecruitLabel = isRecruitLabel
+    
+    //homeLabel
+    let homeLabel = UILabel()
+    homeLabel.textColor = ANIColor.green
+    homeLabel.textAlignment = .center
+    homeLabel.font = UIFont.boldSystemFont(ofSize: 13.0)
+    homeLabel.layer.cornerRadius = 5.0
+    homeLabel.layer.masksToBounds = true
+    homeLabel.layer.borderColor = ANIColor.green.cgColor
+    homeLabel.layer.borderWidth = 1.0
+    basicInfoStackView.addArrangedSubview(homeLabel)
+    homeLabel.height(24.0)
+    self.homeLabel = homeLabel
+    
+    //ageLabel
+    let ageLabel = UILabel()
+    ageLabel.textColor = ANIColor.green
+    ageLabel.textAlignment = .center
+    ageLabel.font = UIFont.boldSystemFont(ofSize: 13.0)
+    ageLabel.layer.cornerRadius = 5.0
+    ageLabel.layer.masksToBounds = true
+    ageLabel.layer.borderColor = ANIColor.green.cgColor
+    ageLabel.layer.borderWidth = 1.0
+    basicInfoStackView.addArrangedSubview(ageLabel)
+    ageLabel.height(24.0)
+    self.ageLabel = ageLabel
+    
+    //sexLabel
+    let sexLabel = UILabel()
+    sexLabel.textColor = ANIColor.green
+    sexLabel.textAlignment = .center
+    sexLabel.font = UIFont.boldSystemFont(ofSize: 13.0)
+    sexLabel.layer.cornerRadius = 5.0
+    sexLabel.layer.masksToBounds = true
+    sexLabel.layer.borderColor = ANIColor.green.cgColor
+    sexLabel.layer.borderWidth = 1.0
+    basicInfoStackView.addArrangedSubview(sexLabel)
+    sexLabel.height(24.0)
+    self.sexLabel = sexLabel
+    
     //titleLabel
     let titleLabel = UILabel()
     titleLabel.font = UIFont.boldSystemFont(ofSize: 17.0)
     titleLabel.textAlignment = .left
     titleLabel.textColor = ANIColor.dark
     addSubview(titleLabel)
-    titleLabel.topToBottom(of: recruitImageView, offset: 10.0)
+    titleLabel.topToBottom(of: basicInfoStackView, offset: 10.0)
     titleLabel.leftToSuperview(offset: 10.0)
     titleLabel.rightToSuperview(offset: 10.0)
     titleLabel.height(20.0)
@@ -147,5 +221,32 @@ class ANIRecruitViewCell: UITableViewCell {
     line.height(0.5)
     line.bottomToSuperview()
     self.line = line
+  }
+  
+  private func reloadLayout() {
+    guard let recruitImageView = self.recruitImageView,
+          let isRecruitLabel = self.isRecruitLabel,
+          let homeLabel = self.homeLabel,
+          let ageLabel = self.ageLabel,
+          let sexLabel = self.sexLabel,
+          let titleLabel = self.titleLabel,
+          let subTitleLabel = self.subTitleLabel,
+          let profileImageView = self.profileImageView,
+          let userNameLabel = self.userNameLabel,
+          let supportCountLabel = self.supportCountLabel,
+          let loveCountLabel = self.loveCountLabel,
+          let recruit = self.recruit else { return }
+    
+    recruitImageView.image = recruit.recruitInfo.headerImage
+    isRecruitLabel.text = recruit.recruitInfo.isRecruit ? "募集中" : "決まり！"
+    homeLabel.text = recruit.recruitInfo.home
+    ageLabel.text = recruit.recruitInfo.age
+    sexLabel.text = recruit.recruitInfo.sex
+    titleLabel.text = recruit.recruitInfo.title
+    subTitleLabel.text = recruit.recruitInfo.reason
+    profileImageView.image = recruit.user.profileImage
+    userNameLabel.text = recruit.user.name
+    supportCountLabel.text = "\(recruit.supportCount)"
+    loveCountLabel.text = "\(recruit.loveCount)"
   }
 }
