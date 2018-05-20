@@ -21,4 +21,5 @@ struct RecruitInfo {
   let introduce: String
   let introduceImages: [UIImage?]
   let passing: String
+  let isRecruit: Bool
 }
