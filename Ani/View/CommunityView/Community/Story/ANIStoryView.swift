@@ -55,13 +55,9 @@ extension ANIStoryView: UITableViewDataSource {
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let id = NSStringFromClass(ANIStoryViewCell.self)
     let cell = tableView.dequeueReusableCell(withIdentifier: id, for: indexPath) as! ANIStoryViewCell
-    cell.storyImagesView.images = storys[indexPath.item].storyImages
-    cell.storyImagesView.pageControl?.numberOfPages = storys[indexPath.item].storyImages.count
-    cell.subTitleLabel.text = storys[indexPath.item].story
-    cell.profileImageView.image = storys[indexPath.item].user.profileImage
-    cell.userNameLabel.text = storys[indexPath.item].user.name
-    cell.loveCountLabel.text = "\(storys[indexPath.item].loveCount)"
-    cell.commentCountLabel.text = "\(storys[indexPath.item].commentCount)"
+    
+    cell.story = storys[indexPath.row]
+
     return cell
   }
 }

@@ -10,15 +10,21 @@ import UIKit
 import WCLShineButton
 
 class ANIStoryViewCell: UITableViewCell {
-  var storyImagesView = ANIStoryImagesView()
-  var subTitleLabel = UILabel()
-  private weak var line = UIImageView()
-  var profileImageView = UIImageView()
-  var userNameLabel = UILabel()
-  private weak var loveButton = WCLShineButton()
-  var loveCountLabel = UILabel()
-  private weak var commentButton = UIButton()
-  var commentCountLabel = UILabel()
+  private weak var storyImagesView: ANIStoryImagesView?
+  private weak var subTitleLabel: UILabel?
+  private weak var line: UIImageView?
+  private weak var profileImageView: UIImageView?
+  private weak var userNameLabel: UILabel?
+  private weak var loveButton: WCLShineButton?
+  private weak var loveCountLabel: UILabel?
+  private weak var commentButton: UIButton?
+  private weak var commentCountLabel: UILabel?
+  
+  var story: Story? {
+    didSet {
+      reloadLayout()
+    }
+  }
   
   override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -129,6 +135,24 @@ class ANIStoryViewCell: UITableViewCell {
     line.height(0.5)
     line.bottomToSuperview()
     self.line = line
+  }
+  
+  private func reloadLayout() {
+    guard let storyImagesView = self.storyImagesView,
+          let subTitleLabel = self.subTitleLabel,
+          let profileImageView = self.profileImageView,
+          let userNameLabel = self.userNameLabel,
+          let loveCountLabel = self.loveCountLabel,
+          let commentCountLabel = self.commentCountLabel,
+          let story = self.story else { return }
+    
+        storyImagesView.images = story.storyImages
+        storyImagesView.pageControl?.numberOfPages = story.storyImages.count
+        subTitleLabel.text = story.story
+        profileImageView.image = story.user.profileImage
+        userNameLabel.text = story.user.name
+        loveCountLabel.text = "\(story.loveCount)"
+        commentCountLabel.text = "\(story.commentCount)"
   }
   
   //MARK: action
