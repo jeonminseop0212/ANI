@@ -8,6 +8,10 @@
 
 import UIKit
 
+protocol ANIStoryViewDelegate {
+  func storyViewCellDidSelect(index: Int)
+}
+
 class ANIStoryView: UIView {
   
   var storyTableView: UITableView?
@@ -18,6 +22,8 @@ class ANIStoryView: UIView {
       storyTableView.reloadData()
     }
   }
+  
+  var delegate: ANIStoryViewDelegate?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -41,12 +47,14 @@ class ANIStoryView: UIView {
     tableView.register(ANIStoryViewCell.self, forCellReuseIdentifier: id)
     tableView.separatorStyle = .none
     tableView.dataSource = self
+    tableView.delegate = self
     addSubview(tableView)
     tableView.edgesToSuperview()
     self.storyTableView = tableView
   }
 }
 
+//MARK: UITableViewDataSource
 extension ANIStoryView: UITableViewDataSource {
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     return storys.count
@@ -62,3 +70,9 @@ extension ANIStoryView: UITableViewDataSource {
   }
 }
 
+//MARK: UITableViewDelegate
+extension ANIStoryView: UITableViewDelegate {
+  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    self.delegate?.storyViewCellDidSelect(index: indexPath.row)
+  }
+}

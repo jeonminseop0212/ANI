@@ -19,6 +19,11 @@ class ANICommunityStoryCell: UICollectionViewCell {
     }
   }
   
+  var delegate: ANIStoryViewDelegate? {
+    get { return self.storyView?.delegate }
+    set(v) { self.storyView?.delegate = v }
+  }
+  
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()

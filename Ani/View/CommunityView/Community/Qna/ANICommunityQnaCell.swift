@@ -19,6 +19,11 @@ class ANICommunityQnaCell: UICollectionViewCell {
     }
   }
   
+  var delegate: ANIQnaViewDelegate? {
+    get { return self.qnaView?.delegate }
+    set(v) { self.qnaView?.delegate = v }
+  }
+  
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()
