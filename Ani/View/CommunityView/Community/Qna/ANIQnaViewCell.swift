@@ -145,7 +145,7 @@ class ANIQnaViewCell: UITableViewCell {
           let qna = self.qna else { return }
     
     qnaImagesView.images = qna.qnaImages
-    subTitleLabel.text = qna.subTitle
+    subTitleLabel.text = qna.qna
     profileImageView.image = qna.user.profileImage
     userNameLabel.text = qna.user.name
     loveCountLabel.text = "\(qna.loveCount)"

@@ -8,6 +8,10 @@
 
 import UIKit
 
+protocol ANIQnaViewDelegate {
+  func qnaViewCellDidSelect(index: Int)
+}
+
 class ANIQnaView: UIView {
   
   var qnaTableView: UITableView?
@@ -18,6 +22,8 @@ class ANIQnaView: UIView {
       qnaTableView.reloadData()
     }
   }
+  
+  var delegate: ANIQnaViewDelegate?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -41,6 +47,7 @@ class ANIQnaView: UIView {
     let id = NSStringFromClass(ANIQnaViewCell.self)
     tableView.register(ANIQnaViewCell.self, forCellReuseIdentifier: id)
     tableView.dataSource = self
+    tableView.delegate = self
     tableView.separatorStyle = .none
     addSubview(tableView)
     tableView.edgesToSuperview()
@@ -48,6 +55,7 @@ class ANIQnaView: UIView {
   }
 }
 
+//MARK: UITableViewDataSource
 extension ANIQnaView: UITableViewDataSource {
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     return qnas.count
@@ -63,4 +71,9 @@ extension ANIQnaView: UITableViewDataSource {
   }
 }
 
-
+//MARK: UITableViewDelegate
+extension ANIQnaView: UITableViewDelegate {
+  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    self.delegate?.qnaViewCellDidSelect(index: indexPath.row)
+  }
+}
