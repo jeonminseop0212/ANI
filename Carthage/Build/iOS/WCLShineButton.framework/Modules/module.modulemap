@@ -1,0 +1,6 @@
+framework module WCLShineButton {
+  header "WCLShineButton-Swift.h"
+
+  export *
+  module WCLShineButton { export * }
+}

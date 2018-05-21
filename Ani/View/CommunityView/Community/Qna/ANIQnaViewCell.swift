@@ -7,13 +7,14 @@
 //
 
 import UIKit
+import WCLShineButton
 
 class ANIQnaViewCell: UITableViewCell {
   var subTitleLabel = UILabel()
   var profileImageView = UIImageView()
   var userNameLabel = UILabel()
   var qnaImagesView = ANIQnaImagesView()
-  private weak var loveButton = UIButton()
+  private weak var loveButton = WCLShineButton()
   var loveCountLabel = UILabel()
   private weak var commentButton = UIButton()
   var commentCountLabel = UILabel()
@@ -112,13 +113,24 @@ class ANIQnaViewCell: UITableViewCell {
     self.loveCountLabel = loveCountLabel
 
     //loveButton
-    let loveButton = UIButton()
-    loveButton.setImage(UIImage(named: "love"), for: .normal)
+    var param = WCLShineParams()
+    param.bigShineColor = ANIColor.red
+    param.smallShineColor = ANIColor.pink
+    let loveButton = WCLShineButton(frame: CGRect(x: 0.0, y: 0.0, width: 20.0, height: 20.0), params: param)
+    loveButton.fillColor = ANIColor.red
+    loveButton.color = ANIColor.gray
+    loveButton.image = .heart
+    loveButton.addTarget(self, action: #selector(love), for: .valueChanged)
     addSubview(loveButton)
     loveButton.centerY(to: profileImageView)
     loveButton.rightToLeft(of: loveCountLabel, offset: -10.0)
     loveButton.width(21.0)
     loveButton.height(21.0)
     self.loveButton = loveButton
+  }
+  
+  //MARK: action
+  @objc private func love() {
+    print("love")
   }
 }
