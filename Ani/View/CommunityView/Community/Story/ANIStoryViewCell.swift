@@ -146,13 +146,13 @@ class ANIStoryViewCell: UITableViewCell {
           let commentCountLabel = self.commentCountLabel,
           let story = self.story else { return }
     
-        storyImagesView.images = story.storyImages
-        storyImagesView.pageControl?.numberOfPages = story.storyImages.count
-        subTitleLabel.text = story.story
-        profileImageView.image = story.user.profileImage
-        userNameLabel.text = story.user.name
-        loveCountLabel.text = "\(story.loveCount)"
-        commentCountLabel.text = "\(story.commentCount)"
+    storyImagesView.images = story.storyImages
+    storyImagesView.pageControl?.numberOfPages = story.storyImages.count
+    subTitleLabel.text = story.story
+    profileImageView.image = story.user.profileImage
+    userNameLabel.text = story.user.name
+    loveCountLabel.text = "\(story.loveCount)"
+    commentCountLabel.text = "\(story.commentCount)"
   }
   
   //MARK: action

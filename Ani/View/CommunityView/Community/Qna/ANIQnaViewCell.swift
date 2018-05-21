@@ -10,14 +10,20 @@ import UIKit
 import WCLShineButton
 
 class ANIQnaViewCell: UITableViewCell {
-  var subTitleLabel = UILabel()
-  var profileImageView = UIImageView()
-  var userNameLabel = UILabel()
-  var qnaImagesView = ANIQnaImagesView()
-  private weak var loveButton = WCLShineButton()
-  var loveCountLabel = UILabel()
-  private weak var commentButton = UIButton()
-  var commentCountLabel = UILabel()
+  private weak var subTitleLabel: UILabel?
+  private weak var profileImageView: UIImageView?
+  private weak var userNameLabel: UILabel?
+  private weak var qnaImagesView: ANIQnaImagesView?
+  private weak var loveButton: WCLShineButton?
+  private weak var loveCountLabel: UILabel?
+  private weak var commentButton: UIButton?
+  private var commentCountLabel: UILabel?
+  
+  var qna: Qna? {
+    didSet {
+      reloadLayout()
+    }
+  }
   
   override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -127,6 +133,23 @@ class ANIQnaViewCell: UITableViewCell {
     loveButton.width(21.0)
     loveButton.height(21.0)
     self.loveButton = loveButton
+  }
+  
+  private func reloadLayout() {
+    guard let qnaImagesView = self.qnaImagesView,
+          let subTitleLabel = self.subTitleLabel,
+          let profileImageView = self.profileImageView,
+          let userNameLabel = self.userNameLabel,
+          let loveCountLabel = self.loveCountLabel,
+          let commentCountLabel = self.commentCountLabel,
+          let qna = self.qna else { return }
+    
+    qnaImagesView.images = qna.qnaImages
+    subTitleLabel.text = qna.subTitle
+    profileImageView.image = qna.user.profileImage
+    userNameLabel.text = qna.user.name
+    loveCountLabel.text = "\(qna.loveCount)"
+    commentCountLabel.text = "\(qna.commentCount)"
   }
   
   //MARK: action
