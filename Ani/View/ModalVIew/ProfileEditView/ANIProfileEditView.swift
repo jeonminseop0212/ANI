@@ -46,6 +46,8 @@ class ANIProfileEditView: UIView {
     }
   }
   
+  private var selectedTextViewMaxY: CGFloat?
+  
   var delegate: ANIProfileEditViewDelegate?
   
   private let KEYBOARD_HIDE_TOOL_BAR_HEIGHT: CGFloat = 40.0
@@ -197,7 +199,7 @@ class ANIProfileEditView: UIView {
     introduceBG.topToBottom(of: introduceTitleLabel, offset: 10.0)
     introduceBG.leftToSuperview(offset: 10.0)
     introduceBG.rightToSuperview(offset: 10.0)
-    introduceBG.bottomToSuperview(offset: 10.0)
+    introduceBG.bottomToSuperview(offset: -10.0)
     self.introduceBG = introduceBG
     
     //introduceTextView
@@ -216,6 +218,7 @@ class ANIProfileEditView: UIView {
   
   private func setNotification() {
     ANINotificationManager.receive(pickerViewDidSelect: self, selector: #selector(updateKind))
+    ANINotificationManager.receive(keyboardWillChangeFrame: self, selector: #selector(keyboardWillChangeFrame))
   }
   
   private func reloadLayout() {
@@ -251,6 +254,19 @@ class ANIProfileEditView: UIView {
     }
   }
   
+  @objc func keyboardWillChangeFrame(_ notification: Notification) {
+    guard let keyboardFrame = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
+          let scrollView = self.scrollView,
+          let selectedTextViewMaxY = self.selectedTextViewMaxY else { return }
+
+    let selectedTextViewVisiableMaxY = selectedTextViewMaxY - scrollView.contentOffset.y + UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    if selectedTextViewVisiableMaxY > keyboardFrame.origin.y {
+      let margin: CGFloat = 10.0
+      let blindHeight = selectedTextViewVisiableMaxY - keyboardFrame.origin.y
+      scrollView.contentOffset.y = scrollView.contentOffset.y + blindHeight + margin
+    }
+  }
+  
   //MARK: action
   @objc func keyboardHideButtonTapped(){
     self.endEditing(true)
@@ -274,6 +290,17 @@ class ANIProfileEditView: UIView {
 extension ANIProfileEditView: UITextViewDelegate {
   func textViewDidChange(_ textView: UITextView) {
     editButtonEnable()
+  }
+  
+  func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
+    guard let selectedTextViewSuperView = textView.superview else { return false }
+    selectedTextViewMaxY = selectedTextViewSuperView.frame.maxY
+
+    return true
+  }
+
+  func textViewDidEndEditing(_ textView: UITextView) {
+    selectedTextViewMaxY = nil
   }
 }
 

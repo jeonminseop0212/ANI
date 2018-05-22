@@ -8,6 +8,7 @@
 
 import UIKit
 import Gallery
+import TinyConstraints
 
 class ANIProfileEditViewController: UIViewController {
   
@@ -18,6 +19,8 @@ class ANIProfileEditViewController: UIViewController {
   private weak var editButtonBG: UIView?
   private weak var editButton: UIButton?
   
+  private var profileEditViewOriginalBottomConstraintConstant: CGFloat?
+  private var profileEditViewBottomConstraint: Constraint?
   private weak var profileEditView: ANIProfileEditView?
   
   private var gallery: GalleryController?
@@ -36,6 +39,7 @@ class ANIProfileEditViewController: UIViewController {
   
   override func viewDidLoad() {
     setup()
+    setupNotification()
   }
   
   private func setup() {
@@ -115,9 +119,17 @@ class ANIProfileEditViewController: UIViewController {
       profileEditView.user = user
     }
     self.view.addSubview(profileEditView)
-    profileEditView.edgesToSuperview(excluding: .top)
+    profileEditView.leftToSuperview()
+    profileEditView.rightToSuperview()
+    profileEditViewBottomConstraint = profileEditView.bottomToSuperview()
+    profileEditViewOriginalBottomConstraintConstant = profileEditViewBottomConstraint?.constant
     profileEditView.topToBottom(of: myNavigationBar)
     self.profileEditView = profileEditView
+  }
+  
+  private func setupNotification() {
+    ANINotificationManager.receive(keyboardWillChangeFrame: self, selector: #selector(keyboardWillChangeFrame))
+    ANINotificationManager.receive(keyboardWillHide: self, selector: #selector(keyboardWillHide))
   }
   
   func getCropImages(images: [UIImage?], items: [Image]) -> [UIImage] {
@@ -137,6 +149,34 @@ class ANIProfileEditViewController: UIViewController {
       croppedImages.append(croppedImage)
     }
     return croppedImages
+  }
+  
+  @objc private func keyboardWillChangeFrame(_ notification: Notification) {
+    guard let keyboardFrame = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
+          let duration = notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as? TimeInterval,
+          let curve = notification.userInfo?[UIKeyboardAnimationCurveUserInfoKey] as? UInt,
+          let profileEditViewBottomConstraint = self.profileEditViewBottomConstraint else { return }
+    
+    let h = keyboardFrame.height
+    
+    profileEditViewBottomConstraint.constant = -h
+    
+    UIView.animate(withDuration: duration, delay: 0, options: UIViewAnimationOptions(rawValue: curve), animations: {
+      self.view.layoutIfNeeded()
+    })
+  }
+  
+  @objc private func keyboardWillHide(_ notification: Notification) {
+    guard let duration = notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as? TimeInterval,
+          let curve = notification.userInfo?[UIKeyboardAnimationCurveUserInfoKey] as? UInt,
+          let profileEditViewOriginalBottomConstraintConstant = self.profileEditViewOriginalBottomConstraintConstant,
+          let profileEditViewBottomConstraint = self.profileEditViewBottomConstraint else { return }
+    
+    profileEditViewBottomConstraint.constant = profileEditViewOriginalBottomConstraintConstant
+    
+    UIView.animate(withDuration: duration, delay: 0, options: UIViewAnimationOptions(rawValue: curve), animations: {
+      self.view.layoutIfNeeded()
+    })
   }
   
   //MARK: Action
