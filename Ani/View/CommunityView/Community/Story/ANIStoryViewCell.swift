@@ -72,6 +72,8 @@ class ANIStoryViewCell: UITableViewCell {
 
     //commentCountLabel
     let commentCountLabel = UILabel()
+    commentCountLabel.font = UIFont.boldSystemFont(ofSize: 16.0)
+    commentCountLabel.textColor = ANIColor.dark
     addSubview(commentCountLabel)
     commentCountLabel.centerY(to: profileImageView)
     commentCountLabel.rightToSuperview(offset: 20.0)
@@ -91,6 +93,8 @@ class ANIStoryViewCell: UITableViewCell {
     
     //loveCountLabel
     let loveCountLabel = UILabel()
+    loveCountLabel.font = UIFont.boldSystemFont(ofSize: 16.0)
+    loveCountLabel.textColor = ANIColor.dark
     addSubview(loveCountLabel)
     loveCountLabel.centerY(to: profileImageView)
     loveCountLabel.rightToLeft(of: commentButton, offset: -10.0)
