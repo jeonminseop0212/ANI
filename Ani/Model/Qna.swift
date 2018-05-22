@@ -14,5 +14,5 @@ struct Qna {
   let user: User
   let loveCount: Int
   let commentCount: Int
-  let comments: [Comment]?
+  var comments: [Comment]?
 }

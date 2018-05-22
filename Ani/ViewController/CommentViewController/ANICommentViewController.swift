@@ -9,6 +9,10 @@
 import UIKit
 import TinyConstraints
 
+protocol ANICommentViewControllerDelegate {
+  func commentViewControllerPop()
+}
+
 enum CommentMode {
   case story
   case qna
@@ -30,10 +34,26 @@ class ANICommentViewController: UIViewController {
     
   var commentMode: CommentMode?
   
-  var story: Story?
-  var qna: Qna?
+  var story: Story? {
+    didSet {
+      guard let commentView = self.commentView,
+            let story = self.story else { return }
+      
+      commentView.story = story
+    }
+  }
+  var qna: Qna? {
+    didSet {
+      guard let commentView = self.commentView,
+            let qna = self.qna else { return }
+      
+      commentView.qna = qna
+    }
+  }
   
   var me: User?
+  
+  var delegate: ANICommentViewControllerDelegate?
   
   override func viewDidLoad() {
     setup()
@@ -92,6 +112,7 @@ class ANICommentViewController: UIViewController {
     //commentBar
     let commentBar = ANICommentBar()
     commentBar.me = me
+    commentBar.delegate = self
     self.view.addSubview(commentBar)
     commentBar.leftToSuperview()
     commentBar.rightToSuperview()
@@ -175,5 +196,27 @@ class ANICommentViewController: UIViewController {
   //MARK: Action
   @objc private func back() {
     self.navigationController?.popViewController(animated: true)
+    self.delegate?.commentViewControllerPop()
+  }
+}
+
+extension ANICommentViewController: ANICommentBarDelegate {
+  func commentContributionButtonTapped(comment: String) {
+    //TODO: 本体updateやってないsever作ったらupdate
+    guard let commentMode = self.commentMode,
+          let me = self.me else { return }
+    
+    switch commentMode {
+    case CommentMode.story:
+      if story != nil {
+        let comment = Comment(user: me, comment: comment, loveCount: 0, commentCount: 0)
+        story?.comments?.append(comment)
+      }
+    case CommentMode.qna:
+      if qna != nil {
+        let comment = Comment(user: me, comment: comment, loveCount: 0, commentCount: 0)
+        qna?.comments?.append(comment)
+      }
+    }
   }
 }
