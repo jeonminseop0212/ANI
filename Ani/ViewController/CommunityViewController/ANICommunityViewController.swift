@@ -32,10 +32,13 @@ class ANICommunityViewController: UIViewController {
       containerCollectionView.reloadData()
     }
   }
+  
+  private var me: User?
 
   override func viewDidLoad() {
     super.viewDidLoad()
     setup()
+    setupMe()
     setupTestStoryData()
     setupTestQnaData()
     setupNotification()
@@ -111,7 +114,10 @@ class ANICommunityViewController: UIViewController {
     let comment1 = Comment(user: user1, comment: "可愛い写真ですね", loveCount: 0, commentCount: 0)
     let comment2 = Comment(user: user2, comment: "いいですねえええええええええコメントだよいいですねえええええええええコメントだよいいですねえええええええええコメントだよいいですねえええええええええコメントだよいいですねえええええええええコメントだよ", loveCount: 0, commentCount: 0)
     let comment3 = Comment(user: user3, comment: "コメントふふふふ", loveCount: 0, commentCount: 0)
-    let story1 = Story(storyImages: [cat1, cat2, cat3], story: "あれこれ内容を書くところだよおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user1, loveCount: 10, commentCount: 10, comments: [comment1, comment2, comment3])
+    let comment4 = Comment(user: user1, comment: "可愛い写真ですね", loveCount: 0, commentCount: 0)
+    let comment5 = Comment(user: user2, comment: "いいですねえええええええええコメントだよいいですねえええええええええコメントだよいいですねえええええええええコメントだよいいですねえええええええええコメントだよいいですねえええええええええコメントだよ", loveCount: 0, commentCount: 0)
+    let comment6 = Comment(user: user3, comment: "コメントふふふふ", loveCount: 0, commentCount: 0)
+    let story1 = Story(storyImages: [cat1, cat2, cat3], story: "あれこれ内容を書くところだよおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user1, loveCount: 10, commentCount: 10, comments: [comment1, comment2, comment3, comment4, comment5, comment6])
     let story2 = Story(storyImages: [cat2, cat1, cat3, cat4], story: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user2, loveCount: 5, commentCount: 8, comments: [comment1, comment2, comment3])
     let story3 = Story(storyImages: [cat3, cat2, cat1], story: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user3, loveCount: 15, commentCount: 20, comments: [comment1, comment2, comment3])
     self.storys = [story1, story2, story3, story1, story2, story3]
@@ -134,6 +140,13 @@ class ANICommunityViewController: UIViewController {
     let qna3 = Qna(qnaImages: [cat3, cat2, cat1], qna: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user3, loveCount: 15, commentCount: 10, comments: [comment1, comment2, comment3])
     
     self.qnas = [qna1, qna2, qna3, qna1, qna2, qna3]
+  }
+  
+  private func setupMe() {
+    let familyImages = [UIImage(named: "family1")!, UIImage(named: "family2")!, UIImage(named: "family3")!]
+    let me = User(profileImage: UIImage(named: "meProfileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
+    
+    self.me = me
   }
   
   //MARK: action
@@ -203,12 +216,15 @@ extension ANICommunityViewController: UICollectionViewDelegate {
 //MARK: ANIButtonViewDelegate
 extension ANICommunityViewController: ANIButtonViewDelegate{
   func buttonViewTapped(view: ANIButtonView) {
+    guard let me = self.me else { return }
+    
     if view === self.contributionButon {
       if selectedIndex == 0 {
         let contributionViewController = ANIContributionViewController()
         contributionViewController.navigationTitle = "STORY"
         contributionViewController.selectedContributionMode = ContributionMode.story
         contributionViewController.delegate = self
+        contributionViewController.me = me
         let contributionNV = UINavigationController(rootViewController: contributionViewController)
         self.present(contributionNV, animated: true, completion: nil)
       } else {
@@ -216,6 +232,7 @@ extension ANICommunityViewController: ANIButtonViewDelegate{
         contributionViewController.navigationTitle = "Q&A"
         contributionViewController.selectedContributionMode = ContributionMode.qna
         contributionViewController.delegate = self
+        contributionViewController.me = me
         let contributionNV = UINavigationController(rootViewController: contributionViewController)
         self.present(contributionNV, animated: true, completion: nil)
       }
@@ -260,6 +277,7 @@ extension ANICommunityViewController: ANIStoryViewDelegate {
     commentViewController.hidesBottomBarWhenPushed = true
     commentViewController.commentMode = CommentMode.story
     commentViewController.story = storys[index]
+    commentViewController.me = me
     self.navigationController?.pushViewController(commentViewController, animated: true)
   }
 }
@@ -273,6 +291,7 @@ extension ANICommunityViewController: ANIQnaViewDelegate {
     commentViewController.hidesBottomBarWhenPushed = true
     commentViewController.commentMode = CommentMode.qna
     commentViewController.qna = qnas[index]
+    commentViewController.me = me
     self.navigationController?.pushViewController(commentViewController, animated: true)
   }
 }

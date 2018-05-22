@@ -31,9 +31,12 @@ class ANIRecruitViewController: UIViewController {
     }
   }
   
+  private var me: User?
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     setup()
+    setupMe()
     setupTestData()
     setupNotifications()
   }
@@ -113,23 +116,11 @@ class ANIRecruitViewController: UIViewController {
     self.contributionButon = contributionButon
   }
   
-  
-  //MARK: Action
-  @objc func filter() {
-    print("filtering")
-  }
-  
-  @objc private func hideKeyboard() {
-    guard let searchBar = self.searchBar,
-      let searchBarTextField = searchBar.textField else { return }
-    if searchBarTextField.isFirstResponder {
-      searchBarTextField.resignFirstResponder()
-      searchBar.setShowsCancelButton(false, animated: true)
-      
-      if let searchCancelButton = searchBar.cancelButton {
-        searchCancelButton.alpha = 0.0
-      }
-    }
+  private func setupMe() {
+    let familyImages = [UIImage(named: "family1")!, UIImage(named: "family2")!, UIImage(named: "family3")!]
+    let me = User(profileImage: UIImage(named: "meProfileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
+    
+    self.me = me
   }
   
   private func setupTestData() {
@@ -155,6 +146,24 @@ class ANIRecruitViewController: UIViewController {
   //MARK: Notifications
   private func setupNotifications() {
     ANINotificationManager.receive(viewScrolled: self, selector: #selector(hideKeyboard))
+  }
+  
+  //MARK: Action
+  @objc func filter() {
+    print("filtering")
+  }
+  
+  @objc private func hideKeyboard() {
+    guard let searchBar = self.searchBar,
+      let searchBarTextField = searchBar.textField else { return }
+    if searchBarTextField.isFirstResponder {
+      searchBarTextField.resignFirstResponder()
+      searchBar.setShowsCancelButton(false, animated: true)
+      
+      if let searchCancelButton = searchBar.cancelButton {
+        searchCancelButton.alpha = 0.0
+      }
+    }
   }
 }
 
@@ -228,10 +237,9 @@ extension ANIRecruitViewController: ANIRecruitViewDelegate {
 
 extension ANIRecruitViewController: ANIRecruitContributionViewControllerDelegate {
   func contributionButtonTapped(recruitInfo: RecruitInfo) {
-    let familyImages = [UIImage(named: "family1")!, UIImage(named: "family2")!, UIImage(named: "family3")!]
-    let user = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
-    let recruit = Recruit(recruitInfo: recruitInfo, user: user, supportCount: 10, loveCount: 10)
+    guard let me = self.me else { return }
     
+    let recruit = Recruit(recruitInfo: recruitInfo, user: me, supportCount: 10, loveCount: 10)
     self.recruits.insert(recruit, at: 0)
   }
 }

@@ -39,6 +39,8 @@ class ANIContributionViewController: UIViewController {
   
   var selectedContributionMode: ContributionMode?
   
+  var me: User?
+  
   var delegate: ANIContributionViewControllerDelegate?
 
   override func viewDidLoad() {
@@ -208,20 +210,17 @@ class ANIContributionViewController: UIViewController {
   @objc private func contribute() {
     guard let selectedContributionMode = self.selectedContributionMode,
           let contriButionView = self.contriButionView,
-          let contentTextView = contriButionView.contentTextView else { return }
+          let contentTextView = contriButionView.contentTextView,
+          let me = self.me else { return }
     
     switch selectedContributionMode {
     case ContributionMode.story:
-      let familyImages = [UIImage(named: "family1")!, UIImage(named: "family2")!, UIImage(named: "family3")!]
-      let user = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
-      let story = Story(storyImages: contriButionView.contentImages, story: contentTextView.text, user: user, loveCount: 0, commentCount: 0, comments: nil)
+      let story = Story(storyImages: contriButionView.contentImages, story: contentTextView.text, user: me, loveCount: 0, commentCount: 0, comments: nil)
       self.delegate?.contributionButtonTapped(story: story)
       
       self.dismiss(animated: true, completion: nil)
     case ContributionMode.qna:
-      let familyImages = [UIImage(named: "family1")!, UIImage(named: "family2")!, UIImage(named: "family3")!]
-      let user = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
-      let qna = Qna(qnaImages: contriButionView.contentImages, qna: contentTextView.text, user: user, loveCount: 0, commentCount: 0, comments: nil)
+      let qna = Qna(qnaImages: contriButionView.contentImages, qna: contentTextView.text, user: me, loveCount: 0, commentCount: 0, comments: nil)
       self.delegate?.contributionButtonTapped(qna: qna)
       
       self.dismiss(animated: true, completion: nil)
