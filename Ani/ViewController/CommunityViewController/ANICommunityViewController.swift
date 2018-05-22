@@ -33,6 +33,8 @@ class ANICommunityViewController: UIViewController {
     }
   }
   
+  private var commentViewController: ANICommentViewController?
+  
   private var me: User?
 
   override func viewDidLoad() {
@@ -273,12 +275,15 @@ extension ANICommunityViewController: ANIStoryViewDelegate {
   func storyViewCellDidSelect(index: Int) {
     guard let storys = self.storys else { return }
     
-    let commentViewController = ANICommentViewController()
-    commentViewController.hidesBottomBarWhenPushed = true
-    commentViewController.commentMode = CommentMode.story
-    commentViewController.story = storys[index]
-    commentViewController.me = me
-    self.navigationController?.pushViewController(commentViewController, animated: true)
+    commentViewController = ANICommentViewController()
+    if let commentViewControllerUnrap = commentViewController {
+      commentViewControllerUnrap.hidesBottomBarWhenPushed = true
+      commentViewControllerUnrap.commentMode = CommentMode.story
+      commentViewControllerUnrap.story = storys[index]
+      commentViewControllerUnrap.me = me
+      commentViewControllerUnrap.delegate = self
+      self.navigationController?.pushViewController(commentViewControllerUnrap, animated: true)
+    }
   }
 }
 
@@ -287,11 +292,20 @@ extension ANICommunityViewController: ANIQnaViewDelegate {
   func qnaViewCellDidSelect(index: Int) {
     guard let qnas = self.qnas else { return }
     
-    let commentViewController = ANICommentViewController()
-    commentViewController.hidesBottomBarWhenPushed = true
-    commentViewController.commentMode = CommentMode.qna
-    commentViewController.qna = qnas[index]
-    commentViewController.me = me
-    self.navigationController?.pushViewController(commentViewController, animated: true)
+    commentViewController = ANICommentViewController()
+    if let commentViewControllerUnrap = commentViewController {
+      commentViewControllerUnrap.hidesBottomBarWhenPushed = true
+      commentViewControllerUnrap.commentMode = CommentMode.qna
+      commentViewControllerUnrap.qna = qnas[index]
+      commentViewControllerUnrap.me = me
+      commentViewControllerUnrap.delegate = self
+      self.navigationController?.pushViewController(commentViewControllerUnrap, animated: true)
+    }
+  }
+}
+
+extension ANICommunityViewController: ANICommentViewControllerDelegate {
+  func commentViewControllerPop() {
+    commentViewController = nil
   }
 }

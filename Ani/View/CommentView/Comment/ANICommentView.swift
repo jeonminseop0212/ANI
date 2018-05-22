@@ -14,8 +14,20 @@ class ANICommentView: UIView {
   
   var commentMode: CommentMode?
   
-  var story: Story?
-  var qna: Qna?
+  var story: Story? {
+    didSet {
+      guard let commentTableView = self.commentTableView else { return }
+      
+      commentTableView.reloadData()
+    }
+  }
+  var qna: Qna? {
+    didSet {
+      guard let commentTableView = self.commentTableView else { return }
+      
+      commentTableView.reloadData()
+    }
+  }
   
   private var originalScrollY: CGFloat = 0.0
   

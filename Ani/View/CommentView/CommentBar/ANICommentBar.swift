@@ -8,6 +8,10 @@
 
 import UIKit
 
+protocol ANICommentBarDelegate {
+  func commentContributionButtonTapped(comment: String)
+}
+
 class ANICommentBar: UIView {
   
   private weak var profileImageView: UIImageView?
@@ -25,6 +29,8 @@ class ANICommentBar: UIView {
       profileImageView.image = me.profileImage
     }
   }
+  
+  var delegate: ANICommentBarDelegate?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -114,6 +120,8 @@ class ANICommentBar: UIView {
   //MARK: action
   @objc private func contribute() {
     guard let commentTextView = self.commentTextView else { return }
+    
+    self.delegate?.commentContributionButtonTapped(comment: commentTextView.text)
     commentTextView.text = ""
     commentTextView.placeHolderLabel.alpha = 1.0
     commentTextView.endEditing(true)
