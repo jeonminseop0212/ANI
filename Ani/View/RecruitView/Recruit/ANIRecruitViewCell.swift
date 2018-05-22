@@ -165,6 +165,8 @@ class ANIRecruitViewCell: UITableViewCell {
     
     //loveCountLabel
     let loveCountLabel = UILabel()
+    loveCountLabel.font = UIFont.boldSystemFont(ofSize: 16.0)
+    loveCountLabel.textColor = ANIColor.dark
     addSubview(loveCountLabel)
     loveCountLabel.centerY(to: profileImageView)
     loveCountLabel.rightToLeft(of: clipButton, offset: -10.0)
@@ -190,6 +192,8 @@ class ANIRecruitViewCell: UITableViewCell {
     
     //supportCountLabel
     let supportCountLabel = UILabel()
+    supportCountLabel.font = UIFont.boldSystemFont(ofSize: 16.0)
+    supportCountLabel.textColor = ANIColor.dark
     addSubview(supportCountLabel)
     supportCountLabel.centerY(to: profileImageView)
     supportCountLabel.rightToLeft(of: loveButton, offset: -10.0)
