@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import TinyConstraints
 
 enum CommentMode {
   case story
@@ -23,15 +24,22 @@ class ANICommentViewController: UIViewController {
   
   private weak var commentView: ANICommentView?
   
+  private var commentBarBottomConstraint: Constraint?
+  private var commentBarOriginalBottomConstraintConstant: CGFloat?
+  private weak var commentBar: ANICommentBar?
+    
   var commentMode: CommentMode?
   
   var story: Story?
   var qna: Qna?
   
+  var me: User?
+  
   override func viewDidLoad() {
     setup()
     passingData()
     setupNavigationProfileImage()
+    setupNotification()
   }
   
   private func setup() {
@@ -81,11 +89,23 @@ class ANICommentViewController: UIViewController {
     navigationProfileImageView.centerInSuperview()
     self.navigationProfileImageView = navigationProfileImageView
     
+    //commentBar
+    let commentBar = ANICommentBar()
+    commentBar.me = me
+    self.view.addSubview(commentBar)
+    commentBar.leftToSuperview()
+    commentBar.rightToSuperview()
+    commentBarBottomConstraint = commentBar.bottomToSuperview()
+    commentBarOriginalBottomConstraintConstant = commentBarBottomConstraint?.constant
+    self.commentBar = commentBar
+    
     //commentView
     let commentView = ANICommentView()
     self.view.addSubview(commentView)
     commentView.topToBottom(of: myNavigationBar)
-    commentView.edgesToSuperview(excluding: .top)
+    commentView.leftToSuperview()
+    commentView.rightToSuperview()
+    commentView.bottomToTop(of: commentBar)
     self.commentView = commentView
   }
   
@@ -117,6 +137,39 @@ class ANICommentViewController: UIViewController {
         navigationProfileImageView.image = qna.user.profileImage
       }
     }
+  }
+  
+  private func setupNotification() {
+    ANINotificationManager.receive(keyboardWillChangeFrame: self, selector: #selector(keyboardWillChangeFrame))
+    ANINotificationManager.receive(keyboardWillHide: self, selector: #selector(keyboardWillHide))
+  }
+  
+  @objc private func keyboardWillChangeFrame(_ notification: Notification) {
+    guard let keyboardFrame = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
+      let duration = notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as? TimeInterval,
+      let curve = notification.userInfo?[UIKeyboardAnimationCurveUserInfoKey] as? UInt,
+      let commentBarBottomConstraint = self.commentBarBottomConstraint else { return }
+    
+    let h = keyboardFrame.height
+    
+    commentBarBottomConstraint.constant = -h
+    
+    UIView.animate(withDuration: duration, delay: 0, options: UIViewAnimationOptions(rawValue: curve), animations: {
+      self.view.layoutIfNeeded()
+    })
+  }
+  
+  @objc private func keyboardWillHide(_ notification: Notification) {
+    guard let duration = notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as? TimeInterval,
+      let curve = notification.userInfo?[UIKeyboardAnimationCurveUserInfoKey] as? UInt,
+      let commentBarOriginalBottomConstraintConstant = self.commentBarOriginalBottomConstraintConstant,
+      let commentBarBottomConstraint = self.commentBarBottomConstraint else { return }
+    
+    commentBarBottomConstraint.constant = commentBarOriginalBottomConstraintConstant
+    
+    UIView.animate(withDuration: duration, delay: 0, options: UIViewAnimationOptions(rawValue: curve), animations: {
+      self.view.layoutIfNeeded()
+    })
   }
   
   //MARK: Action

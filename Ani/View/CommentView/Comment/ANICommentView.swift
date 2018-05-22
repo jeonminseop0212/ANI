@@ -12,14 +12,12 @@ class ANICommentView: UIView {
   
   private weak var commentTableView: UITableView?
   
-  private let COMMENT_BAR_HEIHGT: CGFloat = 60.0
-  private weak var commentBar: UIView?
-  private weak var commentBarProfileImageView: UIImageView?
-  
   var commentMode: CommentMode?
   
   var story: Story?
   var qna: Qna?
+  
+  private var originalScrollY: CGFloat = 0.0
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -40,23 +38,10 @@ class ANICommentView: UIView {
     let commentCellId = NSStringFromClass(ANICommentCell.self)
     commentTableView.register(ANICommentCell.self, forCellReuseIdentifier: commentCellId)
     commentTableView.dataSource = self
+    commentTableView.delegate = self
     addSubview(commentTableView)
-    commentTableView.edgesToSuperview(excluding: .bottom)
+    commentTableView.edgesToSuperview()
     self.commentTableView = commentTableView
-    
-    //commentBar
-    let commentBar = UIView()
-    commentBar.backgroundColor = .green
-    addSubview(commentBar)
-    commentBar.topToBottom(of: commentTableView)
-    commentBar.height(COMMENT_BAR_HEIHGT)
-    commentBar.edgesToSuperview(excluding: .top)
-    self.commentBar = commentBar
-    
-    //commentBarProfileImageView
-    let commentBarProfileImageView = UIImageView()
-    
-    self.commentBarProfileImageView = commentBarProfileImageView
   }
 }
 
@@ -117,5 +102,18 @@ extension ANICommentView: UITableViewDataSource {
 
       return cell
     }
+  }
+}
+
+extension ANICommentView: UITableViewDelegate {
+  func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    let scrollY = scrollView.contentOffset.y
+    if (originalScrollY - scrollY) > 50 {
+      ANINotificationManager.postViewScrolled()
+    }
+  }
+  
+  func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+    originalScrollY = scrollView.contentOffset.y
   }
 }

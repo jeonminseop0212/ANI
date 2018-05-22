@@ -57,6 +57,7 @@
 		CDDD04A420B269900094DBFA /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDD04A320B269900094DBFA /* Comment.swift */; };
 		CDDD04A620B26CD50094DBFA /* ANICommentContentCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDD04A520B26CD50094DBFA /* ANICommentContentCell.swift */; };
 		CDDD04A820B271090094DBFA /* ANICommentCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDD04A720B271090094DBFA /* ANICommentCell.swift */; };
+		CDDD04AC20B3B0AA0094DBFA /* ANICommentBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDD04AB20B3B0AA0094DBFA /* ANICommentBar.swift */; };
 		CDF7F168208D772300254A0F /* ANINotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF7F167208D772300254A0F /* ANINotificationManager.swift */; };
 		CDF7F16E208F2BEF00254A0F /* UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF7F16D208F2BEF00254A0F /* UIView.swift */; };
 		CDF7F171208F651E00254A0F /* ANIButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF7F170208F651E00254A0F /* ANIButtonView.swift */; };
@@ -192,6 +193,7 @@
 		CDDD04A320B269900094DBFA /* Comment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Comment.swift; sourceTree = "<group>"; };
 		CDDD04A520B26CD50094DBFA /* ANICommentContentCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommentContentCell.swift; sourceTree = "<group>"; };
 		CDDD04A720B271090094DBFA /* ANICommentCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommentCell.swift; sourceTree = "<group>"; };
+		CDDD04AB20B3B0AA0094DBFA /* ANICommentBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommentBar.swift; sourceTree = "<group>"; };
 		CDF7F167208D772300254A0F /* ANINotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotificationManager.swift; sourceTree = "<group>"; };
 		CDF7F16D208F2BEF00254A0F /* UIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIView.swift; sourceTree = "<group>"; };
 		CDF7F170208F651E00254A0F /* ANIButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIButtonView.swift; sourceTree = "<group>"; };
@@ -511,9 +513,8 @@
 		CDA97B5B20B263BE00F46DA4 /* CommentView */ = {
 			isa = PBXGroup;
 			children = (
-				CDA97B5920B263B500F46DA4 /* ANICommentView.swift */,
-				CDDD04A520B26CD50094DBFA /* ANICommentContentCell.swift */,
-				CDDD04A720B271090094DBFA /* ANICommentCell.swift */,
+				CDDD04AA20B3B09C0094DBFA /* Comment */,
+				CDDD04AD20B3B0AF0094DBFA /* CommentBar */,
 			);
 			path = CommentView;
 			sourceTree = "<group>";
@@ -544,6 +545,24 @@
 				CDD0550D20A6B23B00BEF482 /* ANIImageFilterCell.swift */,
 			);
 			path = Filter;
+			sourceTree = "<group>";
+		};
+		CDDD04AA20B3B09C0094DBFA /* Comment */ = {
+			isa = PBXGroup;
+			children = (
+				CDA97B5920B263B500F46DA4 /* ANICommentView.swift */,
+				CDDD04A520B26CD50094DBFA /* ANICommentContentCell.swift */,
+				CDDD04A720B271090094DBFA /* ANICommentCell.swift */,
+			);
+			path = Comment;
+			sourceTree = "<group>";
+		};
+		CDDD04AD20B3B0AF0094DBFA /* CommentBar */ = {
+			isa = PBXGroup;
+			children = (
+				CDDD04AB20B3B0AA0094DBFA /* ANICommentBar.swift */,
+			);
+			path = CommentBar;
 			sourceTree = "<group>";
 		};
 		CDF7F16F208F650600254A0F /* Button */ = {
@@ -1245,6 +1264,7 @@
 				CD6B675420A90F8A009BF63D /* ANIPlaceholderTextView.swift in Sources */,
 				CDA32A2720AA6652008A2AC1 /* ANIPopupPickerView.swift in Sources */,
 				F57F7D5D208313F0008A2645 /* Noti.swift in Sources */,
+				CDDD04AC20B3B0AA0094DBFA /* ANICommentBar.swift in Sources */,
 				CDD0550620A5CF2200BEF482 /* ANIImageFilterPreviewView.swift in Sources */,
 				F5E9E2242076961E0021D4CC /* Recruit.swift in Sources */,
 				CDA32A9420AFE82E008A2AC1 /* ANIProfileQnaImagesCell.swift in Sources */,
