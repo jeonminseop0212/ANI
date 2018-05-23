@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import GrowingTextView
 
 protocol ANICommentBarDelegate {
   func commentContributionButtonTapped(comment: String)
@@ -17,7 +18,7 @@ class ANICommentBar: UIView {
   private weak var profileImageView: UIImageView?
   
   private weak var commentTextViewBG: UIView?
-  private weak var commentTextView: ANIPlaceHolderTextView?
+  private weak var commentTextView: GrowingTextView?
   
   private weak var commentContributionButton: UIButton?
   
@@ -48,6 +49,7 @@ class ANICommentBar: UIView {
     let profileImageView = UIImageView()
     profileImageView.layer.cornerRadius = 40.0 / 2
     profileImageView.layer.masksToBounds = true
+    profileImageView.contentMode = .scaleAspectFill
     addSubview(profileImageView)
     profileImageView.width(40.0)
     profileImageView.height(40.0)
@@ -77,22 +79,26 @@ class ANICommentBar: UIView {
     commentContributionButton.alpha = 0.3
     commentTextViewBG.addSubview(commentContributionButton)
     commentContributionButton.rightToSuperview(offset: 10.0)
-    commentContributionButton.centerY(to: profileImageView, offset: -2.0)
+    commentContributionButton.centerY(to: profileImageView)
     commentContributionButton.height(to: profileImageView)
     commentContributionButton.width(60.0)
     self.commentContributionButton = commentContributionButton
     
     //commentTextView
-    let commentTextView = ANIPlaceHolderTextView()
+    let commentTextView = GrowingTextView()
     commentTextView.textColor = ANIColor.dark
     commentTextView.font = UIFont.systemFont(ofSize: 15.0)
-    commentTextView.placeHolder = "コメント"
-    commentTextView.isScrollEnabled = false
+    commentTextView.placeholder = "コメント"
+    commentTextView.showsVerticalScrollIndicator = false
+    if let lineHeight = commentTextView.font?.lineHeight {
+      commentTextView.minHeight = 30.0
+      commentTextView.maxHeight = lineHeight * 6
+    }
     commentTextView.delegate = self
     commentTextViewBG.addSubview(commentTextView)
-    let insets = UIEdgeInsets(top: 5.0, left: 5.0, bottom: 5.0, right: -5.0)
-    commentTextView.edgesToSuperview(excluding: .right, insets: insets)
-    commentTextView.rightToLeft(of: commentContributionButton, offset: -10.0)
+    let insets = UIEdgeInsets(top: 2.5, left: 5.0, bottom: 2.5, right: -5.0)
+    commentTextView.edgesToSuperview(excluding: .right,insets: insets)
+    commentTextView.rightToLeft(of: commentContributionButton, offset: -5.0)
     self.commentTextView = commentTextView
   }
   
@@ -123,14 +129,13 @@ class ANICommentBar: UIView {
     
     self.delegate?.commentContributionButtonTapped(comment: commentTextView.text)
     commentTextView.text = ""
-    commentTextView.placeHolderLabel.alpha = 1.0
     commentTextView.endEditing(true)
     updateCommentContributionButton(text: commentTextView.text)
   }
 }
 
-//MARK: UITextViewDelegate
-extension ANICommentBar: UITextViewDelegate {
+//MARK: GrowingTextViewDelegate
+extension ANICommentBar: GrowingTextViewDelegate {
   func textViewDidChange(_ textView: UITextView) {
     updateCommentContributionButton(text: textView.text)
   }
