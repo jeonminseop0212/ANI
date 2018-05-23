@@ -58,6 +58,7 @@
 		CDDD04A620B26CD50094DBFA /* ANICommentContentCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDD04A520B26CD50094DBFA /* ANICommentContentCell.swift */; };
 		CDDD04A820B271090094DBFA /* ANICommentCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDD04A720B271090094DBFA /* ANICommentCell.swift */; };
 		CDDD04AC20B3B0AA0094DBFA /* ANICommentBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDD04AB20B3B0AA0094DBFA /* ANICommentBar.swift */; };
+		CDDD04AF20B4F8130094DBFA /* GrowingTextView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CDDD04AE20B4F8130094DBFA /* GrowingTextView.framework */; };
 		CDF7F168208D772300254A0F /* ANINotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF7F167208D772300254A0F /* ANINotificationManager.swift */; };
 		CDF7F16E208F2BEF00254A0F /* UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF7F16D208F2BEF00254A0F /* UIView.swift */; };
 		CDF7F171208F651E00254A0F /* ANIButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF7F170208F651E00254A0F /* ANIButtonView.swift */; };
@@ -194,6 +195,7 @@
 		CDDD04A520B26CD50094DBFA /* ANICommentContentCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommentContentCell.swift; sourceTree = "<group>"; };
 		CDDD04A720B271090094DBFA /* ANICommentCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommentCell.swift; sourceTree = "<group>"; };
 		CDDD04AB20B3B0AA0094DBFA /* ANICommentBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommentBar.swift; sourceTree = "<group>"; };
+		CDDD04AE20B4F8130094DBFA /* GrowingTextView.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GrowingTextView.framework; path = Carthage/Build/iOS/GrowingTextView.framework; sourceTree = "<group>"; };
 		CDF7F167208D772300254A0F /* ANINotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotificationManager.swift; sourceTree = "<group>"; };
 		CDF7F16D208F2BEF00254A0F /* UIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIView.swift; sourceTree = "<group>"; };
 		CDF7F170208F651E00254A0F /* ANIButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIButtonView.swift; sourceTree = "<group>"; };
@@ -274,6 +276,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CDDD04AF20B4F8130094DBFA /* GrowingTextView.framework in Frameworks */,
 				CDA97B5420B2497200F46DA4 /* WCLShineButton.framework in Frameworks */,
 				F5B1EFC520726658000CFB0B /* TinyConstraints.framework in Frameworks */,
 				23BE6C66072673B423ABA35D /* Pods_Ani.framework in Frameworks */,
@@ -876,6 +879,7 @@
 		F5B1EFC320726657000CFB0B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				CDDD04AE20B4F8130094DBFA /* GrowingTextView.framework */,
 				CDA97B5320B2497200F46DA4 /* WCLShineButton.framework */,
 				F5B1EFC420726658000CFB0B /* TinyConstraints.framework */,
 				FD08576705673419CEA26417 /* Pods_Ani.framework */,
@@ -1238,6 +1242,7 @@
 			inputPaths = (
 				"$(SRCROOT)/Carthage/Build/iOS/TinyConstraints.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/WCLShineButton.framework",
+				"$(SRCROOT)/Carthage/Build/iOS/GrowingTextView.framework",
 			);
 			outputPaths = (
 			);
