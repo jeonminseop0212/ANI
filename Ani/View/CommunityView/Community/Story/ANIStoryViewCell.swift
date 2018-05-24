@@ -114,8 +114,8 @@ class ANIStoryViewCell: UITableViewCell {
     addSubview(loveButton)
     loveButton.centerY(to: profileImageView)
     loveButton.rightToLeft(of: loveCountLabel, offset: -10.0)
-    loveButton.width(21.0)
-    loveButton.height(21.0)
+    loveButton.width(20.0)
+    loveButton.height(20.0)
     self.loveButton = loveButton
 
     //userNameLabel
