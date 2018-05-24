@@ -42,7 +42,9 @@ class ANIRecruitContributionViewController: UIViewController {
   private var rejectViewBottomConstraint: Constraint?
   private var rejectViewBottomConstraintOriginalConstant: CGFloat?
   private weak var rejectView: UIView?
+  private weak var rejectBaseView: UIView?
   private weak var rejectLabel: UILabel?
+  private var isRejectAnimating: Bool = false
   
   var pickMode: BasicInfoPickMode? {
     didSet {
@@ -140,16 +142,23 @@ class ANIRecruitContributionViewController: UIViewController {
     rejectView.height(UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT)
     self.rejectView = rejectView
     
+    //rejectBaseView
+    let rejectBaseView = UIView()
+    rejectBaseView.backgroundColor = ANIColor.green
+    rejectView.addSubview(rejectBaseView)
+    rejectBaseView.edgesToSuperview(excluding: .top)
+    rejectBaseView.height(UIViewController.NAVIGATION_BAR_HEIGHT)
+    self.rejectBaseView = rejectBaseView
+    
     //rejectLabel
     let rejectLabel = UILabel()
     rejectLabel.text = "入力してない項目があります！"
     rejectLabel.textColor = .white
+    rejectLabel.textAlignment = .center
     rejectLabel.font = UIFont.boldSystemFont(ofSize: 16.0)
     rejectLabel.textAlignment = .center
-    rejectView.addSubview(rejectLabel)
-    rejectLabel.leftToSuperview()
-    rejectLabel.rightToSuperview()
-    rejectLabel.bottomToSuperview(offset: -15.0)
+    rejectBaseView.addSubview(rejectLabel)
+    rejectLabel.edgesToSuperview()
     self.rejectLabel = rejectLabel
   }
   
@@ -399,7 +408,8 @@ extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
     if view === self.contributeButton {
       guard let recruitContributionView = self.recruitContributionView,
             let recruitInfo = recruitContributionView.getRecruitInfo(),
-            let rejectViewBottomConstraint = self.rejectViewBottomConstraint else { return }
+            let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
+            !isRejectAnimating else { return }
       
       if recruitInfo.headerImage != UIImage(named: "headerDefault") && recruitInfo.title.count > 0 && recruitInfo.kind.count > 0 && recruitInfo.age.count > 0 && recruitInfo.age.count > 0 && recruitInfo.sex.count > 0 && recruitInfo.home.count > 0 && recruitInfo.vaccine.count > 0 && recruitInfo.castration.count > 0 && recruitInfo.reason.count > 0 && recruitInfo.introduce.count > 0 && recruitInfo.passing.count > 0 && !recruitInfo.introduceImages.isEmpty {
         self.delegate?.contributionButtonTapped(recruitInfo: recruitInfo)
@@ -408,6 +418,7 @@ extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
       } else {
         rejectViewBottomConstraint.constant = UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
         UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut, animations: {
+          self.isRejectAnimating = true
           self.view.layoutIfNeeded()
         }) { (complete) in
           guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
@@ -416,7 +427,9 @@ extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
           rejectViewBottomConstraint.constant = rejectViewBottomConstraintOriginalConstant
           UIView.animate(withDuration: 0.3, delay: 1.0, options: .curveEaseInOut, animations: {
             self.view.layoutIfNeeded()
-          }, completion: nil)
+          }, completion: { (complete) in
+            self.isRejectAnimating = false
+          })
         }
       }
     }

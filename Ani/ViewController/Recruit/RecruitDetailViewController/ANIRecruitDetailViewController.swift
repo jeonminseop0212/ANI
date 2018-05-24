@@ -29,7 +29,7 @@ class ANIRecruitDetailViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     setup()
-    setNotification()
+    setupNotification()
   }
   
   private func setup() {
@@ -38,7 +38,6 @@ class ANIRecruitDetailViewController: UIViewController {
     self.navigationController?.setNavigationBarHidden(true, animated: false)
     self.navigationController?.navigationBar.isTranslucent = false
     UIApplication.shared.statusBarStyle = .lightContent
-    statusBarStyle = .lightContent
 
     //recruitDetailView
     let recruitDetailView = ANIRecruitDetailView()
@@ -109,7 +108,7 @@ class ANIRecruitDetailViewController: UIViewController {
     self.applyButtonLabel = applyButtonLabel
   }
   
-  private func setNotification() {
+  private func setupNotification() {
     ANINotificationManager.receive(imageCellTapped: self, selector: #selector(presentImageBrowser(_:)))
   }
   

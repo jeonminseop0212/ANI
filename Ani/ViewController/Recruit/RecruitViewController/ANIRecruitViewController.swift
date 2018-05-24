@@ -43,6 +43,7 @@ class ANIRecruitViewController: UIViewController {
   
   override func viewWillAppear(_ animated: Bool) {
     UIApplication.shared.statusBarStyle = .default
+    UIApplication.shared.statusBar?.isHidden = false
   }
   
   private func setup() {
@@ -118,16 +119,16 @@ class ANIRecruitViewController: UIViewController {
   
   private func setupMe() {
     let familyImages = [UIImage(named: "family1")!, UIImage(named: "family2")!, UIImage(named: "family3")!]
-    let me = User(profileImage: UIImage(named: "meProfileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
+    let me = User(id: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "meProfileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
     
     self.me = me
   }
   
   private func setupTestData() {
     let familyImages = [UIImage(named: "family1")!, UIImage(named: "family2")!, UIImage(named: "family3")!]
-    let user1 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
-    let user2 = User(profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
-    let user3 = User(profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "団体", introduce: "団体で猫たちのためにボランティア活動をしています")
+    let user1 = User(id: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
+    let user2 = User(id: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
+    let user3 = User(id: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "団体", introduce: "団体で猫たちのためにボランティア活動をしています")
     
     let image1 = UIImage(named: "storyCat1")!
     let image2 = UIImage(named: "storyCat2")!

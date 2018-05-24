@@ -9,9 +9,11 @@
 import UIKit
 
 struct User {
+  var id: String
+  var password: String
   var profileImage: UIImage
   var name: String
-  var familyImages: [UIImage]
-  var kind: String
-  var introduce: String
+  var familyImages: [UIImage]?
+  var kind: String?
+  var introduce: String?
 }
