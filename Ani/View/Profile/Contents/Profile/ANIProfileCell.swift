@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ANIProfileProfileCell: UITableViewCell {
+class ANIProfileCell: UITableViewCell {
   
   private weak var nameLabel: UILabel?
   private let PROFILE_EDIT_BUTTON_HEIGHT: CGFloat = 30.0
@@ -107,7 +107,7 @@ class ANIProfileProfileCell: UITableViewCell {
 }
 
 //MARK: ANIButtonViewDelegate
-extension ANIProfileProfileCell: ANIButtonViewDelegate {
+extension ANIProfileCell: ANIButtonViewDelegate {
   func buttonViewTapped(view: ANIButtonView) {
     if view === self.profileEditButton {
       ANINotificationManager.postProfileEditButtonTapped()
