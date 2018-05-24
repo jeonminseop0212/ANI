@@ -10,6 +10,8 @@ import UIKit
 
 class ANITabBarController: UITabBarController {
 
+  static var isLogin: Bool = false
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     //tabBar上の線を消す
@@ -40,5 +42,20 @@ class ANITabBarController: UITabBarController {
     let profileNV = UINavigationController(rootViewController: profileVC)
     
     setViewControllers([recruitNV, communityNV, notiNV, searchNV, profileNV], animated: false)
+  }
+  
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(true)
+    
+    if !ANITabBarController.isLogin {
+      showInitialView()
+    }
+  }
+  
+  private func showInitialView() {
+    //TODO: 初めての開いた、アカウントがない場合だけinitialviewを開く
+    let initialViewController = ANIInitialViewController()
+    let initialNV = UINavigationController(rootViewController: initialViewController)
+    self.present(initialNV, animated: true, completion: nil)
   }
 }

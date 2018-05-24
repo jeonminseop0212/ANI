@@ -45,15 +45,19 @@ class ANIFamilyView: UIView {
 
 extension ANIFamilyView: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-    guard let user = self.user else { return 0 }
-    return user.familyImages.count
+    guard let user = self.user,
+          let familyImages = user.familyImages else { return 0 }
+    
+    return familyImages.count
   }
   
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-    guard let user = self.user else { return UICollectionViewCell() }
+    guard let user = self.user,
+          let familyImages = user.familyImages else { return UICollectionViewCell() }
+    
     let id = NSStringFromClass(ANIFamilyViewCell.self)
     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! ANIFamilyViewCell
-    cell.familyImageView?.image = user.familyImages[indexPath.item]
+    cell.familyImageView?.image = familyImages[indexPath.item]
     return cell
   }
   

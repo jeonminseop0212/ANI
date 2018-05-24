@@ -15,6 +15,8 @@
 		CD08A7712091975500F0B72D /* UIApplication.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD08A7702091975500F0B72D /* UIApplication.swift */; };
 		CD2C414520A556AE00581267 /* ANIRecruitContributionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2C414420A556AE00581267 /* ANIRecruitContributionViewController.swift */; };
 		CD2C414820A5A23C00581267 /* ANIImageFilterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2C414720A5A23C00581267 /* ANIImageFilterViewController.swift */; };
+		CD6229DC20B64A6400E36875 /* ANISignUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6229DB20B64A6400E36875 /* ANISignUpViewController.swift */; };
+		CD6229DE20B64B9900E36875 /* ANISignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6229DD20B64B9900E36875 /* ANISignUpView.swift */; };
 		CD6B675120A8844B009BF63D /* ANIRecruitContributionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6B675020A8844B009BF63D /* ANIRecruitContributionView.swift */; };
 		CD6B675420A90F8A009BF63D /* ANIPlaceholderTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6B675320A90F8A009BF63D /* ANIPlaceholderTextView.swift */; };
 		CD9E52B120921EB400715F50 /* UIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD9E52B020921EB400715F50 /* UIViewController.swift */; };
@@ -59,6 +61,10 @@
 		CDDD04A820B271090094DBFA /* ANICommentCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDD04A720B271090094DBFA /* ANICommentCell.swift */; };
 		CDDD04AC20B3B0AA0094DBFA /* ANICommentBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDD04AB20B3B0AA0094DBFA /* ANICommentBar.swift */; };
 		CDDD04AF20B4F8130094DBFA /* GrowingTextView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CDDD04AE20B4F8130094DBFA /* GrowingTextView.framework */; };
+		CDDD04B320B50FEA0094DBFA /* ANIInitialViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDD04B220B50FEA0094DBFA /* ANIInitialViewController.swift */; };
+		CDDD04BA20B538540094DBFA /* ANILoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDD04B920B538540094DBFA /* ANILoginViewController.swift */; };
+		CDDD04C020B53A8B0094DBFA /* ANIInitialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDD04BF20B53A8B0094DBFA /* ANIInitialView.swift */; };
+		CDDD04C520B53C870094DBFA /* ANILoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDD04C420B53C870094DBFA /* ANILoginView.swift */; };
 		CDF7F168208D772300254A0F /* ANINotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF7F167208D772300254A0F /* ANINotificationManager.swift */; };
 		CDF7F16E208F2BEF00254A0F /* UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF7F16D208F2BEF00254A0F /* UIView.swift */; };
 		CDF7F171208F651E00254A0F /* ANIButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF7F170208F651E00254A0F /* ANIButtonView.swift */; };
@@ -152,6 +158,8 @@
 		CD08A7702091975500F0B72D /* UIApplication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIApplication.swift; sourceTree = "<group>"; };
 		CD2C414420A556AE00581267 /* ANIRecruitContributionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitContributionViewController.swift; sourceTree = "<group>"; };
 		CD2C414720A5A23C00581267 /* ANIImageFilterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIImageFilterViewController.swift; sourceTree = "<group>"; };
+		CD6229DB20B64A6400E36875 /* ANISignUpViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANISignUpViewController.swift; sourceTree = "<group>"; };
+		CD6229DD20B64B9900E36875 /* ANISignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANISignUpView.swift; sourceTree = "<group>"; };
 		CD6B675020A8844B009BF63D /* ANIRecruitContributionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitContributionView.swift; sourceTree = "<group>"; };
 		CD6B675320A90F8A009BF63D /* ANIPlaceholderTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIPlaceholderTextView.swift; sourceTree = "<group>"; };
 		CD9E52B020921EB400715F50 /* UIViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewController.swift; sourceTree = "<group>"; };
@@ -196,6 +204,10 @@
 		CDDD04A720B271090094DBFA /* ANICommentCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommentCell.swift; sourceTree = "<group>"; };
 		CDDD04AB20B3B0AA0094DBFA /* ANICommentBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommentBar.swift; sourceTree = "<group>"; };
 		CDDD04AE20B4F8130094DBFA /* GrowingTextView.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GrowingTextView.framework; path = Carthage/Build/iOS/GrowingTextView.framework; sourceTree = "<group>"; };
+		CDDD04B220B50FEA0094DBFA /* ANIInitialViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIInitialViewController.swift; sourceTree = "<group>"; };
+		CDDD04B920B538540094DBFA /* ANILoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANILoginViewController.swift; sourceTree = "<group>"; };
+		CDDD04BF20B53A8B0094DBFA /* ANIInitialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIInitialView.swift; sourceTree = "<group>"; };
+		CDDD04C420B53C870094DBFA /* ANILoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANILoginView.swift; sourceTree = "<group>"; };
 		CDF7F167208D772300254A0F /* ANINotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotificationManager.swift; sourceTree = "<group>"; };
 		CDF7F16D208F2BEF00254A0F /* UIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIView.swift; sourceTree = "<group>"; };
 		CDF7F170208F651E00254A0F /* ANIButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIButtonView.swift; sourceTree = "<group>"; };
@@ -568,6 +580,83 @@
 			path = CommentBar;
 			sourceTree = "<group>";
 		};
+		CDDD04B120B50FCE0094DBFA /* InitialViewController */ = {
+			isa = PBXGroup;
+			children = (
+				CDDD04B220B50FEA0094DBFA /* ANIInitialViewController.swift */,
+			);
+			path = InitialViewController;
+			sourceTree = "<group>";
+		};
+		CDDD04B520B5381B0094DBFA /* Initial */ = {
+			isa = PBXGroup;
+			children = (
+				CDDD04B120B50FCE0094DBFA /* InitialViewController */,
+				CDDD04B820B538400094DBFA /* Login */,
+				CDDD04BB20B539EE0094DBFA /* SignUp */,
+			);
+			path = Initial;
+			sourceTree = "<group>";
+		};
+		CDDD04B720B5382D0094DBFA /* Recruit */ = {
+			isa = PBXGroup;
+			children = (
+				F5B1EFBF20725B79000CFB0B /* RecruitViewController */,
+				CD08A72F20915BDF00F0B72D /* RecruitDetailViewController */,
+			);
+			path = Recruit;
+			sourceTree = "<group>";
+		};
+		CDDD04B820B538400094DBFA /* Login */ = {
+			isa = PBXGroup;
+			children = (
+				CDDD04B920B538540094DBFA /* ANILoginViewController.swift */,
+			);
+			path = Login;
+			sourceTree = "<group>";
+		};
+		CDDD04BB20B539EE0094DBFA /* SignUp */ = {
+			isa = PBXGroup;
+			children = (
+				CD6229DB20B64A6400E36875 /* ANISignUpViewController.swift */,
+			);
+			path = SignUp;
+			sourceTree = "<group>";
+		};
+		CDDD04BE20B53A7C0094DBFA /* InitialView */ = {
+			isa = PBXGroup;
+			children = (
+				CDDD04BF20B53A8B0094DBFA /* ANIInitialView.swift */,
+			);
+			path = InitialView;
+			sourceTree = "<group>";
+		};
+		CDDD04C120B53C110094DBFA /* Initial */ = {
+			isa = PBXGroup;
+			children = (
+				CDDD04BE20B53A7C0094DBFA /* InitialView */,
+				CDDD04C220B53C1A0094DBFA /* LoginView */,
+				CDDD04C320B53C760094DBFA /* SignUpView */,
+			);
+			path = Initial;
+			sourceTree = "<group>";
+		};
+		CDDD04C220B53C1A0094DBFA /* LoginView */ = {
+			isa = PBXGroup;
+			children = (
+				CDDD04C420B53C870094DBFA /* ANILoginView.swift */,
+			);
+			path = LoginView;
+			sourceTree = "<group>";
+		};
+		CDDD04C320B53C760094DBFA /* SignUpView */ = {
+			isa = PBXGroup;
+			children = (
+				CD6229DD20B64B9900E36875 /* ANISignUpView.swift */,
+			);
+			path = SignUpView;
+			sourceTree = "<group>";
+		};
 		CDF7F16F208F650600254A0F /* Button */ = {
 			isa = PBXGroup;
 			children = (
@@ -929,8 +1018,8 @@
 		F5E9E2302079AF8C0021D4CC /* ViewController */ = {
 			isa = PBXGroup;
 			children = (
-				F5B1EFBF20725B79000CFB0B /* RecruitViewController */,
-				CD08A72F20915BDF00F0B72D /* RecruitDetailViewController */,
+				CDDD04B520B5381B0094DBFA /* Initial */,
+				CDDD04B720B5382D0094DBFA /* Recruit */,
 				F5E9E2312079AFA40021D4CC /* CommunityViewController */,
 				F57F7D482081F3A1008A2645 /* NotiViewController */,
 				F57F7D8620844A62008A2645 /* SearchViewController */,
@@ -953,6 +1042,7 @@
 		F5E9E2342079B1660021D4CC /* View */ = {
 			isa = PBXGroup;
 			children = (
+				CDDD04C120B53C110094DBFA /* Initial */,
 				F56634842075265E006CB81B /* RecruitView */,
 				F5E9E2352079B16F0021D4CC /* CommunityView */,
 				F57F7D4B2081FC26008A2645 /* NotiView */,
@@ -1274,6 +1364,7 @@
 				F5E9E2242076961E0021D4CC /* Recruit.swift in Sources */,
 				CDA32A9420AFE82E008A2AC1 /* ANIProfileQnaImagesCell.swift in Sources */,
 				F57F7D63208323F9008A2645 /* Message.swift in Sources */,
+				CDDD04C520B53C870094DBFA /* ANILoginView.swift in Sources */,
 				CDA97AC620AFF34C00F46DA4 /* ANIProfileEditViewController.swift in Sources */,
 				F5DF835D207A17C200EA7FBE /* ANICommunityQnaCell.swift in Sources */,
 				CDD0550C20A5D29900BEF482 /* ANIImageFilterView.swift in Sources */,
@@ -1309,12 +1400,14 @@
 				CDD0550E20A6B23B00BEF482 /* ANIImageFilterCell.swift in Sources */,
 				CDA32A2320AA6041008A2AC1 /* ANIPopupPickerViewController.swift in Sources */,
 				F566348320752656006CB81B /* ANIRecruitCategoriesView.swift in Sources */,
+				CD6229DC20B64A6400E36875 /* ANISignUpViewController.swift in Sources */,
 				CDA32A2B20ABBC20008A2AC1 /* ANIRecruitContributionImagesCell.swift in Sources */,
 				CDF7F174208F658E00254A0F /* ANIImageButtonView.swift in Sources */,
 				CD08A72E20915BD700F0B72D /* ANIRecruitDetailView.swift in Sources */,
 				CDA32A7B20AE7007008A2AC1 /* ANIQnaImagesCell.swift in Sources */,
 				F5DF8365207A27DC00EA7FBE /* ANIStoryViewCell.swift in Sources */,
 				F5E9E22F2079AEC30021D4CC /* Orientation.swift in Sources */,
+				CDDD04B320B50FEA0094DBFA /* ANIInitialViewController.swift in Sources */,
 				F5E9E2372079B1900021D4CC /* ANICommunityMenuBar.swift in Sources */,
 				CDA32A3A20AD22E7008A2AC1 /* ANIContributionImagesView.swift in Sources */,
 				CDA32A3520AC14C0008A2AC1 /* ANIContributionViewController.swift in Sources */,
@@ -1330,6 +1423,7 @@
 				CDA97ACC20B000FF00F46DA4 /* ANIProfileEditFamilyView.swift in Sources */,
 				F530AB1C207A45D900114E6B /* ANIStoryImagesCell.swift in Sources */,
 				CDA32A8D20AFE594008A2AC1 /* ANIProfileStoryImagesView.swift in Sources */,
+				CD6229DE20B64B9900E36875 /* ANISignUpView.swift in Sources */,
 				CDF7F16E208F2BEF00254A0F /* UIView.swift in Sources */,
 				CDDD04A420B269900094DBFA /* Comment.swift in Sources */,
 				CDA32A7920AE6B17008A2AC1 /* ANIQnaImagesView.swift in Sources */,
@@ -1338,6 +1432,7 @@
 				CDA97B5820B25F3B00F46DA4 /* ANICommentViewController.swift in Sources */,
 				CDA32A1320A93422008A2AC1 /* ANIScrollView.swift in Sources */,
 				CDD0551020A6C64300BEF482 /* ANIFilter.swift in Sources */,
+				CDDD04BA20B538540094DBFA /* ANILoginViewController.swift in Sources */,
 				F57F7D9120844DC2008A2645 /* ANIUserSearchView.swift in Sources */,
 				CD9E52B7209441C900715F50 /* ANIRecruitDetailImagesViewCell.swift in Sources */,
 				CDDD04A820B271090094DBFA /* ANICommentCell.swift in Sources */,
@@ -1346,6 +1441,7 @@
 				F5E9E22620769AD60021D4CC /* User.swift in Sources */,
 				CD9E52BB2094614400715F50 /* ANIAreaButtonView.swift in Sources */,
 				F53E87BA208468DF00B19A2F /* ANIStorySearchView.swift in Sources */,
+				CDDD04C020B53A8B0094DBFA /* ANIInitialView.swift in Sources */,
 				CDA32A2920ABBA21008A2AC1 /* ANIRecruitContributionImagesView.swift in Sources */,
 				CD08A73120915C2A00F0B72D /* ANIRecruitDetailViewController.swift in Sources */,
 				F53E87C62085F13800B19A2F /* ANIProfileMenuBar.swift in Sources */,
