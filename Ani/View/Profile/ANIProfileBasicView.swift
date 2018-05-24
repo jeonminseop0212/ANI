@@ -49,14 +49,14 @@ class ANIProfileBasicView: UIView {
     basicTableView.dataSource = self
     let topCellId = NSStringFromClass(ANIProfileTopCell.self)
     basicTableView.register(ANIProfileTopCell.self, forCellReuseIdentifier: topCellId)
-    let profileCellid = NSStringFromClass(ANIProfileProfileCell.self)
-    basicTableView.register(ANIProfileProfileCell.self, forCellReuseIdentifier: profileCellid)
-    let recruitCellid = NSStringFromClass(ANIProfileRecruitCell.self)
-    basicTableView.register(ANIProfileRecruitCell.self, forCellReuseIdentifier: recruitCellid)
-    let storyCellid = NSStringFromClass(ANIProfileStoryCell.self)
-    basicTableView.register(ANIProfileStoryCell.self, forCellReuseIdentifier: storyCellid)
-    let qnaCellid = NSStringFromClass(ANIProfileQnaCell.self)
-    basicTableView.register(ANIProfileQnaCell.self, forCellReuseIdentifier: qnaCellid)
+    let profileCellid = NSStringFromClass(ANIProfileCell.self)
+    basicTableView.register(ANIProfileCell.self, forCellReuseIdentifier: profileCellid)
+    let recruitCellid = NSStringFromClass(ANIRecruitViewCell.self)
+    basicTableView.register(ANIRecruitViewCell.self, forCellReuseIdentifier: recruitCellid)
+    let storyCellid = NSStringFromClass(ANIStoryViewCell.self)
+    basicTableView.register(ANIStoryViewCell.self, forCellReuseIdentifier: storyCellid)
+    let qnaCellid = NSStringFromClass(ANIQnaViewCell.self)
+    basicTableView.register(ANIQnaViewCell.self, forCellReuseIdentifier: qnaCellid)
     addSubview(basicTableView)
     basicTableView.edgesToSuperview()
     self.basicTableView = basicTableView
@@ -164,41 +164,30 @@ extension ANIProfileBasicView: UITableViewDataSource {
       if contentType == .profile {
         guard let user = self.user else { return UITableViewCell() }
         
-        let profileCellid = NSStringFromClass(ANIProfileProfileCell.self)
-        let cell = tableView.dequeueReusableCell(withIdentifier: profileCellid, for: indexPath) as! ANIProfileProfileCell
+        let profileCellid = NSStringFromClass(ANIProfileCell.self)
+        let cell = tableView.dequeueReusableCell(withIdentifier: profileCellid, for: indexPath) as! ANIProfileCell
         cell.user = user
         return cell
       } else if contentType == .recruit {
-        let recruitCellid = NSStringFromClass(ANIProfileRecruitCell.self)
-        let cell = tableView.dequeueReusableCell(withIdentifier: recruitCellid, for: indexPath) as! ANIProfileRecruitCell
-        cell.recruitImageView.image = recruits[indexPath.item].recruitInfo.headerImage
-        cell.titleLabel.text = recruits[indexPath.item].recruitInfo.title
-        cell.subTitleLabel.text = recruits[indexPath.item].recruitInfo.reason
-        cell.profileImageView.image = recruits[indexPath.item].user.profileImage
-        cell.userNameLabel.text = recruits[indexPath.item].user.name
-        cell.supportCountLabel.text = "\(recruits[indexPath.item].supportCount)"
-        cell.loveCountLabel.text = "\(recruits[indexPath.item].loveCount)"
+        let recruitCellid = NSStringFromClass(ANIRecruitViewCell.self)
+        let cell = tableView.dequeueReusableCell(withIdentifier: recruitCellid, for: indexPath) as! ANIRecruitViewCell
+        
+        cell.recruit = recruits[indexPath.row]
+
         return cell
       } else if contentType == .story {
-        let storyCellid = NSStringFromClass(ANIProfileStoryCell.self)
-        let cell = tableView.dequeueReusableCell(withIdentifier: storyCellid, for: indexPath) as! ANIProfileStoryCell
-        cell.storyImagesView.images = storys[indexPath.item].storyImages
-        cell.storyImagesView.pageControl?.numberOfPages = storys[indexPath.item].storyImages.count
-        cell.subTitleLabel.text = storys[indexPath.item].story
-        cell.profileImageView.image = storys[indexPath.item].user.profileImage
-        cell.userNameLabel.text = storys[indexPath.item].user.name
-        cell.loveCountLabel.text = "\(storys[indexPath.item].loveCount)"
-        cell.commentCountLabel.text = "\(storys[indexPath.item].commentCount)"
+        let storyCellid = NSStringFromClass(ANIStoryViewCell.self)
+        let cell = tableView.dequeueReusableCell(withIdentifier: storyCellid, for: indexPath) as! ANIStoryViewCell
+        
+        cell.story = storys[indexPath.row]
+
         return cell
       } else {
-        let qnaCellid = NSStringFromClass(ANIProfileQnaCell.self)
-        let cell = tableView.dequeueReusableCell(withIdentifier: qnaCellid, for: indexPath) as! ANIProfileQnaCell
-        cell.subTitleLabel.text = qnas[indexPath.item].qna
-        cell.qnaImagesView.images = qnas[indexPath.item].qnaImages
-        cell.profileImageView.image = qnas[indexPath.item].user.profileImage
-        cell.userNameLabel.text = qnas[indexPath.item].user.name
-        cell.loveCountLabel.text = "\(qnas[indexPath.item].loveCount)"
-        cell.commentCountLabel.text = "\(qnas[indexPath.item].commentCount)"
+        let qnaCellid = NSStringFromClass(ANIQnaViewCell.self)
+        let cell = tableView.dequeueReusableCell(withIdentifier: qnaCellid, for: indexPath) as! ANIQnaViewCell
+        
+        cell.qna = qnas[indexPath.row]
+
         return cell
       }
     }

@@ -40,10 +40,6 @@
 		CDA32A8320AE7B02008A2AC1 /* ANIImageBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A8220AE7B02008A2AC1 /* ANIImageBrowserViewController.swift */; };
 		CDA32A8620AE8DD4008A2AC1 /* ANIImageBrowserCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A8520AE8DD4008A2AC1 /* ANIImageBrowserCell.swift */; };
 		CDA32A8A20AEA7BC008A2AC1 /* ANIDraggableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A8920AEA7BC008A2AC1 /* ANIDraggableView.swift */; };
-		CDA32A8D20AFE594008A2AC1 /* ANIProfileStoryImagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A8C20AFE594008A2AC1 /* ANIProfileStoryImagesView.swift */; };
-		CDA32A8F20AFE5A9008A2AC1 /* ANIProfileStoryImagesCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A8E20AFE5A9008A2AC1 /* ANIProfileStoryImagesCell.swift */; };
-		CDA32A9220AFE803008A2AC1 /* ANIProfileQnaImagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A9120AFE803008A2AC1 /* ANIProfileQnaImagesView.swift */; };
-		CDA32A9420AFE82E008A2AC1 /* ANIProfileQnaImagesCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A9320AFE82E008A2AC1 /* ANIProfileQnaImagesCell.swift */; };
 		CDA97AC620AFF34C00F46DA4 /* ANIProfileEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA97AC520AFF34C00F46DA4 /* ANIProfileEditViewController.swift */; };
 		CDA97AC920AFFFEC00F46DA4 /* ANIProfileEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA97AC820AFFFEC00F46DA4 /* ANIProfileEditView.swift */; };
 		CDA97ACC20B000FF00F46DA4 /* ANIProfileEditFamilyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA97ACB20B000FF00F46DA4 /* ANIProfileEditFamilyView.swift */; };
@@ -82,7 +78,7 @@
 		F53E87C32085B50900B19A2F /* ANIFamilyViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F53E87C22085B50900B19A2F /* ANIFamilyViewCell.swift */; };
 		F53E87C62085F13800B19A2F /* ANIProfileMenuBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F53E87C52085F13800B19A2F /* ANIProfileMenuBar.swift */; };
 		F53E87C82085F5FA00B19A2F /* ANIProfileMenuBarCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F53E87C72085F5FA00B19A2F /* ANIProfileMenuBarCell.swift */; };
-		F53E87D02086EF6600B19A2F /* ANIProfileProfileCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F53E87CF2086EF6600B19A2F /* ANIProfileProfileCell.swift */; };
+		F53E87D02086EF6600B19A2F /* ANIProfileCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F53E87CF2086EF6600B19A2F /* ANIProfileCell.swift */; };
 		F566348320752656006CB81B /* ANIRecruitCategoriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F566348220752656006CB81B /* ANIRecruitCategoriesView.swift */; };
 		F56634862075285D006CB81B /* ANIRecruitCategoryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F56634852075285D006CB81B /* ANIRecruitCategoryCell.swift */; };
 		F57F7D4A2081F43F008A2645 /* ANINotiViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57F7D492081F43F008A2645 /* ANINotiViewController.swift */; };
@@ -125,9 +121,6 @@
 		F5E9E23D2079C10C0021D4CC /* ANIStoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E23C2079C10C0021D4CC /* ANIStoryView.swift */; };
 		F5F5300C2088599D0076E938 /* ANIProfileBasicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5F5300B2088599D0076E938 /* ANIProfileBasicView.swift */; };
 		F5F5300F20885E820076E938 /* ANIProfileTopCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5F5300E20885E820076E938 /* ANIProfileTopCell.swift */; };
-		F5F530142088624E0076E938 /* ANIProfileRecruitCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5F530132088624E0076E938 /* ANIProfileRecruitCell.swift */; };
-		F5F53016208863040076E938 /* ANIProfileStoryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5F53015208863040076E938 /* ANIProfileStoryCell.swift */; };
-		F5F530182088631A0076E938 /* ANIProfileQnaCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5F530172088631A0076E938 /* ANIProfileQnaCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -183,10 +176,6 @@
 		CDA32A8220AE7B02008A2AC1 /* ANIImageBrowserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIImageBrowserViewController.swift; sourceTree = "<group>"; };
 		CDA32A8520AE8DD4008A2AC1 /* ANIImageBrowserCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIImageBrowserCell.swift; sourceTree = "<group>"; };
 		CDA32A8920AEA7BC008A2AC1 /* ANIDraggableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIDraggableView.swift; sourceTree = "<group>"; };
-		CDA32A8C20AFE594008A2AC1 /* ANIProfileStoryImagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIProfileStoryImagesView.swift; sourceTree = "<group>"; };
-		CDA32A8E20AFE5A9008A2AC1 /* ANIProfileStoryImagesCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIProfileStoryImagesCell.swift; sourceTree = "<group>"; };
-		CDA32A9120AFE803008A2AC1 /* ANIProfileQnaImagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIProfileQnaImagesView.swift; sourceTree = "<group>"; };
-		CDA32A9320AFE82E008A2AC1 /* ANIProfileQnaImagesCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIProfileQnaImagesCell.swift; sourceTree = "<group>"; };
 		CDA97AC520AFF34C00F46DA4 /* ANIProfileEditViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIProfileEditViewController.swift; sourceTree = "<group>"; };
 		CDA97AC820AFFFEC00F46DA4 /* ANIProfileEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIProfileEditView.swift; sourceTree = "<group>"; };
 		CDA97ACB20B000FF00F46DA4 /* ANIProfileEditFamilyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIProfileEditFamilyView.swift; sourceTree = "<group>"; };
@@ -227,7 +216,7 @@
 		F53E87C22085B50900B19A2F /* ANIFamilyViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIFamilyViewCell.swift; sourceTree = "<group>"; };
 		F53E87C52085F13800B19A2F /* ANIProfileMenuBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIProfileMenuBar.swift; sourceTree = "<group>"; };
 		F53E87C72085F5FA00B19A2F /* ANIProfileMenuBarCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIProfileMenuBarCell.swift; sourceTree = "<group>"; };
-		F53E87CF2086EF6600B19A2F /* ANIProfileProfileCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIProfileProfileCell.swift; sourceTree = "<group>"; };
+		F53E87CF2086EF6600B19A2F /* ANIProfileCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIProfileCell.swift; sourceTree = "<group>"; };
 		F566348220752656006CB81B /* ANIRecruitCategoriesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitCategoriesView.swift; sourceTree = "<group>"; };
 		F56634852075285D006CB81B /* ANIRecruitCategoryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitCategoryCell.swift; sourceTree = "<group>"; };
 		F57F7D492081F43F008A2645 /* ANINotiViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotiViewController.swift; sourceTree = "<group>"; };
@@ -276,9 +265,6 @@
 		F5E9E23C2079C10C0021D4CC /* ANIStoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIStoryView.swift; sourceTree = "<group>"; };
 		F5F5300B2088599D0076E938 /* ANIProfileBasicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIProfileBasicView.swift; sourceTree = "<group>"; };
 		F5F5300E20885E820076E938 /* ANIProfileTopCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIProfileTopCell.swift; sourceTree = "<group>"; };
-		F5F530132088624E0076E938 /* ANIProfileRecruitCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIProfileRecruitCell.swift; sourceTree = "<group>"; };
-		F5F53015208863040076E938 /* ANIProfileStoryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIProfileStoryCell.swift; sourceTree = "<group>"; };
-		F5F530172088631A0076E938 /* ANIProfileQnaCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIProfileQnaCell.swift; sourceTree = "<group>"; };
 		F8BF8D21240D7035E50361DD /* Pods-Ani.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Ani.release.xcconfig"; path = "Pods/Target Support Files/Pods-Ani/Pods-Ani.release.xcconfig"; sourceTree = "<group>"; };
 		FD08576705673419CEA26417 /* Pods_Ani.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Ani.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -471,24 +457,6 @@
 				CDA32A8920AEA7BC008A2AC1 /* ANIDraggableView.swift */,
 			);
 			path = ImageBrowserView;
-			sourceTree = "<group>";
-		};
-		CDA32A8B20AFE577008A2AC1 /* ImagesView */ = {
-			isa = PBXGroup;
-			children = (
-				CDA32A8C20AFE594008A2AC1 /* ANIProfileStoryImagesView.swift */,
-				CDA32A8E20AFE5A9008A2AC1 /* ANIProfileStoryImagesCell.swift */,
-			);
-			path = ImagesView;
-			sourceTree = "<group>";
-		};
-		CDA32A9020AFE7DB008A2AC1 /* imagesView */ = {
-			isa = PBXGroup;
-			children = (
-				CDA32A9120AFE803008A2AC1 /* ANIProfileQnaImagesView.swift */,
-				CDA32A9320AFE82E008A2AC1 /* ANIProfileQnaImagesCell.swift */,
-			);
-			path = imagesView;
 			sourceTree = "<group>";
 		};
 		CDA97AC420AFF33200F46DA4 /* ProfileEditViewController */ = {
@@ -770,9 +738,6 @@
 			isa = PBXGroup;
 			children = (
 				F53E87CA20861A5B00B19A2F /* Profile */,
-				F5F530112088621A0076E938 /* Recruit */,
-				F5F53010208862140076E938 /* Story */,
-				F5F530122088621F0076E938 /* Qna */,
 			);
 			path = Contents;
 			sourceTree = "<group>";
@@ -780,7 +745,7 @@
 		F53E87CA20861A5B00B19A2F /* Profile */ = {
 			isa = PBXGroup;
 			children = (
-				F53E87CF2086EF6600B19A2F /* ANIProfileProfileCell.swift */,
+				F53E87CF2086EF6600B19A2F /* ANIProfileCell.swift */,
 			);
 			path = Profile;
 			sourceTree = "<group>";
@@ -1092,32 +1057,6 @@
 			path = Top;
 			sourceTree = "<group>";
 		};
-		F5F53010208862140076E938 /* Story */ = {
-			isa = PBXGroup;
-			children = (
-				F5F53015208863040076E938 /* ANIProfileStoryCell.swift */,
-				CDA32A8B20AFE577008A2AC1 /* ImagesView */,
-			);
-			path = Story;
-			sourceTree = "<group>";
-		};
-		F5F530112088621A0076E938 /* Recruit */ = {
-			isa = PBXGroup;
-			children = (
-				F5F530132088624E0076E938 /* ANIProfileRecruitCell.swift */,
-			);
-			path = Recruit;
-			sourceTree = "<group>";
-		};
-		F5F530122088621F0076E938 /* Qna */ = {
-			isa = PBXGroup;
-			children = (
-				F5F530172088631A0076E938 /* ANIProfileQnaCell.swift */,
-				CDA32A9020AFE7DB008A2AC1 /* imagesView */,
-			);
-			path = Qna;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -1362,7 +1301,6 @@
 				CDDD04AC20B3B0AA0094DBFA /* ANICommentBar.swift in Sources */,
 				CDD0550620A5CF2200BEF482 /* ANIImageFilterPreviewView.swift in Sources */,
 				F5E9E2242076961E0021D4CC /* Recruit.swift in Sources */,
-				CDA32A9420AFE82E008A2AC1 /* ANIProfileQnaImagesCell.swift in Sources */,
 				F57F7D63208323F9008A2645 /* Message.swift in Sources */,
 				CDDD04C520B53C870094DBFA /* ANILoginView.swift in Sources */,
 				CDA97AC620AFF34C00F46DA4 /* ANIProfileEditViewController.swift in Sources */,
@@ -1372,12 +1310,11 @@
 				CD9E52B32094304700715F50 /* ANIRecruitDetailImagesView.swift in Sources */,
 				F57F7D652083250D008A2645 /* ANIMessageViewCell.swift in Sources */,
 				F51D221920768E8D009D1B26 /* ANIRecuruitView.swift in Sources */,
-				F53E87D02086EF6600B19A2F /* ANIProfileProfileCell.swift in Sources */,
+				F53E87D02086EF6600B19A2F /* ANIProfileCell.swift in Sources */,
 				CDA97ACE20B0018600F46DA4 /* ANIProfileEditFamilyCell.swift in Sources */,
 				CDA32A8620AE8DD4008A2AC1 /* ANIImageBrowserCell.swift in Sources */,
 				CDF7F171208F651E00254A0F /* ANIButtonView.swift in Sources */,
 				F57F7D8E20844C4E008A2645 /* ANISearchCategoryCell.swift in Sources */,
-				F5F530182088631A0076E938 /* ANIProfileQnaCell.swift in Sources */,
 				F53E87C12085B19700B19A2F /* ANIFamilyView.swift in Sources */,
 				CD9E52B520943C9500715F50 /* ANIRecruitDetailImagesViewFlowLayout.swift in Sources */,
 				F5C381FF207A068D000BBB8C /* ANIQnaView.swift in Sources */,
@@ -1388,7 +1325,6 @@
 				F57F7D5F208314DF008A2645 /* ANINotiViewCell.swift in Sources */,
 				F57F7D552081FEB2008A2645 /* ANINotiNotiCell.swift in Sources */,
 				F5B5149A207AEDC300366500 /* Qna.swift in Sources */,
-				CDA32A8F20AFE5A9008A2AC1 /* ANIProfileStoryImagesCell.swift in Sources */,
 				F521184C207A4421000B12C2 /* ANIStoryImagesView.swift in Sources */,
 				CD2C414820A5A23C00581267 /* ANIImageFilterViewController.swift in Sources */,
 				F53E87C32085B50900B19A2F /* ANIFamilyViewCell.swift in Sources */,
@@ -1413,7 +1349,6 @@
 				CDA32A3520AC14C0008A2AC1 /* ANIContributionViewController.swift in Sources */,
 				F53E87BD2085AFC700B19A2F /* ANIProfileViewController.swift in Sources */,
 				F5B1EF9320725964000CFB0B /* ANIRecruitViewController.swift in Sources */,
-				F5F53016208863040076E938 /* ANIProfileStoryCell.swift in Sources */,
 				F51D221520768B24009D1B26 /* UISearchBar.swift in Sources */,
 				F5E9E2392079B9D20021D4CC /* ANICommunityMenuBarCell.swift in Sources */,
 				F5E9E23D2079C10C0021D4CC /* ANIStoryView.swift in Sources */,
@@ -1422,7 +1357,6 @@
 				F57F7D572081FEBF008A2645 /* ANINotiMessageCell.swift in Sources */,
 				CDA97ACC20B000FF00F46DA4 /* ANIProfileEditFamilyView.swift in Sources */,
 				F530AB1C207A45D900114E6B /* ANIStoryImagesCell.swift in Sources */,
-				CDA32A8D20AFE594008A2AC1 /* ANIProfileStoryImagesView.swift in Sources */,
 				CD6229DE20B64B9900E36875 /* ANISignUpView.swift in Sources */,
 				CDF7F16E208F2BEF00254A0F /* UIView.swift in Sources */,
 				CDDD04A420B269900094DBFA /* Comment.swift in Sources */,
@@ -1445,8 +1379,6 @@
 				CDA32A2920ABBA21008A2AC1 /* ANIRecruitContributionImagesView.swift in Sources */,
 				CD08A73120915C2A00F0B72D /* ANIRecruitDetailViewController.swift in Sources */,
 				F53E87C62085F13800B19A2F /* ANIProfileMenuBar.swift in Sources */,
-				CDA32A9220AFE803008A2AC1 /* ANIProfileQnaImagesView.swift in Sources */,
-				F5F530142088624E0076E938 /* ANIProfileRecruitCell.swift in Sources */,
 				CDA97AC920AFFFEC00F46DA4 /* ANIProfileEditView.swift in Sources */,
 				F57F7D61208322D3008A2645 /* ANIMessageView.swift in Sources */,
 				CD9E52B120921EB400715F50 /* UIViewController.swift in Sources */,
