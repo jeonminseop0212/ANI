@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import WCLShineButton
 
 class ANIProfileRecruitCell: UITableViewCell {
   
@@ -17,7 +18,7 @@ class ANIProfileRecruitCell: UITableViewCell {
   var userNameLabel = UILabel()
   var supportCountLabel = UILabel()
   var supportButton = UIButton()
-  var loveButton = UIButton()
+  var loveButton = WCLShineButton()
   var loveCountLabel = UILabel()
   var clipButton = UIButton()
   var line = UIImageView()
@@ -98,13 +99,18 @@ class ANIProfileRecruitCell: UITableViewCell {
     self.loveCountLabel = loveCountLabel
     
     //loveButton
-    let loveButton = UIButton()
-    loveButton.setImage(UIImage(named: "love"), for: .normal)
+    var param = WCLShineParams()
+    param.bigShineColor = ANIColor.red
+    param.smallShineColor = ANIColor.pink
+    let loveButton = WCLShineButton(frame: CGRect(x: 0.0, y: 0.0, width: 20.0, height: 20.0), params: param)
+    loveButton.fillColor = ANIColor.red
+    loveButton.color = ANIColor.gray
+    loveButton.image = .heart
     addSubview(loveButton)
     loveButton.centerY(to: profileImageView)
     loveButton.rightToLeft(of: loveCountLabel, offset: -10.0)
-    loveButton.width(21.0)
-    loveButton.height(21.0)
+    loveButton.width(20.0)
+    loveButton.height(20.0)
     self.loveButton = loveButton
     
     //supportCountLabel
