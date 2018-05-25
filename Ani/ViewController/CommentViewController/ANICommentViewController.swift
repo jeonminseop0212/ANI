@@ -9,10 +9,6 @@
 import UIKit
 import TinyConstraints
 
-protocol ANICommentViewControllerDelegate {
-  func commentViewControllerPop()
-}
-
 enum CommentMode {
   case story
   case qna
@@ -52,9 +48,7 @@ class ANICommentViewController: UIViewController {
   }
   
   var me: User?
-  
-  var delegate: ANICommentViewControllerDelegate?
-  
+    
   override func viewDidLoad() {
     setup()
     passingData()
@@ -196,7 +190,6 @@ class ANICommentViewController: UIViewController {
   //MARK: Action
   @objc private func back() {
     self.navigationController?.popViewController(animated: true)
-    self.delegate?.commentViewControllerPop()
   }
 }
 
