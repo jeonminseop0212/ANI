@@ -110,7 +110,7 @@ class ANICommentViewController: UIViewController {
     self.view.addSubview(commentBar)
     commentBar.leftToSuperview()
     commentBar.rightToSuperview()
-    commentBarBottomConstraint = commentBar.bottomToSuperview()
+    commentBarBottomConstraint = commentBar.bottomToSuperview(usingSafeArea: true)
     commentBarOriginalBottomConstraintConstant = commentBarBottomConstraint?.constant
     self.commentBar = commentBar
     
@@ -163,11 +163,13 @@ class ANICommentViewController: UIViewController {
     guard let keyboardFrame = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
       let duration = notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as? TimeInterval,
       let curve = notification.userInfo?[UIKeyboardAnimationCurveUserInfoKey] as? UInt,
-      let commentBarBottomConstraint = self.commentBarBottomConstraint else { return }
+      let commentBarBottomConstraint = self.commentBarBottomConstraint,
+      let window = UIApplication.shared.keyWindow else { return }
     
     let h = keyboardFrame.height
+    let bottomSafeArea = window.safeAreaInsets.bottom
     
-    commentBarBottomConstraint.constant = -h
+    commentBarBottomConstraint.constant = -h + bottomSafeArea
     
     UIView.animate(withDuration: duration, delay: 0, options: UIViewAnimationOptions(rawValue: curve), animations: {
       self.view.layoutIfNeeded()
