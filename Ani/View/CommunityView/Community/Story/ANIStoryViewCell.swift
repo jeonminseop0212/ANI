@@ -11,7 +11,7 @@ import WCLShineButton
 
 class ANIStoryViewCell: UITableViewCell {
   private weak var storyImagesView: ANIStoryImagesView?
-  private weak var subTitleLabel: UILabel?
+  private weak var storyLabel: UILabel?
   private weak var line: UIImageView?
   private weak var profileImageView: UIImageView?
   private weak var userNameLabel: UILabel?
@@ -44,25 +44,24 @@ class ANIStoryViewCell: UITableViewCell {
     storyImagesView.topToSuperview()
     storyImagesView.leftToSuperview()
     storyImagesView.rightToSuperview()
-    storyImagesView.height(UIScreen.main.bounds.width + ANIStoryImagesView.PAGE_CONTROL_HEIGHT + ANIStoryImagesView.PAGE_CONTROL_TOP_MARGIN)
     self.storyImagesView = storyImagesView
 
-    //subTitleLabel
-    let subTitleLabel = UILabel()
-    subTitleLabel.font = UIFont.systemFont(ofSize: 14.0)
-    subTitleLabel.textAlignment = .left
-    subTitleLabel.textColor = ANIColor.subTitle
-    subTitleLabel.numberOfLines = 0
-    addSubview(subTitleLabel)
-    subTitleLabel.topToBottom(of: storyImagesView, offset: 5.0)
-    subTitleLabel.leftToSuperview(offset: 10.0)
-    subTitleLabel.rightToSuperview(offset: 10.0)
-    self.subTitleLabel = subTitleLabel
+    //storyLabel
+    let storyLabel = UILabel()
+    storyLabel.font = UIFont.systemFont(ofSize: 14.0)
+    storyLabel.textAlignment = .left
+    storyLabel.textColor = ANIColor.subTitle
+    storyLabel.numberOfLines = 0
+    addSubview(storyLabel)
+    storyLabel.topToBottom(of: storyImagesView, offset: 5.0)
+    storyLabel.leftToSuperview(offset: 10.0)
+    storyLabel.rightToSuperview(offset: 10.0)
+    self.storyLabel = storyLabel
 
     //profileImageView
     let profileImageView = UIImageView()
     addSubview(profileImageView)
-    profileImageView.topToBottom(of: subTitleLabel, offset: 10.0)
+    profileImageView.topToBottom(of: storyLabel, offset: 10.0)
     profileImageView.leftToSuperview(offset: 10.0)
     profileImageView.width(32.0)
     profileImageView.height(32.0)
@@ -143,7 +142,7 @@ class ANIStoryViewCell: UITableViewCell {
   
   private func reloadLayout() {
     guard let storyImagesView = self.storyImagesView,
-          let subTitleLabel = self.subTitleLabel,
+          let storyLabel = self.storyLabel,
           let profileImageView = self.profileImageView,
           let userNameLabel = self.userNameLabel,
           let loveCountLabel = self.loveCountLabel,
@@ -152,7 +151,7 @@ class ANIStoryViewCell: UITableViewCell {
     
     storyImagesView.images = story.storyImages
     storyImagesView.pageControl?.numberOfPages = story.storyImages.count
-    subTitleLabel.text = story.story
+    storyLabel.text = story.story
     profileImageView.image = story.user.profileImage
     userNameLabel.text = story.user.name
     loveCountLabel.text = "\(story.loveCount)"

@@ -7,13 +7,14 @@
 //
 
 import UIKit
+import TinyConstraints
 
 class ANIStoryImagesView: UIView {
   
   private weak var imagesCollectionView: UICollectionView?
+  private let PAGE_CONTROL_HEIGHT: CGFloat = 30.0
+  private var pageControlHeightConstraint: Constraint?
   weak var pageControl: UIPageControl?
-  static let PAGE_CONTROL_HEIGHT: CGFloat = 30.0
-  static let PAGE_CONTROL_TOP_MARGIN: CGFloat = 5.0
   
   var images = [UIImage?]() {
     didSet {
@@ -21,6 +22,7 @@ class ANIStoryImagesView: UIView {
         subview.removeFromSuperview()
       }
       setup()
+      setupPageControlHeight(images: images)
     }
   }
   
@@ -51,7 +53,7 @@ class ANIStoryImagesView: UIView {
     imagesCollectionView.topToSuperview()
     imagesCollectionView.leftToSuperview()
     imagesCollectionView.rightToSuperview()
-    imagesCollectionView.bottomToSuperview(offset: -(ANIStoryImagesView.PAGE_CONTROL_HEIGHT + ANIStoryImagesView.PAGE_CONTROL_TOP_MARGIN))
+    imagesCollectionView.height(UIScreen.main.bounds.width)
     self.imagesCollectionView = imagesCollectionView
     
     //pageControl
@@ -61,11 +63,25 @@ class ANIStoryImagesView: UIView {
     pageControl.currentPage = 0
     pageControl.isUserInteractionEnabled = false
     addSubview(pageControl)
-    pageControl.topToBottom(of: imagesCollectionView, offset: ANIStoryImagesView.PAGE_CONTROL_TOP_MARGIN)
+    pageControl.topToBottom(of: imagesCollectionView, offset: 5.0)
     pageControl.leftToSuperview()
     pageControl.rightToSuperview()
-    pageControl.height(ANIStoryImagesView.PAGE_CONTROL_HEIGHT)
+    pageControlHeightConstraint = pageControl.height(PAGE_CONTROL_HEIGHT)
+    pageControl.bottomToSuperview()
     self.pageControl = pageControl
+  }
+  
+  private func setupPageControlHeight(images: [UIImage?]) {
+    guard let pageControlHeightConstraint = self.pageControlHeightConstraint,
+          let pageControl = self.pageControl else { return }
+    
+    if images.count < 2 {
+      pageControlHeightConstraint.constant = 0
+      pageControl.alpha = 0.0
+    } else {
+      pageControlHeightConstraint.constant = PAGE_CONTROL_HEIGHT
+      pageControl.alpha = 1.0
+    }
   }
 }
 
