@@ -139,6 +139,7 @@ class ANIContributionViewController: UIViewController {
     Gallery.Config.PageIndicator.backgroundColor = .white
     Gallery.Config.Camera.oneImageMode = false
     Config.Camera.imageLimit = 10
+    Config.tabsToShow = [.imageTab, .cameraTab]
     Gallery.Config.Font.Main.regular = UIFont.boldSystemFont(ofSize: 17)
     Gallery.Config.Grid.ArrowButton.tintColor = ANIColor.dark
     Gallery.Config.Grid.FrameView.borderColor = ANIColor.green
