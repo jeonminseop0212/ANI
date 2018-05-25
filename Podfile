@@ -7,6 +7,8 @@ target 'Ani' do
 
   # Pods for Ani
 pod 'Gallery'
+pod 'Firebase/Core'
+
   target 'AniTests' do
     inherit! :search_paths
     # Pods for testing
