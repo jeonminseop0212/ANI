@@ -15,6 +15,10 @@ protocol ANIImageFilterPreviewViewDelegate {
 class ANIImageFilterPreviewView: UIView {
   
   private weak var previewCollectionView: UICollectionView?
+  
+  private let PAGE_CONTROL_HEIGHT: CGFloat = 20.0
+  private weak var pageControl: UIPageControl?
+  
   var images = [UIImage?]() {
     didSet {
       guard let pageControl = self.pageControl else { return }
@@ -31,9 +35,6 @@ class ANIImageFilterPreviewView: UIView {
       }
     }
   }
-  
-  static let PAGE_CONTROL_HEIGHT: CGFloat = 20.0
-  private weak var pageControl: UIPageControl?
   
   var filteredImages = [UIImage?]() {
     didSet {
@@ -92,7 +93,7 @@ class ANIImageFilterPreviewView: UIView {
     previewCollectionView.register(ANIImageFilterPreviewCell.self, forCellWithReuseIdentifier: id)
     addSubview(previewCollectionView)
     previewCollectionView.edgesToSuperview(excluding: .bottom)
-    previewCollectionView.bottomToSuperview(offset: -ANIStoryImagesView.PAGE_CONTROL_HEIGHT)
+    previewCollectionView.height(UIScreen.main.bounds.width)
     self.previewCollectionView = previewCollectionView
     
     //pageCotrol
@@ -106,7 +107,8 @@ class ANIImageFilterPreviewView: UIView {
     pageControl.topToBottom(of: previewCollectionView, offset: 8.0)
     pageControl.leftToSuperview()
     pageControl.rightToSuperview()
-    pageControl.height(ANIImageFilterPreviewView.PAGE_CONTROL_HEIGHT)
+    pageControl.height(PAGE_CONTROL_HEIGHT)
+    pageControl.bottomToSuperview()
     self.pageControl = pageControl
   }
 }
