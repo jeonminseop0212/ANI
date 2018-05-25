@@ -24,7 +24,7 @@ class ANIRecruitDetailViewController: UIViewController {
   
   var testRecruit: Recruit?
   
-  var isBack: Bool = false
+  private var isBack: Bool = false
 
   override func viewDidLoad() {
     super.viewDidLoad()
