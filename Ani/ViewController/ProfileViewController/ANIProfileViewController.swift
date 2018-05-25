@@ -11,18 +11,18 @@ import TinyConstraints
 
 class ANIProfileViewController: UIViewController {
   
+  private weak var myNavigationBar: UIView?
+  private weak var myNavigationBase: UIView?
+  private weak var navigationTitleLabel: UILabel?
+  
   private weak var profileBasicView: ANIProfileBasicView?
   
   private var recruits = [Recruit]()
-  
   private var storys = [Story]()
-  
   private var qnas = [Qna]()
-  
   private var me: User?
-  
-  var user: User?
-  
+  private var user: User?
+    
   override func viewDidLoad() {
     super.viewDidLoad()
     setupTestUser()
@@ -40,11 +40,36 @@ class ANIProfileViewController: UIViewController {
   
   private func setup() {
     //basic
-    Orientation.lockOrientation(.portrait)
     self.view.backgroundColor = .white
+    self.navigationController?.setNavigationBarHidden(true, animated: false)
     self.navigationController?.navigationBar.isTranslucent = false
-    self.navigationItem.title = "PROFILE"
-    self.navigationController?.navigationBar.tintColor = ANIColor.dark
+    Orientation.lockOrientation(.portrait)
+    
+    //myNavigationBar
+    let myNavigationBar = UIView()
+    myNavigationBar.backgroundColor = .white
+    self.view.addSubview(myNavigationBar)
+    myNavigationBar.topToSuperview()
+    myNavigationBar.leftToSuperview()
+    myNavigationBar.rightToSuperview()
+    myNavigationBar.height(UIViewController.STATUS_BAR_HEIGHT + UIViewController.NAVIGATION_BAR_HEIGHT)
+    self.myNavigationBar = myNavigationBar
+    
+    //myNavigationBase
+    let myNavigationBase = UIView()
+    myNavigationBar.addSubview(myNavigationBase)
+    myNavigationBase.edgesToSuperview(excluding: .top)
+    myNavigationBase.height(UIViewController.NAVIGATION_BAR_HEIGHT)
+    self.myNavigationBase = myNavigationBase
+    
+    //navigationTitleLabel
+    let navigationTitleLabel = UILabel()
+    navigationTitleLabel.text = "プロフィール"
+    navigationTitleLabel.textColor = ANIColor.dark
+    navigationTitleLabel.font = UIFont.boldSystemFont(ofSize: 17)
+    myNavigationBase.addSubview(navigationTitleLabel)
+    navigationTitleLabel.centerInSuperview()
+    self.navigationTitleLabel = navigationTitleLabel
     
     //profileBasicView
     let profileBasicView = ANIProfileBasicView()
@@ -54,7 +79,8 @@ class ANIProfileViewController: UIViewController {
     profileBasicView.user = user
     profileBasicView.delegate = self
     self.view.addSubview(profileBasicView)
-    profileBasicView.edgesToSuperview()
+    profileBasicView.topToBottom(of: myNavigationBar)
+    profileBasicView.edgesToSuperview(excluding: .top)
     self.profileBasicView = profileBasicView
   }
   
