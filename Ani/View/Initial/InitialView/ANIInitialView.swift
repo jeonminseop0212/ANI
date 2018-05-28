@@ -10,7 +10,6 @@ import UIKit
 
 protocol ANIInitialViewDelegate {
   func loginButtonTapped()
-  func signUpButtonTapped()
 }
 
 class ANIInitialView: UIView {
@@ -21,12 +20,10 @@ class ANIInitialView: UIView {
   private weak var titleLabel: UILabel?
   private weak var subTitleLabel: UILabel?
   
-  private weak var buttonStackView: UIStackView?
-  private let LOGIN_BUTTON_HEIGHT: CGFloat = 45.0
-  private weak var loginButton: ANIAreaButtonView?
-  private weak var loginButtonLabel: UILabel?
-  private weak var signUpButton: ANIAreaButtonView?
-  private weak var signUpButtonLabel: UILabel?
+  private let START_BUTTON_HEIGHT: CGFloat = 45.0
+  private let START_BUTTON_WIDTH: CGFloat = 150.0
+  private weak var startButton: ANIAreaButtonView?
+  private weak var startButtonLabel: UILabel?
   
   private weak var fotterImageView: UIImageView?
   
@@ -74,58 +71,48 @@ class ANIInitialView: UIView {
     titleLabel.centerXToSuperview()
     self.titleLabel = titleLabel
     
-    //buttonStackView
-    let buttonStackView = UIStackView()
-    buttonStackView.backgroundColor = .red
-    buttonStackView.axis = .horizontal
-    buttonStackView.alignment = .center
-    buttonStackView.distribution = .fillEqually
-    buttonStackView.spacing = 18.0
-    base.addSubview(buttonStackView)
-    buttonStackView.topToBottom(of: subTitleLabel, offset: 15.0)
-    buttonStackView.leftToSuperview(offset: 40.0)
-    buttonStackView.rightToSuperview(offset: 40.0)
-    self.buttonStackView = buttonStackView
+    //startButton
+    let startButton = ANIAreaButtonView()
+    startButton.base?.layer.cornerRadius = START_BUTTON_HEIGHT / 2
+    startButton.base?.backgroundColor = ANIColor.green
+    startButton.delegate = self
+    addSubview(startButton)
+    startButton.height(START_BUTTON_HEIGHT)
+    startButton.width(START_BUTTON_WIDTH)
+    startButton.topToBottom(of: subTitleLabel, offset: 20.0)
+    startButton.centerXToSuperview()
+    self.startButton = startButton
     
-    //loginButton
-    let loginButton = ANIAreaButtonView()
-    loginButton.base?.layer.cornerRadius = LOGIN_BUTTON_HEIGHT / 2
-    loginButton.base?.backgroundColor = ANIColor.green
-    loginButton.delegate = self
-    buttonStackView.addArrangedSubview(loginButton)
-    loginButton.height(LOGIN_BUTTON_HEIGHT)
-    self.loginButton = loginButton
+    //startButtonLabel
+    let startButtonLabel = UILabel()
+    startButtonLabel.textColor = .white
+    startButtonLabel.textAlignment = .center
+    startButtonLabel.text = "はじめる"
+    startButtonLabel.font = UIFont.boldSystemFont(ofSize: 20.0)
+    startButton.addContent(startButtonLabel)
+    startButtonLabel.edgesToSuperview()
+    self.startButtonLabel = startButtonLabel
     
-    //loginButtonLabel
-    let loginButtonLabel = UILabel()
-    loginButtonLabel.textColor = .white
-    loginButtonLabel.textAlignment = .center
-    loginButtonLabel.text = "ログイン"
-    loginButtonLabel.font = UIFont.boldSystemFont(ofSize: 20.0)
-    loginButton.addContent(loginButtonLabel)
-    loginButtonLabel.edgesToSuperview()
-    self.loginButtonLabel = loginButtonLabel
-    
-    //signUpButton
-    let signUpButton = ANIAreaButtonView()
-    signUpButton.base?.layer.cornerRadius = LOGIN_BUTTON_HEIGHT / 2
-    signUpButton.base?.backgroundColor = .white
-    signUpButton.base?.layer.borderColor = ANIColor.green.cgColor
-    signUpButton.base?.layer.borderWidth = 2.0
-    signUpButton.delegate = self
-    buttonStackView.addArrangedSubview(signUpButton)
-    signUpButton.height(LOGIN_BUTTON_HEIGHT)
-    self.signUpButton = signUpButton
-    
-    //signUpButtonLabel
-    let signUpButtonLabel = UILabel()
-    signUpButtonLabel.textColor = ANIColor.green
-    signUpButtonLabel.textAlignment = .center
-    signUpButtonLabel.text = "登録"
-    signUpButtonLabel.font = UIFont.boldSystemFont(ofSize: 20.0)
-    signUpButton.addContent(signUpButtonLabel)
-    signUpButtonLabel.edgesToSuperview()
-    self.signUpButtonLabel = signUpButtonLabel
+//    //signUpButton
+//    let signUpButton = ANIAreaButtonView()
+//    signUpButton.base?.layer.cornerRadius = START_BUTTON_HEIGHT / 2
+//    signUpButton.base?.backgroundColor = .white
+//    signUpButton.base?.layer.borderColor = ANIColor.green.cgColor
+//    signUpButton.base?.layer.borderWidth = 2.0
+//    signUpButton.delegate = self
+//    buttonStackView.addArrangedSubview(signUpButton)
+//    signUpButton.height(START_BUTTON_HEIGHT)
+//    self.signUpButton = signUpButton
+//
+//    //signUpButtonLabel
+//    let signUpButtonLabel = UILabel()
+//    signUpButtonLabel.textColor = ANIColor.green
+//    signUpButtonLabel.textAlignment = .center
+//    signUpButtonLabel.text = "登録"
+//    signUpButtonLabel.font = UIFont.boldSystemFont(ofSize: 20.0)
+//    signUpButton.addContent(signUpButtonLabel)
+//    signUpButtonLabel.edgesToSuperview()
+//    self.signUpButtonLabel = signUpButtonLabel
     
     //headerImageView
     let headerImageView = UIImageView()
@@ -150,11 +137,8 @@ class ANIInitialView: UIView {
 //MARK: ANIButtonViewDelegate
 extension ANIInitialView: ANIButtonViewDelegate {
   func buttonViewTapped(view: ANIButtonView) {
-    if view === loginButton {
+    if view === startButton {
       self.delegate?.loginButtonTapped()
-    }
-    if view === signUpButton {
-      self.delegate?.signUpButtonTapped()
     }
   }
 }

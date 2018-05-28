@@ -104,7 +104,6 @@ class ANILoginViewController: UIViewController {
     rejectLabel.textAlignment = .center
     rejectLabel.textColor = .white
     rejectLabel.font = UIFont.boldSystemFont(ofSize: 16.0)
-    rejectLabel.text = "ユーザーが見つかりません！"
     rejectLabel.textAlignment = .center
     rejectBaseView.addSubview(rejectLabel)
     rejectLabel.edgesToSuperview()
@@ -152,14 +151,16 @@ class ANILoginViewController: UIViewController {
 
 //MARK: ANILoginViewDelegate
 extension ANILoginViewController: ANILoginViewDelegate {
-  func loginButtonTapped() {
-    ANITabBarController.isLogin = true
+  func loginSuccess() {
     self.navigationController?.dismiss(animated: true, completion: nil)
   }
   
-  func reject() {
+  func reject(notiText: String) {
     guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
+          let rejectLabel = self.rejectLabel,
           !isRejectAnimating else { return }
+    
+    rejectLabel.text = notiText
     
     rejectViewBottomConstraint.constant = UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
     UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut, animations: {
@@ -176,5 +177,10 @@ extension ANILoginViewController: ANILoginViewDelegate {
         self.isRejectAnimating = false
       })
     }
+  }
+  
+  func signUp() {
+    let signUpViewController = ANISignUpViewController()
+    self.navigationController?.pushViewController(signUpViewController, animated: true)
   }
 }

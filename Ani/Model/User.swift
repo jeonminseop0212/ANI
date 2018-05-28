@@ -9,7 +9,7 @@
 import UIKit
 
 struct User {
-  var id: String
+  var adress: String
   var password: String
   var profileImage: UIImage
   var name: String
