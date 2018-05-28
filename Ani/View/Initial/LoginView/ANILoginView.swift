@@ -7,10 +7,12 @@
 //
 
 import UIKit
+import FirebaseAuth
 
 protocol ANILoginViewDelegate {
-  func reject()
-  func loginButtonTapped()
+  func reject(notiText: String)
+  func loginSuccess()
+  func signUp()
 }
 
 class ANILoginView: UIView {
@@ -19,13 +21,17 @@ class ANILoginView: UIView {
   private weak var contentView: UIView?
   
   private weak var titleLabel: UILabel?
-  private weak var idTextFieldBG: UIView?
-  private weak var idImageView: UIImageView?
-  private weak var idTextField: UITextField?
+  private weak var emailTextFieldBG: UIView?
+  private weak var emailImageView: UIImageView?
+  private weak var emailTextField: UITextField?
   
   private weak var passwordTextFieldBG: UIView?
   private weak var passwordImageView: UIImageView?
   private weak var passwordTextField: UITextField?
+  
+  private let SIGN_UP_BUTTOM_WIDTH: CGFloat = 210.0
+  private let SIGN_UP_BUTTOM_HEIGHT: CGFloat = 25.0
+  private weak var signUpButton: UIButton?
   
   private let LOGIN_BUTTON_HEIGHT: CGFloat = 45.0
   private weak var loginButton: ANIAreaButtonView?
@@ -64,7 +70,7 @@ class ANILoginView: UIView {
     let titleLabel = UILabel()
     titleLabel.font = UIFont.boldSystemFont(ofSize: 30.0)
     titleLabel.textColor = ANIColor.dark
-    titleLabel.text = "おかえりなさい😻"
+    titleLabel.text = "ようこそ😻"
     titleLabel.textAlignment = .center
     contentView.addSubview(titleLabel)
     titleLabel.topToSuperview(offset: 50.0)
@@ -72,40 +78,40 @@ class ANILoginView: UIView {
     titleLabel.rightToSuperview(offset: 10.0)
     self.titleLabel = titleLabel
     
-    //idTextFieldBG
-    let idTextFieldBG = UIView()
-    idTextFieldBG.backgroundColor = ANIColor.lightGray
-    idTextFieldBG.layer.cornerRadius = 10.0
-    idTextFieldBG.layer.masksToBounds = true
-    contentView.addSubview(idTextFieldBG)
-    idTextFieldBG.topToBottom(of: titleLabel, offset: 30.0)
-    idTextFieldBG.leftToSuperview(offset: 10.0)
-    idTextFieldBG.rightToSuperview(offset: 10.0)
-    self.idTextFieldBG = idTextFieldBG
+    //emailTextFieldBG
+    let emailTextFieldBG = UIView()
+    emailTextFieldBG.backgroundColor = ANIColor.lightGray
+    emailTextFieldBG.layer.cornerRadius = 10.0
+    emailTextFieldBG.layer.masksToBounds = true
+    contentView.addSubview(emailTextFieldBG)
+    emailTextFieldBG.topToBottom(of: titleLabel, offset: 30.0)
+    emailTextFieldBG.leftToSuperview(offset: 10.0)
+    emailTextFieldBG.rightToSuperview(offset: 10.0)
+    self.emailTextFieldBG = emailTextFieldBG
     
-    //idImageView
-    let idImageView = UIImageView()
-    idImageView.image = UIImage(named: "idImage")
-    idTextFieldBG.addSubview(idImageView)
-    idImageView.width(19.0)
-    idImageView.height(18.0)
-    idImageView.leftToSuperview(offset: 10.0)
-    idImageView.centerYToSuperview()
-    self.idImageView = idImageView
+    //emailImageView
+    let emailImageView = UIImageView()
+    emailImageView.image = UIImage(named: "idImage")
+    emailTextFieldBG.addSubview(emailImageView)
+    emailImageView.width(19.0)
+    emailImageView.height(18.0)
+    emailImageView.leftToSuperview(offset: 10.0)
+    emailImageView.centerYToSuperview()
+    self.emailImageView = emailImageView
     
-    //idTextField
-    let idTextField = UITextField()
-    idTextField.font = UIFont.systemFont(ofSize: 18.0)
-    idTextField.textColor = ANIColor.dark
-    idTextField.backgroundColor = .clear
-    idTextField.placeholder = "IDまたはユーザーネーム"
-    idTextField.returnKeyType = .done
-    idTextField.delegate = self
-    idTextFieldBG.addSubview(idTextField)
+    //emailTextField
+    let emailTextField = UITextField()
+    emailTextField.font = UIFont.systemFont(ofSize: 18.0)
+    emailTextField.textColor = ANIColor.dark
+    emailTextField.backgroundColor = .clear
+    emailTextField.placeholder = "メールアドレス"
+    emailTextField.returnKeyType = .done
+    emailTextField.delegate = self
+    emailTextFieldBG.addSubview(emailTextField)
     let insets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: -10.0)
-    idTextField.edgesToSuperview(excluding: .left, insets: insets)
-    idTextField.leftToRight(of: idImageView, offset: 10.0)
-    self.idTextField = idTextField
+    emailTextField.edgesToSuperview(excluding: .left, insets: insets)
+    emailTextField.leftToRight(of: emailImageView, offset: 10.0)
+    self.emailTextField = emailTextField
     
     //passwordTextFieldBG
     let passwordTextFieldBG = UIView()
@@ -113,7 +119,7 @@ class ANILoginView: UIView {
     passwordTextFieldBG.layer.cornerRadius = 10.0
     passwordTextFieldBG.layer.masksToBounds = true
     contentView.addSubview(passwordTextFieldBG)
-    passwordTextFieldBG.topToBottom(of: idTextFieldBG, offset: 20.0)
+    passwordTextFieldBG.topToBottom(of: emailTextFieldBG, offset: 20.0)
     passwordTextFieldBG.leftToSuperview(offset: 10.0)
     passwordTextFieldBG.rightToSuperview(offset: 10.0)
     self.passwordTextFieldBG = passwordTextFieldBG
@@ -124,7 +130,7 @@ class ANILoginView: UIView {
     passwordTextFieldBG.addSubview(passwordImageView)
     passwordImageView.width(15.0)
     passwordImageView.height(20.0)
-    passwordImageView.centerX(to: idImageView)
+    passwordImageView.centerX(to: emailImageView)
     passwordImageView.centerYToSuperview()
     self.passwordImageView = passwordImageView
     
@@ -139,22 +145,22 @@ class ANILoginView: UIView {
     passwordTextField.delegate = self
     passwordTextFieldBG.addSubview(passwordTextField)
     passwordTextField.edgesToSuperview(excluding: .left, insets: insets)
-    passwordTextField.left(to: idTextField)
+    passwordTextField.left(to: emailTextField)
     self.passwordTextField = passwordTextField
     
     //loginButton
-    let logButton = ANIAreaButtonView()
-    logButton.base?.backgroundColor = ANIColor.green
-    logButton.base?.layer.cornerRadius = LOGIN_BUTTON_HEIGHT / 2
-    logButton.delegate = self
-    logButton.dropShadow(opacity: 0.1)
-    contentView.addSubview(logButton)
-    logButton.topToBottom(of: passwordTextFieldBG, offset: 30.0)
-    logButton.centerXToSuperview()
-    logButton.width(190.0)
-    logButton.height(LOGIN_BUTTON_HEIGHT)
-    logButton.bottomToSuperview(offset: -10)
-    self.loginButton = logButton
+    let loginButton = ANIAreaButtonView()
+    loginButton.base?.backgroundColor = ANIColor.green
+    loginButton.base?.layer.cornerRadius = LOGIN_BUTTON_HEIGHT / 2
+    loginButton.delegate = self
+    loginButton.dropShadow(opacity: 0.1)
+    contentView.addSubview(loginButton)
+    loginButton.topToBottom(of: passwordTextFieldBG, offset: 25.0)
+    loginButton.centerXToSuperview()
+    loginButton.width(190.0)
+    loginButton.height(LOGIN_BUTTON_HEIGHT)
+    loginButton.bottomToSuperview(offset: -10)
+    self.loginButton = loginButton
 
     //loginButtonLabel
     let loginButtonLabel = UILabel()
@@ -162,9 +168,22 @@ class ANILoginView: UIView {
     loginButtonLabel.text = "ログイン"
     loginButtonLabel.textAlignment = .center
     loginButtonLabel.font = UIFont.boldSystemFont(ofSize: 20.0)
-    logButton.addContent(loginButtonLabel)
+    loginButton.addContent(loginButtonLabel)
     loginButtonLabel.edgesToSuperview()
     self.loginButtonLabel = loginButtonLabel
+    
+    //signUpButton
+    let signUpButton = UIButton()
+    signUpButton.setTitle("まだアカウントがない方はこちら！", for: .normal)
+    signUpButton.setTitleColor(ANIColor.subTitle, for: .normal)
+    signUpButton.titleLabel?.font = UIFont.systemFont(ofSize: 13.0)
+    signUpButton.addTarget(self, action: #selector(signUp), for: .touchUpInside)
+    addSubview(signUpButton)
+    signUpButton.topToBottom(of: loginButton, offset: 15.0)
+    signUpButton.width(SIGN_UP_BUTTOM_WIDTH)
+    signUpButton.height(SIGN_UP_BUTTOM_HEIGHT)
+    signUpButton.centerXToSuperview()
+    self.signUpButton = signUpButton
   }
   
   private func setupNotification() {
@@ -184,15 +203,41 @@ class ANILoginView: UIView {
       scrollView.contentOffset.y = scrollView.contentOffset.y + blindHeight
     }
   }
+  
+  //MARK: action
+  @objc private func signUp() {
+    self.delegate?.signUp()
+  }
 }
 
 //MARK: ANIButtonViewDelegate
 extension ANILoginView: ANIButtonViewDelegate {
   func buttonViewTapped(view: ANIButtonView) {
     if view === loginButton {
-      //TODO: reject, sever
-//      self.delegate?.reject()
-      self.delegate?.loginButtonTapped()
+      guard let emailTextField = self.emailTextField,
+            let email = emailTextField.text,
+            let passwordTextField = self.passwordTextField,
+            let password = passwordTextField.text else { return }
+      
+      Auth.auth().signIn(withEmail: email, password: password) { (successUser, error) in
+        if let errorUnrap = error {
+          let nsError = errorUnrap as NSError
+          
+          print("nsError \(nsError)")
+          if nsError.code == 17008 {
+            self.delegate?.reject(notiText: "存在しないメールアドレスです！")
+          } else if nsError.code == 17009 {
+            self.delegate?.reject(notiText: "パスワードが違います！")
+          } else if nsError.code == 17011 || nsError.code == 17008 {
+            self.delegate?.reject(notiText: "存在しないメールアドレスです！")
+          } else {
+            self.delegate?.reject(notiText: "ログインに失敗しました！")
+          }
+        } else {
+          //login
+          self.delegate?.loginSuccess()
+        }
+      }
     }
   }
 }

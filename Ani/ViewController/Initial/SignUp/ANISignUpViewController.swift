@@ -172,8 +172,7 @@ class ANISignUpViewController: UIViewController {
 
 //MARK: ANISignUpViewDelegate
 extension ANISignUpViewController: ANISignUpViewDelegate {
-  func donButtonTapped() {
-    ANITabBarController.isLogin = true
+  func signUpSuccess() {
     self.navigationController?.dismiss(animated: true, completion: nil)
   }
   

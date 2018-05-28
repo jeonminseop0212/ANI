@@ -38,9 +38,4 @@ extension ANIInitialViewController: ANIInitialViewDelegate {
     let loginViewController = ANILoginViewController()
     self.navigationController?.pushViewController(loginViewController, animated: true)
   }
-  
-  func signUpButtonTapped() {
-    let signUpViewController = ANISignUpViewController()
-    self.navigationController?.pushViewController(signUpViewController, animated: true)
-  }
 }
