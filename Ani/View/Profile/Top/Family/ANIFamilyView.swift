@@ -57,7 +57,7 @@ extension ANIFamilyView: UICollectionViewDataSource, UICollectionViewDelegateFlo
     
     let id = NSStringFromClass(ANIFamilyViewCell.self)
     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! ANIFamilyViewCell
-    cell.familyImageView?.image = familyImages[indexPath.item]
+//    cell.familyImageView?.image = familyImages[indexPath.item]
     return cell
   }
   

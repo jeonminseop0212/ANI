@@ -140,7 +140,7 @@ class ANICommentCell: UITableViewCell {
           let loveCountLabel = self.loveCountLabel,
           let comment = self.comment else { return }
     
-    profileImageView.image = comment.user.profileImage
+//    profileImageView.image = comment.user.profileImage
     userNameLabel.text = comment.user.name
     commentLabel.text = comment.comment
     commentCountLabel.text = "\(comment.commentCount)"

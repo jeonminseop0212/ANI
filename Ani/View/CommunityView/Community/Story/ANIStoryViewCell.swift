@@ -152,7 +152,7 @@ class ANIStoryViewCell: UITableViewCell {
     storyImagesView.images = story.storyImages
     storyImagesView.pageControl?.numberOfPages = story.storyImages.count
     storyLabel.text = story.story
-    profileImageView.image = story.user.profileImage
+//    profileImageView.image = story.user.profileImage
     userNameLabel.text = story.user.name
     loveCountLabel.text = "\(story.loveCount)"
     commentCountLabel.text = "\(story.commentCount)"

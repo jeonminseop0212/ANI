@@ -72,7 +72,7 @@ extension ANIProfileEditFamilyView: UICollectionViewDataSource {
     let id = NSStringFromClass(ANIProfileEditFamilyCell.self)
     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! ANIProfileEditFamilyCell
     if indexPath.item != familyImages.count {
-      cell.familyImageView?.image = familyImages[indexPath.item]
+//      cell.familyImageView?.image = familyImages[indexPath.item]
       cell.imagePickImageView?.alpha = 1.0
     } else {
       cell.familyImageView?.image = UIImage(named: "familyImageAdd")

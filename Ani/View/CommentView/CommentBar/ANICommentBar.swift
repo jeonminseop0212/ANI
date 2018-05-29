@@ -27,7 +27,7 @@ class ANICommentBar: UIView {
       guard let profileImageView = self.profileImageView,
             let me = self.me else { return }
       
-      profileImageView.image = me.profileImage
+//      profileImageView.image = me.profileImage
     }
   }
   

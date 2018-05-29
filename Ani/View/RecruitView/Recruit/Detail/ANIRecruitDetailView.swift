@@ -368,7 +368,7 @@ class ANIRecruitDetailView: UIView {
     
     titleLabel.text = testRecruit.recruitInfo.title
     
-    profileImageView.image = testRecruit.user.profileImage
+//    profileImageView.image = testRecruit.user.profileImage
     
     userNameLabel?.text = testRecruit.user.name
     

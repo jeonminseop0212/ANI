@@ -8,6 +8,9 @@
 
 import UIKit
 import FirebaseAuth
+import FirebaseDatabase
+import FirebaseStorage
+import Salada
 
 protocol ANISignUpViewDelegate {
   func signUpSuccess()
@@ -56,6 +59,8 @@ class ANISignUpView: UIView {
       profileImageView.image = profileImage
     }
   }
+  
+  var ref: DatabaseReference?
   
   var delegate: ANISignUpViewDelegate?
   
@@ -280,8 +285,8 @@ class ANISignUpView: UIView {
   }
   
   //MARK: action
-  private func signUp(user: User) {
-    Auth.auth().createUser(withEmail: user.adress, password: user.password) { (successUser, error) in
+  private func signUp(adress: String, password: String) {
+    Auth.auth().createUser(withEmail: adress, password: password) { (successUser, error) in
       if let errorUnrap = error {
         let nsError = errorUnrap as NSError
         if nsError.code == 17007 {
@@ -294,20 +299,36 @@ class ANISignUpView: UIView {
           self.delegate?.reject(notiText: "登録に失敗しました！")
         }
       } else {
-        //login
-        self.login(user: user)
+        self.login(adress: adress, password: password)
       }
     }
   }
   
-  private func login(user: User) {
-    Auth.auth().signIn(withEmail: user.adress, password: user.password) { (successUser, error) in
+  private func login(adress: String, password: String) {
+    Auth.auth().signIn(withEmail: adress, password: password) { (successUser, error) in
       if let errorUnrap = error {
         print("loginError \(errorUnrap.localizedDescription)")
       } else {
         self.delegate?.signUpSuccess()
+        
+        self.createUserData()
       }
     }
+  }
+  
+  private func createUserData() {
+    guard let currentUser = Auth.auth().currentUser,
+          let profileImage = self.profileImage,
+          let profileImageData = UIImageJPEGRepresentation(profileImage, 0.1),
+          let userNameTextField = self.userNameTextField,
+          let userName = userNameTextField.text else { return }
+    
+    let user = User()
+    user.uid = currentUser.uid
+    user.name = userName
+    let profileImageFile = File(data: profileImageData)
+    user.profileImage = profileImageFile
+    user.save()
   }
 }
 
@@ -318,8 +339,7 @@ extension ANISignUpView: ANIButtonViewDelegate {
       self.delegate?.prifileImagePickButtonTapped()
     }
     if view == doneButton {
-      guard let profileImage = self.profileImage,
-            let adressTextField = self.adressTextField,
+      guard let adressTextField = self.adressTextField,
             let adress = adressTextField.text,
             let passwordTextField = self.passwordTextField,
             let password = passwordTextField.text,
@@ -330,9 +350,7 @@ extension ANISignUpView: ANIButtonViewDelegate {
       
       if adress.count > 0 && password.count > 0 && passwordCheck.count > 0 && userName.count > 0 {
         if password == passwordCheck {
-          let user = User(adress: adress, password: password, profileImage: profileImage, name: userName, familyImages: nil, kind: nil, introduce: nil)
-          
-          signUp(user: user)
+          signUp(adress: adress, password: password)
         } else {
           self.delegate?.reject(notiText: "パスワードが異なります！")
         }
