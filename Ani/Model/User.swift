@@ -7,13 +7,16 @@
 //
 
 import UIKit
+import Salada
 
-struct User {
-  var adress: String
-  var password: String
-  var profileImage: UIImage
-  var name: String
-  var familyImages: [UIImage]?
-  var kind: String?
-  var introduce: String?
+class User: Salada.Object {
+  
+  typealias user = User
+  
+  @objc dynamic var uid: String?
+  @objc dynamic var profileImage: File?
+  @objc dynamic var name: String?
+  @objc dynamic var familyImages: [File]?
+  @objc dynamic var kind: String?
+  @objc dynamic var introduce: String?
 }

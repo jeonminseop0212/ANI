@@ -46,12 +46,6 @@ class ANITabBarController: UITabBarController {
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(true)
     
-    do {
-      try Auth.auth().signOut()
-    } catch let signOutError as NSError {
-      print("signOutError \(signOutError)")
-    }
-    
     if Auth.auth().currentUser == nil {
       showInitialView()
     }

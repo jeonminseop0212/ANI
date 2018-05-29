@@ -10,6 +10,8 @@ pod 'Gallery'
 pod 'Firebase/Core'
 pod 'Firebase/Auth'
 pod 'Firebase/Database'
+pod 'Salada'
+pod 'Firebase/Storage'
 
   target 'AniTests' do
     inherit! :search_paths

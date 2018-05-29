@@ -255,7 +255,7 @@ class ANIRecruitViewCell: UITableViewCell {
     sexLabel.text = recruit.recruitInfo.sex
     titleLabel.text = recruit.recruitInfo.title
     subTitleLabel.text = recruit.recruitInfo.reason
-    profileImageView.image = recruit.user.profileImage
+//    profileImageView.image = recruit.user.profileImage
     userNameLabel.text = recruit.user.name
     supportCountLabel.text = "\(recruit.supportCount)"
     loveCountLabel.text = "\(recruit.loveCount)"

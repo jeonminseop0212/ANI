@@ -45,24 +45,24 @@ class ANIMessageView: UIView {
   }
   
   private func setupTestData() {
-    let familyImages = [UIImage(named: "family1")!, UIImage(named: "family2")!, UIImage(named: "family3")!]
-    let user1 = User(adress: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
-    let user2 = User(adress: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
-    let user3 = User(adress: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "団体", introduce: "団体で猫たちのためにボランティア活動をしています")
-    let message1 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user1)
-    let message2 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user2)
-    let message3 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user3)
-    let message4 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user1)
-    let message5 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user2)
-    let message6 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user3)
-    let message7 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user1)
-    let message8 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user2)
-    let message9 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user3)
-    let message10 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user1)
-    let message11 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user2)
-    let message12 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user3)
-    
-    self.testMessageData = [message1, message2, message3, message4, message5, message6, message7, message8, message9, message10, message11, message12]
+//    let familyImages = [UIImage(named: "family1")!, UIImage(named: "family2")!, UIImage(named: "family3")!]
+//    let user1 = User(adress: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
+//    let user2 = User(adress: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
+//    let user3 = User(adress: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "団体", introduce: "団体で猫たちのためにボランティア活動をしています")
+//    let message1 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user1)
+//    let message2 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user2)
+//    let message3 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user3)
+//    let message4 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user1)
+//    let message5 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user2)
+//    let message6 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user3)
+//    let message7 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user1)
+//    let message8 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user2)
+//    let message9 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user3)
+//    let message10 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user1)
+//    let message11 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user2)
+//    let message12 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user3)
+//    
+//    self.testMessageData = [message1, message2, message3, message4, message5, message6, message7, message8, message9, message10, message11, message12]
   }
 }
 
@@ -74,7 +74,7 @@ extension ANIMessageView: UICollectionViewDataSource, UICollectionViewDelegateFl
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     let id = NSStringFromClass(ANIMessageViewCell.self)
     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! ANIMessageViewCell
-    cell.profileImageView?.image = testMessageData[indexPath.item].user.profileImage
+//    cell.profileImageView?.image = testMessageData[indexPath.item].user.profileImage
     cell.userNameLabel?.text = testMessageData[indexPath.item].user.name
     cell.subTitleLabel?.text = testMessageData[indexPath.item].subtitle
     return cell

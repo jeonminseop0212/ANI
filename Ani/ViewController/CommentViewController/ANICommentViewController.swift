@@ -145,11 +145,11 @@ class ANICommentViewController: UIViewController {
     switch commentMode {
     case .story:
       if let story = self.story {
-        navigationProfileImageView.image = story.user.profileImage
+//        navigationProfileImageView.image = story.user.profileImage
       }
     case .qna:
       if let qna = self.qna {
-        navigationProfileImageView.image = qna.user.profileImage
+//        navigationProfileImageView.image = qna.user.profileImage
       }
     }
   }

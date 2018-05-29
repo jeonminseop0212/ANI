@@ -298,14 +298,14 @@ extension ANIProfileEditViewController: ANIImageFilterViewControllerDelegate {
           let filteredImage = filteredImages[0],
           let user = self.user else { return }
     
-    if isFamilyAdd {
-      var userTemp = user
-      userTemp.familyImages?.append(filteredImage)
-      self.user = userTemp
-    } else if let editImageIndex = self.editImageIndex {
-      var userTemp = user
-      userTemp.familyImages?[editImageIndex] = filteredImage
-      self.user = userTemp
-    }
+//    if isFamilyAdd {
+//      var userTemp = user
+//      userTemp.familyImages?.append(filteredImage)
+//      self.user = userTemp
+//    } else if let editImageIndex = self.editImageIndex {
+//      var userTemp = user
+//      userTemp.familyImages?[editImageIndex] = filteredImage
+//      self.user = userTemp
+//    }
   }
 }
