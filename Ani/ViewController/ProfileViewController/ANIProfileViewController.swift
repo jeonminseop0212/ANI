@@ -8,6 +8,8 @@
 
 import UIKit
 import TinyConstraints
+import FirebaseAuth
+import FirebaseDatabase
 
 class ANIProfileViewController: UIViewController {
   
@@ -20,7 +22,7 @@ class ANIProfileViewController: UIViewController {
   private var recruits = [Recruit]()
   private var storys = [Story]()
   private var qnas = [Qna]()
-  private var me: User?
+  private var currentUser: FirebaseUser? { return ANISessionManager.shared.currentUser }
   private var user: User?
     
   override func viewDidLoad() {
@@ -29,7 +31,6 @@ class ANIProfileViewController: UIViewController {
     setupTestRecruitData()
     setupTestStoryData()
     setupTestQnaData()
-    setupMe()
     setup()
     setupNotification()
   }
@@ -77,6 +78,7 @@ class ANIProfileViewController: UIViewController {
     profileBasicView.storys = storys
     profileBasicView.qnas = qnas
     profileBasicView.user = user
+    profileBasicView.currentUser = currentUser
     profileBasicView.delegate = self
     self.view.addSubview(profileBasicView)
     profileBasicView.topToBottom(of: myNavigationBar)
@@ -148,13 +150,6 @@ class ANIProfileViewController: UIViewController {
     self.qnas = [qna1, qna2, qna3, qna1, qna2, qna3]
   }
   
-  private func setupMe() {
-    let familyImages = [UIImage(named: "family1")!, UIImage(named: "family2")!, UIImage(named: "family3")!]
-    let me = User(id: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "meProfileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
-    
-    self.me = me
-  }
-  
   private func setupNotification() {
     ANINotificationManager.receive(imageCellTapped: self, selector: #selector(presentImageBrowser(_:)))
     ANINotificationManager.receive(profileEditButtonTapped: self, selector: #selector(openProfileEdit))
@@ -177,7 +172,7 @@ class ANIProfileViewController: UIViewController {
     guard let profileBasicView = self.profileBasicView else { return }
     
     let profileEditViewController = ANIProfileEditViewController()
-    profileEditViewController.user = profileBasicView.user
+//    profileEditViewController.user = profileBasicView.user
     self.present(profileEditViewController, animated: true, completion: nil)
   }
 }
@@ -196,7 +191,7 @@ extension ANIProfileViewController: ANIProfileBasicViewDelegate {
     commentViewController.hidesBottomBarWhenPushed = true
     commentViewController.commentMode = CommentMode.story
     commentViewController.story = storys[index]
-    commentViewController.me = me
+//    commentViewController.me = currentUser
     self.navigationController?.pushViewController(commentViewController, animated: true)
   }
   
@@ -205,7 +200,7 @@ extension ANIProfileViewController: ANIProfileBasicViewDelegate {
     commentViewController.hidesBottomBarWhenPushed = true
     commentViewController.commentMode = CommentMode.qna
     commentViewController.qna = qnas[index]
-    commentViewController.me = me
+//    commentViewController.me = currentUser
     self.navigationController?.pushViewController(commentViewController, animated: true)
   }
 }

@@ -16,7 +16,7 @@ class ANIProfileTopCell: UITableViewCell {
   private weak var menuBar: ANIProfileMenuBar?
   private let MENU_BAR_HEIGHT: CGFloat = 60.0
   
-  var user: User? {
+  var user: FirebaseUser? {
     didSet {
       guard let familyView = self.familyView,
             let user = self.user else { return }

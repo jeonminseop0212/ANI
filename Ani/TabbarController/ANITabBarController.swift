@@ -8,6 +8,7 @@
 
 import UIKit
 import FirebaseAuth
+import FirebaseDatabase
 
 class ANITabBarController: UITabBarController {
   
@@ -52,8 +53,25 @@ class ANITabBarController: UITabBarController {
 //      print("signOutError \(signOutError)")
 //    }
     
-    if Auth.auth().currentUser == nil {
+    if Auth.auth().currentUser?.uid == nil {
+      do {
+        try Auth.auth().signOut()
+      } catch let signOutError as NSError {
+        print("signOutError \(signOutError)")
+      }
+      
       showInitialView()
+    } else {
+      if let current = Auth.auth().currentUser {
+        Database.database().reference().child("users").child(current.uid).observe(.value, with: { (snapshot) in
+          if let dictionary = snapshot.value as? [String: AnyObject] {
+            let user = FirebaseUser()
+            user.setValuesForKeys(dictionary)
+            
+            ANISessionManager.shared.currentUser = user
+          }
+        })
+      }
     }
   }
   

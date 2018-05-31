@@ -213,6 +213,7 @@ extension ANILoginView: ANIButtonViewDelegate {
         } else {
           //login
           self.delegate?.loginSuccess()
+          self.endEditing(true)
         }
       }
     }
