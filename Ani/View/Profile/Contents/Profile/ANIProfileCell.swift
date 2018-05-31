@@ -17,7 +17,7 @@ class ANIProfileCell: UITableViewCell {
   private weak var groupLabel: UILabel?
   private weak var introductionLabel: UILabel?
   
-  var user: User? {
+  var user: FirebaseUser? {
     didSet {
       reloadLayout()
     }
@@ -98,11 +98,10 @@ class ANIProfileCell: UITableViewCell {
           let introductionLabel = self.introductionLabel,
           let user = self.user else { return }
     
-    nameLabel.text = user.name
-    
+    nameLabel.text = user.userName
     groupLabel.text = user.kind
-    
-    introductionLabel.text = user.introduce
+//
+//    introductionLabel.text = user.introduce
   }
 }
 

@@ -35,6 +35,12 @@ class ANIProfileBasicView: UIView {
   var qnas = [Qna]()
   
   var user: User?
+  var currentUser: FirebaseUser? {
+    didSet {
+      guard let basicTableView = self.basicTableView else { return }
+      basicTableView.reloadData()
+    }
+  }
   
   var delegate: ANIProfileBasicViewDelegate?
   
@@ -93,21 +99,21 @@ extension ANIProfileBasicView: UITableViewDataSource {
     let section = indexPath.section
 
     if section == 0 {
-      guard let user = self.user else { return UITableViewCell() }
+//      guard let user = self.user else { return UITableViewCell() }
 
       let topCellId = NSStringFromClass(ANIProfileTopCell.self)
       let cell = tableView.dequeueReusableCell(withIdentifier: topCellId, for: indexPath) as! ANIProfileTopCell
       cell.delegate = self
       cell.selectedIndex = contentType.rawValue
-      cell.user = user
+      cell.user = currentUser
       return cell
     } else {
       if contentType == .profile {
-        guard let user = self.user else { return UITableViewCell() }
+//        guard let user = self.user else { return UITableViewCell() }
         
         let profileCellid = NSStringFromClass(ANIProfileCell.self)
         let cell = tableView.dequeueReusableCell(withIdentifier: profileCellid, for: indexPath) as! ANIProfileCell
-        cell.user = user
+        cell.user = currentUser
         return cell
       } else if contentType == .recruit {
         let recruitCellid = NSStringFromClass(ANIRecruitViewCell.self)

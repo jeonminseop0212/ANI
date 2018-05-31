@@ -9,6 +9,7 @@
 import UIKit
 import FirebaseAuth
 import FirebaseDatabase
+import FirebaseStorage
 
 protocol ANISignUpViewDelegate {
   func donButtonTapped()
@@ -291,34 +292,43 @@ class ANISignUpView: UIView {
       if let errorUnrap = error {
         print("loginError \(errorUnrap.localizedDescription)")
       } else {
-        self.delegate?.signUpSuccess()
-        
-        self.createUserData()
+        self.uploadUserData()
       }
     }
   }
   
-  private func createUserData() {
+  private func uploadUserData() {
     guard let currentUser = Auth.auth().currentUser,
-      let profileImage = self.profileImage,
-      let profileImageData = UIImageJPEGRepresentation(profileImage, 0.1),
-      let userNameTextField = self.userNameTextField,
-      let userName = userNameTextField.text else { return }
-//
-//    let user = User()
-//    user.uid = currentUser.uid
-//    user.name = userName
-//    let profileImageFile = File(data: profileImageData)
-//    user.profileImage = profileImageFile
-//    user.save()
-    let ref = Database.database().reference(fromURL: "https://ani-ios-1faa3.firebaseio.com/")
-    let userRef = ref.child("users").child(currentUser.uid)
-    let values = ["userName": userName]
-    userRef.updateChildValues(values) { (error, ref) in
+          let profileImage = self.profileImage,
+          let profileImageData = UIImageJPEGRepresentation(profileImage, 0.5),
+          let userNameTextField = self.userNameTextField,
+          let userName = userNameTextField.text else { return }
+
+    let storageRef = Storage.storage().reference()
+    storageRef.child("\(currentUser.uid).png").putData(profileImageData, metadata: nil) { (metaData, error) in
       if error != nil {
-        print("createUserDataError")
+        print("storageError")
         return
       }
+      
+      if let profileImageUrl = metaData?.downloadURL() {
+        let values = ["userName": userName, "kind": "個人", "profileImageUrl": profileImageUrl.absoluteString] as [String : AnyObject]
+        self.uploadUserIntoDatabase(uid: currentUser.uid, values: values)
+      }
+    }
+  }
+  
+  private func uploadUserIntoDatabase(uid: String, values: [String: AnyObject]) {
+    let databaseRef = Database.database().reference(fromURL: "https://ani-ios-1faa3.firebaseio.com/")
+    let userRef = databaseRef.child("users").child(uid)
+    
+    userRef.updateChildValues(values) { (error, ref) in
+      if error != nil {
+        print("dataError")
+        return
+      }
+      
+      self.delegate?.signUpSuccess()
     }
   }
   
