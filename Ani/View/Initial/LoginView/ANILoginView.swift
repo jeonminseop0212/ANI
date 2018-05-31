@@ -7,10 +7,12 @@
 //
 
 import UIKit
+import FirebaseAuth
 
 protocol ANILoginViewDelegate {
-  func reject()
+  func reject(notiText: String)
   func loginButtonTapped()
+  func loginSuccess()
 }
 
 class ANILoginView: UIView {
@@ -19,9 +21,9 @@ class ANILoginView: UIView {
   private weak var contentView: UIView?
   
   private weak var titleLabel: UILabel?
-  private weak var idTextFieldBG: UIView?
-  private weak var idImageView: UIImageView?
-  private weak var idTextField: UITextField?
+  private weak var emailTextFieldBG: UIView?
+  private weak var emailImageView: UIImageView?
+  private weak var emailTextField: UITextField?
   
   private weak var passwordTextFieldBG: UIView?
   private weak var passwordImageView: UIImageView?
@@ -72,40 +74,40 @@ class ANILoginView: UIView {
     titleLabel.rightToSuperview(offset: 10.0)
     self.titleLabel = titleLabel
     
-    //idTextFieldBG
-    let idTextFieldBG = UIView()
-    idTextFieldBG.backgroundColor = ANIColor.lightGray
-    idTextFieldBG.layer.cornerRadius = 10.0
-    idTextFieldBG.layer.masksToBounds = true
-    contentView.addSubview(idTextFieldBG)
-    idTextFieldBG.topToBottom(of: titleLabel, offset: 30.0)
-    idTextFieldBG.leftToSuperview(offset: 10.0)
-    idTextFieldBG.rightToSuperview(offset: 10.0)
-    self.idTextFieldBG = idTextFieldBG
+    //emailTextFieldBG
+    let emailTextFieldBG = UIView()
+    emailTextFieldBG.backgroundColor = ANIColor.lightGray
+    emailTextFieldBG.layer.cornerRadius = 10.0
+    emailTextFieldBG.layer.masksToBounds = true
+    contentView.addSubview(emailTextFieldBG)
+    emailTextFieldBG.topToBottom(of: titleLabel, offset: 30.0)
+    emailTextFieldBG.leftToSuperview(offset: 10.0)
+    emailTextFieldBG.rightToSuperview(offset: 10.0)
+    self.emailTextFieldBG = emailTextFieldBG
     
-    //idImageView
-    let idImageView = UIImageView()
-    idImageView.image = UIImage(named: "idImage")
-    idTextFieldBG.addSubview(idImageView)
-    idImageView.width(19.0)
-    idImageView.height(18.0)
-    idImageView.leftToSuperview(offset: 10.0)
-    idImageView.centerYToSuperview()
-    self.idImageView = idImageView
+    //emailImageView
+    let emailImageView = UIImageView()
+    emailImageView.image = UIImage(named: "idImage")
+    emailTextFieldBG.addSubview(emailImageView)
+    emailImageView.width(19.0)
+    emailImageView.height(18.0)
+    emailImageView.leftToSuperview(offset: 10.0)
+    emailImageView.centerYToSuperview()
+    self.emailImageView = emailImageView
     
-    //idTextField
-    let idTextField = UITextField()
-    idTextField.font = UIFont.systemFont(ofSize: 18.0)
-    idTextField.textColor = ANIColor.dark
-    idTextField.backgroundColor = .clear
-    idTextField.placeholder = "IDまたはユーザーネーム"
-    idTextField.returnKeyType = .done
-    idTextField.delegate = self
-    idTextFieldBG.addSubview(idTextField)
+    //emailTextField
+    let emailTextField = UITextField()
+    emailTextField.font = UIFont.systemFont(ofSize: 18.0)
+    emailTextField.textColor = ANIColor.dark
+    emailTextField.backgroundColor = .clear
+    emailTextField.placeholder = "IDまたはユーザーネーム"
+    emailTextField.returnKeyType = .done
+    emailTextField.delegate = self
+    emailTextFieldBG.addSubview(emailTextField)
     let insets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: -10.0)
-    idTextField.edgesToSuperview(excluding: .left, insets: insets)
-    idTextField.leftToRight(of: idImageView, offset: 10.0)
-    self.idTextField = idTextField
+    emailTextField.edgesToSuperview(excluding: .left, insets: insets)
+    emailTextField.leftToRight(of: emailImageView, offset: 10.0)
+    self.emailTextField = emailTextField
     
     //passwordTextFieldBG
     let passwordTextFieldBG = UIView()
@@ -113,7 +115,7 @@ class ANILoginView: UIView {
     passwordTextFieldBG.layer.cornerRadius = 10.0
     passwordTextFieldBG.layer.masksToBounds = true
     contentView.addSubview(passwordTextFieldBG)
-    passwordTextFieldBG.topToBottom(of: idTextFieldBG, offset: 20.0)
+    passwordTextFieldBG.topToBottom(of: emailTextFieldBG, offset: 20.0)
     passwordTextFieldBG.leftToSuperview(offset: 10.0)
     passwordTextFieldBG.rightToSuperview(offset: 10.0)
     self.passwordTextFieldBG = passwordTextFieldBG
@@ -124,7 +126,7 @@ class ANILoginView: UIView {
     passwordTextFieldBG.addSubview(passwordImageView)
     passwordImageView.width(15.0)
     passwordImageView.height(20.0)
-    passwordImageView.centerX(to: idImageView)
+    passwordImageView.centerX(to: emailImageView)
     passwordImageView.centerYToSuperview()
     self.passwordImageView = passwordImageView
     
@@ -139,7 +141,7 @@ class ANILoginView: UIView {
     passwordTextField.delegate = self
     passwordTextFieldBG.addSubview(passwordTextField)
     passwordTextField.edgesToSuperview(excluding: .left, insets: insets)
-    passwordTextField.left(to: idTextField)
+    passwordTextField.left(to: emailTextField)
     self.passwordTextField = passwordTextField
     
     //loginButton
@@ -190,9 +192,30 @@ class ANILoginView: UIView {
 extension ANILoginView: ANIButtonViewDelegate {
   func buttonViewTapped(view: ANIButtonView) {
     if view === loginButton {
-      //TODO: reject, sever
-//      self.delegate?.reject()
-      self.delegate?.loginButtonTapped()
+      guard let emailTextField = self.emailTextField,
+        let email = emailTextField.text,
+        let passwordTextField = self.passwordTextField,
+        let password = passwordTextField.text else { return }
+      
+      Auth.auth().signIn(withEmail: email, password: password) { (successUser, error) in
+        if let errorUnrap = error {
+          let nsError = errorUnrap as NSError
+          
+          print("nsError \(nsError)")
+          if nsError.code == 17008 {
+            self.delegate?.reject(notiText: "存在しないメールアドレスです！")
+          } else if nsError.code == 17009 {
+            self.delegate?.reject(notiText: "パスワードが違います！")
+          } else if nsError.code == 17011 || nsError.code == 17008 {
+            self.delegate?.reject(notiText: "存在しないメールアドレスです！")
+          } else {
+            self.delegate?.reject(notiText: "ログインに失敗しました！")
+          }
+        } else {
+          //login
+          self.delegate?.loginSuccess()
+        }
+      }
     }
   }
 }
