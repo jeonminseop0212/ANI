@@ -11,7 +11,6 @@ import FirebaseAuth
 
 protocol ANILoginViewDelegate {
   func reject(notiText: String)
-  func loginButtonTapped()
   func loginSuccess()
 }
 

@@ -177,7 +177,6 @@ extension ANISignUpViewController: ANISignUpViewDelegate {
   }
   
   func donButtonTapped() {
-    ANITabBarController.isLogin = true
     self.navigationController?.dismiss(animated: true, completion: nil)
   }
   

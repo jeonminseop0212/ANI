@@ -156,11 +156,6 @@ extension ANILoginViewController: ANILoginViewDelegate {
     self.navigationController?.dismiss(animated: true, completion: nil)
   }
   
-  func loginButtonTapped() {
-    ANITabBarController.isLogin = true
-    self.navigationController?.dismiss(animated: true, completion: nil)
-  }
-  
   func reject(notiText: String) {
     guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
           !isRejectAnimating,
