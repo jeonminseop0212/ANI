@@ -305,14 +305,14 @@ class ANISignUpView: UIView {
           let userName = userNameTextField.text else { return }
 
     let storageRef = Storage.storage().reference()
-    storageRef.child("\(currentUser.uid).png").putData(profileImageData, metadata: nil) { (metaData, error) in
+    storageRef.child(KEY_PROFILE_IMAGES).child("\(currentUser.uid).jpeg").putData(profileImageData, metadata: nil) { (metaData, error) in
       if error != nil {
         print("storageError")
         return
       }
       
       if let profileImageUrl = metaData?.downloadURL() {
-        let values = ["userName": userName, "kind": "個人", "profileImageUrl": profileImageUrl.absoluteString] as [String : AnyObject]
+        let values = [KEY_USER_NAME: userName, KEY_KIND: "個人", KEY_INTRODUCE: "", KEY_PROFILE_IMAGE_URL: profileImageUrl.absoluteString] as [String : AnyObject]
         self.uploadUserIntoDatabase(uid: currentUser.uid, values: values)
       }
     }
@@ -320,7 +320,7 @@ class ANISignUpView: UIView {
   
   private func uploadUserIntoDatabase(uid: String, values: [String: AnyObject]) {
     let databaseRef = Database.database().reference(fromURL: "https://ani-ios-1faa3.firebaseio.com/")
-    let userRef = databaseRef.child("users").child(uid)
+    let userRef = databaseRef.child(KEY_USERS).child(uid)
     
     userRef.updateChildValues(values) { (error, ref) in
       if error != nil {

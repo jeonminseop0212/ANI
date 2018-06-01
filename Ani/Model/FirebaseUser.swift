@@ -11,5 +11,6 @@ import UIKit
 class FirebaseUser: NSObject {
   @objc var userName: String?
   @objc var kind: String?
+  @objc var introduce: String?
   @objc var profileImageUrl: String?
 }

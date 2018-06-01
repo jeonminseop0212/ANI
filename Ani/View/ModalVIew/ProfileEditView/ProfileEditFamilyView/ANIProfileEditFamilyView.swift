@@ -17,7 +17,15 @@ class ANIProfileEditFamilyView: UIView {
   
   private weak var familyCollectionView: UICollectionView?
   
-  var user: User? {
+  var profileImage: UIImage? {
+    didSet {
+      guard let familyCollectionView = self.familyCollectionView else { return }
+      
+      familyCollectionView.reloadData()
+    }
+  }
+  
+  var currentUser: FirebaseUser? {
     didSet {
       guard let familyCollectionView = self.familyCollectionView else { return }
       
@@ -60,39 +68,49 @@ class ANIProfileEditFamilyView: UIView {
 //MARK: UICollectionViewDataSource
 extension ANIProfileEditFamilyView: UICollectionViewDataSource {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-    guard let user = self.user,
-          let familyImages = user.familyImages else { return 0 }
+//    guard let currentUser = self.currentUser else { return 0 }
     
-    return familyImages.count + 1
+    return 1
   }
   
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-    guard let user = self.user,
-          let familyImages = user.familyImages else { return UICollectionViewCell() }
     let id = NSStringFromClass(ANIProfileEditFamilyCell.self)
     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! ANIProfileEditFamilyCell
-    if indexPath.item != familyImages.count {
-      cell.familyImageView?.image = familyImages[indexPath.item]
-      cell.imagePickImageView?.alpha = 1.0
-    } else {
-      cell.familyImageView?.image = UIImage(named: "familyImageAdd")
-      cell.imagePickImageView?.alpha = 0.0
+    
+    if let profileImage = self.profileImage {
+      cell.familyImageView?.image = profileImage
+    } else if let currentUser = currentUser, let profileImageUrl = currentUser.profileImageUrl {
+      cell.familyImageView?.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
     }
+    
     return cell
+    
+//    guard let user = self.user,
+//          let familyImages = user.familyImages else { return UICollectionViewCell() }
+//    let id = NSStringFromClass(ANIProfileEditFamilyCell.self)
+//    let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! ANIProfileEditFamilyCell
+//    if indexPath.item != familyImages.count {
+//      cell.familyImageView?.image = familyImages[indexPath.item]
+//      cell.imagePickImageView?.alpha = 1.0
+//    } else {
+//      cell.familyImageView?.image = UIImage(named: "familyImageAdd")
+//      cell.imagePickImageView?.alpha = 0.0
+//    }
+//    return cell
   }
 }
 
 //MARK: UICollectionViewDelegate
 extension ANIProfileEditFamilyView: UICollectionViewDelegate {
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-    guard let user = self.user,
-          let familyImages = user.familyImages else { return }
-    
-    if indexPath.item == familyImages.count {
-      self.delegate?.imagePickerCellTapped()
-    } else {
+//    guard let user = self.user,
+//          let familyImages = user.familyImages else { return }
+//    
+//    if indexPath.item == familyImages.count {
+//      self.delegate?.imagePickerCellTapped()
+//    } else {
       self.delegate?.imageEditButtonTapped(index: indexPath.item)
-    }
+//    }
   }
 }
 

@@ -25,7 +25,7 @@ class ANINotiViewController: UIViewController {
   
   private func setup() {
     //basic
-    Orientation.lockOrientation(.portrait)
+    ANIOrientation.lockOrientation(.portrait)
     navigationController?.setNavigationBarHidden(true, animated: false)
     
     //container

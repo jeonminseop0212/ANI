@@ -100,8 +100,7 @@ class ANIProfileCell: UITableViewCell {
     
     nameLabel.text = user.userName
     groupLabel.text = user.kind
-//
-//    introductionLabel.text = user.introduce
+    introductionLabel.text = user.introduce
   }
 }
 

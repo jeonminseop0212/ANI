@@ -33,6 +33,7 @@ class ANIFamilyViewCell: UICollectionViewCell {
     self.familyImageViewBG = imageViewBG
     
     let imageView = UIImageView()
+    imageView.backgroundColor = ANIColor.bg
     imageViewBG.addSubview(imageView)
     imageView.layer.cornerRadius = FAMILY_IMAGE_VIEW_BG_HEIGHT / 2
     imageView.layer.masksToBounds = true
