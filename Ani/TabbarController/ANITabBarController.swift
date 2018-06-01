@@ -52,8 +52,17 @@ class ANITabBarController: UITabBarController {
 //    } catch let signOutError as NSError {
 //      print("signOutError \(signOutError)")
 //    }
-    
-    if Auth.auth().currentUser?.uid == nil {
+    ANISessionManager.shared.currentUserUid = Auth.auth().currentUser?.uid
+    if let currentUserUid = ANISessionManager.shared.currentUserUid {
+      Database.database().reference().child(KEY_USERS).child(currentUserUid).observe(.value, with: { (snapshot) in
+        if let dictionary = snapshot.value as? [String: AnyObject] {
+          let user = FirebaseUser()
+          user.setValuesForKeys(dictionary)
+          
+          ANISessionManager.shared.currentUser = user
+        }
+      })
+    } else {
       do {
         try Auth.auth().signOut()
       } catch let signOutError as NSError {
@@ -61,17 +70,6 @@ class ANITabBarController: UITabBarController {
       }
       
       showInitialView()
-    } else {
-      if let current = Auth.auth().currentUser {
-        Database.database().reference().child("users").child(current.uid).observe(.value, with: { (snapshot) in
-          if let dictionary = snapshot.value as? [String: AnyObject] {
-            let user = FirebaseUser()
-            user.setValuesForKeys(dictionary)
-            
-            ANISessionManager.shared.currentUser = user
-          }
-        })
-      }
     }
   }
   

@@ -9,6 +9,12 @@
 import UIKit
 import Gallery
 import TinyConstraints
+import FirebaseDatabase
+import FirebaseStorage
+
+protocol ANIProfileEditViewControllerDelegate {
+  func didEdit()
+}
 
 class ANIProfileEditViewController: UIViewController {
   
@@ -27,15 +33,19 @@ class ANIProfileEditViewController: UIViewController {
   
   private var editImageIndex: Int?
   
-  var user: User? {
+  var currentUser: FirebaseUser?
+  
+  private var isFamilyAdd: Bool = false
+  
+  var profileImage: UIImage? {
     didSet {
-      guard let profileEditView = self.profileEditView else { return }
-      
-      profileEditView.user = user
+      guard let profileEditView = self.profileEditView,
+            let profileImage = self.profileImage else { return }
+      profileEditView.profileImage = profileImage
     }
   }
   
-  private var isFamilyAdd: Bool = false
+  var delegate: ANIProfileEditViewControllerDelegate?
   
   override func viewDidLoad() {
     setup()
@@ -115,9 +125,7 @@ class ANIProfileEditViewController: UIViewController {
     //profileEditView
     let profileEditView = ANIProfileEditView()
     profileEditView.delegate = self
-    if let user = self.user {
-      profileEditView.user = user
-    }
+    profileEditView.currentUser = currentUser
     self.view.addSubview(profileEditView)
     profileEditView.leftToSuperview()
     profileEditView.rightToSuperview()
@@ -185,8 +193,48 @@ class ANIProfileEditViewController: UIViewController {
   }
   
   @objc private func edit() {
-    //TODO: update user server
-    self.dismiss(animated: true, completion: nil)
+    guard let profileEditView = self.profileEditView,
+          let currentUserUid = ANISessionManager.shared.currentUserUid,
+          let updateUser = profileEditView.getUpdateUser(),
+          let userName = updateUser.userName,
+          let kind = updateUser.kind,
+          let introduce = updateUser.introduce else { return }
+    
+    if let profileImage = self.profileImage, let profileImageData = UIImageJPEGRepresentation(profileImage, 0.5) {
+      let storageRef = Storage.storage().reference()
+      storageRef.child(KEY_PROFILE_IMAGES).child("\(currentUserUid).jpeg").putData(profileImageData, metadata: nil) { (metaData, error) in
+        if error != nil {
+          print("storageError")
+          return
+        }
+        
+        if let profileImageUrl = metaData?.downloadURL() {
+          let values = [KEY_USER_NAME: userName, KEY_KIND: kind, KEY_INTRODUCE: introduce, KEY_PROFILE_IMAGE_URL: profileImageUrl.absoluteString] as [String : AnyObject]
+          self.uploadUserIntoDatabase(uid: currentUserUid, values: values)
+        }
+      }
+    } else {
+      let values = [KEY_USER_NAME: userName, KEY_KIND: kind, KEY_INTRODUCE: introduce] as [String : AnyObject]
+      self.uploadUserIntoDatabase(uid: currentUserUid, values: values)
+    }
+  }
+  
+  private func uploadUserIntoDatabase(uid: String, values: [String: AnyObject]) {
+    let databaseRef = Database.database().reference(fromURL: "https://ani-ios-1faa3.firebaseio.com/")
+    let userRef = databaseRef.child(KEY_USERS).child(uid)
+    
+    userRef.updateChildValues(values)
+    
+    databaseRef.child(KEY_USERS).child(uid).observe(.value, with: { (snapshot) in
+      if let dictionary = snapshot.value as? [String: AnyObject] {
+        let user = FirebaseUser()
+        user.setValuesForKeys(dictionary)
+
+        ANISessionManager.shared.currentUser = user
+        self.delegate?.didEdit()
+        self.dismiss(animated: true, completion: nil)
+      }
+    })
   }
 }
 
@@ -295,17 +343,25 @@ extension ANIProfileEditViewController: GalleryControllerDelegate {
 extension ANIProfileEditViewController: ANIImageFilterViewControllerDelegate {
   func doneFilterImages(filteredImages: [UIImage?]) {
     guard !filteredImages.isEmpty,
-          let filteredImage = filteredImages[0],
-          let user = self.user else { return }
+          let filteredImage = filteredImages[0] else { return }
     
     if isFamilyAdd {
-      var userTemp = user
-      userTemp.familyImages?.append(filteredImage)
-      self.user = userTemp
-    } else if let editImageIndex = self.editImageIndex {
-      var userTemp = user
-      userTemp.familyImages?[editImageIndex] = filteredImage
-      self.user = userTemp
+      
+    } else {
+      profileImage = filteredImage
     }
+//    guard !filteredImages.isEmpty,
+//          let filteredImage = filteredImages[0],
+//          let user = self.user else { return }
+//    
+//    if isFamilyAdd {
+//      var userTemp = user
+//      userTemp.familyImages?.append(filteredImage)
+//      self.user = userTemp
+//    } else if let editImageIndex = self.editImageIndex {
+//      var userTemp = user
+//      userTemp.familyImages?[editImageIndex] = filteredImage
+//      self.user = userTemp
+//    }
   }
 }

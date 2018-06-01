@@ -12,4 +12,5 @@ class ANISessionManager: NSObject {
   static let shared = ANISessionManager()
   
   var currentUser: FirebaseUser?
+  var currentUserUid: String?
 }

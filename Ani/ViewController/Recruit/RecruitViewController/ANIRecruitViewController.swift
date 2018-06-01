@@ -48,7 +48,7 @@ class ANIRecruitViewController: UIViewController {
   
   private func setup() {
     //basic
-    Orientation.lockOrientation(.portrait)
+    ANIOrientation.lockOrientation(.portrait)
     self.view.backgroundColor = .white
     self.navigationController?.setNavigationBarHidden(true, animated: false)
     self.navigationController?.navigationBar.isTranslucent = false

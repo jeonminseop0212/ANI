@@ -44,7 +44,7 @@ class ANIProfileViewController: UIViewController {
     self.view.backgroundColor = .white
     self.navigationController?.setNavigationBarHidden(true, animated: false)
     self.navigationController?.navigationBar.isTranslucent = false
-    Orientation.lockOrientation(.portrait)
+    ANIOrientation.lockOrientation(.portrait)
     
     //myNavigationBar
     let myNavigationBar = UIView()
@@ -169,10 +169,9 @@ class ANIProfileViewController: UIViewController {
   }
   
   @objc private func openProfileEdit() {
-    guard let profileBasicView = self.profileBasicView else { return }
-    
     let profileEditViewController = ANIProfileEditViewController()
-//    profileEditViewController.user = profileBasicView.user
+    profileEditViewController.delegate = self
+    profileEditViewController.currentUser = currentUser
     self.present(profileEditViewController, animated: true, completion: nil)
   }
 }
@@ -202,5 +201,12 @@ extension ANIProfileViewController: ANIProfileBasicViewDelegate {
     commentViewController.qna = qnas[index]
 //    commentViewController.me = currentUser
     self.navigationController?.pushViewController(commentViewController, animated: true)
+  }
+}
+
+extension ANIProfileViewController: ANIProfileEditViewControllerDelegate {
+  func didEdit() {
+    guard let profileBasicView = self.profileBasicView else { return }
+    profileBasicView.currentUser = currentUser
   }
 }
