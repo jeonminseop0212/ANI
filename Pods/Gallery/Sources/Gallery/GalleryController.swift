@@ -45,10 +45,6 @@ public class GalleryController: UIViewController, PermissionControllerDelegate {
     navigationController?.setNavigationBarHidden(true, animated: false)
   }
   
-  public override func viewWillDisappear(_ animated: Bool) {
-    UIApplication.shared.isStatusBarHidden = false
-  }
-  
   public override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
     get {
       return .portrait

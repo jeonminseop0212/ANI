@@ -21,7 +21,7 @@ class ANIInitialViewController: UIViewController {
     self.view.backgroundColor = .white
     self.navigationController?.setNavigationBarHidden(true, animated: false)
     self.navigationController?.navigationBar.isTranslucent = false
-    UIApplication.shared.statusBar?.isHidden = true
+    UIApplication.shared.isStatusBarHidden = true
     
     //initialView
     let initialView = ANIInitialView()
