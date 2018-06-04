@@ -246,7 +246,9 @@ class ANIProfileEditViewController: UIViewController {
               for image in sortdImages {
                 uiImages.append(image.value)
               }
-              completion?(uiImages)
+              DispatchQueue.main.async {
+                completion?(uiImages)
+              }
             }
           }
         }
