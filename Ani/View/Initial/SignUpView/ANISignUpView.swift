@@ -312,7 +312,7 @@ class ANISignUpView: UIView {
       }
       
       if let profileImageUrl = metaData?.downloadURL() {
-        let values = [KEY_USER_NAME: userName, KEY_KIND: "個人", KEY_INTRODUCE: "", KEY_PROFILE_IMAGE_URL: profileImageUrl.absoluteString] as [String : AnyObject]
+        let values = [KEY_UID: currentUser.uid, KEY_USER_NAME: userName, KEY_KIND: "個人", KEY_INTRODUCE: "", KEY_PROFILE_IMAGE_URL: profileImageUrl.absoluteString] as [String : AnyObject]
         self.uploadUserIntoDatabase(uid: currentUser.uid, values: values)
       }
     }

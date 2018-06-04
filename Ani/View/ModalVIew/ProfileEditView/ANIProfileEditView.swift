@@ -55,6 +55,12 @@ class ANIProfileEditView: UIView {
       familyView.profileImage = profileImage
     }
   }
+  var familyImages: [UIImage?]? {
+    didSet {
+      guard let familyView = self.familyView else { return }
+      familyView.familyImages = familyImages
+    }
+  }
   
   var delegate: ANIProfileEditViewDelegate?
   
