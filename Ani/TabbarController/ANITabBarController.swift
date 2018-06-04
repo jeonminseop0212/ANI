@@ -7,10 +7,10 @@
 //
 
 import UIKit
+import FirebaseAuth
+import FirebaseDatabase
 
 class ANITabBarController: UITabBarController {
-
-  static var isLogin: Bool = false
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -47,13 +47,33 @@ class ANITabBarController: UITabBarController {
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(true)
     
-    if !ANITabBarController.isLogin {
+//    do {
+//      try Auth.auth().signOut()
+//    } catch let signOutError as NSError {
+//      print("signOutError \(signOutError)")
+//    }
+    ANISessionManager.shared.currentUserUid = Auth.auth().currentUser?.uid
+    if let currentUserUid = ANISessionManager.shared.currentUserUid {
+      Database.database().reference().child(KEY_USERS).child(currentUserUid).observe(.value, with: { (snapshot) in
+        if let dictionary = snapshot.value as? [String: AnyObject] {
+          let user = FirebaseUser()
+          user.setValuesForKeys(dictionary)
+          
+          ANISessionManager.shared.currentUser = user
+        }
+      })
+    } else {
+      do {
+        try Auth.auth().signOut()
+      } catch let signOutError as NSError {
+        print("signOutError \(signOutError)")
+      }
+      
       showInitialView()
     }
   }
   
   private func showInitialView() {
-    //TODO: 初めての開いた、アカウントがない場合だけinitialviewを開く
     let initialViewController = ANIInitialViewController()
     let initialNV = UINavigationController(rootViewController: initialViewController)
     self.present(initialNV, animated: true, completion: nil)

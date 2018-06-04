@@ -37,16 +37,30 @@ class ANIProfileEditView: UIView {
   private weak var introduceBG: UIView?
   private weak var introduceTextView: ANIPlaceHolderTextView?
   
-  var user: User? {
+  var currentUser: FirebaseUser? {
     didSet {
-      guard let familyView = self.familyView else { return }
-      familyView.user = user
+      guard let familyView = self.familyView,
+            let currentUser = self.currentUser else { return }
+      familyView.currentUser = currentUser
       
       reloadLayout()
     }
   }
   
   private var selectedTextViewMaxY: CGFloat?
+  
+  var profileImage = UIImage() {
+    didSet {
+      guard let familyView = self.familyView else { return }
+      familyView.profileImage = profileImage
+    }
+  }
+  var familyImages: [UIImage?]? {
+    didSet {
+      guard let familyView = self.familyView else { return }
+      familyView.familyImages = familyImages
+    }
+  }
   
   var delegate: ANIProfileEditViewDelegate?
   
@@ -225,13 +239,11 @@ class ANIProfileEditView: UIView {
     guard let nameTextView = self.nameTextView,
           let kindLabel = self.kindLabel,
           let introduceTextView = self.introduceTextView,
-          let user = self.user else { return }
+          let currentUser = self.currentUser else { return }
     
-    nameTextView.text = user.name
-    
-    kindLabel.text = user.kind
-    
-    introduceTextView.text = user.introduce
+    nameTextView.text = currentUser.userName
+    kindLabel.text = currentUser.kind
+    introduceTextView.text = currentUser.introduce
   }
   
   private func setHideButtonOnKeyboard(textView: UITextView){
@@ -244,14 +256,28 @@ class ANIProfileEditView: UIView {
   }
   
   private func editButtonEnable() {
-    guard let nameTextView = self.nameTextView,
-          let introduceTextView = self.introduceTextView else { return }
+    guard let nameTextView = self.nameTextView else { return }
     
-    if nameTextView.text.count > 0 && introduceTextView.text.count > 0 {
+    if nameTextView.text.count > 0 {
       self.delegate?.editButtonEnable(enable: true)
     } else {
       self.delegate?.editButtonEnable(enable: false)
     }
+  }
+  
+  func getUpdateUser() -> FirebaseUser? {
+    guard let nameTextView = self.nameTextView,
+          let name = nameTextView.text,
+          let kindLabel = self.kindLabel,
+          let kind = kindLabel.text,
+          let introduceTextView = self.introduceTextView,
+          let introduce = introduceTextView.text else { return nil }
+    
+    let updateUser = FirebaseUser()
+    updateUser.userName = name
+    updateUser.kind = kind
+    updateUser.introduce = introduce
+    return updateUser
   }
   
   @objc func keyboardWillChangeFrame(_ notification: Notification) {
