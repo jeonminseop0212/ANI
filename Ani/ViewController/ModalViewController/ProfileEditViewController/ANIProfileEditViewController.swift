@@ -66,6 +66,10 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
     setupNotification()
   }
   
+  override func viewWillAppear(_ animated: Bool) {
+    UIApplication.shared.isStatusBarHidden = false
+  }
+  
   private func setup() {
     //basic
     self.view.backgroundColor = .white

@@ -43,7 +43,7 @@ class ANIRecruitViewController: UIViewController {
   
   override func viewWillAppear(_ animated: Bool) {
     UIApplication.shared.statusBarStyle = .default
-    UIApplication.shared.statusBar?.isHidden = false
+    UIApplication.shared.isStatusBarHidden = false
   }
   
   private func setup() {
