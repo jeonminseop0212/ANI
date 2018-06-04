@@ -29,7 +29,6 @@ class ANIRecruitDetailViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     setup()
-    setupNotification()
   }
   
   private func setup() {
@@ -108,10 +107,6 @@ class ANIRecruitDetailViewController: UIViewController {
     self.applyButtonLabel = applyButtonLabel
   }
   
-  private func setupNotification() {
-    ANINotificationManager.receive(imageCellTapped: self, selector: #selector(presentImageBrowser(_:)))
-  }
-  
   //MARK: Action
   @objc private func back() {
     isBack = true
@@ -122,10 +117,9 @@ class ANIRecruitDetailViewController: UIViewController {
     print("apply")
   }
   
-  @objc private func presentImageBrowser(_ notification: NSNotification) {
-    guard let item = notification.object as? (Int, [UIImage?]) else { return }
-    let selectedIndex = item.0
-    let images = item.1
+  private func presentImageBrowser(index: Int, images: [UIImage?]) {
+    let selectedIndex = index
+    let images = images
     let imageBrowserViewController = ANIImageBrowserViewController()
     imageBrowserViewController.selectedIndex = selectedIndex
     imageBrowserViewController.images = images
@@ -142,29 +136,33 @@ extension ANIRecruitDetailViewController: ANIRecruitDetailViewDelegate {
           let clipButton = self.clipButton,
           !isBack else { return }
     
-      if offset > 1 {
-        let backGroundColorOffset: CGFloat = 1.0
-        let tintColorOffset = 1.0 - offset
+    if offset > 1 {
+      let backGroundColorOffset: CGFloat = 1.0
+      let tintColorOffset = 1.0 - offset
+      backButton.tintColor = UIColor(hue: 0, saturation: 0, brightness: tintColorOffset, alpha: 1)
+      clipButton.tintColor = UIColor(hue: 0, saturation: 0, brightness: tintColorOffset, alpha: 1)
+      myNavigationBar.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: backGroundColorOffset)
+      UIApplication.shared.statusBarStyle = .default
+      statusBarStyle = .default
+    } else {
+      let tintColorOffset = 1.0 - offset
+      let ANIColorDarkBrightness: CGFloat = 0.18
+      if tintColorOffset > ANIColorDarkBrightness {
         backButton.tintColor = UIColor(hue: 0, saturation: 0, brightness: tintColorOffset, alpha: 1)
         clipButton.tintColor = UIColor(hue: 0, saturation: 0, brightness: tintColorOffset, alpha: 1)
-        myNavigationBar.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: backGroundColorOffset)
-        UIApplication.shared.statusBarStyle = .default
-        statusBarStyle = .default
       } else {
-        let tintColorOffset = 1.0 - offset
-        let ANIColorDarkBrightness: CGFloat = 0.18
-        if tintColorOffset > ANIColorDarkBrightness {
-          backButton.tintColor = UIColor(hue: 0, saturation: 0, brightness: tintColorOffset, alpha: 1)
-          clipButton.tintColor = UIColor(hue: 0, saturation: 0, brightness: tintColorOffset, alpha: 1)
-        } else {
-          backButton.tintColor = UIColor(hue: 0, saturation: 0, brightness: ANIColorDarkBrightness, alpha: 1)
-          clipButton.tintColor = UIColor(hue: 0, saturation: 0, brightness: ANIColorDarkBrightness, alpha: 1)
-        }
-       
-        myNavigationBar.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: offset)
-        UIApplication.shared.statusBarStyle = .lightContent
-        statusBarStyle = .lightContent
+        backButton.tintColor = UIColor(hue: 0, saturation: 0, brightness: ANIColorDarkBrightness, alpha: 1)
+        clipButton.tintColor = UIColor(hue: 0, saturation: 0, brightness: ANIColorDarkBrightness, alpha: 1)
       }
+     
+      myNavigationBar.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: offset)
+      UIApplication.shared.statusBarStyle = .lightContent
+      statusBarStyle = .lightContent
+    }
+  }
+  
+  func imageCellTapped(index: Int, introduceImages: [UIImage?]) {
+    presentImageBrowser(index: index, images: introduceImages)
   }
 }
 

@@ -9,6 +9,10 @@
 import UIKit
 import Photos
 
+protocol ANIRecruitDetailImagesViewDelegate {
+  func imageCellTapped(index: Int, introduceImages: [UIImage?])
+}
+
 class ANIRecruitDetailImagesView: UIView {
   
   private weak var imagesViewCollectionView: UICollectionView?
@@ -18,6 +22,8 @@ class ANIRecruitDetailImagesView: UIView {
       reloadLayout()
     }
   }
+  
+  var delegate: ANIRecruitDetailImagesViewDelegate?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -77,6 +83,6 @@ extension ANIRecruitDetailImagesView: UICollectionViewDelegateFlowLayout {
 //MARK: UICollectionViewDelegate
 extension ANIRecruitDetailImagesView: UICollectionViewDelegate {
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-    ANINotificationManager.postImageCellTapped(tapCellItem: (indexPath.item, introduceImages))
+    self.delegate?.imageCellTapped(index: indexPath.item, introduceImages: introduceImages)    
   }
 }
