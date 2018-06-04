@@ -152,14 +152,16 @@ class ANILoginViewController: UIViewController {
 
 //MARK: ANILoginViewDelegate
 extension ANILoginViewController: ANILoginViewDelegate {
-  func loginButtonTapped() {
-    ANITabBarController.isLogin = true
+  func loginSuccess() {
     self.navigationController?.dismiss(animated: true, completion: nil)
   }
   
-  func reject() {
+  func reject(notiText: String) {
     guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
-          !isRejectAnimating else { return }
+          !isRejectAnimating,
+          let rejectLabel = self.rejectLabel else { return }
+    
+    rejectLabel.text = notiText
     
     rejectViewBottomConstraint.constant = UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
     UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut, animations: {

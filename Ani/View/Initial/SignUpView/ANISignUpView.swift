@@ -7,11 +7,15 @@
 //
 
 import UIKit
+import FirebaseAuth
+import FirebaseDatabase
+import FirebaseStorage
 
 protocol ANISignUpViewDelegate {
   func donButtonTapped()
   func prifileImagePickButtonTapped()
   func reject(notiText: String)
+  func signUpSuccess()
 }
 
 class ANISignUpView: UIView {
@@ -26,9 +30,9 @@ class ANISignUpView: UIView {
   private let PROFILE_IMAGE_PICK_BUTTON_HEIGHT: CGFloat = 30.0
   private weak var profileImagePickButton: ANIImageButtonView?
   
-  private weak var idTitleLabel: UILabel?
-  private weak var idTextFieldBG: UIView?
-  private weak var idTextField: UITextField?
+  private weak var adressTitleLabel: UILabel?
+  private weak var adressTextFieldBG: UIView?
+  private weak var adressTextField: UITextField?
   
   private weak var passwordTitleLabel: UILabel?
   private weak var passwordTextFieldBG: UIView?
@@ -107,40 +111,40 @@ class ANISignUpView: UIView {
     profileImagePickButton.right(to: profileImageView)
     self.profileImagePickButton = profileImagePickButton
     
-    //idTitleLabel
-    let idTitleLabel = UILabel()
-    idTitleLabel.font = UIFont.boldSystemFont(ofSize: 20.0)
-    idTitleLabel.textColor = ANIColor.dark
-    idTitleLabel.text = "IDを決めましょ！"
-    contentView.addSubview(idTitleLabel)
-    idTitleLabel.topToBottom(of: profileImageView, offset: CONTENT_SPACE)
-    idTitleLabel.leftToSuperview(offset: 10.0)
-    idTitleLabel.rightToSuperview(offset: 10.0)
-    self.idTitleLabel = idTitleLabel
+    //adressTitleLabel
+    let adressTitleLabel = UILabel()
+    adressTitleLabel.font = UIFont.boldSystemFont(ofSize: 20.0)
+    adressTitleLabel.textColor = ANIColor.dark
+    adressTitleLabel.text = "IDを決めましょ！"
+    contentView.addSubview(adressTitleLabel)
+    adressTitleLabel.topToBottom(of: profileImageView, offset: CONTENT_SPACE)
+    adressTitleLabel.leftToSuperview(offset: 10.0)
+    adressTitleLabel.rightToSuperview(offset: 10.0)
+    self.adressTitleLabel = adressTitleLabel
     
-    //idTextFieldBG
-    let idTextFieldBG = UIView()
-    idTextFieldBG.backgroundColor = ANIColor.lightGray
-    idTextFieldBG.layer.cornerRadius = 10.0
-    idTextFieldBG.layer.masksToBounds = true
-    contentView.addSubview(idTextFieldBG)
-    idTextFieldBG.topToBottom(of: idTitleLabel, offset: 10.0)
-    idTextFieldBG.leftToSuperview(offset: 10.0)
-    idTextFieldBG.rightToSuperview(offset: 10.0)
-    self.idTextFieldBG = idTextFieldBG
+    //adressTextFieldBG
+    let adressTextFieldBG = UIView()
+    adressTextFieldBG.backgroundColor = ANIColor.lightGray
+    adressTextFieldBG.layer.cornerRadius = 10.0
+    adressTextFieldBG.layer.masksToBounds = true
+    contentView.addSubview(adressTextFieldBG)
+    adressTextFieldBG.topToBottom(of: adressTitleLabel, offset: 10.0)
+    adressTextFieldBG.leftToSuperview(offset: 10.0)
+    adressTextFieldBG.rightToSuperview(offset: 10.0)
+    self.adressTextFieldBG = adressTextFieldBG
     
-    //idTextField
-    let idTextField = UITextField()
-    idTextField.font = UIFont.systemFont(ofSize: 18.0)
-    idTextField.textColor = ANIColor.dark
-    idTextField.backgroundColor = .clear
-    idTextField.placeholder = "ex)ANI-ani"
-    idTextField.returnKeyType = .done
-    idTextField.delegate = self
-    idTextFieldBG.addSubview(idTextField)
+    //adressTextField
+    let adressTextField = UITextField()
+    adressTextField.font = UIFont.systemFont(ofSize: 18.0)
+    adressTextField.textColor = ANIColor.dark
+    adressTextField.backgroundColor = .clear
+    adressTextField.placeholder = "ex)ANI-ani"
+    adressTextField.returnKeyType = .done
+    adressTextField.delegate = self
+    adressTextFieldBG.addSubview(adressTextField)
     let insets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: -10.0)
-    idTextField.edgesToSuperview(insets: insets)
-    self.idTextField = idTextField
+    adressTextField.edgesToSuperview(insets: insets)
+    self.adressTextField = adressTextField
     
     //passwordTitleLabel
     let passwordTitleLabel = UILabel()
@@ -148,7 +152,7 @@ class ANISignUpView: UIView {
     passwordTitleLabel.textColor = ANIColor.dark
     passwordTitleLabel.text = "パスワードを決めましょう🔑"
     contentView.addSubview(passwordTitleLabel)
-    passwordTitleLabel.topToBottom(of: idTextFieldBG, offset: CONTENT_SPACE)
+    passwordTitleLabel.topToBottom(of: adressTextFieldBG, offset: CONTENT_SPACE)
     passwordTitleLabel.leftToSuperview(offset: 10.0)
     passwordTitleLabel.rightToSuperview(offset: 10.0)
     self.passwordTitleLabel = passwordTitleLabel
@@ -264,6 +268,70 @@ class ANISignUpView: UIView {
     ANINotificationManager.receive(keyboardWillChangeFrame: self, selector: #selector(keyboardWillChangeFrame))
   }
   
+  private func signUp(adress: String, password: String) {
+    Auth.auth().createUser(withEmail: adress, password: password) { (successUser, error) in
+      if let errorUnrap = error {
+        let nsError = errorUnrap as NSError
+        if nsError.code == 17007 {
+          self.delegate?.reject(notiText: "すでに存在するメールアドレスです！")
+        } else if nsError.code == 17008 {
+          self.delegate?.reject(notiText: "メールアドレスの書式が正しくありません！")
+        } else if nsError.code == 17026 {
+          self.delegate?.reject(notiText: "パスワードが短いです！")
+        } else {
+          self.delegate?.reject(notiText: "登録に失敗しました！")
+        }
+      } else {
+        self.login(adress: adress, password: password)
+      }
+    }
+  }
+  
+  private func login(adress: String, password: String) {
+    Auth.auth().signIn(withEmail: adress, password: password) { (successUser, error) in
+      if let errorUnrap = error {
+        print("loginError \(errorUnrap.localizedDescription)")
+      } else {
+        self.uploadUserData()
+      }
+    }
+  }
+  
+  private func uploadUserData() {
+    guard let currentUser = Auth.auth().currentUser,
+          let profileImage = self.profileImage,
+          let profileImageData = UIImageJPEGRepresentation(profileImage, 0.5),
+          let userNameTextField = self.userNameTextField,
+          let userName = userNameTextField.text else { return }
+
+    let storageRef = Storage.storage().reference()
+    storageRef.child(KEY_PROFILE_IMAGES).child("\(currentUser.uid).jpeg").putData(profileImageData, metadata: nil) { (metaData, error) in
+      if error != nil {
+        print("storageError")
+        return
+      }
+      
+      if let profileImageUrl = metaData?.downloadURL() {
+        let values = [KEY_UID: currentUser.uid, KEY_USER_NAME: userName, KEY_KIND: "個人", KEY_INTRODUCE: "", KEY_PROFILE_IMAGE_URL: profileImageUrl.absoluteString] as [String : AnyObject]
+        self.uploadUserIntoDatabase(uid: currentUser.uid, values: values)
+      }
+    }
+  }
+  
+  private func uploadUserIntoDatabase(uid: String, values: [String: AnyObject]) {
+    let databaseRef = Database.database().reference(fromURL: "https://ani-ios-1faa3.firebaseio.com/")
+    let userRef = databaseRef.child(KEY_USERS).child(uid)
+    
+    userRef.updateChildValues(values) { (error, ref) in
+      if error != nil {
+        print("dataError")
+        return
+      }
+      
+      self.delegate?.signUpSuccess()
+    }
+  }
+  
   @objc func keyboardWillChangeFrame(_ notification: Notification) {
     guard let keyboardFrame = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
           let scrollView = self.scrollView,
@@ -286,9 +354,8 @@ extension ANISignUpView: ANIButtonViewDelegate {
       self.delegate?.prifileImagePickButtonTapped()
     }
     if view == doneButton {
-      guard let profileImage = self.profileImage,
-            let idTextField = self.idTextField,
-            let id = idTextField.text,
+      guard let adressTextField = self.adressTextField,
+            let adress = adressTextField.text,
             let passwordTextField = self.passwordTextField,
             let password = passwordTextField.text,
             let passwordCheckTextField = self.passwordCheckTextField,
@@ -296,13 +363,9 @@ extension ANISignUpView: ANIButtonViewDelegate {
             let userNameTextField = self.userNameTextField,
             let userName = userNameTextField.text else { return }
       
-      if id.count > 0 && password.count > 0 && passwordCheck.count > 0 && userName.count > 0 {
+      if adress.count > 0 && password.count > 0 && passwordCheck.count > 0 && userName.count > 0 {
         if password == passwordCheck {
-          let user = User(id: id, password: password, profileImage: profileImage, name: userName, familyImages: nil, kind: nil, introduce: nil)
-          
-          //TODO: user create server
-          
-          self.delegate?.donButtonTapped()
+          signUp(adress: adress, password: password)
         } else {
           self.delegate?.reject(notiText: "パスワードが異なります！")
         }

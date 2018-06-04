@@ -7,6 +7,11 @@ target 'Ani' do
 
   # Pods for Ani
 pod 'Gallery'
+pod 'Firebase/Database'
+pod 'Firebase/Auth'
+pod 'Firebase/Storage'
+pod 'FirebaseUI/Storage', '~> 3.0'
+
   target 'AniTests' do
     inherit! :search_paths
     # Pods for testing

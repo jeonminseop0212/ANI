@@ -35,7 +35,10 @@ class ANIImageFilterViewController: UIViewController {
   private func setup() {
     //basic
     self.view.backgroundColor = .white
-    
+    self.navigationController?.setNavigationBarHidden(true, animated: false)
+    self.navigationController?.navigationBar.isTranslucent = false
+    UIApplication.shared.isStatusBarHidden = true
+
     //myNavigationBar
     let myNavigationBar = UIView()
     myNavigationBar.backgroundColor = .white

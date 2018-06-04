@@ -43,12 +43,12 @@ class ANIRecruitViewController: UIViewController {
   
   override func viewWillAppear(_ animated: Bool) {
     UIApplication.shared.statusBarStyle = .default
-    UIApplication.shared.statusBar?.isHidden = false
+    UIApplication.shared.isStatusBarHidden = false
   }
   
   private func setup() {
     //basic
-    Orientation.lockOrientation(.portrait)
+    ANIOrientation.lockOrientation(.portrait)
     self.view.backgroundColor = .white
     self.navigationController?.setNavigationBarHidden(true, animated: false)
     self.navigationController?.navigationBar.isTranslucent = false
