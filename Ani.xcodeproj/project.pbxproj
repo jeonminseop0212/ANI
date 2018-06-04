@@ -7,12 +7,95 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		23BE6C66072673B423ABA35D /* Pods_Ani.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FD08576705673419CEA26417 /* Pods_Ani.framework */; };
+		8751932F6CAEF562E234E91C /* Pods_AniTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA314F74AF3E318A20DDD5DB /* Pods_AniTests.framework */; };
+		BFFABBAF01DF20A602B9BB7F /* Pods_AniUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C5DC98FBA0B2CCFDA47C5CD8 /* Pods_AniUITests.framework */; };
+		CD08A72E20915BD700F0B72D /* ANIRecruitDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD08A72D20915BD700F0B72D /* ANIRecruitDetailView.swift */; };
+		CD08A73120915C2A00F0B72D /* ANIRecruitDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD08A73020915C2A00F0B72D /* ANIRecruitDetailViewController.swift */; };
+		CD08A7712091975500F0B72D /* UIApplication.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD08A7702091975500F0B72D /* UIApplication.swift */; };
+		CD2C414520A556AE00581267 /* ANIRecruitContributionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2C414420A556AE00581267 /* ANIRecruitContributionViewController.swift */; };
+		CD2C414820A5A23C00581267 /* ANIImageFilterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2C414720A5A23C00581267 /* ANIImageFilterViewController.swift */; };
+		CD6229DC20B64A6400E36875 /* ANISignUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6229DB20B64A6400E36875 /* ANISignUpViewController.swift */; };
+		CD6229DE20B64B9900E36875 /* ANISignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6229DD20B64B9900E36875 /* ANISignUpView.swift */; };
+		CD6B675120A8844B009BF63D /* ANIRecruitContributionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6B675020A8844B009BF63D /* ANIRecruitContributionView.swift */; };
+		CD6B675420A90F8A009BF63D /* ANIPlaceholderTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6B675320A90F8A009BF63D /* ANIPlaceholderTextView.swift */; };
+		CD9E52B120921EB400715F50 /* UIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD9E52B020921EB400715F50 /* UIViewController.swift */; };
+		CD9E52B32094304700715F50 /* ANIRecruitDetailImagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD9E52B22094304700715F50 /* ANIRecruitDetailImagesView.swift */; };
+		CD9E52B520943C9500715F50 /* ANIRecruitDetailImagesViewFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD9E52B420943C9500715F50 /* ANIRecruitDetailImagesViewFlowLayout.swift */; };
+		CD9E52B7209441C900715F50 /* ANIRecruitDetailImagesViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD9E52B6209441C900715F50 /* ANIRecruitDetailImagesViewCell.swift */; };
+		CD9E52BB2094614400715F50 /* ANIAreaButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD9E52BA2094614400715F50 /* ANIAreaButtonView.swift */; };
+		CDA32A1320A93422008A2AC1 /* ANIScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A1220A93422008A2AC1 /* ANIScrollView.swift */; };
+		CDA32A2320AA6041008A2AC1 /* ANIPopupPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A2220AA6041008A2AC1 /* ANIPopupPickerViewController.swift */; };
+		CDA32A2720AA6652008A2AC1 /* ANIPopupPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A2620AA6652008A2AC1 /* ANIPopupPickerView.swift */; };
+		CDA32A2920ABBA21008A2AC1 /* ANIRecruitContributionImagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A2820ABBA21008A2AC1 /* ANIRecruitContributionImagesView.swift */; };
+		CDA32A2B20ABBC20008A2AC1 /* ANIRecruitContributionImagesCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A2A20ABBC20008A2AC1 /* ANIRecruitContributionImagesCell.swift */; };
+		CDA32A2D20ABCE5F008A2AC1 /* RecruitInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A2C20ABCE5F008A2AC1 /* RecruitInfo.swift */; };
+		CDA32A2F20ABD941008A2AC1 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A2E20ABD941008A2AC1 /* String.swift */; };
+		CDA32A3520AC14C0008A2AC1 /* ANIContributionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A3420AC14C0008A2AC1 /* ANIContributionViewController.swift */; };
+		CDA32A3820AD1ED3008A2AC1 /* ANIContributionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A3720AD1ED3008A2AC1 /* ANIContributionView.swift */; };
+		CDA32A3A20AD22E7008A2AC1 /* ANIContributionImagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A3920AD22E7008A2AC1 /* ANIContributionImagesView.swift */; };
+		CDA32A3C20AD2520008A2AC1 /* ANIContributionImagesCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A3B20AD2520008A2AC1 /* ANIContributionImagesCell.swift */; };
+		CDA32A7920AE6B17008A2AC1 /* ANIQnaImagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A7820AE6B17008A2AC1 /* ANIQnaImagesView.swift */; };
+		CDA32A7B20AE7007008A2AC1 /* ANIQnaImagesCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A7A20AE7007008A2AC1 /* ANIQnaImagesCell.swift */; };
+		CDA32A8320AE7B02008A2AC1 /* ANIImageBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A8220AE7B02008A2AC1 /* ANIImageBrowserViewController.swift */; };
+		CDA32A8620AE8DD4008A2AC1 /* ANIImageBrowserCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A8520AE8DD4008A2AC1 /* ANIImageBrowserCell.swift */; };
+		CDA32A8A20AEA7BC008A2AC1 /* ANIDraggableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A8920AEA7BC008A2AC1 /* ANIDraggableView.swift */; };
+		CDA97AC620AFF34C00F46DA4 /* ANIProfileEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA97AC520AFF34C00F46DA4 /* ANIProfileEditViewController.swift */; };
+		CDA97AC920AFFFEC00F46DA4 /* ANIProfileEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA97AC820AFFFEC00F46DA4 /* ANIProfileEditView.swift */; };
+		CDA97ACC20B000FF00F46DA4 /* ANIProfileEditFamilyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA97ACB20B000FF00F46DA4 /* ANIProfileEditFamilyView.swift */; };
+		CDA97ACE20B0018600F46DA4 /* ANIProfileEditFamilyCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA97ACD20B0018600F46DA4 /* ANIProfileEditFamilyCell.swift */; };
+		CDA97B5420B2497200F46DA4 /* WCLShineButton.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CDA97B5320B2497200F46DA4 /* WCLShineButton.framework */; };
+		CDA97B5820B25F3B00F46DA4 /* ANICommentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA97B5720B25F3B00F46DA4 /* ANICommentViewController.swift */; };
+		CDA97B5A20B263B500F46DA4 /* ANICommentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA97B5920B263B500F46DA4 /* ANICommentView.swift */; };
+		CDD0550620A5CF2200BEF482 /* ANIImageFilterPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD0550520A5CF2200BEF482 /* ANIImageFilterPreviewView.swift */; };
+		CDD0550820A5D07600BEF482 /* ANIImageFilterPreviewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD0550720A5D07600BEF482 /* ANIImageFilterPreviewCell.swift */; };
+		CDD0550C20A5D29900BEF482 /* ANIImageFilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD0550B20A5D29900BEF482 /* ANIImageFilterView.swift */; };
+		CDD0550E20A6B23B00BEF482 /* ANIImageFilterCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD0550D20A6B23B00BEF482 /* ANIImageFilterCell.swift */; };
+		CDD0551020A6C64300BEF482 /* ANIFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD0550F20A6C64300BEF482 /* ANIFilter.swift */; };
+		CDDD04A420B269900094DBFA /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDD04A320B269900094DBFA /* Comment.swift */; };
+		CDDD04A620B26CD50094DBFA /* ANICommentContentCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDD04A520B26CD50094DBFA /* ANICommentContentCell.swift */; };
+		CDDD04A820B271090094DBFA /* ANICommentCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDD04A720B271090094DBFA /* ANICommentCell.swift */; };
+		CDDD04AC20B3B0AA0094DBFA /* ANICommentBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDD04AB20B3B0AA0094DBFA /* ANICommentBar.swift */; };
+		CDDD04AF20B4F8130094DBFA /* GrowingTextView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CDDD04AE20B4F8130094DBFA /* GrowingTextView.framework */; };
+		CDDD04B320B50FEA0094DBFA /* ANIInitialViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDD04B220B50FEA0094DBFA /* ANIInitialViewController.swift */; };
+		CDDD04BA20B538540094DBFA /* ANILoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDD04B920B538540094DBFA /* ANILoginViewController.swift */; };
+		CDDD04C020B53A8B0094DBFA /* ANIInitialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDD04BF20B53A8B0094DBFA /* ANIInitialView.swift */; };
+		CDDD04C520B53C870094DBFA /* ANILoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDD04C420B53C870094DBFA /* ANILoginView.swift */; };
+		CDF7F168208D772300254A0F /* ANINotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF7F167208D772300254A0F /* ANINotificationManager.swift */; };
+		CDF7F16E208F2BEF00254A0F /* UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF7F16D208F2BEF00254A0F /* UIView.swift */; };
+		CDF7F171208F651E00254A0F /* ANIButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF7F170208F651E00254A0F /* ANIButtonView.swift */; };
+		CDF7F174208F658E00254A0F /* ANIImageButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF7F173208F658E00254A0F /* ANIImageButtonView.swift */; };
 		F51D221020767E62009D1B26 /* ANIColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F51D220F20767E62009D1B26 /* ANIColor.swift */; };
 		F51D221220767F03009D1B26 /* UIColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F51D221120767F03009D1B26 /* UIColor.swift */; };
 		F51D221520768B24009D1B26 /* UISearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F51D221420768B24009D1B26 /* UISearchBar.swift */; };
 		F51D221920768E8D009D1B26 /* ANIRecuruitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F51D221820768E8D009D1B26 /* ANIRecuruitView.swift */; };
+		F521184C207A4421000B12C2 /* ANIStoryImagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F521184B207A4421000B12C2 /* ANIStoryImagesView.swift */; };
+		F530AB1C207A45D900114E6B /* ANIStoryImagesCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F530AB1B207A45D900114E6B /* ANIStoryImagesCell.swift */; };
+		F53E87B72084608000B19A2F /* ANIUserSearchViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F53E87B62084608000B19A2F /* ANIUserSearchViewCell.swift */; };
+		F53E87BA208468DF00B19A2F /* ANIStorySearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F53E87B9208468DF00B19A2F /* ANIStorySearchView.swift */; };
+		F53E87BD2085AFC700B19A2F /* ANIProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F53E87BC2085AFC700B19A2F /* ANIProfileViewController.swift */; };
+		F53E87C12085B19700B19A2F /* ANIFamilyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F53E87C02085B19700B19A2F /* ANIFamilyView.swift */; };
+		F53E87C32085B50900B19A2F /* ANIFamilyViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F53E87C22085B50900B19A2F /* ANIFamilyViewCell.swift */; };
+		F53E87C62085F13800B19A2F /* ANIProfileMenuBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F53E87C52085F13800B19A2F /* ANIProfileMenuBar.swift */; };
+		F53E87C82085F5FA00B19A2F /* ANIProfileMenuBarCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F53E87C72085F5FA00B19A2F /* ANIProfileMenuBarCell.swift */; };
+		F53E87D02086EF6600B19A2F /* ANIProfileCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F53E87CF2086EF6600B19A2F /* ANIProfileCell.swift */; };
 		F566348320752656006CB81B /* ANIRecruitCategoriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F566348220752656006CB81B /* ANIRecruitCategoriesView.swift */; };
 		F56634862075285D006CB81B /* ANIRecruitCategoryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F56634852075285D006CB81B /* ANIRecruitCategoryCell.swift */; };
+		F57F7D4A2081F43F008A2645 /* ANINotiViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57F7D492081F43F008A2645 /* ANINotiViewController.swift */; };
+		F57F7D4F2081FC64008A2645 /* ANiNotiMenuBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57F7D4E2081FC64008A2645 /* ANiNotiMenuBar.swift */; };
+		F57F7D512081FC71008A2645 /* ANINotiMenuBarCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57F7D502081FC71008A2645 /* ANINotiMenuBarCell.swift */; };
+		F57F7D552081FEB2008A2645 /* ANINotiNotiCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57F7D542081FEB2008A2645 /* ANINotiNotiCell.swift */; };
+		F57F7D572081FEBF008A2645 /* ANINotiMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57F7D562081FEBF008A2645 /* ANINotiMessageCell.swift */; };
+		F57F7D59208311C1008A2645 /* ANINotiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57F7D58208311C1008A2645 /* ANINotiView.swift */; };
+		F57F7D5D208313F0008A2645 /* Noti.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57F7D5C208313F0008A2645 /* Noti.swift */; };
+		F57F7D5F208314DF008A2645 /* ANINotiViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57F7D5E208314DF008A2645 /* ANINotiViewCell.swift */; };
+		F57F7D61208322D3008A2645 /* ANIMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57F7D60208322D3008A2645 /* ANIMessageView.swift */; };
+		F57F7D63208323F9008A2645 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57F7D62208323F9008A2645 /* Message.swift */; };
+		F57F7D652083250D008A2645 /* ANIMessageViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57F7D642083250D008A2645 /* ANIMessageViewCell.swift */; };
+		F57F7D8820844A90008A2645 /* ANISearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57F7D8720844A8F008A2645 /* ANISearchViewController.swift */; };
+		F57F7D8C20844C41008A2645 /* ANISearchCategoriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57F7D8B20844C41008A2645 /* ANISearchCategoriesView.swift */; };
+		F57F7D8E20844C4E008A2645 /* ANISearchCategoryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57F7D8D20844C4E008A2645 /* ANISearchCategoryCell.swift */; };
+		F57F7D9120844DC2008A2645 /* ANIUserSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57F7D9020844DC2008A2645 /* ANIUserSearchView.swift */; };
 		F5B1EF9120725964000CFB0B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B1EF9020725964000CFB0B /* AppDelegate.swift */; };
 		F5B1EF9320725964000CFB0B /* ANIRecruitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B1EF9220725964000CFB0B /* ANIRecruitViewController.swift */; };
 		F5B1EF9820725964000CFB0B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F5B1EF9720725964000CFB0B /* Assets.xcassets */; };
@@ -21,9 +104,23 @@
 		F5B1EFB120725964000CFB0B /* AniUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B1EFB020725964000CFB0B /* AniUITests.swift */; };
 		F5B1EFC220725BDC000CFB0B /* ANITabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B1EFC120725BDC000CFB0B /* ANITabBarController.swift */; };
 		F5B1EFC520726658000CFB0B /* TinyConstraints.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5B1EFC420726658000CFB0B /* TinyConstraints.framework */; };
+		F5B5149A207AEDC300366500 /* Qna.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B51499207AEDC300366500 /* Qna.swift */; };
+		F5C381FD2079F73F000BBB8C /* ANICommunityStoryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5C381FC2079F73F000BBB8C /* ANICommunityStoryCell.swift */; };
+		F5C381FF207A068D000BBB8C /* ANIQnaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5C381FE207A068D000BBB8C /* ANIQnaView.swift */; };
+		F5DF835D207A17C200EA7FBE /* ANICommunityQnaCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5DF835C207A17C200EA7FBE /* ANICommunityQnaCell.swift */; };
+		F5DF8361207A1D4A00EA7FBE /* Story.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5DF8360207A1D4A00EA7FBE /* Story.swift */; };
+		F5DF8365207A27DC00EA7FBE /* ANIStoryViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5DF8364207A27DC00EA7FBE /* ANIStoryViewCell.swift */; };
+		F5DF8367207A27E900EA7FBE /* ANIQnaViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5DF8366207A27E900EA7FBE /* ANIQnaViewCell.swift */; };
 		F5E9E221207692C60021D4CC /* ANIRecruitViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E220207692C60021D4CC /* ANIRecruitViewCell.swift */; };
 		F5E9E2242076961E0021D4CC /* Recruit.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E2232076961D0021D4CC /* Recruit.swift */; };
 		F5E9E22620769AD60021D4CC /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E22520769AD60021D4CC /* User.swift */; };
+		F5E9E22F2079AEC30021D4CC /* Orientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E22E2079AEC30021D4CC /* Orientation.swift */; };
+		F5E9E2332079AFF40021D4CC /* ANICommunityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E2322079AFF40021D4CC /* ANICommunityViewController.swift */; };
+		F5E9E2372079B1900021D4CC /* ANICommunityMenuBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E2362079B1900021D4CC /* ANICommunityMenuBar.swift */; };
+		F5E9E2392079B9D20021D4CC /* ANICommunityMenuBarCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E2382079B9D20021D4CC /* ANICommunityMenuBarCell.swift */; };
+		F5E9E23D2079C10C0021D4CC /* ANIStoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E23C2079C10C0021D4CC /* ANIStoryView.swift */; };
+		F5F5300C2088599D0076E938 /* ANIProfileBasicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5F5300B2088599D0076E938 /* ANIProfileBasicView.swift */; };
+		F5F5300F20885E820076E938 /* ANIProfileTopCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5F5300E20885E820076E938 /* ANIProfileTopCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,12 +141,99 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		17FAD9EDAE08B9FA7A60EDB8 /* Pods-AniTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AniTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-AniTests/Pods-AniTests.release.xcconfig"; sourceTree = "<group>"; };
+		9F7E1F101C01F36DEDE88686 /* Pods-AniTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AniTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-AniTests/Pods-AniTests.debug.xcconfig"; sourceTree = "<group>"; };
+		AA314F74AF3E318A20DDD5DB /* Pods_AniTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AniTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B1141BC302D4697B8D251698 /* Pods-AniUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AniUITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-AniUITests/Pods-AniUITests.release.xcconfig"; sourceTree = "<group>"; };
+		C5DC98FBA0B2CCFDA47C5CD8 /* Pods_AniUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AniUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		CD08A72D20915BD700F0B72D /* ANIRecruitDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitDetailView.swift; sourceTree = "<group>"; };
+		CD08A73020915C2A00F0B72D /* ANIRecruitDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitDetailViewController.swift; sourceTree = "<group>"; };
+		CD08A7702091975500F0B72D /* UIApplication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIApplication.swift; sourceTree = "<group>"; };
+		CD2C414420A556AE00581267 /* ANIRecruitContributionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitContributionViewController.swift; sourceTree = "<group>"; };
+		CD2C414720A5A23C00581267 /* ANIImageFilterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIImageFilterViewController.swift; sourceTree = "<group>"; };
+		CD6229DB20B64A6400E36875 /* ANISignUpViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANISignUpViewController.swift; sourceTree = "<group>"; };
+		CD6229DD20B64B9900E36875 /* ANISignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANISignUpView.swift; sourceTree = "<group>"; };
+		CD6B675020A8844B009BF63D /* ANIRecruitContributionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitContributionView.swift; sourceTree = "<group>"; };
+		CD6B675320A90F8A009BF63D /* ANIPlaceholderTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIPlaceholderTextView.swift; sourceTree = "<group>"; };
+		CD9E52B020921EB400715F50 /* UIViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewController.swift; sourceTree = "<group>"; };
+		CD9E52B22094304700715F50 /* ANIRecruitDetailImagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitDetailImagesView.swift; sourceTree = "<group>"; };
+		CD9E52B420943C9500715F50 /* ANIRecruitDetailImagesViewFlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitDetailImagesViewFlowLayout.swift; sourceTree = "<group>"; };
+		CD9E52B6209441C900715F50 /* ANIRecruitDetailImagesViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitDetailImagesViewCell.swift; sourceTree = "<group>"; };
+		CD9E52BA2094614400715F50 /* ANIAreaButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIAreaButtonView.swift; sourceTree = "<group>"; };
+		CDA32A1220A93422008A2AC1 /* ANIScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIScrollView.swift; sourceTree = "<group>"; };
+		CDA32A2220AA6041008A2AC1 /* ANIPopupPickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIPopupPickerViewController.swift; sourceTree = "<group>"; };
+		CDA32A2620AA6652008A2AC1 /* ANIPopupPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIPopupPickerView.swift; sourceTree = "<group>"; };
+		CDA32A2820ABBA21008A2AC1 /* ANIRecruitContributionImagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitContributionImagesView.swift; sourceTree = "<group>"; };
+		CDA32A2A20ABBC20008A2AC1 /* ANIRecruitContributionImagesCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitContributionImagesCell.swift; sourceTree = "<group>"; };
+		CDA32A2C20ABCE5F008A2AC1 /* RecruitInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecruitInfo.swift; sourceTree = "<group>"; };
+		CDA32A2E20ABD941008A2AC1 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
+		CDA32A3420AC14C0008A2AC1 /* ANIContributionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIContributionViewController.swift; sourceTree = "<group>"; };
+		CDA32A3720AD1ED3008A2AC1 /* ANIContributionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIContributionView.swift; sourceTree = "<group>"; };
+		CDA32A3920AD22E7008A2AC1 /* ANIContributionImagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIContributionImagesView.swift; sourceTree = "<group>"; };
+		CDA32A3B20AD2520008A2AC1 /* ANIContributionImagesCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIContributionImagesCell.swift; sourceTree = "<group>"; };
+		CDA32A7820AE6B17008A2AC1 /* ANIQnaImagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIQnaImagesView.swift; sourceTree = "<group>"; };
+		CDA32A7A20AE7007008A2AC1 /* ANIQnaImagesCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIQnaImagesCell.swift; sourceTree = "<group>"; };
+		CDA32A8220AE7B02008A2AC1 /* ANIImageBrowserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIImageBrowserViewController.swift; sourceTree = "<group>"; };
+		CDA32A8520AE8DD4008A2AC1 /* ANIImageBrowserCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIImageBrowserCell.swift; sourceTree = "<group>"; };
+		CDA32A8920AEA7BC008A2AC1 /* ANIDraggableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIDraggableView.swift; sourceTree = "<group>"; };
+		CDA97AC520AFF34C00F46DA4 /* ANIProfileEditViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIProfileEditViewController.swift; sourceTree = "<group>"; };
+		CDA97AC820AFFFEC00F46DA4 /* ANIProfileEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIProfileEditView.swift; sourceTree = "<group>"; };
+		CDA97ACB20B000FF00F46DA4 /* ANIProfileEditFamilyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIProfileEditFamilyView.swift; sourceTree = "<group>"; };
+		CDA97ACD20B0018600F46DA4 /* ANIProfileEditFamilyCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIProfileEditFamilyCell.swift; sourceTree = "<group>"; };
+		CDA97B5320B2497200F46DA4 /* WCLShineButton.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WCLShineButton.framework; path = Carthage/Build/iOS/WCLShineButton.framework; sourceTree = "<group>"; };
+		CDA97B5720B25F3B00F46DA4 /* ANICommentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommentViewController.swift; sourceTree = "<group>"; };
+		CDA97B5920B263B500F46DA4 /* ANICommentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommentView.swift; sourceTree = "<group>"; };
+		CDD0550520A5CF2200BEF482 /* ANIImageFilterPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIImageFilterPreviewView.swift; sourceTree = "<group>"; };
+		CDD0550720A5D07600BEF482 /* ANIImageFilterPreviewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIImageFilterPreviewCell.swift; sourceTree = "<group>"; };
+		CDD0550B20A5D29900BEF482 /* ANIImageFilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIImageFilterView.swift; sourceTree = "<group>"; };
+		CDD0550D20A6B23B00BEF482 /* ANIImageFilterCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIImageFilterCell.swift; sourceTree = "<group>"; };
+		CDD0550F20A6C64300BEF482 /* ANIFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIFilter.swift; sourceTree = "<group>"; };
+		CDDD04A320B269900094DBFA /* Comment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Comment.swift; sourceTree = "<group>"; };
+		CDDD04A520B26CD50094DBFA /* ANICommentContentCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommentContentCell.swift; sourceTree = "<group>"; };
+		CDDD04A720B271090094DBFA /* ANICommentCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommentCell.swift; sourceTree = "<group>"; };
+		CDDD04AB20B3B0AA0094DBFA /* ANICommentBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommentBar.swift; sourceTree = "<group>"; };
+		CDDD04AE20B4F8130094DBFA /* GrowingTextView.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GrowingTextView.framework; path = Carthage/Build/iOS/GrowingTextView.framework; sourceTree = "<group>"; };
+		CDDD04B220B50FEA0094DBFA /* ANIInitialViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIInitialViewController.swift; sourceTree = "<group>"; };
+		CDDD04B920B538540094DBFA /* ANILoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANILoginViewController.swift; sourceTree = "<group>"; };
+		CDDD04BF20B53A8B0094DBFA /* ANIInitialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIInitialView.swift; sourceTree = "<group>"; };
+		CDDD04C420B53C870094DBFA /* ANILoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANILoginView.swift; sourceTree = "<group>"; };
+		CDF7F167208D772300254A0F /* ANINotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotificationManager.swift; sourceTree = "<group>"; };
+		CDF7F16D208F2BEF00254A0F /* UIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIView.swift; sourceTree = "<group>"; };
+		CDF7F170208F651E00254A0F /* ANIButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIButtonView.swift; sourceTree = "<group>"; };
+		CDF7F173208F658E00254A0F /* ANIImageButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIImageButtonView.swift; sourceTree = "<group>"; };
+		F1C7C5FF61E6DE40085AB66D /* Pods-AniUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AniUITests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-AniUITests/Pods-AniUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		F1F77997FC894BF232AA6788 /* Pods-Ani.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Ani.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Ani/Pods-Ani.debug.xcconfig"; sourceTree = "<group>"; };
 		F51D220F20767E62009D1B26 /* ANIColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIColor.swift; sourceTree = "<group>"; };
 		F51D221120767F03009D1B26 /* UIColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColor.swift; sourceTree = "<group>"; };
 		F51D221420768B24009D1B26 /* UISearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UISearchBar.swift; sourceTree = "<group>"; };
 		F51D221820768E8D009D1B26 /* ANIRecuruitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecuruitView.swift; sourceTree = "<group>"; };
+		F521184B207A4421000B12C2 /* ANIStoryImagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIStoryImagesView.swift; sourceTree = "<group>"; };
+		F530AB1B207A45D900114E6B /* ANIStoryImagesCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIStoryImagesCell.swift; sourceTree = "<group>"; };
+		F53E87B62084608000B19A2F /* ANIUserSearchViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIUserSearchViewCell.swift; sourceTree = "<group>"; };
+		F53E87B9208468DF00B19A2F /* ANIStorySearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIStorySearchView.swift; sourceTree = "<group>"; };
+		F53E87BC2085AFC700B19A2F /* ANIProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIProfileViewController.swift; sourceTree = "<group>"; };
+		F53E87C02085B19700B19A2F /* ANIFamilyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIFamilyView.swift; sourceTree = "<group>"; };
+		F53E87C22085B50900B19A2F /* ANIFamilyViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIFamilyViewCell.swift; sourceTree = "<group>"; };
+		F53E87C52085F13800B19A2F /* ANIProfileMenuBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIProfileMenuBar.swift; sourceTree = "<group>"; };
+		F53E87C72085F5FA00B19A2F /* ANIProfileMenuBarCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIProfileMenuBarCell.swift; sourceTree = "<group>"; };
+		F53E87CF2086EF6600B19A2F /* ANIProfileCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIProfileCell.swift; sourceTree = "<group>"; };
 		F566348220752656006CB81B /* ANIRecruitCategoriesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitCategoriesView.swift; sourceTree = "<group>"; };
 		F56634852075285D006CB81B /* ANIRecruitCategoryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitCategoryCell.swift; sourceTree = "<group>"; };
+		F57F7D492081F43F008A2645 /* ANINotiViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotiViewController.swift; sourceTree = "<group>"; };
+		F57F7D4E2081FC64008A2645 /* ANiNotiMenuBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANiNotiMenuBar.swift; sourceTree = "<group>"; };
+		F57F7D502081FC71008A2645 /* ANINotiMenuBarCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotiMenuBarCell.swift; sourceTree = "<group>"; };
+		F57F7D542081FEB2008A2645 /* ANINotiNotiCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotiNotiCell.swift; sourceTree = "<group>"; };
+		F57F7D562081FEBF008A2645 /* ANINotiMessageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotiMessageCell.swift; sourceTree = "<group>"; };
+		F57F7D58208311C1008A2645 /* ANINotiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotiView.swift; sourceTree = "<group>"; };
+		F57F7D5C208313F0008A2645 /* Noti.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Noti.swift; sourceTree = "<group>"; };
+		F57F7D5E208314DF008A2645 /* ANINotiViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotiViewCell.swift; sourceTree = "<group>"; };
+		F57F7D60208322D3008A2645 /* ANIMessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIMessageView.swift; sourceTree = "<group>"; };
+		F57F7D62208323F9008A2645 /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
+		F57F7D642083250D008A2645 /* ANIMessageViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIMessageViewCell.swift; sourceTree = "<group>"; };
+		F57F7D8720844A8F008A2645 /* ANISearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANISearchViewController.swift; sourceTree = "<group>"; };
+		F57F7D8B20844C41008A2645 /* ANISearchCategoriesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANISearchCategoriesView.swift; sourceTree = "<group>"; };
+		F57F7D8D20844C4E008A2645 /* ANISearchCategoryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANISearchCategoryCell.swift; sourceTree = "<group>"; };
+		F57F7D9020844DC2008A2645 /* ANIUserSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIUserSearchView.swift; sourceTree = "<group>"; };
 		F5B1EF8D20725963000CFB0B /* Ani.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Ani.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5B1EF9020725964000CFB0B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F5B1EF9220725964000CFB0B /* ANIRecruitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitViewController.swift; sourceTree = "<group>"; };
@@ -64,9 +248,25 @@
 		F5B1EFB220725964000CFB0B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F5B1EFC120725BDC000CFB0B /* ANITabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANITabBarController.swift; sourceTree = "<group>"; };
 		F5B1EFC420726658000CFB0B /* TinyConstraints.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TinyConstraints.framework; path = Carthage/Build/iOS/TinyConstraints.framework; sourceTree = "<group>"; };
+		F5B51499207AEDC300366500 /* Qna.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Qna.swift; sourceTree = "<group>"; };
+		F5C381FC2079F73F000BBB8C /* ANICommunityStoryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommunityStoryCell.swift; sourceTree = "<group>"; };
+		F5C381FE207A068D000BBB8C /* ANIQnaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIQnaView.swift; sourceTree = "<group>"; };
+		F5DF835C207A17C200EA7FBE /* ANICommunityQnaCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommunityQnaCell.swift; sourceTree = "<group>"; };
+		F5DF8360207A1D4A00EA7FBE /* Story.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Story.swift; sourceTree = "<group>"; };
+		F5DF8364207A27DC00EA7FBE /* ANIStoryViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIStoryViewCell.swift; sourceTree = "<group>"; };
+		F5DF8366207A27E900EA7FBE /* ANIQnaViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIQnaViewCell.swift; sourceTree = "<group>"; };
 		F5E9E220207692C60021D4CC /* ANIRecruitViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitViewCell.swift; sourceTree = "<group>"; };
 		F5E9E2232076961D0021D4CC /* Recruit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Recruit.swift; sourceTree = "<group>"; };
 		F5E9E22520769AD60021D4CC /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		F5E9E22E2079AEC30021D4CC /* Orientation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Orientation.swift; sourceTree = "<group>"; };
+		F5E9E2322079AFF40021D4CC /* ANICommunityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommunityViewController.swift; sourceTree = "<group>"; };
+		F5E9E2362079B1900021D4CC /* ANICommunityMenuBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommunityMenuBar.swift; sourceTree = "<group>"; };
+		F5E9E2382079B9D20021D4CC /* ANICommunityMenuBarCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommunityMenuBarCell.swift; sourceTree = "<group>"; };
+		F5E9E23C2079C10C0021D4CC /* ANIStoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIStoryView.swift; sourceTree = "<group>"; };
+		F5F5300B2088599D0076E938 /* ANIProfileBasicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIProfileBasicView.swift; sourceTree = "<group>"; };
+		F5F5300E20885E820076E938 /* ANIProfileTopCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIProfileTopCell.swift; sourceTree = "<group>"; };
+		F8BF8D21240D7035E50361DD /* Pods-Ani.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Ani.release.xcconfig"; path = "Pods/Target Support Files/Pods-Ani/Pods-Ani.release.xcconfig"; sourceTree = "<group>"; };
+		FD08576705673419CEA26417 /* Pods_Ani.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Ani.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,7 +274,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CDDD04AF20B4F8130094DBFA /* GrowingTextView.framework in Frameworks */,
+				CDA97B5420B2497200F46DA4 /* WCLShineButton.framework in Frameworks */,
 				F5B1EFC520726658000CFB0B /* TinyConstraints.framework in Frameworks */,
+				23BE6C66072673B423ABA35D /* Pods_Ani.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -82,6 +285,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8751932F6CAEF562E234E91C /* Pods_AniTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -89,17 +293,358 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BFFABBAF01DF20A602B9BB7F /* Pods_AniUITests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		45824576DBA272D1C4D63B2A /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				F1F77997FC894BF232AA6788 /* Pods-Ani.debug.xcconfig */,
+				F8BF8D21240D7035E50361DD /* Pods-Ani.release.xcconfig */,
+				9F7E1F101C01F36DEDE88686 /* Pods-AniTests.debug.xcconfig */,
+				17FAD9EDAE08B9FA7A60EDB8 /* Pods-AniTests.release.xcconfig */,
+				F1C7C5FF61E6DE40085AB66D /* Pods-AniUITests.debug.xcconfig */,
+				B1141BC302D4697B8D251698 /* Pods-AniUITests.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		CD08A72C20915BB400F0B72D /* Detail */ = {
+			isa = PBXGroup;
+			children = (
+				CD08A72D20915BD700F0B72D /* ANIRecruitDetailView.swift */,
+				CD9E52B22094304700715F50 /* ANIRecruitDetailImagesView.swift */,
+				CD9E52B6209441C900715F50 /* ANIRecruitDetailImagesViewCell.swift */,
+				CD9E52B420943C9500715F50 /* ANIRecruitDetailImagesViewFlowLayout.swift */,
+			);
+			path = Detail;
+			sourceTree = "<group>";
+		};
+		CD08A72F20915BDF00F0B72D /* RecruitDetailViewController */ = {
+			isa = PBXGroup;
+			children = (
+				CD08A73020915C2A00F0B72D /* ANIRecruitDetailViewController.swift */,
+			);
+			path = RecruitDetailViewController;
+			sourceTree = "<group>";
+		};
+		CD2C414320A5566B00581267 /* RecruitContributionViewController */ = {
+			isa = PBXGroup;
+			children = (
+				CD2C414420A556AE00581267 /* ANIRecruitContributionViewController.swift */,
+			);
+			path = RecruitContributionViewController;
+			sourceTree = "<group>";
+		};
+		CD2C414620A5A1FF00581267 /* ImageFilterViewController */ = {
+			isa = PBXGroup;
+			children = (
+				CD2C414720A5A23C00581267 /* ANIImageFilterViewController.swift */,
+			);
+			path = ImageFilterViewController;
+			sourceTree = "<group>";
+		};
+		CD6B674F20A88420009BF63D /* RecruitContributionView */ = {
+			isa = PBXGroup;
+			children = (
+				CD6B675020A8844B009BF63D /* ANIRecruitContributionView.swift */,
+				CDA32A2820ABBA21008A2AC1 /* ANIRecruitContributionImagesView.swift */,
+				CDA32A2A20ABBC20008A2AC1 /* ANIRecruitContributionImagesCell.swift */,
+			);
+			path = RecruitContributionView;
+			sourceTree = "<group>";
+		};
+		CD6B675220A90F78009BF63D /* PlaceholderTextView */ = {
+			isa = PBXGroup;
+			children = (
+				CD6B675320A90F8A009BF63D /* ANIPlaceholderTextView.swift */,
+			);
+			path = PlaceholderTextView;
+			sourceTree = "<group>";
+		};
+		CDA32A1420A9347A008A2AC1 /* ScrollView */ = {
+			isa = PBXGroup;
+			children = (
+				CDA32A1220A93422008A2AC1 /* ANIScrollView.swift */,
+			);
+			path = ScrollView;
+			sourceTree = "<group>";
+		};
+		CDA32A2020AA6029008A2AC1 /* PopupPickerViewController */ = {
+			isa = PBXGroup;
+			children = (
+				CDA32A2220AA6041008A2AC1 /* ANIPopupPickerViewController.swift */,
+			);
+			path = PopupPickerViewController;
+			sourceTree = "<group>";
+		};
+		CDA32A2120AA6041008A2AC1 /* ModalViewController */ = {
+			isa = PBXGroup;
+			children = (
+				CD2C414320A5566B00581267 /* RecruitContributionViewController */,
+				CDA32A2020AA6029008A2AC1 /* PopupPickerViewController */,
+				CDA32A3320AC1491008A2AC1 /* ContributeViewController */,
+				CDA32A8120AE7AE2008A2AC1 /* ImageBrowserViewController */,
+				CDA97AC420AFF33200F46DA4 /* ProfileEditViewController */,
+			);
+			path = ModalViewController;
+			sourceTree = "<group>";
+		};
+		CDA32A2420AA661A008A2AC1 /* ModalVIew */ = {
+			isa = PBXGroup;
+			children = (
+				CD6B674F20A88420009BF63D /* RecruitContributionView */,
+				CDA32A2520AA6630008A2AC1 /* PopupPickerView */,
+				CDA32A3620AD1E8F008A2AC1 /* ContributionView */,
+				CDA32A8420AE8DBC008A2AC1 /* ImageBrowserView */,
+				CDA97AC720AFFFD200F46DA4 /* ProfileEditView */,
+			);
+			path = ModalVIew;
+			sourceTree = "<group>";
+		};
+		CDA32A2520AA6630008A2AC1 /* PopupPickerView */ = {
+			isa = PBXGroup;
+			children = (
+				CDA32A2620AA6652008A2AC1 /* ANIPopupPickerView.swift */,
+			);
+			path = PopupPickerView;
+			sourceTree = "<group>";
+		};
+		CDA32A3320AC1491008A2AC1 /* ContributeViewController */ = {
+			isa = PBXGroup;
+			children = (
+				CDA32A3420AC14C0008A2AC1 /* ANIContributionViewController.swift */,
+			);
+			path = ContributeViewController;
+			sourceTree = "<group>";
+		};
+		CDA32A3620AD1E8F008A2AC1 /* ContributionView */ = {
+			isa = PBXGroup;
+			children = (
+				CDA32A3720AD1ED3008A2AC1 /* ANIContributionView.swift */,
+				CDA32A3920AD22E7008A2AC1 /* ANIContributionImagesView.swift */,
+				CDA32A3B20AD2520008A2AC1 /* ANIContributionImagesCell.swift */,
+			);
+			path = ContributionView;
+			sourceTree = "<group>";
+		};
+		CDA32A7720AE6B03008A2AC1 /* ImagesView */ = {
+			isa = PBXGroup;
+			children = (
+				CDA32A7820AE6B17008A2AC1 /* ANIQnaImagesView.swift */,
+				CDA32A7A20AE7007008A2AC1 /* ANIQnaImagesCell.swift */,
+			);
+			path = ImagesView;
+			sourceTree = "<group>";
+		};
+		CDA32A8120AE7AE2008A2AC1 /* ImageBrowserViewController */ = {
+			isa = PBXGroup;
+			children = (
+				CDA32A8220AE7B02008A2AC1 /* ANIImageBrowserViewController.swift */,
+			);
+			name = ImageBrowserViewController;
+			path = "New Group";
+			sourceTree = "<group>";
+		};
+		CDA32A8420AE8DBC008A2AC1 /* ImageBrowserView */ = {
+			isa = PBXGroup;
+			children = (
+				CDA32A8520AE8DD4008A2AC1 /* ANIImageBrowserCell.swift */,
+				CDA32A8920AEA7BC008A2AC1 /* ANIDraggableView.swift */,
+			);
+			path = ImageBrowserView;
+			sourceTree = "<group>";
+		};
+		CDA97AC420AFF33200F46DA4 /* ProfileEditViewController */ = {
+			isa = PBXGroup;
+			children = (
+				CDA97AC520AFF34C00F46DA4 /* ANIProfileEditViewController.swift */,
+			);
+			path = ProfileEditViewController;
+			sourceTree = "<group>";
+		};
+		CDA97AC720AFFFD200F46DA4 /* ProfileEditView */ = {
+			isa = PBXGroup;
+			children = (
+				CDA97AC820AFFFEC00F46DA4 /* ANIProfileEditView.swift */,
+				CDA97ACA20B000D800F46DA4 /* ProfileEditFamilyView */,
+			);
+			path = ProfileEditView;
+			sourceTree = "<group>";
+		};
+		CDA97ACA20B000D800F46DA4 /* ProfileEditFamilyView */ = {
+			isa = PBXGroup;
+			children = (
+				CDA97ACB20B000FF00F46DA4 /* ANIProfileEditFamilyView.swift */,
+				CDA97ACD20B0018600F46DA4 /* ANIProfileEditFamilyCell.swift */,
+			);
+			path = ProfileEditFamilyView;
+			sourceTree = "<group>";
+		};
+		CDA97B5620B25F2000F46DA4 /* CommentViewController */ = {
+			isa = PBXGroup;
+			children = (
+				CDA97B5720B25F3B00F46DA4 /* ANICommentViewController.swift */,
+			);
+			path = CommentViewController;
+			sourceTree = "<group>";
+		};
+		CDA97B5B20B263BE00F46DA4 /* CommentView */ = {
+			isa = PBXGroup;
+			children = (
+				CDDD04AA20B3B09C0094DBFA /* Comment */,
+				CDDD04AD20B3B0AF0094DBFA /* CommentBar */,
+			);
+			path = CommentView;
+			sourceTree = "<group>";
+		};
+		CDD0550420A5CF0100BEF482 /* ImageFilter */ = {
+			isa = PBXGroup;
+			children = (
+				CDD0550F20A6C64300BEF482 /* ANIFilter.swift */,
+				CDD0550920A5D27300BEF482 /* Preview */,
+				CDD0550A20A5D28100BEF482 /* Filter */,
+			);
+			path = ImageFilter;
+			sourceTree = "<group>";
+		};
+		CDD0550920A5D27300BEF482 /* Preview */ = {
+			isa = PBXGroup;
+			children = (
+				CDD0550520A5CF2200BEF482 /* ANIImageFilterPreviewView.swift */,
+				CDD0550720A5D07600BEF482 /* ANIImageFilterPreviewCell.swift */,
+			);
+			path = Preview;
+			sourceTree = "<group>";
+		};
+		CDD0550A20A5D28100BEF482 /* Filter */ = {
+			isa = PBXGroup;
+			children = (
+				CDD0550B20A5D29900BEF482 /* ANIImageFilterView.swift */,
+				CDD0550D20A6B23B00BEF482 /* ANIImageFilterCell.swift */,
+			);
+			path = Filter;
+			sourceTree = "<group>";
+		};
+		CDDD04AA20B3B09C0094DBFA /* Comment */ = {
+			isa = PBXGroup;
+			children = (
+				CDA97B5920B263B500F46DA4 /* ANICommentView.swift */,
+				CDDD04A520B26CD50094DBFA /* ANICommentContentCell.swift */,
+				CDDD04A720B271090094DBFA /* ANICommentCell.swift */,
+			);
+			path = Comment;
+			sourceTree = "<group>";
+		};
+		CDDD04AD20B3B0AF0094DBFA /* CommentBar */ = {
+			isa = PBXGroup;
+			children = (
+				CDDD04AB20B3B0AA0094DBFA /* ANICommentBar.swift */,
+			);
+			path = CommentBar;
+			sourceTree = "<group>";
+		};
+		CDDD04B120B50FCE0094DBFA /* InitialViewController */ = {
+			isa = PBXGroup;
+			children = (
+				CDDD04B220B50FEA0094DBFA /* ANIInitialViewController.swift */,
+			);
+			path = InitialViewController;
+			sourceTree = "<group>";
+		};
+		CDDD04B520B5381B0094DBFA /* Initial */ = {
+			isa = PBXGroup;
+			children = (
+				CDDD04B120B50FCE0094DBFA /* InitialViewController */,
+				CDDD04B820B538400094DBFA /* Login */,
+				CDDD04BB20B539EE0094DBFA /* SignUp */,
+			);
+			path = Initial;
+			sourceTree = "<group>";
+		};
+		CDDD04B720B5382D0094DBFA /* Recruit */ = {
+			isa = PBXGroup;
+			children = (
+				F5B1EFBF20725B79000CFB0B /* RecruitViewController */,
+				CD08A72F20915BDF00F0B72D /* RecruitDetailViewController */,
+			);
+			path = Recruit;
+			sourceTree = "<group>";
+		};
+		CDDD04B820B538400094DBFA /* Login */ = {
+			isa = PBXGroup;
+			children = (
+				CDDD04B920B538540094DBFA /* ANILoginViewController.swift */,
+			);
+			path = Login;
+			sourceTree = "<group>";
+		};
+		CDDD04BB20B539EE0094DBFA /* SignUp */ = {
+			isa = PBXGroup;
+			children = (
+				CD6229DB20B64A6400E36875 /* ANISignUpViewController.swift */,
+			);
+			path = SignUp;
+			sourceTree = "<group>";
+		};
+		CDDD04BE20B53A7C0094DBFA /* InitialView */ = {
+			isa = PBXGroup;
+			children = (
+				CDDD04BF20B53A8B0094DBFA /* ANIInitialView.swift */,
+			);
+			path = InitialView;
+			sourceTree = "<group>";
+		};
+		CDDD04C120B53C110094DBFA /* Initial */ = {
+			isa = PBXGroup;
+			children = (
+				CDDD04BE20B53A7C0094DBFA /* InitialView */,
+				CDDD04C220B53C1A0094DBFA /* LoginView */,
+				CDDD04C320B53C760094DBFA /* SignUpView */,
+			);
+			path = Initial;
+			sourceTree = "<group>";
+		};
+		CDDD04C220B53C1A0094DBFA /* LoginView */ = {
+			isa = PBXGroup;
+			children = (
+				CDDD04C420B53C870094DBFA /* ANILoginView.swift */,
+			);
+			path = LoginView;
+			sourceTree = "<group>";
+		};
+		CDDD04C320B53C760094DBFA /* SignUpView */ = {
+			isa = PBXGroup;
+			children = (
+				CD6229DD20B64B9900E36875 /* ANISignUpView.swift */,
+			);
+			path = SignUpView;
+			sourceTree = "<group>";
+		};
+		CDF7F16F208F650600254A0F /* Button */ = {
+			isa = PBXGroup;
+			children = (
+				CDF7F170208F651E00254A0F /* ANIButtonView.swift */,
+				CDF7F173208F658E00254A0F /* ANIImageButtonView.swift */,
+				CD9E52BA2094614400715F50 /* ANIAreaButtonView.swift */,
+			);
+			path = Button;
+			sourceTree = "<group>";
+		};
 		F51D220E20767E49009D1B26 /* Utility */ = {
 			isa = PBXGroup;
 			children = (
+				CDA32A1420A9347A008A2AC1 /* ScrollView */,
+				CD6B675220A90F78009BF63D /* PlaceholderTextView */,
+				CDF7F16F208F650600254A0F /* Button */,
 				F51D220F20767E62009D1B26 /* ANIColor.swift */,
 				F51D221320768B01009D1B26 /* Extensioin */,
+				F5E9E22E2079AEC30021D4CC /* Orientation.swift */,
+				CDF7F167208D772300254A0F /* ANINotificationManager.swift */,
 			);
 			path = Utility;
 			sourceTree = "<group>";
@@ -109,6 +654,10 @@
 			children = (
 				F51D221120767F03009D1B26 /* UIColor.swift */,
 				F51D221420768B24009D1B26 /* UISearchBar.swift */,
+				CDF7F16D208F2BEF00254A0F /* UIView.swift */,
+				CD08A7702091975500F0B72D /* UIApplication.swift */,
+				CD9E52B020921EB400715F50 /* UIViewController.swift */,
+				CDA32A2E20ABD941008A2AC1 /* String.swift */,
 			);
 			path = Extensioin;
 			sourceTree = "<group>";
@@ -127,17 +676,178 @@
 			children = (
 				F51D221820768E8D009D1B26 /* ANIRecuruitView.swift */,
 				F5E9E220207692C60021D4CC /* ANIRecruitViewCell.swift */,
+				CD08A72C20915BB400F0B72D /* Detail */,
 			);
 			path = Recruit;
+			sourceTree = "<group>";
+		};
+		F521184D207A4428000B12C2 /* ImagesView */ = {
+			isa = PBXGroup;
+			children = (
+				F521184B207A4421000B12C2 /* ANIStoryImagesView.swift */,
+				F530AB1B207A45D900114E6B /* ANIStoryImagesCell.swift */,
+			);
+			path = ImagesView;
+			sourceTree = "<group>";
+		};
+		F53E87B82084687900B19A2F /* StorySearch */ = {
+			isa = PBXGroup;
+			children = (
+				F53E87B9208468DF00B19A2F /* ANIStorySearchView.swift */,
+			);
+			path = StorySearch;
+			sourceTree = "<group>";
+		};
+		F53E87BB2085AF9D00B19A2F /* ProfileViewController */ = {
+			isa = PBXGroup;
+			children = (
+				F53E87BC2085AFC700B19A2F /* ANIProfileViewController.swift */,
+			);
+			path = ProfileViewController;
+			sourceTree = "<group>";
+		};
+		F53E87BE2085B14A00B19A2F /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				F5F5300B2088599D0076E938 /* ANIProfileBasicView.swift */,
+				F5F5300D20885E670076E938 /* Top */,
+				F53E87C920861A4D00B19A2F /* Contents */,
+			);
+			path = Profile;
+			sourceTree = "<group>";
+		};
+		F53E87BF2085B15900B19A2F /* Family */ = {
+			isa = PBXGroup;
+			children = (
+				F53E87C02085B19700B19A2F /* ANIFamilyView.swift */,
+				F53E87C22085B50900B19A2F /* ANIFamilyViewCell.swift */,
+			);
+			path = Family;
+			sourceTree = "<group>";
+		};
+		F53E87C42085D0DF00B19A2F /* ProfileMenuBar */ = {
+			isa = PBXGroup;
+			children = (
+				F53E87C52085F13800B19A2F /* ANIProfileMenuBar.swift */,
+				F53E87C72085F5FA00B19A2F /* ANIProfileMenuBarCell.swift */,
+			);
+			path = ProfileMenuBar;
+			sourceTree = "<group>";
+		};
+		F53E87C920861A4D00B19A2F /* Contents */ = {
+			isa = PBXGroup;
+			children = (
+				F53E87CA20861A5B00B19A2F /* Profile */,
+			);
+			path = Contents;
+			sourceTree = "<group>";
+		};
+		F53E87CA20861A5B00B19A2F /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				F53E87CF2086EF6600B19A2F /* ANIProfileCell.swift */,
+			);
+			path = Profile;
 			sourceTree = "<group>";
 		};
 		F56634842075265E006CB81B /* RecruitView */ = {
 			isa = PBXGroup;
 			children = (
-				F51D221720768E5F009D1B26 /* Recruit */,
 				F51D221620768E53009D1B26 /* Category */,
+				F51D221720768E5F009D1B26 /* Recruit */,
 			);
 			path = RecruitView;
+			sourceTree = "<group>";
+		};
+		F57F7D482081F3A1008A2645 /* NotiViewController */ = {
+			isa = PBXGroup;
+			children = (
+				F57F7D492081F43F008A2645 /* ANINotiViewController.swift */,
+			);
+			path = NotiViewController;
+			sourceTree = "<group>";
+		};
+		F57F7D4B2081FC26008A2645 /* NotiView */ = {
+			isa = PBXGroup;
+			children = (
+				F57F7D4C2081FC3D008A2645 /* NotiMenuBar */,
+				F57F7D4D2081FC47008A2645 /* Noti */,
+			);
+			path = NotiView;
+			sourceTree = "<group>";
+		};
+		F57F7D4C2081FC3D008A2645 /* NotiMenuBar */ = {
+			isa = PBXGroup;
+			children = (
+				F57F7D4E2081FC64008A2645 /* ANiNotiMenuBar.swift */,
+				F57F7D502081FC71008A2645 /* ANINotiMenuBarCell.swift */,
+			);
+			path = NotiMenuBar;
+			sourceTree = "<group>";
+		};
+		F57F7D4D2081FC47008A2645 /* Noti */ = {
+			isa = PBXGroup;
+			children = (
+				F57F7D522081FC8B008A2645 /* Noti */,
+				F57F7D532081FC9A008A2645 /* Message */,
+			);
+			path = Noti;
+			sourceTree = "<group>";
+		};
+		F57F7D522081FC8B008A2645 /* Noti */ = {
+			isa = PBXGroup;
+			children = (
+				F57F7D542081FEB2008A2645 /* ANINotiNotiCell.swift */,
+				F57F7D58208311C1008A2645 /* ANINotiView.swift */,
+				F57F7D5E208314DF008A2645 /* ANINotiViewCell.swift */,
+			);
+			path = Noti;
+			sourceTree = "<group>";
+		};
+		F57F7D532081FC9A008A2645 /* Message */ = {
+			isa = PBXGroup;
+			children = (
+				F57F7D562081FEBF008A2645 /* ANINotiMessageCell.swift */,
+				F57F7D60208322D3008A2645 /* ANIMessageView.swift */,
+				F57F7D642083250D008A2645 /* ANIMessageViewCell.swift */,
+			);
+			path = Message;
+			sourceTree = "<group>";
+		};
+		F57F7D8620844A62008A2645 /* SearchViewController */ = {
+			isa = PBXGroup;
+			children = (
+				F57F7D8720844A8F008A2645 /* ANISearchViewController.swift */,
+			);
+			path = SearchViewController;
+			sourceTree = "<group>";
+		};
+		F57F7D8920844BD4008A2645 /* SearchView */ = {
+			isa = PBXGroup;
+			children = (
+				F57F7D8A20844C0C008A2645 /* SearchCategory */,
+				F57F7D8F20844D8C008A2645 /* UserSearch */,
+				F53E87B82084687900B19A2F /* StorySearch */,
+			);
+			path = SearchView;
+			sourceTree = "<group>";
+		};
+		F57F7D8A20844C0C008A2645 /* SearchCategory */ = {
+			isa = PBXGroup;
+			children = (
+				F57F7D8B20844C41008A2645 /* ANISearchCategoriesView.swift */,
+				F57F7D8D20844C4E008A2645 /* ANISearchCategoryCell.swift */,
+			);
+			path = SearchCategory;
+			sourceTree = "<group>";
+		};
+		F57F7D8F20844D8C008A2645 /* UserSearch */ = {
+			isa = PBXGroup;
+			children = (
+				F57F7D9020844DC2008A2645 /* ANIUserSearchView.swift */,
+				F53E87B62084608000B19A2F /* ANIUserSearchViewCell.swift */,
+			);
+			path = UserSearch;
 			sourceTree = "<group>";
 		};
 		F5B1EF8420725963000CFB0B = {
@@ -148,6 +858,7 @@
 				F5B1EFAF20725964000CFB0B /* AniUITests */,
 				F5B1EF8E20725963000CFB0B /* Products */,
 				F5B1EFC320726657000CFB0B /* Frameworks */,
+				45824576DBA272D1C4D63B2A /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -166,8 +877,8 @@
 			children = (
 				F5B1EFBE20725B6C000CFB0B /* Supporting */,
 				F5E9E222207696060021D4CC /* Model */,
-				F5B1EFBF20725B79000CFB0B /* RecruitViewController */,
-				F56634842075265E006CB81B /* RecruitView */,
+				F5E9E2302079AF8C0021D4CC /* ViewController */,
+				F5E9E2342079B1660021D4CC /* View */,
 				F5B1EFC020725B86000CFB0B /* TabbarController */,
 				F51D220E20767E49009D1B26 /* Utility */,
 				F5B1EF9C20725964000CFB0B /* Info.plist */,
@@ -222,18 +933,128 @@
 		F5B1EFC320726657000CFB0B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				CDDD04AE20B4F8130094DBFA /* GrowingTextView.framework */,
+				CDA97B5320B2497200F46DA4 /* WCLShineButton.framework */,
 				F5B1EFC420726658000CFB0B /* TinyConstraints.framework */,
+				FD08576705673419CEA26417 /* Pods_Ani.framework */,
+				AA314F74AF3E318A20DDD5DB /* Pods_AniTests.framework */,
+				C5DC98FBA0B2CCFDA47C5CD8 /* Pods_AniUITests.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		F5DF835E207A1CA300EA7FBE /* Story */ = {
+			isa = PBXGroup;
+			children = (
+				F5C381FC2079F73F000BBB8C /* ANICommunityStoryCell.swift */,
+				F5E9E23C2079C10C0021D4CC /* ANIStoryView.swift */,
+				F5DF8364207A27DC00EA7FBE /* ANIStoryViewCell.swift */,
+				F521184D207A4428000B12C2 /* ImagesView */,
+			);
+			path = Story;
+			sourceTree = "<group>";
+		};
+		F5DF835F207A1CB000EA7FBE /* Qna */ = {
+			isa = PBXGroup;
+			children = (
+				F5DF835C207A17C200EA7FBE /* ANICommunityQnaCell.swift */,
+				F5C381FE207A068D000BBB8C /* ANIQnaView.swift */,
+				F5DF8366207A27E900EA7FBE /* ANIQnaViewCell.swift */,
+				CDA32A7720AE6B03008A2AC1 /* ImagesView */,
+			);
+			path = Qna;
 			sourceTree = "<group>";
 		};
 		F5E9E222207696060021D4CC /* Model */ = {
 			isa = PBXGroup;
 			children = (
 				F5E9E2232076961D0021D4CC /* Recruit.swift */,
+				CDA32A2C20ABCE5F008A2AC1 /* RecruitInfo.swift */,
 				F5E9E22520769AD60021D4CC /* User.swift */,
+				F5DF8360207A1D4A00EA7FBE /* Story.swift */,
+				F5B51499207AEDC300366500 /* Qna.swift */,
+				F57F7D5C208313F0008A2645 /* Noti.swift */,
+				F57F7D62208323F9008A2645 /* Message.swift */,
+				CDDD04A320B269900094DBFA /* Comment.swift */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		F5E9E2302079AF8C0021D4CC /* ViewController */ = {
+			isa = PBXGroup;
+			children = (
+				CDDD04B520B5381B0094DBFA /* Initial */,
+				CDDD04B720B5382D0094DBFA /* Recruit */,
+				F5E9E2312079AFA40021D4CC /* CommunityViewController */,
+				F57F7D482081F3A1008A2645 /* NotiViewController */,
+				F57F7D8620844A62008A2645 /* SearchViewController */,
+				F53E87BB2085AF9D00B19A2F /* ProfileViewController */,
+				CD2C414620A5A1FF00581267 /* ImageFilterViewController */,
+				CDA97B5620B25F2000F46DA4 /* CommentViewController */,
+				CDA32A2120AA6041008A2AC1 /* ModalViewController */,
+			);
+			path = ViewController;
+			sourceTree = "<group>";
+		};
+		F5E9E2312079AFA40021D4CC /* CommunityViewController */ = {
+			isa = PBXGroup;
+			children = (
+				F5E9E2322079AFF40021D4CC /* ANICommunityViewController.swift */,
+			);
+			path = CommunityViewController;
+			sourceTree = "<group>";
+		};
+		F5E9E2342079B1660021D4CC /* View */ = {
+			isa = PBXGroup;
+			children = (
+				CDDD04C120B53C110094DBFA /* Initial */,
+				F56634842075265E006CB81B /* RecruitView */,
+				F5E9E2352079B16F0021D4CC /* CommunityView */,
+				F57F7D4B2081FC26008A2645 /* NotiView */,
+				F57F7D8920844BD4008A2645 /* SearchView */,
+				F53E87BE2085B14A00B19A2F /* Profile */,
+				CDD0550420A5CF0100BEF482 /* ImageFilter */,
+				CDA97B5B20B263BE00F46DA4 /* CommentView */,
+				CDA32A2420AA661A008A2AC1 /* ModalVIew */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		F5E9E2352079B16F0021D4CC /* CommunityView */ = {
+			isa = PBXGroup;
+			children = (
+				F5E9E23A2079C0B00021D4CC /* CoummunityMenuBar */,
+				F5E9E23B2079C0BD0021D4CC /* Community */,
+			);
+			path = CommunityView;
+			sourceTree = "<group>";
+		};
+		F5E9E23A2079C0B00021D4CC /* CoummunityMenuBar */ = {
+			isa = PBXGroup;
+			children = (
+				F5E9E2362079B1900021D4CC /* ANICommunityMenuBar.swift */,
+				F5E9E2382079B9D20021D4CC /* ANICommunityMenuBarCell.swift */,
+			);
+			path = CoummunityMenuBar;
+			sourceTree = "<group>";
+		};
+		F5E9E23B2079C0BD0021D4CC /* Community */ = {
+			isa = PBXGroup;
+			children = (
+				F5DF835E207A1CA300EA7FBE /* Story */,
+				F5DF835F207A1CB000EA7FBE /* Qna */,
+			);
+			path = Community;
+			sourceTree = "<group>";
+		};
+		F5F5300D20885E670076E938 /* Top */ = {
+			isa = PBXGroup;
+			children = (
+				F5F5300E20885E820076E938 /* ANIProfileTopCell.swift */,
+				F53E87BF2085B15900B19A2F /* Family */,
+				F53E87C42085D0DF00B19A2F /* ProfileMenuBar */,
+			);
+			path = Top;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -243,10 +1064,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F5B1EFB520725964000CFB0B /* Build configuration list for PBXNativeTarget "Ani" */;
 			buildPhases = (
+				62BE84D0F0E3D26B0AF0897B /* [CP] Check Pods Manifest.lock */,
 				F5B1EF8920725963000CFB0B /* Sources */,
 				F5B1EF8A20725963000CFB0B /* Frameworks */,
 				F5B1EF8B20725963000CFB0B /* Resources */,
 				F5B1EFC62072666A000CFB0B /* ShellScript */,
+				D8894B36BCEAEA49086B4D2B /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -261,6 +1084,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F5B1EFB820725964000CFB0B /* Build configuration list for PBXNativeTarget "AniTests" */;
 			buildPhases = (
+				C08E1861744C02BF273FFC88 /* [CP] Check Pods Manifest.lock */,
 				F5B1EF9D20725964000CFB0B /* Sources */,
 				F5B1EF9E20725964000CFB0B /* Frameworks */,
 				F5B1EF9F20725964000CFB0B /* Resources */,
@@ -279,6 +1103,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F5B1EFBB20725964000CFB0B /* Build configuration list for PBXNativeTarget "AniUITests" */;
 			buildPhases = (
+				A0744A8CD183542E9D046630 /* [CP] Check Pods Manifest.lock */,
 				F5B1EFA820725964000CFB0B /* Sources */,
 				F5B1EFA920725964000CFB0B /* Frameworks */,
 				F5B1EFAA20725964000CFB0B /* Resources */,
@@ -366,6 +1191,78 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		62BE84D0F0E3D26B0AF0897B /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Ani-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		A0744A8CD183542E9D046630 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-AniUITests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		C08E1861744C02BF273FFC88 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-AniTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		D8894B36BCEAEA49086B4D2B /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-Ani/Pods-Ani-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/Gallery/Gallery.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Gallery.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Ani/Pods-Ani-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		F5B1EFC62072666A000CFB0B /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -373,6 +1270,8 @@
 			);
 			inputPaths = (
 				"$(SRCROOT)/Carthage/Build/iOS/TinyConstraints.framework",
+				"$(SRCROOT)/Carthage/Build/iOS/WCLShineButton.framework",
+				"$(SRCROOT)/Carthage/Build/iOS/GrowingTextView.framework",
 			);
 			outputPaths = (
 			);
@@ -387,18 +1286,110 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CD08A7712091975500F0B72D /* UIApplication.swift in Sources */,
 				F56634862075285D006CB81B /* ANIRecruitCategoryCell.swift in Sources */,
+				F57F7D4A2081F43F008A2645 /* ANINotiViewController.swift in Sources */,
 				F51D221220767F03009D1B26 /* UIColor.swift in Sources */,
+				F57F7D59208311C1008A2645 /* ANINotiView.swift in Sources */,
+				F5C381FD2079F73F000BBB8C /* ANICommunityStoryCell.swift in Sources */,
+				F5F5300F20885E820076E938 /* ANIProfileTopCell.swift in Sources */,
 				F5B1EFC220725BDC000CFB0B /* ANITabBarController.swift in Sources */,
+				F53E87B72084608000B19A2F /* ANIUserSearchViewCell.swift in Sources */,
+				CD6B675420A90F8A009BF63D /* ANIPlaceholderTextView.swift in Sources */,
+				CDA32A2720AA6652008A2AC1 /* ANIPopupPickerView.swift in Sources */,
+				F57F7D5D208313F0008A2645 /* Noti.swift in Sources */,
+				CDDD04AC20B3B0AA0094DBFA /* ANICommentBar.swift in Sources */,
+				CDD0550620A5CF2200BEF482 /* ANIImageFilterPreviewView.swift in Sources */,
 				F5E9E2242076961E0021D4CC /* Recruit.swift in Sources */,
+				F57F7D63208323F9008A2645 /* Message.swift in Sources */,
+				CDDD04C520B53C870094DBFA /* ANILoginView.swift in Sources */,
+				CDA97AC620AFF34C00F46DA4 /* ANIProfileEditViewController.swift in Sources */,
+				F5DF835D207A17C200EA7FBE /* ANICommunityQnaCell.swift in Sources */,
+				CDD0550C20A5D29900BEF482 /* ANIImageFilterView.swift in Sources */,
+				CD2C414520A556AE00581267 /* ANIRecruitContributionViewController.swift in Sources */,
+				CD9E52B32094304700715F50 /* ANIRecruitDetailImagesView.swift in Sources */,
+				F57F7D652083250D008A2645 /* ANIMessageViewCell.swift in Sources */,
 				F51D221920768E8D009D1B26 /* ANIRecuruitView.swift in Sources */,
+				F53E87D02086EF6600B19A2F /* ANIProfileCell.swift in Sources */,
+				CDA97ACE20B0018600F46DA4 /* ANIProfileEditFamilyCell.swift in Sources */,
+				CDA32A8620AE8DD4008A2AC1 /* ANIImageBrowserCell.swift in Sources */,
+				CDF7F171208F651E00254A0F /* ANIButtonView.swift in Sources */,
+				F57F7D8E20844C4E008A2645 /* ANISearchCategoryCell.swift in Sources */,
+				F53E87C12085B19700B19A2F /* ANIFamilyView.swift in Sources */,
+				CD9E52B520943C9500715F50 /* ANIRecruitDetailImagesViewFlowLayout.swift in Sources */,
+				F5C381FF207A068D000BBB8C /* ANIQnaView.swift in Sources */,
+				CDF7F168208D772300254A0F /* ANINotificationManager.swift in Sources */,
+				CDA32A8320AE7B02008A2AC1 /* ANIImageBrowserViewController.swift in Sources */,
+				F5DF8367207A27E900EA7FBE /* ANIQnaViewCell.swift in Sources */,
+				CDA97B5A20B263B500F46DA4 /* ANICommentView.swift in Sources */,
+				F57F7D5F208314DF008A2645 /* ANINotiViewCell.swift in Sources */,
+				F57F7D552081FEB2008A2645 /* ANINotiNotiCell.swift in Sources */,
+				F5B5149A207AEDC300366500 /* Qna.swift in Sources */,
+				F521184C207A4421000B12C2 /* ANIStoryImagesView.swift in Sources */,
+				CD2C414820A5A23C00581267 /* ANIImageFilterViewController.swift in Sources */,
+				F53E87C32085B50900B19A2F /* ANIFamilyViewCell.swift in Sources */,
+				CDA32A3C20AD2520008A2AC1 /* ANIContributionImagesCell.swift in Sources */,
+				CD6B675120A8844B009BF63D /* ANIRecruitContributionView.swift in Sources */,
+				F57F7D4F2081FC64008A2645 /* ANiNotiMenuBar.swift in Sources */,
+				F57F7D512081FC71008A2645 /* ANINotiMenuBarCell.swift in Sources */,
+				CDA32A3820AD1ED3008A2AC1 /* ANIContributionView.swift in Sources */,
+				CDD0550E20A6B23B00BEF482 /* ANIImageFilterCell.swift in Sources */,
+				CDA32A2320AA6041008A2AC1 /* ANIPopupPickerViewController.swift in Sources */,
 				F566348320752656006CB81B /* ANIRecruitCategoriesView.swift in Sources */,
+				CD6229DC20B64A6400E36875 /* ANISignUpViewController.swift in Sources */,
+				CDA32A2B20ABBC20008A2AC1 /* ANIRecruitContributionImagesCell.swift in Sources */,
+				CDF7F174208F658E00254A0F /* ANIImageButtonView.swift in Sources */,
+				CD08A72E20915BD700F0B72D /* ANIRecruitDetailView.swift in Sources */,
+				CDA32A7B20AE7007008A2AC1 /* ANIQnaImagesCell.swift in Sources */,
+				F5DF8365207A27DC00EA7FBE /* ANIStoryViewCell.swift in Sources */,
+				F5E9E22F2079AEC30021D4CC /* Orientation.swift in Sources */,
+				CDDD04B320B50FEA0094DBFA /* ANIInitialViewController.swift in Sources */,
+				F5E9E2372079B1900021D4CC /* ANICommunityMenuBar.swift in Sources */,
+				CDA32A3A20AD22E7008A2AC1 /* ANIContributionImagesView.swift in Sources */,
+				CDA32A3520AC14C0008A2AC1 /* ANIContributionViewController.swift in Sources */,
+				F53E87BD2085AFC700B19A2F /* ANIProfileViewController.swift in Sources */,
 				F5B1EF9320725964000CFB0B /* ANIRecruitViewController.swift in Sources */,
 				F51D221520768B24009D1B26 /* UISearchBar.swift in Sources */,
+				F5E9E2392079B9D20021D4CC /* ANICommunityMenuBarCell.swift in Sources */,
+				F5E9E23D2079C10C0021D4CC /* ANIStoryView.swift in Sources */,
+				CDA32A2D20ABCE5F008A2AC1 /* RecruitInfo.swift in Sources */,
+				F53E87C82085F5FA00B19A2F /* ANIProfileMenuBarCell.swift in Sources */,
+				F57F7D572081FEBF008A2645 /* ANINotiMessageCell.swift in Sources */,
+				CDA97ACC20B000FF00F46DA4 /* ANIProfileEditFamilyView.swift in Sources */,
+				F530AB1C207A45D900114E6B /* ANIStoryImagesCell.swift in Sources */,
+				CD6229DE20B64B9900E36875 /* ANISignUpView.swift in Sources */,
+				CDF7F16E208F2BEF00254A0F /* UIView.swift in Sources */,
+				CDDD04A420B269900094DBFA /* Comment.swift in Sources */,
+				CDA32A7920AE6B17008A2AC1 /* ANIQnaImagesView.swift in Sources */,
+				CDD0550820A5D07600BEF482 /* ANIImageFilterPreviewCell.swift in Sources */,
+				F57F7D8820844A90008A2645 /* ANISearchViewController.swift in Sources */,
+				CDA97B5820B25F3B00F46DA4 /* ANICommentViewController.swift in Sources */,
+				CDA32A1320A93422008A2AC1 /* ANIScrollView.swift in Sources */,
+				CDD0551020A6C64300BEF482 /* ANIFilter.swift in Sources */,
+				CDDD04BA20B538540094DBFA /* ANILoginViewController.swift in Sources */,
+				F57F7D9120844DC2008A2645 /* ANIUserSearchView.swift in Sources */,
+				CD9E52B7209441C900715F50 /* ANIRecruitDetailImagesViewCell.swift in Sources */,
+				CDDD04A820B271090094DBFA /* ANICommentCell.swift in Sources */,
+				F5E9E2332079AFF40021D4CC /* ANICommunityViewController.swift in Sources */,
+				F5F5300C2088599D0076E938 /* ANIProfileBasicView.swift in Sources */,
 				F5E9E22620769AD60021D4CC /* User.swift in Sources */,
+				CD9E52BB2094614400715F50 /* ANIAreaButtonView.swift in Sources */,
+				F53E87BA208468DF00B19A2F /* ANIStorySearchView.swift in Sources */,
+				CDDD04C020B53A8B0094DBFA /* ANIInitialView.swift in Sources */,
+				CDA32A2920ABBA21008A2AC1 /* ANIRecruitContributionImagesView.swift in Sources */,
+				CD08A73120915C2A00F0B72D /* ANIRecruitDetailViewController.swift in Sources */,
+				F53E87C62085F13800B19A2F /* ANIProfileMenuBar.swift in Sources */,
+				CDA97AC920AFFFEC00F46DA4 /* ANIProfileEditView.swift in Sources */,
+				F57F7D61208322D3008A2645 /* ANIMessageView.swift in Sources */,
+				CD9E52B120921EB400715F50 /* UIViewController.swift in Sources */,
+				CDA32A2F20ABD941008A2AC1 /* String.swift in Sources */,
 				F51D221020767E62009D1B26 /* ANIColor.swift in Sources */,
 				F5E9E221207692C60021D4CC /* ANIRecruitViewCell.swift in Sources */,
 				F5B1EF9120725964000CFB0B /* AppDelegate.swift in Sources */,
+				F5DF8361207A1D4A00EA7FBE /* Story.swift in Sources */,
+				CDA32A8A20AEA7BC008A2AC1 /* ANIDraggableView.swift in Sources */,
+				CDDD04A620B26CD50094DBFA /* ANICommentContentCell.swift in Sources */,
+				F57F7D8C20844C41008A2645 /* ANISearchCategoriesView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -554,10 +1545,11 @@
 		};
 		F5B1EFB620725964000CFB0B /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = F1F77997FC894BF232AA6788 /* Pods-Ani.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = BY8G5B9E3U;
+				DEVELOPMENT_TEAM = 7WMX7DJ97Q;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
@@ -573,10 +1565,11 @@
 		};
 		F5B1EFB720725964000CFB0B /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = F8BF8D21240D7035E50361DD /* Pods-Ani.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = BY8G5B9E3U;
+				DEVELOPMENT_TEAM = 7WMX7DJ97Q;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
@@ -592,6 +1585,7 @@
 		};
 		F5B1EFB920725964000CFB0B /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9F7E1F101C01F36DEDE88686 /* Pods-AniTests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -609,6 +1603,7 @@
 		};
 		F5B1EFBA20725964000CFB0B /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 17FAD9EDAE08B9FA7A60EDB8 /* Pods-AniTests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -626,6 +1621,7 @@
 		};
 		F5B1EFBC20725964000CFB0B /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = F1C7C5FF61E6DE40085AB66D /* Pods-AniUITests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
@@ -642,6 +1638,7 @@
 		};
 		F5B1EFBD20725964000CFB0B /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = B1141BC302D4697B8D251698 /* Pods-AniUITests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;

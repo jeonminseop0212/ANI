@@ -10,11 +10,52 @@ import UIKit
 
 class ANITabBarController: UITabBarController {
 
+  static var isLogin: Bool = false
+  
   override func viewDidLoad() {
     super.viewDidLoad()
+    //tabBar上の線を消す
+    let tabBarAppearane = UITabBar.appearance()
+    tabBarAppearane.barTintColor = .white
+    tabBar.alpha = 0.95
+    tabBar.layer.borderWidth = 0.0
+    tabBar.clipsToBounds = true
+    
     let recruitVC = ANIRecruitViewController()
     recruitVC.tabBarItem = UITabBarItem(tabBarSystemItem: .downloads, tag: 1)
     let recruitNV = UINavigationController(rootViewController: recruitVC)
-    setViewControllers([recruitNV], animated: false)
+    
+    let communityVC = ANICommunityViewController()
+    communityVC.tabBarItem = UITabBarItem(tabBarSystemItem: .bookmarks, tag: 2)
+    let communityNV = UINavigationController(rootViewController: communityVC)
+    
+    let notiVC = ANINotiViewController()
+    notiVC.tabBarItem = UITabBarItem(tabBarSystemItem: .bookmarks, tag: 3)
+    let notiNV = UINavigationController(rootViewController: notiVC)
+    
+    let searchVC = ANISearchViewController()
+    searchVC.tabBarItem = UITabBarItem(tabBarSystemItem: .search, tag: 4)
+    let searchNV = UINavigationController(rootViewController: searchVC)
+    
+    let profileVC = ANIProfileViewController()
+    profileVC.tabBarItem = UITabBarItem(tabBarSystemItem: .search, tag: 5)
+    let profileNV = UINavigationController(rootViewController: profileVC)
+    
+    setViewControllers([recruitNV, communityNV, notiNV, searchNV, profileNV], animated: false)
+  }
+  
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(true)
+    
+    if !ANITabBarController.isLogin {
+      showInitialView()
+    }
+  }
+  
+  private func showInitialView() {
+    //TODO: 初めての開いた、アカウントがない場合だけinitialviewを開く
+    let initialViewController = ANIInitialViewController()
+    let initialNV = UINavigationController(rootViewController: initialViewController)
+    self.present(initialNV, animated: true, completion: nil)
   }
 }

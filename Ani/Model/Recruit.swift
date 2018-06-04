@@ -8,10 +8,8 @@
 
 import UIKit
 
-struct Recurit {
-  let recruitImage: UIImage
-  let title: String
-  let subTitle: String
+struct Recruit {
+  let recruitInfo: RecruitInfo
   let user: User
   let supportCount: Int
   let loveCount: Int
