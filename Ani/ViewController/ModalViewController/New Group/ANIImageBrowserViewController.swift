@@ -35,6 +35,11 @@ class ANIImageBrowserViewController: UIViewController {
     openAnimation()
   }
   
+  override func viewWillDisappear(_ animated: Bool) {
+    UIApplication.shared.statusBar?.alpha = 1.0
+    UIApplication.shared.statusBarStyle = .default
+  }
+  
   private func setup() {
     //basic
     self.view.alpha = 0.0

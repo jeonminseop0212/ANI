@@ -11,6 +11,7 @@ import TinyConstraints
 
 protocol ANIRecruitDetailViewDelegate {
   func recruitDetailViewDidScroll(offset: CGFloat)
+  func imageCellTapped(index: Int, introduceImages: [UIImage?])
 }
 
 class ANIRecruitDetailView: UIView {
@@ -308,6 +309,7 @@ class ANIRecruitDetailView: UIView {
     
     //introduceImagesView
     let introduceImagesView = ANIRecruitDetailImagesView()
+    introduceImagesView.delegate = self
     introduceImagesView.introduceImages = introduceImages
     contentView.addSubview(introduceImagesView)
     introduceImagesView.topToBottom(of: introduceBG, offset: 10.0)
@@ -420,6 +422,12 @@ extension ANIRecruitDetailView: UIScrollViewDelegate {
     //navigation bar animation
     let offset = newScrollY / (headerImageViewHeight - headerMinHeight)
     self.delegate?.recruitDetailViewDidScroll(offset: offset)
+  }
+}
+
+extension ANIRecruitDetailView: ANIRecruitDetailImagesViewDelegate {
+  func imageCellTapped(index: Int, introduceImages: [UIImage?]) {
+    self.delegate?.imageCellTapped(index: index, introduceImages: introduceImages)
   }
 }
 
