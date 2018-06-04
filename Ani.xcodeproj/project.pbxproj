@@ -10,6 +10,7 @@
 		23BE6C66072673B423ABA35D /* Pods_Ani.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FD08576705673419CEA26417 /* Pods_Ani.framework */; };
 		8751932F6CAEF562E234E91C /* Pods_AniTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA314F74AF3E318A20DDD5DB /* Pods_AniTests.framework */; };
 		BFFABBAF01DF20A602B9BB7F /* Pods_AniUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C5DC98FBA0B2CCFDA47C5CD8 /* Pods_AniUITests.framework */; };
+		CD047EBE20C4E9A000248958 /* NVActivityIndicatorView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD047EBD20C4E9A000248958 /* NVActivityIndicatorView.framework */; };
 		CD08A72E20915BD700F0B72D /* ANIRecruitDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD08A72D20915BD700F0B72D /* ANIRecruitDetailView.swift */; };
 		CD08A73120915C2A00F0B72D /* ANIRecruitDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD08A73020915C2A00F0B72D /* ANIRecruitDetailViewController.swift */; };
 		CD08A7712091975500F0B72D /* UIApplication.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD08A7702091975500F0B72D /* UIApplication.swift */; };
@@ -150,6 +151,7 @@
 		AA314F74AF3E318A20DDD5DB /* Pods_AniTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AniTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B1141BC302D4697B8D251698 /* Pods-AniUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AniUITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-AniUITests/Pods-AniUITests.release.xcconfig"; sourceTree = "<group>"; };
 		C5DC98FBA0B2CCFDA47C5CD8 /* Pods_AniUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AniUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		CD047EBD20C4E9A000248958 /* NVActivityIndicatorView.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NVActivityIndicatorView.framework; path = Carthage/Build/iOS/NVActivityIndicatorView.framework; sourceTree = "<group>"; };
 		CD08A72D20915BD700F0B72D /* ANIRecruitDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitDetailView.swift; sourceTree = "<group>"; };
 		CD08A73020915C2A00F0B72D /* ANIRecruitDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitDetailViewController.swift; sourceTree = "<group>"; };
 		CD08A7702091975500F0B72D /* UIApplication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIApplication.swift; sourceTree = "<group>"; };
@@ -282,6 +284,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CD047EBE20C4E9A000248958 /* NVActivityIndicatorView.framework in Frameworks */,
 				CDDD04AF20B4F8130094DBFA /* GrowingTextView.framework in Frameworks */,
 				CDA97B5420B2497200F46DA4 /* WCLShineButton.framework in Frameworks */,
 				F5B1EFC520726658000CFB0B /* TinyConstraints.framework in Frameworks */,
@@ -952,6 +955,7 @@
 		F5B1EFC320726657000CFB0B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				CD047EBD20C4E9A000248958 /* NVActivityIndicatorView.framework */,
 				CDDD04AE20B4F8130094DBFA /* GrowingTextView.framework */,
 				CDA97B5320B2497200F46DA4 /* WCLShineButton.framework */,
 				F5B1EFC420726658000CFB0B /* TinyConstraints.framework */,
@@ -1303,6 +1307,7 @@
 				"$(SRCROOT)/Carthage/Build/iOS/TinyConstraints.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/WCLShineButton.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/GrowingTextView.framework",
+				"$(SRCROOT)/Carthage/Build/iOS/NVActivityIndicatorView.framework",
 			);
 			outputPaths = (
 			);

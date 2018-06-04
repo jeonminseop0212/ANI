@@ -11,12 +11,13 @@ import Gallery
 import TinyConstraints
 import FirebaseDatabase
 import FirebaseStorage
+import NVActivityIndicatorView
 
 protocol ANIProfileEditViewControllerDelegate {
   func didEdit()
 }
 
-class ANIProfileEditViewController: UIViewController {
+class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewable {
   
   private weak var myNavigationBar: UIView?
   private weak var myNavigationBase: UIView?
@@ -52,6 +53,8 @@ class ANIProfileEditViewController: UIViewController {
       profileEditView.familyImages = familyImages
     }
   }
+  
+  private var familyImagesChange: Bool = false
   
   var delegate: ANIProfileEditViewControllerDelegate?
   
@@ -210,6 +213,7 @@ class ANIProfileEditViewController: UIViewController {
         user.setValuesForKeys(dictionary)
         
         ANISessionManager.shared.currentUser = user
+        NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
         self.delegate?.didEdit()
         self.dismiss(animated: true, completion: nil)
       }
@@ -237,7 +241,8 @@ class ANIProfileEditViewController: UIViewController {
     for (index, familyImageUrl) in familyImageUrls.enumerated() {
       if let url = URL(string: familyImageUrl) {
         DispatchQueue.global().async {
-          if let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
+          if let data = try? Data(contentsOf: url) {
+            let image = UIImage(data: data)
             images[index] = image
             
             let sortdImages = images.sorted(by: {$0.0 < $1.0})
@@ -259,7 +264,7 @@ class ANIProfileEditViewController: UIViewController {
   private func setFamilyImageUrls(completion:((_ urls :[String])->())? = nil) {
     if let familyImages = self.familyImages {
       var familyImageUrls = [Int: String]()
-      
+
       for (index, familyImage) in familyImages.enumerated() {
         if let familyImage = familyImage {
           if let familyImageData = UIImageJPEGRepresentation(familyImage, 0.5) {
@@ -303,15 +308,20 @@ class ANIProfileEditViewController: UIViewController {
           let kind = updateUser.kind,
           let introduce = updateUser.introduce else { return }
     
-    if let familyUrls = currentUser.familyImageUrls {
-      deleteFamilyImages(urls: familyUrls)
+    let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.green)
+    NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData)
+    
+    if familyImagesChange {
+      if let familyUrls = currentUser.familyImageUrls {
+        deleteFamilyImages(urls: familyUrls)
+      }
+      
+      setFamilyImageUrls(completion: { (urls) in
+        let databaseRef = Database.database().reference()
+        databaseRef.child(KEY_USERS).child(currentUserUid).child(KEY_FAMILY_IMAGE_URLS).setValue(urls)
+      })
     }
 
-    setFamilyImageUrls(completion: { (urls) in
-      let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_USERS).child(currentUserUid).child(KEY_FAMILY_IMAGE_URLS).setValue(urls)
-    })
-    
     if let profileImage = self.profileImage, let profileImageData = UIImageJPEGRepresentation(profileImage, 0.5) {
       let storageRef = Storage.storage().reference()
       storageRef.child(KEY_PROFILE_IMAGES).child("\(currentUserUid).jpeg").putData(profileImageData, metadata: nil) { (metaData, error) in
@@ -451,6 +461,7 @@ extension ANIProfileEditViewController: ANIImageFilterViewControllerDelegate {
         profileImage = filteredImage
       } else if let editImageIndex = editImageIndex {
         self.familyImages?[editImageIndex - 1] = filteredImage
+        familyImagesChange = true
       }
     }
   }
