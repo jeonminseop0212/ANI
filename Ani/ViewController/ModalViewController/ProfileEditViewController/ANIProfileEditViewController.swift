@@ -45,9 +45,20 @@ class ANIProfileEditViewController: UIViewController {
     }
   }
   
+  var familyImages: [UIImage?]? {
+    didSet {
+      guard let profileEditView = self.profileEditView,
+            let familyImages = self.familyImages else { return }
+      profileEditView.familyImages = familyImages
+    }
+  }
+  
   var delegate: ANIProfileEditViewControllerDelegate?
   
   override func viewDidLoad() {
+    setFamilyImages { (images) in
+      self.familyImages = images
+    }
     setup()
     setupNotification()
   }
@@ -187,6 +198,95 @@ class ANIProfileEditViewController: UIViewController {
     })
   }
   
+  private func uploadUserIntoDatabase(uid: String, values: [String: AnyObject]) {
+    let databaseRef = Database.database().reference(fromURL: "https://ani-ios-1faa3.firebaseio.com/")
+    let userRef = databaseRef.child(KEY_USERS).child(uid)
+    
+    userRef.updateChildValues(values)
+    
+    databaseRef.child(KEY_USERS).child(uid).observe(.value, with: { (snapshot) in
+      if let dictionary = snapshot.value as? [String: AnyObject] {
+        let user = FirebaseUser()
+        user.setValuesForKeys(dictionary)
+        
+        ANISessionManager.shared.currentUser = user
+        self.delegate?.didEdit()
+        self.dismiss(animated: true, completion: nil)
+      }
+    })
+  }
+  
+  private func deleteFamilyImages(urls: [String]) {
+    for url in urls {
+      let storage = Storage.storage()
+      let storageRef = storage.reference(forURL: url)
+      
+      storageRef.delete { error in
+        if let error = error {
+          print(error)
+        }
+      }
+    }
+  }
+  
+  private func setFamilyImages(completion:((_ images :[UIImage])->())? = nil) {
+    guard let currentUser = ANISessionManager.shared.currentUser,
+          let familyImageUrls = currentUser.familyImageUrls else { return }
+    
+    var images = [Int: UIImage]()
+    for (index, familyImageUrl) in familyImageUrls.enumerated() {
+      if let url = URL(string: familyImageUrl) {
+        DispatchQueue.global().async {
+          if let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
+            images[index] = image
+            
+            let sortdImages = images.sorted(by: {$0.0 < $1.0})
+            if sortdImages.count == familyImageUrls.count {
+              var uiImages = [UIImage]()
+              for image in sortdImages {
+                uiImages.append(image.value)
+              }
+              completion?(uiImages)
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  private func setFamilyImageUrls(completion:((_ urls :[String])->())? = nil) {
+    if let familyImages = self.familyImages {
+      var familyImageUrls = [Int: String]()
+      
+      for (index, familyImage) in familyImages.enumerated() {
+        if let familyImage = familyImage {
+          if let familyImageData = UIImageJPEGRepresentation(familyImage, 0.5) {
+            let uuid = NSUUID().uuidString
+            let storageRef = Storage.storage().reference()
+            storageRef.child(KEY_FAMILY_IMAGES).child(uuid).putData(familyImageData, metadata: nil) { (metaData, error) in
+              if error != nil {
+                print("storageError")
+                return
+              }
+              
+              if let familyImageUrl = metaData?.downloadURL() {
+                familyImageUrls[index] = familyImageUrl.absoluteString
+                if familyImageUrls.count == familyImages.count {
+                  let sortdUrls = familyImageUrls.sorted(by: {$0.0 < $1.0})
+                  var urls = [String]()
+                  for url in sortdUrls {
+                    urls.append(url.value)
+                  }
+                  completion?(urls)
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
   //MARK: Action
   @objc private func back() {
     self.dismiss(animated: true, completion: nil)
@@ -194,11 +294,21 @@ class ANIProfileEditViewController: UIViewController {
   
   @objc private func edit() {
     guard let profileEditView = self.profileEditView,
+          let currentUser = ANISessionManager.shared.currentUser,
           let currentUserUid = ANISessionManager.shared.currentUserUid,
           let updateUser = profileEditView.getUpdateUser(),
           let userName = updateUser.userName,
           let kind = updateUser.kind,
           let introduce = updateUser.introduce else { return }
+    
+    if let familyUrls = currentUser.familyImageUrls {
+      deleteFamilyImages(urls: familyUrls)
+    }
+
+    setFamilyImageUrls(completion: { (urls) in
+      let databaseRef = Database.database().reference()
+      databaseRef.child(KEY_USERS).child(currentUserUid).child(KEY_FAMILY_IMAGE_URLS).setValue(urls)
+    })
     
     if let profileImage = self.profileImage, let profileImageData = UIImageJPEGRepresentation(profileImage, 0.5) {
       let storageRef = Storage.storage().reference()
@@ -217,24 +327,6 @@ class ANIProfileEditViewController: UIViewController {
       let values = [KEY_USER_NAME: userName, KEY_KIND: kind, KEY_INTRODUCE: introduce] as [String : AnyObject]
       self.uploadUserIntoDatabase(uid: currentUserUid, values: values)
     }
-  }
-  
-  private func uploadUserIntoDatabase(uid: String, values: [String: AnyObject]) {
-    let databaseRef = Database.database().reference(fromURL: "https://ani-ios-1faa3.firebaseio.com/")
-    let userRef = databaseRef.child(KEY_USERS).child(uid)
-    
-    userRef.updateChildValues(values)
-    
-    databaseRef.child(KEY_USERS).child(uid).observe(.value, with: { (snapshot) in
-      if let dictionary = snapshot.value as? [String: AnyObject] {
-        let user = FirebaseUser()
-        user.setValuesForKeys(dictionary)
-
-        ANISessionManager.shared.currentUser = user
-        self.delegate?.didEdit()
-        self.dismiss(animated: true, completion: nil)
-      }
-    })
   }
 }
 
@@ -266,11 +358,10 @@ extension ANIProfileEditViewController: ANIProfileEditViewDelegate {
       galleryUnrap.delegate = self
       Gallery.Config.initialTab = .imageTab
       Gallery.Config.PageIndicator.backgroundColor = .white
-      Gallery.Config.Camera.oneImageMode = true
-      if Gallery.Config.Camera.oneImageMode {
-        Gallery.Config.Grid.previewRatio = UIViewController.HEADER_IMAGE_VIEW_RATIO
-        Config.tabsToShow = [.imageTab, .cameraTab]
-      }
+      Gallery.Config.Camera.oneImageMode = false
+      Gallery.Config.Grid.previewRatio = UIViewController.HEADER_IMAGE_VIEW_RATIO
+      Config.tabsToShow = [.imageTab, .cameraTab]
+      Config.Camera.imageLimit = 10
       Gallery.Config.Font.Main.regular = UIFont.boldSystemFont(ofSize: 17)
       Gallery.Config.Grid.ArrowButton.tintColor = ANIColor.dark
       Gallery.Config.Grid.FrameView.borderColor = ANIColor.green
@@ -346,22 +437,19 @@ extension ANIProfileEditViewController: ANIImageFilterViewControllerDelegate {
           let filteredImage = filteredImages[0] else { return }
     
     if isFamilyAdd {
-      
+      if familyImages != nil {
+        for image in filteredImages {
+          familyImages?.append(image)
+        }
+      } else {
+        familyImages = filteredImages
+      }
     } else {
-      profileImage = filteredImage
+      if editImageIndex == 0 {
+        profileImage = filteredImage
+      } else if let editImageIndex = editImageIndex {
+        self.familyImages?[editImageIndex - 1] = filteredImage
+      }
     }
-//    guard !filteredImages.isEmpty,
-//          let filteredImage = filteredImages[0],
-//          let user = self.user else { return }
-//    
-//    if isFamilyAdd {
-//      var userTemp = user
-//      userTemp.familyImages?.append(filteredImage)
-//      self.user = userTemp
-//    } else if let editImageIndex = self.editImageIndex {
-//      var userTemp = user
-//      userTemp.familyImages?[editImageIndex] = filteredImage
-//      self.user = userTemp
-//    }
   }
 }

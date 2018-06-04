@@ -8,6 +8,7 @@
 
 import UIKit
 import FirebaseStorageUI
+import FirebaseDatabase
 
 class ANIFamilyView: UIView {
   
@@ -51,18 +52,25 @@ class ANIFamilyView: UIView {
 
 extension ANIFamilyView: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-//    guard let user = self.user,
-//          let profileImageUrl = user.profileImageUrl else { return 0 }
-    
-    return 1
+    if let user = self.user, let familyImageUrls = user.familyImageUrls {
+      return 1 + familyImageUrls.count
+    } else {
+      return 1
+    }
   }
   
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     let id = NSStringFromClass(ANIFamilyViewCell.self)
     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! ANIFamilyViewCell
     
-    if let user = self.user, let profileImageUrl = user.profileImageUrl {
-      cell.familyImageView?.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
+    if indexPath.item == 0 {
+      if let user = self.user, let profileImageUrl = user.profileImageUrl {
+        cell.familyImageView?.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
+      }
+    } else {
+      if let user = self.user, let familyImageUrls = user.familyImageUrls {
+        cell.familyImageView?.sd_setImage(with: URL(string: familyImageUrls[indexPath.item - 1]), completed: nil)
+      }
     }
     
     return cell

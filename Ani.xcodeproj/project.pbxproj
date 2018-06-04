@@ -356,6 +356,18 @@
 			path = ImageFilterViewController;
 			sourceTree = "<group>";
 		};
+		CD66F49020C4C0CD00FF563C /* Supporting */ = {
+			isa = PBXGroup;
+			children = (
+				F51D220F20767E62009D1B26 /* ANIColor.swift */,
+				F5E9E22E2079AEC30021D4CC /* ANIOrientation.swift */,
+				CDF7F167208D772300254A0F /* ANINotificationManager.swift */,
+				CD0FAD0D20BFC02E00D8CD27 /* ANISessionManager.swift */,
+				CD92792120C0DCB400B1F006 /* ANIKey.swift */,
+			);
+			path = Supporting;
+			sourceTree = "<group>";
+		};
 		CD6B674F20A88420009BF63D /* RecruitContributionView */ = {
 			isa = PBXGroup;
 			children = (
@@ -649,12 +661,8 @@
 				CDA32A1420A9347A008A2AC1 /* ScrollView */,
 				CD6B675220A90F78009BF63D /* PlaceholderTextView */,
 				CDF7F16F208F650600254A0F /* Button */,
-				F51D220F20767E62009D1B26 /* ANIColor.swift */,
 				F51D221320768B01009D1B26 /* Extensioin */,
-				F5E9E22E2079AEC30021D4CC /* ANIOrientation.swift */,
-				CDF7F167208D772300254A0F /* ANINotificationManager.swift */,
-				CD0FAD0D20BFC02E00D8CD27 /* ANISessionManager.swift */,
-				CD92792120C0DCB400B1F006 /* ANIKey.swift */,
+				CD66F49020C4C0CD00FF563C /* Supporting */,
 			);
 			path = Utility;
 			sourceTree = "<group>";
