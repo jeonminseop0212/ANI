@@ -10,9 +10,9 @@ import UIKit
 import FirebaseAuth
 import FirebaseDatabase
 import FirebaseStorage
+import CodableFirebase
 
 protocol ANISignUpViewDelegate {
-  func donButtonTapped()
   func prifileImagePickButtonTapped()
   func reject(notiText: String)
   func signUpSuccess()

@@ -9,6 +9,7 @@
 import UIKit
 import FirebaseAuth
 import FirebaseDatabase
+import CodableFirebase
 
 class ANITabBarController: UITabBarController {
   
@@ -55,11 +56,12 @@ class ANITabBarController: UITabBarController {
     ANISessionManager.shared.currentUserUid = Auth.auth().currentUser?.uid
     if let currentUserUid = ANISessionManager.shared.currentUserUid {
       Database.database().reference().child(KEY_USERS).child(currentUserUid).observe(.value, with: { (snapshot) in
-        if let dictionary = snapshot.value as? [String: AnyObject] {
-          let user = FirebaseUser()
-          user.setValuesForKeys(dictionary)
-          
+        guard let value = snapshot.value else { return }
+        do {
+          let user = try FirebaseDecoder().decode(FirebaseUser.self, from: value)
           ANISessionManager.shared.currentUser = user
+        } catch let error {
+          print(error)
         }
       })
     } else {

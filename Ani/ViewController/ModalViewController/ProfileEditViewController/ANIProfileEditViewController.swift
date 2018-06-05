@@ -11,6 +11,7 @@ import Gallery
 import TinyConstraints
 import FirebaseDatabase
 import FirebaseStorage
+import CodableFirebase
 import NVActivityIndicatorView
 
 protocol ANIProfileEditViewControllerDelegate {
@@ -211,16 +212,18 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
     
     userRef.updateChildValues(values)
     
+    
     databaseRef.child(KEY_USERS).child(uid).observe(.value, with: { (snapshot) in
-      if let dictionary = snapshot.value as? [String: AnyObject] {
-        let user = FirebaseUser()
-        user.setValuesForKeys(dictionary)
-        
-        ANISessionManager.shared.currentUser = user
-        NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
-        self.delegate?.didEdit()
-        self.dismiss(animated: true, completion: nil)
-      }
+        guard let value = snapshot.value else { return }
+        do {
+          let user = try FirebaseDecoder().decode(FirebaseUser.self, from: value)
+          ANISessionManager.shared.currentUser = user
+          NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
+          self.delegate?.didEdit()
+          self.dismiss(animated: true, completion: nil)
+        } catch let error {
+          print(error)
+        }
     })
   }
   
