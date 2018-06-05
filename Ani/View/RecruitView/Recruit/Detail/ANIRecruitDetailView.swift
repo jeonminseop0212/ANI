@@ -11,7 +11,7 @@ import TinyConstraints
 
 protocol ANIRecruitDetailViewDelegate {
   func recruitDetailViewDidScroll(offset: CGFloat)
-  func imageCellTapped(index: Int, introduceImages: [UIImage?])
+  func imageCellTapped(index: Int, introduceImageUrls: [String])
 }
 
 class ANIRecruitDetailView: UIView {
@@ -56,16 +56,16 @@ class ANIRecruitDetailView: UIView {
   private weak var passingBG: UIView?
   private weak var passingLabel: UILabel?
   
-  private var introduceImages = [UIImage?]() {
+  private var introduceImageUrls = [String]() {
     didSet {
       guard let introduceImagesView = self.introduceImagesView else { return }
-      introduceImagesView.introduceImages = introduceImages
+      introduceImagesView.introduceImageUrls = introduceImageUrls
     }
   }
   
   var delegate: ANIRecruitDetailViewDelegate?
   
-  var testRecruit: Recruit? {
+  var recruit: FirebaseRecruit? {
     didSet {
       reloadLayout()
     }
@@ -310,7 +310,7 @@ class ANIRecruitDetailView: UIView {
     //introduceImagesView
     let introduceImagesView = ANIRecruitDetailImagesView()
     introduceImagesView.delegate = self
-    introduceImagesView.introduceImages = introduceImages
+    introduceImagesView.introduceImageUrls = introduceImageUrls
     contentView.addSubview(introduceImagesView)
     introduceImagesView.topToBottom(of: introduceBG, offset: 10.0)
     introduceImagesView.leftToSuperview()
@@ -352,10 +352,10 @@ class ANIRecruitDetailView: UIView {
   }
   
   private func reloadLayout() {
-    guard let testRecruit = self.testRecruit,
-          let headerImageView = self.headerImageView,
+    guard let headerImageView = self.headerImageView,
           let titleLabel = self.titleLabel,
           let profileImageView = self.profileImageView,
+          let userNameLabel = self.userNameLabel,
           let basicInfoKindLabel = self.basicInfoKindLabel,
           let basicInfoAgeLabel = self.basicInfoAgeLabel,
           let basicInfoSexLabel = self.basicInfoSexLabel,
@@ -364,29 +364,32 @@ class ANIRecruitDetailView: UIView {
           let basicInfoCastrationLabel = self.basicInfoCastrationLabel,
           let reasonLabel = self.reasonLabel,
           let introduceLabel = self.introduceLabel,
-          let passingLabel = self.passingLabel else { return }
+          let passingLabel = self.passingLabel,
+          let recruit = self.recruit,
+          let headerImageUrl = recruit.headerImageUrl,
+          let introduceImageUrls = recruit.introduceImageUrls else { return }
     
-    headerImageView.image = testRecruit.recruitInfo.headerImage
+    headerImageView.sd_setImage(with: URL(string: headerImageUrl), completed: nil)
     
-    titleLabel.text = testRecruit.recruitInfo.title
+    titleLabel.text = recruit.title
     
-    profileImageView.image = testRecruit.user.profileImage
+    profileImageView.sd_setImage(with: URL(string: recruit.profileImageUrl), completed: nil)
     
-    userNameLabel?.text = testRecruit.user.name
+    userNameLabel.text = recruit.userName
     
-    basicInfoKindLabel.text = "種類：\(testRecruit.recruitInfo.kind)"
-    basicInfoAgeLabel.text = "年齢：\(testRecruit.recruitInfo.age)"
-    basicInfoSexLabel.text = "性別：\(testRecruit.recruitInfo.sex)"
-    basicInfoHomeLabel.text = "お家：\(testRecruit.recruitInfo.home)"
-    basicInfoVaccineLabel.text = "ワクチン：\(testRecruit.recruitInfo.vaccine)"
-    basicInfoCastrationLabel.text = "去勢生：\(testRecruit.recruitInfo.castration)"
+    basicInfoKindLabel.text = "種類：\(recruit.kind)"
+    basicInfoAgeLabel.text = "年齢：\(recruit.age)"
+    basicInfoSexLabel.text = "性別：\(recruit.sex)"
+    basicInfoHomeLabel.text = "お家：\(recruit.home)"
+    basicInfoVaccineLabel.text = "ワクチン：\(recruit.vaccine)"
+    basicInfoCastrationLabel.text = "去勢生：\(recruit.castration)"
     
-    reasonLabel.text = testRecruit.recruitInfo.reason
+    reasonLabel.text = recruit.reason
     
-    introduceLabel.text = testRecruit.recruitInfo.introduce
-    introduceImages = testRecruit.recruitInfo.introduceImages
+    introduceLabel.text = recruit.introduce
+    self.introduceImageUrls = introduceImageUrls
     
-    passingLabel.text = testRecruit.recruitInfo.passing
+    passingLabel.text = recruit.passing
   }
 }
 
@@ -426,8 +429,8 @@ extension ANIRecruitDetailView: UIScrollViewDelegate {
 }
 
 extension ANIRecruitDetailView: ANIRecruitDetailImagesViewDelegate {
-  func imageCellTapped(index: Int, introduceImages: [UIImage?]) {
-    self.delegate?.imageCellTapped(index: index, introduceImages: introduceImages)
+  func imageCellTapped(index: Int, introduceImageUrls: [String]) {
+    self.delegate?.imageCellTapped(index: index, introduceImageUrls: introduceImageUrls)
   }
 }
 

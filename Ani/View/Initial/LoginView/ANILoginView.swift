@@ -8,6 +8,7 @@
 
 import UIKit
 import FirebaseAuth
+import NVActivityIndicatorView
 
 protocol ANILoginViewDelegate {
   func reject(notiText: String)
@@ -196,10 +197,17 @@ extension ANILoginView: ANIButtonViewDelegate {
         let passwordTextField = self.passwordTextField,
         let password = passwordTextField.text else { return }
       
+      let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.green)
+      NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData)
+      
+      self.endEditing(true)
+      
       Auth.auth().signIn(withEmail: email, password: password) { (successUser, error) in
         if let errorUnrap = error {
           let nsError = errorUnrap as NSError
           
+          NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
+
           print("nsError \(nsError)")
           if nsError.code == 17008 {
             self.delegate?.reject(notiText: "存在しないメールアドレスです！")
@@ -212,6 +220,7 @@ extension ANILoginView: ANIButtonViewDelegate {
           }
         } else {
           //login
+          NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
           self.delegate?.loginSuccess()
           self.endEditing(true)
         }

@@ -22,7 +22,7 @@ class ANIRecruitDetailViewController: UIViewController {
   
   private var statusBarStyle: UIStatusBarStyle = .default
   
-  var testRecruit: Recruit?
+  var recruit: FirebaseRecruit?
   
   private var isBack: Bool = false
 
@@ -42,7 +42,7 @@ class ANIRecruitDetailViewController: UIViewController {
     let recruitDetailView = ANIRecruitDetailView()
     recruitDetailView.headerMinHeight = UIViewController.STATUS_BAR_HEIGHT + UIViewController.NAVIGATION_BAR_HEIGHT
     recruitDetailView.delegate = self
-    recruitDetailView.testRecruit = testRecruit
+    recruitDetailView.recruit = recruit
     self.view.addSubview(recruitDetailView)
     recruitDetailView.edgesToSuperview()
     self.recruitDetailView = recruitDetailView
@@ -117,12 +117,10 @@ class ANIRecruitDetailViewController: UIViewController {
     print("apply")
   }
   
-  private func presentImageBrowser(index: Int, images: [UIImage?]) {
-    let selectedIndex = index
-    let images = images
+  private func presentImageBrowser(index: Int, imageUrls: [String]) {
     let imageBrowserViewController = ANIImageBrowserViewController()
-    imageBrowserViewController.selectedIndex = selectedIndex
-    imageBrowserViewController.images = images
+    imageBrowserViewController.selectedIndex = index
+    imageBrowserViewController.imageUrls = imageUrls
     imageBrowserViewController.modalPresentationStyle = .overCurrentContext
     imageBrowserViewController.delegate = self
     self.present(imageBrowserViewController, animated: false, completion: nil)
@@ -161,8 +159,8 @@ extension ANIRecruitDetailViewController: ANIRecruitDetailViewDelegate {
     }
   }
   
-  func imageCellTapped(index: Int, introduceImages: [UIImage?]) {
-    presentImageBrowser(index: index, images: introduceImages)
+  func imageCellTapped(index: Int, introduceImageUrls: [String]) {
+    presentImageBrowser(index: index, imageUrls: introduceImageUrls)
   }
 }
 

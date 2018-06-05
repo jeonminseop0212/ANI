@@ -157,7 +157,7 @@ class ANICommunityViewController: UIViewController {
     let images = item.1
     let imageBrowserViewController = ANIImageBrowserViewController()
     imageBrowserViewController.selectedIndex = selectedIndex
-    imageBrowserViewController.images = images
+//    imageBrowserViewController.images = images
     imageBrowserViewController.modalPresentationStyle = .overCurrentContext
     //overCurrentContextだとtabBarが消えないのでtabBarからpresentする
     self.tabBarController?.present(imageBrowserViewController, animated: false, completion: nil)

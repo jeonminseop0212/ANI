@@ -11,6 +11,7 @@ import FirebaseAuth
 import FirebaseDatabase
 import FirebaseStorage
 import CodableFirebase
+import NVActivityIndicatorView
 
 protocol ANISignUpViewDelegate {
   func prifileImagePickButtonTapped()
@@ -269,9 +270,15 @@ class ANISignUpView: UIView {
   }
   
   private func signUp(adress: String, password: String) {
+    let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.green)
+    NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData)
+    
     Auth.auth().createUser(withEmail: adress, password: password) { (successUser, error) in
       if let errorUnrap = error {
         let nsError = errorUnrap as NSError
+        
+        NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
+
         if nsError.code == 17007 {
           self.delegate?.reject(notiText: "すでに存在するメールアドレスです！")
         } else if nsError.code == 17008 {
@@ -300,7 +307,7 @@ class ANISignUpView: UIView {
   private func uploadUserData() {
     guard let currentUser = Auth.auth().currentUser,
           let profileImage = self.profileImage,
-          let profileImageData = UIImageJPEGRepresentation(profileImage, 0.5),
+          let profileImageData = UIImageJPEGRepresentation(profileImage, 0.1),
           let userNameTextField = self.userNameTextField,
           let userName = userNameTextField.text else { return }
 
@@ -328,6 +335,7 @@ class ANISignUpView: UIView {
         return
       }
       
+      NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
       self.delegate?.signUpSuccess()
     }
   }
