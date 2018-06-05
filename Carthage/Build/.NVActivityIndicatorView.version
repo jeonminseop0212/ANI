@@ -3,11 +3,11 @@
   "iOS" : [
     {
       "name" : "NVActivityIndicatorViewAppExtension",
-      "hash" : "95d6d60d9c2da82937a84a71abc71fef3e90f04caf8936802f65a4c84d9bd454"
+      "hash" : "afc449a9a0b2f23742ffd3fa24840fff38e3e655f72e0419acff85599f2d4fc1"
     },
     {
       "name" : "NVActivityIndicatorView",
-      "hash" : "5d13a6e44d71fa644eda910d32a3f7446d025382c7dcc5fa3876ee94f4d32272"
+      "hash" : "1cebc93dd0ee7a491801fac5b7ba6feb21f56361c5f6b34fa7e43c4a00be67ff"
     }
   ]
 }

@@ -273,7 +273,7 @@ class ANIProfileEditView: UIView {
           let introduceTextView = self.introduceTextView,
           let introduce = introduceTextView.text else { return nil }
     
-    let updateUser = FirebaseUser()
+    var updateUser = FirebaseUser()
     updateUser.userName = name
     updateUser.kind = kind
     updateUser.introduce = introduce

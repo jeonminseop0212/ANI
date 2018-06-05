@@ -14,6 +14,7 @@
 		CD08A72E20915BD700F0B72D /* ANIRecruitDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD08A72D20915BD700F0B72D /* ANIRecruitDetailView.swift */; };
 		CD08A73120915C2A00F0B72D /* ANIRecruitDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD08A73020915C2A00F0B72D /* ANIRecruitDetailViewController.swift */; };
 		CD08A7712091975500F0B72D /* UIApplication.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD08A7702091975500F0B72D /* UIApplication.swift */; };
+		CD0BFF1020C6186500D5959B /* CodableFirebase.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD0BFF0F20C6186500D5959B /* CodableFirebase.framework */; };
 		CD0FAD0520BF7B9E00D8CD27 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = CD0FAD0420BF7B9D00D8CD27 /* GoogleService-Info.plist */; };
 		CD0FAD0A20BF8DFD00D8CD27 /* FirebaseUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0FAD0920BF8DFD00D8CD27 /* FirebaseUser.swift */; };
 		CD0FAD0E20BFC02E00D8CD27 /* ANISessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0FAD0D20BFC02E00D8CD27 /* ANISessionManager.swift */; };
@@ -155,6 +156,7 @@
 		CD08A72D20915BD700F0B72D /* ANIRecruitDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitDetailView.swift; sourceTree = "<group>"; };
 		CD08A73020915C2A00F0B72D /* ANIRecruitDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitDetailViewController.swift; sourceTree = "<group>"; };
 		CD08A7702091975500F0B72D /* UIApplication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIApplication.swift; sourceTree = "<group>"; };
+		CD0BFF0F20C6186500D5959B /* CodableFirebase.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CodableFirebase.framework; path = Carthage/Build/iOS/CodableFirebase.framework; sourceTree = "<group>"; };
 		CD0FAD0420BF7B9D00D8CD27 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		CD0FAD0920BF8DFD00D8CD27 /* FirebaseUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseUser.swift; sourceTree = "<group>"; };
 		CD0FAD0D20BFC02E00D8CD27 /* ANISessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANISessionManager.swift; sourceTree = "<group>"; };
@@ -284,6 +286,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CD0BFF1020C6186500D5959B /* CodableFirebase.framework in Frameworks */,
 				CD047EBE20C4E9A000248958 /* NVActivityIndicatorView.framework in Frameworks */,
 				CDDD04AF20B4F8130094DBFA /* GrowingTextView.framework in Frameworks */,
 				CDA97B5420B2497200F46DA4 /* WCLShineButton.framework in Frameworks */,
@@ -955,6 +958,7 @@
 		F5B1EFC320726657000CFB0B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				CD0BFF0F20C6186500D5959B /* CodableFirebase.framework */,
 				CD047EBD20C4E9A000248958 /* NVActivityIndicatorView.framework */,
 				CDDD04AE20B4F8130094DBFA /* GrowingTextView.framework */,
 				CDA97B5320B2497200F46DA4 /* WCLShineButton.framework */,
@@ -1308,6 +1312,7 @@
 				"$(SRCROOT)/Carthage/Build/iOS/WCLShineButton.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/GrowingTextView.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/NVActivityIndicatorView.framework",
+				"$(SRCROOT)/Carthage/Build/iOS/CodableFirebase.framework",
 			);
 			outputPaths = (
 			);

@@ -8,11 +8,11 @@
 
 import UIKit
 
-class FirebaseUser: NSObject {
-  @objc var uid: String?
-  @objc var userName: String?
-  @objc var kind: String?
-  @objc var introduce: String?
-  @objc var profileImageUrl: String?
-  @objc var familyImageUrls: [String]?
+struct FirebaseUser: Codable {
+  var uid: String?
+  var userName: String?
+  var kind: String?
+  var introduce: String?
+  var profileImageUrl: String?
+  var familyImageUrls: [String]?
 }
