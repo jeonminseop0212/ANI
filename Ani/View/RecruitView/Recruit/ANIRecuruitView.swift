@@ -7,9 +7,11 @@
 //
 
 import UIKit
+import FirebaseDatabase
+import CodableFirebase
 
 protocol ANIRecruitViewDelegate {
-  func recruitRowTap(tapRowIndex: Int)
+  func recruitRowTap(selectedRecruit: FirebaseRecruit)
   func recruitViewDidScroll(scrollY: CGFloat)
 }
 
@@ -23,17 +25,13 @@ class ANIRecuruitView: UIView {
     }
   }
   
-  var recruits = [Recruit]() {
-    didSet {
-      guard let recruitTableView = self.recruitTableView else { return }
-      recruitTableView.reloadData()
-    }
-  }
+  var recruits = [FirebaseRecruit]()
 
   var delegate:ANIRecruitViewDelegate?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
+    loadRecruit()
     setup()
   }
   
@@ -56,6 +54,25 @@ class ANIRecuruitView: UIView {
     tableView.edgesToSuperview()
     self.recruitTableView = tableView
   }
+  
+  private func loadRecruit() {
+    DispatchQueue.global().async {
+      Database.database().reference().child(KEY_RECRUITS).observe(.childAdded, with: { (snapshot) in
+        guard let value = snapshot.value else { return }
+        do {
+          let recruit = try FirebaseDecoder().decode(FirebaseRecruit.self, from: value)
+          self.recruits.insert(recruit, at: 0)
+          
+          DispatchQueue.main.async {
+            guard let recruitTableView = self.recruitTableView else { return }
+            recruitTableView.reloadData()
+          }
+        } catch let error {
+          print(error)
+        }
+      })
+    }
+  }
 }
 
 extension ANIRecuruitView: UITableViewDataSource, UITableViewDelegate {
@@ -73,7 +90,7 @@ extension ANIRecuruitView: UITableViewDataSource, UITableViewDelegate {
   }
   
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    self.delegate?.recruitRowTap(tapRowIndex: indexPath.row)
+    self.delegate?.recruitRowTap(selectedRecruit: recruits[indexPath.row])
   }
   
   func scrollViewDidScroll(_ scrollView: UIScrollView) {

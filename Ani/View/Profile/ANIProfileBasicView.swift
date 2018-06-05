@@ -7,9 +7,11 @@
 //
 
 import UIKit
+import FirebaseDatabase
+import CodableFirebase
 
 protocol ANIProfileBasicViewDelegate {
-  func recruitViewCellDidSelect(index: Int)
+  func recruitViewCellDidSelect(selectedRecruit: FirebaseRecruit)
   func storyViewCellDidSelect(index: Int)
   func qnaViewCellDidSelect(index: Int)
 }
@@ -28,7 +30,7 @@ class ANIProfileBasicView: UIView {
   
   private weak var basicTableView: UITableView?
   
-  var recruits = [Recruit]()
+  var recruits = [FirebaseRecruit]()
   
   var storys = [Story]()
   
@@ -37,6 +39,8 @@ class ANIProfileBasicView: UIView {
   var user: User?
   var currentUser: FirebaseUser? {
     didSet {
+      loadRecruit()
+
       guard let basicTableView = self.basicTableView else { return }
       basicTableView.reloadData()
     }
@@ -71,6 +75,33 @@ class ANIProfileBasicView: UIView {
     addSubview(basicTableView)
     basicTableView.edgesToSuperview()
     self.basicTableView = basicTableView
+  }
+  
+  private func loadRecruit() {
+    guard let currentUser = self.currentUser,
+          let postRecruitIds = currentUser.postRecruitIds else { return }
+    
+    let sortedIds = postRecruitIds.sorted(by: {$0.key < $1.key})
+    
+    for sortedId in sortedIds {
+      DispatchQueue.global().async {
+        Database.database().reference().child(KEY_RECRUITS).child(sortedId.key).observe(.value, with: { (snapshot) in
+          
+          guard let value = snapshot.value else { return }
+          do {
+            let recruit = try FirebaseDecoder().decode(FirebaseRecruit.self, from: value)
+            self.recruits.insert(recruit, at: 0)
+            
+            DispatchQueue.main.async {
+              guard let basicTableView = self.basicTableView else { return }
+              basicTableView.reloadData()
+            }
+          } catch let error {
+            print(error)
+          }
+        })
+      }
+    }
   }
 }
 
@@ -147,7 +178,7 @@ extension ANIProfileBasicView: UITableViewDelegate {
     case .profile:
       return
     case .recruit:
-      self.delegate?.recruitViewCellDidSelect(index: indexPath.row)
+      self.delegate?.recruitViewCellDidSelect(selectedRecruit: recruits[indexPath.row])
     case .story:
       self.delegate?.storyViewCellDidSelect(index: indexPath.row)
     case .qna:

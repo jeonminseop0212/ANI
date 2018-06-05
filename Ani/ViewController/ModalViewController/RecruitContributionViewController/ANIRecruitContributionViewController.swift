@@ -9,6 +9,9 @@
 import UIKit
 import Gallery
 import TinyConstraints
+import FirebaseStorage
+import FirebaseDatabase
+import CodableFirebase
 
 enum BasicInfoPickMode {
   case kind
@@ -17,10 +20,6 @@ enum BasicInfoPickMode {
   case home
   case vaccine
   case castration
-}
-
-protocol ANIRecruitContributionViewControllerDelegate {
-  func contributionButtonTapped(recruitInfo: RecruitInfo)
 }
 
 class ANIRecruitContributionViewController: UIViewController {
@@ -56,8 +55,6 @@ class ANIRecruitContributionViewController: UIViewController {
   
   private var isHaderImagePick: Bool = false
   
-  var delegate: ANIRecruitContributionViewControllerDelegate?
-    
   override func viewDidLoad() {
     super.viewDidLoad()
     
@@ -256,6 +253,29 @@ class ANIRecruitContributionViewController: UIViewController {
     return croppedImages
   }
   
+  private func upateDatabase(recruit: FirebaseRecruit) {
+    if recruit.headerImageUrl != nil && recruit.introduceImageUrls != nil {
+      do {
+        if let data = try FirebaseEncoder().encode(recruit) as? [String : AnyObject] {
+          let detabaseRef = Database.database().reference()
+          let databaseRecruitRef = detabaseRef.child(KEY_RECRUITS).childByAutoId()
+          let id = databaseRecruitRef.key
+          databaseRecruitRef.updateChildValues(data)
+          
+          do {
+            if let currentUser = ANISessionManager.shared.currentUser,  let uid = currentUser.uid {
+              let detabaseUsersRef = detabaseRef.child(KEY_USERS).child(uid).child(KEY_POST_RECRUIT_IDS)
+              let value: [String: Bool] = [id: true]
+              detabaseUsersRef.updateChildValues(value)
+            }
+          }
+        }
+      } catch let error {
+        print(error)
+      }
+    }
+  }
+  
   //MARK: Action
   @objc private func recruitContributeDismiss() {
     self.navigationController?.dismiss(animated: true, completion: nil)
@@ -406,13 +426,75 @@ extension ANIRecruitContributionViewController: ANIRecruitContributionViewDelega
 extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
   func buttonViewTapped(view: ANIButtonView) {
     if view === self.contributeButton {
-      guard let recruitContributionView = self.recruitContributionView,
+      guard let currentUser = ANISessionManager.shared.currentUser,
+            let userId = currentUser.uid,
+            let userName = currentUser.userName,
+            let profileImageUrl = currentUser.profileImageUrl,
+            let recruitContributionView = self.recruitContributionView,
             let recruitInfo = recruitContributionView.getRecruitInfo(),
             let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
             !isRejectAnimating else { return }
       
       if recruitInfo.headerImage != UIImage(named: "headerDefault") && recruitInfo.title.count > 0 && recruitInfo.kind.count > 0 && recruitInfo.age.count > 0 && recruitInfo.age.count > 0 && recruitInfo.sex.count > 0 && recruitInfo.home.count > 0 && recruitInfo.vaccine.count > 0 && recruitInfo.castration.count > 0 && recruitInfo.reason.count > 0 && recruitInfo.introduce.count > 0 && recruitInfo.passing.count > 0 && !recruitInfo.introduceImages.isEmpty {
-        self.delegate?.contributionButtonTapped(recruitInfo: recruitInfo)
+        
+        let storageRef = Storage.storage().reference()
+        var recruit = FirebaseRecruit(headerImageUrl: nil, title: recruitInfo.title, kind: recruitInfo.kind, age: recruitInfo.age, sex: recruitInfo.sex, home: recruitInfo.home, vaccine: recruitInfo.vaccine, castration: recruitInfo.castration, reason: recruitInfo.reason, introduce: recruitInfo.introduce, introduceImageUrls: nil, passing: recruitInfo.passing, isRecruit: true, userId: userId, userName: userName, profileImageUrl: profileImageUrl, supportCount: 0, loveCount: 0)
+        
+        DispatchQueue.global().async {
+          if let recruitHeaderImageData = UIImageJPEGRepresentation(recruitInfo.headerImage, 0.1) {
+            let uuid = NSUUID().uuidString
+            storageRef.child(KEY_RECRUIT_HEADER_IMAGES).child(uuid).putData(recruitHeaderImageData, metadata: nil) { (metaData, error) in
+              if error != nil {
+                print("storageError")
+                return
+              }
+              
+              if let recruitHeaderImageUrl = metaData?.downloadURL() {
+                recruit.headerImageUrl = recruitHeaderImageUrl.absoluteString
+                
+                DispatchQueue.main.async {
+                  self.upateDatabase(recruit: recruit)
+                }
+              }
+            }
+          }
+        }
+        
+        DispatchQueue.global().async {
+        var introduceImageUrls = [Int: String]()
+          for (index, introduceImage) in recruitInfo.introduceImages.enumerated() {
+            if let introduceImage = introduceImage {
+              if let introduceImageData = UIImageJPEGRepresentation(introduceImage, 0.1) {
+                let uuid = NSUUID().uuidString
+                storageRef.child(KEY_RECRUIT_INTRODUCE_IMAGES).child(uuid).putData(introduceImageData, metadata: nil) { (metaData, error) in
+                  if error != nil {
+                    print("storageError")
+                    return
+                  }
+                  
+                  if let introduceImageUrl = metaData?.downloadURL() {
+                    introduceImageUrls[index] = introduceImageUrl.absoluteString
+                    if introduceImageUrls.count == recruitInfo.introduceImages.count {
+                      let sortdUrls = introduceImageUrls.sorted(by: {$0.0 < $1.0})
+                      var urls = [String]()
+                      for url in sortdUrls {
+                        urls.append(url.value)
+                      }
+                      
+                      recruit.introduceImageUrls = urls
+                      
+                      DispatchQueue.main.async {
+                        self.upateDatabase(recruit: recruit)
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        
+        
         
         self.dismiss(animated: true, completion: nil)
       } else {

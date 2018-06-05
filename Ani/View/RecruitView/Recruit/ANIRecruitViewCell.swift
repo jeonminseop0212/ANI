@@ -28,7 +28,7 @@ class ANIRecruitViewCell: UITableViewCell {
   private weak var clipButton: UIButton?
   private weak var line: UIImageView?
   
-  var recruit: Recruit? {
+  var recruit: FirebaseRecruit? {
     didSet {
       reloadLayout()
     }
@@ -47,6 +47,7 @@ class ANIRecruitViewCell: UITableViewCell {
     self.selectionStyle = .none
     //recruitImageView
     let recruitImageView = UIImageView()
+    recruitImageView.backgroundColor = ANIColor.bg
     recruitImageView.contentMode = .redraw
     addSubview(recruitImageView)
     let recruitImageViewHeight: CGFloat = UIScreen.main.bounds.width * UIViewController.HEADER_IMAGE_VIEW_RATIO
@@ -246,17 +247,18 @@ class ANIRecruitViewCell: UITableViewCell {
           let userNameLabel = self.userNameLabel,
           let supportCountLabel = self.supportCountLabel,
           let loveCountLabel = self.loveCountLabel,
-          let recruit = self.recruit else { return }
+          let recruit = self.recruit,
+          let headerImageUrl = recruit.headerImageUrl else { return }
     
-    recruitImageView.image = recruit.recruitInfo.headerImage
-    isRecruitLabel.text = recruit.recruitInfo.isRecruit ? "募集中" : "決まり！"
-    homeLabel.text = recruit.recruitInfo.home
-    ageLabel.text = recruit.recruitInfo.age
-    sexLabel.text = recruit.recruitInfo.sex
-    titleLabel.text = recruit.recruitInfo.title
-    subTitleLabel.text = recruit.recruitInfo.reason
-    profileImageView.image = recruit.user.profileImage
-    userNameLabel.text = recruit.user.name
+    recruitImageView.sd_setImage(with: URL(string: headerImageUrl), completed: nil)
+    isRecruitLabel.text = recruit.isRecruit ? "募集中" : "決まり！"
+    homeLabel.text = recruit.home
+    ageLabel.text = recruit.age
+    sexLabel.text = recruit.sex
+    titleLabel.text = recruit.title
+    subTitleLabel.text = recruit.reason
+    profileImageView.sd_setImage(with: URL(string: recruit.profileImageUrl), completed: nil)
+    userNameLabel.text = recruit.userName
     supportCountLabel.text = "\(recruit.supportCount)"
     loveCountLabel.text = "\(recruit.loveCount)"
   }

@@ -521,7 +521,7 @@ class ANIRecruitContributionView: UIView {
     let age = ageText.substring(3...) == "選択" ? "" : ageText.substring(3...)
     let sex = sexText.substring(3...) == "選択" ? "" : sexText.substring(3...)
     let home = homeText.substring(3...) == "選択" ? "" : homeText.substring(3...)
-    let vaccine = vaccineText.substring(5...) == "選択" ? "" : vaccineText.substring(3...)
+    let vaccine = vaccineText.substring(5...) == "選択" ? "" : vaccineText.substring(5...)
     let castration = castrationText.substring(3...) == "選択" ? "" : castrationText.substring(3...)
     
     let recruitInfo = RecruitInfo(headerImage: headerImage, title: titleTextView.text, kind: kind, age: age, sex: sex, home: home, vaccine: vaccine, castration: castration, reason: resonTextView.text, introduce: introduceTextView.text, introduceImages: introduceImages, passing: passingTextView.text, isRecruit: true)
