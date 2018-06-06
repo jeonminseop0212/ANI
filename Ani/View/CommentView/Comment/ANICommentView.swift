@@ -14,7 +14,7 @@ class ANICommentView: UIView {
   
   var commentMode: CommentMode?
   
-  var story: Story? {
+  var story: FirebaseStory? {
     didSet {
       guard let commentTableView = self.commentTableView else { return }
       
@@ -64,11 +64,11 @@ extension ANICommentView: UITableViewDataSource {
     
     switch commentMode {
     case .story:
-      if let story = self.story, let comments = story.comments {
-        return comments.count + 1
-      } else {
+//      if let story = self.story, let comments = story.comments {
+//        return comments.count + 1
+//      } else {
         return 0
-      }
+//      }
     case .qna:
       if let qna = self.qna, let comments = qna.comments {
         return comments.count + 1
@@ -103,9 +103,10 @@ extension ANICommentView: UITableViewDataSource {
       
       switch commentMode {
       case .story:
-        if let story = self.story, let comments = story.comments {
-          cell.comment = comments[indexPath.row - 1]
-        }
+//        if let story = self.story, let comments = story.comments {
+//          cell.comment = comments[indexPath.row - 1]
+//        }
+        print("story")
       case .qna:
         if let qna = self.qna, let comments = qna.comments {
           cell.comment = comments[indexPath.row - 1]

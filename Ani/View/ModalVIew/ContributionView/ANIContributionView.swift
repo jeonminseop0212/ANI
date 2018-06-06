@@ -19,7 +19,7 @@ class ANIContributionView: UIView {
   private weak var scrollView: ANIScrollView?
   private weak var contentView: UIView?
   
-  weak var contentTextView: ANIPlaceHolderTextView?
+  private weak var contentTextView: ANIPlaceHolderTextView?
   private let CONTENT_IMAGES_VIEW_RATIO: CGFloat = 0.5
   private weak var contentImagesView: ANIContributionImagesView?
   
@@ -88,6 +88,13 @@ class ANIContributionView: UIView {
     contentImagesView.height(UIScreen.main.bounds.width * CONTENT_IMAGES_VIEW_RATIO)
     contentImagesView.bottomToSuperview(offset: -10.0)
     self.contentImagesView = contentImagesView
+  }
+  
+  func getContent() -> String {
+    guard let contentTextView = self.contentTextView,
+          let text = contentTextView.text else { return "" }
+    
+    return text
   }
   
   private func setHideButtonOnKeyboard(textView: UITextView){

@@ -24,3 +24,8 @@ let KEY_POST_RECRUIT_IDS = "postRecruitIds"
 let KEY_RECRUIT_HEADER_IMAGES = "recruit_header_images"
 let KEY_RECRUIT_INTRODUCE_IMAGES = "recruit_introduce_images"
 let KEY_RECRUITS = "recruits"
+
+//story
+let KEY_STORY_IMAGES = "story_images"
+let KEY_STORIES = "stories"
+let KEY_POST_STORY_IDS = "postStoryIds"

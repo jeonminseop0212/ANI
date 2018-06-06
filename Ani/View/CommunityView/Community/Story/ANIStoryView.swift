@@ -7,26 +7,24 @@
 //
 
 import UIKit
+import FirebaseDatabase
+import CodableFirebase
 
 protocol ANIStoryViewDelegate {
-  func storyViewCellDidSelect(index: Int)
+  func storyViewCellDidSelect(selectedStory: FirebaseStory)
 }
 
 class ANIStoryView: UIView {
   
   var storyTableView: UITableView?
   
-  var storys = [Story]() {
-    didSet {
-      guard let storyTableView = self.storyTableView else { return }
-      storyTableView.reloadData()
-    }
-  }
+  var storys = [FirebaseStory]()
   
   var delegate: ANIStoryViewDelegate?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
+    loadStory()
     setup()
   }
   
@@ -52,6 +50,25 @@ class ANIStoryView: UIView {
     tableView.edgesToSuperview()
     self.storyTableView = tableView
   }
+  
+  private func loadStory() {
+    DispatchQueue.global().async {
+      Database.database().reference().child(KEY_STORIES).observe(.childAdded, with: { (snapshot) in
+        guard let value = snapshot.value else { return }
+        do {
+          let story = try FirebaseDecoder().decode(FirebaseStory.self, from: value)
+          self.storys.insert(story, at: 0)
+          
+          DispatchQueue.main.async {
+            guard let storyTableView = self.storyTableView else { return }
+            storyTableView.reloadData()
+          }
+        } catch let error {
+          print(error)
+        }
+      })
+    }
+  }
 }
 
 //MARK: UITableViewDataSource
@@ -73,6 +90,6 @@ extension ANIStoryView: UITableViewDataSource {
 //MARK: UITableViewDelegate
 extension ANIStoryView: UITableViewDelegate {
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    self.delegate?.storyViewCellDidSelect(index: indexPath.row)
+    self.delegate?.storyViewCellDidSelect(selectedStory: storys[indexPath.row])
   }
 }

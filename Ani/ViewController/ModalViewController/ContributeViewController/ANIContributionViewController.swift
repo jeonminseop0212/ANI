@@ -9,15 +9,13 @@
 import UIKit
 import Gallery
 import TinyConstraints
+import FirebaseStorage
+import FirebaseDatabase
+import CodableFirebase
 
 enum ContributionMode {
   case story
   case qna
-}
-
-protocol ANIContributionViewControllerDelegate {
-  func contributionButtonTapped(story: Story)
-  func contributionButtonTapped(qna: Qna)
 }
 
 class ANIContributionViewController: UIViewController {
@@ -41,8 +39,14 @@ class ANIContributionViewController: UIViewController {
   
   var me: User?
   
-  var delegate: ANIContributionViewControllerDelegate?
-
+  private var contentImages = [UIImage?]() {
+    didSet {
+      guard let contriButionView = self.contriButionView else { return }
+      
+      contriButionView.contentImages = contentImages
+    }
+  }
+  
   override func viewDidLoad() {
     setup()
     setupImagePickGalleryController()
@@ -155,6 +159,70 @@ class ANIContributionViewController: UIViewController {
     ANINotificationManager.receive(keyboardWillHide: self, selector: #selector(keyboardWillHide))
   }
   
+  func putStory() {
+    guard let contriButionView = self.contriButionView,
+          let currentUser = ANISessionManager.shared.currentUser,
+          let uid = currentUser.uid,
+          let userName = currentUser.userName,
+          let profileImageUrl = currentUser.profileImageUrl else { return }
+    
+    let storageRef = Storage.storage().reference()
+    var contentImageUrls = [Int: String]()
+    
+    DispatchQueue.global().async {
+      for (index, contentImage) in self.contentImages.enumerated() {
+        if let contentImage = contentImage, let contentImageData = UIImageJPEGRepresentation(contentImage, 0.1) {
+          let uuid = UUID().uuidString
+          storageRef.child(KEY_STORY_IMAGES).child(uuid).putData(contentImageData, metadata: nil) { (metaData, error) in
+            if error != nil {
+              print("storageError")
+              return
+            }
+            
+            if let contentImageUrl = metaData?.downloadURL() {
+              contentImageUrls[index] = contentImageUrl.absoluteString
+              if contentImageUrls.count == self.contentImages.count {
+                let sortdUrls = contentImageUrls.sorted(by: {$0.0 < $1.0})
+                var urls = [String]()
+                for url in sortdUrls {
+                  urls.append(url.value)
+                }
+                
+                let content = contriButionView.getContent()
+                let story = FirebaseStory(storyImageUrls: urls, story: content, userId: uid, userName: userName, profileImageUrl: profileImageUrl, loveCount: 0, commentCount: 0)
+                
+                DispatchQueue.main.async {
+                  self.upateStroyDatabase(story: story)
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  private func upateStroyDatabase(story: FirebaseStory) {
+    do {
+      if let data = try FirebaseEncoder().encode(story) as? [String : AnyObject] {
+        let detabaseRef = Database.database().reference()
+        let databaseStoryRef = detabaseRef.child(KEY_STORIES).childByAutoId()
+        let id = databaseStoryRef.key
+        databaseStoryRef.updateChildValues(data)
+        
+        do {
+          if let currentUser = ANISessionManager.shared.currentUser,  let uid = currentUser.uid {
+            let detabaseUsersRef = detabaseRef.child(KEY_USERS).child(uid).child(KEY_POST_STORY_IDS)
+            let value: [String: Bool] = [id: true]
+            detabaseUsersRef.updateChildValues(value)
+          }
+        }
+      }
+    } catch let error {
+      print(error)
+    }
+  }
+  
   private func contentImagesPick(animation: Bool) {
     let imagePickgalleryNV = UINavigationController(rootViewController: imagePickGallery)
     present(imagePickgalleryNV, animated: animation, completion: nil)
@@ -213,20 +281,16 @@ class ANIContributionViewController: UIViewController {
   }
   
   @objc private func contribute() {
-    guard let selectedContributionMode = self.selectedContributionMode,
-          let contriButionView = self.contriButionView,
-          let contentTextView = contriButionView.contentTextView,
-          let me = self.me else { return }
+    guard let selectedContributionMode = self.selectedContributionMode else { return }
     
     switch selectedContributionMode {
     case ContributionMode.story:
-      let story = Story(storyImages: contriButionView.contentImages, story: contentTextView.text, user: me, loveCount: 0, commentCount: 0, comments: nil)
-      self.delegate?.contributionButtonTapped(story: story)
+      putStory()
       
       self.dismiss(animated: true, completion: nil)
     case ContributionMode.qna:
-      let qna = Qna(qnaImages: contriButionView.contentImages, qna: contentTextView.text, user: me, loveCount: 0, commentCount: 0, comments: nil)
-      self.delegate?.contributionButtonTapped(qna: qna)
+//      let qna = Qna(qnaImages: contriButionView.contentImages, qna: contentTextView.text, user: me, loveCount: 0, commentCount: 0, comments: nil)
+//      self.delegate?.contributionButtonTapped(qna: qna)
       
       self.dismiss(animated: true, completion: nil)
     }
@@ -261,10 +325,9 @@ extension ANIContributionViewController: GalleryControllerDelegate {
 //MARK: ANIImageFilterViewControllerDelegate
 extension ANIContributionViewController: ANIImageFilterViewControllerDelegate {
   func doneFilterImages(filteredImages: [UIImage?]) {
-    guard let contriButionView = self.contriButionView,
-          !filteredImages.isEmpty else { return }
+    guard !filteredImages.isEmpty else { return }
     
-    contriButionView.contentImages = filteredImages
+    contentImages = filteredImages
   }
 }
 

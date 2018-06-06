@@ -12,7 +12,7 @@ import CodableFirebase
 
 protocol ANIProfileBasicViewDelegate {
   func recruitViewCellDidSelect(selectedRecruit: FirebaseRecruit)
-  func storyViewCellDidSelect(index: Int)
+  func storyViewCellDidSelect(selectedStory: FirebaseStory)
   func qnaViewCellDidSelect(index: Int)
 }
 
@@ -32,7 +32,7 @@ class ANIProfileBasicView: UIView {
   
   var recruits = [FirebaseRecruit]()
   
-  var storys = [Story]()
+  var storys = [FirebaseStory]()
   
   var qnas = [Qna]()
   
@@ -40,6 +40,7 @@ class ANIProfileBasicView: UIView {
   var currentUser: FirebaseUser? {
     didSet {
       loadRecruit()
+      loadStory()
 
       guard let basicTableView = self.basicTableView else { return }
       basicTableView.reloadData()
@@ -103,6 +104,25 @@ class ANIProfileBasicView: UIView {
       }
     }
   }
+  
+  private func loadStory() {
+    DispatchQueue.global().async {
+      Database.database().reference().child(KEY_STORIES).observe(.childAdded, with: { (snapshot) in
+        guard let value = snapshot.value else { return }
+        do {
+          let story = try FirebaseDecoder().decode(FirebaseStory.self, from: value)
+          self.storys.insert(story, at: 0)
+          
+          DispatchQueue.main.async {
+            guard let basicTableView = self.basicTableView else { return }
+            basicTableView.reloadData()
+          }
+        } catch let error {
+          print(error)
+        }
+      })
+    }
+  }
 }
 
 //MARK: UITableViewDataSource
@@ -130,8 +150,6 @@ extension ANIProfileBasicView: UITableViewDataSource {
     let section = indexPath.section
 
     if section == 0 {
-//      guard let user = self.user else { return UITableViewCell() }
-
       let topCellId = NSStringFromClass(ANIProfileTopCell.self)
       let cell = tableView.dequeueReusableCell(withIdentifier: topCellId, for: indexPath) as! ANIProfileTopCell
       cell.delegate = self
@@ -140,8 +158,6 @@ extension ANIProfileBasicView: UITableViewDataSource {
       return cell
     } else {
       if contentType == .profile {
-//        guard let user = self.user else { return UITableViewCell() }
-        
         let profileCellid = NSStringFromClass(ANIProfileCell.self)
         let cell = tableView.dequeueReusableCell(withIdentifier: profileCellid, for: indexPath) as! ANIProfileCell
         cell.user = currentUser
@@ -180,7 +196,7 @@ extension ANIProfileBasicView: UITableViewDelegate {
     case .recruit:
       self.delegate?.recruitViewCellDidSelect(selectedRecruit: recruits[indexPath.row])
     case .story:
-      self.delegate?.storyViewCellDidSelect(index: indexPath.row)
+      self.delegate?.storyViewCellDidSelect(selectedStory: storys[indexPath.row])
     case .qna:
       self.delegate?.qnaViewCellDidSelect(index: indexPath.row)
     }
