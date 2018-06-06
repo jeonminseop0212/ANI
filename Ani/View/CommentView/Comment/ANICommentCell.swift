@@ -24,7 +24,7 @@ class ANICommentCell: UITableViewCell {
   
   private weak var line: UIImageView?
   
-  var comment: Comment? {
+  var comment: FirebaseComment? {
     didSet {
       reloadLayout()
     }
@@ -56,6 +56,8 @@ class ANICommentCell: UITableViewCell {
     
     //profileImageView
     let profileImageView = UIImageView()
+    profileImageView.layer.cornerRadius = PROFILE_IMAGE_VIEW_HEIGHT / 2
+    profileImageView.layer.masksToBounds = true
     addSubview(profileImageView)
     profileImageView.width(PROFILE_IMAGE_VIEW_HEIGHT)
     profileImageView.height(PROFILE_IMAGE_VIEW_HEIGHT)
@@ -140,8 +142,8 @@ class ANICommentCell: UITableViewCell {
           let loveCountLabel = self.loveCountLabel,
           let comment = self.comment else { return }
     
-    profileImageView.image = comment.user.profileImage
-    userNameLabel.text = comment.user.name
+    profileImageView.sd_setImage(with: URL(string: comment.profileImageUrl), completed: nil)
+    userNameLabel.text = comment.userName
     commentLabel.text = comment.comment
     commentCountLabel.text = "\(comment.commentCount)"
     loveCountLabel.text = "\(comment.loveCount)"

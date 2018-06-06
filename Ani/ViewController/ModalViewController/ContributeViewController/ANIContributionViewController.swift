@@ -188,11 +188,14 @@ class ANIContributionViewController: UIViewController {
                   urls.append(url.value)
                 }
                 
+                let detabaseRef = Database.database().reference()
+                let databaseStoryRef = detabaseRef.child(KEY_STORIES).childByAutoId()
+                let id = databaseStoryRef.key
                 let content = contriButionView.getContent()
-                let story = FirebaseStory(storyImageUrls: urls, story: content, userId: uid, userName: userName, profileImageUrl: profileImageUrl, loveCount: 0, commentCount: 0)
+                let story = FirebaseStory(id: id, storyImageUrls: urls, story: content, userId: uid, userName: userName, profileImageUrl: profileImageUrl, loveCount: 0, commentCount: 0, commentIds: nil)
                 
                 DispatchQueue.main.async {
-                  self.upateStroyDatabase(story: story)
+                  self.upateStroyDatabase(story: story, databaseStoryRef: databaseStoryRef)
                 }
               }
             }
@@ -202,20 +205,17 @@ class ANIContributionViewController: UIViewController {
     }
   }
   
-  private func upateStroyDatabase(story: FirebaseStory) {
+  private func upateStroyDatabase(story: FirebaseStory, databaseStoryRef: DatabaseReference) {
     do {
       if let data = try FirebaseEncoder().encode(story) as? [String : AnyObject] {
-        let detabaseRef = Database.database().reference()
-        let databaseStoryRef = detabaseRef.child(KEY_STORIES).childByAutoId()
-        let id = databaseStoryRef.key
         databaseStoryRef.updateChildValues(data)
-        
-        do {
-          if let currentUser = ANISessionManager.shared.currentUser,  let uid = currentUser.uid {
-            let detabaseUsersRef = detabaseRef.child(KEY_USERS).child(uid).child(KEY_POST_STORY_IDS)
-            let value: [String: Bool] = [id: true]
-            detabaseUsersRef.updateChildValues(value)
-          }
+      }
+      do {
+        let detabaseRef = Database.database().reference()
+        if let currentUser = ANISessionManager.shared.currentUser, let uid = currentUser.uid, let id = story.id {
+          let detabaseUsersRef = detabaseRef.child(KEY_USERS).child(uid).child(KEY_POST_STORY_IDS)
+          let value: [String: Bool] = [id: true]
+          detabaseUsersRef.updateChildValues(value)
         }
       }
     } catch let error {

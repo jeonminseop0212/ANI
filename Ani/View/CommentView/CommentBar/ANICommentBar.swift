@@ -8,10 +8,8 @@
 
 import UIKit
 import GrowingTextView
-
-protocol ANICommentBarDelegate {
-  func commentContributionButtonTapped(comment: String)
-}
+import FirebaseDatabase
+import CodableFirebase
 
 class ANICommentBar: UIView {
   
@@ -22,21 +20,15 @@ class ANICommentBar: UIView {
   
   private weak var commentContributionButton: UIButton?
   
-  var me: User? {
-    didSet {
-      guard let profileImageView = self.profileImageView,
-            let me = self.me else { return }
-      
-      profileImageView.image = me.profileImage
-    }
-  }
-  
-  var delegate: ANICommentBarDelegate?
-  
+  var commentMode: CommentMode?
+
+  var story: FirebaseStory?
+    
   override init(frame: CGRect) {
     super.init(frame: frame)
     
     setup()
+    setProfileImage()
     setupNotification()
   }
   
@@ -106,6 +98,14 @@ class ANICommentBar: UIView {
     ANINotificationManager.receive(viewScrolled: self, selector: #selector(keyboardHide))
   }
   
+  private func setProfileImage() {
+    guard let currentUser = ANISessionManager.shared.currentUser,
+          let profileImageUrl = currentUser.profileImageUrl,
+          let profileImageView = self.profileImageView else { return }
+    
+    profileImageView.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
+  }
+  
   @objc private func keyboardHide() {
     guard let commentTextView = self.commentTextView else { return }
     commentTextView.endEditing(true)
@@ -125,9 +125,41 @@ class ANICommentBar: UIView {
   
   //MARK: action
   @objc private func contribute() {
-    guard let commentTextView = self.commentTextView else { return }
+    guard let commentTextView = self.commentTextView,
+          let text = commentTextView.text,
+          let currentuser = ANISessionManager.shared.currentUser,
+          let uid = currentuser.uid,
+          let userName = currentuser.userName,
+          let profileImageUrl = currentuser.profileImageUrl,
+          let commentMode = self.commentMode else { return }
     
-    self.delegate?.commentContributionButtonTapped(comment: commentTextView.text)
+    let comment = FirebaseComment(userId: uid, userName: userName, profileImageUrl: profileImageUrl, comment: text, loveCount: 0, commentCount: 0)
+    
+    do {
+      if let data = try FirebaseEncoder().encode(comment) as? [String : AnyObject] {
+        let detabaseRef = Database.database().reference()
+        let databaseCommentRef = detabaseRef.child(KEY_COMMENTS).childByAutoId()
+        let id = databaseCommentRef.key
+        databaseCommentRef.updateChildValues(data)
+        
+        switch commentMode {
+        case .story:
+          guard let story = self.story,
+                let storyId = story.id else { return }
+          
+          do {
+            let detabaseStoryRef = detabaseRef.child(KEY_STORIES).child(storyId).child(KEY_COMMENT_IDS)
+            let value: [String: Bool] = [id: true]
+            detabaseStoryRef.updateChildValues(value)
+          }
+        case .qna:
+          print("qna")
+        }
+      }
+    } catch let error {
+      print(error)
+    }
+    
     commentTextView.text = ""
     commentTextView.endEditing(true)
     updateCommentContributionButton(text: commentTextView.text)

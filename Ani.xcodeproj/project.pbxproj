@@ -17,6 +17,7 @@
 		CD0BFF1020C6186500D5959B /* CodableFirebase.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD0BFF0F20C6186500D5959B /* CodableFirebase.framework */; };
 		CD0BFF1220C624EC00D5959B /* FirebaseRecruit.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0BFF1120C624EC00D5959B /* FirebaseRecruit.swift */; };
 		CD0BFF1420C7619600D5959B /* FirebaseStory.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0BFF1320C7619600D5959B /* FirebaseStory.swift */; };
+		CD0BFF1620C7807F00D5959B /* FirebaseComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0BFF1520C7807F00D5959B /* FirebaseComment.swift */; };
 		CD0FAD0520BF7B9E00D8CD27 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = CD0FAD0420BF7B9D00D8CD27 /* GoogleService-Info.plist */; };
 		CD0FAD0A20BF8DFD00D8CD27 /* FirebaseUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0FAD0920BF8DFD00D8CD27 /* FirebaseUser.swift */; };
 		CD0FAD0E20BFC02E00D8CD27 /* ANISessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0FAD0D20BFC02E00D8CD27 /* ANISessionManager.swift */; };
@@ -161,6 +162,7 @@
 		CD0BFF0F20C6186500D5959B /* CodableFirebase.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CodableFirebase.framework; path = Carthage/Build/iOS/CodableFirebase.framework; sourceTree = "<group>"; };
 		CD0BFF1120C624EC00D5959B /* FirebaseRecruit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseRecruit.swift; sourceTree = "<group>"; };
 		CD0BFF1320C7619600D5959B /* FirebaseStory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseStory.swift; sourceTree = "<group>"; };
+		CD0BFF1520C7807F00D5959B /* FirebaseComment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseComment.swift; sourceTree = "<group>"; };
 		CD0FAD0420BF7B9D00D8CD27 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		CD0FAD0920BF8DFD00D8CD27 /* FirebaseUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseUser.swift; sourceTree = "<group>"; };
 		CD0FAD0D20BFC02E00D8CD27 /* ANISessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANISessionManager.swift; sourceTree = "<group>"; };
@@ -1010,6 +1012,7 @@
 				CD0FAD0920BF8DFD00D8CD27 /* FirebaseUser.swift */,
 				CD0BFF1120C624EC00D5959B /* FirebaseRecruit.swift */,
 				CD0BFF1320C7619600D5959B /* FirebaseStory.swift */,
+				CD0BFF1520C7807F00D5959B /* FirebaseComment.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -1431,6 +1434,7 @@
 				CDA32A2920ABBA21008A2AC1 /* ANIRecruitContributionImagesView.swift in Sources */,
 				CD08A73120915C2A00F0B72D /* ANIRecruitDetailViewController.swift in Sources */,
 				F53E87C62085F13800B19A2F /* ANIProfileMenuBar.swift in Sources */,
+				CD0BFF1620C7807F00D5959B /* FirebaseComment.swift in Sources */,
 				CDA97AC920AFFFEC00F46DA4 /* ANIProfileEditView.swift in Sources */,
 				F57F7D61208322D3008A2645 /* ANIMessageView.swift in Sources */,
 				CD9E52B120921EB400715F50 /* UIViewController.swift in Sources */,
