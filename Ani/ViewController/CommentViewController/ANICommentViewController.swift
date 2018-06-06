@@ -30,7 +30,7 @@ class ANICommentViewController: UIViewController {
     
   var commentMode: CommentMode?
   
-  var story: Story? {
+  var story: FirebaseStory? {
     didSet {
       guard let commentView = self.commentView,
             let story = self.story else { return }
@@ -95,8 +95,10 @@ class ANICommentViewController: UIViewController {
     
     //navigationProfileImageView
     let navigationProfileImageView = UIImageView()
-    navigationProfileImageView.dropShadow(opacity: 0.1, offset: CGSize(width: 0.0, height: 3.0))
+    navigationProfileImageView.contentMode = .scaleAspectFit
+//    navigationProfileImageView.dropShadow(opacity: 0.1, offset: CGSize(width: 0.0, height: 3.0))
     navigationProfileImageView.layer.cornerRadius = NAVIGATION_PROFILE_IMAGE_VIEW_HEIGHT / 2
+    navigationProfileImageView.layer.masksToBounds = true
     myNavigationBase.addSubview(navigationProfileImageView)
     navigationProfileImageView.width(NAVIGATION_PROFILE_IMAGE_VIEW_HEIGHT)
     navigationProfileImageView.height(NAVIGATION_PROFILE_IMAGE_VIEW_HEIGHT)
@@ -145,7 +147,7 @@ class ANICommentViewController: UIViewController {
     switch commentMode {
     case .story:
       if let story = self.story {
-        navigationProfileImageView.image = story.user.profileImage
+        navigationProfileImageView.sd_setImage(with: URL(string: story.profileImageUrl), completed: nil)
       }
     case .qna:
       if let qna = self.qna {
@@ -203,10 +205,11 @@ extension ANICommentViewController: ANICommentBarDelegate {
     
     switch commentMode {
     case CommentMode.story:
-      if story != nil {
-        let comment = Comment(user: me, comment: comment, loveCount: 0, commentCount: 0)
-        story?.comments?.append(comment)
-      }
+//      if story != nil {
+//        let comment = Comment(user: me, comment: comment, loveCount: 0, commentCount: 0)
+//        story?.comments?.append(comment)
+//      }
+      print("story")
     case CommentMode.qna:
       if qna != nil {
         let comment = Comment(user: me, comment: comment, loveCount: 0, commentCount: 0)

@@ -16,13 +16,13 @@ class ANIStoryImagesView: UIView {
   private var pageControlHeightConstraint: Constraint?
   weak var pageControl: UIPageControl?
   
-  var images = [UIImage?]() {
+  var imageUrls = [String]() {
     didSet {
       for subview in self.subviews{
         subview.removeFromSuperview()
       }
       setup()
-      setupPageControlHeight(images: images)
+      setupPageControlHeight(imageUrls: imageUrls)
     }
   }
   
@@ -71,11 +71,11 @@ class ANIStoryImagesView: UIView {
     self.pageControl = pageControl
   }
   
-  private func setupPageControlHeight(images: [UIImage?]) {
+  private func setupPageControlHeight(imageUrls: [String]) {
     guard let pageControlHeightConstraint = self.pageControlHeightConstraint,
           let pageControl = self.pageControl else { return }
     
-    if images.count < 2 {
+    if imageUrls.count < 2 {
       pageControlHeightConstraint.constant = 0
       pageControl.alpha = 0.0
     } else {
@@ -87,13 +87,13 @@ class ANIStoryImagesView: UIView {
 
 extension ANIStoryImagesView: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-    return images.count
+    return imageUrls.count
   }
   
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     let id = NSStringFromClass(ANIStoryImagesCell.self)
     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! ANIStoryImagesCell
-    cell.imageView?.image = images[indexPath.item]
+    cell.imageView?.sd_setImage(with: URL(string: imageUrls[indexPath.item]), completed: nil)
     return cell
   }
   

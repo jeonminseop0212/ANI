@@ -19,13 +19,6 @@ class ANICommunityViewController: UIViewController {
   
   private var selectedIndex: Int = 0
   
-  private var storys: [Story]? {
-    didSet {
-      guard let containerCollectionView = self.containerCollectionView else { return }
-      containerCollectionView.reloadData()
-    }
-  }
-  
   private var qnas: [Qna]? {
     didSet {
       guard let containerCollectionView = self.containerCollectionView else { return }
@@ -33,13 +26,9 @@ class ANICommunityViewController: UIViewController {
     }
   }
   
-  private var me: User?
-
   override func viewDidLoad() {
     super.viewDidLoad()
     setup()
-    setupMe()
-    setupTestStoryData()
     setupTestQnaData()
     setupNotification()
   }
@@ -103,27 +92,6 @@ class ANICommunityViewController: UIViewController {
     ANINotificationManager.receive(imageCellTapped: self, selector: #selector(presentImageBrowser(_:)))
   }
   
-  private func setupTestStoryData() {
-    let cat1 = UIImage(named: "storyCat1")!
-    let cat2 = UIImage(named: "storyCat2")!
-    let cat3 = UIImage(named: "storyCat3")!
-    let cat4 = UIImage(named: "storyCat1")!
-    let familyImages = [UIImage(named: "family1")!, UIImage(named: "family2")!, UIImage(named: "family3")!]
-    let user1 = User(id: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
-    let user2 = User(id: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
-    let user3 = User(id: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "団体", introduce: "団体で猫たちのためにボランティア活動をしています")
-    let comment1 = Comment(user: user1, comment: "可愛い写真ですね", loveCount: 0, commentCount: 0)
-    let comment2 = Comment(user: user2, comment: "いいですねえええええええええコメントだよいいですねえええええええええコメントだよいいですねえええええええええコメントだよいいですねえええええええええコメントだよいいですねえええええええええコメントだよ", loveCount: 0, commentCount: 0)
-    let comment3 = Comment(user: user3, comment: "コメントふふふふ", loveCount: 0, commentCount: 0)
-    let comment4 = Comment(user: user1, comment: "可愛い写真ですね", loveCount: 0, commentCount: 0)
-    let comment5 = Comment(user: user2, comment: "いいですねえええええええええコメントだよいいですねえええええええええコメントだよいいですねえええええええええコメントだよいいですねえええええええええコメントだよいいですねえええええええええコメントだよ", loveCount: 0, commentCount: 0)
-    let comment6 = Comment(user: user3, comment: "コメントふふふふ", loveCount: 0, commentCount: 0)
-    let story1 = Story(storyImages: [cat1, cat2, cat3], story: "あれこれ内容を書くところだよおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user1, loveCount: 10, commentCount: 10, comments: [comment1, comment2, comment3, comment4, comment5, comment6])
-    let story2 = Story(storyImages: [cat2, cat1, cat3, cat4], story: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user2, loveCount: 5, commentCount: 8, comments: [comment1, comment2, comment3])
-    let story3 = Story(storyImages: [cat3, cat2, cat1], story: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user3, loveCount: 15, commentCount: 20, comments: [comment1, comment2, comment3])
-    self.storys = [story1, story2, story3, story1, story2, story3]
-  }
-  
   private func setupTestQnaData() {
     let cat1 = UIImage(named: "storyCat1")!
     let cat2 = UIImage(named: "storyCat2")!
@@ -141,13 +109,6 @@ class ANICommunityViewController: UIViewController {
     let qna3 = Qna(qnaImages: [cat3, cat2, cat1], qna: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user3, loveCount: 15, commentCount: 10, comments: [comment1, comment2, comment3])
     
     self.qnas = [qna1, qna2, qna3, qna1, qna2, qna3]
-  }
-  
-  private func setupMe() {
-    let familyImages = [UIImage(named: "family1")!, UIImage(named: "family2")!, UIImage(named: "family3")!]
-    let me = User(id: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "meProfileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
-    
-    self.me = me
   }
   
   //MARK: action
@@ -176,7 +137,6 @@ extension ANICommunityViewController: UICollectionViewDataSource {
       let storyId = NSStringFromClass(ANICommunityStoryCell.self)
       let cell = collectionView.dequeueReusableCell(withReuseIdentifier: storyId, for: indexPath) as! ANICommunityStoryCell
       cell.frame.origin.y = collectionView.frame.origin.y
-      cell.storys = storys
       cell.delegate = self
       return cell
     } else {
@@ -217,45 +177,21 @@ extension ANICommunityViewController: UICollectionViewDelegate {
 //MARK: ANIButtonViewDelegate
 extension ANICommunityViewController: ANIButtonViewDelegate{
   func buttonViewTapped(view: ANIButtonView) {
-    guard let me = self.me else { return }
     
     if view === self.contributionButon {
       if selectedIndex == 0 {
         let contributionViewController = ANIContributionViewController()
         contributionViewController.navigationTitle = "STORY"
         contributionViewController.selectedContributionMode = ContributionMode.story
-        contributionViewController.delegate = self
-        contributionViewController.me = me
         let contributionNV = UINavigationController(rootViewController: contributionViewController)
         self.present(contributionNV, animated: true, completion: nil)
       } else {
         let contributionViewController = ANIContributionViewController()
         contributionViewController.navigationTitle = "Q&A"
         contributionViewController.selectedContributionMode = ContributionMode.qna
-        contributionViewController.delegate = self
-        contributionViewController.me = me
         let contributionNV = UINavigationController(rootViewController: contributionViewController)
         self.present(contributionNV, animated: true, completion: nil)
       }
-    }
-  }
-}
-
-//MARK: ANIContributionViewControllerDelegate
-extension ANICommunityViewController: ANIContributionViewControllerDelegate {
-  func contributionButtonTapped(story: Story) {
-    if self.storys != nil {
-      storys?.insert(story, at: 0)
-    } else {
-      storys = [story]
-    }
-  }
-  
-  func contributionButtonTapped(qna: Qna) {
-    if self.qnas != nil {
-      qnas?.insert(qna, at: 0)
-    } else {
-      qnas = [qna]
     }
   }
 }
@@ -271,14 +207,11 @@ extension ANICommunityViewController: ANICommunityMenuBarDelegate {
 
 //MARK: ANIStoryViewDelegate
 extension ANICommunityViewController: ANIStoryViewDelegate {
-  func storyViewCellDidSelect(index: Int) {
-    guard let storys = self.storys else { return }
-    
+  func storyViewCellDidSelect(selectedStory: FirebaseStory) {
     let commentViewController = ANICommentViewController()
     commentViewController.hidesBottomBarWhenPushed = true
     commentViewController.commentMode = CommentMode.story
-    commentViewController.story = storys[index]
-    commentViewController.me = me
+    commentViewController.story = selectedStory
     self.navigationController?.pushViewController(commentViewController, animated: true)
   }
 }
@@ -292,7 +225,6 @@ extension ANICommunityViewController: ANIQnaViewDelegate {
     commentViewController.hidesBottomBarWhenPushed = true
     commentViewController.commentMode = CommentMode.qna
     commentViewController.qna = qnas[index]
-    commentViewController.me = me
     self.navigationController?.pushViewController(commentViewController, animated: true)
   }
 }

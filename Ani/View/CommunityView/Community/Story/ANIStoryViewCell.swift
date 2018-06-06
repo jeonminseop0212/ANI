@@ -20,7 +20,7 @@ class ANIStoryViewCell: UITableViewCell {
   private weak var commentButton: UIButton?
   private weak var commentCountLabel: UILabel?
   
-  var story: Story? {
+  var story: FirebaseStory? {
     didSet {
       reloadLayout()
     }
@@ -149,11 +149,11 @@ class ANIStoryViewCell: UITableViewCell {
           let commentCountLabel = self.commentCountLabel,
           let story = self.story else { return }
     
-    storyImagesView.images = story.storyImages
-    storyImagesView.pageControl?.numberOfPages = story.storyImages.count
+    storyImagesView.imageUrls = story.storyImageUrls
+    storyImagesView.pageControl?.numberOfPages = story.storyImageUrls.count
     storyLabel.text = story.story
-    profileImageView.image = story.user.profileImage
-    userNameLabel.text = story.user.name
+    profileImageView.sd_setImage(with: URL(string: story.profileImageUrl), completed: nil)
+    userNameLabel.text = story.userName
     loveCountLabel.text = "\(story.loveCount)"
     commentCountLabel.text = "\(story.commentCount)"
   }

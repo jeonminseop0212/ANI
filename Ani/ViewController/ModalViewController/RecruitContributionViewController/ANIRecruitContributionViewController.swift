@@ -463,29 +463,27 @@ extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
         DispatchQueue.global().async {
         var introduceImageUrls = [Int: String]()
           for (index, introduceImage) in recruitInfo.introduceImages.enumerated() {
-            if let introduceImage = introduceImage {
-              if let introduceImageData = UIImageJPEGRepresentation(introduceImage, 0.1) {
-                let uuid = NSUUID().uuidString
-                storageRef.child(KEY_RECRUIT_INTRODUCE_IMAGES).child(uuid).putData(introduceImageData, metadata: nil) { (metaData, error) in
-                  if error != nil {
-                    print("storageError")
-                    return
-                  }
-                  
-                  if let introduceImageUrl = metaData?.downloadURL() {
-                    introduceImageUrls[index] = introduceImageUrl.absoluteString
-                    if introduceImageUrls.count == recruitInfo.introduceImages.count {
-                      let sortdUrls = introduceImageUrls.sorted(by: {$0.0 < $1.0})
-                      var urls = [String]()
-                      for url in sortdUrls {
-                        urls.append(url.value)
-                      }
-                      
-                      recruit.introduceImageUrls = urls
-                      
-                      DispatchQueue.main.async {
-                        self.upateDatabase(recruit: recruit)
-                      }
+            if let introduceImage = introduceImage, let introduceImageData = UIImageJPEGRepresentation(introduceImage, 0.1) {
+              let uuid = NSUUID().uuidString
+              storageRef.child(KEY_RECRUIT_INTRODUCE_IMAGES).child(uuid).putData(introduceImageData, metadata: nil) { (metaData, error) in
+                if error != nil {
+                  print("storageError")
+                  return
+                }
+                
+                if let introduceImageUrl = metaData?.downloadURL() {
+                  introduceImageUrls[index] = introduceImageUrl.absoluteString
+                  if introduceImageUrls.count == recruitInfo.introduceImages.count {
+                    let sortdUrls = introduceImageUrls.sorted(by: {$0.0 < $1.0})
+                    var urls = [String]()
+                    for url in sortdUrls {
+                      urls.append(url.value)
+                    }
+                    
+                    recruit.introduceImageUrls = urls
+                    
+                    DispatchQueue.main.async {
+                      self.upateDatabase(recruit: recruit)
                     }
                   }
                 }
@@ -493,8 +491,6 @@ extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
             }
           }
         }
-        
-        
         
         self.dismiss(animated: true, completion: nil)
       } else {
