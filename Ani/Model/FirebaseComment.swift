@@ -1,5 +1,5 @@
 //
-//  FirebaseStory.swift
+//  FirebaseComment.swift
 //  Ani
 //
 //  Created by jeonminseop on 2018/06/06.
@@ -8,15 +8,11 @@
 
 import UIKit
 
-struct FirebaseStory: Codable {
-  var id: String?
-  let storyImageUrls: [String]
-  let story: String
+struct FirebaseComment: Codable {
   let userId: String
   let userName: String
   let profileImageUrl: String
+  let comment: String
   let loveCount: Int
   let commentCount: Int
-  var commentIds: [String: Bool]?
 }
-

@@ -145,6 +145,7 @@ extension ANIProfileViewController: ANIProfileBasicViewDelegate {
     let commentViewController = ANICommentViewController()
     commentViewController.hidesBottomBarWhenPushed = true
     commentViewController.commentMode = CommentMode.story
+    commentViewController.story = selectedStory
     self.navigationController?.pushViewController(commentViewController, animated: true)
   }
   

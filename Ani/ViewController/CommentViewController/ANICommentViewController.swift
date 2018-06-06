@@ -30,25 +30,9 @@ class ANICommentViewController: UIViewController {
     
   var commentMode: CommentMode?
   
-  var story: FirebaseStory? {
-    didSet {
-      guard let commentView = self.commentView,
-            let story = self.story else { return }
-      
-      commentView.story = story
-    }
-  }
-  var qna: Qna? {
-    didSet {
-      guard let commentView = self.commentView,
-            let qna = self.qna else { return }
-      
-      commentView.qna = qna
-    }
-  }
+  var story: FirebaseStory?
+  var qna: Qna?
   
-  var me: User?
-    
   override func viewDidLoad() {
     setup()
     passingData()
@@ -107,8 +91,6 @@ class ANICommentViewController: UIViewController {
     
     //commentBar
     let commentBar = ANICommentBar()
-    commentBar.me = me
-    commentBar.delegate = self
     self.view.addSubview(commentBar)
     commentBar.leftToSuperview()
     commentBar.rightToSuperview()
@@ -128,16 +110,19 @@ class ANICommentViewController: UIViewController {
   
   private func passingData() {
     guard let commentView = self.commentView,
+          let commentBar = self.commentBar,
           let commentMode = self.commentMode else { return }
+
+    commentView.commentMode = commentMode
+    commentBar.commentMode = commentMode
     
     switch commentMode {
     case .story:
       commentView.story = story
+      commentBar.story = story
     case .qna:
       commentView.qna = qna
     }
-    
-    commentView.commentMode = commentMode
   }
   
   private func setupNavigationProfileImage() {
@@ -194,27 +179,5 @@ class ANICommentViewController: UIViewController {
   //MARK: Action
   @objc private func back() {
     self.navigationController?.popViewController(animated: true)
-  }
-}
-
-extension ANICommentViewController: ANICommentBarDelegate {
-  func commentContributionButtonTapped(comment: String) {
-    //TODO: 本体updateやってないsever作ったらupdate
-    guard let commentMode = self.commentMode,
-          let me = self.me else { return }
-    
-    switch commentMode {
-    case CommentMode.story:
-//      if story != nil {
-//        let comment = Comment(user: me, comment: comment, loveCount: 0, commentCount: 0)
-//        story?.comments?.append(comment)
-//      }
-      print("story")
-    case CommentMode.qna:
-      if qna != nil {
-        let comment = Comment(user: me, comment: comment, loveCount: 0, commentCount: 0)
-        qna?.comments?.append(comment)
-      }
-    }
   }
 }

@@ -106,21 +106,29 @@ class ANIProfileBasicView: UIView {
   }
   
   private func loadStory() {
-    DispatchQueue.global().async {
-      Database.database().reference().child(KEY_STORIES).observe(.childAdded, with: { (snapshot) in
-        guard let value = snapshot.value else { return }
-        do {
-          let story = try FirebaseDecoder().decode(FirebaseStory.self, from: value)
-          self.storys.insert(story, at: 0)
+    guard let currentUser = self.currentUser,
+          let postStoryIds = currentUser.postStoryIds else { return }
+    
+    let sortedIds = postStoryIds.sorted(by: {$0.key < $1.key})
+    
+    for sortedId in sortedIds {
+      DispatchQueue.global().async {
+        Database.database().reference().child(KEY_STORIES).child(sortedId.key).observe(.value, with: { (snapshot) in
           
-          DispatchQueue.main.async {
-            guard let basicTableView = self.basicTableView else { return }
-            basicTableView.reloadData()
+          guard let value = snapshot.value else { return }
+          do {
+            let story = try FirebaseDecoder().decode(FirebaseStory.self, from: value)
+            self.storys.insert(story, at: 0)
+            
+            DispatchQueue.main.async {
+              guard let basicTableView = self.basicTableView else { return }
+              basicTableView.reloadData()
+            }
+          } catch let error {
+            print(error)
           }
-        } catch let error {
-          print(error)
-        }
-      })
+        })
+      }
     }
   }
 }
