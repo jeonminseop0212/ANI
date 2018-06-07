@@ -18,6 +18,7 @@
 		CD0BFF1220C624EC00D5959B /* FirebaseRecruit.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0BFF1120C624EC00D5959B /* FirebaseRecruit.swift */; };
 		CD0BFF1420C7619600D5959B /* FirebaseStory.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0BFF1320C7619600D5959B /* FirebaseStory.swift */; };
 		CD0BFF1620C7807F00D5959B /* FirebaseComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0BFF1520C7807F00D5959B /* FirebaseComment.swift */; };
+		CD0BFF1820C7AD9C00D5959B /* FirebaseQna.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0BFF1720C7AD9C00D5959B /* FirebaseQna.swift */; };
 		CD0FAD0520BF7B9E00D8CD27 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = CD0FAD0420BF7B9D00D8CD27 /* GoogleService-Info.plist */; };
 		CD0FAD0A20BF8DFD00D8CD27 /* FirebaseUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0FAD0920BF8DFD00D8CD27 /* FirebaseUser.swift */; };
 		CD0FAD0E20BFC02E00D8CD27 /* ANISessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0FAD0D20BFC02E00D8CD27 /* ANISessionManager.swift */; };
@@ -163,6 +164,7 @@
 		CD0BFF1120C624EC00D5959B /* FirebaseRecruit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseRecruit.swift; sourceTree = "<group>"; };
 		CD0BFF1320C7619600D5959B /* FirebaseStory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseStory.swift; sourceTree = "<group>"; };
 		CD0BFF1520C7807F00D5959B /* FirebaseComment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseComment.swift; sourceTree = "<group>"; };
+		CD0BFF1720C7AD9C00D5959B /* FirebaseQna.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseQna.swift; sourceTree = "<group>"; };
 		CD0FAD0420BF7B9D00D8CD27 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		CD0FAD0920BF8DFD00D8CD27 /* FirebaseUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseUser.swift; sourceTree = "<group>"; };
 		CD0FAD0D20BFC02E00D8CD27 /* ANISessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANISessionManager.swift; sourceTree = "<group>"; };
@@ -1012,6 +1014,7 @@
 				CD0FAD0920BF8DFD00D8CD27 /* FirebaseUser.swift */,
 				CD0BFF1120C624EC00D5959B /* FirebaseRecruit.swift */,
 				CD0BFF1320C7619600D5959B /* FirebaseStory.swift */,
+				CD0BFF1720C7AD9C00D5959B /* FirebaseQna.swift */,
 				CD0BFF1520C7807F00D5959B /* FirebaseComment.swift */,
 			);
 			path = Model;
@@ -1423,6 +1426,7 @@
 				CD0FAD0A20BF8DFD00D8CD27 /* FirebaseUser.swift in Sources */,
 				CDDD04BA20B538540094DBFA /* ANILoginViewController.swift in Sources */,
 				F57F7D9120844DC2008A2645 /* ANIUserSearchView.swift in Sources */,
+				CD0BFF1820C7AD9C00D5959B /* FirebaseQna.swift in Sources */,
 				CD9E52B7209441C900715F50 /* ANIRecruitDetailImagesViewCell.swift in Sources */,
 				CDDD04A820B271090094DBFA /* ANICommentCell.swift in Sources */,
 				F5E9E2332079AFF40021D4CC /* ANICommunityViewController.swift in Sources */,

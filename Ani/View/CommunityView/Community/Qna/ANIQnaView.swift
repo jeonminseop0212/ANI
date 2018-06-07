@@ -7,26 +7,24 @@
 //
 
 import UIKit
+import FirebaseDatabase
+import CodableFirebase
 
 protocol ANIQnaViewDelegate {
-  func qnaViewCellDidSelect(index: Int)
+  func qnaViewCellDidSelect(selectedQna: FirebaseQna)
 }
 
 class ANIQnaView: UIView {
   
   var qnaTableView: UITableView?
   
-  var qnas = [Qna]() {
-    didSet {
-      guard let qnaTableView = self.qnaTableView else { return }
-      qnaTableView.reloadData()
-    }
-  }
+  var qnas = [FirebaseQna]()
   
   var delegate: ANIQnaViewDelegate?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
+    loadQna()
     setup()
   }
   
@@ -53,6 +51,25 @@ class ANIQnaView: UIView {
     tableView.edgesToSuperview()
     self.qnaTableView = tableView
   }
+  
+  private func loadQna() {
+    DispatchQueue.global().async {
+      Database.database().reference().child(KEY_QNAS).observe(.childAdded, with: { (snapshot) in
+        guard let value = snapshot.value else { return }
+        do {
+          let qna = try FirebaseDecoder().decode(FirebaseQna.self, from: value)
+          self.qnas.insert(qna, at: 0)
+          
+          DispatchQueue.main.async {
+            guard let qnaTableView = self.qnaTableView else { return }
+            qnaTableView.reloadData()
+          }
+        } catch let error {
+          print(error)
+        }
+      })
+    }
+  }
 }
 
 //MARK: UITableViewDataSource
@@ -74,6 +91,6 @@ extension ANIQnaView: UITableViewDataSource {
 //MARK: UITableViewDelegate
 extension ANIQnaView: UITableViewDelegate {
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    self.delegate?.qnaViewCellDidSelect(index: indexPath.row)
+    self.delegate?.qnaViewCellDidSelect(selectedQna: qnas[indexPath.row])
   }
 }

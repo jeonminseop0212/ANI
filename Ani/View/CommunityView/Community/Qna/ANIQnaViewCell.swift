@@ -19,7 +19,7 @@ class ANIQnaViewCell: UITableViewCell {
   private weak var commentButton: UIButton?
   private var commentCountLabel: UILabel?
   
-  var qna: Qna? {
+  var qna: FirebaseQna? {
     didSet {
       reloadLayout()
     }
@@ -148,10 +148,10 @@ class ANIQnaViewCell: UITableViewCell {
           let commentCountLabel = self.commentCountLabel,
           let qna = self.qna else { return }
     
-    qnaImagesView.images = qna.qnaImages
+    qnaImagesView.imageUrls = qna.qnaImageUrls
     subTitleLabel.text = qna.qna
-    profileImageView.image = qna.user.profileImage
-    userNameLabel.text = qna.user.name
+    profileImageView.sd_setImage(with: URL(string: qna.profileImageUrl), completed: nil)
+    userNameLabel.text = qna.userName
     loveCountLabel.text = "\(qna.loveCount)"
     commentCountLabel.text = "\(qna.commentCount)"
   }

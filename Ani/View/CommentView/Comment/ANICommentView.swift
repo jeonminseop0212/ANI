@@ -21,11 +21,9 @@ class ANICommentView: UIView {
       loadComment()
     }
   }
-  var qna: Qna? {
+  var qna: FirebaseQna? {
     didSet {
-      guard let commentTableView = self.commentTableView else { return }
-      
-      commentTableView.reloadData()
+      loadComment()
     }
   }
   
@@ -89,7 +87,31 @@ class ANICommentView: UIView {
         }
       }
     case .qna:
-      print("qna")
+      guard let qna = self.qna,
+            let commentIds = qna.commentIds else { return }
+      
+      let sortedCommentIds = commentIds.sorted(by: {$0.key < $1.key})
+      for commentId in sortedCommentIds {
+        DispatchQueue.global().sync {
+          let databaseRef = Database.database().reference()
+          databaseRef.child(KEY_COMMENTS).child(commentId.key).observe(.value) { (snapshot) in
+            guard let value = snapshot.value else { return }
+            do {
+              let comment = try FirebaseDecoder().decode(FirebaseComment.self, from: value)
+              
+              self.comments.append(comment)
+              
+              DispatchQueue.main.async {
+                guard let commentTableView = self.commentTableView else { return }
+                
+                commentTableView.reloadData()
+              }
+            } catch let error {
+              print(error)
+            }
+          }
+        }
+      }
     }
   }
 }
@@ -97,18 +119,7 @@ class ANICommentView: UIView {
 //MARK: UITableViewDataSource
 extension ANICommentView: UITableViewDataSource {
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    guard let commentMode = self.commentMode else { return 0 }
-    
-    switch commentMode {
-    case .story:
-      return comments.count + 1
-    case .qna:
-      if let qna = self.qna, let comments = qna.comments {
-        return comments.count + 1
-      } else {
-        return 0
-      }
-    }
+    return comments.count + 1
   }
   
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -137,12 +148,8 @@ extension ANICommentView: UITableViewDataSource {
       switch commentMode {
       case .story:
         cell.comment = comments[indexPath.row - 1]
-        print("story")
       case .qna:
-//        if let qna = self.qna, let comments = qna.comments {
-//          cell.comment = comments[indexPath.row - 1]
-//        }
-        print("qna")
+        cell.comment = comments[indexPath.row - 1]
       }
 
       return cell

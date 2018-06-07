@@ -23,6 +23,7 @@ class ANICommentBar: UIView {
   var commentMode: CommentMode?
 
   var story: FirebaseStory?
+  var qna: FirebaseQna?
     
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -153,7 +154,14 @@ class ANICommentBar: UIView {
             detabaseStoryRef.updateChildValues(value)
           }
         case .qna:
-          print("qna")
+          guard let qna = self.qna,
+            let qnaId = qna.id else { return }
+          
+          do {
+            let detabaseStoryRef = detabaseRef.child(KEY_QNAS).child(qnaId).child(KEY_COMMENT_IDS)
+            let value: [String: Bool] = [id: true]
+            detabaseStoryRef.updateChildValues(value)
+          }
         }
       }
     } catch let error {

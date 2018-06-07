@@ -13,7 +13,7 @@ import CodableFirebase
 protocol ANIProfileBasicViewDelegate {
   func recruitViewCellDidSelect(selectedRecruit: FirebaseRecruit)
   func storyViewCellDidSelect(selectedStory: FirebaseStory)
-  func qnaViewCellDidSelect(index: Int)
+  func qnaViewCellDidSelect(selectedQna: FirebaseQna)
 }
 
 class ANIProfileBasicView: UIView {
@@ -34,13 +34,14 @@ class ANIProfileBasicView: UIView {
   
   var storys = [FirebaseStory]()
   
-  var qnas = [Qna]()
+  var qnas = [FirebaseQna]()
   
   var user: User?
   var currentUser: FirebaseUser? {
     didSet {
       loadRecruit()
       loadStory()
+      loadQna()
 
       guard let basicTableView = self.basicTableView else { return }
       basicTableView.reloadData()
@@ -60,6 +61,7 @@ class ANIProfileBasicView: UIView {
   
   private func setup() {
     let basicTableView = UITableView()
+    basicTableView.backgroundColor = ANIColor.bg
     basicTableView.separatorStyle = .none
     basicTableView.dataSource = self
     basicTableView.delegate = self
@@ -119,6 +121,33 @@ class ANIProfileBasicView: UIView {
           do {
             let story = try FirebaseDecoder().decode(FirebaseStory.self, from: value)
             self.storys.insert(story, at: 0)
+            
+            DispatchQueue.main.async {
+              guard let basicTableView = self.basicTableView else { return }
+              basicTableView.reloadData()
+            }
+          } catch let error {
+            print(error)
+          }
+        })
+      }
+    }
+  }
+  
+  private func loadQna() {
+    guard let currentUser = self.currentUser,
+          let postQnaIds = currentUser.postQnaIds else { return }
+    
+    let sortedIds = postQnaIds.sorted(by: {$0.key < $1.key})
+    
+    for sortedId in sortedIds {
+      DispatchQueue.global().async {
+        Database.database().reference().child(KEY_QNAS).child(sortedId.key).observe(.value, with: { (snapshot) in
+          
+          guard let value = snapshot.value else { return }
+          do {
+            let qna = try FirebaseDecoder().decode(FirebaseQna.self, from: value)
+            self.qnas.insert(qna, at: 0)
             
             DispatchQueue.main.async {
               guard let basicTableView = self.basicTableView else { return }
@@ -206,7 +235,7 @@ extension ANIProfileBasicView: UITableViewDelegate {
     case .story:
       self.delegate?.storyViewCellDidSelect(selectedStory: storys[indexPath.row])
     case .qna:
-      self.delegate?.qnaViewCellDidSelect(index: indexPath.row)
+      self.delegate?.qnaViewCellDidSelect(selectedQna: qnas[indexPath.row])
     }
   }
 }

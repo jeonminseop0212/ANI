@@ -31,7 +31,7 @@ class ANICommentViewController: UIViewController {
   var commentMode: CommentMode?
   
   var story: FirebaseStory?
-  var qna: Qna?
+  var qna: FirebaseQna?
   
   override func viewDidLoad() {
     setup()
@@ -122,6 +122,7 @@ class ANICommentViewController: UIViewController {
       commentBar.story = story
     case .qna:
       commentView.qna = qna
+      commentBar.qna = qna
     }
   }
   
@@ -136,7 +137,7 @@ class ANICommentViewController: UIViewController {
       }
     case .qna:
       if let qna = self.qna {
-        navigationProfileImageView.image = qna.user.profileImage
+        navigationProfileImageView.sd_setImage(with: URL(string: qna.profileImageUrl), completed: nil)
       }
     }
   }
