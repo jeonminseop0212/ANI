@@ -1,25 +1,23 @@
 //
-//  SignUpViewController.swift
+//  ANILoginViewController.swift
 //  Ani
 //
-//  Created by jeonminseop on 2018/05/24.
+//  Created by jeonminseop on 2018/05/23.
 //  Copyright © 2018年 JeonMinseop. All rights reserved.
 //
 
 import UIKit
-import Gallery
 import TinyConstraints
 
-class ANISignUpViewController: UIViewController {
+class ANILoginViewController: UIViewController {
+  
   private weak var myNavigationBar: UIView?
   private weak var myNavigationBarBase: UIView?
   private weak var backButton: UIButton?
   
-  private var signUpViewOriginalBottomConstraintConstant: CGFloat?
-  private var signUpViewBottomConstraint: Constraint?
-  private weak var signUpView: ANISignUpView?
-  
-  private var gallery: GalleryController?
+  private var loginViewOriginalBottomConstraintConstant: CGFloat?
+  private var loginViewBottomConstraint: Constraint?
+  private weak var loginView: ANILoginView?
   
   private var rejectViewBottomConstraint: Constraint?
   private var rejectViewBottomConstraintOriginalConstant: CGFloat?
@@ -31,6 +29,10 @@ class ANISignUpViewController: UIViewController {
   override func viewDidLoad() {
     setup()
     setupNotification()
+  }
+  
+  override func viewWillAppear(_ animated: Bool) {
+    UIApplication.shared.statusBar?.alpha = 1.0
   }
   
   private func setup() {
@@ -71,16 +73,16 @@ class ANISignUpViewController: UIViewController {
     backButton.centerYToSuperview()
     self.backButton = backButton
     
-    //signUpView
-    let signUpView = ANISignUpView()
-    signUpView.delegate = self
-    self.view.addSubview(signUpView)
-    signUpView.topToBottom(of: myNavigationBar)
-    signUpView.leftToSuperview()
-    signUpView.rightToSuperview()
-    signUpViewBottomConstraint = signUpView.bottomToSuperview()
-    signUpViewOriginalBottomConstraintConstant = signUpViewBottomConstraint?.constant
-    self.signUpView = signUpView
+    //loginView
+    let loginView = ANILoginView()
+    loginView.delegate = self
+    self.view.addSubview(loginView)
+    loginView.topToBottom(of: myNavigationBar)
+    loginView.leftToSuperview()
+    loginView.rightToSuperview()
+    loginViewBottomConstraint = loginView.bottomToSuperview()
+    rejectViewBottomConstraintOriginalConstant = loginViewBottomConstraint?.constant
+    self.loginView = loginView
     
     //rejectView
     let rejectView = UIView()
@@ -106,6 +108,7 @@ class ANISignUpViewController: UIViewController {
     rejectLabel.textAlignment = .center
     rejectLabel.textColor = .white
     rejectLabel.font = UIFont.boldSystemFont(ofSize: 16.0)
+    rejectLabel.text = "ユーザーが見つかりません！"
     rejectLabel.textAlignment = .center
     rejectBaseView.addSubview(rejectLabel)
     rejectLabel.edgesToSuperview()
@@ -121,11 +124,11 @@ class ANISignUpViewController: UIViewController {
     guard let keyboardFrame = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
           let duration = notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as? TimeInterval,
           let curve = notification.userInfo?[UIKeyboardAnimationCurveUserInfoKey] as? UInt,
-          let signUpViewBottomConstraint = self.signUpViewBottomConstraint else { return }
+          let loginViewBottomConstraint = self.loginViewBottomConstraint else { return }
     
     let h = keyboardFrame.height
     
-    signUpViewBottomConstraint.constant = -h
+    loginViewBottomConstraint.constant = -h
     
     UIView.animate(withDuration: duration, delay: 0, options: UIViewAnimationOptions(rawValue: curve), animations: {
       self.view.layoutIfNeeded()
@@ -135,33 +138,14 @@ class ANISignUpViewController: UIViewController {
   @objc private func keyboardWillHide(_ notification: Notification) {
     guard let duration = notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as? TimeInterval,
           let curve = notification.userInfo?[UIKeyboardAnimationCurveUserInfoKey] as? UInt,
-          let signUpViewOriginalBottomConstraintConstant = self.signUpViewOriginalBottomConstraintConstant,
-          let signUpViewBottomConstraint = self.signUpViewBottomConstraint else { return }
+          let signUpViewOriginalBottomConstraintConstant = self.loginViewOriginalBottomConstraintConstant,
+          let loginViewBottomConstraint = self.loginViewBottomConstraint else { return }
     
-    signUpViewBottomConstraint.constant = signUpViewOriginalBottomConstraintConstant
+    loginViewBottomConstraint.constant = signUpViewOriginalBottomConstraintConstant
     
     UIView.animate(withDuration: duration, delay: 0, options: UIViewAnimationOptions(rawValue: curve), animations: {
       self.view.layoutIfNeeded()
     })
-  }
-  
-  func getCropImages(images: [UIImage?], items: [Image]) -> [UIImage] {
-    var croppedImages = [UIImage]()
-    
-    for (index, image) in images.enumerated() {
-      let imageSize = image?.size
-      let scrollViewWidth = self.view.frame.width
-      let widthScale =  scrollViewWidth / (imageSize?.width)! * items[index].scale
-      let heightScale = scrollViewWidth / (imageSize?.height)! * items[index].scale
-      
-      let scale = 1 / min(widthScale, heightScale)
-      let visibleRect = CGRect(x: items[index].offset.x * scale, y: items[index].offset.y * scale, width: scrollViewWidth * scale, height: scrollViewWidth * scale * Config.Grid.previewRatio)
-      let ref: CGImage = (image?.cgImage?.cropping(to: visibleRect))!
-      let croppedImage:UIImage = UIImage(cgImage: ref)
-      
-      croppedImages.append(croppedImage)
-    }
-    return croppedImages
   }
   
   //MARK: action
@@ -170,41 +154,16 @@ class ANISignUpViewController: UIViewController {
   }
 }
 
-//MARK: ANISignUpViewDelegate
-extension ANISignUpViewController: ANISignUpViewDelegate {
-  func signUpSuccess() {
+//MARK: ANILoginViewDelegate
+extension ANILoginViewController: ANILoginViewDelegate {
+  func loginSuccess() {
     self.navigationController?.dismiss(animated: true, completion: nil)
-  }
-  
-  func donButtonTapped() {
-    self.navigationController?.dismiss(animated: true, completion: nil)
-  }
-  
-  func prifileImagePickButtonTapped() {
-    gallery = GalleryController()
-    if let galleryUnrap = gallery {
-      galleryUnrap.delegate = self
-      Gallery.Config.initialTab = .imageTab
-      Gallery.Config.PageIndicator.backgroundColor = .white
-      Gallery.Config.Camera.oneImageMode = true
-      if Gallery.Config.Camera.oneImageMode {
-        Gallery.Config.Grid.previewRatio = UIViewController.HEADER_IMAGE_VIEW_RATIO
-        Config.tabsToShow = [.imageTab, .cameraTab]
-      }
-      Gallery.Config.Font.Main.regular = UIFont.boldSystemFont(ofSize: 17)
-      Gallery.Config.Grid.ArrowButton.tintColor = ANIColor.dark
-      Gallery.Config.Grid.FrameView.borderColor = ANIColor.green
-      Gallery.Config.Grid.previewRatio = 1.0
-      
-      let galleryNV = UINavigationController(rootViewController: galleryUnrap)
-      self.present(galleryNV, animated: true, completion: nil)
-    }
   }
   
   func reject(notiText: String) {
     guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
-          let rejectLabel = self.rejectLabel,
-          !isRejectAnimating else { return }
+          !isRejectAnimating,
+          let rejectLabel = self.rejectLabel else { return }
     
     rejectLabel.text = notiText
     
@@ -223,47 +182,5 @@ extension ANISignUpViewController: ANISignUpViewDelegate {
         self.isRejectAnimating = false
       })
     }
-  }
-}
-
-//MARK: GalleryControllerDelegate
-extension ANISignUpViewController: GalleryControllerDelegate {
-  func galleryController(_ controller: GalleryController, didSelectImages images: [Image]) {
-    
-    Image.resolve(images: images) { (myImages) in
-      let imageFilteriewController = ANIImageFilterViewController()
-      imageFilteriewController.images = self.getCropImages(images: myImages, items: images)
-      imageFilteriewController.delegate = self
-      controller.navigationController?.pushViewController(imageFilteriewController, animated: true)
-    }
-    
-    gallery = nil
-  }
-  
-  func galleryController(_ controller: GalleryController, didSelectVideo video: Video) {
-    controller.dismiss(animated: true, completion: nil)
-    
-    gallery = nil
-  }
-  
-  func galleryController(_ controller: GalleryController, requestLightbox images: [Image]) {
-    controller.dismiss(animated: true, completion: nil)
-    gallery = nil
-  }
-  
-  func galleryControllerDidCancel(_ controller: GalleryController) {
-    controller.dismiss(animated: true, completion: nil)
-    gallery = nil
-  }
-}
-
-//MARK: ANIImageFilterViewControllerDelegate
-extension ANISignUpViewController: ANIImageFilterViewControllerDelegate {
-  func doneFilterImages(filteredImages: [UIImage?]) {
-    guard !filteredImages.isEmpty,
-          let filteredImage = filteredImages[0],
-          let signUpView = self.signUpView else { return }
-    
-    signUpView.profileImage = filteredImage
   }
 }

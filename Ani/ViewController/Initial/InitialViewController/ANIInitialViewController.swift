@@ -16,12 +16,15 @@ class ANIInitialViewController: UIViewController {
     setup()
   }
   
+  override func viewWillAppear(_ animated: Bool) {
+    UIApplication.shared.statusBar?.alpha = 0.0
+  }
+  
   private func setup() {
     //basic
     self.view.backgroundColor = .white
     self.navigationController?.setNavigationBarHidden(true, animated: false)
     self.navigationController?.navigationBar.isTranslucent = false
-    UIApplication.shared.isStatusBarHidden = true
     
     //initialView
     let initialView = ANIInitialView()
