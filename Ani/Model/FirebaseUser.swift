@@ -17,4 +17,5 @@ struct FirebaseUser: Codable {
   var familyImageUrls: [String]?
   var postRecruitIds: [String: Bool]?
   var postStoryIds: [String: Bool]?
+  var postQnaIds: [String: Bool]?
 }

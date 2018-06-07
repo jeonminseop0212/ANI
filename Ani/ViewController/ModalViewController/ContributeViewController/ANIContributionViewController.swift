@@ -159,7 +159,7 @@ class ANIContributionViewController: UIViewController {
     ANINotificationManager.receive(keyboardWillHide: self, selector: #selector(keyboardWillHide))
   }
   
-  func putStory() {
+  func uploadStory() {
     guard let contriButionView = self.contriButionView,
           let currentUser = ANISessionManager.shared.currentUser,
           let uid = currentUser.uid,
@@ -205,6 +205,52 @@ class ANIContributionViewController: UIViewController {
     }
   }
   
+  func uploadQna() {
+    guard let contriButionView = self.contriButionView,
+      let currentUser = ANISessionManager.shared.currentUser,
+      let uid = currentUser.uid,
+      let userName = currentUser.userName,
+      let profileImageUrl = currentUser.profileImageUrl else { return }
+    
+    let storageRef = Storage.storage().reference()
+    var contentImageUrls = [Int: String]()
+    
+    DispatchQueue.global().async {
+      for (index, contentImage) in self.contentImages.enumerated() {
+        if let contentImage = contentImage, let contentImageData = UIImageJPEGRepresentation(contentImage, 0.1) {
+          let uuid = UUID().uuidString
+          storageRef.child(KEY_QNA_IMAGES).child(uuid).putData(contentImageData, metadata: nil) { (metaData, error) in
+            if error != nil {
+              print("storageError")
+              return
+            }
+            
+            if let contentImageUrl = metaData?.downloadURL() {
+              contentImageUrls[index] = contentImageUrl.absoluteString
+              if contentImageUrls.count == self.contentImages.count {
+                let sortdUrls = contentImageUrls.sorted(by: {$0.0 < $1.0})
+                var urls = [String]()
+                for url in sortdUrls {
+                  urls.append(url.value)
+                }
+                
+                let detabaseRef = Database.database().reference()
+                let databaseQnaRef = detabaseRef.child(KEY_QNAS).childByAutoId()
+                let id = databaseQnaRef.key
+                let content = contriButionView.getContent()
+                let qna = FirebaseQna(id: id, qnaImageUrls: urls, qna: content, userId: uid, userName: userName, profileImageUrl: profileImageUrl, loveCount: 0, commentCount: 0, commentIds: nil)
+                
+                DispatchQueue.main.async {
+                  self.upateQnaDatabase(qna: qna, databaseQnaRef: databaseQnaRef)
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
   private func upateStroyDatabase(story: FirebaseStory, databaseStoryRef: DatabaseReference) {
     do {
       if let data = try FirebaseEncoder().encode(story) as? [String : AnyObject] {
@@ -214,6 +260,24 @@ class ANIContributionViewController: UIViewController {
         let detabaseRef = Database.database().reference()
         if let currentUser = ANISessionManager.shared.currentUser, let uid = currentUser.uid, let id = story.id {
           let detabaseUsersRef = detabaseRef.child(KEY_USERS).child(uid).child(KEY_POST_STORY_IDS)
+          let value: [String: Bool] = [id: true]
+          detabaseUsersRef.updateChildValues(value)
+        }
+      }
+    } catch let error {
+      print(error)
+    }
+  }
+  
+  private func upateQnaDatabase(qna: FirebaseQna, databaseQnaRef: DatabaseReference) {
+    do {
+      if let data = try FirebaseEncoder().encode(qna) as? [String : AnyObject] {
+        databaseQnaRef.updateChildValues(data)
+      }
+      do {
+        let detabaseRef = Database.database().reference()
+        if let currentUser = ANISessionManager.shared.currentUser, let uid = currentUser.uid, let id = qna.id {
+          let detabaseUsersRef = detabaseRef.child(KEY_USERS).child(uid).child(KEY_POST_QNA_IDS)
           let value: [String: Bool] = [id: true]
           detabaseUsersRef.updateChildValues(value)
         }
@@ -284,13 +348,12 @@ class ANIContributionViewController: UIViewController {
     guard let selectedContributionMode = self.selectedContributionMode else { return }
     
     switch selectedContributionMode {
-    case ContributionMode.story:
-      putStory()
+    case .story:
+      uploadStory()
       
       self.dismiss(animated: true, completion: nil)
-    case ContributionMode.qna:
-//      let qna = Qna(qnaImages: contriButionView.contentImages, qna: contentTextView.text, user: me, loveCount: 0, commentCount: 0, comments: nil)
-//      self.delegate?.contributionButtonTapped(qna: qna)
+    case .qna:
+      uploadQna()
       
       self.dismiss(animated: true, completion: nil)
     }

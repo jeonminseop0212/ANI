@@ -12,7 +12,7 @@ class ANIQnaImagesView: UIView {
   
   private weak var imagesCollectionView: UICollectionView?
   
-  var images = [UIImage?]() {
+  var imageUrls = [String]() {
     didSet {
       for subview in self.subviews{
         subview.removeFromSuperview()
@@ -51,13 +51,13 @@ class ANIQnaImagesView: UIView {
 //MARK: UICollectionViewDataSource
 extension ANIQnaImagesView: UICollectionViewDataSource {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-    return images.count
+    return imageUrls.count
   }
   
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     let id = NSStringFromClass(ANIQnaImagesCell.self)
     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! ANIQnaImagesCell
-    cell.imageView?.image = images[indexPath.item]
+    cell.imageView?.sd_setImage(with: URL(string: imageUrls[indexPath.item]), completed: nil)
     return cell
   }
 }

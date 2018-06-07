@@ -20,6 +20,7 @@ let KEY_PROFILE_IMAGES = "profile_images"
 let KEY_FAMILY_IMAGES = "family_images"
 let KEY_POST_RECRUIT_IDS = "postRecruitIds"
 let KEY_POST_STORY_IDS = "postStoryIds"
+let KEY_POST_QNA_IDS = "postQnaIds"
 
 //recruit
 let KEY_RECRUIT_HEADER_IMAGES = "recruit_header_images"
@@ -30,6 +31,10 @@ let KEY_RECRUITS = "recruits"
 let KEY_STORY_IMAGES = "story_images"
 let KEY_STORIES = "stories"
 let KEY_COMMENT_IDS = "commentIds"
+
+//qna
+let KEY_QNA_IMAGES = "qna_images"
+let KEY_QNAS = "qnas"
 
 //comment
 let KEY_COMMENTS = "comments"
