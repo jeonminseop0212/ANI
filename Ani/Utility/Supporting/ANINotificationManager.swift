@@ -70,7 +70,7 @@ class ANINotificationManager: NSObject {
   
   //MARK: image view tapped
   private static let N_IMAGE_CELL_TAPPED = "N_IMAGE_CELL_TAPPED"
-  static func postImageCellTapped(tapCellItem: (Int, [UIImage?])) { self.post(name: N_IMAGE_CELL_TAPPED, object: tapCellItem, userInfo:nil) }
+  static func postImageCellTapped(tapCellItem: (Int, [String])) { self.post(name: N_IMAGE_CELL_TAPPED, object: tapCellItem, userInfo:nil) }
   static func receive(imageCellTapped observer:Any, selector:Selector) { receive(name: N_IMAGE_CELL_TAPPED, observer: observer, selector: selector) }
   
   //MARK: profile edit button tapped

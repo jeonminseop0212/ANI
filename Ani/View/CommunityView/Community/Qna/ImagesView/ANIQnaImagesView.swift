@@ -65,7 +65,7 @@ extension ANIQnaImagesView: UICollectionViewDataSource {
 //MARK: UICollectionViewDelegate
 extension ANIQnaImagesView: UICollectionViewDelegate {
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-//    ANINotificationManager.postImageCellTapped(tapCellItem: (indexPath.item, images))
+    ANINotificationManager.postImageCellTapped(tapCellItem: (indexPath.item, imageUrls))
   }
 }
 
