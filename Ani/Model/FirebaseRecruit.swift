@@ -9,6 +9,7 @@
 import UIKit
 
 struct FirebaseRecruit: Codable {
+  var id: String?
   var headerImageUrl: String?
   let title: String
   let kind: String

@@ -127,6 +127,8 @@ class ANIRecruitDetailView: UIView {
     
     //profileImageView
     let profileImageView = UIImageView()
+    profileImageView.layer.cornerRadius = PROFILE_IMAGE_HEIGHT / 2
+    profileImageView.layer.masksToBounds = true
     contentView.addSubview(profileImageView)
     profileImageView.width(PROFILE_IMAGE_HEIGHT)
     profileImageView.height(PROFILE_IMAGE_HEIGHT)
