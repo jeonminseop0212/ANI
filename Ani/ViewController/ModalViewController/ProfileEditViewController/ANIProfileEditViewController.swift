@@ -463,6 +463,8 @@ extension ANIProfileEditViewController: ANIImageFilterViewControllerDelegate {
       } else {
         familyImages = filteredImages
       }
+      
+      familyImagesChange = true
     } else {
       if editImageIndex == 0 {
         profileImage = filteredImage
