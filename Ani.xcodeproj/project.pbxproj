@@ -592,8 +592,8 @@
 			isa = PBXGroup;
 			children = (
 				CDDD04B120B50FCE0094DBFA /* InitialViewController */,
-				CDDD04B820B538400094DBFA /* Login */,
-				CDDD04BB20B539EE0094DBFA /* SignUp */,
+				CDDD04B820B538400094DBFA /* LoginViewController */,
+				CDDD04BB20B539EE0094DBFA /* SignUpViewController */,
 			);
 			path = Initial;
 			sourceTree = "<group>";
@@ -607,20 +607,20 @@
 			path = Recruit;
 			sourceTree = "<group>";
 		};
-		CDDD04B820B538400094DBFA /* Login */ = {
+		CDDD04B820B538400094DBFA /* LoginViewController */ = {
 			isa = PBXGroup;
 			children = (
 				CDDD04B920B538540094DBFA /* ANILoginViewController.swift */,
 			);
-			path = Login;
+			path = LoginViewController;
 			sourceTree = "<group>";
 		};
-		CDDD04BB20B539EE0094DBFA /* SignUp */ = {
+		CDDD04BB20B539EE0094DBFA /* SignUpViewController */ = {
 			isa = PBXGroup;
 			children = (
 				CD6229DB20B64A6400E36875 /* ANISignUpViewController.swift */,
 			);
-			path = SignUp;
+			path = SignUpViewController;
 			sourceTree = "<group>";
 		};
 		CDDD04BE20B53A7C0094DBFA /* InitialView */ = {
