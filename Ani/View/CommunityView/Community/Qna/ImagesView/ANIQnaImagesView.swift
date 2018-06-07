@@ -42,6 +42,7 @@ class ANIQnaImagesView: UIView {
     imagesCollectionView.dataSource = self
     imagesCollectionView.delegate = self
     imagesCollectionView.showsHorizontalScrollIndicator = false
+    imagesCollectionView.alwaysBounceHorizontal = true
     addSubview(imagesCollectionView)
     imagesCollectionView.edgesToSuperview()
     self.imagesCollectionView = imagesCollectionView

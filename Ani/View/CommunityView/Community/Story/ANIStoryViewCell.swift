@@ -155,7 +155,11 @@ class ANIStoryViewCell: UITableViewCell {
     profileImageView.sd_setImage(with: URL(string: story.profileImageUrl), completed: nil)
     userNameLabel.text = story.userName
     loveCountLabel.text = "\(story.loveCount)"
-    commentCountLabel.text = "\(story.commentCount)"
+    if let commentIds = story.commentIds {
+      commentCountLabel.text = "\(commentIds.count)"
+    } else {
+      commentCountLabel.text = "0"
+    }
   }
   
   //MARK: action
