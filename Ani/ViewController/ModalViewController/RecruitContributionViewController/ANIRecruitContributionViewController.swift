@@ -253,17 +253,15 @@ class ANIRecruitContributionViewController: UIViewController {
     return croppedImages
   }
   
-  private func upateDatabase(recruit: FirebaseRecruit) {
+  private func upateDatabase(recruit: FirebaseRecruit, databaseRecruitRef: DatabaseReference) {
     if recruit.headerImageUrl != nil && recruit.introduceImageUrls != nil {
       do {
         if let data = try FirebaseEncoder().encode(recruit) as? [String : AnyObject] {
-          let detabaseRef = Database.database().reference()
-          let databaseRecruitRef = detabaseRef.child(KEY_RECRUITS).childByAutoId()
-          let id = databaseRecruitRef.key
           databaseRecruitRef.updateChildValues(data)
           
           do {
-            if let currentUser = ANISessionManager.shared.currentUser,  let uid = currentUser.uid {
+            let detabaseRef = Database.database().reference()
+            if let currentUser = ANISessionManager.shared.currentUser,  let uid = currentUser.uid, let id = recruit.id {
               let detabaseUsersRef = detabaseRef.child(KEY_USERS).child(uid).child(KEY_POST_RECRUIT_IDS)
               let value: [String: Bool] = [id: true]
               detabaseUsersRef.updateChildValues(value)
@@ -438,7 +436,11 @@ extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
       if recruitInfo.headerImage != UIImage(named: "headerDefault") && recruitInfo.title.count > 0 && recruitInfo.kind.count > 0 && recruitInfo.age.count > 0 && recruitInfo.age.count > 0 && recruitInfo.sex.count > 0 && recruitInfo.home.count > 0 && recruitInfo.vaccine.count > 0 && recruitInfo.castration.count > 0 && recruitInfo.reason.count > 0 && recruitInfo.introduce.count > 0 && recruitInfo.passing.count > 0 && !recruitInfo.introduceImages.isEmpty {
         
         let storageRef = Storage.storage().reference()
-        var recruit = FirebaseRecruit(headerImageUrl: nil, title: recruitInfo.title, kind: recruitInfo.kind, age: recruitInfo.age, sex: recruitInfo.sex, home: recruitInfo.home, vaccine: recruitInfo.vaccine, castration: recruitInfo.castration, reason: recruitInfo.reason, introduce: recruitInfo.introduce, introduceImageUrls: nil, passing: recruitInfo.passing, isRecruit: true, userId: userId, userName: userName, profileImageUrl: profileImageUrl, supportCount: 0, loveCount: 0)
+        
+        let detabaseRef = Database.database().reference()
+        let databaseRecruitRef = detabaseRef.child(KEY_RECRUITS).childByAutoId()
+        let id = databaseRecruitRef.key
+        var recruit = FirebaseRecruit(id: id, headerImageUrl: nil, title: recruitInfo.title, kind: recruitInfo.kind, age: recruitInfo.age, sex: recruitInfo.sex, home: recruitInfo.home, vaccine: recruitInfo.vaccine, castration: recruitInfo.castration, reason: recruitInfo.reason, introduce: recruitInfo.introduce, introduceImageUrls: nil, passing: recruitInfo.passing, isRecruit: true, userId: userId, userName: userName, profileImageUrl: profileImageUrl, supportCount: 0, loveCount: 0)
         
         DispatchQueue.global().async {
           if let recruitHeaderImageData = UIImageJPEGRepresentation(recruitInfo.headerImage, 0.1) {
@@ -453,7 +455,7 @@ extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
                 recruit.headerImageUrl = recruitHeaderImageUrl.absoluteString
                 
                 DispatchQueue.main.async {
-                  self.upateDatabase(recruit: recruit)
+                  self.upateDatabase(recruit: recruit, databaseRecruitRef: databaseRecruitRef)
                 }
               }
             }
@@ -483,7 +485,7 @@ extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
                     recruit.introduceImageUrls = urls
                     
                     DispatchQueue.main.async {
-                      self.upateDatabase(recruit: recruit)
+                      self.upateDatabase(recruit: recruit, databaseRecruitRef: databaseRecruitRef)
                     }
                   }
                 }
