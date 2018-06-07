@@ -16,7 +16,6 @@ struct FirebaseStory: Codable {
   let userName: String
   let profileImageUrl: String
   let loveCount: Int
-  let commentCount: Int
   var commentIds: [String: Bool]?
 }
 

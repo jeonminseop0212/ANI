@@ -192,7 +192,7 @@ class ANIContributionViewController: UIViewController {
                 let databaseStoryRef = detabaseRef.child(KEY_STORIES).childByAutoId()
                 let id = databaseStoryRef.key
                 let content = contriButionView.getContent()
-                let story = FirebaseStory(id: id, storyImageUrls: urls, story: content, userId: uid, userName: userName, profileImageUrl: profileImageUrl, loveCount: 0, commentCount: 0, commentIds: nil)
+                let story = FirebaseStory(id: id, storyImageUrls: urls, story: content, userId: uid, userName: userName, profileImageUrl: profileImageUrl, loveCount: 0, commentIds: nil)
                 
                 DispatchQueue.main.async {
                   self.upateStroyDatabase(story: story, databaseStoryRef: databaseStoryRef)
@@ -238,7 +238,7 @@ class ANIContributionViewController: UIViewController {
                 let databaseQnaRef = detabaseRef.child(KEY_QNAS).childByAutoId()
                 let id = databaseQnaRef.key
                 let content = contriButionView.getContent()
-                let qna = FirebaseQna(id: id, qnaImageUrls: urls, qna: content, userId: uid, userName: userName, profileImageUrl: profileImageUrl, loveCount: 0, commentCount: 0, commentIds: nil)
+                let qna = FirebaseQna(id: id, qnaImageUrls: urls, qna: content, userId: uid, userName: userName, profileImageUrl: profileImageUrl, loveCount: 0, commentIds: nil)
                 
                 DispatchQueue.main.async {
                   self.upateQnaDatabase(qna: qna, databaseQnaRef: databaseQnaRef)

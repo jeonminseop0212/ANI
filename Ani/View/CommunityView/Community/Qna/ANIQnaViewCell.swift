@@ -153,7 +153,11 @@ class ANIQnaViewCell: UITableViewCell {
     profileImageView.sd_setImage(with: URL(string: qna.profileImageUrl), completed: nil)
     userNameLabel.text = qna.userName
     loveCountLabel.text = "\(qna.loveCount)"
-    commentCountLabel.text = "\(qna.commentCount)"
+    if let commentIds = qna.commentIds {
+      commentCountLabel.text = "\(commentIds.count)"
+    } else {
+      commentCountLabel.text = "0"
+    }
   }
   
   //MARK: action
