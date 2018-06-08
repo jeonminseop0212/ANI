@@ -8,6 +8,8 @@
 
 import UIKit
 import WCLShineButton
+import FirebaseDatabase
+import CodableFirebase
 
 class ANIQnaViewCell: UITableViewCell {
   private weak var subTitleLabel: UILabel?
@@ -137,6 +139,26 @@ class ANIQnaViewCell: UITableViewCell {
     loveButton.width(21.0)
     loveButton.height(21.0)
     self.loveButton = loveButton
+  }
+  
+  func observeQna() {
+    guard let qna = self.qna,
+          let qnaId = qna.id else { return }
+    
+    let databaseRef = Database.database().reference()
+    
+    DispatchQueue.global().async {
+      databaseRef.child(KEY_QNAS).child(qnaId).observe(.value) { (snapshot) in
+        guard let value = snapshot.value else { return }
+        do {
+          let qna = try FirebaseDecoder().decode(FirebaseQna.self, from: value)
+          
+          self.qna = qna
+        } catch let error {
+          print(error)
+        }
+      }
+    }
   }
   
   private func reloadLayout() {

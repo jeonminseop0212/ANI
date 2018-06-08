@@ -83,6 +83,7 @@ extension ANIQnaView: UITableViewDataSource {
     let cell = tableView.dequeueReusableCell(withIdentifier: id, for: indexPath) as! ANIQnaViewCell
 
     cell.qna = qnas[indexPath.row]
+    cell.observeQna()
     
     return cell
   }

@@ -82,6 +82,7 @@ extension ANIStoryView: UITableViewDataSource {
     let cell = tableView.dequeueReusableCell(withIdentifier: id, for: indexPath) as! ANIStoryViewCell
     
     cell.story = storys[indexPath.row]
+    cell.observeStory()
 
     return cell
   }
