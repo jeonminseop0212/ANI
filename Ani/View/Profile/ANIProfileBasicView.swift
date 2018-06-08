@@ -88,7 +88,7 @@ class ANIProfileBasicView: UIView {
     
     for sortedId in sortedIds {
       DispatchQueue.global().async {
-        Database.database().reference().child(KEY_RECRUITS).child(sortedId.key).observe(.value, with: { (snapshot) in
+        Database.database().reference().child(KEY_RECRUITS).child(sortedId.key).observeSingleEvent(of: .value, with: { (snapshot) in
           
           guard let value = snapshot.value else { return }
           do {
@@ -115,7 +115,7 @@ class ANIProfileBasicView: UIView {
     
     for sortedId in sortedIds {
       DispatchQueue.global().async {
-        Database.database().reference().child(KEY_STORIES).child(sortedId.key).observe(.value, with: { (snapshot) in
+        Database.database().reference().child(KEY_STORIES).child(sortedId.key).observeSingleEvent(of: .value, with: { (snapshot) in
           
           guard let value = snapshot.value else { return }
           do {
@@ -142,7 +142,7 @@ class ANIProfileBasicView: UIView {
     
     for sortedId in sortedIds {
       DispatchQueue.global().async {
-        Database.database().reference().child(KEY_QNAS).child(sortedId.key).observe(.value, with: { (snapshot) in
+        Database.database().reference().child(KEY_QNAS).child(sortedId.key).observeSingleEvent(of: .value, with: { (snapshot) in
           
           guard let value = snapshot.value else { return }
           do {
@@ -211,6 +211,7 @@ extension ANIProfileBasicView: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: storyCellid, for: indexPath) as! ANIStoryViewCell
         
         cell.story = storys[indexPath.row]
+        cell.observeStory()
 
         return cell
       } else {
@@ -218,6 +219,7 @@ extension ANIProfileBasicView: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: qnaCellid, for: indexPath) as! ANIQnaViewCell
         
         cell.qna = qnas[indexPath.row]
+        cell.observeQna()
 
         return cell
       }

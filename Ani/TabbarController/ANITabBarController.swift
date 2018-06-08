@@ -10,8 +10,9 @@ import UIKit
 import FirebaseAuth
 import FirebaseDatabase
 import CodableFirebase
+import NVActivityIndicatorView
 
-class ANITabBarController: UITabBarController {
+class ANITabBarController: UITabBarController, NVActivityIndicatorViewable {
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -55,15 +56,23 @@ class ANITabBarController: UITabBarController {
 //    }
     ANISessionManager.shared.currentUserUid = Auth.auth().currentUser?.uid
     if let currentUserUid = ANISessionManager.shared.currentUserUid {
-      Database.database().reference().child(KEY_USERS).child(currentUserUid).observe(.value, with: { (snapshot) in
-        guard let value = snapshot.value else { return }
-        do {
-          let user = try FirebaseDecoder().decode(FirebaseUser.self, from: value)
-          ANISessionManager.shared.currentUser = user
-        } catch let error {
-          print(error)
-        }
-      })
+      let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.green)
+      NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData)
+      
+      DispatchQueue.global().async {
+        Database.database().reference().child(KEY_USERS).child(currentUserUid).observe(.value, with: { (snapshot) in
+          guard let value = snapshot.value else { return }
+          do {
+            let user = try FirebaseDecoder().decode(FirebaseUser.self, from: value)
+            DispatchQueue.main.async {
+              ANISessionManager.shared.currentUser = user
+              NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
+            }
+          } catch let error {
+            print(error)
+          }
+        })
+      }
     } else {
       do {
         try Auth.auth().signOut()
