@@ -8,6 +8,8 @@
 
 import UIKit
 import WCLShineButton
+import FirebaseDatabase
+import CodableFirebase
 
 class ANIStoryViewCell: UITableViewCell {
   private weak var storyImagesView: ANIStoryImagesView?
@@ -138,6 +140,26 @@ class ANIStoryViewCell: UITableViewCell {
     line.height(0.5)
     line.bottomToSuperview()
     self.line = line
+  }
+  
+  func observeStory() {
+    guard let story = self.story,
+          let storyId = story.id else { return }
+    
+    let databaseRef = Database.database().reference()
+    
+    DispatchQueue.global().async {
+      databaseRef.child(KEY_STORIES).child(storyId).observe(.value) { (snapshot) in
+        guard let value = snapshot.value else { return }
+        do {
+          let story = try FirebaseDecoder().decode(FirebaseStory.self, from: value)
+          
+          self.story = story
+        } catch let error {
+          print(error)
+        }
+      }
+    }
   }
   
   private func reloadLayout() {

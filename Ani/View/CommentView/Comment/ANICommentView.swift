@@ -59,56 +59,50 @@ class ANICommentView: UIView {
   private func loadComment() {
     guard let commentMode = self.commentMode else { return }
     
+    let databaseRef = Database.database().reference()
+
     switch commentMode {
     case .story:
       guard let story = self.story,
-            let commentIds = story.commentIds else { return }
+            let storyId = story.id else { return }
       
-      let sortedCommentIds = commentIds.sorted(by: {$0.key < $1.key})
-      for commentId in sortedCommentIds {
-        DispatchQueue.global().sync {
-          let databaseRef = Database.database().reference()
-          databaseRef.child(KEY_COMMENTS).child(commentId.key).observe(.value) { (snapshot) in
-            guard let value = snapshot.value else { return }
-            do {
-              let comment = try FirebaseDecoder().decode(FirebaseComment.self, from: value)
-              
-              self.comments.append(comment)
-              
-              DispatchQueue.main.async {
-                guard let commentTableView = self.commentTableView else { return }
-                
-                commentTableView.reloadData()
-              }
-            } catch let error {
-              print(error)
+      DispatchQueue.global().async {
+        
+        databaseRef.child(KEY_COMMENTS).child(storyId).observe(.childAdded) { (snapshot) in
+          guard let value = snapshot.value else { return }
+          do {
+            let comment = try FirebaseDecoder().decode(FirebaseComment.self, from: value)
+            
+            self.comments.append(comment)
+            DispatchQueue.main.async {
+              guard let commentTableView = self.commentTableView else { return }
+
+              commentTableView.reloadData()
             }
+          } catch let error {
+            print(error)
           }
         }
       }
     case .qna:
       guard let qna = self.qna,
-            let commentIds = qna.commentIds else { return }
+            let qnaId = qna.id else { return }
       
-      let sortedCommentIds = commentIds.sorted(by: {$0.key < $1.key})
-      for commentId in sortedCommentIds {
-        DispatchQueue.global().sync {
-          let databaseRef = Database.database().reference()
-          databaseRef.child(KEY_COMMENTS).child(commentId.key).observe(.value) { (snapshot) in
-            guard let value = snapshot.value else { return }
-            do {
-              let comment = try FirebaseDecoder().decode(FirebaseComment.self, from: value)
+      DispatchQueue.global().async {
+        
+        databaseRef.child(KEY_COMMENTS).child(qnaId).observe(.childAdded) { (snapshot) in
+          guard let value = snapshot.value else { return }
+          do {
+            let comment = try FirebaseDecoder().decode(FirebaseComment.self, from: value)
+            
+            self.comments.append(comment)
+            DispatchQueue.main.async {
+              guard let commentTableView = self.commentTableView else { return }
               
-              self.comments.append(comment)
-              
-              DispatchQueue.main.async {
-                guard let commentTableView = self.commentTableView else { return }
-                
-                commentTableView.reloadData()
-              }
-            } catch let error {
-              print(error)
+              commentTableView.reloadData()
             }
+          } catch let error {
+            print(error)
           }
         }
       }

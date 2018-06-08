@@ -139,25 +139,30 @@ class ANICommentBar: UIView {
     do {
       if let data = try FirebaseEncoder().encode(comment) as? [String : AnyObject] {
         let detabaseRef = Database.database().reference()
-        let databaseCommentRef = detabaseRef.child(KEY_COMMENTS).childByAutoId()
-        let id = databaseCommentRef.key
-        databaseCommentRef.updateChildValues(data)
         
         switch commentMode {
         case .story:
           guard let story = self.story,
                 let storyId = story.id else { return }
           
-          do {
+          DispatchQueue.global().async {
+            let databaseCommentRef = detabaseRef.child(KEY_COMMENTS).child(storyId).childByAutoId()
+            let id = databaseCommentRef.key
+            databaseCommentRef.updateChildValues(data)
+            
             let detabaseStoryRef = detabaseRef.child(KEY_STORIES).child(storyId).child(KEY_COMMENT_IDS)
             let value: [String: Bool] = [id: true]
             detabaseStoryRef.updateChildValues(value)
           }
         case .qna:
           guard let qna = self.qna,
-            let qnaId = qna.id else { return }
+                let qnaId = qna.id else { return }
           
-          do {
+          DispatchQueue.global().async {
+            let databaseCommentRef = detabaseRef.child(KEY_COMMENTS).child(qnaId).childByAutoId()
+            let id = databaseCommentRef.key
+            databaseCommentRef.updateChildValues(data)
+            
             let detabaseStoryRef = detabaseRef.child(KEY_QNAS).child(qnaId).child(KEY_COMMENT_IDS)
             let value: [String: Bool] = [id: true]
             detabaseStoryRef.updateChildValues(value)
