@@ -32,7 +32,7 @@ class ANIProfileBasicView: UIView {
   
   var recruits = [FirebaseRecruit]()
   
-  var storys = [FirebaseStory]()
+  var stories = [FirebaseStory]()
   
   var qnas = [FirebaseQna]()
   
@@ -82,14 +82,13 @@ class ANIProfileBasicView: UIView {
   
   private func loadRecruit() {
     guard let currentUser = self.currentUser,
-          let postRecruitIds = currentUser.postRecruitIds else { return }
+          let uid = currentUser.uid else { return }
     
-    let sortedIds = postRecruitIds.sorted(by: {$0.key < $1.key})
-    
-    for sortedId in sortedIds {
-      DispatchQueue.global().async {
-        Database.database().reference().child(KEY_RECRUITS).child(sortedId.key).observeSingleEvent(of: .value, with: { (snapshot) in
-          
+    DispatchQueue.global().async {
+      let databaseRef = Database.database().reference()
+      databaseRef.child(KEY_USERS).child(uid).child(KEY_POST_RECRUIT_IDS).queryLimited(toFirst: 20).observe(.childAdded) { (snapshot) in
+        databaseRef.child(KEY_RECRUITS).child(snapshot.key).observeSingleEvent(of: .value, with: { (snapshot) in
+
           guard let value = snapshot.value else { return }
           do {
             let recruit = try FirebaseDecoder().decode(FirebaseRecruit.self, from: value)
@@ -109,18 +108,17 @@ class ANIProfileBasicView: UIView {
   
   private func loadStory() {
     guard let currentUser = self.currentUser,
-          let postStoryIds = currentUser.postStoryIds else { return }
+          let uid = currentUser.uid else { return }
     
-    let sortedIds = postStoryIds.sorted(by: {$0.key < $1.key})
-    
-    for sortedId in sortedIds {
-      DispatchQueue.global().async {
-        Database.database().reference().child(KEY_STORIES).child(sortedId.key).observeSingleEvent(of: .value, with: { (snapshot) in
+    DispatchQueue.global().async {
+      let databaseRef = Database.database().reference()
+      databaseRef.child(KEY_USERS).child(uid).child(KEY_POST_STORY_IDS).queryLimited(toFirst: 20).observe(.childAdded) { (snapshot) in
+        databaseRef.child(KEY_STORIES).child(snapshot.key).observeSingleEvent(of: .value, with: { (snapshot) in
           
           guard let value = snapshot.value else { return }
           do {
             let story = try FirebaseDecoder().decode(FirebaseStory.self, from: value)
-            self.storys.insert(story, at: 0)
+            self.stories.insert(story, at: 0)
             
             DispatchQueue.main.async {
               guard let basicTableView = self.basicTableView else { return }
@@ -136,13 +134,12 @@ class ANIProfileBasicView: UIView {
   
   private func loadQna() {
     guard let currentUser = self.currentUser,
-          let postQnaIds = currentUser.postQnaIds else { return }
+          let uid = currentUser.uid else { return }
     
-    let sortedIds = postQnaIds.sorted(by: {$0.key < $1.key})
-    
-    for sortedId in sortedIds {
-      DispatchQueue.global().async {
-        Database.database().reference().child(KEY_QNAS).child(sortedId.key).observeSingleEvent(of: .value, with: { (snapshot) in
+    DispatchQueue.global().async {
+      let databaseRef = Database.database().reference()
+      databaseRef.child(KEY_USERS).child(uid).child(KEY_POST_QNA_IDS).queryLimited(toFirst: 20).observe(.childAdded) { (snapshot) in
+        databaseRef.child(KEY_QNAS).child(snapshot.key).observeSingleEvent(of: .value, with: { (snapshot) in
           
           guard let value = snapshot.value else { return }
           do {
@@ -176,7 +173,7 @@ extension ANIProfileBasicView: UITableViewDataSource {
       } else if contentType == .recruit {
         return recruits.count
       } else if contentType == .story {
-        return storys.count
+        return stories.count
       } else {
         return qnas.count
       }
@@ -210,7 +207,7 @@ extension ANIProfileBasicView: UITableViewDataSource {
         let storyCellid = NSStringFromClass(ANIStoryViewCell.self)
         let cell = tableView.dequeueReusableCell(withIdentifier: storyCellid, for: indexPath) as! ANIStoryViewCell
         
-        cell.story = storys[indexPath.row]
+        cell.story = stories[indexPath.row]
         cell.observeStory()
 
         return cell
@@ -235,7 +232,7 @@ extension ANIProfileBasicView: UITableViewDelegate {
     case .recruit:
       self.delegate?.recruitViewCellDidSelect(selectedRecruit: recruits[indexPath.row])
     case .story:
-      self.delegate?.storyViewCellDidSelect(selectedStory: storys[indexPath.row])
+      self.delegate?.storyViewCellDidSelect(selectedStory: stories[indexPath.row])
     case .qna:
       self.delegate?.qnaViewCellDidSelect(selectedQna: qnas[indexPath.row])
     }

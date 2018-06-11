@@ -18,14 +18,14 @@ class ANIStoryView: UIView {
   
   var storyTableView: UITableView?
   
-  var storys = [FirebaseStory]()
+  var stories = [FirebaseStory]()
   
   var delegate: ANIStoryViewDelegate?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
-    loadStory()
     setup()
+    loadStory(sender: nil)
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -44,27 +44,45 @@ class ANIStoryView: UIView {
     let id = NSStringFromClass(ANIStoryViewCell.self)
     tableView.register(ANIStoryViewCell.self, forCellReuseIdentifier: id)
     tableView.separatorStyle = .none
+    tableView.backgroundColor = ANIColor.bg
     tableView.dataSource = self
     tableView.delegate = self
+    let refreshControl = UIRefreshControl()
+    refreshControl.addTarget(self, action: #selector(loadStory(sender:)), for: .valueChanged)
+    tableView.addSubview(refreshControl)
     addSubview(tableView)
     tableView.edgesToSuperview()
     self.storyTableView = tableView
   }
   
-  private func loadStory() {
+  @objc private func loadStory(sender: UIRefreshControl?) {
+    if !self.stories.isEmpty {
+      self.stories.removeAll()
+    }
+    
     DispatchQueue.global().async {
-      Database.database().reference().child(KEY_STORIES).observe(.childAdded, with: { (snapshot) in
-        guard let value = snapshot.value else { return }
-        do {
-          let story = try FirebaseDecoder().decode(FirebaseStory.self, from: value)
-          self.storys.insert(story, at: 0)
-          
-          DispatchQueue.main.async {
-            guard let storyTableView = self.storyTableView else { return }
-            storyTableView.reloadData()
+      let databaseRef = Database.database().reference()
+      databaseRef.child(KEY_STORIES).queryLimited(toFirst: 20).observe(.value, with: { (snapshot) in
+        databaseRef.child(KEY_STORIES).removeAllObservers()
+        
+        for item in snapshot.children {
+          if let snapshot = item as? DataSnapshot, let value = snapshot.value {
+            do {
+              let story = try FirebaseDecoder().decode(FirebaseStory.self, from: value)
+              self.stories.insert(story, at: 0)
+              
+              DispatchQueue.main.async {
+                if let sender = sender {
+                  sender.endRefreshing()
+                }
+                
+                guard let storyTableView = self.storyTableView else { return }
+                storyTableView.reloadData()
+              }
+            } catch let error {
+              print(error)
+            }
           }
-        } catch let error {
-          print(error)
         }
       })
     }
@@ -74,15 +92,17 @@ class ANIStoryView: UIView {
 //MARK: UITableViewDataSource
 extension ANIStoryView: UITableViewDataSource {
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return storys.count
+    return stories.count
   }
   
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let id = NSStringFromClass(ANIStoryViewCell.self)
     let cell = tableView.dequeueReusableCell(withIdentifier: id, for: indexPath) as! ANIStoryViewCell
     
-    cell.story = storys[indexPath.row]
-    cell.observeStory()
+    if !stories.isEmpty {
+      cell.story = stories[indexPath.row]
+      cell.observeStory()
+    }
 
     return cell
   }
@@ -91,6 +111,6 @@ extension ANIStoryView: UITableViewDataSource {
 //MARK: UITableViewDelegate
 extension ANIStoryView: UITableViewDelegate {
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    self.delegate?.storyViewCellDidSelect(selectedStory: storys[indexPath.row])
+    self.delegate?.storyViewCellDidSelect(selectedStory: stories[indexPath.row])
   }
 }
