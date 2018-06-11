@@ -24,7 +24,7 @@ class ANIQnaView: UIView {
   
   override init(frame: CGRect) {
     super.init(frame: frame)
-    loadQna()
+    loadQna(sender: nil)
     setup()
   }
   
@@ -47,25 +47,42 @@ class ANIQnaView: UIView {
     tableView.dataSource = self
     tableView.delegate = self
     tableView.separatorStyle = .none
+    let refreshControl = UIRefreshControl()
+    refreshControl.addTarget(self, action: #selector(loadQna(sender:)), for: .valueChanged)
+    tableView.addSubview(refreshControl)
     addSubview(tableView)
     tableView.edgesToSuperview()
     self.qnaTableView = tableView
   }
   
-  private func loadQna() {
+  @objc private func loadQna(sender: UIRefreshControl?) {
+    if !self.qnas.isEmpty {
+      self.qnas.removeAll()
+    }
+    
     DispatchQueue.global().async {
-      Database.database().reference().child(KEY_QNAS).observe(.childAdded, with: { (snapshot) in
-        guard let value = snapshot.value else { return }
-        do {
-          let qna = try FirebaseDecoder().decode(FirebaseQna.self, from: value)
-          self.qnas.insert(qna, at: 0)
-          
-          DispatchQueue.main.async {
-            guard let qnaTableView = self.qnaTableView else { return }
-            qnaTableView.reloadData()
+      let databaseRef = Database.database().reference()
+      databaseRef.child(KEY_QNAS).queryLimited(toFirst: 20).observe(.value, with: { (snapshot) in
+        databaseRef.child(KEY_QNAS).removeAllObservers()
+        
+        for item in snapshot.children {
+          if let snapshot = item as? DataSnapshot, let value = snapshot.value {
+            do {
+              let qna = try FirebaseDecoder().decode(FirebaseQna.self, from: value)
+              self.qnas.insert(qna, at: 0)
+              
+              DispatchQueue.main.async {
+                if let sender = sender {
+                  sender.endRefreshing()
+                }
+                
+                guard let qnaTableView = self.qnaTableView else { return }
+                qnaTableView.reloadData()
+              }
+            } catch let error {
+              print(error)
+            }
           }
-        } catch let error {
-          print(error)
         }
       })
     }
@@ -82,8 +99,10 @@ extension ANIQnaView: UITableViewDataSource {
     let id = NSStringFromClass(ANIQnaViewCell.self)
     let cell = tableView.dequeueReusableCell(withIdentifier: id, for: indexPath) as! ANIQnaViewCell
 
-    cell.qna = qnas[indexPath.row]
-    cell.observeQna()
+    if !qnas.isEmpty {
+      cell.qna = qnas[indexPath.row]
+      cell.observeQna()
+    }
     
     return cell
   }

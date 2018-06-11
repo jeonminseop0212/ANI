@@ -26,13 +26,15 @@ class ANIRecuruitView: UIView {
   }
   
   var recruits = [FirebaseRecruit]()
+  
+  private var handle: DatabaseHandle?
 
   var delegate:ANIRecruitViewDelegate?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
-    loadRecruit()
     setup()
+    loadRecruit(sender: nil)
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -45,30 +47,47 @@ class ANIRecuruitView: UIView {
     let topInset = UIViewController.NAVIGATION_BAR_HEIGHT + ANIRecruitViewController.CATEGORIES_VIEW_HEIGHT
     tableView.contentInset = UIEdgeInsets(top: topInset, left: 0, bottom: 0, right: 0)
     tableView.scrollIndicatorInsets  = UIEdgeInsets(top: topInset, left: 0, bottom: 0, right: 0)
-    tableView.backgroundColor = .white
+    tableView.backgroundColor = ANIColor.bg
     let id = NSStringFromClass(ANIRecruitViewCell.self)
     tableView.register(ANIRecruitViewCell.self, forCellReuseIdentifier: id)
     tableView.dataSource = self
     tableView.delegate = self
+    let refreshControl = UIRefreshControl()
+    refreshControl.addTarget(self, action: #selector(loadRecruit(sender:)), for: .valueChanged)
+    tableView.addSubview(refreshControl)
     addSubview(tableView)
     tableView.edgesToSuperview()
     self.recruitTableView = tableView
   }
   
-  private func loadRecruit() {
+  @objc private func loadRecruit(sender: UIRefreshControl?) {
+    if !self.recruits.isEmpty {
+      self.recruits.removeAll()
+    }
+    
     DispatchQueue.global().async {
-      Database.database().reference().child(KEY_RECRUITS).observe(.childAdded, with: { (snapshot) in
-        guard let value = snapshot.value else { return }
-        do {
-          let recruit = try FirebaseDecoder().decode(FirebaseRecruit.self, from: value)
-          self.recruits.insert(recruit, at: 0)
-          
-          DispatchQueue.main.async {
-            guard let recruitTableView = self.recruitTableView else { return }
-            recruitTableView.reloadData()
+      let databaseRef = Database.database().reference()
+      databaseRef.child(KEY_RECRUITS).queryLimited(toFirst: 20).observe(.value, with: { (snapshot) in
+        databaseRef.child(KEY_RECRUITS).removeAllObservers()
+        
+        for item in snapshot.children {
+          if let snapshot = item as? DataSnapshot, let value = snapshot.value {
+            do {
+              let recruit = try FirebaseDecoder().decode(FirebaseRecruit.self, from: value)
+              self.recruits.insert(recruit, at: 0)
+              
+              DispatchQueue.main.async {
+                if let sender = sender {
+                  sender.endRefreshing()
+                }
+    
+                guard let recruitTableView = self.recruitTableView else { return }
+                recruitTableView.reloadData()
+              }
+            } catch let error {
+              print(error)
+            }
           }
-        } catch let error {
-          print(error)
         }
       })
     }
@@ -84,7 +103,9 @@ extension ANIRecuruitView: UITableViewDataSource, UITableViewDelegate {
     let id = NSStringFromClass(ANIRecruitViewCell.self)
     let cell = tableView.dequeueReusableCell(withIdentifier: id, for: indexPath) as! ANIRecruitViewCell
     
-    cell.recruit = recruits[indexPath.row]
+    if !recruits.isEmpty {
+      cell.recruit = recruits[indexPath.row]
+    }
     
     return cell
   }
