@@ -77,4 +77,9 @@ class ANINotificationManager: NSObject {
   private static let N_PROFILE_EDIT_BUTTON_TAPPED = "N_PROFILE_EDIT_BUTTON_TAPPED"
   static func postProfileEditButtonTapped() { self.post(name: N_PROFILE_EDIT_BUTTON_TAPPED, object: nil, userInfo:nil) }
   static func receive(profileEditButtonTapped observer:Any, selector:Selector) { receive(name: N_PROFILE_EDIT_BUTTON_TAPPED, observer: observer, selector: selector) }
+  
+  //MARK: profile image view tapped
+  private static let N_PROFILE_IMAGE_VIEW_TAPPED = "N_PROFILE_IMAGE_VIEW_TAPPED"
+  static func postProfileImageViewTapped(userId: String) { self.post(name: N_PROFILE_IMAGE_VIEW_TAPPED, object: userId, userInfo:nil) }
+  static func receive(profileImageViewTapped observer:Any, selector:Selector) { receive(name: N_PROFILE_IMAGE_VIEW_TAPPED, observer: observer, selector: selector) }
 }

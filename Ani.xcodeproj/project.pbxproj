@@ -57,6 +57,10 @@
 		CDA97B5420B2497200F46DA4 /* WCLShineButton.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CDA97B5320B2497200F46DA4 /* WCLShineButton.framework */; };
 		CDA97B5820B25F3B00F46DA4 /* ANICommentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA97B5720B25F3B00F46DA4 /* ANICommentViewController.swift */; };
 		CDA97B5A20B263B500F46DA4 /* ANICommentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA97B5920B263B500F46DA4 /* ANICommentView.swift */; };
+		CDC6AE4120CF6E7900A836F6 /* ANIOtherProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDC6AE4020CF6E7900A836F6 /* ANIOtherProfileViewController.swift */; };
+		CDC6AE4420CF724700A836F6 /* ANIOtherProfileBasicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDC6AE4320CF724700A836F6 /* ANIOtherProfileBasicView.swift */; };
+		CDC6AE4820CF74C600A836F6 /* ANIOtherProfileCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDC6AE4720CF74C600A836F6 /* ANIOtherProfileCell.swift */; };
+		CDC6AE4B20CF855A00A836F6 /* ANIOtherProfileTopCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDC6AE4A20CF855A00A836F6 /* ANIOtherProfileTopCell.swift */; };
 		CDD0550620A5CF2200BEF482 /* ANIImageFilterPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD0550520A5CF2200BEF482 /* ANIImageFilterPreviewView.swift */; };
 		CDD0550820A5D07600BEF482 /* ANIImageFilterPreviewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD0550720A5D07600BEF482 /* ANIImageFilterPreviewCell.swift */; };
 		CDD0550C20A5D29900BEF482 /* ANIImageFilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD0550B20A5D29900BEF482 /* ANIImageFilterView.swift */; };
@@ -114,15 +118,12 @@
 		F5B1EFB120725964000CFB0B /* AniUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B1EFB020725964000CFB0B /* AniUITests.swift */; };
 		F5B1EFC220725BDC000CFB0B /* ANITabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B1EFC120725BDC000CFB0B /* ANITabBarController.swift */; };
 		F5B1EFC520726658000CFB0B /* TinyConstraints.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5B1EFC420726658000CFB0B /* TinyConstraints.framework */; };
-		F5B5149A207AEDC300366500 /* Qna.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B51499207AEDC300366500 /* Qna.swift */; };
 		F5C381FD2079F73F000BBB8C /* ANICommunityStoryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5C381FC2079F73F000BBB8C /* ANICommunityStoryCell.swift */; };
 		F5C381FF207A068D000BBB8C /* ANIQnaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5C381FE207A068D000BBB8C /* ANIQnaView.swift */; };
 		F5DF835D207A17C200EA7FBE /* ANICommunityQnaCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5DF835C207A17C200EA7FBE /* ANICommunityQnaCell.swift */; };
-		F5DF8361207A1D4A00EA7FBE /* Story.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5DF8360207A1D4A00EA7FBE /* Story.swift */; };
 		F5DF8365207A27DC00EA7FBE /* ANIStoryViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5DF8364207A27DC00EA7FBE /* ANIStoryViewCell.swift */; };
 		F5DF8367207A27E900EA7FBE /* ANIQnaViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5DF8366207A27E900EA7FBE /* ANIQnaViewCell.swift */; };
 		F5E9E221207692C60021D4CC /* ANIRecruitViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E220207692C60021D4CC /* ANIRecruitViewCell.swift */; };
-		F5E9E2242076961E0021D4CC /* Recruit.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E2232076961D0021D4CC /* Recruit.swift */; };
 		F5E9E22620769AD60021D4CC /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E22520769AD60021D4CC /* User.swift */; };
 		F5E9E22F2079AEC30021D4CC /* ANIOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E22E2079AEC30021D4CC /* ANIOrientation.swift */; };
 		F5E9E2332079AFF40021D4CC /* ANICommunityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E9E2322079AFF40021D4CC /* ANICommunityViewController.swift */; };
@@ -203,6 +204,10 @@
 		CDA97B5320B2497200F46DA4 /* WCLShineButton.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WCLShineButton.framework; path = Carthage/Build/iOS/WCLShineButton.framework; sourceTree = "<group>"; };
 		CDA97B5720B25F3B00F46DA4 /* ANICommentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommentViewController.swift; sourceTree = "<group>"; };
 		CDA97B5920B263B500F46DA4 /* ANICommentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommentView.swift; sourceTree = "<group>"; };
+		CDC6AE4020CF6E7900A836F6 /* ANIOtherProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIOtherProfileViewController.swift; sourceTree = "<group>"; };
+		CDC6AE4320CF724700A836F6 /* ANIOtherProfileBasicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIOtherProfileBasicView.swift; sourceTree = "<group>"; };
+		CDC6AE4720CF74C600A836F6 /* ANIOtherProfileCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIOtherProfileCell.swift; sourceTree = "<group>"; };
+		CDC6AE4A20CF855A00A836F6 /* ANIOtherProfileTopCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIOtherProfileTopCell.swift; sourceTree = "<group>"; };
 		CDD0550520A5CF2200BEF482 /* ANIImageFilterPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIImageFilterPreviewView.swift; sourceTree = "<group>"; };
 		CDD0550720A5D07600BEF482 /* ANIImageFilterPreviewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIImageFilterPreviewCell.swift; sourceTree = "<group>"; };
 		CDD0550B20A5D29900BEF482 /* ANIImageFilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIImageFilterView.swift; sourceTree = "<group>"; };
@@ -268,15 +273,12 @@
 		F5B1EFB220725964000CFB0B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F5B1EFC120725BDC000CFB0B /* ANITabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANITabBarController.swift; sourceTree = "<group>"; };
 		F5B1EFC420726658000CFB0B /* TinyConstraints.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TinyConstraints.framework; path = Carthage/Build/iOS/TinyConstraints.framework; sourceTree = "<group>"; };
-		F5B51499207AEDC300366500 /* Qna.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Qna.swift; sourceTree = "<group>"; };
 		F5C381FC2079F73F000BBB8C /* ANICommunityStoryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommunityStoryCell.swift; sourceTree = "<group>"; };
 		F5C381FE207A068D000BBB8C /* ANIQnaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIQnaView.swift; sourceTree = "<group>"; };
 		F5DF835C207A17C200EA7FBE /* ANICommunityQnaCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommunityQnaCell.swift; sourceTree = "<group>"; };
-		F5DF8360207A1D4A00EA7FBE /* Story.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Story.swift; sourceTree = "<group>"; };
 		F5DF8364207A27DC00EA7FBE /* ANIStoryViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIStoryViewCell.swift; sourceTree = "<group>"; };
 		F5DF8366207A27E900EA7FBE /* ANIQnaViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIQnaViewCell.swift; sourceTree = "<group>"; };
 		F5E9E220207692C60021D4CC /* ANIRecruitViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitViewCell.swift; sourceTree = "<group>"; };
-		F5E9E2232076961D0021D4CC /* Recruit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Recruit.swift; sourceTree = "<group>"; };
 		F5E9E22520769AD60021D4CC /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		F5E9E22E2079AEC30021D4CC /* ANIOrientation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIOrientation.swift; sourceTree = "<group>"; };
 		F5E9E2322079AFF40021D4CC /* ANICommunityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommunityViewController.swift; sourceTree = "<group>"; };
@@ -534,6 +536,48 @@
 				CDDD04AD20B3B0AF0094DBFA /* CommentBar */,
 			);
 			path = CommentView;
+			sourceTree = "<group>";
+		};
+		CDC6AE3F20CF6E5C00A836F6 /* OtherProfileViewController */ = {
+			isa = PBXGroup;
+			children = (
+				CDC6AE4020CF6E7900A836F6 /* ANIOtherProfileViewController.swift */,
+			);
+			path = OtherProfileViewController;
+			sourceTree = "<group>";
+		};
+		CDC6AE4220CF723000A836F6 /* OtherProfile */ = {
+			isa = PBXGroup;
+			children = (
+				CDC6AE4320CF724700A836F6 /* ANIOtherProfileBasicView.swift */,
+				CDC6AE4920CF854700A836F6 /* Top */,
+				CDC6AE4520CF74AB00A836F6 /* Contents */,
+			);
+			path = OtherProfile;
+			sourceTree = "<group>";
+		};
+		CDC6AE4520CF74AB00A836F6 /* Contents */ = {
+			isa = PBXGroup;
+			children = (
+				CDC6AE4620CF74B600A836F6 /* Profile */,
+			);
+			path = Contents;
+			sourceTree = "<group>";
+		};
+		CDC6AE4620CF74B600A836F6 /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				CDC6AE4720CF74C600A836F6 /* ANIOtherProfileCell.swift */,
+			);
+			path = Profile;
+			sourceTree = "<group>";
+		};
+		CDC6AE4920CF854700A836F6 /* Top */ = {
+			isa = PBXGroup;
+			children = (
+				CDC6AE4A20CF855A00A836F6 /* ANIOtherProfileTopCell.swift */,
+			);
+			path = Top;
 			sourceTree = "<group>";
 		};
 		CDD0550420A5CF0100BEF482 /* ImageFilter */ = {
@@ -1003,11 +1047,8 @@
 		F5E9E222207696060021D4CC /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				F5E9E2232076961D0021D4CC /* Recruit.swift */,
 				CDA32A2C20ABCE5F008A2AC1 /* RecruitInfo.swift */,
 				F5E9E22520769AD60021D4CC /* User.swift */,
-				F5DF8360207A1D4A00EA7FBE /* Story.swift */,
-				F5B51499207AEDC300366500 /* Qna.swift */,
 				F57F7D5C208313F0008A2645 /* Noti.swift */,
 				F57F7D62208323F9008A2645 /* Message.swift */,
 				CDDD04A320B269900094DBFA /* Comment.swift */,
@@ -1029,6 +1070,7 @@
 				F57F7D482081F3A1008A2645 /* NotiViewController */,
 				F57F7D8620844A62008A2645 /* SearchViewController */,
 				F53E87BB2085AF9D00B19A2F /* ProfileViewController */,
+				CDC6AE3F20CF6E5C00A836F6 /* OtherProfileViewController */,
 				CD2C414620A5A1FF00581267 /* ImageFilterViewController */,
 				CDA97B5620B25F2000F46DA4 /* CommentViewController */,
 				CDA32A2120AA6041008A2AC1 /* ModalViewController */,
@@ -1053,6 +1095,7 @@
 				F57F7D4B2081FC26008A2645 /* NotiView */,
 				F57F7D8920844BD4008A2645 /* SearchView */,
 				F53E87BE2085B14A00B19A2F /* Profile */,
+				CDC6AE4220CF723000A836F6 /* OtherProfile */,
 				CDD0550420A5CF0100BEF482 /* ImageFilter */,
 				CDA97B5B20B263BE00F46DA4 /* CommentView */,
 				CDA32A2420AA661A008A2AC1 /* ModalVIew */,
@@ -1353,7 +1396,6 @@
 				F57F7D5D208313F0008A2645 /* Noti.swift in Sources */,
 				CDDD04AC20B3B0AA0094DBFA /* ANICommentBar.swift in Sources */,
 				CDD0550620A5CF2200BEF482 /* ANIImageFilterPreviewView.swift in Sources */,
-				F5E9E2242076961E0021D4CC /* Recruit.swift in Sources */,
 				F57F7D63208323F9008A2645 /* Message.swift in Sources */,
 				CDDD04C520B53C870094DBFA /* ANILoginView.swift in Sources */,
 				CDA97AC620AFF34C00F46DA4 /* ANIProfileEditViewController.swift in Sources */,
@@ -1363,12 +1405,14 @@
 				CD2C414520A556AE00581267 /* ANIRecruitContributionViewController.swift in Sources */,
 				CD9E52B32094304700715F50 /* ANIRecruitDetailImagesView.swift in Sources */,
 				F57F7D652083250D008A2645 /* ANIMessageViewCell.swift in Sources */,
+				CDC6AE4120CF6E7900A836F6 /* ANIOtherProfileViewController.swift in Sources */,
 				F51D221920768E8D009D1B26 /* ANIRecuruitView.swift in Sources */,
 				F53E87D02086EF6600B19A2F /* ANIProfileCell.swift in Sources */,
 				CDA97ACE20B0018600F46DA4 /* ANIProfileEditFamilyCell.swift in Sources */,
 				CDA32A8620AE8DD4008A2AC1 /* ANIImageBrowserCell.swift in Sources */,
 				CDF7F171208F651E00254A0F /* ANIButtonView.swift in Sources */,
 				F57F7D8E20844C4E008A2645 /* ANISearchCategoryCell.swift in Sources */,
+				CDC6AE4420CF724700A836F6 /* ANIOtherProfileBasicView.swift in Sources */,
 				F53E87C12085B19700B19A2F /* ANIFamilyView.swift in Sources */,
 				CD0BFF1220C624EC00D5959B /* FirebaseRecruit.swift in Sources */,
 				CD9E52B520943C9500715F50 /* ANIRecruitDetailImagesViewFlowLayout.swift in Sources */,
@@ -1379,7 +1423,6 @@
 				CDA97B5A20B263B500F46DA4 /* ANICommentView.swift in Sources */,
 				F57F7D5F208314DF008A2645 /* ANINotiViewCell.swift in Sources */,
 				F57F7D552081FEB2008A2645 /* ANINotiNotiCell.swift in Sources */,
-				F5B5149A207AEDC300366500 /* Qna.swift in Sources */,
 				F521184C207A4421000B12C2 /* ANIStoryImagesView.swift in Sources */,
 				CD2C414820A5A23C00581267 /* ANIImageFilterViewController.swift in Sources */,
 				F53E87C32085B50900B19A2F /* ANIFamilyViewCell.swift in Sources */,
@@ -1412,6 +1455,7 @@
 				F53E87C82085F5FA00B19A2F /* ANIProfileMenuBarCell.swift in Sources */,
 				F57F7D572081FEBF008A2645 /* ANINotiMessageCell.swift in Sources */,
 				CDA97ACC20B000FF00F46DA4 /* ANIProfileEditFamilyView.swift in Sources */,
+				CDC6AE4820CF74C600A836F6 /* ANIOtherProfileCell.swift in Sources */,
 				F530AB1C207A45D900114E6B /* ANIStoryImagesCell.swift in Sources */,
 				CD6229DE20B64B9900E36875 /* ANISignUpView.swift in Sources */,
 				CDF7F16E208F2BEF00254A0F /* UIView.swift in Sources */,
@@ -1421,6 +1465,7 @@
 				F57F7D8820844A90008A2645 /* ANISearchViewController.swift in Sources */,
 				CDA97B5820B25F3B00F46DA4 /* ANICommentViewController.swift in Sources */,
 				CDA32A1320A93422008A2AC1 /* ANIScrollView.swift in Sources */,
+				CDC6AE4B20CF855A00A836F6 /* ANIOtherProfileTopCell.swift in Sources */,
 				CDD0551020A6C64300BEF482 /* ANIFilter.swift in Sources */,
 				CD0BFF1420C7619600D5959B /* FirebaseStory.swift in Sources */,
 				CD0FAD0A20BF8DFD00D8CD27 /* FirebaseUser.swift in Sources */,
@@ -1446,7 +1491,6 @@
 				F51D221020767E62009D1B26 /* ANIColor.swift in Sources */,
 				F5E9E221207692C60021D4CC /* ANIRecruitViewCell.swift in Sources */,
 				F5B1EF9120725964000CFB0B /* AppDelegate.swift in Sources */,
-				F5DF8361207A1D4A00EA7FBE /* Story.swift in Sources */,
 				CDA32A8A20AEA7BC008A2AC1 /* ANIDraggableView.swift in Sources */,
 				CDDD04A620B26CD50094DBFA /* ANICommentContentCell.swift in Sources */,
 				F57F7D8C20844C41008A2645 /* ANISearchCategoriesView.swift in Sources */,

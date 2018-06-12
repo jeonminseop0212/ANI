@@ -70,6 +70,7 @@ class ANITabBarController: UITabBarController, NVActivityIndicatorViewable {
             }
           } catch let error {
             print(error)
+            NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
           }
         })
       }

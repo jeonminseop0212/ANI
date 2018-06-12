@@ -36,9 +36,7 @@ class ANIContributionViewController: UIViewController {
   var navigationTitle: String?
   
   var selectedContributionMode: ContributionMode?
-  
-  var me: User?
-  
+    
   private var contentImages = [UIImage?]() {
     didSet {
       guard let contriButionView = self.contriButionView else { return }

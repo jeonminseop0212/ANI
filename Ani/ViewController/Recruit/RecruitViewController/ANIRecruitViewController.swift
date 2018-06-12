@@ -108,6 +108,7 @@ class ANIRecruitViewController: UIViewController {
   //MARK: Notifications
   private func setupNotifications() {
     ANINotificationManager.receive(viewScrolled: self, selector: #selector(hideKeyboard))
+    ANINotificationManager.receive(profileImageViewTapped: self, selector: #selector(pushOtherProfile))
   }
   
   //MARK: Action
@@ -125,6 +126,23 @@ class ANIRecruitViewController: UIViewController {
       if let searchCancelButton = searchBar.cancelButton {
         searchCancelButton.alpha = 0.0
       }
+    }
+  }
+  
+  @objc private func pushOtherProfile(_ notification: NSNotification) {
+    guard let userId = notification.object as? String,
+          let currentUserUid = ANISessionManager.shared.currentUserUid else { return }
+    
+    if currentUserUid == userId {
+      let profileViewController = ANIProfileViewController()
+      profileViewController.hidesBottomBarWhenPushed = true
+      self.navigationController?.pushViewController(profileViewController, animated: true)
+      profileViewController.isBackButtonHide = false
+    } else {
+      let otherProfileViewController = ANIOtherProfileViewController()
+      otherProfileViewController.hidesBottomBarWhenPushed = true
+      otherProfileViewController.userId = userId
+      self.navigationController?.pushViewController(otherProfileViewController, animated: true)
     }
   }
 }
