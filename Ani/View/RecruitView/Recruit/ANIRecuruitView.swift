@@ -27,8 +27,6 @@ class ANIRecuruitView: UIView {
   
   var recruits = [FirebaseRecruit]()
   
-  private var handle: DatabaseHandle?
-
   var delegate:ANIRecruitViewDelegate?
   
   override init(frame: CGRect) {
@@ -94,7 +92,8 @@ class ANIRecuruitView: UIView {
   }
 }
 
-extension ANIRecuruitView: UITableViewDataSource, UITableViewDelegate {
+//MARK: UITableViewDataSource
+extension ANIRecuruitView: UITableViewDataSource {
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     return recruits.count
   }
@@ -109,7 +108,10 @@ extension ANIRecuruitView: UITableViewDataSource, UITableViewDelegate {
     
     return cell
   }
-  
+}
+
+//MARK: UITableViewDelegate
+extension ANIRecuruitView: UITableViewDelegate {
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     self.delegate?.recruitRowTap(selectedRecruit: recruits[indexPath.row])
   }

@@ -1,8 +1,8 @@
 //
-//  ANIProfileBasicView.swift
+//  ANIOtherProfileBasicView.swift
 //  Ani
 //
-//  Created by 전민섭 on 2018/04/19.
+//  Created by jeonminseop on 2018/06/12.
 //  Copyright © 2018年 JeonMinseop. All rights reserved.
 //
 
@@ -10,13 +10,13 @@ import UIKit
 import FirebaseDatabase
 import CodableFirebase
 
-protocol ANIProfileBasicViewDelegate {
+protocol ANIOtherProfileBasicViewDelegate {
   func recruitViewCellDidSelect(selectedRecruit: FirebaseRecruit)
   func storyViewCellDidSelect(selectedStory: FirebaseStory)
   func qnaViewCellDidSelect(selectedQna: FirebaseQna)
 }
 
-class ANIProfileBasicView: UIView {
+class ANIOtherProfileBasicView: UIView {
   
   enum SectionType:Int { case top = 0; case content = 1 }
   enum ContentType:Int { case profile; case recruit; case story; case qna;}
@@ -36,18 +36,24 @@ class ANIProfileBasicView: UIView {
   
   var qnas = [FirebaseQna]()
   
-  var currentUser: FirebaseUser? {
+  var user: FirebaseUser? {
     didSet {
       loadRecruit()
       loadStory()
       loadQna()
-
+      
       guard let basicTableView = self.basicTableView else { return }
       basicTableView.reloadData()
     }
   }
   
-  var delegate: ANIProfileBasicViewDelegate?
+  var userId: String? {
+    didSet {
+      loadUser()
+    }
+  }
+  
+  var delegate: ANIOtherProfileBasicViewDelegate?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -64,10 +70,10 @@ class ANIProfileBasicView: UIView {
     basicTableView.separatorStyle = .none
     basicTableView.dataSource = self
     basicTableView.delegate = self
-    let topCellId = NSStringFromClass(ANIProfileTopCell.self)
-    basicTableView.register(ANIProfileTopCell.self, forCellReuseIdentifier: topCellId)
-    let profileCellid = NSStringFromClass(ANIProfileCell.self)
-    basicTableView.register(ANIProfileCell.self, forCellReuseIdentifier: profileCellid)
+    let topCellId = NSStringFromClass(ANIOtherProfileTopCell.self)
+    basicTableView.register(ANIOtherProfileTopCell.self, forCellReuseIdentifier: topCellId)
+    let profileCellid = NSStringFromClass(ANIOtherProfileCell.self)
+    basicTableView.register(ANIOtherProfileCell.self, forCellReuseIdentifier: profileCellid)
     let recruitCellid = NSStringFromClass(ANIRecruitViewCell.self)
     basicTableView.register(ANIRecruitViewCell.self, forCellReuseIdentifier: recruitCellid)
     let storyCellid = NSStringFromClass(ANIStoryViewCell.self)
@@ -79,15 +85,34 @@ class ANIProfileBasicView: UIView {
     self.basicTableView = basicTableView
   }
   
+  private func loadUser() {
+    guard let userId = self.userId else { return }
+    
+    DispatchQueue.global().async {
+      let databaseRef = Database.database().reference()
+      databaseRef.child(KEY_USERS).child(userId).observeSingleEvent(of: .value, with: { (snapshot) in
+        
+        guard let value = snapshot.value else { return }
+        do {
+          let user = try FirebaseDecoder().decode(FirebaseUser.self, from: value)
+          
+          self.user = user
+        } catch let error {
+          print(error)
+        }
+      })
+    }
+  }
+  
   private func loadRecruit() {
-    guard let currentUser = self.currentUser,
-          let uid = currentUser.uid else { return }
+    guard let user = self.user,
+          let uid = user.uid else { return }
     
     DispatchQueue.global().async {
       let databaseRef = Database.database().reference()
       databaseRef.child(KEY_USERS).child(uid).child(KEY_POST_RECRUIT_IDS).queryLimited(toFirst: 20).observe(.childAdded) { (snapshot) in
         databaseRef.child(KEY_RECRUITS).child(snapshot.key).observeSingleEvent(of: .value, with: { (snapshot) in
-
+          
           guard let value = snapshot.value else { return }
           do {
             let recruit = try FirebaseDecoder().decode(FirebaseRecruit.self, from: value)
@@ -106,8 +131,8 @@ class ANIProfileBasicView: UIView {
   }
   
   private func loadStory() {
-    guard let currentUser = self.currentUser,
-          let uid = currentUser.uid else { return }
+    guard let user = self.user,
+          let uid = user.uid else { return }
     
     DispatchQueue.global().async {
       let databaseRef = Database.database().reference()
@@ -132,8 +157,8 @@ class ANIProfileBasicView: UIView {
   }
   
   private func loadQna() {
-    guard let currentUser = self.currentUser,
-          let uid = currentUser.uid else { return }
+    guard let user = self.user,
+          let uid = user.uid else { return }
     
     DispatchQueue.global().async {
       let databaseRef = Database.database().reference()
@@ -159,7 +184,7 @@ class ANIProfileBasicView: UIView {
 }
 
 //MARK: UITableViewDataSource
-extension ANIProfileBasicView: UITableViewDataSource {
+extension ANIOtherProfileBasicView: UITableViewDataSource {
   func numberOfSections(in tableView: UITableView) -> Int {
     return 2
   }
@@ -178,29 +203,29 @@ extension ANIProfileBasicView: UITableViewDataSource {
       }
     }
   }
-
+  
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let section = indexPath.section
-
+    
     if section == 0 {
-      let topCellId = NSStringFromClass(ANIProfileTopCell.self)
-      let cell = tableView.dequeueReusableCell(withIdentifier: topCellId, for: indexPath) as! ANIProfileTopCell
+      let topCellId = NSStringFromClass(ANIOtherProfileTopCell.self)
+      let cell = tableView.dequeueReusableCell(withIdentifier: topCellId, for: indexPath) as! ANIOtherProfileTopCell
       cell.delegate = self
       cell.selectedIndex = contentType.rawValue
-      cell.user = currentUser
+      cell.user = user
       return cell
     } else {
       if contentType == .profile {
-        let profileCellid = NSStringFromClass(ANIProfileCell.self)
-        let cell = tableView.dequeueReusableCell(withIdentifier: profileCellid, for: indexPath) as! ANIProfileCell
-        cell.user = currentUser
+        let profileCellid = NSStringFromClass(ANIOtherProfileCell.self)
+        let cell = tableView.dequeueReusableCell(withIdentifier: profileCellid, for: indexPath) as! ANIOtherProfileCell
+        cell.user = user
         return cell
       } else if contentType == .recruit {
         let recruitCellid = NSStringFromClass(ANIRecruitViewCell.self)
         let cell = tableView.dequeueReusableCell(withIdentifier: recruitCellid, for: indexPath) as! ANIRecruitViewCell
         
         cell.recruit = recruits[indexPath.row]
-
+        
         return cell
       } else if contentType == .story {
         let storyCellid = NSStringFromClass(ANIStoryViewCell.self)
@@ -208,7 +233,7 @@ extension ANIProfileBasicView: UITableViewDataSource {
         
         cell.story = stories[indexPath.row]
         cell.observeStory()
-
+        
         return cell
       } else {
         let qnaCellid = NSStringFromClass(ANIQnaViewCell.self)
@@ -216,7 +241,7 @@ extension ANIProfileBasicView: UITableViewDataSource {
         
         cell.qna = qnas[indexPath.row]
         cell.observeQna()
-
+        
         return cell
       }
     }
@@ -224,7 +249,7 @@ extension ANIProfileBasicView: UITableViewDataSource {
 }
 
 //MARK: UITableViewDelegate
-extension ANIProfileBasicView: UITableViewDelegate {
+extension ANIOtherProfileBasicView: UITableViewDelegate {
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     switch contentType {
     case .profile:
@@ -240,7 +265,7 @@ extension ANIProfileBasicView: UITableViewDelegate {
 }
 
 //MARK: ANIProfileMenuBarDelegate
-extension ANIProfileBasicView: ANIProfileMenuBarDelegate {
+extension ANIOtherProfileBasicView: ANIProfileMenuBarDelegate {
   func didSelecteMenuItem(selectedIndex: Int) {
     guard let basicTableView = self.basicTableView else { return }
     
@@ -256,7 +281,7 @@ extension ANIProfileBasicView: ANIProfileMenuBarDelegate {
     default:
       print("default")
     }
-
+    
     basicTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
   }
 }
