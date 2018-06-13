@@ -13,6 +13,7 @@ class ANIProfileEditFamilyCell: UICollectionViewCell {
   private let FAMILY_IMAGE_VIEW_BG_HEIGHT: CGFloat = 80.0
   private weak var familyImageViewBG: UIView?
   weak var familyImageView: UIImageView?
+  private let IMAGE_PICK_IMAGE_VIEW_HEGITH: CGFloat = 25.0
   weak var imagePickImageView: UIImageView?
   
   override init(frame: CGRect) {
@@ -35,6 +36,7 @@ class ANIProfileEditFamilyCell: UICollectionViewCell {
     
     //imageView
     let imageView = UIImageView()
+    imageView.backgroundColor = ANIColor.bg
     imageView.contentMode = .scaleAspectFit
     imageViewBG.addSubview(imageView)
     imageView.layer.cornerRadius = FAMILY_IMAGE_VIEW_BG_HEIGHT / 2
@@ -44,11 +46,14 @@ class ANIProfileEditFamilyCell: UICollectionViewCell {
     
     //imagePickImageView
     let imagePickImageView = UIImageView()
+    imagePickImageView.backgroundColor = ANIColor.bg
     imagePickImageView.contentMode = .scaleAspectFit
     imagePickImageView.image = UIImage(named: "imagePickButton")
+    imagePickImageView.layer.cornerRadius = IMAGE_PICK_IMAGE_VIEW_HEGITH / 2
+    imagePickImageView.layer.masksToBounds = true
     imageViewBG.addSubview(imagePickImageView)
-    imagePickImageView.width(25.0)
-    imagePickImageView.height(25.0)
+    imagePickImageView.width(IMAGE_PICK_IMAGE_VIEW_HEGITH)
+    imagePickImageView.height(IMAGE_PICK_IMAGE_VIEW_HEGITH)
     imagePickImageView.rightToSuperview()
     imagePickImageView.bottomToSuperview()
     self.imagePickImageView = imagePickImageView

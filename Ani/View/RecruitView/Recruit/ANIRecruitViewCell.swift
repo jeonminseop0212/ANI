@@ -148,6 +148,7 @@ class ANIRecruitViewCell: UITableViewCell {
     profileImageView.isUserInteractionEnabled = true
     let tapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped))
     profileImageView.addGestureRecognizer(tapGesture)
+    profileImageView.backgroundColor = ANIColor.bg
     addSubview(profileImageView)
     profileImageView.topToBottom(of: subTitleLabel, offset: 10.0)
     profileImageView.leftToSuperview(offset: 10.0)

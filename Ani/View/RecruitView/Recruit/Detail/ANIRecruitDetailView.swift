@@ -85,6 +85,7 @@ class ANIRecruitDetailView: UIView {
     
     //headerImageView
     let headerImageView = UIImageView()
+    headerImageView.backgroundColor = ANIColor.bg
     addSubview(headerImageView)
     headerImageViewTopConstraint = headerImageView.topToSuperview()
     let headerImageViewHeight: CGFloat = UIScreen.main.bounds.width * UIViewController.HEADER_IMAGE_VIEW_RATIO
@@ -127,6 +128,7 @@ class ANIRecruitDetailView: UIView {
     
     //profileImageView
     let profileImageView = UIImageView()
+    profileImageView.backgroundColor = ANIColor.bg
     profileImageView.layer.cornerRadius = PROFILE_IMAGE_HEIGHT / 2
     profileImageView.layer.masksToBounds = true
     profileImageView.isUserInteractionEnabled = true

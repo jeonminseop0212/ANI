@@ -56,6 +56,7 @@ class ANICommentCell: UITableViewCell {
     
     //profileImageView
     let profileImageView = UIImageView()
+    profileImageView.backgroundColor = ANIColor.bg
     profileImageView.layer.cornerRadius = PROFILE_IMAGE_VIEW_HEIGHT / 2
     profileImageView.layer.masksToBounds = true
     profileImageView.isUserInteractionEnabled = true

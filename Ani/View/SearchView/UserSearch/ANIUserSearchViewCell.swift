@@ -27,6 +27,7 @@ class ANIUserSearchViewCell: UITableViewCell {
     self.selectionStyle = .none
     //profileImageView
     let profileImageView = UIImageView()
+    profileImageView.backgroundColor = ANIColor.bg
     addSubview(profileImageView)
     profileImageView.topToSuperview(offset: 10.0)
     profileImageView.leftToSuperview(offset: 10.0)

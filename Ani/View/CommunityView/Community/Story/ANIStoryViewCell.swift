@@ -62,6 +62,7 @@ class ANIStoryViewCell: UITableViewCell {
 
     //profileImageView
     let profileImageView = UIImageView()
+    profileImageView.backgroundColor = ANIColor.bg
     profileImageView.isUserInteractionEnabled = true
     let tapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped))
     profileImageView.addGestureRecognizer(tapGesture)
