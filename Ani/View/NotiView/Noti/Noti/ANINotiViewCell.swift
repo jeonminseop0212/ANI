@@ -26,6 +26,7 @@ class ANINotiViewCell: UICollectionViewCell {
     backgroundColor = .white
     //profileImageView
     let profileImageView = UIImageView()
+    profileImageView.backgroundColor = ANIColor.bg
     addSubview(profileImageView)
     profileImageView.topToSuperview(offset: 10.0)
     profileImageView.leftToSuperview(offset: 10.0)

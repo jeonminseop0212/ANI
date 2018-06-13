@@ -169,7 +169,7 @@ class ANIContributionViewController: UIViewController {
     
     DispatchQueue.global().async {
       for (index, contentImage) in self.contentImages.enumerated() {
-        if let contentImage = contentImage, let contentImageData = UIImageJPEGRepresentation(contentImage, 0.1) {
+        if let contentImage = contentImage, let contentImageData = UIImageJPEGRepresentation(contentImage, 0.5) {
           let uuid = UUID().uuidString
           storageRef.child(KEY_STORY_IMAGES).child(uuid).putData(contentImageData, metadata: nil) { (metaData, error) in
             if error != nil {
@@ -215,7 +215,7 @@ class ANIContributionViewController: UIViewController {
     
     DispatchQueue.global().async {
       for (index, contentImage) in self.contentImages.enumerated() {
-        if let contentImage = contentImage, let contentImageData = UIImageJPEGRepresentation(contentImage, 0.1) {
+        if let contentImage = contentImage, let contentImageData = UIImageJPEGRepresentation(contentImage, 0.5) {
           let uuid = UUID().uuidString
           storageRef.child(KEY_QNA_IMAGES).child(uuid).putData(contentImageData, metadata: nil) { (metaData, error) in
             if error != nil {

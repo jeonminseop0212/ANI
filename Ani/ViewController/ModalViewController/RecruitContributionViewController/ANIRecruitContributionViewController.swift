@@ -409,7 +409,7 @@ extension ANIRecruitContributionViewController: ANIRecruitContributionViewDelega
   
   func castrationSelectButtonTapped() {
     let popupPickerViewController = ANIPopupPickerViewController()
-    popupPickerViewController.pickerItem = ["わからない", "済み"]
+    popupPickerViewController.pickerItem = ["わからない", "済み", "していない"]
     pickMode = BasicInfoPickMode.castration
     popupPickerViewController.modalPresentationStyle = .overCurrentContext
     present(popupPickerViewController, animated: false, completion: nil)
@@ -443,7 +443,7 @@ extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
         var recruit = FirebaseRecruit(id: id, headerImageUrl: nil, title: recruitInfo.title, kind: recruitInfo.kind, age: recruitInfo.age, sex: recruitInfo.sex, home: recruitInfo.home, vaccine: recruitInfo.vaccine, castration: recruitInfo.castration, reason: recruitInfo.reason, introduce: recruitInfo.introduce, introduceImageUrls: nil, passing: recruitInfo.passing, isRecruit: true, userId: userId, userName: userName, profileImageUrl: profileImageUrl, supportCount: 0, loveCount: 0)
         
         DispatchQueue.global().async {
-          if let recruitHeaderImageData = UIImageJPEGRepresentation(recruitInfo.headerImage, 0.1) {
+          if let recruitHeaderImageData = UIImageJPEGRepresentation(recruitInfo.headerImage, 0.5) {
             let uuid = NSUUID().uuidString
             storageRef.child(KEY_RECRUIT_HEADER_IMAGES).child(uuid).putData(recruitHeaderImageData, metadata: nil) { (metaData, error) in
               if error != nil {
@@ -465,7 +465,7 @@ extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
         DispatchQueue.global().async {
         var introduceImageUrls = [Int: String]()
           for (index, introduceImage) in recruitInfo.introduceImages.enumerated() {
-            if let introduceImage = introduceImage, let introduceImageData = UIImageJPEGRepresentation(introduceImage, 0.1) {
+            if let introduceImage = introduceImage, let introduceImageData = UIImageJPEGRepresentation(introduceImage, 0.5) {
               let uuid = NSUUID().uuidString
               storageRef.child(KEY_RECRUIT_INTRODUCE_IMAGES).child(uuid).putData(introduceImageData, metadata: nil) { (metaData, error) in
                 if error != nil {

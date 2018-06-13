@@ -307,7 +307,7 @@ class ANISignUpView: UIView {
   private func uploadUserData() {
     guard let currentUser = Auth.auth().currentUser,
           let profileImage = self.profileImage,
-          let profileImageData = UIImageJPEGRepresentation(profileImage, 0.1),
+          let profileImageData = UIImageJPEGRepresentation(profileImage, 0.5),
           let userNameTextField = self.userNameTextField,
           let userName = userNameTextField.text else { return }
 

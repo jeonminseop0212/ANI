@@ -101,6 +101,7 @@ class ANIRecruitContributionView: UIView {
     
     //headerImageView
     let headerImageView = UIImageView()
+    headerImageView.backgroundColor = ANIColor.bg
     addSubview(headerImageView)
     let headerImageViewHeight: CGFloat = UIScreen.main.bounds.width * UIViewController.HEADER_IMAGE_VIEW_RATIO
     headerImageViewTopConstraint = headerImageView.topToSuperview()
@@ -184,6 +185,7 @@ class ANIRecruitContributionView: UIView {
     
     //basicInfoLine
     let basicInfoLine = UIImageView()
+    basicInfoLine.backgroundColor = ANIColor.bg
     basicInfoLine.image = UIImage(named: "basicInfoLine")
     basicInfoBG.addSubview(basicInfoLine)
     basicInfoLine.topToSuperview(offset: 10.0)

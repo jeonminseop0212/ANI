@@ -274,7 +274,7 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
 
       for (index, familyImage) in familyImages.enumerated() {
         if let familyImage = familyImage {
-          if let familyImageData = UIImageJPEGRepresentation(familyImage, 0.1) {
+          if let familyImageData = UIImageJPEGRepresentation(familyImage, 0.5) {
             let uuid = NSUUID().uuidString
             let storageRef = Storage.storage().reference()
             storageRef.child(KEY_FAMILY_IMAGES).child(uuid).putData(familyImageData, metadata: nil) { (metaData, error) in
@@ -329,7 +329,7 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
       })
     }
 
-    if let profileImage = self.profileImage, let profileImageData = UIImageJPEGRepresentation(profileImage, 0.1) {
+    if let profileImage = self.profileImage, let profileImageData = UIImageJPEGRepresentation(profileImage, 0.5) {
       let storageRef = Storage.storage().reference()
       storageRef.child(KEY_PROFILE_IMAGES).child("\(currentUserUid).jpeg").putData(profileImageData, metadata: nil) { (metaData, error) in
         if error != nil {
