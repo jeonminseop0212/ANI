@@ -83,39 +83,39 @@ class ANIRecruitViewCell: UITableViewCell {
     
     //homeLabel
     let homeLabel = UILabel()
-    homeLabel.textColor = ANIColor.green
+    homeLabel.textColor = ANIColor.darkGray
     homeLabel.textAlignment = .center
     homeLabel.font = UIFont.boldSystemFont(ofSize: 13.0)
     homeLabel.layer.cornerRadius = 5.0
     homeLabel.layer.masksToBounds = true
-    homeLabel.layer.borderColor = ANIColor.green.cgColor
-    homeLabel.layer.borderWidth = 1.0
+    homeLabel.layer.borderColor = ANIColor.darkGray.cgColor
+    homeLabel.layer.borderWidth = 1.2
     basicInfoStackView.addArrangedSubview(homeLabel)
     homeLabel.height(24.0)
     self.homeLabel = homeLabel
     
     //ageLabel
     let ageLabel = UILabel()
-    ageLabel.textColor = ANIColor.green
+    ageLabel.textColor = ANIColor.darkGray
     ageLabel.textAlignment = .center
     ageLabel.font = UIFont.boldSystemFont(ofSize: 13.0)
     ageLabel.layer.cornerRadius = 5.0
     ageLabel.layer.masksToBounds = true
-    ageLabel.layer.borderColor = ANIColor.green.cgColor
-    ageLabel.layer.borderWidth = 1.0
+    ageLabel.layer.borderColor = ANIColor.darkGray.cgColor
+    ageLabel.layer.borderWidth = 1.2
     basicInfoStackView.addArrangedSubview(ageLabel)
     ageLabel.height(24.0)
     self.ageLabel = ageLabel
     
     //sexLabel
     let sexLabel = UILabel()
-    sexLabel.textColor = ANIColor.green
+    sexLabel.textColor = ANIColor.darkGray
     sexLabel.textAlignment = .center
     sexLabel.font = UIFont.boldSystemFont(ofSize: 13.0)
     sexLabel.layer.cornerRadius = 5.0
     sexLabel.layer.masksToBounds = true
-    sexLabel.layer.borderColor = ANIColor.green.cgColor
-    sexLabel.layer.borderWidth = 1.0
+    sexLabel.layer.borderColor = ANIColor.darkGray.cgColor
+    sexLabel.layer.borderWidth = 1.2
     basicInfoStackView.addArrangedSubview(sexLabel)
     sexLabel.height(24.0)
     self.sexLabel = sexLabel
