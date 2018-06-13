@@ -37,7 +37,14 @@ class ANICommentViewController: UIViewController {
     setup()
     passingData()
     setupNavigationProfileImage()
+  }
+  
+  override func viewWillAppear(_ animated: Bool) {
     setupNotification()
+  }
+  
+  override func viewWillDisappear(_ animated: Bool) {
+    removeNotifications()
   }
   
   private func setup() {
@@ -142,9 +149,15 @@ class ANICommentViewController: UIViewController {
     }
   }
   
+  //MARK: notification
   private func setupNotification() {
     ANINotificationManager.receive(keyboardWillChangeFrame: self, selector: #selector(keyboardWillChangeFrame))
     ANINotificationManager.receive(keyboardWillHide: self, selector: #selector(keyboardWillHide))
+    ANINotificationManager.receive(profileImageViewTapped: self, selector: #selector(pushOtherProfile))
+  }
+  
+  private func removeNotifications() {
+    ANINotificationManager.remove(self)
   }
   
   @objc private func keyboardWillChangeFrame(_ notification: Notification) {
@@ -175,6 +188,23 @@ class ANICommentViewController: UIViewController {
     UIView.animate(withDuration: duration, delay: 0, options: UIViewAnimationOptions(rawValue: curve), animations: {
       self.view.layoutIfNeeded()
     })
+  }
+  
+  @objc private func pushOtherProfile(_ notification: NSNotification) {
+    guard let userId = notification.object as? String,
+          let currentUserUid = ANISessionManager.shared.currentUserUid else { return }
+    
+    if currentUserUid == userId {
+      let profileViewController = ANIProfileViewController()
+      profileViewController.hidesBottomBarWhenPushed = true
+      self.navigationController?.pushViewController(profileViewController, animated: true)
+      profileViewController.isBackButtonHide = false
+    } else {
+      let otherProfileViewController = ANIOtherProfileViewController()
+      otherProfileViewController.hidesBottomBarWhenPushed = true
+      otherProfileViewController.userId = userId
+      self.navigationController?.pushViewController(otherProfileViewController, animated: true)
+    }
   }
   
   //MARK: Action

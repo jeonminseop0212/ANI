@@ -58,6 +58,9 @@ class ANICommentCell: UITableViewCell {
     let profileImageView = UIImageView()
     profileImageView.layer.cornerRadius = PROFILE_IMAGE_VIEW_HEIGHT / 2
     profileImageView.layer.masksToBounds = true
+    profileImageView.isUserInteractionEnabled = true
+    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped))
+    profileImageView.addGestureRecognizer(tapGesture)
     addSubview(profileImageView)
     profileImageView.width(PROFILE_IMAGE_VIEW_HEIGHT)
     profileImageView.height(PROFILE_IMAGE_VIEW_HEIGHT)
@@ -152,5 +155,11 @@ class ANICommentCell: UITableViewCell {
   //MARK: action
   @objc private func love() {
     print("love")
+  }
+  
+  @objc private func profileImageViewTapped() {
+    guard let comment = self.comment else { return }
+    
+    ANINotificationManager.postProfileImageViewTapped(userId: comment.userId)
   }
 }

@@ -22,12 +22,16 @@ class ANICommunityViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     setup()
-    setupNotification()
   }
   
   override func viewWillAppear(_ animated: Bool) {
     UIApplication.shared.statusBarStyle = .default
     UIApplication.shared.isStatusBarHidden = false
+    setupNotification()
+  }
+  
+  override func viewWillDisappear(_ animated: Bool) {
+    removeNotifications()
   }
   
   private func setup() {
@@ -80,11 +84,33 @@ class ANICommunityViewController: UIViewController {
     self.contributionButon = contributionButon
   }
   
+  //MAKR: notification
   private func setupNotification() {
     ANINotificationManager.receive(imageCellTapped: self, selector: #selector(presentImageBrowser(_:)))
+    ANINotificationManager.receive(profileImageViewTapped: self, selector: #selector(pushOtherProfile))
   }
   
-  //MARK: action
+  private func removeNotifications() {
+    ANINotificationManager.remove(self)
+  }
+  
+  @objc private func pushOtherProfile(_ notification: NSNotification) {
+    guard let userId = notification.object as? String,
+          let currentUserUid = ANISessionManager.shared.currentUserUid else { return }
+    
+    if currentUserUid == userId {
+      let profileViewController = ANIProfileViewController()
+      profileViewController.hidesBottomBarWhenPushed = true
+      self.navigationController?.pushViewController(profileViewController, animated: true)
+      profileViewController.isBackButtonHide = false
+    } else {
+      let otherProfileViewController = ANIOtherProfileViewController()
+      otherProfileViewController.hidesBottomBarWhenPushed = true
+      otherProfileViewController.userId = userId
+      self.navigationController?.pushViewController(otherProfileViewController, animated: true)
+    }
+  }
+  
   @objc private func presentImageBrowser(_ notification: NSNotification) {
     guard let item = notification.object as? (Int, [String]) else { return }
     let selectedIndex = item.0

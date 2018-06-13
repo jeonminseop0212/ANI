@@ -129,6 +129,10 @@ class ANIRecruitDetailView: UIView {
     let profileImageView = UIImageView()
     profileImageView.layer.cornerRadius = PROFILE_IMAGE_HEIGHT / 2
     profileImageView.layer.masksToBounds = true
+    profileImageView.isUserInteractionEnabled = true
+    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped))
+    profileImageView.addGestureRecognizer(tapGesture)
+    addSubview(profileImageView)
     contentView.addSubview(profileImageView)
     profileImageView.width(PROFILE_IMAGE_HEIGHT)
     profileImageView.height(PROFILE_IMAGE_HEIGHT)
@@ -393,14 +397,20 @@ class ANIRecruitDetailView: UIView {
     
     passingLabel.text = recruit.passing
   }
+  
+  //MARK: action
+  @objc private func profileImageViewTapped() {
+    guard let recruit = self.recruit else { return }
+    
+    ANINotificationManager.postProfileImageViewTapped(userId: recruit.userId)
+  }
 }
 
 extension ANIRecruitDetailView: UIScrollViewDelegate {
   func scrollViewDidScroll(_ scrollView: UIScrollView) {
     guard let imageView = self.headerImageView,
           let imageViewTopConstraint = self.headerImageViewTopConstraint,
-          let headerMinHeight = self.headerMinHeight
-          else { return }
+          let headerMinHeight = self.headerMinHeight else { return }
     
     let headerImageViewHeight: CGFloat = UIScreen.main.bounds.width * UIViewController.HEADER_IMAGE_VIEW_RATIO
 

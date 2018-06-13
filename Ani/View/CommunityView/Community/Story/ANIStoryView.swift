@@ -81,6 +81,10 @@ class ANIStoryView: UIView {
               }
             } catch let error {
               print(error)
+              
+              if let sender = sender {
+                sender.endRefreshing()
+              }
             }
           }
         }

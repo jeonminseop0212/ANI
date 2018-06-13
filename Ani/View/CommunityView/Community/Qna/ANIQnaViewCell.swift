@@ -62,6 +62,9 @@ class ANIQnaViewCell: UITableViewCell {
     
     //profileImageView
     let profileImageView = UIImageView()
+    profileImageView.isUserInteractionEnabled = true
+    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped))
+    profileImageView.addGestureRecognizer(tapGesture)
     addSubview(profileImageView)
     profileImageView.topToBottom(of: qnaImagesView, offset: 10.0)
     profileImageView.leftToSuperview(offset: 10.0)
@@ -185,5 +188,11 @@ class ANIQnaViewCell: UITableViewCell {
   //MARK: action
   @objc private func love() {
     print("love")
+  }
+  
+  @objc private func profileImageViewTapped() {
+    guard let qna = self.qna else { return }
+    
+    ANINotificationManager.postProfileImageViewTapped(userId: qna.userId)
   }
 }
