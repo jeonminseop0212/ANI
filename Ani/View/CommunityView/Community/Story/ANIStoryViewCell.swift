@@ -62,6 +62,9 @@ class ANIStoryViewCell: UITableViewCell {
 
     //profileImageView
     let profileImageView = UIImageView()
+    profileImageView.isUserInteractionEnabled = true
+    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped))
+    profileImageView.addGestureRecognizer(tapGesture)
     addSubview(profileImageView)
     profileImageView.topToBottom(of: storyLabel, offset: 10.0)
     profileImageView.leftToSuperview(offset: 10.0)
@@ -187,6 +190,12 @@ class ANIStoryViewCell: UITableViewCell {
   //MARK: action
   @objc private func love() {
     print("love")
+  }
+  
+  @objc private func profileImageViewTapped() {
+    guard let story = self.story else { return }
+    
+    ANINotificationManager.postProfileImageViewTapped(userId: story.userId)
   }
 }
 

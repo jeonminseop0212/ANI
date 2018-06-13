@@ -22,11 +22,15 @@ class ANIOtherProfileViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     setup()
-    setupNotification()
   }
   
   override func viewWillAppear(_ animated: Bool) {
     UIApplication.shared.statusBarStyle = .default
+    setupNotification()
+  }
+
+  override func viewWillDisappear(_ animated: Bool) {
+    removeNotifications()
   }
   
   private func setup() {
@@ -85,11 +89,15 @@ class ANIOtherProfileViewController: UIViewController {
     self.profileBasicView = profileBasicView
   }
   
+  //MARK: notification
   private func setupNotification() {
     ANINotificationManager.receive(imageCellTapped: self, selector: #selector(presentImageBrowser(_:)))
   }
   
-  //MARK: action
+  private func removeNotifications() {
+    ANINotificationManager.remove(self)
+  }
+  
   @objc private func presentImageBrowser(_ notification: NSNotification) {
     guard let item = notification.object as? (Int, [String]) else { return }
     let selectedIndex = item.0
@@ -102,6 +110,7 @@ class ANIOtherProfileViewController: UIViewController {
     self.tabBarController?.present(imageBrowserViewController, animated: false, completion: nil)
   }
   
+  //MARK: action
   @objc private func back() {
     self.navigationController?.popViewController(animated: true)
   }

@@ -27,12 +27,16 @@ class ANIRecruitViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     setup()
-    setupNotifications()
   }
   
   override func viewWillAppear(_ animated: Bool) {
     UIApplication.shared.statusBarStyle = .default
     UIApplication.shared.isStatusBarHidden = false
+    setupNotifications()
+  }
+  
+  override func viewWillDisappear(_ animated: Bool) {
+    removeNotifications()
   }
   
   private func setup() {
@@ -111,9 +115,8 @@ class ANIRecruitViewController: UIViewController {
     ANINotificationManager.receive(profileImageViewTapped: self, selector: #selector(pushOtherProfile))
   }
   
-  //MARK: Action
-  @objc func filter() {
-    print("filtering")
+  private func removeNotifications() {
+    ANINotificationManager.remove(self)
   }
   
   @objc private func hideKeyboard() {
@@ -144,6 +147,11 @@ class ANIRecruitViewController: UIViewController {
       otherProfileViewController.userId = userId
       self.navigationController?.pushViewController(otherProfileViewController, animated: true)
     }
+  }
+  
+  //MARK: Action
+  @objc func filter() {
+    print("filtering")
   }
 }
 
