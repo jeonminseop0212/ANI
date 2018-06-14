@@ -11,9 +11,9 @@ import FirebaseDatabase
 import CodableFirebase
 
 protocol ANIProfileBasicViewDelegate {
-  func recruitViewCellDidSelect(selectedRecruit: FirebaseRecruit)
-  func storyViewCellDidSelect(selectedStory: FirebaseStory)
-  func qnaViewCellDidSelect(selectedQna: FirebaseQna)
+  func recruitViewCellDidSelect(selectedRecruit: FirebaseRecruit, user: FirebaseUser)
+  func storyViewCellDidSelect(selectedStory: FirebaseStory, user: FirebaseUser)
+  func qnaViewCellDidSelect(selectedQna: FirebaseQna, user:FirebaseUser)
 }
 
 class ANIProfileBasicView: UIView {
@@ -63,7 +63,6 @@ class ANIProfileBasicView: UIView {
     basicTableView.backgroundColor = ANIColor.bg
     basicTableView.separatorStyle = .none
     basicTableView.dataSource = self
-    basicTableView.delegate = self
     let topCellId = NSStringFromClass(ANIProfileTopCell.self)
     basicTableView.register(ANIProfileTopCell.self, forCellReuseIdentifier: topCellId)
     let profileCellid = NSStringFromClass(ANIProfileCell.self)
@@ -200,6 +199,7 @@ extension ANIProfileBasicView: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: recruitCellid, for: indexPath) as! ANIRecruitViewCell
         
         cell.recruit = recruits[indexPath.row]
+        cell.delegate = self
 
         return cell
       } else if contentType == .story {
@@ -208,6 +208,7 @@ extension ANIProfileBasicView: UITableViewDataSource {
         
         cell.story = stories[indexPath.row]
         cell.observeStory()
+        cell.delegate = self
 
         return cell
       } else {
@@ -216,25 +217,10 @@ extension ANIProfileBasicView: UITableViewDataSource {
         
         cell.qna = qnas[indexPath.row]
         cell.observeQna()
+        cell.delegate = self
 
         return cell
       }
-    }
-  }
-}
-
-//MARK: UITableViewDelegate
-extension ANIProfileBasicView: UITableViewDelegate {
-  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    switch contentType {
-    case .profile:
-      return
-    case .recruit:
-      self.delegate?.recruitViewCellDidSelect(selectedRecruit: recruits[indexPath.row])
-    case .story:
-      self.delegate?.storyViewCellDidSelect(selectedStory: stories[indexPath.row])
-    case .qna:
-      self.delegate?.qnaViewCellDidSelect(selectedQna: qnas[indexPath.row])
     }
   }
 }
@@ -258,5 +244,26 @@ extension ANIProfileBasicView: ANIProfileMenuBarDelegate {
     }
 
     basicTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
+  }
+}
+
+//MARK: ANIRecruitViewCellDelegate
+extension ANIProfileBasicView: ANIRecruitViewCellDelegate {
+  func cellTapped(recruit: FirebaseRecruit, user: FirebaseUser) {
+    self.delegate?.recruitViewCellDidSelect(selectedRecruit: recruit, user: user)
+  }
+}
+
+//MARK: ANIStoryViewCellDelegate
+extension ANIProfileBasicView: ANIStoryViewCellDelegate {
+  func cellTapped(story: FirebaseStory, user: FirebaseUser) {
+    self.delegate?.storyViewCellDidSelect(selectedStory: story, user: user)
+  }
+}
+
+//MARK: ANIQnaViewCellDelegate
+extension ANIProfileBasicView: ANIQnaViewCellDelegate {
+  func cellTapped(qna: FirebaseQna, user: FirebaseUser) {
+    self.delegate?.qnaViewCellDidSelect(selectedQna: qna, user: user)
   }
 }
