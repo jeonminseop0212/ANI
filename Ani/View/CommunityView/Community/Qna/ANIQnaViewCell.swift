@@ -11,6 +11,10 @@ import WCLShineButton
 import FirebaseDatabase
 import CodableFirebase
 
+protocol ANIQnaViewCellDelegate {
+  func cellTapped(qna: FirebaseQna, user: FirebaseUser)
+}
+
 class ANIQnaViewCell: UITableViewCell {
   private weak var subTitleLabel: UILabel?
   private weak var profileImageView: UIImageView?
@@ -24,8 +28,13 @@ class ANIQnaViewCell: UITableViewCell {
   var qna: FirebaseQna? {
     didSet {
       reloadLayout()
+      loadUser()
     }
   }
+  
+  var user: FirebaseUser?
+  
+  var delegate: ANIQnaViewCellDelegate?
   
   override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -38,6 +47,8 @@ class ANIQnaViewCell: UITableViewCell {
   
   private func setup() {
     self.selectionStyle = .none
+    let cellTapGesture = UITapGestureRecognizer(target: self, action: #selector(cellTapped))
+    self.addGestureRecognizer(cellTapGesture)
 
     self.backgroundColor = .white
     //subTitleLabel
@@ -168,21 +179,49 @@ class ANIQnaViewCell: UITableViewCell {
   private func reloadLayout() {
     guard let qnaImagesView = self.qnaImagesView,
           let subTitleLabel = self.subTitleLabel,
-          let profileImageView = self.profileImageView,
-          let userNameLabel = self.userNameLabel,
           let loveCountLabel = self.loveCountLabel,
           let commentCountLabel = self.commentCountLabel,
           let qna = self.qna else { return }
     
     qnaImagesView.imageUrls = qna.qnaImageUrls
     subTitleLabel.text = qna.qna
-    profileImageView.sd_setImage(with: URL(string: qna.profileImageUrl), completed: nil)
-    userNameLabel.text = qna.userName
     loveCountLabel.text = "\(qna.loveCount)"
     if let commentIds = qna.commentIds {
       commentCountLabel.text = "\(commentIds.count)"
     } else {
       commentCountLabel.text = "0"
+    }
+  }
+  
+  private func reloadUserLayout(user: FirebaseUser) {
+    guard let userNameLabel = self.userNameLabel,
+          let profileImageView = self.profileImageView,
+          let profileImageUrl = user.profileImageUrl,
+          let userName = user.userName else { return }
+    
+    profileImageView.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
+    userNameLabel.text = userName
+  }
+  
+  private func loadUser() {
+    guard let qna = self.qna else { return }
+    
+    DispatchQueue.global().async {
+      let databaseRef = Database.database().reference()
+      databaseRef.child(KEY_USERS).child(qna.userId).observeSingleEvent(of: .value, with: { (userSnapshot) in
+        if let userValue = userSnapshot.value {
+          do {
+            let user = try FirebaseDecoder().decode(FirebaseUser.self, from: userValue)
+            self.user = user
+            
+            DispatchQueue.main.async {
+              self.reloadUserLayout(user: user)
+            }
+          } catch let error {
+            print(error)
+          }
+        }
+      })
     }
   }
   
@@ -195,5 +234,12 @@ class ANIQnaViewCell: UITableViewCell {
     guard let qna = self.qna else { return }
     
     ANINotificationManager.postProfileImageViewTapped(userId: qna.userId)
+  }
+  
+  @objc private func cellTapped() {
+    guard let qna = self.qna,
+          let user = self.user else { return }
+    
+    self.delegate?.cellTapped(qna: qna, user: user)
   }
 }

@@ -131,11 +131,9 @@ class ANICommentBar: UIView {
           let text = commentTextView.text,
           let currentuser = ANISessionManager.shared.currentUser,
           let uid = currentuser.uid,
-          let userName = currentuser.userName,
-          let profileImageUrl = currentuser.profileImageUrl,
           let commentMode = self.commentMode else { return }
     
-    let comment = FirebaseComment(userId: uid, userName: userName, profileImageUrl: profileImageUrl, comment: text, loveCount: 0, commentCount: 0)
+    let comment = FirebaseComment(userId: uid, comment: text, loveCount: 0, commentCount: 0)
     
     do {
       if let data = try FirebaseEncoder().encode(comment) as? [String : AnyObject] {

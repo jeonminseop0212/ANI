@@ -10,8 +10,6 @@ import UIKit
 
 struct FirebaseComment: Codable {
   let userId: String
-  let userName: String
-  let profileImageUrl: String
   let comment: String
   let loveCount: Int
   let commentCount: Int

@@ -8,6 +8,12 @@
 
 import UIKit
 import WCLShineButton
+import FirebaseDatabase
+import CodableFirebase
+
+protocol ANIRecruitViewCellDelegate {
+  func cellTapped(recruit: FirebaseRecruit, user: FirebaseUser)
+}
 
 class ANIRecruitViewCell: UITableViewCell {
   private weak var recruitImageView: UIImageView?
@@ -31,8 +37,13 @@ class ANIRecruitViewCell: UITableViewCell {
   var recruit: FirebaseRecruit? {
     didSet {
       reloadLayout()
+      loadUser()
     }
   }
+  
+  var user: FirebaseUser?
+  
+  var delegate: ANIRecruitViewCellDelegate?
   
   override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -45,6 +56,9 @@ class ANIRecruitViewCell: UITableViewCell {
   
   private func setup() {
     self.selectionStyle = .none
+    let cellTapGesture = UITapGestureRecognizer(target: self, action: #selector(cellTapped))
+    self.addGestureRecognizer(cellTapGesture)
+    
     //recruitImageView
     let recruitImageView = UIImageView()
     recruitImageView.backgroundColor = ANIColor.bg
@@ -146,8 +160,8 @@ class ANIRecruitViewCell: UITableViewCell {
     //profileImageView
     let profileImageView = UIImageView()
     profileImageView.isUserInteractionEnabled = true
-    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped))
-    profileImageView.addGestureRecognizer(tapGesture)
+    let profileImageTapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped))
+    profileImageView.addGestureRecognizer(profileImageTapGesture)
     profileImageView.backgroundColor = ANIColor.bg
     addSubview(profileImageView)
     profileImageView.topToBottom(of: subTitleLabel, offset: 10.0)
@@ -247,8 +261,6 @@ class ANIRecruitViewCell: UITableViewCell {
           let sexLabel = self.sexLabel,
           let titleLabel = self.titleLabel,
           let subTitleLabel = self.subTitleLabel,
-          let profileImageView = self.profileImageView,
-          let userNameLabel = self.userNameLabel,
           let supportCountLabel = self.supportCountLabel,
           let loveCountLabel = self.loveCountLabel,
           let recruit = self.recruit,
@@ -261,10 +273,40 @@ class ANIRecruitViewCell: UITableViewCell {
     sexLabel.text = recruit.sex
     titleLabel.text = recruit.title
     subTitleLabel.text = recruit.reason
-    profileImageView.sd_setImage(with: URL(string: recruit.profileImageUrl), completed: nil)
-    userNameLabel.text = recruit.userName
     supportCountLabel.text = "\(recruit.supportCount)"
     loveCountLabel.text = "\(recruit.loveCount)"
+  }
+  
+  private func reloadUserLayout(user: FirebaseUser) {
+    guard let userNameLabel = self.userNameLabel,
+          let profileImageView = self.profileImageView,
+          let profileImageUrl = user.profileImageUrl,
+          let userName = user.userName else { return }
+    
+    profileImageView.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
+    userNameLabel.text = userName
+  }
+  
+  private func loadUser() {
+    guard let recruit = self.recruit else { return }
+    
+    DispatchQueue.global().async {
+      let databaseRef = Database.database().reference()
+      databaseRef.child(KEY_USERS).child(recruit.userId).observeSingleEvent(of: .value, with: { (userSnapshot) in
+        if let userValue = userSnapshot.value {
+          do {
+            let user = try FirebaseDecoder().decode(FirebaseUser.self, from: userValue)
+            self.user = user
+            
+            DispatchQueue.main.async {
+              self.reloadUserLayout(user: user)
+            }
+          } catch let error {
+            print(error)
+          }
+        }
+      })
+    }
   }
   
   //MARK: action
@@ -276,5 +318,12 @@ class ANIRecruitViewCell: UITableViewCell {
     guard let recruit = self.recruit else { return }
     
     ANINotificationManager.postProfileImageViewTapped(userId: recruit.userId)
+  }
+  
+  @objc private func cellTapped() {
+    guard let recruit = self.recruit,
+          let user = self.user else { return }
+    
+    self.delegate?.cellTapped(recruit: recruit, user: user)
   }
 }

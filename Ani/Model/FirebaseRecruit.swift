@@ -24,8 +24,6 @@ struct FirebaseRecruit: Codable {
   let passing: String
   let isRecruit: Bool
   let userId: String
-  let userName: String
-  let profileImageUrl: String
   let supportCount: Int
   let loveCount: Int
 }

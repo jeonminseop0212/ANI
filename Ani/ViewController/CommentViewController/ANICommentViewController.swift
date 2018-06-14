@@ -32,6 +32,7 @@ class ANICommentViewController: UIViewController {
   
   var story: FirebaseStory?
   var qna: FirebaseQna?
+  var user: FirebaseUser?
   
   override func viewDidLoad() {
     setup()
@@ -135,18 +136,10 @@ class ANICommentViewController: UIViewController {
   
   private func setupNavigationProfileImage() {
     guard let navigationProfileImageView = self.navigationProfileImageView,
-          let commentMode = self.commentMode else { return }
+          let user = self.user,
+          let profileImageUrl = user.profileImageUrl else { return }
     
-    switch commentMode {
-    case .story:
-      if let story = self.story {
-        navigationProfileImageView.sd_setImage(with: URL(string: story.profileImageUrl), completed: nil)
-      }
-    case .qna:
-      if let qna = self.qna {
-        navigationProfileImageView.sd_setImage(with: URL(string: qna.profileImageUrl), completed: nil)
-      }
-    }
+    navigationProfileImageView.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
   }
   
   //MARK: notification

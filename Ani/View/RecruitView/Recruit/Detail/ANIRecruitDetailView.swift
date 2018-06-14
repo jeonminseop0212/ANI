@@ -71,6 +71,12 @@ class ANIRecruitDetailView: UIView {
     }
   }
   
+  var user: FirebaseUser? {
+    didSet {
+      reloadUserLayout()
+    }
+  }
+
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()
@@ -362,8 +368,6 @@ class ANIRecruitDetailView: UIView {
   private func reloadLayout() {
     guard let headerImageView = self.headerImageView,
           let titleLabel = self.titleLabel,
-          let profileImageView = self.profileImageView,
-          let userNameLabel = self.userNameLabel,
           let basicInfoKindLabel = self.basicInfoKindLabel,
           let basicInfoAgeLabel = self.basicInfoAgeLabel,
           let basicInfoSexLabel = self.basicInfoSexLabel,
@@ -381,10 +385,6 @@ class ANIRecruitDetailView: UIView {
     
     titleLabel.text = recruit.title
     
-    profileImageView.sd_setImage(with: URL(string: recruit.profileImageUrl), completed: nil)
-    
-    userNameLabel.text = recruit.userName
-    
     basicInfoKindLabel.text = "種類：\(recruit.kind)"
     basicInfoAgeLabel.text = "年齢：\(recruit.age)"
     basicInfoSexLabel.text = "性別：\(recruit.sex)"
@@ -398,6 +398,18 @@ class ANIRecruitDetailView: UIView {
     self.introduceImageUrls = introduceImageUrls
     
     passingLabel.text = recruit.passing
+  }
+  
+  private func reloadUserLayout() {
+    guard let profileImageView = self.profileImageView,
+          let userNameLabel = self.userNameLabel,
+          let user = self.user,
+          let userName = user.userName,
+          let profileImageUrl = user.profileImageUrl else { return }
+    
+    profileImageView.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
+
+    userNameLabel.text = userName
   }
   
   //MARK: action

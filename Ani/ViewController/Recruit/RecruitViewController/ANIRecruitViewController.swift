@@ -184,10 +184,11 @@ extension ANIRecruitViewController:ANIButtonViewDelegate {
 
 //ANIRecruitViewDelegate
 extension ANIRecruitViewController: ANIRecruitViewDelegate {
-  func recruitRowTap(selectedRecruit: FirebaseRecruit) {
+  func recruitCellTap(selectedRecruit: FirebaseRecruit, user: FirebaseUser) {
     let recruitDetailViewController = ANIRecruitDetailViewController()
     recruitDetailViewController.hidesBottomBarWhenPushed = true
     recruitDetailViewController.recruit = selectedRecruit
+    recruitDetailViewController.user = user
     self.navigationController?.pushViewController(recruitDetailViewController, animated: true)
   }
   

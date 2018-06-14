@@ -11,7 +11,7 @@ import FirebaseDatabase
 import CodableFirebase
 
 protocol ANIRecruitViewDelegate {
-  func recruitRowTap(selectedRecruit: FirebaseRecruit)
+  func recruitCellTap(selectedRecruit: FirebaseRecruit, user: FirebaseUser)
   func recruitViewDidScroll(scrollY: CGFloat)
 }
 
@@ -112,6 +112,7 @@ extension ANIRecuruitView: UITableViewDataSource {
     
     if !recruits.isEmpty {
       cell.recruit = recruits[indexPath.row]
+      cell.delegate = self
     }
     
     return cell
@@ -120,15 +121,18 @@ extension ANIRecuruitView: UITableViewDataSource {
 
 //MARK: UITableViewDelegate
 extension ANIRecuruitView: UITableViewDelegate {
-  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    self.delegate?.recruitRowTap(selectedRecruit: recruits[indexPath.row])
-  }
-  
   func scrollViewDidScroll(_ scrollView: UIScrollView) {
     ANINotificationManager.postViewScrolled()
     
     //navigation bar animation
     let scrollY = scrollView.contentOffset.y
     self.delegate?.recruitViewDidScroll(scrollY: scrollY)
+  }
+}
+
+//MARK: ANIRecruitViewCellDelegate
+extension ANIRecuruitView: ANIRecruitViewCellDelegate {
+  func cellTapped(recruit: FirebaseRecruit, user: FirebaseUser) {
+    self.delegate?.recruitCellTap(selectedRecruit: recruit, user: user)
   }
 }

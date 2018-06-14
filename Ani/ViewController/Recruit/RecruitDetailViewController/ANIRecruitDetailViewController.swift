@@ -24,6 +24,8 @@ class ANIRecruitDetailViewController: UIViewController {
   
   var recruit: FirebaseRecruit?
   
+  var user: FirebaseUser?
+  
   private var isBack: Bool = false
 
   override func viewDidLoad() {
@@ -51,6 +53,7 @@ class ANIRecruitDetailViewController: UIViewController {
     recruitDetailView.headerMinHeight = UIViewController.STATUS_BAR_HEIGHT + UIViewController.NAVIGATION_BAR_HEIGHT
     recruitDetailView.delegate = self
     recruitDetailView.recruit = recruit
+    recruitDetailView.user = user
     self.view.addSubview(recruitDetailView)
     recruitDetailView.edgesToSuperview()
     self.recruitDetailView = recruitDetailView
