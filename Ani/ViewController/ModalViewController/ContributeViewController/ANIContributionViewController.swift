@@ -129,6 +129,7 @@ class ANIContributionViewController: UIViewController {
     
     //contriButionView
     let contriButionView = ANIContributionView()
+    contriButionView.selectedContributionMode = selectedContributionMode
     contriButionView.delegate = self
     self.view.addSubview(contriButionView)
     contriButionView.topToBottom(of: myNavigationBar)
@@ -160,9 +161,7 @@ class ANIContributionViewController: UIViewController {
   func uploadStory() {
     guard let contriButionView = self.contriButionView,
           let currentUser = ANISessionManager.shared.currentUser,
-          let uid = currentUser.uid,
-          let userName = currentUser.userName,
-          let profileImageUrl = currentUser.profileImageUrl else { return }
+          let uid = currentUser.uid else { return }
     
     let storageRef = Storage.storage().reference()
     var contentImageUrls = [Int: String]()
@@ -205,41 +204,51 @@ class ANIContributionViewController: UIViewController {
   
   func uploadQna() {
     guard let contriButionView = self.contriButionView,
-      let currentUser = ANISessionManager.shared.currentUser,
-      let uid = currentUser.uid,
-      let userName = currentUser.userName,
-      let profileImageUrl = currentUser.profileImageUrl else { return }
+          let currentUser = ANISessionManager.shared.currentUser,
+          let uid = currentUser.uid else { return }
     
     let storageRef = Storage.storage().reference()
     var contentImageUrls = [Int: String]()
     
     DispatchQueue.global().async {
-      for (index, contentImage) in self.contentImages.enumerated() {
-        if let contentImage = contentImage, let contentImageData = UIImageJPEGRepresentation(contentImage, 0.5) {
-          let uuid = UUID().uuidString
-          storageRef.child(KEY_QNA_IMAGES).child(uuid).putData(contentImageData, metadata: nil) { (metaData, error) in
-            if error != nil {
-              print("storageError")
-              return
-            }
-            
-            if let contentImageUrl = metaData?.downloadURL() {
-              contentImageUrls[index] = contentImageUrl.absoluteString
-              if contentImageUrls.count == self.contentImages.count {
-                let sortdUrls = contentImageUrls.sorted(by: {$0.0 < $1.0})
-                var urls = [String]()
-                for url in sortdUrls {
-                  urls.append(url.value)
-                }
-                
-                let detabaseRef = Database.database().reference()
-                let databaseQnaRef = detabaseRef.child(KEY_QNAS).childByAutoId()
-                let id = databaseQnaRef.key
-                let content = contriButionView.getContent()
-                let qna = FirebaseQna(id: id, qnaImageUrls: urls, qna: content, userId: uid, loveCount: 0, commentIds: nil)
-                
-                DispatchQueue.main.async {
-                  self.upateQnaDatabase(qna: qna, databaseQnaRef: databaseQnaRef)
+      if self.contentImages.isEmpty {
+        let detabaseRef = Database.database().reference()
+        let databaseQnaRef = detabaseRef.child(KEY_QNAS).childByAutoId()
+        let id = databaseQnaRef.key
+        let content = contriButionView.getContent()
+        let qna = FirebaseQna(id: id, qnaImageUrls: nil, qna: content, userId: uid, loveCount: 0, commentIds: nil)
+        
+        DispatchQueue.main.async {
+          self.upateQnaDatabase(qna: qna, databaseQnaRef: databaseQnaRef)
+        }
+      } else {
+        for (index, contentImage) in self.contentImages.enumerated() {
+          if let contentImage = contentImage, let contentImageData = UIImageJPEGRepresentation(contentImage, 0.5) {
+            let uuid = UUID().uuidString
+            storageRef.child(KEY_QNA_IMAGES).child(uuid).putData(contentImageData, metadata: nil) { (metaData, error) in
+              if error != nil {
+                print("storageError")
+                return
+              }
+              
+              if let contentImageUrl = metaData?.downloadURL() {
+                contentImageUrls[index] = contentImageUrl.absoluteString
+                if contentImageUrls.count == self.contentImages.count {
+                  let sortdUrls = contentImageUrls.sorted(by: {$0.0 < $1.0})
+                  var urls = [String]()
+                  for url in sortdUrls {
+                    urls.append(url.value)
+                  }
+                  
+                  let detabaseRef = Database.database().reference()
+                  let databaseQnaRef = detabaseRef.child(KEY_QNAS).childByAutoId()
+                  let id = databaseQnaRef.key
+                  let content = contriButionView.getContent()
+                  let qna = FirebaseQna(id: id, qnaImageUrls: urls, qna: content, userId: uid, loveCount: 0, commentIds: nil)
+                  
+                  DispatchQueue.main.async {
+                    self.upateQnaDatabase(qna: qna, databaseQnaRef: databaseQnaRef)
+                  }
                 }
               }
             }
@@ -404,7 +413,7 @@ extension ANIContributionViewController: ANIContributionViewDelegate {
   
   func contributionButtonOn(on: Bool) {
     guard let contributionButton = self.contributionButton,
-      let contributionButtonBG = self.contributionButtonBG else { return }
+          let contributionButtonBG = self.contributionButtonBG else { return }
     if on {
       contributionButton.isEnabled = true
       contributionButtonBG.alpha = 1.0

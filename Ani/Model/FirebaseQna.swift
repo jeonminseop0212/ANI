@@ -10,7 +10,7 @@ import UIKit
 
 struct FirebaseQna: Codable {
   var id: String?
-  let qnaImageUrls: [String]
+  let qnaImageUrls: [String]?
   let qna: String
   let userId: String
   let loveCount: Int

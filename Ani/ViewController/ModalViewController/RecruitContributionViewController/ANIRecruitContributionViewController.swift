@@ -426,8 +426,6 @@ extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
     if view === self.contributeButton {
       guard let currentUser = ANISessionManager.shared.currentUser,
             let userId = currentUser.uid,
-            let userName = currentUser.userName,
-            let profileImageUrl = currentUser.profileImageUrl,
             let recruitContributionView = self.recruitContributionView,
             let recruitInfo = recruitContributionView.getRecruitInfo(),
             let rejectViewBottomConstraint = self.rejectViewBottomConstraint,

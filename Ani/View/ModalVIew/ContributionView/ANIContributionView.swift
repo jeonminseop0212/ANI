@@ -25,17 +25,19 @@ class ANIContributionView: UIView {
   
   var contentImages = [UIImage?]() {
     didSet {
-      guard let contentImagesView = self.contentImagesView,
-            let contentTextView = self.contentTextView else { return }
+      guard let contentImagesView = self.contentImagesView else { return }
+      
       contentImagesView.contentImages = contentImages
       
-      if contentTextView.text.count > 0 && !contentImages.isEmpty {
+      if isContributable() {
         self.delegate?.contributionButtonOn(on: true)
       } else {
         self.delegate?.contributionButtonOn(on: false)
       }
     }
   }
+  
+  var selectedContributionMode: ContributionMode?
   
   private let KEYBOARD_HIDE_TOOL_BAR_HEIGHT: CGFloat = 40.0
   
@@ -97,6 +99,26 @@ class ANIContributionView: UIView {
     return text
   }
   
+  private func isContributable() -> Bool {
+    guard let selectedContributionMode = self.selectedContributionMode,
+          let contentTextView = self.contentTextView else { return false }
+    
+    switch selectedContributionMode {
+    case .story:
+      if contentTextView.text.count > 0 && !contentImages.isEmpty {
+        return true
+      } else {
+        return false
+      }
+    case .qna:
+      if contentTextView.text.count > 0 {
+        return true
+      } else {
+        return false
+      }
+    }
+  }
+  
   private func setHideButtonOnKeyboard(textView: UITextView){
     let tools = UIToolbar()
     tools.frame = CGRect(x: 0, y: 0, width: frame.width, height: KEYBOARD_HIDE_TOOL_BAR_HEIGHT)
@@ -127,7 +149,7 @@ extension ANIContributionView: ANIContributionImagesViewDelegate {
 
 extension ANIContributionView: UITextViewDelegate {
   func textViewDidChange(_ textView: UITextView) {
-    if textView.text.count > 0 && !contentImages.isEmpty {
+    if isContributable() {
       self.delegate?.contributionButtonOn(on: true)
     } else {
       self.delegate?.contributionButtonOn(on: false)

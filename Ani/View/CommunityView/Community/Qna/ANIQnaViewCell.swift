@@ -10,6 +10,7 @@ import UIKit
 import WCLShineButton
 import FirebaseDatabase
 import CodableFirebase
+import TinyConstraints
 
 protocol ANIQnaViewCellDelegate {
   func cellTapped(qna: FirebaseQna, user: FirebaseUser)
@@ -19,6 +20,8 @@ class ANIQnaViewCell: UITableViewCell {
   private weak var subTitleLabel: UILabel?
   private weak var profileImageView: UIImageView?
   private weak var userNameLabel: UILabel?
+  private var qnaImagesViewHeightConstraint: Constraint?
+  private var qnaImagesViewHeight: CGFloat = 0.0
   private weak var qnaImagesView: ANIQnaImagesView?
   private weak var loveButton: WCLShineButton?
   private weak var loveCountLabel: UILabel?
@@ -68,7 +71,8 @@ class ANIQnaViewCell: UITableViewCell {
     qnaImagesView.topToBottom(of: subTitleLabel, offset: 10.0)
     qnaImagesView.leftToSuperview()
     qnaImagesView.rightToSuperview()
-    qnaImagesView.height(UIScreen.main.bounds.width / 2 - 30)
+    qnaImagesViewHeight = UIScreen.main.bounds.width / 2 - 30
+    qnaImagesViewHeightConstraint = qnaImagesView.height(qnaImagesViewHeight)
     self.qnaImagesView = qnaImagesView
     
     //profileImageView
@@ -181,9 +185,15 @@ class ANIQnaViewCell: UITableViewCell {
           let subTitleLabel = self.subTitleLabel,
           let loveCountLabel = self.loveCountLabel,
           let commentCountLabel = self.commentCountLabel,
-          let qna = self.qna else { return }
+          let qna = self.qna,
+          let qnaImagesViewHeightConstraint = self.qnaImagesViewHeightConstraint else { return }
     
-    qnaImagesView.imageUrls = qna.qnaImageUrls
+    if let qnaImageUrls = qna.qnaImageUrls {
+      qnaImagesView.imageUrls = qnaImageUrls
+      qnaImagesViewHeightConstraint.constant = qnaImagesViewHeight
+    } else {
+      qnaImagesViewHeightConstraint.constant = 0
+    }
     subTitleLabel.text = qna.qna
     loveCountLabel.text = "\(qna.loveCount)"
     if let commentIds = qna.commentIds {
