@@ -11,6 +11,10 @@ import WCLShineButton
 import FirebaseDatabase
 import CodableFirebase
 
+protocol ANIStoryViewCellDelegate {
+  func cellTapped(story: FirebaseStory, user: FirebaseUser)
+}
+
 class ANIStoryViewCell: UITableViewCell {
   private weak var storyImagesView: ANIStoryImagesView?
   private weak var storyLabel: UILabel?
@@ -25,8 +29,13 @@ class ANIStoryViewCell: UITableViewCell {
   var story: FirebaseStory? {
     didSet {
       reloadLayout()
+      loadUser()
     }
   }
+  
+  var user: FirebaseUser?
+  
+  var delegate: ANIStoryViewCellDelegate?
   
   override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -39,7 +48,9 @@ class ANIStoryViewCell: UITableViewCell {
   
   private func setup() {
     self.selectionStyle = .none
-
+    let cellTapGesture = UITapGestureRecognizer(target: self, action: #selector(cellTapped))
+    self.addGestureRecognizer(cellTapGesture)
+    
     //storyImagesView
     let storyImagesView = ANIStoryImagesView()
     addSubview(storyImagesView)
@@ -169,8 +180,6 @@ class ANIStoryViewCell: UITableViewCell {
   private func reloadLayout() {
     guard let storyImagesView = self.storyImagesView,
           let storyLabel = self.storyLabel,
-          let profileImageView = self.profileImageView,
-          let userNameLabel = self.userNameLabel,
           let loveCountLabel = self.loveCountLabel,
           let commentCountLabel = self.commentCountLabel,
           let story = self.story else { return }
@@ -178,13 +187,43 @@ class ANIStoryViewCell: UITableViewCell {
     storyImagesView.imageUrls = story.storyImageUrls
     storyImagesView.pageControl?.numberOfPages = story.storyImageUrls.count
     storyLabel.text = story.story
-    profileImageView.sd_setImage(with: URL(string: story.profileImageUrl), completed: nil)
-    userNameLabel.text = story.userName
     loveCountLabel.text = "\(story.loveCount)"
     if let commentIds = story.commentIds {
       commentCountLabel.text = "\(commentIds.count)"
     } else {
       commentCountLabel.text = "0"
+    }
+  }
+  
+  private func reloadUserLayout(user: FirebaseUser) {
+    guard let userNameLabel = self.userNameLabel,
+          let profileImageView = self.profileImageView,
+          let profileImageUrl = user.profileImageUrl,
+          let userName = user.userName else { return }
+    
+    profileImageView.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
+    userNameLabel.text = userName
+  }
+  
+  private func loadUser() {
+    guard let story = self.story else { return }
+    
+    DispatchQueue.global().async {
+      let databaseRef = Database.database().reference()
+      databaseRef.child(KEY_USERS).child(story.userId).observeSingleEvent(of: .value, with: { (userSnapshot) in
+        if let userValue = userSnapshot.value {
+          do {
+            let user = try FirebaseDecoder().decode(FirebaseUser.self, from: userValue)
+            self.user = user
+            
+            DispatchQueue.main.async {
+              self.reloadUserLayout(user: user)
+            }
+          } catch let error {
+            print(error)
+          }
+        }
+      })
     }
   }
   
@@ -197,6 +236,13 @@ class ANIStoryViewCell: UITableViewCell {
     guard let story = self.story else { return }
     
     ANINotificationManager.postProfileImageViewTapped(userId: story.userId)
+  }
+  
+  @objc private func cellTapped() {
+    guard let story = self.story,
+          let user = self.user else { return }
+    
+    self.delegate?.cellTapped(story: story, user: user)
   }
 }
 

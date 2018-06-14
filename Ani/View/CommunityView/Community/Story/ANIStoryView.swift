@@ -11,7 +11,7 @@ import FirebaseDatabase
 import CodableFirebase
 
 protocol ANIStoryViewDelegate {
-  func storyViewCellDidSelect(selectedStory: FirebaseStory)
+  func storyViewCellDidSelect(selectedStory: FirebaseStory, user: FirebaseUser)
 }
 
 class ANIStoryView: UIView {
@@ -46,7 +46,6 @@ class ANIStoryView: UIView {
     tableView.separatorStyle = .none
     tableView.backgroundColor = ANIColor.bg
     tableView.dataSource = self
-    tableView.delegate = self
     let refreshControl = UIRefreshControl()
     refreshControl.addTarget(self, action: #selector(loadStory(sender:)), for: .valueChanged)
     tableView.addSubview(refreshControl)
@@ -110,15 +109,16 @@ extension ANIStoryView: UITableViewDataSource {
     if !stories.isEmpty {
       cell.story = stories[indexPath.row]
       cell.observeStory()
+      cell.delegate = self
     }
 
     return cell
   }
 }
 
-//MARK: UITableViewDelegate
-extension ANIStoryView: UITableViewDelegate {
-  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    self.delegate?.storyViewCellDidSelect(selectedStory: stories[indexPath.row])
+//MARK: ANIStoryViewCellDelegate
+extension ANIStoryView: ANIStoryViewCellDelegate {
+  func cellTapped(story: FirebaseStory, user: FirebaseUser) {
+    self.delegate?.storyViewCellDidSelect(selectedStory: story, user: user)
   }
 }

@@ -11,7 +11,7 @@ import FirebaseDatabase
 import CodableFirebase
 
 protocol ANIQnaViewDelegate {
-  func qnaViewCellDidSelect(selectedQna: FirebaseQna)
+  func qnaViewCellDidSelect(selectedQna: FirebaseQna, user: FirebaseUser)
 }
 
 class ANIQnaView: UIView {
@@ -45,7 +45,6 @@ class ANIQnaView: UIView {
     let id = NSStringFromClass(ANIQnaViewCell.self)
     tableView.register(ANIQnaViewCell.self, forCellReuseIdentifier: id)
     tableView.dataSource = self
-    tableView.delegate = self
     tableView.separatorStyle = .none
     let refreshControl = UIRefreshControl()
     refreshControl.addTarget(self, action: #selector(loadQna(sender:)), for: .valueChanged)
@@ -110,15 +109,16 @@ extension ANIQnaView: UITableViewDataSource {
     if !qnas.isEmpty {
       cell.qna = qnas[indexPath.row]
       cell.observeQna()
+      cell.delegate = self
     }
     
     return cell
   }
 }
 
-//MARK: UITableViewDelegate
-extension ANIQnaView: UITableViewDelegate {
-  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    self.delegate?.qnaViewCellDidSelect(selectedQna: qnas[indexPath.row])
+//MARK: ANIQnaViewCellDelegate
+extension ANIQnaView: ANIQnaViewCellDelegate {
+  func cellTapped(qna: FirebaseQna, user: FirebaseUser) {
+    self.delegate?.qnaViewCellDidSelect(selectedQna: qna, user: user)
   }
 }

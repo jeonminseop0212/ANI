@@ -8,6 +8,8 @@
 
 import UIKit
 import WCLShineButton
+import FirebaseDatabase
+import CodableFirebase
 
 class ANICommentCell: UITableViewCell {
   
@@ -27,8 +29,11 @@ class ANICommentCell: UITableViewCell {
   var comment: FirebaseComment? {
     didSet {
       reloadLayout()
+      loadUser()
     }
   }
+  
+  var user: FirebaseUser?
   
   override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -139,18 +144,46 @@ class ANICommentCell: UITableViewCell {
   }
   
   private func reloadLayout() {
-    guard let profileImageView = self.profileImageView,
-          let commentLabel = self.commentLabel,
-          let userNameLabel = self.userNameLabel,
+    guard let commentLabel = self.commentLabel,
           let commentCountLabel = self.commentCountLabel,
           let loveCountLabel = self.loveCountLabel,
           let comment = self.comment else { return }
     
-    profileImageView.sd_setImage(with: URL(string: comment.profileImageUrl), completed: nil)
-    userNameLabel.text = comment.userName
     commentLabel.text = comment.comment
     commentCountLabel.text = "\(comment.commentCount)"
     loveCountLabel.text = "\(comment.loveCount)"
+  }
+  
+  private func reloadUserLayout(user: FirebaseUser) {
+    guard let userNameLabel = self.userNameLabel,
+          let profileImageView = self.profileImageView,
+          let profileImageUrl = user.profileImageUrl,
+          let userName = user.userName else { return }
+    
+    profileImageView.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
+    userNameLabel.text = userName
+  }
+  
+  private func loadUser() {
+    guard let comment = self.comment else { return }
+    
+    DispatchQueue.global().async {
+      let databaseRef = Database.database().reference()
+      databaseRef.child(KEY_USERS).child(comment.userId).observeSingleEvent(of: .value, with: { (userSnapshot) in
+        if let userValue = userSnapshot.value {
+          do {
+            let user = try FirebaseDecoder().decode(FirebaseUser.self, from: userValue)
+            self.user = user
+            
+            DispatchQueue.main.async {
+              self.reloadUserLayout(user: user)
+            }
+          } catch let error {
+            print(error)
+          }
+        }
+      })
+    }
   }
   
   //MARK: action

@@ -261,7 +261,7 @@ class ANIRecruitContributionViewController: UIViewController {
           
           do {
             let detabaseRef = Database.database().reference()
-            if let currentUser = ANISessionManager.shared.currentUser,  let uid = currentUser.uid, let id = recruit.id {
+            if let currentUser = ANISessionManager.shared.currentUser, let uid = currentUser.uid, let id = recruit.id {
               let detabaseUsersRef = detabaseRef.child(KEY_USERS).child(uid).child(KEY_POST_RECRUIT_IDS)
               let value: [String: Bool] = [id: true]
               detabaseUsersRef.updateChildValues(value)
@@ -440,7 +440,7 @@ extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
         let detabaseRef = Database.database().reference()
         let databaseRecruitRef = detabaseRef.child(KEY_RECRUITS).childByAutoId()
         let id = databaseRecruitRef.key
-        var recruit = FirebaseRecruit(id: id, headerImageUrl: nil, title: recruitInfo.title, kind: recruitInfo.kind, age: recruitInfo.age, sex: recruitInfo.sex, home: recruitInfo.home, vaccine: recruitInfo.vaccine, castration: recruitInfo.castration, reason: recruitInfo.reason, introduce: recruitInfo.introduce, introduceImageUrls: nil, passing: recruitInfo.passing, isRecruit: true, userId: userId, userName: userName, profileImageUrl: profileImageUrl, supportCount: 0, loveCount: 0)
+        var recruit = FirebaseRecruit(id: id, headerImageUrl: nil, title: recruitInfo.title, kind: recruitInfo.kind, age: recruitInfo.age, sex: recruitInfo.sex, home: recruitInfo.home, vaccine: recruitInfo.vaccine, castration: recruitInfo.castration, reason: recruitInfo.reason, introduce: recruitInfo.introduce, introduceImageUrls: nil, passing: recruitInfo.passing, isRecruit: true, userId: userId, supportCount: 0, loveCount: 0)
         
         DispatchQueue.global().async {
           if let recruitHeaderImageData = UIImageJPEGRepresentation(recruitInfo.headerImage, 0.5) {

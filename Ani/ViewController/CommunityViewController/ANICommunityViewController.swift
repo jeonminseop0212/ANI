@@ -205,22 +205,24 @@ extension ANICommunityViewController: ANICommunityMenuBarDelegate {
 
 //MARK: ANIStoryViewDelegate
 extension ANICommunityViewController: ANIStoryViewDelegate {
-  func storyViewCellDidSelect(selectedStory: FirebaseStory) {
+  func storyViewCellDidSelect(selectedStory: FirebaseStory, user: FirebaseUser) {
     let commentViewController = ANICommentViewController()
     commentViewController.hidesBottomBarWhenPushed = true
     commentViewController.commentMode = CommentMode.story
     commentViewController.story = selectedStory
+    commentViewController.user = user
     self.navigationController?.pushViewController(commentViewController, animated: true)
   }
 }
 
 //MARK: ANIQnaViewDelegate
 extension ANICommunityViewController: ANIQnaViewDelegate {
-  func qnaViewCellDidSelect(selectedQna: FirebaseQna) {
+  func qnaViewCellDidSelect(selectedQna: FirebaseQna, user: FirebaseUser) {
     let commentViewController = ANICommentViewController()
     commentViewController.hidesBottomBarWhenPushed = true
     commentViewController.commentMode = CommentMode.qna
     commentViewController.qna = selectedQna
+    commentViewController.user = user
     self.navigationController?.pushViewController(commentViewController, animated: true)
   }
 }
