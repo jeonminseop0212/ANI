@@ -20,6 +20,7 @@ class ANICommentViewController: UIViewController {
   private weak var myNavigationBase: UIView?
   private weak var backButton: UIButton?
   private let NAVIGATION_PROFILE_IMAGE_VIEW_HEIGHT: CGFloat = 30.0
+  private weak var navigationProfileImageShadowView: UIView?
   private weak var navigationProfileImageView: UIImageView?
   
   private weak var commentView: ANICommentView?
@@ -85,16 +86,23 @@ class ANICommentViewController: UIViewController {
     backButton.centerYToSuperview()
     self.backButton = backButton
     
+    //navigationProfileImageShadowView
+    let navigationProfileImageShadowView = UIView()
+    navigationProfileImageShadowView.layer.cornerRadius = NAVIGATION_PROFILE_IMAGE_VIEW_HEIGHT / 2
+    navigationProfileImageShadowView.dropShadow(opacity: 0.25, offset: CGSize(width: 0.0, height: 1.0))
+    myNavigationBase.addSubview(navigationProfileImageShadowView)
+    navigationProfileImageShadowView.width(NAVIGATION_PROFILE_IMAGE_VIEW_HEIGHT)
+    navigationProfileImageShadowView.height(NAVIGATION_PROFILE_IMAGE_VIEW_HEIGHT)
+    navigationProfileImageShadowView.centerInSuperview()
+    self.navigationProfileImageShadowView = navigationProfileImageShadowView
+    
     //navigationProfileImageView
     let navigationProfileImageView = UIImageView()
     navigationProfileImageView.contentMode = .scaleAspectFit
-//    navigationProfileImageView.dropShadow(opacity: 0.1, offset: CGSize(width: 0.0, height: 3.0))
     navigationProfileImageView.layer.cornerRadius = NAVIGATION_PROFILE_IMAGE_VIEW_HEIGHT / 2
     navigationProfileImageView.layer.masksToBounds = true
-    myNavigationBase.addSubview(navigationProfileImageView)
-    navigationProfileImageView.width(NAVIGATION_PROFILE_IMAGE_VIEW_HEIGHT)
-    navigationProfileImageView.height(NAVIGATION_PROFILE_IMAGE_VIEW_HEIGHT)
-    navigationProfileImageView.centerInSuperview()
+    navigationProfileImageShadowView.addSubview(navigationProfileImageView)
+    navigationProfileImageView.edgesToSuperview()
     self.navigationProfileImageView = navigationProfileImageView
     
     //commentBar
