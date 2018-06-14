@@ -133,26 +133,29 @@ class ANIProfileViewController: UIViewController {
 
 //MARK: ANIProfileBasicViewDelegate
 extension ANIProfileViewController: ANIProfileBasicViewDelegate {
-  func recruitViewCellDidSelect(selectedRecruit: FirebaseRecruit) {
+  func recruitViewCellDidSelect(selectedRecruit: FirebaseRecruit, user: FirebaseUser) {
     let recruitDetailViewController = ANIRecruitDetailViewController()
     recruitDetailViewController.hidesBottomBarWhenPushed = true
     recruitDetailViewController.recruit = selectedRecruit
+    recruitDetailViewController.user = user
     self.navigationController?.pushViewController(recruitDetailViewController, animated: true)
   }
   
-  func storyViewCellDidSelect(selectedStory: FirebaseStory) {
+  func storyViewCellDidSelect(selectedStory: FirebaseStory, user: FirebaseUser) {
     let commentViewController = ANICommentViewController()
     commentViewController.hidesBottomBarWhenPushed = true
     commentViewController.commentMode = CommentMode.story
     commentViewController.story = selectedStory
+    commentViewController.user = user
     self.navigationController?.pushViewController(commentViewController, animated: true)
   }
   
-  func qnaViewCellDidSelect(selectedQna: FirebaseQna) {
+  func qnaViewCellDidSelect(selectedQna: FirebaseQna, user: FirebaseUser) {
     let commentViewController = ANICommentViewController()
     commentViewController.hidesBottomBarWhenPushed = true
     commentViewController.commentMode = CommentMode.qna
     commentViewController.qna = selectedQna
+    commentViewController.user = user
     self.navigationController?.pushViewController(commentViewController, animated: true)
   }
 }
