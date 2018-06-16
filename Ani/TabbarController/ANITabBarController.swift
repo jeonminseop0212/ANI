@@ -18,32 +18,13 @@ class ANITabBarController: UITabBarController, NVActivityIndicatorViewable {
     super.viewDidLoad()
     //tabBar上の線を消す
     let tabBarAppearane = UITabBar.appearance()
-    tabBarAppearane.barTintColor = .white
-    tabBar.alpha = 0.95
+    tabBarAppearane.backgroundImage = UIImage()
+    tabBarAppearane.shadowImage = UIImage()
+    tabBarAppearane.backgroundColor = UIColor(red: 255, green: 255, blue: 255, a: 0.95)
     tabBar.layer.borderWidth = 0.0
     tabBar.clipsToBounds = true
     
-    let recruitVC = ANIRecruitViewController()
-    recruitVC.tabBarItem = UITabBarItem(tabBarSystemItem: .downloads, tag: 1)
-    let recruitNV = UINavigationController(rootViewController: recruitVC)
-    
-    let communityVC = ANICommunityViewController()
-    communityVC.tabBarItem = UITabBarItem(tabBarSystemItem: .bookmarks, tag: 2)
-    let communityNV = UINavigationController(rootViewController: communityVC)
-    
-    let notiVC = ANINotiViewController()
-    notiVC.tabBarItem = UITabBarItem(tabBarSystemItem: .bookmarks, tag: 3)
-    let notiNV = UINavigationController(rootViewController: notiVC)
-    
-    let searchVC = ANISearchViewController()
-    searchVC.tabBarItem = UITabBarItem(tabBarSystemItem: .search, tag: 4)
-    let searchNV = UINavigationController(rootViewController: searchVC)
-    
-    let profileVC = ANIProfileViewController()
-    profileVC.tabBarItem = UITabBarItem(tabBarSystemItem: .search, tag: 5)
-    let profileNV = UINavigationController(rootViewController: profileVC)
-    
-    setViewControllers([recruitNV, communityNV, notiNV, searchNV, profileNV], animated: false)
+    setTabBar()
   }
   
   override func viewDidAppear(_ animated: Bool) {
@@ -82,6 +63,41 @@ class ANITabBarController: UITabBarController, NVActivityIndicatorViewable {
       }
       
       showInitialView()
+    }
+  }
+  
+  private func setTabBar() {
+    let recruitVC = ANIRecruitViewController()
+    recruitVC.tabBarItem.image = UIImage(named: "home")?.withRenderingMode(.alwaysOriginal)
+    recruitVC.tabBarItem.selectedImage = UIImage(named: "homeSelected")?.withRenderingMode(.alwaysOriginal)
+    let recruitNV = UINavigationController(rootViewController: recruitVC)
+    
+    let communityVC = ANICommunityViewController()
+    communityVC.tabBarItem.image = UIImage(named: "community")?.withRenderingMode(.alwaysOriginal)
+    communityVC.tabBarItem.selectedImage = UIImage(named: "communitySelected")?.withRenderingMode(.alwaysOriginal)
+    let communityNV = UINavigationController(rootViewController: communityVC)
+    
+    let notiVC = ANINotiViewController()
+    notiVC.tabBarItem.image = UIImage(named: "noti")?.withRenderingMode(.alwaysOriginal)
+    notiVC.tabBarItem.selectedImage = UIImage(named: "notiSelected")?.withRenderingMode(.alwaysOriginal)
+    let notiNV = UINavigationController(rootViewController: notiVC)
+    
+    let searchVC = ANISearchViewController()
+    searchVC.tabBarItem.image = UIImage(named: "search")?.withRenderingMode(.alwaysOriginal)
+    searchVC.tabBarItem.selectedImage = UIImage(named: "searchSelected")?.withRenderingMode(.alwaysOriginal)
+    let searchNV = UINavigationController(rootViewController: searchVC)
+    
+    let profileVC = ANIProfileViewController()
+    profileVC.tabBarItem.image = UIImage(named: "profile")?.withRenderingMode(.alwaysOriginal)
+    profileVC.tabBarItem.selectedImage = UIImage(named: "profileSelected")?.withRenderingMode(.alwaysOriginal)
+    let profileNV = UINavigationController(rootViewController: profileVC)
+    
+    setViewControllers([recruitNV, communityNV, notiNV, searchNV, profileNV], animated: false)
+    
+    if let items = tabBar.items {
+      for item in items {
+        item.imageInsets = UIEdgeInsetsMake(4.0, 0.0, -4.0, 0.0)
+      }
     }
   }
   
