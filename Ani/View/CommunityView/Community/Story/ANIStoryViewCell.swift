@@ -16,6 +16,7 @@ protocol ANIStoryViewCellDelegate {
 }
 
 class ANIStoryViewCell: UITableViewCell {
+  private weak var tapArea: UIView?
   private weak var storyImagesView: ANIStoryImagesView?
   private weak var storyLabel: UILabel?
   private weak var line: UIImageView?
@@ -48,12 +49,19 @@ class ANIStoryViewCell: UITableViewCell {
   
   private func setup() {
     self.selectionStyle = .none
+    self.backgroundColor = .white
+    
+    //tapArea
+    let tapArea = UIView()
     let cellTapGesture = UITapGestureRecognizer(target: self, action: #selector(cellTapped))
-    self.addGestureRecognizer(cellTapGesture)
+    tapArea.addGestureRecognizer(cellTapGesture)
+    addSubview(tapArea)
+    tapArea.edgesToSuperview(excluding: .bottom)
+    self.tapArea = tapArea
     
     //storyImagesView
     let storyImagesView = ANIStoryImagesView()
-    addSubview(storyImagesView)
+    tapArea.addSubview(storyImagesView)
     storyImagesView.topToSuperview()
     storyImagesView.leftToSuperview()
     storyImagesView.rightToSuperview()
@@ -65,11 +73,13 @@ class ANIStoryViewCell: UITableViewCell {
     storyLabel.textAlignment = .left
     storyLabel.textColor = ANIColor.subTitle
     storyLabel.numberOfLines = 0
-    addSubview(storyLabel)
+    tapArea.addSubview(storyLabel)
     storyLabel.topToBottom(of: storyImagesView, offset: 5.0)
     storyLabel.leftToSuperview(offset: 10.0)
     storyLabel.rightToSuperview(offset: 10.0)
     self.storyLabel = storyLabel
+    
+    tapArea.bottom(to: storyLabel)
 
     //profileImageView
     let profileImageView = UIImageView()
@@ -100,6 +110,7 @@ class ANIStoryViewCell: UITableViewCell {
     //commentButton
     let commentButton = UIButton()
     commentButton.setImage(UIImage(named: "comment"), for: .normal)
+    commentButton.addTarget(self, action: #selector(cellTapped), for: .touchUpInside)
     addSubview(commentButton)
     commentButton.centerY(to: profileImageView)
     commentButton.rightToLeft(of: commentCountLabel, offset: -10.0)
