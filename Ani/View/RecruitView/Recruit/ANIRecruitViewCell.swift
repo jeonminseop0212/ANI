@@ -16,6 +16,7 @@ protocol ANIRecruitViewCellDelegate {
 }
 
 class ANIRecruitViewCell: UITableViewCell {
+  private weak var tapArea: UIView?
   private weak var recruitImageView: UIImageView?
   private weak var basicInfoStackView: UIStackView?
   private weak var isRecruitLabel: UILabel?
@@ -56,14 +57,21 @@ class ANIRecruitViewCell: UITableViewCell {
   
   private func setup() {
     self.selectionStyle = .none
+    self.backgroundColor = .white
+    
+    //tapArea
+    let tapArea = UIView()
     let cellTapGesture = UITapGestureRecognizer(target: self, action: #selector(cellTapped))
-    self.addGestureRecognizer(cellTapGesture)
+    tapArea.addGestureRecognizer(cellTapGesture)
+    addSubview(tapArea)
+    tapArea.edgesToSuperview(excluding: .bottom)
+    self.tapArea = tapArea
     
     //recruitImageView
     let recruitImageView = UIImageView()
     recruitImageView.backgroundColor = ANIColor.bg
     recruitImageView.contentMode = .redraw
-    addSubview(recruitImageView)
+    tapArea.addSubview(recruitImageView)
     let recruitImageViewHeight: CGFloat = UIScreen.main.bounds.width * UIViewController.HEADER_IMAGE_VIEW_RATIO
     recruitImageView.topToSuperview()
     recruitImageView.leftToSuperview()
@@ -77,7 +85,7 @@ class ANIRecruitViewCell: UITableViewCell {
     basicInfoStackView.distribution = .fillEqually
     basicInfoStackView.alignment = .center
     basicInfoStackView.spacing = 8.0
-    addSubview(basicInfoStackView)
+    tapArea.addSubview(basicInfoStackView)
     basicInfoStackView.topToBottom(of: recruitImageView, offset: 10.0)
     basicInfoStackView.leftToSuperview(offset: 10.0)
     basicInfoStackView.rightToSuperview(offset: 10.0)
@@ -139,7 +147,7 @@ class ANIRecruitViewCell: UITableViewCell {
     titleLabel.font = UIFont.boldSystemFont(ofSize: 17.0)
     titleLabel.textAlignment = .left
     titleLabel.textColor = ANIColor.dark
-    addSubview(titleLabel)
+    tapArea.addSubview(titleLabel)
     titleLabel.topToBottom(of: basicInfoStackView, offset: 10.0)
     titleLabel.leftToSuperview(offset: 10.0)
     titleLabel.rightToSuperview(offset: 10.0)
@@ -151,11 +159,13 @@ class ANIRecruitViewCell: UITableViewCell {
     subTitleLabel.numberOfLines = 3
     subTitleLabel.font = UIFont.systemFont(ofSize: 14.0)
     subTitleLabel.textColor = ANIColor.subTitle
-    addSubview(subTitleLabel)
+    tapArea.addSubview(subTitleLabel)
     subTitleLabel.topToBottom(of: titleLabel, offset: 10.0)
     subTitleLabel.leftToSuperview(offset: 10.0)
     subTitleLabel.rightToSuperview(offset: 10.0)
     self.subTitleLabel = subTitleLabel
+    
+    tapArea.bottom(to: subTitleLabel)
     
     //profileImageView
     let profileImageView = UIImageView()
@@ -164,7 +174,7 @@ class ANIRecruitViewCell: UITableViewCell {
     profileImageView.addGestureRecognizer(profileImageTapGesture)
     profileImageView.backgroundColor = ANIColor.bg
     addSubview(profileImageView)
-    profileImageView.topToBottom(of: subTitleLabel, offset: 10.0)
+    profileImageView.topToBottom(of: tapArea, offset: 10.0)
     profileImageView.leftToSuperview(offset: 10.0)
     profileImageView.width(PROFILE_IMAGE_HEIGHT)
     profileImageView.height(PROFILE_IMAGE_HEIGHT)

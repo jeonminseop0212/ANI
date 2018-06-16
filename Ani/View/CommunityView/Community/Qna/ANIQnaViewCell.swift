@@ -17,6 +17,7 @@ protocol ANIQnaViewCellDelegate {
 }
 
 class ANIQnaViewCell: UITableViewCell {
+  private weak var tapArea: UIView?
   private weak var subTitleLabel: UILabel?
   private weak var profileImageView: UIImageView?
   private weak var userNameLabel: UILabel?
@@ -50,20 +51,28 @@ class ANIQnaViewCell: UITableViewCell {
   
   private func setup() {
     self.selectionStyle = .none
-    let cellTapGesture = UITapGestureRecognizer(target: self, action: #selector(cellTapped))
-    self.addGestureRecognizer(cellTapGesture)
-
     self.backgroundColor = .white
+    
+    //tapArea
+    let tapArea = UIView()
+    let cellTapGesture = UITapGestureRecognizer(target: self, action: #selector(cellTapped))
+    tapArea.addGestureRecognizer(cellTapGesture)
+    addSubview(tapArea)
+    tapArea.edgesToSuperview(excluding: .bottom)
+    self.tapArea = tapArea
+    
     //subTitleLabel
     let subTitleLabel = UILabel()
     subTitleLabel.font = UIFont.systemFont(ofSize: 14.0)
     subTitleLabel.textColor = ANIColor.subTitle
     subTitleLabel.numberOfLines = 0
-    addSubview(subTitleLabel)
+    tapArea.addSubview(subTitleLabel)
     subTitleLabel.topToSuperview(offset: 10.0)
     subTitleLabel.leftToSuperview(offset: 10.0)
     subTitleLabel.rightToSuperview(offset: 10.0)
     self.subTitleLabel = subTitleLabel
+    
+    tapArea.bottom(to: subTitleLabel)
     
     //qnaImagesView
     let qnaImagesView = ANIQnaImagesView()
@@ -125,6 +134,7 @@ class ANIQnaViewCell: UITableViewCell {
     //commentButton
     let commentButton = UIButton()
     commentButton.setImage(UIImage(named: "comment"), for: .normal)
+    commentButton.addTarget(self, action: #selector(cellTapped), for: .touchUpInside)
     addSubview(commentButton)
     commentButton.centerY(to: profileImageView)
     commentButton.rightToLeft(of: commentCountLabel, offset: -10.0)
