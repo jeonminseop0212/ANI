@@ -31,6 +31,8 @@ class ANIStoryViewCell: UITableViewCell {
     didSet {
       reloadLayout()
       loadUser()
+      isLoved()
+      observeLove()
     }
   }
   
@@ -198,7 +200,13 @@ class ANIStoryViewCell: UITableViewCell {
     storyImagesView.imageUrls = story.storyImageUrls
     storyImagesView.pageControl?.numberOfPages = story.storyImageUrls.count
     storyLabel.text = story.story
-    loveCountLabel.text = "\(story.loveCount)"
+    
+    if let loveIds = story.loveIds {
+      loveCountLabel.text = "\(loveIds.count)"
+    } else {
+      loveCountLabel.text = "0"
+    }
+    
     if let commentIds = story.commentIds {
       commentCountLabel.text = "\(commentIds.count)"
     } else {
@@ -238,9 +246,72 @@ class ANIStoryViewCell: UITableViewCell {
     }
   }
   
+  private func observeLove() {
+    guard let story = self.story,
+          let storyId = story.id else { return }
+    
+    let databaseRef = Database.database().reference()
+    DispatchQueue.global().async {
+      databaseRef.child(KEY_STORIES).child(storyId).child(KEY_LOVE_IDS).observe(.value) { (snapshot) in
+        if let loveIds = snapshot.value as? [String: AnyObject] {
+          DispatchQueue.main.async {
+            guard let loveCountLabel = self.loveCountLabel else { return }
+            
+            loveCountLabel.text = "\(loveIds.count)"
+          }
+        } else {
+          DispatchQueue.main.async {
+            guard let loveCountLabel = self.loveCountLabel else { return }
+            
+            loveCountLabel.text = "0"
+          }
+        }
+      }
+    }
+  }
+  
+  private func isLoved() {
+    guard let story = self.story,
+          let storyId = story.id,
+          let currentUserId = ANISessionManager.shared.currentUserUid else { return }
+    
+    let databaseRef = Database.database().reference()
+    DispatchQueue.global().async {
+      databaseRef.child(KEY_STORIES).child(storyId).child(KEY_LOVE_IDS).observeSingleEvent(of: .value) { (snapshot) in
+        for item in snapshot.children {
+          if let snapshot = item as? DataSnapshot {
+            if snapshot.key == currentUserId {
+              DispatchQueue.main.async {
+                guard let loveButton = self.loveButton else { return }
+                
+                loveButton.isSelected = true
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
   //MARK: action
   @objc private func love() {
-    print("love")
+    guard let story = self.story,
+          let storyId = story.id,
+          let currentUserId = ANISessionManager.shared.currentUserUid,
+          let loveButton = self.loveButton else { return }
+    
+    let databaseRef = Database.database().reference()
+    if loveButton.isSelected == true {
+      DispatchQueue.global().async {
+        databaseRef.child(KEY_STORIES).child(storyId).child(KEY_LOVE_IDS).updateChildValues([currentUserId: true])
+        databaseRef.child(KEY_USERS).child(currentUserId).child(KEY_LOVE_STORY_IDS).updateChildValues([storyId: true])
+      }
+    } else {
+      DispatchQueue.global().async {
+        databaseRef.child(KEY_STORIES).child(storyId).child(KEY_LOVE_IDS).child(currentUserId).removeValue()
+        databaseRef.child(KEY_USERS).child(currentUserId).child(KEY_LOVE_STORY_IDS).child(storyId).removeValue()
+      }
+    }
   }
   
   @objc private func profileImageViewTapped() {
