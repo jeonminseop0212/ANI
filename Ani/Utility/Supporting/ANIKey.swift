@@ -21,11 +21,15 @@ let KEY_FAMILY_IMAGES = "family_images"
 let KEY_POST_RECRUIT_IDS = "postRecruitIds"
 let KEY_POST_STORY_IDS = "postStoryIds"
 let KEY_POST_QNA_IDS = "postQnaIds"
+let KEY_LOVE_RECRUIT_IDS = "loveRecruitIds"
+let KEY_LOVE_STORY_IDS = "loveStoryIds"
+let KEY_LOVE_QNA_IDS = "loveQnaIds"
 
 //recruit
 let KEY_RECRUIT_HEADER_IMAGES = "recruit_header_images"
 let KEY_RECRUIT_INTRODUCE_IMAGES = "recruit_introduce_images"
 let KEY_RECRUITS = "recruits"
+let KEY_LOVE_IDS = "loveIds"
 
 //story
 let KEY_STORY_IMAGES = "story_images"

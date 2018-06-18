@@ -65,7 +65,7 @@ DEPENDENCIES:
   - Gallery
 
 SPEC REPOS:
-  https://github.com/CocoaPods/Specs.git:
+  https://github.com/cocoapods/specs.git:
     - Firebase
     - FirebaseAnalytics
     - FirebaseAuth
@@ -99,4 +99,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 6e72a717f1d5ad667db591869a0d39c3ec23f7d4
 
-COCOAPODS: 1.5.0
+COCOAPODS: 1.5.3

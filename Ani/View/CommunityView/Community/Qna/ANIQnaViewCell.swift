@@ -33,6 +33,8 @@ class ANIQnaViewCell: UITableViewCell {
     didSet {
       reloadLayout()
       loadUser()
+      isLoved()
+      observeLove()
     }
   }
   
@@ -205,7 +207,13 @@ class ANIQnaViewCell: UITableViewCell {
       qnaImagesViewHeightConstraint.constant = 0
     }
     subTitleLabel.text = qna.qna
-    loveCountLabel.text = "\(qna.loveCount)"
+
+    if let loveIds = qna.loveIds {
+      loveCountLabel.text = "\(loveIds.count)"
+    } else {
+      loveCountLabel.text = "0"
+    }
+    
     if let commentIds = qna.commentIds {
       commentCountLabel.text = "\(commentIds.count)"
     } else {
@@ -245,9 +253,72 @@ class ANIQnaViewCell: UITableViewCell {
     }
   }
   
+  private func observeLove() {
+    guard let qna = self.qna,
+          let qnaId = qna.id else { return }
+    
+    let databaseRef = Database.database().reference()
+    DispatchQueue.global().async {
+      databaseRef.child(KEY_QNAS).child(qnaId).child(KEY_LOVE_IDS).observe(.value) { (snapshot) in
+        if let loveIds = snapshot.value as? [String: AnyObject] {
+          DispatchQueue.main.async {
+            guard let loveCountLabel = self.loveCountLabel else { return }
+            
+            loveCountLabel.text = "\(loveIds.count)"
+          }
+        } else {
+          DispatchQueue.main.async {
+            guard let loveCountLabel = self.loveCountLabel else { return }
+            
+            loveCountLabel.text = "0"
+          }
+        }
+      }
+    }
+  }
+  
+  private func isLoved() {
+    guard let qna = self.qna,
+          let qnaId = qna.id,
+          let currentUserId = ANISessionManager.shared.currentUserUid else { return }
+    
+    let databaseRef = Database.database().reference()
+    DispatchQueue.global().async {
+      databaseRef.child(KEY_QNAS).child(qnaId).child(KEY_LOVE_IDS).observeSingleEvent(of: .value) { (snapshot) in
+        for item in snapshot.children {
+          if let snapshot = item as? DataSnapshot {
+            if snapshot.key == currentUserId {
+              DispatchQueue.main.async {
+                guard let loveButton = self.loveButton else { return }
+                
+                loveButton.isSelected = true
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
   //MARK: action
   @objc private func love() {
-    print("love")
+    guard let qna = self.qna,
+          let qnaId = qna.id,
+          let currentUserId = ANISessionManager.shared.currentUserUid,
+          let loveButton = self.loveButton else { return }
+    
+    let databaseRef = Database.database().reference()
+    if loveButton.isSelected == true {
+      DispatchQueue.global().async {
+        databaseRef.child(KEY_QNAS).child(qnaId).child(KEY_LOVE_IDS).updateChildValues([currentUserId: true])
+        databaseRef.child(KEY_USERS).child(currentUserId).child(KEY_LOVE_QNA_IDS).updateChildValues([qnaId: true])
+      }
+    } else {
+      DispatchQueue.global().async {
+        databaseRef.child(KEY_QNAS).child(qnaId).child(KEY_LOVE_IDS).child(currentUserId).removeValue()
+        databaseRef.child(KEY_USERS).child(currentUserId).child(KEY_LOVE_QNA_IDS).child(qnaId).removeValue()
+      }
+    }
   }
   
   @objc private func profileImageViewTapped() {

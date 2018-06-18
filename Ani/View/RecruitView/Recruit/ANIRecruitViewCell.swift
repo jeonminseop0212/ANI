@@ -39,6 +39,8 @@ class ANIRecruitViewCell: UITableViewCell {
     didSet {
       reloadLayout()
       loadUser()
+      isLoved()
+      observeLove()
     }
   }
   
@@ -272,6 +274,7 @@ class ANIRecruitViewCell: UITableViewCell {
           let titleLabel = self.titleLabel,
           let subTitleLabel = self.subTitleLabel,
           let supportCountLabel = self.supportCountLabel,
+          let loveButton = self.loveButton,
           let loveCountLabel = self.loveCountLabel,
           let recruit = self.recruit,
           let headerImageUrl = recruit.headerImageUrl else { return }
@@ -284,7 +287,12 @@ class ANIRecruitViewCell: UITableViewCell {
     titleLabel.text = recruit.title
     subTitleLabel.text = recruit.reason
     supportCountLabel.text = "\(recruit.supportCount)"
-    loveCountLabel.text = "\(recruit.loveCount)"
+    loveButton.isSelected = false
+    if let loveIds = recruit.loveIds {
+      loveCountLabel.text = "\(loveIds.count)"
+    } else {
+      loveCountLabel.text = "0"
+    }
   }
   
   private func reloadUserLayout(user: FirebaseUser) {
@@ -319,9 +327,72 @@ class ANIRecruitViewCell: UITableViewCell {
     }
   }
   
+  private func observeLove() {
+    guard let recruit = self.recruit,
+          let recuritId = recruit.id else { return }
+    
+    let databaseRef = Database.database().reference()
+    DispatchQueue.global().async {
+      databaseRef.child(KEY_RECRUITS).child(recuritId).child(KEY_LOVE_IDS).observe(.value) { (snapshot) in
+        if let loveIds = snapshot.value as? [String: AnyObject] {
+          DispatchQueue.main.async {
+            guard let loveCountLabel = self.loveCountLabel else { return }
+            
+            loveCountLabel.text = "\(loveIds.count)"
+          }
+        } else {
+          DispatchQueue.main.async {
+            guard let loveCountLabel = self.loveCountLabel else { return }
+            
+            loveCountLabel.text = "0"
+          }
+        }
+      }
+    }
+  }
+  
+  private func isLoved() {
+    guard let recruit = self.recruit,
+          let recuritId = recruit.id,
+          let currentUserId = ANISessionManager.shared.currentUserUid else { return }
+    
+    let databaseRef = Database.database().reference()
+    DispatchQueue.global().async {
+      databaseRef.child(KEY_RECRUITS).child(recuritId).child(KEY_LOVE_IDS).observeSingleEvent(of: .value) { (snapshot) in
+        for item in snapshot.children {
+          if let snapshot = item as? DataSnapshot {
+            if snapshot.key == currentUserId {
+              DispatchQueue.main.async {
+                guard let loveButton = self.loveButton else { return }
+                
+                loveButton.isSelected = true
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
   //MARK: action
   @objc private func love() {
-    print("love")
+    guard let recruit = self.recruit,
+          let recuritId = recruit.id,
+          let currentUserId = ANISessionManager.shared.currentUserUid,
+          let loveButton = self.loveButton else { return }
+    
+    let databaseRef = Database.database().reference()
+    if loveButton.isSelected == true {
+      DispatchQueue.global().async {
+        databaseRef.child(KEY_RECRUITS).child(recuritId).child(KEY_LOVE_IDS).updateChildValues([currentUserId: true])
+        databaseRef.child(KEY_USERS).child(currentUserId).child(KEY_LOVE_RECRUIT_IDS).updateChildValues([recuritId: true])
+      }
+    } else {
+      DispatchQueue.global().async {
+        databaseRef.child(KEY_RECRUITS).child(recuritId).child(KEY_LOVE_IDS).child(currentUserId).removeValue()
+        databaseRef.child(KEY_USERS).child(currentUserId).child(KEY_LOVE_RECRUIT_IDS).child(recuritId).removeValue()
+      }
+    }
   }
   
   @objc private func profileImageViewTapped() {
