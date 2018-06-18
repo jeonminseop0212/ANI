@@ -79,10 +79,9 @@ class ANIStoryViewCell: UITableViewCell {
     storyLabel.topToBottom(of: storyImagesView, offset: 5.0)
     storyLabel.leftToSuperview(offset: 10.0)
     storyLabel.rightToSuperview(offset: 10.0)
+    storyLabel.bottomToSuperview()
     self.storyLabel = storyLabel
     
-    tapArea.bottom(to: storyLabel)
-
     //profileImageView
     let profileImageView = UIImageView()
     profileImageView.backgroundColor = ANIColor.bg
@@ -90,7 +89,7 @@ class ANIStoryViewCell: UITableViewCell {
     let tapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped))
     profileImageView.addGestureRecognizer(tapGesture)
     addSubview(profileImageView)
-    profileImageView.topToBottom(of: storyLabel, offset: 10.0)
+    profileImageView.topToBottom(of: tapArea, offset: 10.0)
     profileImageView.leftToSuperview(offset: 10.0)
     profileImageView.width(32.0)
     profileImageView.height(32.0)
@@ -153,7 +152,7 @@ class ANIStoryViewCell: UITableViewCell {
     userNameLabel.textColor = ANIColor.subTitle
     addSubview(userNameLabel)
     userNameLabel.leftToRight(of: profileImageView, offset: 10.0)
-    userNameLabel.rightToLeft(of: loveButton, offset: 10.0)
+    userNameLabel.rightToLeft(of: loveButton, offset: -10.0)
     userNameLabel.centerY(to: profileImageView)
     userNameLabel.height(20.0)
     self.userNameLabel = userNameLabel
@@ -193,6 +192,7 @@ class ANIStoryViewCell: UITableViewCell {
   private func reloadLayout() {
     guard let storyImagesView = self.storyImagesView,
           let storyLabel = self.storyLabel,
+          let loveButton = self.loveButton,
           let loveCountLabel = self.loveCountLabel,
           let commentCountLabel = self.commentCountLabel,
           let story = self.story else { return }
@@ -201,6 +201,7 @@ class ANIStoryViewCell: UITableViewCell {
     storyImagesView.pageControl?.numberOfPages = story.storyImageUrls.count
     storyLabel.text = story.story
     
+    loveButton.isSelected = false
     if let loveIds = story.loveIds {
       loveCountLabel.text = "\(loveIds.count)"
     } else {

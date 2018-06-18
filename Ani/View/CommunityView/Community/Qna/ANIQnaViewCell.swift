@@ -72,18 +72,17 @@ class ANIQnaViewCell: UITableViewCell {
     subTitleLabel.topToSuperview(offset: 10.0)
     subTitleLabel.leftToSuperview(offset: 10.0)
     subTitleLabel.rightToSuperview(offset: 10.0)
+    subTitleLabel.bottomToSuperview()
     self.subTitleLabel = subTitleLabel
-    
-    tapArea.bottom(to: subTitleLabel)
     
     //qnaImagesView
     let qnaImagesView = ANIQnaImagesView()
     addSubview(qnaImagesView)
-    qnaImagesView.topToBottom(of: subTitleLabel, offset: 10.0)
+    qnaImagesView.topToBottom(of: tapArea, offset: 10.0)
     qnaImagesView.leftToSuperview()
     qnaImagesView.rightToSuperview()
     qnaImagesViewHeight = UIScreen.main.bounds.width / 2 - 30
-    qnaImagesViewHeightConstraint = qnaImagesView.height(qnaImagesViewHeight)
+    qnaImagesViewHeightConstraint = qnaImagesView.height(0, priority: .defaultHigh)
     self.qnaImagesView = qnaImagesView
     
     //profileImageView
@@ -110,17 +109,6 @@ class ANIQnaViewCell: UITableViewCell {
     spaceView.rightToSuperview()
     spaceView.height(10.0)
     spaceView.bottomToSuperview()
-
-    //userNameLabel
-    let userNameLabel = UILabel()
-    userNameLabel.font = UIFont.systemFont(ofSize: 13.0)
-    userNameLabel.textColor = ANIColor.subTitle
-    addSubview(userNameLabel)
-    userNameLabel.leftToRight(of: profileImageView, offset: 10.0)
-    userNameLabel.rightToSuperview(offset: 10.0)
-    userNameLabel.centerY(to: profileImageView)
-    userNameLabel.height(20.0)
-    self.userNameLabel = userNameLabel
 
     //commentCountLabel
     let commentCountLabel = UILabel()
@@ -170,6 +158,17 @@ class ANIQnaViewCell: UITableViewCell {
     loveButton.width(21.0)
     loveButton.height(21.0)
     self.loveButton = loveButton
+
+    //userNameLabel
+    let userNameLabel = UILabel()
+    userNameLabel.font = UIFont.systemFont(ofSize: 13.0)
+    userNameLabel.textColor = ANIColor.subTitle
+    addSubview(userNameLabel)
+    userNameLabel.leftToRight(of: profileImageView, offset: 10.0)
+    userNameLabel.rightToLeft(of: loveButton, offset: -10)
+    userNameLabel.centerY(to: profileImageView)
+    userNameLabel.height(20.0)
+    self.userNameLabel = userNameLabel
   }
   
   func observeQna() {
@@ -193,21 +192,24 @@ class ANIQnaViewCell: UITableViewCell {
   }
   
   private func reloadLayout() {
-    guard let qnaImagesView = self.qnaImagesView,
-          let subTitleLabel = self.subTitleLabel,
+    guard let subTitleLabel = self.subTitleLabel,
+          let qnaImagesView = self.qnaImagesView,
+          let loveButton = self.loveButton,
           let loveCountLabel = self.loveCountLabel,
           let commentCountLabel = self.commentCountLabel,
           let qna = self.qna,
           let qnaImagesViewHeightConstraint = self.qnaImagesViewHeightConstraint else { return }
     
+    subTitleLabel.text = qna.qna
+
     if let qnaImageUrls = qna.qnaImageUrls {
-      qnaImagesView.imageUrls = qnaImageUrls
       qnaImagesViewHeightConstraint.constant = qnaImagesViewHeight
+      qnaImagesView.imageUrls = qnaImageUrls
     } else {
       qnaImagesViewHeightConstraint.constant = 0
     }
-    subTitleLabel.text = qna.qna
 
+    loveButton.isSelected = false
     if let loveIds = qna.loveIds {
       loveCountLabel.text = "\(loveIds.count)"
     } else {
