@@ -120,6 +120,8 @@ class GridView: UIView {
   }
   var shouldCropToSquare = false
   
+  var dropDownController: DropdownController?
+  
   // MARK: - Initialization
   
   override init(frame: CGRect) {
@@ -551,6 +553,8 @@ public class PanGestureHelper: NSObject, UIGestureRecognizerDelegate {
   }
   
   @objc func panned(_ sender: UIPanGestureRecognizer) {
+    guard let dropDownController = v.dropDownController,
+          !dropDownController.expanding else { return }
     
     let preViewHeight = v.topView.frame.height + v.previewScollView.frame.height
     if sender.state == UIGestureRecognizerState.began {
