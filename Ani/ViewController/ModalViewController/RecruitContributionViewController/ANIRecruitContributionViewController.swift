@@ -55,6 +55,8 @@ class ANIRecruitContributionViewController: UIViewController {
   
   private var isHaderImagePick: Bool = false
   
+  private var isBack: Bool = false
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     
@@ -276,6 +278,7 @@ class ANIRecruitContributionViewController: UIViewController {
   
   //MARK: Action
   @objc private func recruitContributeDismiss() {
+    self.isBack = true
     self.navigationController?.dismiss(animated: true, completion: nil)
   }
 }
@@ -337,7 +340,8 @@ extension ANIRecruitContributionViewController: ANIImageFilterViewControllerDele
 extension ANIRecruitContributionViewController: ANIRecruitContributionViewDelegate {
   func recruitContributeViewDidScroll(offset: CGFloat) {
     guard let myNavigationBar = self.myNavigationBar,
-      let dismissButton = self.dismissButton else { return }
+          let dismissButton = self.dismissButton,
+          !isBack else { return }
     
     if offset > 1 {
       let backGroundColorOffset: CGFloat = 1.0
