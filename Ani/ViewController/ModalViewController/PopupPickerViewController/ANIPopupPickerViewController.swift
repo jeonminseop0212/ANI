@@ -60,7 +60,7 @@ class ANIPopupPickerViewController: UIViewController {
   
   @objc private func pickerViewDismiss() {
     guard let popupPickerViewTopConstratint = self.popupPickerViewTopConstratint,
-      let popupPickerViewTopConstraintConstant = self.popupPickerViewTopConstraintConstant else { return }
+          let popupPickerViewTopConstraintConstant = self.popupPickerViewTopConstraintConstant else { return }
 
     popupPickerViewTopConstratint.constant = popupPickerViewTopConstraintConstant
     

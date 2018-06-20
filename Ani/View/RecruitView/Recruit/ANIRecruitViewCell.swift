@@ -13,6 +13,7 @@ import CodableFirebase
 
 protocol ANIRecruitViewCellDelegate {
   func cellTapped(recruit: FirebaseRecruit, user: FirebaseUser)
+  func supportButtonTapped(supportRecruitId: String)
 }
 
 class ANIRecruitViewCell: UITableViewCell {
@@ -186,7 +187,9 @@ class ANIRecruitViewCell: UITableViewCell {
     
     //clipButton
     let clipButton = UIButton()
-    clipButton.setImage(UIImage(named: "clip"), for: .normal)
+    clipButton.setImage(UIImage(named: "clip")?.withRenderingMode(.alwaysTemplate), for: .normal)
+    clipButton.tintColor = ANIColor.gray
+    clipButton.addTarget(self, action: #selector(clip), for: .touchUpInside)
     addSubview(clipButton)
     clipButton.centerY(to: profileImageView)
     clipButton.rightToSuperview(offset: 20.0)
@@ -234,7 +237,9 @@ class ANIRecruitViewCell: UITableViewCell {
     
     //supportButton
     let supportButton = UIButton()
-    supportButton.setImage(UIImage(named: "support"), for: .normal)
+    supportButton.setImage(UIImage(named: "support")?.withRenderingMode(.alwaysTemplate), for: .normal)
+    supportButton.tintColor = ANIColor.gray
+    supportButton.addTarget(self, action: #selector(support), for: .touchUpInside)
     addSubview(supportButton)
     supportButton.centerY(to: profileImageView)
     supportButton.rightToLeft(of: supportCountLabel, offset: -10.0)
@@ -391,6 +396,38 @@ class ANIRecruitViewCell: UITableViewCell {
       DispatchQueue.global().async {
         databaseRef.child(KEY_RECRUITS).child(recuritId).child(KEY_LOVE_IDS).child(currentUserId).removeValue()
         databaseRef.child(KEY_USERS).child(currentUserId).child(KEY_LOVE_RECRUIT_IDS).child(recuritId).removeValue()
+      }
+    }
+  }
+  
+  @objc private func support() {
+    guard let supportButton = self.supportButton,
+          let recruit = self.recruit,
+          let recruitId = recruit.id else { return }
+    
+    if supportButton.tintColor == ANIColor.moreDarkGray {
+      UIView.animate(withDuration: 0.15) {
+        supportButton.tintColor = ANIColor.gray
+      }
+    } else {
+      UIView.animate(withDuration: 0.15) {
+        supportButton.tintColor = ANIColor.moreDarkGray
+        
+        self.delegate?.supportButtonTapped(supportRecruitId: recruitId)
+      }
+    }
+  }
+  
+  @objc private func clip() {
+    guard let clipButton = self.clipButton else { return }
+    
+    if clipButton.tintColor == ANIColor.moreDarkGray {
+      UIView.animate(withDuration: 0.15) {
+        clipButton.tintColor = ANIColor.gray
+      }
+    } else {
+      UIView.animate(withDuration: 0.15) {
+        clipButton.tintColor = ANIColor.moreDarkGray
       }
     }
   }

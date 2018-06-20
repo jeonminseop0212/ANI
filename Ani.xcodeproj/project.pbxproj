@@ -10,6 +10,8 @@
 		23BE6C66072673B423ABA35D /* Pods_Ani.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FD08576705673419CEA26417 /* Pods_Ani.framework */; };
 		8751932F6CAEF562E234E91C /* Pods_AniTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA314F74AF3E318A20DDD5DB /* Pods_AniTests.framework */; };
 		BFFABBAF01DF20A602B9BB7F /* Pods_AniUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C5DC98FBA0B2CCFDA47C5CD8 /* Pods_AniUITests.framework */; };
+		CD033E4120D8D25E002FB770 /* ANISupportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD033E4020D8D25E002FB770 /* ANISupportViewController.swift */; };
+		CD033E4420D8D28D002FB770 /* ANISupportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD033E4320D8D28D002FB770 /* ANISupportView.swift */; };
 		CD047EBE20C4E9A000248958 /* NVActivityIndicatorView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD047EBD20C4E9A000248958 /* NVActivityIndicatorView.framework */; };
 		CD08A72E20915BD700F0B72D /* ANIRecruitDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD08A72D20915BD700F0B72D /* ANIRecruitDetailView.swift */; };
 		CD08A73120915C2A00F0B72D /* ANIRecruitDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD08A73020915C2A00F0B72D /* ANIRecruitDetailViewController.swift */; };
@@ -157,6 +159,8 @@
 		AA314F74AF3E318A20DDD5DB /* Pods_AniTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AniTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B1141BC302D4697B8D251698 /* Pods-AniUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AniUITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-AniUITests/Pods-AniUITests.release.xcconfig"; sourceTree = "<group>"; };
 		C5DC98FBA0B2CCFDA47C5CD8 /* Pods_AniUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AniUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		CD033E4020D8D25E002FB770 /* ANISupportViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANISupportViewController.swift; sourceTree = "<group>"; };
+		CD033E4320D8D28D002FB770 /* ANISupportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANISupportView.swift; sourceTree = "<group>"; };
 		CD047EBD20C4E9A000248958 /* NVActivityIndicatorView.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NVActivityIndicatorView.framework; path = Carthage/Build/iOS/NVActivityIndicatorView.framework; sourceTree = "<group>"; };
 		CD08A72D20915BD700F0B72D /* ANIRecruitDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitDetailView.swift; sourceTree = "<group>"; };
 		CD08A73020915C2A00F0B72D /* ANIRecruitDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitDetailViewController.swift; sourceTree = "<group>"; };
@@ -337,6 +341,22 @@
 			name = Pods;
 			sourceTree = "<group>";
 		};
+		CD033E3F20D8D219002FB770 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				CD033E4320D8D28D002FB770 /* ANISupportView.swift */,
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
+		CD033E4220D8D263002FB770 /* SupportViewController */ = {
+			isa = PBXGroup;
+			children = (
+				CD033E4020D8D25E002FB770 /* ANISupportViewController.swift */,
+			);
+			path = SupportViewController;
+			sourceTree = "<group>";
+		};
 		CD08A72C20915BB400F0B72D /* Detail */ = {
 			isa = PBXGroup;
 			children = (
@@ -422,6 +442,7 @@
 			isa = PBXGroup;
 			children = (
 				CD2C414320A5566B00581267 /* RecruitContributionViewController */,
+				CD033E4220D8D263002FB770 /* SupportViewController */,
 				CDA32A2020AA6029008A2AC1 /* PopupPickerViewController */,
 				CDA32A3320AC1491008A2AC1 /* ContributeViewController */,
 				CDA32A8120AE7AE2008A2AC1 /* ImageBrowserViewController */,
@@ -434,6 +455,7 @@
 			isa = PBXGroup;
 			children = (
 				CD6B674F20A88420009BF63D /* RecruitContributionView */,
+				CD033E3F20D8D219002FB770 /* Support */,
 				CDA32A2520AA6630008A2AC1 /* PopupPickerView */,
 				CDA32A3620AD1E8F008A2AC1 /* ContributionView */,
 				CDA32A8420AE8DBC008A2AC1 /* ImageBrowserView */,
@@ -1476,6 +1498,7 @@
 				CDDD04A820B271090094DBFA /* ANICommentCell.swift in Sources */,
 				F5E9E2332079AFF40021D4CC /* ANICommunityViewController.swift in Sources */,
 				F5F5300C2088599D0076E938 /* ANIProfileBasicView.swift in Sources */,
+				CD033E4120D8D25E002FB770 /* ANISupportViewController.swift in Sources */,
 				F5E9E22620769AD60021D4CC /* User.swift in Sources */,
 				CD9E52BB2094614400715F50 /* ANIAreaButtonView.swift in Sources */,
 				F53E87BA208468DF00B19A2F /* ANIStorySearchView.swift in Sources */,
@@ -1487,6 +1510,7 @@
 				CDA97AC920AFFFEC00F46DA4 /* ANIProfileEditView.swift in Sources */,
 				F57F7D61208322D3008A2645 /* ANIMessageView.swift in Sources */,
 				CD9E52B120921EB400715F50 /* UIViewController.swift in Sources */,
+				CD033E4420D8D28D002FB770 /* ANISupportView.swift in Sources */,
 				CDA32A2F20ABD941008A2AC1 /* String.swift in Sources */,
 				F51D221020767E62009D1B26 /* ANIColor.swift in Sources */,
 				F5E9E221207692C60021D4CC /* ANIRecruitViewCell.swift in Sources */,
