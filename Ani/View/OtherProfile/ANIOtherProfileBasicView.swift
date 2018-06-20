@@ -14,6 +14,7 @@ protocol ANIOtherProfileBasicViewDelegate {
   func recruitViewCellDidSelect(selectedRecruit: FirebaseRecruit, user: FirebaseUser)
   func storyViewCellDidSelect(selectedStory: FirebaseStory, user: FirebaseUser)
   func qnaViewCellDidSelect(selectedQna: FirebaseQna, user:FirebaseUser)
+  func supportButtonTapped()
 }
 
 class ANIOtherProfileBasicView: UIView {
@@ -274,6 +275,10 @@ extension ANIOtherProfileBasicView: ANIProfileMenuBarDelegate {
 
 //MARK: ANIRecruitViewCellDelegate
 extension ANIOtherProfileBasicView: ANIRecruitViewCellDelegate {
+  func supportButtonTapped(supportRecruitId: String) {
+    self.delegate?.supportButtonTapped()
+  }
+  
   func cellTapped(recruit: FirebaseRecruit, user: FirebaseUser) {
     self.delegate?.recruitViewCellDidSelect(selectedRecruit: recruit, user: user)
   }

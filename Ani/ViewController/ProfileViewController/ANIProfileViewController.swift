@@ -133,6 +133,12 @@ class ANIProfileViewController: UIViewController {
 
 //MARK: ANIProfileBasicViewDelegate
 extension ANIProfileViewController: ANIProfileBasicViewDelegate {
+  func supportButtonTapped() {
+    let supportViewController = ANISupportViewController()
+    supportViewController.modalPresentationStyle = .overCurrentContext
+    self.tabBarController?.present(supportViewController, animated: false, completion: nil)
+  }
+  
   func recruitViewCellDidSelect(selectedRecruit: FirebaseRecruit, user: FirebaseUser) {
     let recruitDetailViewController = ANIRecruitDetailViewController()
     recruitDetailViewController.hidesBottomBarWhenPushed = true

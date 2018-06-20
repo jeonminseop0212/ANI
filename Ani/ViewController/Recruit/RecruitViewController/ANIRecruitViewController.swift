@@ -155,6 +155,7 @@ class ANIRecruitViewController: UIViewController {
   }
 }
 
+//MARK: UISearchBarDelegate
 extension ANIRecruitViewController: UISearchBarDelegate {
   func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
     guard let searchBarTextField = searchBar.textField else { return }
@@ -184,6 +185,13 @@ extension ANIRecruitViewController:ANIButtonViewDelegate {
 
 //ANIRecruitViewDelegate
 extension ANIRecruitViewController: ANIRecruitViewDelegate {
+  func supportButtonTapped(supportRecruitId: String) {
+    let supportViewController = ANISupportViewController()
+    supportViewController.modalPresentationStyle = .overCurrentContext
+    supportViewController.recruitId = supportRecruitId
+    self.tabBarController?.present(supportViewController, animated: false, completion: nil)
+  }
+  
   func recruitCellTap(selectedRecruit: FirebaseRecruit, user: FirebaseUser) {
     let recruitDetailViewController = ANIRecruitDetailViewController()
     recruitDetailViewController.hidesBottomBarWhenPushed = true
