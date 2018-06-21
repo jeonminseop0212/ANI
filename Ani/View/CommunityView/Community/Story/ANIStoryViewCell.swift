@@ -36,7 +36,7 @@ class ANIStoryViewCell: UITableViewCell {
     }
   }
   
-  var user: FirebaseUser?
+  private var user: FirebaseUser?
   
   var delegate: ANIStoryViewCellDelegate?
   

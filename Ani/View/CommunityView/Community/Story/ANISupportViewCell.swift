@@ -13,6 +13,7 @@ import CodableFirebase
 
 protocol ANISupportViewCellDelegate {
   func supportCellTapped(story: FirebaseStory, user: FirebaseUser)
+  func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser)
 }
 
 class ANISupportViewCell: UITableViewCell {
@@ -49,9 +50,15 @@ class ANISupportViewCell: UITableViewCell {
     }
   }
   
-  var recruit: FirebaseRecruit?
+  private var recruit: FirebaseRecruit? {
+    didSet {
+      loadRecruitUser()
+    }
+  }
   
-  var user: FirebaseUser?
+  private var user: FirebaseUser?
+
+  private var recruitUser: FirebaseUser?
   
   override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -400,6 +407,25 @@ class ANISupportViewCell: UITableViewCell {
     }
   }
   
+  private func loadRecruitUser() {
+    guard let recruit = self.recruit else { return }
+    
+    DispatchQueue.global().async {
+      let databaseRef = Database.database().reference()
+      databaseRef.child(KEY_USERS).child(recruit.userId).observeSingleEvent(of: .value, with: { (userSnapshot) in
+        if let userValue = userSnapshot.value {
+          do {
+            let recruitUser = try FirebaseDecoder().decode(FirebaseUser.self, from: userValue)
+            
+            self.recruitUser = recruitUser
+          } catch let error {
+            print(error)
+          }
+        }
+      })
+    }
+  }
+  
   private func observeLove() {
     guard let story = self.story,
           let storyId = story.id else { return }
@@ -482,6 +508,9 @@ class ANISupportViewCell: UITableViewCell {
   }
   
   @objc private func recruitTapped() {
-    print("recruit tapped")
+    guard let recruit = self.recruit,
+          let recruitUser = self.recruitUser else { return }
+    
+    self.delegate?.supportCellRecruitTapped(recruit: recruit, user: recruitUser)
   }
 }
