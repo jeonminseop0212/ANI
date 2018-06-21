@@ -250,7 +250,7 @@ extension ANIProfileBasicView: ANIProfileMenuBarDelegate {
 
 //MARK: ANIRecruitViewCellDelegate
 extension ANIProfileBasicView: ANIRecruitViewCellDelegate {
-  func supportButtonTapped(supportRecruitId: String) {
+  func supportButtonTapped(supportRecruit: FirebaseRecruit) {
     self.delegate?.supportButtonTapped()
   }
   
@@ -261,7 +261,7 @@ extension ANIProfileBasicView: ANIRecruitViewCellDelegate {
 
 //MARK: ANIStoryViewCellDelegate
 extension ANIProfileBasicView: ANIStoryViewCellDelegate {
-  func cellTapped(story: FirebaseStory, user: FirebaseUser) {
+  func storyCellTapped(story: FirebaseStory, user: FirebaseUser) {
     self.delegate?.storyViewCellDidSelect(selectedStory: story, user: user)
   }
 }

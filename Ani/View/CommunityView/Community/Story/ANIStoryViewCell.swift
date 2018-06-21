@@ -12,7 +12,7 @@ import FirebaseDatabase
 import CodableFirebase
 
 protocol ANIStoryViewCellDelegate {
-  func cellTapped(story: FirebaseStory, user: FirebaseUser)
+  func storyCellTapped(story: FirebaseStory, user: FirebaseUser)
 }
 
 class ANIStoryViewCell: UITableViewCell {
@@ -197,8 +197,10 @@ class ANIStoryViewCell: UITableViewCell {
           let commentCountLabel = self.commentCountLabel,
           let story = self.story else { return }
     
-    storyImagesView.imageUrls = story.storyImageUrls
-    storyImagesView.pageControl?.numberOfPages = story.storyImageUrls.count
+    if let storyImageUrls = story.storyImageUrls {
+      storyImagesView.imageUrls = storyImageUrls
+      storyImagesView.pageControl?.numberOfPages = storyImageUrls.count
+    }
     storyLabel.text = story.story
     
     loveButton.isSelected = false
@@ -325,7 +327,7 @@ class ANIStoryViewCell: UITableViewCell {
     guard let story = self.story,
           let user = self.user else { return }
     
-    self.delegate?.cellTapped(story: story, user: user)
+    self.delegate?.storyCellTapped(story: story, user: user)
   }
 }
 

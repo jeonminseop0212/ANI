@@ -15,7 +15,7 @@ class ANISupportViewController: UIViewController {
   private var supportViewCenterYConstraint: Constraint?
   private weak var supportView: ANISupportView?
   
-  var recruitId: String?
+  var recruit: FirebaseRecruit?
   
   private var isKeyboardShow: Bool = false
   
@@ -37,6 +37,9 @@ class ANISupportViewController: UIViewController {
     let supportView = ANISupportView()
     supportView.alpha = 0.0
     supportView.delegate = self
+    if let recruit = self.recruit {
+      supportView.recruit = recruit
+    }
     self.view.addSubview(supportView)
     supportViewCenterYConstraint = supportView.centerYToSuperview()
     supportView.leftToSuperview(offset: 10.0)
@@ -90,9 +93,7 @@ class ANISupportViewController: UIViewController {
 
 //MARK: ANISupportViewDelegate
 extension ANISupportViewController: ANISupportViewDelegate {
-  func supportButtonTapped() {
-    guard let recruitId = self.recruitId else { return }
-    
+  func supportButtonTapped() {    
     supportViewDismiss()
   }
 }
