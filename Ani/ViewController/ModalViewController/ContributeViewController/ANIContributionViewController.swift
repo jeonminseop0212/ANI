@@ -189,7 +189,7 @@ class ANIContributionViewController: UIViewController {
                 let databaseStoryRef = detabaseRef.child(KEY_STORIES).childByAutoId()
                 let id = databaseStoryRef.key
                 let content = contriButionView.getContent()
-                let story = FirebaseStory(id: id, storyImageUrls: urls, story: content, userId: uid, loveIds: nil, commentIds: nil)
+                let story = FirebaseStory(id: id, storyImageUrls: urls, story: content, userId: uid, loveIds: nil, commentIds: nil, recruitId: nil, recruitTitle: nil, recruitSubTitle: nil)
                 
                 DispatchQueue.main.async {
                   self.upateStroyDatabase(story: story, databaseStoryRef: databaseStoryRef)

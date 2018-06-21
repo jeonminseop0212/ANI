@@ -275,7 +275,7 @@ extension ANIOtherProfileBasicView: ANIProfileMenuBarDelegate {
 
 //MARK: ANIRecruitViewCellDelegate
 extension ANIOtherProfileBasicView: ANIRecruitViewCellDelegate {
-  func supportButtonTapped(supportRecruitId: String) {
+  func supportButtonTapped(supportRecruit: FirebaseRecruit) {
     self.delegate?.supportButtonTapped()
   }
   
@@ -286,7 +286,7 @@ extension ANIOtherProfileBasicView: ANIRecruitViewCellDelegate {
 
 //MARK: ANIStoryViewCellDelegate
 extension ANIOtherProfileBasicView: ANIStoryViewCellDelegate {
-  func cellTapped(story: FirebaseStory, user: FirebaseUser) {
+  func storyCellTapped(story: FirebaseStory, user: FirebaseUser) {
     self.delegate?.storyViewCellDidSelect(selectedStory: story, user: user)
   }
 }

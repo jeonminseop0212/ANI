@@ -1,8 +1,8 @@
 //
-//  ANIRecruitViewCell.swift
+//  ANISupportViewCell.swift
 //  Ani
 //
-//  Created by 전민섭 on 2018/04/06.
+//  Created by jeonminseop on 2018/06/20.
 //  Copyright © 2018年 JeonMinseop. All rights reserved.
 //
 
@@ -11,13 +11,15 @@ import WCLShineButton
 import FirebaseDatabase
 import CodableFirebase
 
-protocol ANIRecruitViewCellDelegate {
-  func cellTapped(recruit: FirebaseRecruit, user: FirebaseUser)
-  func supportButtonTapped(supportRecruit: FirebaseRecruit)
+protocol ANISupportViewCellDelegate {
+  func supportCellTapped(story: FirebaseStory, user: FirebaseUser)
 }
 
-class ANIRecruitViewCell: UITableViewCell {
-  private weak var tapArea: UIView?
+class ANISupportViewCell: UITableViewCell {
+  
+  private weak var messageLabel: UILabel?
+  
+  private weak var recruitBase: UIView?
   private weak var recruitImageView: UIImageView?
   private weak var basicInfoStackView: UIStackView?
   private weak var isRecruitLabel: UILabel?
@@ -26,31 +28,34 @@ class ANIRecruitViewCell: UITableViewCell {
   private weak var sexLabel: UILabel?
   private weak var titleLabel: UILabel?
   private weak var subTitleLabel: UILabel?
-  private let PROFILE_IMAGE_HEIGHT: CGFloat = 32.0
+  
   private weak var profileImageView: UIImageView?
   private weak var userNameLabel: UILabel?
-  private weak var supportCountLabel: UILabel?
-  private weak var supportButton: UIButton?
   private weak var loveButton: WCLShineButton?
   private weak var loveCountLabel: UILabel?
-  private weak var clipButton: UIButton?
+  private weak var commentButton: UIButton?
+  private weak var commentCountLabel: UILabel?
   private weak var line: UIImageView?
   
-  var recruit: FirebaseRecruit? {
+  var delegate: ANISupportViewCellDelegate?
+  
+  var story: FirebaseStory? {
     didSet {
       reloadLayout()
+      loadRecruit()
       loadUser()
       isLoved()
       observeLove()
     }
   }
   
-  var user: FirebaseUser?
+  var recruit: FirebaseRecruit?
   
-  var delegate: ANIRecruitViewCellDelegate?
+  var user: FirebaseUser?
   
   override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
+    
     setup()
   }
   
@@ -60,22 +65,43 @@ class ANIRecruitViewCell: UITableViewCell {
   
   private func setup() {
     self.selectionStyle = .none
-    self.backgroundColor = .white
+    self.backgroundColor = ANIColor.bg
     
-    //tapArea
-    let tapArea = UIView()
-    let cellTapGesture = UITapGestureRecognizer(target: self, action: #selector(cellTapped))
-    tapArea.addGestureRecognizer(cellTapGesture)
-    addSubview(tapArea)
-    tapArea.edgesToSuperview(excluding: .bottom)
-    self.tapArea = tapArea
+    //messageLabel
+    let messageLabel = UILabel()
+    messageLabel.font = UIFont.systemFont(ofSize: 16.0)
+    messageLabel.textAlignment = .left
+    messageLabel.textColor = ANIColor.subTitle
+    messageLabel.numberOfLines = 0
+    messageLabel.isUserInteractionEnabled = true
+    let labelTapGesture = UITapGestureRecognizer(target: self, action: #selector(cellTapped))
+    messageLabel.addGestureRecognizer(labelTapGesture)
+    addSubview(messageLabel)
+    messageLabel.topToSuperview(offset: 10.0)
+    messageLabel.leftToSuperview(offset: 10.0)
+    messageLabel.rightToSuperview(offset: 10.0)
+    self.messageLabel = messageLabel
+    
+    //recruitBase
+    let recruitBase = UIView()
+    recruitBase.backgroundColor = .white
+    recruitBase.layer.cornerRadius = 10.0
+    recruitBase.layer.masksToBounds = true
+    recruitBase.isUserInteractionEnabled = true
+    let recruitTapGesture = UITapGestureRecognizer(target: self, action: #selector(recruitTapped))
+    recruitBase.addGestureRecognizer(recruitTapGesture)
+    addSubview(recruitBase)
+    recruitBase.topToBottom(of: messageLabel, offset: 10.0)
+    recruitBase.leftToSuperview(offset: 10.0)
+    recruitBase.rightToSuperview(offset: 10.0)
+    self.recruitBase = recruitBase
     
     //recruitImageView
     let recruitImageView = UIImageView()
-    recruitImageView.backgroundColor = ANIColor.bg
+    recruitImageView.backgroundColor = .white
     recruitImageView.contentMode = .redraw
-    tapArea.addSubview(recruitImageView)
-    let recruitImageViewHeight: CGFloat = UIScreen.main.bounds.width * UIViewController.HEADER_IMAGE_VIEW_RATIO
+    recruitBase.addSubview(recruitImageView)
+    let recruitImageViewHeight: CGFloat = (UIScreen.main.bounds.width - 20) * UIViewController.HEADER_IMAGE_VIEW_RATIO
     recruitImageView.topToSuperview()
     recruitImageView.leftToSuperview()
     recruitImageView.rightToSuperview()
@@ -88,7 +114,7 @@ class ANIRecruitViewCell: UITableViewCell {
     basicInfoStackView.distribution = .fillEqually
     basicInfoStackView.alignment = .center
     basicInfoStackView.spacing = 8.0
-    tapArea.addSubview(basicInfoStackView)
+    recruitBase.addSubview(basicInfoStackView)
     basicInfoStackView.topToBottom(of: recruitImageView, offset: 10.0)
     basicInfoStackView.leftToSuperview(offset: 10.0)
     basicInfoStackView.rightToSuperview(offset: 10.0)
@@ -151,7 +177,7 @@ class ANIRecruitViewCell: UITableViewCell {
     titleLabel.textAlignment = .left
     titleLabel.textColor = ANIColor.dark
     titleLabel.numberOfLines = 0
-    tapArea.addSubview(titleLabel)
+    recruitBase.addSubview(titleLabel)
     titleLabel.topToBottom(of: basicInfoStackView, offset: 10.0)
     titleLabel.leftToSuperview(offset: 10.0)
     titleLabel.rightToSuperview(offset: 10.0)
@@ -162,39 +188,49 @@ class ANIRecruitViewCell: UITableViewCell {
     subTitleLabel.numberOfLines = 3
     subTitleLabel.font = UIFont.systemFont(ofSize: 14.0)
     subTitleLabel.textColor = ANIColor.subTitle
-    tapArea.addSubview(subTitleLabel)
+    recruitBase.addSubview(subTitleLabel)
     subTitleLabel.topToBottom(of: titleLabel, offset: 10.0)
     subTitleLabel.leftToSuperview(offset: 10.0)
     subTitleLabel.rightToSuperview(offset: 10.0)
-    subTitleLabel.bottomToSuperview()
+    subTitleLabel.bottomToSuperview(offset: -10)
     self.subTitleLabel = subTitleLabel
     
     //profileImageView
     let profileImageView = UIImageView()
-    profileImageView.isUserInteractionEnabled = true
-    let profileImageTapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped))
-    profileImageView.addGestureRecognizer(profileImageTapGesture)
     profileImageView.backgroundColor = ANIColor.bg
+    profileImageView.isUserInteractionEnabled = true
+    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped))
+    profileImageView.addGestureRecognizer(tapGesture)
     addSubview(profileImageView)
-    profileImageView.topToBottom(of: tapArea, offset: 10.0)
+    profileImageView.topToBottom(of: recruitBase, offset: 10.0)
     profileImageView.leftToSuperview(offset: 10.0)
-    profileImageView.width(PROFILE_IMAGE_HEIGHT)
-    profileImageView.height(PROFILE_IMAGE_HEIGHT)
-    profileImageView.layer.cornerRadius = PROFILE_IMAGE_HEIGHT / 2
+    profileImageView.width(32.0)
+    profileImageView.height(32.0)
+    profileImageView.layer.cornerRadius = profileImageView.constraints[0].constant / 2
     profileImageView.layer.masksToBounds = true
     self.profileImageView = profileImageView
     
-    //clipButton
-    let clipButton = UIButton()
-    clipButton.setImage(UIImage(named: "clip")?.withRenderingMode(.alwaysTemplate), for: .normal)
-    clipButton.tintColor = ANIColor.gray
-    clipButton.addTarget(self, action: #selector(clip), for: .touchUpInside)
-    addSubview(clipButton)
-    clipButton.centerY(to: profileImageView)
-    clipButton.rightToSuperview(offset: 20.0)
-    clipButton.width(21.0)
-    clipButton.height(21.0)
-    self.clipButton = clipButton
+    //commentCountLabel
+    let commentCountLabel = UILabel()
+    commentCountLabel.font = UIFont.boldSystemFont(ofSize: 16.0)
+    commentCountLabel.textColor = ANIColor.dark
+    addSubview(commentCountLabel)
+    commentCountLabel.centerY(to: profileImageView)
+    commentCountLabel.rightToSuperview(offset: 20.0)
+    commentCountLabel.width(30.0)
+    commentCountLabel.height(20.0)
+    self.commentCountLabel = commentCountLabel
+    
+    //commentButton
+    let commentButton = UIButton()
+    commentButton.setImage(UIImage(named: "comment"), for: .normal)
+    commentButton.addTarget(self, action: #selector(cellTapped), for: .touchUpInside)
+    addSubview(commentButton)
+    commentButton.centerY(to: profileImageView)
+    commentButton.rightToLeft(of: commentCountLabel, offset: -10.0)
+    commentButton.width(25.0)
+    commentButton.height(24.0)
+    self.commentButton = commentButton
     
     //loveCountLabel
     let loveCountLabel = UILabel()
@@ -202,7 +238,7 @@ class ANIRecruitViewCell: UITableViewCell {
     loveCountLabel.textColor = ANIColor.dark
     addSubview(loveCountLabel)
     loveCountLabel.centerY(to: profileImageView)
-    loveCountLabel.rightToLeft(of: clipButton, offset: -10.0)
+    loveCountLabel.rightToLeft(of: commentButton, offset: -10.0)
     loveCountLabel.width(30.0)
     loveCountLabel.height(20.0)
     self.loveCountLabel = loveCountLabel
@@ -223,36 +259,13 @@ class ANIRecruitViewCell: UITableViewCell {
     loveButton.height(20.0)
     self.loveButton = loveButton
     
-    //supportCountLabel
-    let supportCountLabel = UILabel()
-    supportCountLabel.font = UIFont.boldSystemFont(ofSize: 16.0)
-    supportCountLabel.textColor = ANIColor.dark
-    addSubview(supportCountLabel)
-    supportCountLabel.centerY(to: profileImageView)
-    supportCountLabel.rightToLeft(of: loveButton, offset: -10.0)
-    supportCountLabel.width(30.0)
-    supportCountLabel.height(20.0)
-    self.supportCountLabel = supportCountLabel
-    
-    //supportButton
-    let supportButton = UIButton()
-    supportButton.setImage(UIImage(named: "support")?.withRenderingMode(.alwaysTemplate), for: .normal)
-    supportButton.tintColor = ANIColor.gray
-    supportButton.addTarget(self, action: #selector(support), for: .touchUpInside)
-    addSubview(supportButton)
-    supportButton.centerY(to: profileImageView)
-    supportButton.rightToLeft(of: supportCountLabel, offset: -10.0)
-    supportButton.width(21.0)
-    supportButton.height(21.0)
-    self.supportButton = supportButton
-    
     //userNameLabel
     let userNameLabel = UILabel()
     userNameLabel.font = UIFont.systemFont(ofSize: 13.0)
     userNameLabel.textColor = ANIColor.subTitle
     addSubview(userNameLabel)
     userNameLabel.leftToRight(of: profileImageView, offset: 10.0)
-    userNameLabel.rightToLeft(of: supportButton, offset: 10.0)
+    userNameLabel.rightToLeft(of: loveButton, offset: -10.0)
     userNameLabel.centerY(to: profileImageView)
     userNameLabel.height(20.0)
     self.userNameLabel = userNameLabel
@@ -269,33 +282,51 @@ class ANIRecruitViewCell: UITableViewCell {
     self.line = line
   }
   
+  func observeStory() {
+    guard let story = self.story,
+      let storyId = story.id else { return }
+    
+    let databaseRef = Database.database().reference()
+    
+    DispatchQueue.global().async {
+      databaseRef.child(KEY_STORIES).child(storyId).observe(.value) { (snapshot) in
+        guard let value = snapshot.value else { return }
+        do {
+          let story = try FirebaseDecoder().decode(FirebaseStory.self, from: value)
+          
+          self.story = story
+        } catch let error {
+          print(error)
+        }
+      }
+    }
+  }
+  
   private func reloadLayout() {
-    guard let recruitImageView = self.recruitImageView,
-          let isRecruitLabel = self.isRecruitLabel,
-          let homeLabel = self.homeLabel,
-          let ageLabel = self.ageLabel,
-          let sexLabel = self.sexLabel,
+    guard let messageLabel = self.messageLabel,
           let titleLabel = self.titleLabel,
           let subTitleLabel = self.subTitleLabel,
-          let supportCountLabel = self.supportCountLabel,
           let loveButton = self.loveButton,
           let loveCountLabel = self.loveCountLabel,
-          let recruit = self.recruit,
-          let headerImageUrl = recruit.headerImageUrl else { return }
+          let commentCountLabel = self.commentCountLabel,
+          let story = self.story else { return }
     
-    recruitImageView.sd_setImage(with: URL(string: headerImageUrl), completed: nil)
-    isRecruitLabel.text = recruit.isRecruit ? "募集中" : "決まり！"
-    homeLabel.text = recruit.home
-    ageLabel.text = recruit.age
-    sexLabel.text = recruit.sex
-    titleLabel.text = recruit.title
-    subTitleLabel.text = recruit.reason
-    supportCountLabel.text = "\(recruit.supportCount)"
+    messageLabel.text = story.story
+    
+    titleLabel.text = story.recruitTitle
+    subTitleLabel.text = story.recruitSubTitle
+
     loveButton.isSelected = false
-    if let loveIds = recruit.loveIds {
+    if let loveIds = story.loveIds {
       loveCountLabel.text = "\(loveIds.count)"
     } else {
       loveCountLabel.text = "0"
+    }
+
+    if let commentIds = story.commentIds {
+      commentCountLabel.text = "\(commentIds.count)"
+    } else {
+      commentCountLabel.text = "0"
     }
   }
   
@@ -304,22 +335,37 @@ class ANIRecruitViewCell: UITableViewCell {
           let profileImageView = self.profileImageView,
           let profileImageUrl = user.profileImageUrl,
           let userName = user.userName else { return }
-    
+
     profileImageView.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
     userNameLabel.text = userName
   }
   
-  private func loadUser() {
-    guard let recruit = self.recruit else { return }
+  private func reloadRecruitLayout(recruit: FirebaseRecruit) {
+    guard let recruitImageView = self.recruitImageView,
+          let isRecruitLabel = self.isRecruitLabel,
+          let homeLabel = self.homeLabel,
+          let ageLabel = self.ageLabel,
+          let sexLabel = self.sexLabel,
+          let headerImageUrl = recruit.headerImageUrl else { return }
     
+    recruitImageView.sd_setImage(with: URL(string: headerImageUrl), completed: nil)
+    isRecruitLabel.text = recruit.isRecruit ? "募集中" : "決まり！"
+    homeLabel.text = recruit.home
+    ageLabel.text = recruit.age
+    sexLabel.text = recruit.sex
+  }
+  
+  private func loadUser() {
+    guard let story = self.story else { return }
+
     DispatchQueue.global().async {
       let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_USERS).child(recruit.userId).observeSingleEvent(of: .value, with: { (userSnapshot) in
+      databaseRef.child(KEY_USERS).child(story.userId).observeSingleEvent(of: .value, with: { (userSnapshot) in
         if let userValue = userSnapshot.value {
           do {
             let user = try FirebaseDecoder().decode(FirebaseUser.self, from: userValue)
             self.user = user
-            
+
             DispatchQueue.main.async {
               self.reloadUserLayout(user: user)
             }
@@ -331,23 +377,46 @@ class ANIRecruitViewCell: UITableViewCell {
     }
   }
   
+  private func loadRecruit() {
+    guard let story = self.story,
+          let recruitId = story.recruitId else { return }
+
+    DispatchQueue.global().async {
+      let databaseRef = Database.database().reference()
+      databaseRef.child(KEY_RECRUITS).child(recruitId).observeSingleEvent(of: .value, with: { (snapshot) in
+        if let recruitValue = snapshot.value {
+          do {
+            let recruit = try FirebaseDecoder().decode(FirebaseRecruit.self, from: recruitValue)
+            self.recruit = recruit
+
+            DispatchQueue.main.async {
+              self.reloadRecruitLayout(recruit: recruit)
+            }
+          } catch let error {
+            print(error)
+          }
+        }
+      })
+    }
+  }
+  
   private func observeLove() {
-    guard let recruit = self.recruit,
-          let recuritId = recruit.id else { return }
-    
+    guard let story = self.story,
+          let storyId = story.id else { return }
+
     let databaseRef = Database.database().reference()
     DispatchQueue.global().async {
-      databaseRef.child(KEY_RECRUITS).child(recuritId).child(KEY_LOVE_IDS).observe(.value) { (snapshot) in
+      databaseRef.child(KEY_STORIES).child(storyId).child(KEY_LOVE_IDS).observe(.value) { (snapshot) in
         if let loveIds = snapshot.value as? [String: AnyObject] {
           DispatchQueue.main.async {
             guard let loveCountLabel = self.loveCountLabel else { return }
-            
+
             loveCountLabel.text = "\(loveIds.count)"
           }
         } else {
           DispatchQueue.main.async {
             guard let loveCountLabel = self.loveCountLabel else { return }
-            
+
             loveCountLabel.text = "0"
           }
         }
@@ -356,19 +425,19 @@ class ANIRecruitViewCell: UITableViewCell {
   }
   
   private func isLoved() {
-    guard let recruit = self.recruit,
-          let recuritId = recruit.id,
+    guard let story = self.story,
+          let storyId = story.id,
           let currentUserId = ANISessionManager.shared.currentUserUid else { return }
-    
+
     let databaseRef = Database.database().reference()
     DispatchQueue.global().async {
-      databaseRef.child(KEY_RECRUITS).child(recuritId).child(KEY_LOVE_IDS).observeSingleEvent(of: .value) { (snapshot) in
+      databaseRef.child(KEY_STORIES).child(storyId).child(KEY_LOVE_IDS).observeSingleEvent(of: .value) { (snapshot) in
         for item in snapshot.children {
           if let snapshot = item as? DataSnapshot {
             if snapshot.key == currentUserId {
               DispatchQueue.main.async {
                 guard let loveButton = self.loveButton else { return }
-                
+
                 loveButton.isSelected = true
               }
             }
@@ -380,66 +449,39 @@ class ANIRecruitViewCell: UITableViewCell {
   
   //MARK: action
   @objc private func love() {
-    guard let recruit = self.recruit,
-          let recuritId = recruit.id,
-          let currentUserId = ANISessionManager.shared.currentUserUid,
-          let loveButton = self.loveButton else { return }
+    guard let story = self.story,
+      let storyId = story.id,
+      let currentUserId = ANISessionManager.shared.currentUserUid,
+      let loveButton = self.loveButton else { return }
     
     let databaseRef = Database.database().reference()
     if loveButton.isSelected == true {
       DispatchQueue.global().async {
-        databaseRef.child(KEY_RECRUITS).child(recuritId).child(KEY_LOVE_IDS).updateChildValues([currentUserId: true])
-        databaseRef.child(KEY_USERS).child(currentUserId).child(KEY_LOVE_RECRUIT_IDS).updateChildValues([recuritId: true])
+        databaseRef.child(KEY_STORIES).child(storyId).child(KEY_LOVE_IDS).updateChildValues([currentUserId: true])
+        databaseRef.child(KEY_USERS).child(currentUserId).child(KEY_LOVE_STORY_IDS).updateChildValues([storyId: true])
       }
     } else {
       DispatchQueue.global().async {
-        databaseRef.child(KEY_RECRUITS).child(recuritId).child(KEY_LOVE_IDS).child(currentUserId).removeValue()
-        databaseRef.child(KEY_USERS).child(currentUserId).child(KEY_LOVE_RECRUIT_IDS).child(recuritId).removeValue()
-      }
-    }
-  }
-  
-  @objc private func support() {
-    guard let supportButton = self.supportButton,
-          let recruit = self.recruit else { return }
-    
-    if supportButton.tintColor == ANIColor.moreDarkGray {
-      UIView.animate(withDuration: 0.15) {
-        supportButton.tintColor = ANIColor.gray
-      }
-    } else {
-      UIView.animate(withDuration: 0.15) {
-        supportButton.tintColor = ANIColor.moreDarkGray
-        
-        self.delegate?.supportButtonTapped(supportRecruit: recruit)
-      }
-    }
-  }
-  
-  @objc private func clip() {
-    guard let clipButton = self.clipButton else { return }
-    
-    if clipButton.tintColor == ANIColor.moreDarkGray {
-      UIView.animate(withDuration: 0.15) {
-        clipButton.tintColor = ANIColor.gray
-      }
-    } else {
-      UIView.animate(withDuration: 0.15) {
-        clipButton.tintColor = ANIColor.moreDarkGray
+        databaseRef.child(KEY_STORIES).child(storyId).child(KEY_LOVE_IDS).child(currentUserId).removeValue()
+        databaseRef.child(KEY_USERS).child(currentUserId).child(KEY_LOVE_STORY_IDS).child(storyId).removeValue()
       }
     }
   }
   
   @objc private func profileImageViewTapped() {
-    guard let recruit = self.recruit else { return }
+    guard let story = self.story else { return }
     
-    ANINotificationManager.postProfileImageViewTapped(userId: recruit.userId)
+    ANINotificationManager.postProfileImageViewTapped(userId: story.userId)
   }
   
   @objc private func cellTapped() {
-    guard let recruit = self.recruit,
+    guard let story = self.story,
           let user = self.user else { return }
     
-    self.delegate?.cellTapped(recruit: recruit, user: user)
+    self.delegate?.supportCellTapped(story: story, user: user)
+  }
+  
+  @objc private func recruitTapped() {
+    print("recruit tapped")
   }
 }

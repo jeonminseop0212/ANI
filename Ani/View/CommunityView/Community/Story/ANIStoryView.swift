@@ -41,8 +41,10 @@ class ANIStoryView: UIView {
     let tableView = UITableView()
     tableView.contentInset = UIEdgeInsets(top: ANICommunityViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT + bottomSafeArea, right: 0)
     tableView.scrollIndicatorInsets  = UIEdgeInsets(top: UIViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT + bottomSafeArea, right: 0)
-    let id = NSStringFromClass(ANIStoryViewCell.self)
-    tableView.register(ANIStoryViewCell.self, forCellReuseIdentifier: id)
+    let storyCellId = NSStringFromClass(ANIStoryViewCell.self)
+    tableView.register(ANIStoryViewCell.self, forCellReuseIdentifier: storyCellId)
+    let supportCellId = NSStringFromClass(ANISupportViewCell.self)
+    tableView.register(ANISupportViewCell.self, forCellReuseIdentifier: supportCellId)
     tableView.separatorStyle = .none
     tableView.backgroundColor = ANIColor.bg
     tableView.dataSource = self
@@ -103,22 +105,42 @@ extension ANIStoryView: UITableViewDataSource {
   }
   
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let id = NSStringFromClass(ANIStoryViewCell.self)
-    let cell = tableView.dequeueReusableCell(withIdentifier: id, for: indexPath) as! ANIStoryViewCell
-    
     if !stories.isEmpty {
-      cell.story = stories[indexPath.row]
-      cell.observeStory()
-      cell.delegate = self
+      if stories[indexPath.row].recruitId != nil {
+        let supportCellId = NSStringFromClass(ANISupportViewCell.self)
+        let cell = tableView.dequeueReusableCell(withIdentifier: supportCellId, for: indexPath) as! ANISupportViewCell
+        
+        cell.story = stories[indexPath.row]
+        cell.observeStory()
+        cell.delegate = self
+        
+        return cell
+      } else {
+        let storyCellId = NSStringFromClass(ANIStoryViewCell.self)
+        let cell = tableView.dequeueReusableCell(withIdentifier: storyCellId, for: indexPath) as! ANIStoryViewCell
+        
+        cell.story = stories[indexPath.row]
+        cell.observeStory()
+        cell.delegate = self
+        
+        return cell
+      }
+    } else {
+      return UITableViewCell()
     }
-
-    return cell
   }
 }
 
 //MARK: ANIStoryViewCellDelegate
 extension ANIStoryView: ANIStoryViewCellDelegate {
-  func cellTapped(story: FirebaseStory, user: FirebaseUser) {
+  func storyCellTapped(story: FirebaseStory, user: FirebaseUser) {
+    self.delegate?.storyViewCellDidSelect(selectedStory: story, user: user)
+  }
+}
+
+//MARK: ANIStoryViewCellDelegate
+extension ANIStoryView: ANISupportViewCellDelegate {
+  func supportCellTapped(story: FirebaseStory, user: FirebaseUser) {
     self.delegate?.storyViewCellDidSelect(selectedStory: story, user: user)
   }
 }

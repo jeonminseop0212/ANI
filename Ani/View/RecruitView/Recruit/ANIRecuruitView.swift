@@ -13,7 +13,7 @@ import CodableFirebase
 protocol ANIRecruitViewDelegate {
   func recruitCellTap(selectedRecruit: FirebaseRecruit, user: FirebaseUser)
   func recruitViewDidScroll(scrollY: CGFloat)
-  func supportButtonTapped(supportRecruitId: String)
+  func supportButtonTapped(supportRecruit: FirebaseRecruit)
 }
 
 class ANIRecuruitView: UIView {
@@ -137,7 +137,7 @@ extension ANIRecuruitView: ANIRecruitViewCellDelegate {
     self.delegate?.recruitCellTap(selectedRecruit: recruit, user: user)
   }
   
-  func supportButtonTapped(supportRecruitId: String) {
-    self.delegate?.supportButtonTapped(supportRecruitId: supportRecruitId)
+  func supportButtonTapped(supportRecruit: FirebaseRecruit) {
+    self.delegate?.supportButtonTapped(supportRecruit: supportRecruit)
   }
 }

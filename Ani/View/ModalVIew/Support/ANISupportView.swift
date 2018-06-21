@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import FirebaseDatabase
+import CodableFirebase
 
 protocol ANISupportViewDelegate {
   func supportButtonTapped()
@@ -19,6 +21,8 @@ class ANISupportView: UIView {
   private let SUPPORT_BUTTON_HEIGHT: CGFloat = 40.0
   private weak var supportButton: ANIAreaButtonView?
   private weak var supportButtonLabel: UILabel?
+  
+  var recruit: FirebaseRecruit?
   
   var delegate: ANISupportViewDelegate?
   
@@ -94,6 +98,32 @@ class ANISupportView: UIView {
 extension ANISupportView: ANIButtonViewDelegate {
   func buttonViewTapped(view: ANIButtonView) {
     if view === supportButton {
+      guard let recruit = self.recruit,
+            let recruitId = recruit.id,
+            let messageTextView = self.messageTextView,
+            let uid = ANISessionManager.shared.currentUserUid else { return }
+      
+      let detabaseRef = Database.database().reference()
+      let databaseStoryRef = detabaseRef.child(KEY_STORIES).childByAutoId()
+      let id = databaseStoryRef.key
+      let story = FirebaseStory(id: id, storyImageUrls: nil, story: messageTextView.text, userId: uid, loveIds: nil, commentIds: nil, recruitId: recruitId, recruitTitle: recruit.title, recruitSubTitle: recruit.reason)
+      
+      DispatchQueue.global().async {
+        do {
+          if let data = try FirebaseEncoder().encode(story) as? [String : AnyObject] {
+            databaseStoryRef.updateChildValues(data)
+          }
+          
+          if let id = story.id {
+            let detabaseUsersRef = detabaseRef.child(KEY_USERS).child(uid).child(KEY_POST_STORY_IDS)
+            let value: [String: Bool] = [id: true]
+            detabaseUsersRef.updateChildValues(value)
+          }
+        } catch let error {
+          print(error)
+        }
+      }
+      
       self.delegate?.supportButtonTapped()
     }
   }
