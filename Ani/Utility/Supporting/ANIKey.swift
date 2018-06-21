@@ -24,6 +24,7 @@ let KEY_POST_QNA_IDS = "postQnaIds"
 let KEY_LOVE_RECRUIT_IDS = "loveRecruitIds"
 let KEY_LOVE_STORY_IDS = "loveStoryIds"
 let KEY_LOVE_QNA_IDS = "loveQnaIds"
+let KEY_SUPPORT_RECRUIT_IDS = "supportRecruitIds"
 
 //recruit
 let KEY_RECRUIT_HEADER_IMAGES = "recruit_header_images"

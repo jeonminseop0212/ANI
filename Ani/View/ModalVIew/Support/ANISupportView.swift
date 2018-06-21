@@ -103,8 +103,8 @@ extension ANISupportView: ANIButtonViewDelegate {
             let messageTextView = self.messageTextView,
             let uid = ANISessionManager.shared.currentUserUid else { return }
       
-      let detabaseRef = Database.database().reference()
-      let databaseStoryRef = detabaseRef.child(KEY_STORIES).childByAutoId()
+      let databaseRef = Database.database().reference()
+      let databaseStoryRef = databaseRef.child(KEY_STORIES).childByAutoId()
       let id = databaseStoryRef.key
       let story = FirebaseStory(id: id, storyImageUrls: nil, story: messageTextView.text, userId: uid, loveIds: nil, commentIds: nil, recruitId: recruitId, recruitTitle: recruit.title, recruitSubTitle: recruit.reason)
       
@@ -115,13 +115,17 @@ extension ANISupportView: ANIButtonViewDelegate {
           }
           
           if let id = story.id {
-            let detabaseUsersRef = detabaseRef.child(KEY_USERS).child(uid).child(KEY_POST_STORY_IDS)
+            let detabaseUsersRef = databaseRef.child(KEY_USERS).child(uid).child(KEY_POST_STORY_IDS)
             let value: [String: Bool] = [id: true]
             detabaseUsersRef.updateChildValues(value)
           }
         } catch let error {
           print(error)
         }
+      }
+      
+      DispatchQueue.global().async {
+        databaseRef.child(KEY_RECRUITS).child(recruitId).child(KEY_SUPPORT_RECRUIT_IDS).updateChildValues([uid: true])
       }
       
       self.delegate?.supportButtonTapped()

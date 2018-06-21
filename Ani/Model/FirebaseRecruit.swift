@@ -24,6 +24,6 @@ struct FirebaseRecruit: Codable {
   let passing: String
   let isRecruit: Bool
   let userId: String
-  let supportCount: Int
   var loveIds: [String: Bool]?
+  var supportIds: [String: Bool]?
 }

@@ -442,7 +442,7 @@ extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
         let detabaseRef = Database.database().reference()
         let databaseRecruitRef = detabaseRef.child(KEY_RECRUITS).childByAutoId()
         let id = databaseRecruitRef.key
-        var recruit = FirebaseRecruit(id: id, headerImageUrl: nil, title: recruitInfo.title, kind: recruitInfo.kind, age: recruitInfo.age, sex: recruitInfo.sex, home: recruitInfo.home, vaccine: recruitInfo.vaccine, castration: recruitInfo.castration, reason: recruitInfo.reason, introduce: recruitInfo.introduce, introduceImageUrls: nil, passing: recruitInfo.passing, isRecruit: true, userId: userId, supportCount: 0, loveIds: nil)
+        var recruit = FirebaseRecruit(id: id, headerImageUrl: nil, title: recruitInfo.title, kind: recruitInfo.kind, age: recruitInfo.age, sex: recruitInfo.sex, home: recruitInfo.home, vaccine: recruitInfo.vaccine, castration: recruitInfo.castration, reason: recruitInfo.reason, introduce: recruitInfo.introduce, introduceImageUrls: nil, passing: recruitInfo.passing, isRecruit: true, userId: userId, loveIds: nil, supportIds: nil)
         
         DispatchQueue.global().async {
           if let recruitHeaderImageData = UIImageJPEGRepresentation(recruitInfo.headerImage, 0.5) {

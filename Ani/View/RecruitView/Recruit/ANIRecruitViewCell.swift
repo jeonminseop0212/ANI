@@ -41,7 +41,9 @@ class ANIRecruitViewCell: UITableViewCell {
       reloadLayout()
       loadUser()
       isLoved()
+      isSupported()
       observeLove()
+      observeSupport()
     }
   }
   
@@ -277,6 +279,7 @@ class ANIRecruitViewCell: UITableViewCell {
           let sexLabel = self.sexLabel,
           let titleLabel = self.titleLabel,
           let subTitleLabel = self.subTitleLabel,
+          let supportButton = self.supportButton,
           let supportCountLabel = self.supportCountLabel,
           let loveButton = self.loveButton,
           let loveCountLabel = self.loveCountLabel,
@@ -290,7 +293,14 @@ class ANIRecruitViewCell: UITableViewCell {
     sexLabel.text = recruit.sex
     titleLabel.text = recruit.title
     subTitleLabel.text = recruit.reason
-    supportCountLabel.text = "\(recruit.supportCount)"
+    
+    supportButton.tintColor = ANIColor.gray
+    if let supportIds = recruit.supportIds {
+      supportCountLabel.text = "\(supportIds.count)"
+    } else {
+      supportCountLabel.text = "0"
+    }
+    
     loveButton.isSelected = false
     if let loveIds = recruit.loveIds {
       loveCountLabel.text = "\(loveIds.count)"
@@ -355,6 +365,33 @@ class ANIRecruitViewCell: UITableViewCell {
     }
   }
   
+  private func observeSupport() {
+    guard let recruit = self.recruit,
+          let recuritId = recruit.id else { return }
+    
+    let databaseRef = Database.database().reference()
+    DispatchQueue.global().async {
+      databaseRef.child(KEY_RECRUITS).child(recuritId).child(KEY_SUPPORT_RECRUIT_IDS).observe(.value) { (snapshot) in
+        if let supportIds = snapshot.value as? [String: AnyObject] {
+          DispatchQueue.main.async {
+            guard let supportCountLabel = self.supportCountLabel else { return }
+            
+            supportCountLabel.text = "\(supportIds.count)"
+            self.isSupported()
+          }
+        } else {
+          DispatchQueue.main.async {
+            guard let supportCountLabel = self.supportCountLabel else { return }
+            
+            supportCountLabel.text = "0"
+            self.isSupported()
+          }
+        }
+      }
+    }
+  }
+
+  
   private func isLoved() {
     guard let recruit = self.recruit,
           let recuritId = recruit.id,
@@ -370,6 +407,29 @@ class ANIRecruitViewCell: UITableViewCell {
                 guard let loveButton = self.loveButton else { return }
                 
                 loveButton.isSelected = true
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  private func isSupported() {
+    guard let recruit = self.recruit,
+          let recuritId = recruit.id,
+          let currentUserId = ANISessionManager.shared.currentUserUid else { return }
+    
+    let databaseRef = Database.database().reference()
+    DispatchQueue.global().async {
+      databaseRef.child(KEY_RECRUITS).child(recuritId).child(KEY_SUPPORT_RECRUIT_IDS).observeSingleEvent(of: .value) { (snapshot) in
+        for item in snapshot.children {
+          if let snapshot = item as? DataSnapshot {
+            if snapshot.key == currentUserId {
+              DispatchQueue.main.async {
+                guard let supportButton = self.supportButton else { return }
+                
+                supportButton.tintColor = ANIColor.moreDarkGray
               }
             }
           }
@@ -403,16 +463,8 @@ class ANIRecruitViewCell: UITableViewCell {
     guard let supportButton = self.supportButton,
           let recruit = self.recruit else { return }
     
-    if supportButton.tintColor == ANIColor.moreDarkGray {
-      UIView.animate(withDuration: 0.15) {
-        supportButton.tintColor = ANIColor.gray
-      }
-    } else {
-      UIView.animate(withDuration: 0.15) {
-        supportButton.tintColor = ANIColor.moreDarkGray
-        
-        self.delegate?.supportButtonTapped(supportRecruit: recruit)
-      }
+    if supportButton.tintColor == ANIColor.gray {
+      self.delegate?.supportButtonTapped(supportRecruit: recruit)
     }
   }
   
