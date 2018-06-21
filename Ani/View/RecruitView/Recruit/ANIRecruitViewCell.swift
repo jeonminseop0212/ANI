@@ -45,7 +45,7 @@ class ANIRecruitViewCell: UITableViewCell {
     }
   }
   
-  var user: FirebaseUser?
+  private var user: FirebaseUser?
   
   var delegate: ANIRecruitViewCellDelegate?
   

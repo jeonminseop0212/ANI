@@ -141,6 +141,14 @@ extension ANIOtherProfileViewController: ANIOtherProfileBasicViewDelegate {
     self.navigationController?.pushViewController(commentViewController, animated: true)
   }
   
+  func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser) {
+    let recruitDetailViewController = ANIRecruitDetailViewController()
+    recruitDetailViewController.hidesBottomBarWhenPushed = true
+    recruitDetailViewController.recruit = recruit
+    recruitDetailViewController.user = user
+    self.navigationController?.pushViewController(recruitDetailViewController, animated: true)
+  }
+  
   func qnaViewCellDidSelect(selectedQna: FirebaseQna, user: FirebaseUser) {
     let commentViewController = ANICommentViewController()
     commentViewController.hidesBottomBarWhenPushed = true

@@ -13,6 +13,7 @@ import CodableFirebase
 protocol ANIOtherProfileBasicViewDelegate {
   func recruitViewCellDidSelect(selectedRecruit: FirebaseRecruit, user: FirebaseUser)
   func storyViewCellDidSelect(selectedStory: FirebaseStory, user: FirebaseUser)
+  func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser)
   func qnaViewCellDidSelect(selectedQna: FirebaseQna, user:FirebaseUser)
   func supportButtonTapped()
 }
@@ -78,6 +79,8 @@ class ANIOtherProfileBasicView: UIView {
     basicTableView.register(ANIRecruitViewCell.self, forCellReuseIdentifier: recruitCellid)
     let storyCellid = NSStringFromClass(ANIStoryViewCell.self)
     basicTableView.register(ANIStoryViewCell.self, forCellReuseIdentifier: storyCellid)
+    let supportCellId = NSStringFromClass(ANISupportViewCell.self)
+    basicTableView.register(ANISupportViewCell.self, forCellReuseIdentifier: supportCellId)
     let qnaCellid = NSStringFromClass(ANIQnaViewCell.self)
     basicTableView.register(ANIQnaViewCell.self, forCellReuseIdentifier: qnaCellid)
     addSubview(basicTableView)
@@ -229,14 +232,29 @@ extension ANIOtherProfileBasicView: UITableViewDataSource {
         
         return cell
       } else if contentType == .story {
-        let storyCellid = NSStringFromClass(ANIStoryViewCell.self)
-        let cell = tableView.dequeueReusableCell(withIdentifier: storyCellid, for: indexPath) as! ANIStoryViewCell
-        
-        cell.story = stories[indexPath.row]
-        cell.observeStory()
-        cell.delegate = self
-        
-        return cell
+        if !stories.isEmpty {
+          if stories[indexPath.row].recruitId != nil {
+            let supportCellId = NSStringFromClass(ANISupportViewCell.self)
+            let cell = tableView.dequeueReusableCell(withIdentifier: supportCellId, for: indexPath) as! ANISupportViewCell
+            
+            cell.story = stories[indexPath.row]
+            cell.observeStory()
+            cell.delegate = self
+            
+            return cell
+          } else {
+            let storyCellId = NSStringFromClass(ANIStoryViewCell.self)
+            let cell = tableView.dequeueReusableCell(withIdentifier: storyCellId, for: indexPath) as! ANIStoryViewCell
+            
+            cell.story = stories[indexPath.row]
+            cell.observeStory()
+            cell.delegate = self
+            
+            return cell
+          }
+        } else {
+          return UITableViewCell()
+        }
       } else {
         let qnaCellid = NSStringFromClass(ANIQnaViewCell.self)
         let cell = tableView.dequeueReusableCell(withIdentifier: qnaCellid, for: indexPath) as! ANIQnaViewCell
@@ -288,6 +306,17 @@ extension ANIOtherProfileBasicView: ANIRecruitViewCellDelegate {
 extension ANIOtherProfileBasicView: ANIStoryViewCellDelegate {
   func storyCellTapped(story: FirebaseStory, user: FirebaseUser) {
     self.delegate?.storyViewCellDidSelect(selectedStory: story, user: user)
+  }
+}
+
+//MARK: ANISupportViewCellDelegate
+extension ANIOtherProfileBasicView: ANISupportViewCellDelegate {
+  func supportCellTapped(story: FirebaseStory, user: FirebaseUser) {
+    self.delegate?.storyViewCellDidSelect(selectedStory: story, user: user)
+  }
+  
+  func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser) {
+    self.delegate?.supportCellRecruitTapped(recruit: recruit, user: user)
   }
 }
 

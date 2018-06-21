@@ -13,6 +13,7 @@ import CodableFirebase
 protocol ANIProfileBasicViewDelegate {
   func recruitViewCellDidSelect(selectedRecruit: FirebaseRecruit, user: FirebaseUser)
   func storyViewCellDidSelect(selectedStory: FirebaseStory, user: FirebaseUser)
+  func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser)
   func qnaViewCellDidSelect(selectedQna: FirebaseQna, user:FirebaseUser)
   func supportButtonTapped()
 }
@@ -66,14 +67,16 @@ class ANIProfileBasicView: UIView {
     basicTableView.dataSource = self
     let topCellId = NSStringFromClass(ANIProfileTopCell.self)
     basicTableView.register(ANIProfileTopCell.self, forCellReuseIdentifier: topCellId)
-    let profileCellid = NSStringFromClass(ANIProfileCell.self)
-    basicTableView.register(ANIProfileCell.self, forCellReuseIdentifier: profileCellid)
-    let recruitCellid = NSStringFromClass(ANIRecruitViewCell.self)
-    basicTableView.register(ANIRecruitViewCell.self, forCellReuseIdentifier: recruitCellid)
-    let storyCellid = NSStringFromClass(ANIStoryViewCell.self)
-    basicTableView.register(ANIStoryViewCell.self, forCellReuseIdentifier: storyCellid)
-    let qnaCellid = NSStringFromClass(ANIQnaViewCell.self)
-    basicTableView.register(ANIQnaViewCell.self, forCellReuseIdentifier: qnaCellid)
+    let profileCellId = NSStringFromClass(ANIProfileCell.self)
+    basicTableView.register(ANIProfileCell.self, forCellReuseIdentifier: profileCellId)
+    let recruitCellId = NSStringFromClass(ANIRecruitViewCell.self)
+    basicTableView.register(ANIRecruitViewCell.self, forCellReuseIdentifier: recruitCellId)
+    let storyCellId = NSStringFromClass(ANIStoryViewCell.self)
+    basicTableView.register(ANIStoryViewCell.self, forCellReuseIdentifier: storyCellId)
+    let supportCellId = NSStringFromClass(ANISupportViewCell.self)
+    basicTableView.register(ANISupportViewCell.self, forCellReuseIdentifier: supportCellId)
+    let qnaCellId = NSStringFromClass(ANIQnaViewCell.self)
+    basicTableView.register(ANIQnaViewCell.self, forCellReuseIdentifier: qnaCellId)
     addSubview(basicTableView)
     basicTableView.edgesToSuperview()
     self.basicTableView = basicTableView
@@ -204,14 +207,29 @@ extension ANIProfileBasicView: UITableViewDataSource {
 
         return cell
       } else if contentType == .story {
-        let storyCellid = NSStringFromClass(ANIStoryViewCell.self)
-        let cell = tableView.dequeueReusableCell(withIdentifier: storyCellid, for: indexPath) as! ANIStoryViewCell
-        
-        cell.story = stories[indexPath.row]
-        cell.observeStory()
-        cell.delegate = self
-
-        return cell
+        if !stories.isEmpty {
+          if stories[indexPath.row].recruitId != nil {
+            let supportCellId = NSStringFromClass(ANISupportViewCell.self)
+            let cell = tableView.dequeueReusableCell(withIdentifier: supportCellId, for: indexPath) as! ANISupportViewCell
+            
+            cell.story = stories[indexPath.row]
+            cell.observeStory()
+            cell.delegate = self
+            
+            return cell
+          } else {
+            let storyCellId = NSStringFromClass(ANIStoryViewCell.self)
+            let cell = tableView.dequeueReusableCell(withIdentifier: storyCellId, for: indexPath) as! ANIStoryViewCell
+            
+            cell.story = stories[indexPath.row]
+            cell.observeStory()
+            cell.delegate = self
+            
+            return cell
+          }
+        } else {
+          return UITableViewCell()
+        }
       } else {
         let qnaCellid = NSStringFromClass(ANIQnaViewCell.self)
         let cell = tableView.dequeueReusableCell(withIdentifier: qnaCellid, for: indexPath) as! ANIQnaViewCell
@@ -263,6 +281,17 @@ extension ANIProfileBasicView: ANIRecruitViewCellDelegate {
 extension ANIProfileBasicView: ANIStoryViewCellDelegate {
   func storyCellTapped(story: FirebaseStory, user: FirebaseUser) {
     self.delegate?.storyViewCellDidSelect(selectedStory: story, user: user)
+  }
+}
+
+//MARK: ANISupportViewCellDelegate
+extension ANIProfileBasicView: ANISupportViewCellDelegate {
+  func supportCellTapped(story: FirebaseStory, user: FirebaseUser) {
+    self.delegate?.storyViewCellDidSelect(selectedStory: story, user: user)
+  }
+  
+  func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser) {
+    self.delegate?.supportCellRecruitTapped(recruit: recruit, user: user)
   }
 }
 
