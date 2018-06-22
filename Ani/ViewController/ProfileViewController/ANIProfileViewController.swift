@@ -14,6 +14,7 @@ class ANIProfileViewController: UIViewController {
   private weak var myNavigationBase: UIView?
   private weak var navigationTitleLabel: UILabel?
   private weak var backButton: UIButton?
+  private weak var optionButton: UIButton?
   
   var isBackButtonHide: Bool = true
   
@@ -86,6 +87,19 @@ class ANIProfileViewController: UIViewController {
     backButton.centerYToSuperview()
     self.backButton = backButton
     
+    //optionButton
+    let optionButton = UIButton()
+    let optionButtonImage = UIImage(named: "optionButton")?.withRenderingMode(.alwaysTemplate)
+    optionButton.setImage(optionButtonImage, for: .normal)
+    optionButton.tintColor = ANIColor.dark
+    optionButton.addTarget(self, action: #selector(option), for: .touchUpInside)
+    myNavigationBase.addSubview(optionButton)
+    optionButton.width(50.0)
+    optionButton.height(44.0)
+    optionButton.rightToSuperview()
+    optionButton.centerYToSuperview()
+    self.optionButton = optionButton
+    
     //profileBasicView
     let profileBasicView = ANIProfileBasicView()
     profileBasicView.currentUser = currentUser
@@ -128,6 +142,12 @@ class ANIProfileViewController: UIViewController {
   //MARK: action
   @objc private func back() {
     self.navigationController?.popViewController(animated: true)
+  }
+  
+  @objc private func option() {
+    let optionViewController = ANIOptionViewController()
+    optionViewController.hidesBottomBarWhenPushed = true
+    self.navigationController?.pushViewController(optionViewController, animated: true)
   }
 }
 
