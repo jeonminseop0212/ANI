@@ -65,11 +65,14 @@ extension ANIFamilyView: UICollectionViewDataSource, UICollectionViewDelegateFlo
     
     if indexPath.item == 0 {
       if let user = self.user, let profileImageUrl = user.profileImageUrl {
-        cell.familyImageView?.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
+        cell.familySmallImageVIew?.alpha = 0.0
+        cell.familyBigImageView?.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
       }
     } else {
       if let user = self.user, let familyImageUrls = user.familyImageUrls {
-        cell.familyImageView?.sd_setImage(with: URL(string: familyImageUrls[indexPath.item - 1]), completed: nil)
+        cell.familySmallImageVIew?.alpha = 1.0
+        cell.familySmallImageVIew?.sd_setImage(with: URL(string: familyImageUrls[indexPath.item - 1]), completed: nil)
+        cell.familyBigImageView?.image = UIImage(named: "familyBG")
       }
     }
     

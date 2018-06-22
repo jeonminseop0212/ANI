@@ -196,12 +196,16 @@ extension ANIOtherProfileBasicView: UITableViewDataSource {
       return 1
     } else {
       if contentType == .profile {
+        tableView.backgroundColor = .white
         return 1
       } else if contentType == .recruit {
+        tableView.backgroundColor = ANIColor.bg
         return recruits.count
       } else if contentType == .story {
+        tableView.backgroundColor = ANIColor.bg
         return stories.count
       } else {
+        tableView.backgroundColor = ANIColor.bg
         return qnas.count
       }
     }
