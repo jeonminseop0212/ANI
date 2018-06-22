@@ -10,6 +10,7 @@ import UIKit
 
 class ANIUserSearchViewCell: UITableViewCell {
   
+  private let PROFILE_IMAGE_VIEW_HEIGHT: CGFloat = 50.0
   var profileImageView = UIImageView()
   var userNameLabel = UILabel()
   var followButton = UIButton()
@@ -25,14 +26,17 @@ class ANIUserSearchViewCell: UITableViewCell {
   
   private func setup() {
     self.selectionStyle = .none
+    
     //profileImageView
     let profileImageView = UIImageView()
+    profileImageView.layer.cornerRadius = PROFILE_IMAGE_VIEW_HEIGHT / 2
+    profileImageView.layer.masksToBounds = true
     profileImageView.backgroundColor = ANIColor.bg
     addSubview(profileImageView)
     profileImageView.topToSuperview(offset: 10.0)
     profileImageView.leftToSuperview(offset: 10.0)
-    profileImageView.width(50.0)
-    profileImageView.height(50.0)
+    profileImageView.width(PROFILE_IMAGE_VIEW_HEIGHT)
+    profileImageView.height(PROFILE_IMAGE_VIEW_HEIGHT)
     profileImageView.bottomToSuperview(offset: -10.0)
     self.profileImageView = profileImageView
     
