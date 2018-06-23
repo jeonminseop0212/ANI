@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import FirebaseAuth
 
 class ANIOptionViewController: UIViewController {
   
@@ -69,6 +70,7 @@ class ANIOptionViewController: UIViewController {
     
     //optionView
     let optionView = ANIOptionView()
+    optionView.delegate = self
     self.view.addSubview(optionView)
     optionView.topToBottom(of: myNavigationBase)
     optionView.edgesToSuperview(excluding: .top)
@@ -78,5 +80,33 @@ class ANIOptionViewController: UIViewController {
   //MARK: action
   @objc private func back() {
     self.navigationController?.popViewController(animated: true)
+  }
+}
+
+//MARK: ANIOptionViewDelegate
+extension ANIOptionViewController: ANIOptionViewDelegate {
+  func logoutTapped() {
+    let alertController = UIAlertController(title: "ログアウト", message: "ログアウトしますか？\nアカウントで再ログインすることができます。", preferredStyle: .alert)
+    
+    let logoutAction = UIAlertAction(title: "ログアウト", style: .default) { (action) in
+      do {
+        try Auth.auth().signOut()
+        
+        ANISessionManager.shared.currentUser = nil
+        ANISessionManager.shared.currentUserUid = nil
+        
+        ANINotificationManager.postLogout()
+        
+        self.navigationController?.popViewController(animated: true)
+      } catch let signOutError as NSError {
+        print("signOutError \(signOutError)")
+      }
+    }
+    let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
+    
+    alertController.addAction(logoutAction)
+    alertController.addAction(cancelAction)
+    
+    self.present(alertController, animated: true, completion: nil)
   }
 }

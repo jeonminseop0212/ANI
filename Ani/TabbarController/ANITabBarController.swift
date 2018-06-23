@@ -30,11 +30,6 @@ class ANITabBarController: UITabBarController, NVActivityIndicatorViewable {
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(true)
     
-//    do {
-//      try Auth.auth().signOut()
-//    } catch let signOutError as NSError {
-//      print("signOutError \(signOutError)")
-//    }
     ANISessionManager.shared.currentUserUid = Auth.auth().currentUser?.uid
     if let currentUserUid = ANISessionManager.shared.currentUserUid {
       let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.green)

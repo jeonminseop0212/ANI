@@ -16,9 +16,9 @@ protocol ANIQnaViewDelegate {
 
 class ANIQnaView: UIView {
   
-  var qnaTableView: UITableView?
+  private weak var qnaTableView: UITableView?
   
-  var qnas = [FirebaseQna]()
+  private var qnas = [FirebaseQna]()
   
   var delegate: ANIQnaViewDelegate?
   
@@ -26,6 +26,7 @@ class ANIQnaView: UIView {
     super.init(frame: frame)
     loadQna(sender: nil)
     setup()
+    setupNotifications()
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -52,6 +53,12 @@ class ANIQnaView: UIView {
     addSubview(tableView)
     tableView.edgesToSuperview()
     self.qnaTableView = tableView
+  }
+  
+  //MARK: Notifications
+  private func setupNotifications() {
+    ANINotificationManager.receive(logout: self, selector: #selector(reloadQna))
+    ANINotificationManager.receive(login: self, selector: #selector(reloadQna))
   }
   
   @objc private func loadQna(sender: UIRefreshControl?) {
@@ -93,6 +100,10 @@ class ANIQnaView: UIView {
         }
       })
     }
+  }
+  
+  @objc private func reloadQna() {
+    loadQna(sender: nil)
   }
 }
 

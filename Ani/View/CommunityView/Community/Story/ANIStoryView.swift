@@ -17,16 +17,17 @@ protocol ANIStoryViewDelegate {
 
 class ANIStoryView: UIView {
   
-  var storyTableView: UITableView?
+  private weak var storyTableView: UITableView?
   
-  var stories = [FirebaseStory]()
+  private var stories = [FirebaseStory]()
   
   var delegate: ANIStoryViewDelegate?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
-    setup()
     loadStory(sender: nil)
+    setup()
+    setupNotifications()
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -55,6 +56,12 @@ class ANIStoryView: UIView {
     addSubview(tableView)
     tableView.edgesToSuperview()
     self.storyTableView = tableView
+  }
+  
+  //MARK: Notifications
+  private func setupNotifications() {
+    ANINotificationManager.receive(logout: self, selector: #selector(reloadStory))
+    ANINotificationManager.receive(login: self, selector: #selector(reloadStory))
   }
   
   @objc private func loadStory(sender: UIRefreshControl?) {
@@ -96,6 +103,10 @@ class ANIStoryView: UIView {
         }
       })
     }
+  }
+  
+  @objc private func reloadStory() {
+    loadStory(sender: nil)
   }
 }
 
