@@ -32,11 +32,11 @@ class ANIProfileBasicView: UIView {
   
   private weak var basicTableView: UITableView?
   
-  var recruits = [FirebaseRecruit]()
+  private var recruits = [FirebaseRecruit]()
   
-  var stories = [FirebaseStory]()
+  private var stories = [FirebaseStory]()
   
-  var qnas = [FirebaseQna]()
+  private var qnas = [FirebaseQna]()
   
   var currentUser: FirebaseUser? {
     didSet {

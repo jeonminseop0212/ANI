@@ -8,12 +8,18 @@
 
 import UIKit
 
+protocol ANIOptionViewDelegate {
+  func logoutTapped()
+}
+
 class ANIOptionView: UIView {
   
   private weak var tableView: UITableView?
   
   private var list = ["『いいね』した募集", "『いいね』したストーリ", "『いいね』した質問", "『クリップ』した募集"]
   private var account = ["ログアウト"]
+  
+  var delegate: ANIOptionViewDelegate?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -94,5 +100,18 @@ extension ANIOptionView: UITableViewDelegate {
     }
     
     return headerView
+  }
+  
+  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    switch indexPath.section {
+    case 0:
+      print("list tapped")
+    case 1:
+      if account[indexPath.row] == "ログアウト" {
+        self.delegate?.logoutTapped()
+      }
+    default:
+      print("default")
+    }
   }
 }

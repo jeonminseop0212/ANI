@@ -82,4 +82,14 @@ class ANINotificationManager: NSObject {
   private static let N_PROFILE_IMAGE_VIEW_TAPPED = "N_PROFILE_IMAGE_VIEW_TAPPED"
   static func postProfileImageViewTapped(userId: String) { self.post(name: N_PROFILE_IMAGE_VIEW_TAPPED, object: userId, userInfo:nil) }
   static func receive(profileImageViewTapped observer:Any, selector:Selector) { receive(name: N_PROFILE_IMAGE_VIEW_TAPPED, observer: observer, selector: selector) }
+  
+  //MARK: logout
+  private static let N_LOGOUT = "N_LOGOUT"
+  static func postLogout() { self.post(name: N_LOGOUT, object: nil, userInfo:nil) }
+  static func receive(logout observer:Any, selector:Selector) { receive(name: N_LOGOUT, observer: observer, selector: selector) }
+  
+  //MARK: login
+  private static let N_LOGIN = "N_LOGIN"
+  static func postLogin() { self.post(name: N_LOGIN, object: nil, userInfo:nil) }
+  static func receive(login observer:Any, selector:Selector) { receive(name: N_LOGIN, observer: observer, selector: selector) }
 }

@@ -26,13 +26,14 @@ class ANIRecuruitView: UIView {
     }
   }
   
-  var recruits = [FirebaseRecruit]()
+  private var recruits = [FirebaseRecruit]()
   
   var delegate:ANIRecruitViewDelegate?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()
+    setupNotifications()
     loadRecruit(sender: nil)
   }
   
@@ -57,6 +58,12 @@ class ANIRecuruitView: UIView {
     addSubview(tableView)
     tableView.edgesToSuperview()
     self.recruitTableView = tableView
+  }
+  
+  //MARK: Notifications
+  private func setupNotifications() {
+    ANINotificationManager.receive(logout: self, selector: #selector(reloadRecruit))
+    ANINotificationManager.receive(login: self, selector: #selector(reloadRecruit))
   }
   
   @objc private func loadRecruit(sender: UIRefreshControl?) {
@@ -98,6 +105,10 @@ class ANIRecuruitView: UIView {
         }
       })
     }
+  }
+  
+  @objc private func reloadRecruit() {
+    loadRecruit(sender: nil)
   }
 }
 
