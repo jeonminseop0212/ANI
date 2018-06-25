@@ -13,6 +13,7 @@ import CodableFirebase
 protocol ANIStoryViewDelegate {
   func storyViewCellDidSelect(selectedStory: FirebaseStory, user: FirebaseUser)
   func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser)
+  func reject()
 }
 
 class ANIStoryView: UIView {
@@ -147,6 +148,10 @@ extension ANIStoryView: UITableViewDataSource {
 extension ANIStoryView: ANIStoryViewCellDelegate {
   func storyCellTapped(story: FirebaseStory, user: FirebaseUser) {
     self.delegate?.storyViewCellDidSelect(selectedStory: story, user: user)
+  }
+  
+  func reject() {
+    self.delegate?.reject()
   }
 }
 

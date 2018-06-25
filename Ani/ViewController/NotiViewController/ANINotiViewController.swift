@@ -14,6 +14,8 @@ class ANINotiViewController: UIViewController {
   private weak var menuBar: ANiNotiMenuBar?
   private weak var containerCollectionView: UICollectionView?
   
+  private weak var needLoginView: ANINeedLoginView?
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     setup()
@@ -21,6 +23,8 @@ class ANINotiViewController: UIViewController {
   
   override func viewWillAppear(_ animated: Bool) {
     UIApplication.shared.statusBarStyle = .default
+    
+    showNeedLoginView()
   }
   
   private func setup() {
@@ -59,12 +63,31 @@ class ANINotiViewController: UIViewController {
     menuBar.rightToSuperview()
     menuBar.height(menuBarHeight)
     self.menuBar = menuBar
+    
+    //needLoginView
+    let needLoginView = ANINeedLoginView()
+    needLoginView.isHidden = true
+    needLoginView.setupMessage(text: "通知とメッセージを利用するには\nログインが必要です。")
+    needLoginView.delegate = self
+    self.view.addSubview(needLoginView)
+    needLoginView.edgesToSuperview()
+    self.needLoginView = needLoginView
   }
   
   func scrollToMenuIndex(menuIndex: Int) {
     guard let containerCollectionView = self.containerCollectionView else { return }
     let indexPath = IndexPath(item: menuIndex, section: 0)
     containerCollectionView.scrollToItem(at: indexPath, at: .left, animated: true)
+  }
+  
+  private func showNeedLoginView() {
+    guard let needLoginView = self.needLoginView else { return }
+    
+    if ANISessionManager.shared.isAnonymous == true {
+      needLoginView.isHidden = false
+    } else {
+      needLoginView.isHidden = true
+    }
   }
 }
 
@@ -101,6 +124,15 @@ extension ANINotiViewController: UICollectionViewDataSource, UICollectionViewDel
     guard let menuBar = self.menuBar else { return }
     let indexPath = IndexPath(item: Int(targetContentOffset.pointee.x / view.frame.width), section: 0)
     menuBar.menuCollectionView?.selectItem(at: indexPath, animated: true, scrollPosition: .left)
+  }
+}
+
+//MARK: ANINeedLoginViewDelegate
+extension ANINotiViewController: ANINeedLoginViewDelegate {
+  func loginButtonTapped() {
+    let initialViewController = ANIInitialViewController()
+    let navigationController = UINavigationController(rootViewController: initialViewController)
+    self.present(navigationController, animated: true, completion: nil)
   }
 }
 

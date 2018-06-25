@@ -94,6 +94,7 @@ extension ANIOptionViewController: ANIOptionViewDelegate {
         
         ANISessionManager.shared.currentUser = nil
         ANISessionManager.shared.currentUserUid = nil
+        ANISessionManager.shared.isAnonymous = true
         
         ANINotificationManager.postLogout()
         

@@ -16,6 +16,7 @@ protocol ANIProfileBasicViewDelegate {
   func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser)
   func qnaViewCellDidSelect(selectedQna: FirebaseQna, user:FirebaseUser)
   func supportButtonTapped()
+  func reject()
 }
 
 class ANIProfileBasicView: UIView {
@@ -54,6 +55,7 @@ class ANIProfileBasicView: UIView {
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()
+    setupNotifications()
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -80,6 +82,10 @@ class ANIProfileBasicView: UIView {
     addSubview(basicTableView)
     basicTableView.edgesToSuperview()
     self.basicTableView = basicTableView
+  }
+  
+  private func setupNotifications() {
+    ANINotificationManager.receive(login: self, selector: #selector(reloadUser))
   }
   
   private func loadRecruit() {
@@ -158,6 +164,12 @@ class ANIProfileBasicView: UIView {
         })
       }
     }
+  }
+  
+  @objc private func reloadUser() {
+    guard let currentUser = ANISessionManager.shared.currentUser else { return }
+    
+    self.currentUser = currentUser
   }
 }
 
@@ -272,6 +284,10 @@ extension ANIProfileBasicView: ANIProfileMenuBarDelegate {
 
 //MARK: ANIRecruitViewCellDelegate
 extension ANIProfileBasicView: ANIRecruitViewCellDelegate {
+  func reject() {
+    self.delegate?.reject()
+  }
+  
   func supportButtonTapped(supportRecruit: FirebaseRecruit) {
     self.delegate?.supportButtonTapped()
   }

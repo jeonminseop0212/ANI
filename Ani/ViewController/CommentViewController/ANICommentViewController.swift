@@ -192,10 +192,9 @@ class ANICommentViewController: UIViewController {
   }
   
   @objc private func pushOtherProfile(_ notification: NSNotification) {
-    guard let userId = notification.object as? String,
-          let currentUserUid = ANISessionManager.shared.currentUserUid else { return }
+    guard let userId = notification.object as? String else { return }
     
-    if currentUserUid == userId {
+    if let currentUserUid = ANISessionManager.shared.currentUserUid, currentUserUid == userId {
       let profileViewController = ANIProfileViewController()
       profileViewController.hidesBottomBarWhenPushed = true
       self.navigationController?.pushViewController(profileViewController, animated: true)

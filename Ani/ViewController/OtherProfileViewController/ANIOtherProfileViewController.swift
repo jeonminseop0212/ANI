@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import TinyConstraints
 
 class ANIOtherProfileViewController: UIViewController {
   
@@ -16,6 +17,12 @@ class ANIOtherProfileViewController: UIViewController {
   private weak var backButton: UIButton?
   
   private weak var profileBasicView: ANIOtherProfileBasicView?
+  
+  private var rejectViewBottomConstraint: Constraint?
+  private var rejectViewBottomConstraintOriginalConstant: CGFloat?
+  private weak var rejectView: ANIRejectView?
+  private var isRejectAnimating: Bool = false
+  private var rejectTapView: UIView?
   
   var userId: String?
   
@@ -87,6 +94,28 @@ class ANIOtherProfileViewController: UIViewController {
     profileBasicView.topToBottom(of: myNavigationBar)
     profileBasicView.edgesToSuperview(excluding: .top)
     self.profileBasicView = profileBasicView
+    
+    //rejectView
+    let rejectView = ANIRejectView()
+    rejectView.setRejectText("ログインが必要です。")
+    self.view.addSubview(rejectView)
+    rejectViewBottomConstraint = rejectView.bottomToTop(of: self.view)
+    rejectViewBottomConstraintOriginalConstant = rejectViewBottomConstraint?.constant
+    rejectView.leftToSuperview()
+    rejectView.rightToSuperview()
+    self.rejectView = rejectView
+    
+    //rejectTapView
+    let rejectTapView = UIView()
+    rejectTapView.isUserInteractionEnabled = true
+    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(rejectViewTapped))
+    rejectTapView.addGestureRecognizer(tapGesture)
+    rejectTapView.isHidden = true
+    rejectTapView.backgroundColor = .clear
+    self.view.addSubview(rejectTapView)
+    rejectTapView.size(to: rejectView)
+    rejectTapView.topToSuperview()
+    self.rejectTapView = rejectTapView
   }
   
   //MARK: notification
@@ -100,6 +129,7 @@ class ANIOtherProfileViewController: UIViewController {
   
   @objc private func presentImageBrowser(_ notification: NSNotification) {
     guard let item = notification.object as? (Int, [String]) else { return }
+    
     let selectedIndex = item.0
     let imageUrls = item.1
     let imageBrowserViewController = ANIImageBrowserViewController()
@@ -113,6 +143,12 @@ class ANIOtherProfileViewController: UIViewController {
   //MARK: action
   @objc private func back() {
     self.navigationController?.popViewController(animated: true)
+  }
+  
+  @objc private func rejectViewTapped() {
+    let initialViewController = ANIInitialViewController()
+    let navigationController = UINavigationController(rootViewController: initialViewController)
+    self.present(navigationController, animated: true, completion: nil)
   }
 }
 
@@ -156,5 +192,30 @@ extension ANIOtherProfileViewController: ANIOtherProfileBasicViewDelegate {
     commentViewController.qna = selectedQna
     commentViewController.user = user
     self.navigationController?.pushViewController(commentViewController, animated: true)
+  }
+  
+  func reject() {
+    guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
+          !isRejectAnimating,
+          let rejectTapView = self.rejectTapView else { return }
+    
+    rejectViewBottomConstraint.constant = UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    rejectTapView.isHidden = false
+
+    UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut, animations: {
+      self.isRejectAnimating = true
+      self.view.layoutIfNeeded()
+    }) { (complete) in
+      guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
+        let rejectViewBottomConstraintOriginalConstant = self.rejectViewBottomConstraintOriginalConstant else { return }
+      
+      rejectViewBottomConstraint.constant = rejectViewBottomConstraintOriginalConstant
+      UIView.animate(withDuration: 0.3, delay: 1.0, options: .curveEaseInOut, animations: {
+        self.view.layoutIfNeeded()
+      }, completion: { (complete) in
+        self.isRejectAnimating = false
+        rejectTapView.isHidden = true
+      })
+    }
   }
 }

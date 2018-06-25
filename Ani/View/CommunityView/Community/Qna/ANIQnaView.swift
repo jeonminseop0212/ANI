@@ -12,6 +12,7 @@ import CodableFirebase
 
 protocol ANIQnaViewDelegate {
   func qnaViewCellDidSelect(selectedQna: FirebaseQna, user: FirebaseUser)
+  func reject()
 }
 
 class ANIQnaView: UIView {
@@ -131,5 +132,9 @@ extension ANIQnaView: UITableViewDataSource {
 extension ANIQnaView: ANIQnaViewCellDelegate {
   func cellTapped(qna: FirebaseQna, user: FirebaseUser) {
     self.delegate?.qnaViewCellDidSelect(selectedQna: qna, user: user)
+  }
+  
+  func reject() {
+    self.delegate?.reject()
   }
 }

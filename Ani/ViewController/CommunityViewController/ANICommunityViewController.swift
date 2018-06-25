@@ -17,6 +17,12 @@ class ANICommunityViewController: UIViewController {
   private let CONTRIBUTION_BUTTON_HEIGHT: CGFloat = 55.0
   private weak var contributionButon: ANIImageButtonView?
   
+  private var rejectViewBottomConstraint: Constraint?
+  private var rejectViewBottomConstraintOriginalConstant: CGFloat?
+  private weak var rejectView: ANIRejectView?
+  private var isRejectAnimating: Bool = false
+  private var rejectTapView: UIView?
+  
   private var selectedIndex: Int = 0
   
   override func viewDidLoad() {
@@ -82,6 +88,28 @@ class ANICommunityViewController: UIViewController {
     contributionButon.rightToSuperview(offset: 15.0)
     contributionButon.bottomToSuperview(offset: -15.0, usingSafeArea: true)
     self.contributionButon = contributionButon
+    
+    //rejectView
+    let rejectView = ANIRejectView()
+    rejectView.setRejectText("ログインが必要です。")
+    self.view.addSubview(rejectView)
+    rejectViewBottomConstraint = rejectView.bottomToTop(of: self.view)
+    rejectViewBottomConstraintOriginalConstant = rejectViewBottomConstraint?.constant
+    rejectView.leftToSuperview()
+    rejectView.rightToSuperview()
+    self.rejectView = rejectView
+    
+    //rejectTapView
+    let rejectTapView = UIView()
+    rejectTapView.isUserInteractionEnabled = true
+    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(rejectViewTapped))
+    rejectTapView.addGestureRecognizer(tapGesture)
+    rejectTapView.isHidden = true
+    rejectTapView.backgroundColor = .clear
+    self.view.addSubview(rejectTapView)
+    rejectTapView.size(to: rejectView)
+    rejectTapView.topToSuperview()
+    self.rejectTapView = rejectTapView
   }
   
   //MAKR: notification
@@ -95,10 +123,9 @@ class ANICommunityViewController: UIViewController {
   }
   
   @objc private func pushOtherProfile(_ notification: NSNotification) {
-    guard let userId = notification.object as? String,
-          let currentUserUid = ANISessionManager.shared.currentUserUid else { return }
+    guard let userId = notification.object as? String else { return }
     
-    if currentUserUid == userId {
+    if let currentUserUid = ANISessionManager.shared.currentUserUid, currentUserUid == userId {
       let profileViewController = ANIProfileViewController()
       profileViewController.hidesBottomBarWhenPushed = true
       self.navigationController?.pushViewController(profileViewController, animated: true)
@@ -121,6 +148,13 @@ class ANICommunityViewController: UIViewController {
     imageBrowserViewController.modalPresentationStyle = .overCurrentContext
     //overCurrentContextだとtabBarが消えないのでtabBarからpresentする
     self.tabBarController?.present(imageBrowserViewController, animated: false, completion: nil)
+  }
+  
+  //action
+  @objc private func rejectViewTapped() {
+    let initialViewController = ANIInitialViewController()
+    let navigationController = UINavigationController(rootViewController: initialViewController)
+    self.present(navigationController, animated: true, completion: nil)
   }
 }
 
@@ -177,18 +211,22 @@ extension ANICommunityViewController: ANIButtonViewDelegate{
   func buttonViewTapped(view: ANIButtonView) {
     
     if view === self.contributionButon {
-      if selectedIndex == 0 {
-        let contributionViewController = ANIContributionViewController()
-        contributionViewController.navigationTitle = "STORY"
-        contributionViewController.selectedContributionMode = ContributionMode.story
-        let contributionNV = UINavigationController(rootViewController: contributionViewController)
-        self.present(contributionNV, animated: true, completion: nil)
+      if ANISessionManager.shared.isAnonymous == false {
+        if selectedIndex == 0 {
+          let contributionViewController = ANIContributionViewController()
+          contributionViewController.navigationTitle = "STORY"
+          contributionViewController.selectedContributionMode = ContributionMode.story
+          let contributionNV = UINavigationController(rootViewController: contributionViewController)
+          self.present(contributionNV, animated: true, completion: nil)
+        } else {
+          let contributionViewController = ANIContributionViewController()
+          contributionViewController.navigationTitle = "Q&A"
+          contributionViewController.selectedContributionMode = ContributionMode.qna
+          let contributionNV = UINavigationController(rootViewController: contributionViewController)
+          self.present(contributionNV, animated: true, completion: nil)
+        }
       } else {
-        let contributionViewController = ANIContributionViewController()
-        contributionViewController.navigationTitle = "Q&A"
-        contributionViewController.selectedContributionMode = ContributionMode.qna
-        let contributionNV = UINavigationController(rootViewController: contributionViewController)
-        self.present(contributionNV, animated: true, completion: nil)
+        reject()
       }
     }
   }
@@ -220,6 +258,31 @@ extension ANICommunityViewController: ANIStoryViewDelegate {
     recruitDetailViewController.recruit = recruit
     recruitDetailViewController.user = user
     self.navigationController?.pushViewController(recruitDetailViewController, animated: true)
+  }
+  
+  func reject() {
+    guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
+      !isRejectAnimating,
+      let rejectTapView = self.rejectTapView else { return }
+    
+    rejectViewBottomConstraint.constant = UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    rejectTapView.isHidden = false
+    
+    UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut, animations: {
+      self.isRejectAnimating = true
+      self.view.layoutIfNeeded()
+    }) { (complete) in
+      guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
+        let rejectViewBottomConstraintOriginalConstant = self.rejectViewBottomConstraintOriginalConstant else { return }
+      
+      rejectViewBottomConstraint.constant = rejectViewBottomConstraintOriginalConstant
+      UIView.animate(withDuration: 0.3, delay: 1.0, options: .curveEaseInOut, animations: {
+        self.view.layoutIfNeeded()
+      }, completion: { (complete) in
+        self.isRejectAnimating = false
+        rejectTapView.isHidden = true
+      })
+    }
   }
 }
 

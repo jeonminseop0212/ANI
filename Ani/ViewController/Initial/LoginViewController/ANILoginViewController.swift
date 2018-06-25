@@ -31,10 +31,6 @@ class ANILoginViewController: UIViewController {
     setupNotification()
   }
   
-  override func viewWillAppear(_ animated: Bool) {
-    UIApplication.shared.statusBar?.alpha = 1.0
-  }
-  
   private func setup() {
     //basic
     self.view.backgroundColor = .white

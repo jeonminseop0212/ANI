@@ -14,6 +14,7 @@ import TinyConstraints
 
 protocol ANIQnaViewCellDelegate {
   func cellTapped(qna: FirebaseQna, user: FirebaseUser)
+  func reject()
 }
 
 class ANIQnaViewCell: UITableViewCell {
@@ -24,6 +25,7 @@ class ANIQnaViewCell: UITableViewCell {
   private var qnaImagesViewHeightConstraint: Constraint?
   private var qnaImagesViewHeight: CGFloat = 0.0
   private weak var qnaImagesView: ANIQnaImagesView?
+  private weak var loveButtonBG: UIView?
   private weak var loveButton: WCLShineButton?
   private weak var loveCountLabel: UILabel?
   private weak var commentButton: UIButton?
@@ -142,6 +144,18 @@ class ANIQnaViewCell: UITableViewCell {
     loveCountLabel.width(30.0)
     loveCountLabel.height(20.0)
     self.loveCountLabel = loveCountLabel
+    
+    //loveButtonBG
+    let loveButtonBG = UIView()
+    loveButtonBG.isUserInteractionEnabled = false
+    let loveButtonBGtapGesture = UITapGestureRecognizer(target: self, action: #selector(loveButtonBGTapped))
+    loveButtonBG.addGestureRecognizer(loveButtonBGtapGesture)
+    addSubview(loveButtonBG)
+    loveButtonBG.centerY(to: profileImageView)
+    loveButtonBG.rightToLeft(of: loveCountLabel, offset: -10.0)
+    loveButtonBG.width(20.0)
+    loveButtonBG.height(20.0)
+    self.loveButtonBG = loveButtonBG
 
     //loveButton
     var param = WCLShineParams()
@@ -194,6 +208,7 @@ class ANIQnaViewCell: UITableViewCell {
   private func reloadLayout() {
     guard let subTitleLabel = self.subTitleLabel,
           let qnaImagesView = self.qnaImagesView,
+          let loveButtonBG = self.loveButtonBG,
           let loveButton = self.loveButton,
           let loveCountLabel = self.loveCountLabel,
           let commentCountLabel = self.commentCountLabel,
@@ -209,6 +224,13 @@ class ANIQnaViewCell: UITableViewCell {
       qnaImagesViewHeightConstraint.constant = 0
     }
 
+    if ANISessionManager.shared.isAnonymous {
+      loveButtonBG.isUserInteractionEnabled = true
+      loveButton.isEnabled = false
+    } else {
+      loveButtonBG.isUserInteractionEnabled = false
+      loveButton.isEnabled = true
+    }
     loveButton.isSelected = false
     if let loveIds = qna.loveIds {
       loveCountLabel.text = "\(loveIds.count)"
@@ -323,6 +345,10 @@ class ANIQnaViewCell: UITableViewCell {
     }
   }
   
+  @objc private func loveButtonBGTapped() {
+    self.delegate?.reject()
+  }
+  
   @objc private func profileImageViewTapped() {
     guard let qna = self.qna else { return }
     
@@ -333,6 +359,10 @@ class ANIQnaViewCell: UITableViewCell {
     guard let qna = self.qna,
           let user = self.user else { return }
     
-    self.delegate?.cellTapped(qna: qna, user: user)
+    if !ANISessionManager.shared.isAnonymous {
+      self.delegate?.cellTapped(qna: qna, user: user)
+    } else {
+      self.delegate?.reject()
+    }
   }
 }

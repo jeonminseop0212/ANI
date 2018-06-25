@@ -20,6 +20,10 @@ class ANIInitialViewController: UIViewController {
     UIApplication.shared.statusBar?.alpha = 0.0
   }
   
+  override func viewWillDisappear(_ animated: Bool) {
+    UIApplication.shared.statusBar?.alpha = 1.0
+  }
+  
   private func setup() {
     //basic
     self.view.backgroundColor = .white
@@ -45,5 +49,10 @@ extension ANIInitialViewController: ANIInitialViewDelegate {
   func signUpButtonTapped() {
     let signUpViewController = ANISignUpViewController()
     self.navigationController?.pushViewController(signUpViewController, animated: true)
+  }
+  
+  func startAnonymous() {
+    self.dismiss(animated: true, completion: nil)
+    ANISessionManager.shared.isAnonymous = true
   }
 }
