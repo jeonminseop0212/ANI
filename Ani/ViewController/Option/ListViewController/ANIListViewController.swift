@@ -1,22 +1,23 @@
 //
-//  ANIOptionViewController.swift
+//  ANIListViewController.swift
 //  Ani
 //
-//  Created by jeonminseop on 2018/06/22.
+//  Created by jeonminseop on 2018/06/25.
 //  Copyright © 2018年 JeonMinseop. All rights reserved.
 //
 
 import UIKit
-import FirebaseAuth
 
-class ANIOptionViewController: UIViewController {
+class ANIListViewController: UIViewController {
   
   private weak var myNavigationBar: UIView?
   private weak var myNavigationBase: UIView?
   private weak var navigationTitleLabel: UILabel?
   private weak var backButton: UIButton?
   
-  private weak var optionView: ANIOptionView?
+  private weak var listView: ANIListView?
+  
+  var list: List?
   
   override func viewDidLoad() {
     setup()
@@ -48,7 +49,9 @@ class ANIOptionViewController: UIViewController {
     
     //navigationTitleLabel
     let navigationTitleLabel = UILabel()
-    navigationTitleLabel.text = "オプション"
+    if let list = list {
+      navigationTitleLabel.text = list.rawValue
+    }
     navigationTitleLabel.textColor = ANIColor.dark
     navigationTitleLabel.font = UIFont.boldSystemFont(ofSize: 17)
     myNavigationBase.addSubview(navigationTitleLabel)
@@ -68,46 +71,19 @@ class ANIOptionViewController: UIViewController {
     backButton.centerYToSuperview()
     self.backButton = backButton
     
-    //optionView
-    let optionView = ANIOptionView()
-    optionView.delegate = self
-    self.view.addSubview(optionView)
-    optionView.topToBottom(of: myNavigationBase)
-    optionView.edgesToSuperview(excluding: .top)
-    self.optionView = optionView
+    //listView
+    let listView = ANIListView()
+    if let list = self.list {
+      listView.list = list
+    }
+    self.view.addSubview(listView)
+    listView.topToBottom(of: myNavigationBar)
+    listView.edgesToSuperview(excluding: .top)
+    self.listView = listView
   }
   
   //MARK: action
   @objc private func back() {
     self.navigationController?.popViewController(animated: true)
-  }
-}
-
-//MARK: ANIOptionViewDelegate
-extension ANIOptionViewController: ANIOptionViewDelegate {
-  func logoutTapped() {
-    let alertController = UIAlertController(title: "ログアウト", message: "ログアウトしますか？\nアカウントで再ログインすることができます。", preferredStyle: .alert)
-    
-    let logoutAction = UIAlertAction(title: "ログアウト", style: .default) { (action) in
-      do {
-        try Auth.auth().signOut()
-        
-        ANISessionManager.shared.currentUser = nil
-        ANISessionManager.shared.currentUserUid = nil
-        ANISessionManager.shared.isAnonymous = true
-        
-        ANINotificationManager.postLogout()
-        
-        self.navigationController?.popViewController(animated: true)
-      } catch let signOutError as NSError {
-        print("signOutError \(signOutError)")
-      }
-    }
-    let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
-    
-    alertController.addAction(logoutAction)
-    alertController.addAction(cancelAction)
-    
-    self.present(alertController, animated: true, completion: nil)
   }
 }

@@ -9,14 +9,22 @@
 import UIKit
 
 protocol ANIOptionViewDelegate {
+  func listTapped(list: List)
   func logoutTapped()
+}
+
+enum List: String {
+  case loveRecruit = "『いいね』した募集";
+  case loveStroy = "『いいね』したストーリ";
+  case loveQuestion = "『いいね』した質問";
+  case clipRecruit = "『クリップ』した募集";
 }
 
 class ANIOptionView: UIView {
   
   private weak var tableView: UITableView?
   
-  private var list = ["『いいね』した募集", "『いいね』したストーリ", "『いいね』した質問", "『クリップ』した募集"]
+  private var list = [List.loveRecruit, List.loveStroy, List.loveQuestion, List.clipRecruit]
   private var account = ["ログアウト"]
   
   var delegate: ANIOptionViewDelegate?
@@ -66,7 +74,7 @@ extension ANIOptionView: UITableViewDataSource {
     
     switch indexPath.section {
     case 0:
-      cell.titleLabel?.text = list[indexPath.row]
+      cell.titleLabel?.text = list[indexPath.row].rawValue
     case 1:
       cell.titleLabel?.text = account[indexPath.row]
     default:
@@ -105,7 +113,7 @@ extension ANIOptionView: UITableViewDelegate {
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     switch indexPath.section {
     case 0:
-      print("list tapped")
+      self.delegate?.listTapped(list: list[indexPath.row])
     case 1:
       if account[indexPath.row] == "ログアウト" {
         self.delegate?.logoutTapped()

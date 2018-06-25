@@ -9,6 +9,7 @@
 import UIKit
 import FirebaseDatabase
 import CodableFirebase
+import NVActivityIndicatorView
 
 protocol ANIStoryViewDelegate {
   func storyViewCellDidSelect(selectedStory: FirebaseStory, user: FirebaseUser)
@@ -22,12 +23,14 @@ class ANIStoryView: UIView {
   
   private var stories = [FirebaseStory]()
   
+  private weak var activityIndicatorView: NVActivityIndicatorView?
+  
   var delegate: ANIStoryViewDelegate?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
-    loadStory(sender: nil)
     setup()
+    loadStory(sender: nil)
     setupNotifications()
   }
   
@@ -36,11 +39,14 @@ class ANIStoryView: UIView {
   }
   
   private func setup() {
+    self.backgroundColor = ANIColor.bg
     let window = UIApplication.shared.keyWindow
     var bottomSafeArea: CGFloat = 0.0
     if let windowUnrap = window {
       bottomSafeArea = windowUnrap.safeAreaInsets.bottom
     }
+    
+    //tableView
     let tableView = UITableView()
     tableView.contentInset = UIEdgeInsets(top: ANICommunityViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT + bottomSafeArea, right: 0)
     tableView.scrollIndicatorInsets  = UIEdgeInsets(top: UIViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT + bottomSafeArea, right: 0)
@@ -51,12 +57,21 @@ class ANIStoryView: UIView {
     tableView.separatorStyle = .none
     tableView.backgroundColor = ANIColor.bg
     tableView.dataSource = self
+    tableView.alpha = 0.0
     let refreshControl = UIRefreshControl()
     refreshControl.addTarget(self, action: #selector(loadStory(sender:)), for: .valueChanged)
     tableView.addSubview(refreshControl)
     addSubview(tableView)
     tableView.edgesToSuperview()
     self.storyTableView = tableView
+    
+    //activityIndicatorView
+    let activityIndicatorView = NVActivityIndicatorView(frame: .zero, type: .lineScale, color: ANIColor.green, padding: 0)
+    addSubview(activityIndicatorView)
+    activityIndicatorView.width(40.0)
+    activityIndicatorView.height(40.0)
+    activityIndicatorView.centerInSuperview()
+    self.activityIndicatorView = activityIndicatorView
   }
   
   //MARK: Notifications
@@ -66,8 +81,14 @@ class ANIStoryView: UIView {
   }
   
   @objc private func loadStory(sender: UIRefreshControl?) {
+    guard let activityIndicatorView = self.activityIndicatorView else { return }
+    
     if !self.stories.isEmpty {
       self.stories.removeAll()
+    }
+    
+    if sender == nil {
+      activityIndicatorView.startAnimating()
     }
     
     DispatchQueue.global().async {
@@ -87,7 +108,14 @@ class ANIStoryView: UIView {
                 }
                 
                 guard let storyTableView = self.storyTableView else { return }
+                
+                activityIndicatorView.stopAnimating()
+                
                 storyTableView.reloadData()
+                
+                UIView.animate(withDuration: 0.2, animations: {
+                  storyTableView.alpha = 1.0
+                })
               }
             } catch let error {
               print(error)

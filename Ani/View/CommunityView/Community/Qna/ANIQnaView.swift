@@ -9,6 +9,7 @@
 import UIKit
 import FirebaseDatabase
 import CodableFirebase
+import NVActivityIndicatorView
 
 protocol ANIQnaViewDelegate {
   func qnaViewCellDidSelect(selectedQna: FirebaseQna, user: FirebaseUser)
@@ -21,12 +22,14 @@ class ANIQnaView: UIView {
   
   private var qnas = [FirebaseQna]()
   
+  private weak var activityIndicatorView: NVActivityIndicatorView?
+  
   var delegate: ANIQnaViewDelegate?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
-    loadQna(sender: nil)
     setup()
+    loadQna(sender: nil)
     setupNotifications()
   }
   
@@ -35,11 +38,14 @@ class ANIQnaView: UIView {
   }
   
   private func setup() {
+    self.backgroundColor = ANIColor.bg
     let window = UIApplication.shared.keyWindow
     var bottomSafeArea: CGFloat = 0.0
     if let windowUnrap = window {
       bottomSafeArea = windowUnrap.safeAreaInsets.bottom
     }
+    
+    //tableView
     let tableView = UITableView()
     tableView.contentInset = UIEdgeInsets(top: ANICommunityViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: ANICommunityViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT + bottomSafeArea, right: 0)
     tableView.scrollIndicatorInsets  = UIEdgeInsets(top: ANICommunityViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: ANICommunityViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT + bottomSafeArea, right: 0)
@@ -48,12 +54,21 @@ class ANIQnaView: UIView {
     tableView.register(ANIQnaViewCell.self, forCellReuseIdentifier: id)
     tableView.dataSource = self
     tableView.separatorStyle = .none
+    tableView.alpha = 0.0
     let refreshControl = UIRefreshControl()
     refreshControl.addTarget(self, action: #selector(loadQna(sender:)), for: .valueChanged)
     tableView.addSubview(refreshControl)
     addSubview(tableView)
     tableView.edgesToSuperview()
     self.qnaTableView = tableView
+    
+    //activityIndicatorView
+    let activityIndicatorView = NVActivityIndicatorView(frame: .zero, type: .lineScale, color: ANIColor.green, padding: 0)
+    addSubview(activityIndicatorView)
+    activityIndicatorView.width(40.0)
+    activityIndicatorView.height(40.0)
+    activityIndicatorView.centerInSuperview()
+    self.activityIndicatorView = activityIndicatorView
   }
   
   //MARK: Notifications
@@ -63,8 +78,14 @@ class ANIQnaView: UIView {
   }
   
   @objc private func loadQna(sender: UIRefreshControl?) {
+    guard let activityIndicatorView = self.activityIndicatorView else { return }
+    
     if !self.qnas.isEmpty {
       self.qnas.removeAll()
+    }
+    
+    if sender == nil {
+      activityIndicatorView.startAnimating()
     }
     
     DispatchQueue.global().async {
@@ -84,7 +105,14 @@ class ANIQnaView: UIView {
                 }
                 
                 guard let qnaTableView = self.qnaTableView else { return }
+                
+                activityIndicatorView.stopAnimating()
+
                 qnaTableView.reloadData()
+                
+                UIView.animate(withDuration: 0.2, animations: {
+                  qnaTableView.alpha = 1.0
+                })
               }
             } catch let error {
               print(error)
