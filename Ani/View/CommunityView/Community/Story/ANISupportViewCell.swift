@@ -508,7 +508,8 @@ class ANISupportViewCell: UITableViewCell {
     if loveButton.isSelected == true {
       DispatchQueue.global().async {
         databaseRef.child(KEY_STORIES).child(storyId).child(KEY_LOVE_IDS).updateChildValues([currentUserId: true])
-        databaseRef.child(KEY_USERS).child(currentUserId).child(KEY_LOVE_STORY_IDS).updateChildValues([storyId: true])
+        let date = ANIFunction.shared.getToday()
+        databaseRef.child(KEY_USERS).child(currentUserId).child(KEY_LOVE_STORY_IDS).updateChildValues([storyId: date])
       }
     } else {
       DispatchQueue.global().async {

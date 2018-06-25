@@ -85,6 +85,7 @@
 		CDDE4B5920DF7658005762A1 /* ANINeedLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDE4B5820DF7658005762A1 /* ANINeedLoginView.swift */; };
 		CDDE4B5C20E079B8005762A1 /* ANIListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDE4B5B20E079B8005762A1 /* ANIListViewController.swift */; };
 		CDDE4B6020E07B58005762A1 /* ANIListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDE4B5F20E07B58005762A1 /* ANIListView.swift */; };
+		CDDE4B6320E0A985005762A1 /* ANIfunction.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDE4B6220E0A985005762A1 /* ANIfunction.swift */; };
 		CDF7F168208D772300254A0F /* ANINotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF7F167208D772300254A0F /* ANINotificationManager.swift */; };
 		CDF7F16E208F2BEF00254A0F /* UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF7F16D208F2BEF00254A0F /* UIView.swift */; };
 		CDF7F171208F651E00254A0F /* ANIButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF7F170208F651E00254A0F /* ANIButtonView.swift */; };
@@ -242,6 +243,7 @@
 		CDDE4B5820DF7658005762A1 /* ANINeedLoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINeedLoginView.swift; sourceTree = "<group>"; };
 		CDDE4B5B20E079B8005762A1 /* ANIListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIListViewController.swift; sourceTree = "<group>"; };
 		CDDE4B5F20E07B58005762A1 /* ANIListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIListView.swift; sourceTree = "<group>"; };
+		CDDE4B6220E0A985005762A1 /* ANIfunction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIfunction.swift; sourceTree = "<group>"; };
 		CDF7F167208D772300254A0F /* ANINotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotificationManager.swift; sourceTree = "<group>"; };
 		CDF7F16D208F2BEF00254A0F /* UIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIView.swift; sourceTree = "<group>"; };
 		CDF7F170208F651E00254A0F /* ANIButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIButtonView.swift; sourceTree = "<group>"; };
@@ -416,6 +418,7 @@
 				CDF7F167208D772300254A0F /* ANINotificationManager.swift */,
 				CD0FAD0D20BFC02E00D8CD27 /* ANISessionManager.swift */,
 				CD92792120C0DCB400B1F006 /* ANIKey.swift */,
+				CDDE4B6220E0A985005762A1 /* ANIfunction.swift */,
 			);
 			path = Supporting;
 			sourceTree = "<group>";
@@ -1513,6 +1516,7 @@
 				CD92792220C0DCB400B1F006 /* ANIKey.swift in Sources */,
 				F5DF835D207A17C200EA7FBE /* ANICommunityQnaCell.swift in Sources */,
 				CDD0550C20A5D29900BEF482 /* ANIImageFilterView.swift in Sources */,
+				CDDE4B6320E0A985005762A1 /* ANIfunction.swift in Sources */,
 				CD2C414520A556AE00581267 /* ANIRecruitContributionViewController.swift in Sources */,
 				CD9E52B32094304700715F50 /* ANIRecruitDetailImagesView.swift in Sources */,
 				F57F7D652083250D008A2645 /* ANIMessageViewCell.swift in Sources */,
