@@ -98,7 +98,7 @@ class ANIListView: UIView {
     
     DispatchQueue.global().async {
       let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_USERS).child(uid).child(KEY_LOVE_RECRUIT_IDS).queryLimited(toFirst: 20).observe(.value) { (snapshot) in
+      databaseRef.child(KEY_USERS).child(uid).child(KEY_LOVE_RECRUIT_IDS).queryOrderedByValue().queryLimited(toFirst: 20).observe(.value) { (snapshot) in
         databaseRef.child(KEY_USERS).child(uid).child(KEY_LOVE_RECRUIT_IDS).removeAllObservers()
 
         for item in snapshot.children {
@@ -112,7 +112,7 @@ class ANIListView: UIView {
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
                   guard let listTableView = self.listTableView,
-                    let activityIndicatorView = self.activityIndicatorView else { return }
+                        let activityIndicatorView = self.activityIndicatorView else { return }
                   
                   listTableView.reloadData()
                   activityIndicatorView.stopAnimating()
@@ -122,10 +122,19 @@ class ANIListView: UIView {
                   })
                 })
               } catch let error {
+                guard let activityIndicatorView = self.activityIndicatorView else { return }
+                
                 print(error)
+                activityIndicatorView.stopAnimating()
               }
             })
           }
+        }
+        
+        if snapshot.value as? [String: Any] == nil {
+          guard let activityIndicatorView = self.activityIndicatorView else { return }
+          
+          activityIndicatorView.stopAnimating()
         }
       }
     }
@@ -137,7 +146,7 @@ class ANIListView: UIView {
     
     DispatchQueue.global().async {
       let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_USERS).child(uid).child(KEY_LOVE_STORY_IDS).queryLimited(toFirst: 20).observe(.value) { (snapshot) in
+      databaseRef.child(KEY_USERS).child(uid).child(KEY_LOVE_STORY_IDS).queryOrderedByValue().queryLimited(toFirst: 20).observe(.value) { (snapshot) in
         databaseRef.child(KEY_USERS).child(uid).child(KEY_LOVE_STORY_IDS).removeAllObservers()
 
         for item in snapshot.children {
@@ -161,10 +170,19 @@ class ANIListView: UIView {
                   })
                 })
               } catch let error {
+                guard let activityIndicatorView = self.activityIndicatorView else { return }
+
                 print(error)
+                activityIndicatorView.stopAnimating()
               }
             })
           }
+        }
+        
+        if snapshot.value as? [String: Any] == nil {
+          guard let activityIndicatorView = self.activityIndicatorView else { return }
+          
+          activityIndicatorView.stopAnimating()
         }
       }
     }
@@ -176,7 +194,7 @@ class ANIListView: UIView {
     
     DispatchQueue.global().async {
       let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_USERS).child(uid).child(KEY_LOVE_QNA_IDS).queryLimited(toFirst: 20).observe(.value) { (snapshot) in
+      databaseRef.child(KEY_USERS).child(uid).child(KEY_LOVE_QNA_IDS).queryOrderedByValue().queryLimited(toFirst: 20).observe(.value) { (snapshot) in
         databaseRef.child(KEY_USERS).child(uid).child(KEY_LOVE_QNA_IDS).removeAllObservers()
 
         for item in snapshot.children {
@@ -200,10 +218,19 @@ class ANIListView: UIView {
                   })
                 })
               } catch let error {
+                guard let activityIndicatorView = self.activityIndicatorView else { return }
+
                 print(error)
+                activityIndicatorView.stopAnimating()
               }
             })
           }
+        }
+        
+        if snapshot.value as? [String: Any] == nil {
+          guard let activityIndicatorView = self.activityIndicatorView else { return }
+          
+          activityIndicatorView.stopAnimating()
         }
       }
     }

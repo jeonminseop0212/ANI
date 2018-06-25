@@ -335,7 +335,8 @@ class ANIQnaViewCell: UITableViewCell {
     if loveButton.isSelected == true {
       DispatchQueue.global().async {
         databaseRef.child(KEY_QNAS).child(qnaId).child(KEY_LOVE_IDS).updateChildValues([currentUserId: true])
-        databaseRef.child(KEY_USERS).child(currentUserId).child(KEY_LOVE_QNA_IDS).updateChildValues([qnaId: true])
+        let date = ANIFunction.shared.getToday()
+        databaseRef.child(KEY_USERS).child(currentUserId).child(KEY_LOVE_QNA_IDS).updateChildValues([qnaId: date])
       }
     } else {
       DispatchQueue.global().async {
