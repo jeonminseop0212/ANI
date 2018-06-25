@@ -11,6 +11,7 @@ import UIKit
 protocol ANIInitialViewDelegate {
   func loginButtonTapped()
   func signUpButtonTapped()
+  func startAnonymous()
 }
 
 class ANIInitialView: UIView {
@@ -27,6 +28,7 @@ class ANIInitialView: UIView {
   private weak var loginButtonLabel: UILabel?
   private weak var signUpButton: ANIAreaButtonView?
   private weak var signUpButtonLabel: UILabel?
+  private weak var anonymousLabel: UILabel?
   
   private weak var fotterImageView: UIImageView?
   
@@ -61,7 +63,8 @@ class ANIInitialView: UIView {
     subTitleLabel.textAlignment = .center
     subTitleLabel.text = "猫たちがもっと幸せに暮らせる\n環境になるように..."
     base.addSubview(subTitleLabel)
-    subTitleLabel.centerInSuperview()
+    subTitleLabel.centerXToSuperview()
+    subTitleLabel.centerYToSuperview(offset: -15.0)
     self.subTitleLabel = subTitleLabel
     
     //titleLabel
@@ -80,7 +83,7 @@ class ANIInitialView: UIView {
     buttonStackView.axis = .horizontal
     buttonStackView.alignment = .center
     buttonStackView.distribution = .fillEqually
-    buttonStackView.spacing = 18.0
+    buttonStackView.spacing = 10.0
     base.addSubview(buttonStackView)
     buttonStackView.topToBottom(of: subTitleLabel, offset: 15.0)
     buttonStackView.leftToSuperview(offset: 40.0)
@@ -127,6 +130,19 @@ class ANIInitialView: UIView {
     signUpButtonLabel.edgesToSuperview()
     self.signUpButtonLabel = signUpButtonLabel
     
+    //anonymousLabel
+    let anonymousLabel = UILabel()
+    anonymousLabel.font = UIFont.systemFont(ofSize: 13.0)
+    anonymousLabel.textColor = ANIColor.darkGray
+    anonymousLabel.text = "ログインしないで始める"
+    anonymousLabel.isUserInteractionEnabled = true
+    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(startAnonymous))
+    anonymousLabel.addGestureRecognizer(tapGesture)
+    base.addSubview(anonymousLabel)
+    anonymousLabel.topToBottom(of: buttonStackView, offset: 15.0)
+    anonymousLabel.centerXToSuperview()
+    self.anonymousLabel = anonymousLabel
+    
     //headerImageView
     let headerImageView = UIImageView()
     headerImageView.image = UIImage(named: "headerImage")
@@ -144,6 +160,10 @@ class ANIInitialView: UIView {
     fotterImageView.edgesToSuperview(excluding: .top)
     fotterImageView.topToBottom(of: base)
     self.fotterImageView = fotterImageView
+  }
+  
+  @objc private func startAnonymous() {
+    self.delegate?.startAnonymous()
   }
 }
 

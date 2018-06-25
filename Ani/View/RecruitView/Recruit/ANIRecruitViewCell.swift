@@ -14,6 +14,7 @@ import CodableFirebase
 protocol ANIRecruitViewCellDelegate {
   func cellTapped(recruit: FirebaseRecruit, user: FirebaseUser)
   func supportButtonTapped(supportRecruit: FirebaseRecruit)
+  func reject()
 }
 
 class ANIRecruitViewCell: UITableViewCell {
@@ -31,6 +32,7 @@ class ANIRecruitViewCell: UITableViewCell {
   private weak var userNameLabel: UILabel?
   private weak var supportCountLabel: UILabel?
   private weak var supportButton: UIButton?
+  private weak var loveButtonBG: UIView?
   private weak var loveButton: WCLShineButton?
   private weak var loveCountLabel: UILabel?
   private weak var clipButton: UIButton?
@@ -209,6 +211,18 @@ class ANIRecruitViewCell: UITableViewCell {
     loveCountLabel.height(20.0)
     self.loveCountLabel = loveCountLabel
     
+    //loveButtonBG
+    let loveButtonBG = UIView()
+    loveButtonBG.isUserInteractionEnabled = false
+    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(loveButtonBGTapped))
+    loveButtonBG.addGestureRecognizer(tapGesture)
+    addSubview(loveButtonBG)
+    loveButtonBG.centerY(to: profileImageView)
+    loveButtonBG.rightToLeft(of: loveCountLabel, offset: -10.0)
+    loveButtonBG.width(20.0)
+    loveButtonBG.height(20.0)
+    self.loveButtonBG = loveButtonBG
+    
     //loveButton
     var param = WCLShineParams()
     param.bigShineColor = ANIColor.red
@@ -217,6 +231,7 @@ class ANIRecruitViewCell: UITableViewCell {
     loveButton.fillColor = ANIColor.red
     loveButton.color = ANIColor.gray
     loveButton.image = .heart
+    loveButton.isEnabled = false
     loveButton.addTarget(self, action: #selector(love), for: .valueChanged)
     addSubview(loveButton)
     loveButton.centerY(to: profileImageView)
@@ -281,6 +296,7 @@ class ANIRecruitViewCell: UITableViewCell {
           let subTitleLabel = self.subTitleLabel,
           let supportButton = self.supportButton,
           let supportCountLabel = self.supportCountLabel,
+          let loveButtonBG = self.loveButtonBG,
           let loveButton = self.loveButton,
           let loveCountLabel = self.loveCountLabel,
           let recruit = self.recruit,
@@ -301,6 +317,13 @@ class ANIRecruitViewCell: UITableViewCell {
       supportCountLabel.text = "0"
     }
     
+    if ANISessionManager.shared.isAnonymous {
+      loveButtonBG.isUserInteractionEnabled = true
+      loveButton.isEnabled = false
+    } else {
+      loveButtonBG.isUserInteractionEnabled = false
+      loveButton.isEnabled = true
+    }
     loveButton.isSelected = false
     if let loveIds = recruit.loveIds {
       loveCountLabel.text = "\(loveIds.count)"
@@ -463,23 +486,35 @@ class ANIRecruitViewCell: UITableViewCell {
     guard let supportButton = self.supportButton,
           let recruit = self.recruit else { return }
     
-    if supportButton.tintColor == ANIColor.gray {
-      self.delegate?.supportButtonTapped(supportRecruit: recruit)
+    if !ANISessionManager.shared.isAnonymous {
+      if supportButton.tintColor == ANIColor.gray {
+        self.delegate?.supportButtonTapped(supportRecruit: recruit)
+      }
+    } else {
+      self.delegate?.reject()
     }
   }
   
   @objc private func clip() {
     guard let clipButton = self.clipButton else { return }
     
-    if clipButton.tintColor == ANIColor.moreDarkGray {
-      UIView.animate(withDuration: 0.15) {
-        clipButton.tintColor = ANIColor.gray
+    if !ANISessionManager.shared.isAnonymous {
+      if clipButton.tintColor == ANIColor.moreDarkGray {
+        UIView.animate(withDuration: 0.15) {
+          clipButton.tintColor = ANIColor.gray
+        }
+      } else {
+        UIView.animate(withDuration: 0.15) {
+          clipButton.tintColor = ANIColor.moreDarkGray
+        }
       }
     } else {
-      UIView.animate(withDuration: 0.15) {
-        clipButton.tintColor = ANIColor.moreDarkGray
-      }
+      self.delegate?.reject()
     }
+  }
+  
+  @objc private func loveButtonBGTapped() {
+    self.delegate?.reject()
   }
   
   @objc private func profileImageViewTapped() {

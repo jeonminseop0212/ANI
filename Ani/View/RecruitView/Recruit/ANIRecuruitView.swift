@@ -14,6 +14,7 @@ protocol ANIRecruitViewDelegate {
   func recruitCellTap(selectedRecruit: FirebaseRecruit, user: FirebaseUser)
   func recruitViewDidScroll(scrollY: CGFloat)
   func supportButtonTapped(supportRecruit: FirebaseRecruit)
+  func reject()
 }
 
 class ANIRecuruitView: UIView {
@@ -150,5 +151,9 @@ extension ANIRecuruitView: ANIRecruitViewCellDelegate {
   
   func supportButtonTapped(supportRecruit: FirebaseRecruit) {
     self.delegate?.supportButtonTapped(supportRecruit: supportRecruit)
+  }
+  
+  func reject() {
+    self.delegate?.reject()
   }
 }

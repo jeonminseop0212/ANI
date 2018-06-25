@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import TinyConstraints
 
 class ANIProfileViewController: UIViewController {
   
@@ -16,9 +17,16 @@ class ANIProfileViewController: UIViewController {
   private weak var backButton: UIButton?
   private weak var optionButton: UIButton?
   
+  private weak var needLoginView: ANINeedLoginView?
+  
   var isBackButtonHide: Bool = true
   
   private weak var profileBasicView: ANIProfileBasicView?
+  
+  private var rejectViewBottomConstraint: Constraint?
+  private var rejectViewBottomConstraintOriginalConstant: CGFloat?
+  private weak var rejectView: ANIRejectView?
+  private var isRejectAnimating: Bool = false
   
   private var currentUser: FirebaseUser? { return ANISessionManager.shared.currentUser }
   
@@ -30,6 +38,7 @@ class ANIProfileViewController: UIViewController {
   override func viewWillAppear(_ animated: Bool) {
     UIApplication.shared.statusBarStyle = .default
     setupNotification()
+    showNeedLoginView()
   }
 
   override func viewWillDisappear(_ animated: Bool) {
@@ -108,6 +117,35 @@ class ANIProfileViewController: UIViewController {
     profileBasicView.topToBottom(of: myNavigationBar)
     profileBasicView.edgesToSuperview(excluding: .top)
     self.profileBasicView = profileBasicView
+    
+    //rejectView
+    let rejectView = ANIRejectView()
+    rejectView.setRejectText("ログインが必要です。")
+    self.view.addSubview(rejectView)
+    rejectViewBottomConstraint = rejectView.bottomToTop(of: self.view)
+    rejectViewBottomConstraintOriginalConstant = rejectViewBottomConstraint?.constant
+    rejectView.leftToSuperview()
+    rejectView.rightToSuperview()
+    self.rejectView = rejectView
+    
+    //needLoginView
+    let needLoginView = ANINeedLoginView()
+    needLoginView.isHidden = true
+    needLoginView.setupMessage(text: "プロフィールを利用するには\nログインが必要です。")
+    needLoginView.delegate = self
+    self.view.addSubview(needLoginView)
+    needLoginView.edgesToSuperview()
+    self.needLoginView = needLoginView
+  }
+  
+  private func showNeedLoginView() {
+    guard let needLoginView = self.needLoginView else { return }
+    
+    if ANISessionManager.shared.isAnonymous == true {
+      needLoginView.isHidden = false
+    } else {
+      needLoginView.isHidden = true
+    }
   }
   
   //MAKR: notification
@@ -192,6 +230,27 @@ extension ANIProfileViewController: ANIProfileBasicViewDelegate {
     commentViewController.user = user
     self.navigationController?.pushViewController(commentViewController, animated: true)
   }
+  
+  func reject() {
+    guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
+          !isRejectAnimating else { return }
+    
+    rejectViewBottomConstraint.constant = UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut, animations: {
+      self.isRejectAnimating = true
+      self.view.layoutIfNeeded()
+    }) { (complete) in
+      guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
+        let rejectViewBottomConstraintOriginalConstant = self.rejectViewBottomConstraintOriginalConstant else { return }
+      
+      rejectViewBottomConstraint.constant = rejectViewBottomConstraintOriginalConstant
+      UIView.animate(withDuration: 0.3, delay: 1.0, options: .curveEaseInOut, animations: {
+        self.view.layoutIfNeeded()
+      }, completion: { (complete) in
+        self.isRejectAnimating = false
+      })
+    }
+  }
 }
 
 //MARK: ANIProfileEditViewControllerDelegate
@@ -199,5 +258,14 @@ extension ANIProfileViewController: ANIProfileEditViewControllerDelegate {
   func didEdit() {
     guard let profileBasicView = self.profileBasicView else { return }
     profileBasicView.currentUser = currentUser
+  }
+}
+
+//MARK: ANINeedLoginViewDelegate
+extension ANIProfileViewController: ANINeedLoginViewDelegate {
+  func loginButtonTapped() {
+    let initialViewController = ANIInitialViewController()
+    let navigationController = UINavigationController(rootViewController: initialViewController)
+    self.present(navigationController, animated: true, completion: nil)
   }
 }

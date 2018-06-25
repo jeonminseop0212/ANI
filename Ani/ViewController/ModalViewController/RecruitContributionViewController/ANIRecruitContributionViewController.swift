@@ -120,7 +120,7 @@ class ANIRecruitContributionViewController: UIViewController {
     contributeButton.height(ANIRecruitContributionViewController.CONTRIBUTE_BUTTON_HEIGHT)
     self.contributeButton = contributeButton
     
-    //ontributeButtonLabel
+    //contributeButtonLabel
     let contributeButtonLabel = UILabel()
     contributeButtonLabel.text = "投稿する"
     contributeButtonLabel.textAlignment = .center

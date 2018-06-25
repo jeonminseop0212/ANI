@@ -33,10 +33,6 @@ class ANISignUpViewController: UIViewController {
     setupNotification()
   }
   
-  override func viewWillAppear(_ animated: Bool) {
-    UIApplication.shared.statusBar?.alpha = 1.0
-  }
-  
   private func setup() {
     //basic
     self.view.backgroundColor = .white
@@ -177,7 +173,9 @@ class ANISignUpViewController: UIViewController {
 //MARK: ANISignUpViewDelegate
 extension ANISignUpViewController: ANISignUpViewDelegate {
   func signUpSuccess() {
-    self.navigationController?.dismiss(animated: true, completion: nil)
+    self.navigationController?.dismiss(animated: true, completion: {
+      ANINotificationManager.postLogin()
+    })
   }
   
   func donButtonTapped() {

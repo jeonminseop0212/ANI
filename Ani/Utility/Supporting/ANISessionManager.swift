@@ -13,4 +13,6 @@ class ANISessionManager: NSObject {
   
   var currentUser: FirebaseUser?
   var currentUserUid: String?
+  
+  var isAnonymous: Bool = false
 }

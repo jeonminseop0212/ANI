@@ -24,6 +24,12 @@ class ANIRecruitViewController: UIViewController {
   private let CONTRIBUTION_BUTTON_HEIGHT:CGFloat = 55.0
   private weak var contributionButon: ANIImageButtonView?
   
+  private var rejectViewBottomConstraint: Constraint?
+  private var rejectViewBottomConstraintOriginalConstant: CGFloat?
+  private weak var rejectView: ANIRejectView?
+  private var isRejectAnimating: Bool = false
+  private var rejectTapView: UIView?
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     setup()
@@ -107,6 +113,28 @@ class ANIRecruitViewController: UIViewController {
     contributionButon.rightToSuperview(offset: 15.0)
     contributionButon.bottomToSuperview(offset: -15, usingSafeArea: true)
     self.contributionButon = contributionButon
+    
+    //rejectView
+    let rejectView = ANIRejectView()
+    rejectView.setRejectText("ログインが必要です。")
+    self.view.addSubview(rejectView)
+    rejectViewBottomConstraint = rejectView.bottomToTop(of: self.view)
+    rejectViewBottomConstraintOriginalConstant = rejectViewBottomConstraint?.constant
+    rejectView.leftToSuperview()
+    rejectView.rightToSuperview()
+    self.rejectView = rejectView
+    
+    //rejectTapView
+    let rejectTapView = UIView()
+    rejectTapView.isUserInteractionEnabled = true
+    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(rejectViewTapped))
+    rejectTapView.addGestureRecognizer(tapGesture)
+    rejectTapView.isHidden = true
+    rejectTapView.backgroundColor = .clear
+    self.view.addSubview(rejectTapView)
+    rejectTapView.size(to: rejectView)
+    rejectTapView.topToSuperview()
+    self.rejectTapView = rejectTapView
   }
   
   //MARK: Notifications
@@ -133,10 +161,9 @@ class ANIRecruitViewController: UIViewController {
   }
   
   @objc private func pushOtherProfile(_ notification: NSNotification) {
-    guard let userId = notification.object as? String,
-          let currentUserUid = ANISessionManager.shared.currentUserUid else { return }
+    guard let userId = notification.object as? String else { return }
     
-    if currentUserUid == userId {
+    if let currentUserUid = ANISessionManager.shared.currentUserUid, currentUserUid == userId {
       let profileViewController = ANIProfileViewController()
       profileViewController.hidesBottomBarWhenPushed = true
       self.navigationController?.pushViewController(profileViewController, animated: true)
@@ -150,8 +177,14 @@ class ANIRecruitViewController: UIViewController {
   }
   
   //MARK: Action
-  @objc func filter() {
+  @objc private func filter() {
     print("filtering")
+  }
+  
+  @objc private func rejectViewTapped() {
+    let initialViewController = ANIInitialViewController()
+    let navigationController = UINavigationController(rootViewController: initialViewController)
+    self.present(navigationController, animated: true, completion: nil)
   }
 }
 
@@ -176,9 +209,13 @@ extension ANIRecruitViewController: UISearchBarDelegate {
 extension ANIRecruitViewController:ANIButtonViewDelegate {
   func buttonViewTapped(view: ANIButtonView) {
     if view === self.contributionButon {
-      let recruitContribtionViewController = ANIRecruitContributionViewController()
-      let recruitContributionNV = UINavigationController(rootViewController: recruitContribtionViewController)
-      self.navigationController?.present(recruitContributionNV, animated: true, completion: nil)
+      if ANISessionManager.shared.isAnonymous == false {
+        let recruitContribtionViewController = ANIRecruitContributionViewController()
+        let recruitContributionNV = UINavigationController(rootViewController: recruitContribtionViewController)
+        self.navigationController?.present(recruitContributionNV, animated: true, completion: nil)
+      } else {
+        reject()
+      }
     }
   }
 }
@@ -227,6 +264,31 @@ extension ANIRecruitViewController: ANIRecruitViewDelegate {
       
       searchBar?.alpha = 1.0
       categoriesView?.categoryCollectionView?.alpha = 1.0
+    }
+  }
+  
+  func reject() {
+    guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
+          !isRejectAnimating,
+          let rejectTapView = self.rejectTapView else { return }
+    
+    rejectViewBottomConstraint.constant = UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    rejectTapView.isHidden = false
+    
+    UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut, animations: {
+      self.isRejectAnimating = true
+      self.view.layoutIfNeeded()
+    }) { (complete) in
+      guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
+        let rejectViewBottomConstraintOriginalConstant = self.rejectViewBottomConstraintOriginalConstant else { return }
+      
+      rejectViewBottomConstraint.constant = rejectViewBottomConstraintOriginalConstant
+      UIView.animate(withDuration: 0.3, delay: 1.0, options: .curveEaseInOut, animations: {
+        self.view.layoutIfNeeded()
+      }, completion: { (complete) in
+        self.isRejectAnimating = false
+        rejectTapView.isHidden = true
+      })
     }
   }
 }

@@ -16,6 +16,7 @@ protocol ANIOtherProfileBasicViewDelegate {
   func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser)
   func qnaViewCellDidSelect(selectedQna: FirebaseQna, user:FirebaseUser)
   func supportButtonTapped()
+  func reject()
 }
 
 class ANIOtherProfileBasicView: UIView {
@@ -303,6 +304,10 @@ extension ANIOtherProfileBasicView: ANIRecruitViewCellDelegate {
   
   func cellTapped(recruit: FirebaseRecruit, user: FirebaseUser) {
     self.delegate?.recruitViewCellDidSelect(selectedRecruit: recruit, user: user)
+  }
+  
+  func reject() {
+    self.delegate?.reject()
   }
 }
 

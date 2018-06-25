@@ -14,6 +14,7 @@ import CodableFirebase
 protocol ANISupportViewCellDelegate {
   func supportCellTapped(story: FirebaseStory, user: FirebaseUser)
   func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser)
+  func reject()
 }
 
 class ANISupportViewCell: UITableViewCell {
@@ -30,8 +31,10 @@ class ANISupportViewCell: UITableViewCell {
   private weak var titleLabel: UILabel?
   private weak var subTitleLabel: UILabel?
   
+  private let PROFILE_IMAGE_VIEW_HEIGHT: CGFloat = 32.0
   private weak var profileImageView: UIImageView?
   private weak var userNameLabel: UILabel?
+  private weak var loveButtonBG: UIView?
   private weak var loveButton: WCLShineButton?
   private weak var loveCountLabel: UILabel?
   private weak var commentButton: UIButton?
@@ -211,9 +214,9 @@ class ANISupportViewCell: UITableViewCell {
     addSubview(profileImageView)
     profileImageView.topToBottom(of: recruitBase, offset: 10.0)
     profileImageView.leftToSuperview(offset: 10.0)
-    profileImageView.width(32.0)
-    profileImageView.height(32.0)
-    profileImageView.layer.cornerRadius = profileImageView.constraints[0].constant / 2
+    profileImageView.width(PROFILE_IMAGE_VIEW_HEIGHT)
+    profileImageView.height(PROFILE_IMAGE_VIEW_HEIGHT)
+    profileImageView.layer.cornerRadius = PROFILE_IMAGE_VIEW_HEIGHT / 2
     profileImageView.layer.masksToBounds = true
     self.profileImageView = profileImageView
     
@@ -250,6 +253,18 @@ class ANISupportViewCell: UITableViewCell {
     loveCountLabel.height(20.0)
     self.loveCountLabel = loveCountLabel
     
+    //loveButtonBG
+    let loveButtonBG = UIView()
+    loveButtonBG.isUserInteractionEnabled = false
+    let loveButtonBGtapGesture = UITapGestureRecognizer(target: self, action: #selector(loveButtonBGTapped))
+    loveButtonBG.addGestureRecognizer(loveButtonBGtapGesture)
+    addSubview(loveButtonBG)
+    loveButtonBG.centerY(to: profileImageView)
+    loveButtonBG.rightToLeft(of: loveCountLabel, offset: -10.0)
+    loveButtonBG.width(20.0)
+    loveButtonBG.height(20.0)
+    self.loveButtonBG = loveButtonBG
+    
     //loveButton
     var param = WCLShineParams()
     param.bigShineColor = ANIColor.red
@@ -258,6 +273,7 @@ class ANISupportViewCell: UITableViewCell {
     loveButton.fillColor = ANIColor.red
     loveButton.color = ANIColor.gray
     loveButton.image = .heart
+    loveButton.isEnabled = false
     loveButton.addTarget(self, action: #selector(love), for: .valueChanged)
     addSubview(loveButton)
     loveButton.centerY(to: profileImageView)
@@ -313,6 +329,7 @@ class ANISupportViewCell: UITableViewCell {
     guard let messageLabel = self.messageLabel,
           let titleLabel = self.titleLabel,
           let subTitleLabel = self.subTitleLabel,
+          let loveButtonBG = self.loveButtonBG,
           let loveButton = self.loveButton,
           let loveCountLabel = self.loveCountLabel,
           let commentCountLabel = self.commentCountLabel,
@@ -323,6 +340,13 @@ class ANISupportViewCell: UITableViewCell {
     titleLabel.text = story.recruitTitle
     subTitleLabel.text = story.recruitSubTitle
 
+    if ANISessionManager.shared.isAnonymous {
+      loveButtonBG.isUserInteractionEnabled = true
+      loveButton.isEnabled = false
+    } else {
+      loveButtonBG.isUserInteractionEnabled = false
+      loveButton.isEnabled = true
+    }
     loveButton.isSelected = false
     if let loveIds = story.loveIds {
       loveCountLabel.text = "\(loveIds.count)"
@@ -494,6 +518,10 @@ class ANISupportViewCell: UITableViewCell {
     }
   }
   
+  @objc private func loveButtonBGTapped() {
+    self.delegate?.reject()
+  }
+  
   @objc private func profileImageViewTapped() {
     guard let story = self.story else { return }
     
@@ -504,7 +532,11 @@ class ANISupportViewCell: UITableViewCell {
     guard let story = self.story,
           let user = self.user else { return }
     
-    self.delegate?.supportCellTapped(story: story, user: user)
+    if !ANISessionManager.shared.isAnonymous {
+      self.delegate?.supportCellTapped(story: story, user: user)
+    } else {
+      self.delegate?.reject()
+    }
   }
   
   @objc private func recruitTapped() {

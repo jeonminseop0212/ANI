@@ -334,9 +334,30 @@ class ANISignUpView: UIView {
         print("dataError")
         return
       }
+            
+      ANISessionManager.shared.currentUserUid = Auth.auth().currentUser?.uid
+      if let currentUserUid = ANISessionManager.shared.currentUserUid {
+        DispatchQueue.global().async {
+          Database.database().reference().child(KEY_USERS).child(currentUserUid).observe(.value, with: { (snapshot) in
+            guard let value = snapshot.value else { return }
+            do {
+              let user = try FirebaseDecoder().decode(FirebaseUser.self, from: value)
+              DispatchQueue.main.async {
+                ANISessionManager.shared.currentUser = user
+                ANISessionManager.shared.isAnonymous = false
+                self.delegate?.signUpSuccess()
+
+                NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
+              }
+            } catch let error {
+              print(error)
+              NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
+            }
+          })
+        }
+      }
       
-      NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
-      self.delegate?.signUpSuccess()
+      self.endEditing(true)
     }
   }
   

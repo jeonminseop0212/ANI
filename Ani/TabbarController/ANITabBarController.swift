@@ -30,6 +30,10 @@ class ANITabBarController: UITabBarController, NVActivityIndicatorViewable {
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(true)
     
+    let userDefault = UserDefaults.standard
+    let dic = [KEY_FIRST_LAUNCH: true]
+    userDefault.register(defaults: dic)
+    
     ANISessionManager.shared.currentUserUid = Auth.auth().currentUser?.uid
     if let currentUserUid = ANISessionManager.shared.currentUserUid {
       let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.green)
@@ -42,6 +46,8 @@ class ANITabBarController: UITabBarController, NVActivityIndicatorViewable {
             let user = try FirebaseDecoder().decode(FirebaseUser.self, from: value)
             DispatchQueue.main.async {
               ANISessionManager.shared.currentUser = user
+              ANISessionManager.shared.isAnonymous = false
+              
               NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
             }
           } catch let error {
@@ -57,7 +63,12 @@ class ANITabBarController: UITabBarController, NVActivityIndicatorViewable {
         print("signOutError \(signOutError)")
       }
       
-      showInitialView()
+      ANISessionManager.shared.isAnonymous = true
+      
+      if userDefault.bool(forKey: KEY_FIRST_LAUNCH) {
+        userDefault.set(false, forKey: KEY_FIRST_LAUNCH)
+        showInitialView()
+      }
     }
   }
   

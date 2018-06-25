@@ -8,6 +8,8 @@
 
 import Foundation
 
+let KEY_FIRST_LAUNCH = "firstLaunch"
+
 //user
 let KEY_UID = "uid"
 let KEY_USERS = "users"
