@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import FirebaseDatabase
 
 class ANIOtherProfileCell: UITableViewCell {
   
@@ -28,6 +29,28 @@ class ANIOtherProfileCell: UITableViewCell {
   var user: FirebaseUser? {
     didSet {
       reloadLayout()
+      isFollowed()
+      
+      if let uid = user?.uid, userId == nil {
+        userId = uid
+      }
+    }
+  }
+  
+  private var userId: String? {
+    didSet {
+      observeUserFollow()
+    }
+  }
+  
+  private var followUserIds = [String: String]() {
+    didSet {
+      reloadFollowLayout()
+    }
+  }
+  private var followingUserIds = [String: String](){
+    didSet {
+      reloadFollowLayout()
     }
   }
   
@@ -49,6 +72,8 @@ class ANIOtherProfileCell: UITableViewCell {
     followButton.base?.backgroundColor = ANIColor.green
     followButton.baseCornerRadius = FOLLOW_BUTTON_HEIGHT / 2
     followButton.delegate = self
+    followButton.base?.layer.borderWidth = 1.8
+    followButton.base?.layer.borderColor = ANIColor.green.cgColor
     addSubview(followButton)
     followButton.topToSuperview(offset: 10.0)
     followButton.rightToSuperview(offset: 10.0)
@@ -179,7 +204,9 @@ class ANIOtherProfileCell: UITableViewCell {
           let user = self.user else { return }
     
     nameLabel.text = user.userName
+    
     groupLabel.text = user.kind
+    
     introductionLabel.text = user.introduce
     if let introduce = user.introduce {
       if introduce.count != 0 {
@@ -189,6 +216,77 @@ class ANIOtherProfileCell: UITableViewCell {
       }
     } else {
       introduceBG.alpha = 0.0
+    }
+  }
+  
+  private func reloadFollowLayout() {
+    guard let currentUserId = ANISessionManager.shared.currentUserUid,
+          let followButton = self.followButton,
+          let followLabel = self.followLabel,
+          let followingCountLabel = self.followingCountLabel,
+          let followerCountLabel = self.followerCountLabel else { return }
+    
+    if !followingUserIds.isEmpty {
+      for id in followingUserIds.keys {
+        if id == currentUserId {
+          followButton.base?.backgroundColor = .clear
+          followLabel.text = "フォロー中"
+          followLabel.textColor = ANIColor.green
+        } else {
+          followButton.base?.backgroundColor = ANIColor.green
+          followLabel.text = "フォロー"
+          followLabel.textColor = .white
+        }
+      }
+    } else {
+      followButton.base?.backgroundColor = ANIColor.green
+      followLabel.text = "フォロー"
+      followLabel.textColor = .white
+    }
+    
+    followerCountLabel.text = "\(followingUserIds.count)"
+    followingCountLabel.text = "\(followUserIds.count)"
+  }
+  
+  func observeUserFollow() {
+    guard let userId = self.userId else { return }
+    
+    let databaseRef = Database.database().reference()
+    
+    databaseRef.child(KEY_USERS).child(userId).child(KEY_FOLLOW_USER_IDS).observe(.value) { (snapshot) in
+      if let followUserIds = snapshot.value as? [String: String] {
+        self.followUserIds = followUserIds
+      } else {
+        self.followUserIds.removeAll()
+      }
+    }
+    
+    databaseRef.child(KEY_USERS).child(userId).child(KEY_FOLLOWING_USER_IDS).observe(.value) { (snapshot) in
+      if let followingUserIds = snapshot.value as? [String: String] {
+        self.followingUserIds = followingUserIds
+      } else {
+        self.followingUserIds.removeAll()
+      }
+    }
+  }
+  
+  private func isFollowed() {
+    guard let user = self.user,
+          let followingUserIds = user.followingUserIds,
+          let currentUserId = ANISessionManager.shared.currentUserUid,
+          let followButton = self.followButton,
+          let followLabel = self.followLabel else { return }
+
+    for id in followingUserIds.keys {
+      if id == currentUserId {
+        followButton.base?.backgroundColor = .clear
+        followLabel.text = "フォロー中"
+        followLabel.textColor = ANIColor.green
+      } else {
+        followButton.base?.backgroundColor = ANIColor.green
+        followLabel.text = "フォロー"
+        followLabel.textColor = .white
+      }
     }
   }
   
@@ -206,7 +304,25 @@ class ANIOtherProfileCell: UITableViewCell {
 extension ANIOtherProfileCell: ANIButtonViewDelegate {
   func buttonViewTapped(view: ANIButtonView) {
     if view === self.followButton {
-      print("follow")
+      guard let currentUserUid = ANISessionManager.shared.currentUserUid,
+            let user = self.user,
+            let userId = user.uid,
+            let followButton = self.followButton else { return }
+      
+      let databaseRef = Database.database().reference()
+
+      if followButton.base?.backgroundColor == ANIColor.green {
+        DispatchQueue.global().async {
+          let date = ANIFunction.shared.getToday()
+          databaseRef.child(KEY_USERS).child(currentUserUid).child(KEY_FOLLOW_USER_IDS).updateChildValues([userId: date])
+          databaseRef.child(KEY_USERS).child(userId).child(KEY_FOLLOWING_USER_IDS).updateChildValues([currentUserUid: date])
+        }
+      } else {
+        DispatchQueue.global().async {
+          databaseRef.child(KEY_USERS).child(currentUserUid).child(KEY_FOLLOW_USER_IDS).child(userId).removeValue()
+          databaseRef.child(KEY_USERS).child(userId).child(KEY_FOLLOWING_USER_IDS).child(currentUserUid).removeValue()
+        }
+      }
     }
   }
 }

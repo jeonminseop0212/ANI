@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import FirebaseDatabase
 
 class ANIProfileCell: UITableViewCell {
   
@@ -29,10 +30,22 @@ class ANIProfileCell: UITableViewCell {
       reloadLayout()
     }
   }
+  
+  private var followUserIds = [String: String]() {
+    didSet {
+      reloadFollowLayout()
+    }
+  }
+  private var followingUserIds = [String: String](){
+    didSet {
+      reloadFollowLayout()
+    }
+  }
     
   override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     setup()
+    observeUserFollow()
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -188,6 +201,36 @@ class ANIProfileCell: UITableViewCell {
       }
     } else {
       introduceBG.alpha = 0.0
+    }
+  }
+  
+  private func reloadFollowLayout() {
+    guard let followingCountLabel = self.followingCountLabel,
+          let followerCountLabel = self.followerCountLabel else { return }
+    
+    followerCountLabel.text = "\(followingUserIds.count)"
+    followingCountLabel.text = "\(followUserIds.count)"
+  }
+  
+  func observeUserFollow() {
+    guard let currentUserId = ANISessionManager.shared.currentUserUid else { return }
+    
+    let databaseRef = Database.database().reference()
+    
+    databaseRef.child(KEY_USERS).child(currentUserId).child(KEY_FOLLOW_USER_IDS).observe(.value) { (snapshot) in
+      if let followUserIds = snapshot.value as? [String: String] {
+        self.followUserIds = followUserIds
+      } else {
+        self.followUserIds.removeAll()
+      }
+    }
+    
+    databaseRef.child(KEY_USERS).child(currentUserId).child(KEY_FOLLOWING_USER_IDS).observe(.value) { (snapshot) in
+      if let followingUserIds = snapshot.value as? [String: String] {
+        self.followingUserIds = followingUserIds
+      } else {
+        self.followingUserIds.removeAll()
+      }
     }
   }
   
