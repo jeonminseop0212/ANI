@@ -114,8 +114,7 @@ class ANIOtherProfileBasicView: UIView {
     
     DispatchQueue.global().async {
       let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_USERS).child(uid).child(KEY_POST_RECRUIT_IDS).queryLimited(toFirst: 20).observe(.value) { (snapshot) in
-        databaseRef.child(KEY_USERS).child(uid).child(KEY_POST_RECRUIT_IDS).removeAllObservers()
+      databaseRef.child(KEY_USERS).child(uid).child(KEY_POST_RECRUIT_IDS).queryLimited(toFirst: 20).observeSingleEvent(of: .value) { (snapshot) in
         
         for item in snapshot.children {
           if let snapshot = item as? DataSnapshot {
@@ -146,8 +145,7 @@ class ANIOtherProfileBasicView: UIView {
     
     DispatchQueue.global().async {
       let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_USERS).child(uid).child(KEY_POST_STORY_IDS).queryLimited(toFirst: 20).observe(.value) { (snapshot) in
-        databaseRef.child(KEY_USERS).child(uid).child(KEY_POST_STORY_IDS).removeAllObservers()
+      databaseRef.child(KEY_USERS).child(uid).child(KEY_POST_STORY_IDS).queryLimited(toFirst: 20).observeSingleEvent(of: .value) { (snapshot) in
 
         for item in snapshot.children {
           if let snapshot = item as? DataSnapshot {
@@ -178,8 +176,7 @@ class ANIOtherProfileBasicView: UIView {
     
     DispatchQueue.global().async {
       let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_USERS).child(uid).child(KEY_POST_QNA_IDS).queryLimited(toFirst: 20).observe(.value) { (snapshot) in
-        databaseRef.child(KEY_USERS).child(uid).child(KEY_POST_QNA_IDS).removeAllObservers()
+      databaseRef.child(KEY_USERS).child(uid).child(KEY_POST_QNA_IDS).queryLimited(toFirst: 20).observeSingleEvent(of: .value) { (snapshot) in
 
         for item in snapshot.children {
           if let snapshot = item as? DataSnapshot {

@@ -90,8 +90,7 @@ class ANIQnaView: UIView {
     
     DispatchQueue.global().async {
       let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_QNAS).queryLimited(toFirst: 20).observe(.value, with: { (snapshot) in
-        databaseRef.child(KEY_QNAS).removeAllObservers()
+      databaseRef.child(KEY_QNAS).queryLimited(toFirst: 20).observeSingleEvent(of: .value, with: { (snapshot) in
         
         for item in snapshot.children {
           if let snapshot = item as? DataSnapshot, let value = snapshot.value {
