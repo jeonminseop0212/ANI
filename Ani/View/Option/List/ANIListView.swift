@@ -39,7 +39,7 @@ class ANIListView: UIView {
       case .loveQuestion:
         loadLoveQna()
       case .clipRecruit:
-        print("clipRecruit")
+        loadClipRecruit()
       }
     }
   }
@@ -49,6 +49,8 @@ class ANIListView: UIView {
   private var loveStories = [FirebaseStory]()
   
   private var loveQnas = [FirebaseQna]()
+  
+  private var clipRecruits = [FirebaseRecruit]()
   
   var delegate: ANIListViewDelegate?
   
@@ -98,8 +100,7 @@ class ANIListView: UIView {
     
     DispatchQueue.global().async {
       let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_USERS).child(uid).child(KEY_LOVE_RECRUIT_IDS).queryOrderedByValue().queryLimited(toFirst: 20).observe(.value) { (snapshot) in
-        databaseRef.child(KEY_USERS).child(uid).child(KEY_LOVE_RECRUIT_IDS).removeAllObservers()
+      databaseRef.child(KEY_USERS).child(uid).child(KEY_LOVE_RECRUIT_IDS).queryOrderedByValue().queryLimited(toFirst: 20).observeSingleEvent(of: .value) { (snapshot) in
 
         for item in snapshot.children {
           if let snapshot = item as? DataSnapshot {
@@ -146,8 +147,7 @@ class ANIListView: UIView {
     
     DispatchQueue.global().async {
       let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_USERS).child(uid).child(KEY_LOVE_STORY_IDS).queryOrderedByValue().queryLimited(toFirst: 20).observe(.value) { (snapshot) in
-        databaseRef.child(KEY_USERS).child(uid).child(KEY_LOVE_STORY_IDS).removeAllObservers()
+      databaseRef.child(KEY_USERS).child(uid).child(KEY_LOVE_STORY_IDS).queryOrderedByValue().queryLimited(toFirst: 20).observeSingleEvent(of: .value) { (snapshot) in
 
         for item in snapshot.children {
           if let snapshot = item as? DataSnapshot {
@@ -194,8 +194,7 @@ class ANIListView: UIView {
     
     DispatchQueue.global().async {
       let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_USERS).child(uid).child(KEY_LOVE_QNA_IDS).queryOrderedByValue().queryLimited(toFirst: 20).observe(.value) { (snapshot) in
-        databaseRef.child(KEY_USERS).child(uid).child(KEY_LOVE_QNA_IDS).removeAllObservers()
+      databaseRef.child(KEY_USERS).child(uid).child(KEY_LOVE_QNA_IDS).queryOrderedByValue().queryLimited(toFirst: 20).observeSingleEvent(of: .value) { (snapshot) in
 
         for item in snapshot.children {
           if let snapshot = item as? DataSnapshot {
@@ -235,6 +234,53 @@ class ANIListView: UIView {
       }
     }
   }
+  
+  private func loadClipRecruit() {
+    guard let currentUser = ANISessionManager.shared.currentUser,
+          let uid = currentUser.uid else { return }
+    
+    DispatchQueue.global().async {
+      let databaseRef = Database.database().reference()
+      databaseRef.child(KEY_USERS).child(uid).child(KEY_CLIP_RECRUIT_IDS).queryOrderedByValue().queryLimited(toFirst: 20).observeSingleEvent(of: .value) { (snapshot) in
+        
+        for item in snapshot.children {
+          if let snapshot = item as? DataSnapshot {
+            databaseRef.child(KEY_RECRUITS).child(snapshot.key).observeSingleEvent(of: .value, with: { (snapshot) in
+              
+              guard let value = snapshot.value else { return }
+              do {
+                let recruit = try FirebaseDecoder().decode(FirebaseRecruit.self, from: value)
+                self.clipRecruits.insert(recruit, at: 0)
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
+                  guard let listTableView = self.listTableView,
+                    let activityIndicatorView = self.activityIndicatorView else { return }
+                  
+                  listTableView.reloadData()
+                  activityIndicatorView.stopAnimating()
+                  
+                  UIView.animate(withDuration: 0.2, animations: {
+                    listTableView.alpha = 1.0
+                  })
+                })
+              } catch let error {
+                guard let activityIndicatorView = self.activityIndicatorView else { return }
+                
+                print(error)
+                activityIndicatorView.stopAnimating()
+              }
+            })
+          }
+        }
+        
+        if snapshot.value as? [String: Any] == nil {
+          guard let activityIndicatorView = self.activityIndicatorView else { return }
+          
+          activityIndicatorView.stopAnimating()
+        }
+      }
+    }
+  }
 }
 
 //MARK: UITableViewDataSource
@@ -250,7 +296,7 @@ extension ANIListView: UITableViewDataSource {
     case .loveQuestion:
       return loveQnas.count
     case .clipRecruit:
-      return 0
+      return clipRecruits.count
     }
   }
   
@@ -300,7 +346,13 @@ extension ANIListView: UITableViewDataSource {
       
       return cell
     case .clipRecruit:
-      return UITableViewCell()
+      let recruitCellid = NSStringFromClass(ANIRecruitViewCell.self)
+      let cell = tableView.dequeueReusableCell(withIdentifier: recruitCellid, for: indexPath) as! ANIRecruitViewCell
+      
+      cell.recruit = clipRecruits[indexPath.row]
+      cell.delegate = self
+      
+      return cell
     }
   }
 }

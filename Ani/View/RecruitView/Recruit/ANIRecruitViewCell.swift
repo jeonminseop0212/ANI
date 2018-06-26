@@ -44,6 +44,7 @@ class ANIRecruitViewCell: UITableViewCell {
       loadUser()
       isLoved()
       isSupported()
+      isClipped()
       observeLove()
       observeSupport()
     }
@@ -299,6 +300,7 @@ class ANIRecruitViewCell: UITableViewCell {
           let loveButtonBG = self.loveButtonBG,
           let loveButton = self.loveButton,
           let loveCountLabel = self.loveCountLabel,
+          let clipButton = self.clipButton,
           let recruit = self.recruit,
           let headerImageUrl = recruit.headerImageUrl else { return }
     
@@ -330,6 +332,8 @@ class ANIRecruitViewCell: UITableViewCell {
     } else {
       loveCountLabel.text = "0"
     }
+    
+    clipButton.tintColor = ANIColor.gray
   }
   
   private func reloadUserLayout(user: FirebaseUser) {
@@ -461,6 +465,29 @@ class ANIRecruitViewCell: UITableViewCell {
     }
   }
   
+  private func isClipped() {
+    guard let recruit = self.recruit,
+          let recuritId = recruit.id,
+          let currentUserId = ANISessionManager.shared.currentUserUid else { return }
+    
+    let databaseRef = Database.database().reference()
+    DispatchQueue.global().async {
+      databaseRef.child(KEY_RECRUITS).child(recuritId).child(KEY_CLIP_IDS).observeSingleEvent(of: .value) { (snapshot) in
+        for item in snapshot.children {
+          if let snapshot = item as? DataSnapshot {
+            if snapshot.key == currentUserId {
+              DispatchQueue.main.async {
+                guard let clipButton = self.clipButton else { return }
+                
+                clipButton.tintColor = ANIColor.moreDarkGray
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
   //MARK: action
   @objc private func love() {
     guard let recruit = self.recruit,
@@ -497,16 +524,32 @@ class ANIRecruitViewCell: UITableViewCell {
   }
   
   @objc private func clip() {
-    guard let clipButton = self.clipButton else { return }
+    guard let recruit = self.recruit,
+          let recuritId = recruit.id,
+          let currentUserId = ANISessionManager.shared.currentUserUid,
+          let clipButton = self.clipButton else { return }
     
     if !ANISessionManager.shared.isAnonymous {
-      if clipButton.tintColor == ANIColor.moreDarkGray {
+      let databaseRef = Database.database().reference()
+
+      if clipButton.tintColor == ANIColor.gray {
         UIView.animate(withDuration: 0.15) {
-          clipButton.tintColor = ANIColor.gray
+          clipButton.tintColor = ANIColor.moreDarkGray
+        }
+        
+        DispatchQueue.global().async {
+          databaseRef.child(KEY_RECRUITS).child(recuritId).child(KEY_CLIP_IDS).updateChildValues([currentUserId: true])
+          let date = ANIFunction.shared.getToday()
+          databaseRef.child(KEY_USERS).child(currentUserId).child(KEY_CLIP_RECRUIT_IDS).updateChildValues([recuritId: date])
         }
       } else {
         UIView.animate(withDuration: 0.15) {
-          clipButton.tintColor = ANIColor.moreDarkGray
+          clipButton.tintColor = ANIColor.gray
+        }
+        
+        DispatchQueue.global().async {
+          databaseRef.child(KEY_RECRUITS).child(recuritId).child(KEY_CLIP_IDS).child(currentUserId).removeValue()
+          databaseRef.child(KEY_USERS).child(currentUserId).child(KEY_CLIP_RECRUIT_IDS).child(recuritId).removeValue()
         }
       }
     } else {

@@ -23,6 +23,14 @@ class ANIListViewController: UIViewController {
     setup()
   }
   
+  override func viewWillAppear(_ animated: Bool) {
+    setupNotifications()
+  }
+  
+  override func viewWillDisappear(_ animated: Bool) {
+    removeNotifications()
+  }
+  
   private func setup() {
     //basic
     self.view.backgroundColor = .white
@@ -76,14 +84,90 @@ class ANIListViewController: UIViewController {
     if let list = self.list {
       listView.list = list
     }
+    listView.delegate = self
     self.view.addSubview(listView)
     listView.topToBottom(of: myNavigationBar)
     listView.edgesToSuperview(excluding: .top)
     self.listView = listView
   }
   
+  //MARK: Notifications
+  private func setupNotifications() {
+    ANINotificationManager.receive(profileImageViewTapped: self, selector: #selector(pushOtherProfile))
+    ANINotificationManager.receive(imageCellTapped: self, selector: #selector(presentImageBrowser(_:)))
+  }
+  
+  private func removeNotifications() {
+    ANINotificationManager.remove(self)
+  }
+  
+  @objc private func pushOtherProfile(_ notification: NSNotification) {
+    guard let userId = notification.object as? String else { return }
+    
+    if let currentUserUid = ANISessionManager.shared.currentUserUid, currentUserUid != userId {
+      let otherProfileViewController = ANIOtherProfileViewController()
+      otherProfileViewController.hidesBottomBarWhenPushed = true
+      otherProfileViewController.userId = userId
+      self.navigationController?.pushViewController(otherProfileViewController, animated: true)
+    }
+  }
+  
+  @objc private func presentImageBrowser(_ notification: NSNotification) {
+    guard let item = notification.object as? (Int, [String]) else { return }
+    let selectedIndex = item.0
+    let imageUrls = item.1
+    let imageBrowserViewController = ANIImageBrowserViewController()
+    imageBrowserViewController.selectedIndex = selectedIndex
+    imageBrowserViewController.imageUrls = imageUrls
+    imageBrowserViewController.modalPresentationStyle = .overCurrentContext
+    self.present(imageBrowserViewController, animated: false, completion: nil)
+  }
+  
   //MARK: action
   @objc private func back() {
     self.navigationController?.popViewController(animated: true)
+  }
+}
+
+//MARK: ANIListViewDelegate
+extension ANIListViewController: ANIListViewDelegate {
+  func recruitViewCellDidSelect(selectedRecruit: FirebaseRecruit, user: FirebaseUser) {
+    let recruitDetailViewController = ANIRecruitDetailViewController()
+    recruitDetailViewController.hidesBottomBarWhenPushed = true
+    recruitDetailViewController.recruit = selectedRecruit
+    recruitDetailViewController.user = user
+    self.navigationController?.pushViewController(recruitDetailViewController, animated: true)
+  }
+  
+  func storyViewCellDidSelect(selectedStory: FirebaseStory, user: FirebaseUser) {
+    let commentViewController = ANICommentViewController()
+    commentViewController.hidesBottomBarWhenPushed = true
+    commentViewController.commentMode = CommentMode.story
+    commentViewController.story = selectedStory
+    commentViewController.user = user
+    self.navigationController?.pushViewController(commentViewController, animated: true)
+  }
+  
+  func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser) {
+    let recruitDetailViewController = ANIRecruitDetailViewController()
+    recruitDetailViewController.hidesBottomBarWhenPushed = true
+    recruitDetailViewController.recruit = recruit
+    recruitDetailViewController.user = user
+    self.navigationController?.pushViewController(recruitDetailViewController, animated: true)
+  }
+  
+  func qnaViewCellDidSelect(selectedQna: FirebaseQna, user: FirebaseUser) {
+    let commentViewController = ANICommentViewController()
+    commentViewController.hidesBottomBarWhenPushed = true
+    commentViewController.commentMode = CommentMode.qna
+    commentViewController.qna = selectedQna
+    commentViewController.user = user
+    self.navigationController?.pushViewController(commentViewController, animated: true)
+  }
+  
+  func supportButtonTapped() {
+    let supportViewController = ANISupportViewController()
+    supportViewController.modalPresentationStyle = .overCurrentContext
+    self.tabBarController?.present(supportViewController, animated: false, completion: nil)
   }
 }
