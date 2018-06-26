@@ -232,15 +232,19 @@ extension ANIOtherProfileBasicView: UITableViewDataSource {
     if section == 0 {
       let topCellId = NSStringFromClass(ANIOtherProfileTopCell.self)
       let cell = tableView.dequeueReusableCell(withIdentifier: topCellId, for: indexPath) as! ANIOtherProfileTopCell
+      
       cell.delegate = self
       cell.selectedIndex = contentType.rawValue
       cell.user = user
+      
       return cell
     } else {
       if contentType == .profile {
         let profileCellid = NSStringFromClass(ANIOtherProfileCell.self)
         let cell = tableView.dequeueReusableCell(withIdentifier: profileCellid, for: indexPath) as! ANIOtherProfileCell
+        
         cell.user = user
+        
         return cell
       } else if contentType == .recruit {
         let recruitCellid = NSStringFromClass(ANIRecruitViewCell.self)

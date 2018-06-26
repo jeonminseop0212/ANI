@@ -28,6 +28,8 @@ let KEY_CLIP_RECRUIT_IDS = "clipRecruitIds"
 let KEY_LOVE_STORY_IDS = "loveStoryIds"
 let KEY_LOVE_QNA_IDS = "loveQnaIds"
 let KEY_SUPPORT_RECRUIT_IDS = "supportRecruitIds"
+let KEY_FOLLOW_USER_IDS = "followUserIds"
+let KEY_FOLLOWING_USER_IDS = "followingUserIds"
 
 //recruit
 let KEY_RECRUIT_HEADER_IMAGES = "recruit_header_images"
