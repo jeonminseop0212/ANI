@@ -154,6 +154,26 @@ class ANIOtherProfileViewController: UIViewController {
 
 //MARK: ANIProfileBasicViewDelegate
 extension ANIOtherProfileViewController: ANIOtherProfileBasicViewDelegate {
+  func followingTapped() {
+    guard let userId = self.userId else { return }
+    
+    let followUserViewController = ANIFollowUserViewContoller()
+    followUserViewController.followUserViewMode = .following
+    followUserViewController.userId = userId
+    followUserViewController.hidesBottomBarWhenPushed = true
+    self.navigationController?.pushViewController(followUserViewController, animated: true)
+  }
+  
+  func followerTapped() {
+    guard let userId = self.userId else { return }
+    
+    let followUserViewController = ANIFollowUserViewContoller()
+    followUserViewController.followUserViewMode = .follower
+    followUserViewController.userId = userId
+    followUserViewController.hidesBottomBarWhenPushed = true
+    self.navigationController?.pushViewController(followUserViewController, animated: true)
+  }
+  
   func supportButtonTapped() {
     let supportViewController = ANISupportViewController()
     supportViewController.modalPresentationStyle = .overCurrentContext

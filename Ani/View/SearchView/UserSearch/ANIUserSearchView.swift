@@ -84,8 +84,10 @@ extension ANIUserSearchView: UITableViewDataSource, UITableViewDelegate {
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let id = NSStringFromClass(ANIUserSearchViewCell.self)
     let cell = tableView.dequeueReusableCell(withIdentifier: id, for: indexPath) as! ANIUserSearchViewCell
-    cell.profileImageView.image = testUserSearchResult[indexPath.row].profileImage
-    cell.userNameLabel.text = testUserSearchResult[indexPath.row].name
+    
+    cell.profileImageView?.image = testUserSearchResult[indexPath.row].profileImage
+    cell.userNameLabel?.text = testUserSearchResult[indexPath.row].name
+    
     return cell
   }
   

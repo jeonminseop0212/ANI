@@ -86,6 +86,9 @@
 		CDDE4B5C20E079B8005762A1 /* ANIListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDE4B5B20E079B8005762A1 /* ANIListViewController.swift */; };
 		CDDE4B6020E07B58005762A1 /* ANIListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDE4B5F20E07B58005762A1 /* ANIListView.swift */; };
 		CDDE4B6320E0A985005762A1 /* ANIfunction.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDE4B6220E0A985005762A1 /* ANIfunction.swift */; };
+		CDDE4B6720E20D3E005762A1 /* ANIFollowUserViewContoller.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDE4B6620E20D3E005762A1 /* ANIFollowUserViewContoller.swift */; };
+		CDDE4B6C20E31247005762A1 /* ANIFollowUserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDE4B6B20E31247005762A1 /* ANIFollowUserView.swift */; };
+		CDDE4B6E20E31390005762A1 /* ANIFollowUserViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDE4B6D20E31390005762A1 /* ANIFollowUserViewCell.swift */; };
 		CDF7F168208D772300254A0F /* ANINotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF7F167208D772300254A0F /* ANINotificationManager.swift */; };
 		CDF7F16E208F2BEF00254A0F /* UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF7F16D208F2BEF00254A0F /* UIView.swift */; };
 		CDF7F171208F651E00254A0F /* ANIButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF7F170208F651E00254A0F /* ANIButtonView.swift */; };
@@ -244,6 +247,9 @@
 		CDDE4B5B20E079B8005762A1 /* ANIListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIListViewController.swift; sourceTree = "<group>"; };
 		CDDE4B5F20E07B58005762A1 /* ANIListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIListView.swift; sourceTree = "<group>"; };
 		CDDE4B6220E0A985005762A1 /* ANIfunction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIfunction.swift; sourceTree = "<group>"; };
+		CDDE4B6620E20D3E005762A1 /* ANIFollowUserViewContoller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIFollowUserViewContoller.swift; sourceTree = "<group>"; };
+		CDDE4B6B20E31247005762A1 /* ANIFollowUserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIFollowUserView.swift; sourceTree = "<group>"; };
+		CDDE4B6D20E31390005762A1 /* ANIFollowUserViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIFollowUserViewCell.swift; sourceTree = "<group>"; };
 		CDF7F167208D772300254A0F /* ANINotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotificationManager.swift; sourceTree = "<group>"; };
 		CDF7F16D208F2BEF00254A0F /* UIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIView.swift; sourceTree = "<group>"; };
 		CDF7F170208F651E00254A0F /* ANIButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIButtonView.swift; sourceTree = "<group>"; };
@@ -811,6 +817,23 @@
 			path = List;
 			sourceTree = "<group>";
 		};
+		CDDE4B6420E20D19005762A1 /* Follow */ = {
+			isa = PBXGroup;
+			children = (
+				CDDE4B6620E20D3E005762A1 /* ANIFollowUserViewContoller.swift */,
+			);
+			path = Follow;
+			sourceTree = "<group>";
+		};
+		CDDE4B6A20E3122B005762A1 /* Follow */ = {
+			isa = PBXGroup;
+			children = (
+				CDDE4B6B20E31247005762A1 /* ANIFollowUserView.swift */,
+				CDDE4B6D20E31390005762A1 /* ANIFollowUserViewCell.swift */,
+			);
+			path = Follow;
+			sourceTree = "<group>";
+		};
 		CDF7F16F208F650600254A0F /* Button */ = {
 			isa = PBXGroup;
 			children = (
@@ -1182,6 +1205,7 @@
 				CDC6AE3F20CF6E5C00A836F6 /* OtherProfileViewController */,
 				CDDE4B5A20E079A5005762A1 /* Option */,
 				CD2C414620A5A1FF00581267 /* ImageFilterViewController */,
+				CDDE4B6420E20D19005762A1 /* Follow */,
 				CDA97B5620B25F2000F46DA4 /* CommentViewController */,
 				CDA32A2120AA6041008A2AC1 /* ModalViewController */,
 			);
@@ -1208,6 +1232,7 @@
 				CDC6AE4220CF723000A836F6 /* OtherProfile */,
 				CDAFD75920DC9CEB00AEDD83 /* Option */,
 				CDD0550420A5CF0100BEF482 /* ImageFilter */,
+				CDDE4B6A20E3122B005762A1 /* Follow */,
 				CDA97B5B20B263BE00F46DA4 /* CommentView */,
 				CDA32A2420AA661A008A2AC1 /* ModalVIew */,
 				CDAFD76020DE1D2100AEDD83 /* RejectView */,
@@ -1550,6 +1575,7 @@
 				CDD0550E20A6B23B00BEF482 /* ANIImageFilterCell.swift in Sources */,
 				CDA32A2320AA6041008A2AC1 /* ANIPopupPickerViewController.swift in Sources */,
 				CDAFD75D20DC9EE800AEDD83 /* ANIOptionViewCell.swift in Sources */,
+				CDDE4B6C20E31247005762A1 /* ANIFollowUserView.swift in Sources */,
 				F566348320752656006CB81B /* ANIRecruitCategoriesView.swift in Sources */,
 				CDAFD75720DC9B4D00AEDD83 /* ANIOptionViewController.swift in Sources */,
 				CD6229DC20B64A6400E36875 /* ANISignUpViewController.swift in Sources */,
@@ -1591,6 +1617,7 @@
 				CD0FAD0A20BF8DFD00D8CD27 /* FirebaseUser.swift in Sources */,
 				CDDD04BA20B538540094DBFA /* ANILoginViewController.swift in Sources */,
 				F57F7D9120844DC2008A2645 /* ANIUserSearchView.swift in Sources */,
+				CDDE4B6E20E31390005762A1 /* ANIFollowUserViewCell.swift in Sources */,
 				CDAFD75F20DE1D1B00AEDD83 /* ANIRejectView.swift in Sources */,
 				CD0BFF1820C7AD9C00D5959B /* FirebaseQna.swift in Sources */,
 				CD9E52B7209441C900715F50 /* ANIRecruitDetailImagesViewCell.swift in Sources */,
@@ -1602,6 +1629,7 @@
 				F5E9E22620769AD60021D4CC /* User.swift in Sources */,
 				CD9E52BB2094614400715F50 /* ANIAreaButtonView.swift in Sources */,
 				F53E87BA208468DF00B19A2F /* ANIStorySearchView.swift in Sources */,
+				CDDE4B6720E20D3E005762A1 /* ANIFollowUserViewContoller.swift in Sources */,
 				CDDD04C020B53A8B0094DBFA /* ANIInitialView.swift in Sources */,
 				CDA32A2920ABBA21008A2AC1 /* ANIRecruitContributionImagesView.swift in Sources */,
 				CD08A73120915C2A00F0B72D /* ANIRecruitDetailViewController.swift in Sources */,

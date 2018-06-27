@@ -18,6 +18,6 @@ struct FirebaseUser: Codable {
   var postRecruitIds: [String: Bool]?
   var postStoryIds: [String: Bool]?
   var postQnaIds: [String: Bool]?
-  var followUserIds: [String: String]?
   var followingUserIds: [String: String]?
+  var followerIds: [String: String]?
 }

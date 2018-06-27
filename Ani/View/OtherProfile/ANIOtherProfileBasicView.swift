@@ -11,6 +11,8 @@ import FirebaseDatabase
 import CodableFirebase
 
 protocol ANIOtherProfileBasicViewDelegate {
+  func followingTapped()
+  func followerTapped()
   func recruitViewCellDidSelect(selectedRecruit: FirebaseRecruit, user: FirebaseUser)
   func storyViewCellDidSelect(selectedStory: FirebaseStory, user: FirebaseUser)
   func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser)
@@ -244,6 +246,7 @@ extension ANIOtherProfileBasicView: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: profileCellid, for: indexPath) as! ANIOtherProfileCell
         
         cell.user = user
+        cell.delegate = self
         
         return cell
       } else if contentType == .recruit {
@@ -311,6 +314,17 @@ extension ANIOtherProfileBasicView: ANIProfileMenuBarDelegate {
     }
     
     basicTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
+  }
+}
+
+//MARK: ANIOtherProfileCellDelegate
+extension ANIOtherProfileBasicView: ANIOtherProfileCellDelegate {
+  func followingTapped() {
+    self.delegate?.followingTapped()
+  }
+  
+  func followerTapped() {
+    self.delegate?.followerTapped()
   }
 }
 
