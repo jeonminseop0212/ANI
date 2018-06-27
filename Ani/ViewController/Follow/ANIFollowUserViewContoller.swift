@@ -30,6 +30,14 @@ class ANIFollowUserViewContoller: UIViewController {
     setup()
   }
   
+  override func viewWillAppear(_ animated: Bool) {
+    setupNotifications()
+  }
+  
+  override func viewWillDisappear(_ animated: Bool) {
+    removeNotifications()
+  }
+  
   private func setup() {
     //basic
     self.view.backgroundColor = .white
@@ -91,6 +99,31 @@ class ANIFollowUserViewContoller: UIViewController {
     followUserView.topToBottom(of: myNavigationBar)
     followUserView.edgesToSuperview(excluding: .top)
     self.followUserView = followUserView
+  }
+  
+  //MARK: Notifications
+  private func setupNotifications() {
+    ANINotificationManager.receive(profileImageViewTapped: self, selector: #selector(pushOtherProfile))
+  }
+  
+  private func removeNotifications() {
+    ANINotificationManager.remove(self)
+  }
+  
+  @objc private func pushOtherProfile(_ notification: NSNotification) {
+    guard let userId = notification.object as? String else { return }
+    
+    if let currentUserUid = ANISessionManager.shared.currentUserUid, currentUserUid == userId {
+      let profileViewController = ANIProfileViewController()
+      profileViewController.hidesBottomBarWhenPushed = true
+      self.navigationController?.pushViewController(profileViewController, animated: true)
+      profileViewController.isBackButtonHide = false
+    } else {
+      let otherProfileViewController = ANIOtherProfileViewController()
+      otherProfileViewController.hidesBottomBarWhenPushed = true
+      otherProfileViewController.userId = userId
+      self.navigationController?.pushViewController(otherProfileViewController, animated: true)
+    }
   }
   
   //MARK: action
