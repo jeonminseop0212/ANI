@@ -55,6 +55,9 @@ class ANIFollowUserViewCell: UITableViewCell {
     profileImageView.layer.cornerRadius = PROFILE_IMAGE_VIEW_HEIGHT / 2
     profileImageView.layer.masksToBounds = true
     profileImageView.backgroundColor = ANIColor.bg
+    profileImageView.isUserInteractionEnabled = true
+    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped))
+    profileImageView.addGestureRecognizer(tapGesture)
     stackView.addArrangedSubview(profileImageView)
     profileImageView.width(PROFILE_IMAGE_VIEW_HEIGHT)
     profileImageView.height(PROFILE_IMAGE_VIEW_HEIGHT)
@@ -131,6 +134,14 @@ class ANIFollowUserViewCell: UITableViewCell {
         followLabel.textColor = .white
       }
     }
+  }
+  
+  //MARK: action
+  @objc private func profileImageViewTapped() {
+    guard let user = self.user,
+          let userId = user.uid else { return }
+    
+    ANINotificationManager.postProfileImageViewTapped(userId: userId)
   }
 }
 
