@@ -191,6 +191,26 @@ class ANIProfileViewController: UIViewController {
 
 //MARK: ANIProfileBasicViewDelegate
 extension ANIProfileViewController: ANIProfileBasicViewDelegate {
+  func followingTapped() {
+    guard let currentUser = self.currentUser else { return }
+    
+    let followUserViewController = ANIFollowUserViewContoller()
+    followUserViewController.followUserViewMode = .following
+    followUserViewController.userId = currentUser.uid
+    followUserViewController.hidesBottomBarWhenPushed = true
+    self.navigationController?.pushViewController(followUserViewController, animated: true)
+  }
+  
+  func followerTapped() {
+    guard let currentUser = self.currentUser else { return }
+
+    let followUserViewController = ANIFollowUserViewContoller()
+    followUserViewController.followUserViewMode = .follower
+    followUserViewController.userId = currentUser.uid
+    followUserViewController.hidesBottomBarWhenPushed = true
+    self.navigationController?.pushViewController(followUserViewController, animated: true)
+  }
+  
   func supportButtonTapped() {
     let supportViewController = ANISupportViewController()
     supportViewController.modalPresentationStyle = .overCurrentContext

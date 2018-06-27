@@ -9,6 +9,11 @@
 import UIKit
 import FirebaseDatabase
 
+protocol ANIProfileCellDelegate {
+  func followingTapped()
+  func followerTapped()
+}
+
 class ANIProfileCell: UITableViewCell {
   
   private weak var nameLabel: UILabel?
@@ -31,16 +36,18 @@ class ANIProfileCell: UITableViewCell {
     }
   }
   
-  private var followUserIds = [String: String]() {
+  private var followingUserIds = [String: String]() {
     didSet {
       reloadFollowLayout()
     }
   }
-  private var followingUserIds = [String: String](){
+  private var followerIds = [String: String](){
     didSet {
       reloadFollowLayout()
     }
   }
+  
+  var delegate: ANIProfileCellDelegate?
     
   override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -208,22 +215,14 @@ class ANIProfileCell: UITableViewCell {
     guard let followingCountLabel = self.followingCountLabel,
           let followerCountLabel = self.followerCountLabel else { return }
     
-    followerCountLabel.text = "\(followingUserIds.count)"
-    followingCountLabel.text = "\(followUserIds.count)"
+    followingCountLabel.text = "\(followingUserIds.count)"
+    followerCountLabel.text = "\(followerIds.count)"
   }
   
   func observeUserFollow() {
     guard let currentUserId = ANISessionManager.shared.currentUserUid else { return }
     
     let databaseRef = Database.database().reference()
-    
-    databaseRef.child(KEY_USERS).child(currentUserId).child(KEY_FOLLOW_USER_IDS).observe(.value) { (snapshot) in
-      if let followUserIds = snapshot.value as? [String: String] {
-        self.followUserIds = followUserIds
-      } else {
-        self.followUserIds.removeAll()
-      }
-    }
     
     databaseRef.child(KEY_USERS).child(currentUserId).child(KEY_FOLLOWING_USER_IDS).observe(.value) { (snapshot) in
       if let followingUserIds = snapshot.value as? [String: String] {
@@ -232,15 +231,23 @@ class ANIProfileCell: UITableViewCell {
         self.followingUserIds.removeAll()
       }
     }
+    
+    databaseRef.child(KEY_USERS).child(currentUserId).child(KEY_FOLLOWER_IDS).observe(.value) { (snapshot) in
+      if let followerIds = snapshot.value as? [String: String] {
+        self.followerIds = followerIds
+      } else {
+        self.followerIds.removeAll()
+      }
+    }
   }
   
   //MARK: action
   @objc private func followingTapped() {
-    print("following tapped")
+    self.delegate?.followingTapped()
   }
   
   @objc private func followerTapped() {
-    print("follower tapped")
+    self.delegate?.followerTapped()
   }
 }
 

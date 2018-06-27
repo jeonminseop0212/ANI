@@ -22,6 +22,7 @@ protocol ANIListViewDelegate {
 class ANIListView: UIView {
   
   private weak var listTableView: UITableView?
+  
   private weak var activityIndicatorView: NVActivityIndicatorView?
   
   var list: List? {

@@ -11,6 +11,8 @@ import FirebaseDatabase
 import CodableFirebase
 
 protocol ANIProfileBasicViewDelegate {
+  func followingTapped()
+  func followerTapped()
   func recruitViewCellDidSelect(selectedRecruit: FirebaseRecruit, user: FirebaseUser)
   func storyViewCellDidSelect(selectedStory: FirebaseStory, user: FirebaseUser)
   func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser)
@@ -204,15 +206,20 @@ extension ANIProfileBasicView: UITableViewDataSource {
     if section == 0 {
       let topCellId = NSStringFromClass(ANIProfileTopCell.self)
       let cell = tableView.dequeueReusableCell(withIdentifier: topCellId, for: indexPath) as! ANIProfileTopCell
+      
       cell.delegate = self
       cell.selectedIndex = contentType.rawValue
       cell.user = currentUser
+      
       return cell
     } else {
       if contentType == .profile {
         let profileCellid = NSStringFromClass(ANIProfileCell.self)
         let cell = tableView.dequeueReusableCell(withIdentifier: profileCellid, for: indexPath) as! ANIProfileCell
+        
         cell.user = currentUser
+        cell.delegate = self
+        
         return cell
       } else if contentType == .recruit {
         let recruitCellid = NSStringFromClass(ANIRecruitViewCell.self)
@@ -279,6 +286,17 @@ extension ANIProfileBasicView: ANIProfileMenuBarDelegate {
     }
 
     basicTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
+  }
+}
+
+//MARK: ANIProfileCellDelegate
+extension ANIProfileBasicView: ANIProfileCellDelegate {
+  func followingTapped() {
+    self.delegate?.followingTapped()
+  }
+  
+  func followerTapped() {
+    self.delegate?.followerTapped()
   }
 }
 

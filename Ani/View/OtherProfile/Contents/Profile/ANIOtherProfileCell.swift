@@ -9,6 +9,11 @@
 import UIKit
 import FirebaseDatabase
 
+protocol ANIOtherProfileCellDelegate {
+  func followingTapped()
+  func followerTapped()
+}
+
 class ANIOtherProfileCell: UITableViewCell {
   
   private weak var nameLabel: UILabel?
@@ -43,16 +48,18 @@ class ANIOtherProfileCell: UITableViewCell {
     }
   }
   
-  private var followUserIds = [String: String]() {
+  private var followingUserIds = [String: String]() {
     didSet {
       reloadFollowLayout()
     }
   }
-  private var followingUserIds = [String: String](){
+  private var followerIds = [String: String]() {
     didSet {
       reloadFollowLayout()
     }
   }
+  
+  var delegate: ANIOtherProfileCellDelegate?
   
   override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -226,8 +233,8 @@ class ANIOtherProfileCell: UITableViewCell {
           let followingCountLabel = self.followingCountLabel,
           let followerCountLabel = self.followerCountLabel else { return }
     
-    if !followingUserIds.isEmpty {
-      for id in followingUserIds.keys {
+    if !followerIds.isEmpty {
+      for id in followerIds.keys {
         if id == currentUserId {
           followButton.base?.backgroundColor = .clear
           followLabel.text = "フォロー中"
@@ -244,22 +251,14 @@ class ANIOtherProfileCell: UITableViewCell {
       followLabel.textColor = .white
     }
     
-    followerCountLabel.text = "\(followingUserIds.count)"
-    followingCountLabel.text = "\(followUserIds.count)"
+    followingCountLabel.text = "\(followingUserIds.count)"
+    followerCountLabel.text = "\(followerIds.count)"
   }
   
   func observeUserFollow() {
     guard let userId = self.userId else { return }
     
     let databaseRef = Database.database().reference()
-    
-    databaseRef.child(KEY_USERS).child(userId).child(KEY_FOLLOW_USER_IDS).observe(.value) { (snapshot) in
-      if let followUserIds = snapshot.value as? [String: String] {
-        self.followUserIds = followUserIds
-      } else {
-        self.followUserIds.removeAll()
-      }
-    }
     
     databaseRef.child(KEY_USERS).child(userId).child(KEY_FOLLOWING_USER_IDS).observe(.value) { (snapshot) in
       if let followingUserIds = snapshot.value as? [String: String] {
@@ -268,16 +267,24 @@ class ANIOtherProfileCell: UITableViewCell {
         self.followingUserIds.removeAll()
       }
     }
+    
+    databaseRef.child(KEY_USERS).child(userId).child(KEY_FOLLOWER_IDS).observe(.value) { (snapshot) in
+      if let followerIds = snapshot.value as? [String: String] {
+        self.followerIds = followerIds
+      } else {
+        self.followerIds.removeAll()
+      }
+    }
   }
   
   private func isFollowed() {
     guard let user = self.user,
-          let followingUserIds = user.followingUserIds,
+          let followerIds = user.followerIds,
           let currentUserId = ANISessionManager.shared.currentUserUid,
           let followButton = self.followButton,
           let followLabel = self.followLabel else { return }
 
-    for id in followingUserIds.keys {
+    for id in followerIds.keys {
       if id == currentUserId {
         followButton.base?.backgroundColor = .clear
         followLabel.text = "フォロー中"
@@ -292,11 +299,11 @@ class ANIOtherProfileCell: UITableViewCell {
   
   //MARK: action
   @objc private func followingTapped() {
-    print("following tapped")
+    self.delegate?.followingTapped()
   }
   
   @objc private func followerTapped() {
-    print("follower tapped")
+    self.delegate?.followerTapped()
   }
 }
 
@@ -314,13 +321,13 @@ extension ANIOtherProfileCell: ANIButtonViewDelegate {
       if followButton.base?.backgroundColor == ANIColor.green {
         DispatchQueue.global().async {
           let date = ANIFunction.shared.getToday()
-          databaseRef.child(KEY_USERS).child(currentUserUid).child(KEY_FOLLOW_USER_IDS).updateChildValues([userId: date])
-          databaseRef.child(KEY_USERS).child(userId).child(KEY_FOLLOWING_USER_IDS).updateChildValues([currentUserUid: date])
+          databaseRef.child(KEY_USERS).child(currentUserUid).child(KEY_FOLLOWING_USER_IDS).updateChildValues([userId: date])
+          databaseRef.child(KEY_USERS).child(userId).child(KEY_FOLLOWER_IDS).updateChildValues([currentUserUid: date])
         }
       } else {
         DispatchQueue.global().async {
-          databaseRef.child(KEY_USERS).child(currentUserUid).child(KEY_FOLLOW_USER_IDS).child(userId).removeValue()
-          databaseRef.child(KEY_USERS).child(userId).child(KEY_FOLLOWING_USER_IDS).child(currentUserUid).removeValue()
+          databaseRef.child(KEY_USERS).child(currentUserUid).child(KEY_FOLLOWING_USER_IDS).child(userId).removeValue()
+          databaseRef.child(KEY_USERS).child(userId).child(KEY_FOLLOWER_IDS).child(currentUserUid).removeValue()
         }
       }
     }
