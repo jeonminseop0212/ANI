@@ -30,6 +30,7 @@ let KEY_LOVE_QNA_IDS = "loveQnaIds"
 let KEY_SUPPORT_RECRUIT_IDS = "supportRecruitIds"
 let KEY_FOLLOWING_USER_IDS = "followingUserIds"
 let KEY_FOLLOWER_IDS = "followerIds"
+let KEY_CHAT_GROUP_IDS = "chatGroupIds"
 
 //recruit
 let KEY_RECRUIT_HEADER_IMAGES = "recruit_header_images"
@@ -49,3 +50,13 @@ let KEY_QNAS = "qnas"
 
 //comment
 let KEY_COMMENTS = "comments"
+
+//chat group
+let KEY_CHAT_GROUPS = "chatGroups"
+let KEY_CHAT_MEMBER_IDS = "memberIds"
+let KEY_CHAT_UPDATE_DATE = "updateDate"
+let KEY_CHAT_LAST_MESSAGE = "lastMessage"
+
+//chat message
+let KEY_CHAT_MESSAGES = "chatChatMessages"
+

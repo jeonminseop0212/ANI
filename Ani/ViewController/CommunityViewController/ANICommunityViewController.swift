@@ -146,6 +146,7 @@ class ANICommunityViewController: UIViewController {
     imageBrowserViewController.selectedIndex = selectedIndex
     imageBrowserViewController.imageUrls = imageUrls
     imageBrowserViewController.modalPresentationStyle = .overCurrentContext
+    imageBrowserViewController.delegate = self
     //overCurrentContextだとtabBarが消えないのでtabBarからpresentする
     self.tabBarController?.present(imageBrowserViewController, animated: false, completion: nil)
   }
@@ -295,5 +296,12 @@ extension ANICommunityViewController: ANIQnaViewDelegate {
     commentViewController.qna = selectedQna
     commentViewController.user = user
     self.navigationController?.pushViewController(commentViewController, animated: true)
+  }
+}
+
+//MARK: ANIImageBrowserViewControllerDelegate
+extension ANICommunityViewController: ANIImageBrowserViewControllerDelegate {
+  func imageBrowserDidDissmiss() {
+    UIApplication.shared.statusBarStyle = .default
   }
 }
