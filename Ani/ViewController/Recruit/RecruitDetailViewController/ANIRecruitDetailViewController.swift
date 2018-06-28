@@ -163,6 +163,7 @@ class ANIRecruitDetailViewController: UIViewController {
   }
 }
 
+//MARK: ANIRecruitDetailViewDelegate
 extension ANIRecruitDetailViewController: ANIRecruitDetailViewDelegate {
   func recruitDetailViewDidScroll(offset: CGFloat) {
     guard let myNavigationBar = self.myNavigationBar,
@@ -206,8 +207,12 @@ extension ANIRecruitDetailViewController: ANIButtonViewDelegate {
     if view === self.clipButton {
       print("clip button tapped")
     }
-    if view === self.applyButton {
-      print("apply button tapped")
+    if view === self.applyButton {      
+      let chatViewController = ANIChatViewController()
+      let navigationContoller = UINavigationController(rootViewController: chatViewController)
+      chatViewController.user = user
+      chatViewController.delegate = self
+      self.present(navigationContoller, animated: true, completion: nil)
     }
   }
 }
@@ -215,6 +220,13 @@ extension ANIRecruitDetailViewController: ANIButtonViewDelegate {
 //MARK: ANIImageBrowserViewControllerDelegate
 extension ANIRecruitDetailViewController: ANIImageBrowserViewControllerDelegate {
   func imageBrowserDidDissmiss() {
+    UIApplication.shared.statusBarStyle = statusBarStyle
+  }
+}
+
+//MARK: ANIChatViewControllerDelegate
+extension ANIRecruitDetailViewController: ANIChatViewControllerDelegate {
+  func chatViewWillDismiss() {
     UIApplication.shared.statusBarStyle = statusBarStyle
   }
 }

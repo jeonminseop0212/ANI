@@ -89,6 +89,13 @@
 		CDDE4B6720E20D3E005762A1 /* ANIFollowUserViewContoller.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDE4B6620E20D3E005762A1 /* ANIFollowUserViewContoller.swift */; };
 		CDDE4B6C20E31247005762A1 /* ANIFollowUserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDE4B6B20E31247005762A1 /* ANIFollowUserView.swift */; };
 		CDDE4B6E20E31390005762A1 /* ANIFollowUserViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDE4B6D20E31390005762A1 /* ANIFollowUserViewCell.swift */; };
+		CDE2F3BA20E35268005E1DE1 /* ANIChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDE2F3B920E35268005E1DE1 /* ANIChatViewController.swift */; };
+		CDE2F3BD20E35B33005E1DE1 /* ANIChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDE2F3BC20E35B33005E1DE1 /* ANIChatView.swift */; };
+		CDE2F3BF20E35CBF005E1DE1 /* ANIMyChatViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDE2F3BE20E35CBF005E1DE1 /* ANIMyChatViewCell.swift */; };
+		CDE2F3C120E35CCE005E1DE1 /* ANIOtherChatViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDE2F3C020E35CCE005E1DE1 /* ANIOtherChatViewCell.swift */; };
+		CDE2F40F20E464D5005E1DE1 /* FirebaseChatGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDE2F40E20E464D5005E1DE1 /* FirebaseChatGroup.swift */; };
+		CDE2F41120E4660E005E1DE1 /* FirebaseChatMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDE2F41020E4660E005E1DE1 /* FirebaseChatMessage.swift */; };
+		CDE2F41520E47070005E1DE1 /* ANIChatBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDE2F41420E47070005E1DE1 /* ANIChatBar.swift */; };
 		CDF7F168208D772300254A0F /* ANINotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF7F167208D772300254A0F /* ANINotificationManager.swift */; };
 		CDF7F16E208F2BEF00254A0F /* UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF7F16D208F2BEF00254A0F /* UIView.swift */; };
 		CDF7F171208F651E00254A0F /* ANIButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF7F170208F651E00254A0F /* ANIButtonView.swift */; };
@@ -250,6 +257,13 @@
 		CDDE4B6620E20D3E005762A1 /* ANIFollowUserViewContoller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIFollowUserViewContoller.swift; sourceTree = "<group>"; };
 		CDDE4B6B20E31247005762A1 /* ANIFollowUserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIFollowUserView.swift; sourceTree = "<group>"; };
 		CDDE4B6D20E31390005762A1 /* ANIFollowUserViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIFollowUserViewCell.swift; sourceTree = "<group>"; };
+		CDE2F3B920E35268005E1DE1 /* ANIChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIChatViewController.swift; sourceTree = "<group>"; };
+		CDE2F3BC20E35B33005E1DE1 /* ANIChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIChatView.swift; sourceTree = "<group>"; };
+		CDE2F3BE20E35CBF005E1DE1 /* ANIMyChatViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIMyChatViewCell.swift; sourceTree = "<group>"; };
+		CDE2F3C020E35CCE005E1DE1 /* ANIOtherChatViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIOtherChatViewCell.swift; sourceTree = "<group>"; };
+		CDE2F40E20E464D5005E1DE1 /* FirebaseChatGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseChatGroup.swift; sourceTree = "<group>"; };
+		CDE2F41020E4660E005E1DE1 /* FirebaseChatMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseChatMessage.swift; sourceTree = "<group>"; };
+		CDE2F41420E47070005E1DE1 /* ANIChatBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIChatBar.swift; sourceTree = "<group>"; };
 		CDF7F167208D772300254A0F /* ANINotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotificationManager.swift; sourceTree = "<group>"; };
 		CDF7F16D208F2BEF00254A0F /* UIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIView.swift; sourceTree = "<group>"; };
 		CDF7F170208F651E00254A0F /* ANIButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIButtonView.swift; sourceTree = "<group>"; };
@@ -834,6 +848,41 @@
 			path = Follow;
 			sourceTree = "<group>";
 		};
+		CDE2F3B820E3524F005E1DE1 /* ChatViewController */ = {
+			isa = PBXGroup;
+			children = (
+				CDE2F3B920E35268005E1DE1 /* ANIChatViewController.swift */,
+			);
+			path = ChatViewController;
+			sourceTree = "<group>";
+		};
+		CDE2F3BB20E35B20005E1DE1 /* ChatView */ = {
+			isa = PBXGroup;
+			children = (
+				CDE2F41220E4704D005E1DE1 /* Chat */,
+				CDE2F41320E47056005E1DE1 /* ChatBar */,
+			);
+			path = ChatView;
+			sourceTree = "<group>";
+		};
+		CDE2F41220E4704D005E1DE1 /* Chat */ = {
+			isa = PBXGroup;
+			children = (
+				CDE2F3BC20E35B33005E1DE1 /* ANIChatView.swift */,
+				CDE2F3BE20E35CBF005E1DE1 /* ANIMyChatViewCell.swift */,
+				CDE2F3C020E35CCE005E1DE1 /* ANIOtherChatViewCell.swift */,
+			);
+			path = Chat;
+			sourceTree = "<group>";
+		};
+		CDE2F41320E47056005E1DE1 /* ChatBar */ = {
+			isa = PBXGroup;
+			children = (
+				CDE2F41420E47070005E1DE1 /* ANIChatBar.swift */,
+			);
+			path = ChatBar;
+			sourceTree = "<group>";
+		};
 		CDF7F16F208F650600254A0F /* Button */ = {
 			isa = PBXGroup;
 			children = (
@@ -1189,6 +1238,8 @@
 				CD0BFF1320C7619600D5959B /* FirebaseStory.swift */,
 				CD0BFF1720C7AD9C00D5959B /* FirebaseQna.swift */,
 				CD0BFF1520C7807F00D5959B /* FirebaseComment.swift */,
+				CDE2F40E20E464D5005E1DE1 /* FirebaseChatGroup.swift */,
+				CDE2F41020E4660E005E1DE1 /* FirebaseChatMessage.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -1207,6 +1258,7 @@
 				CD2C414620A5A1FF00581267 /* ImageFilterViewController */,
 				CDDE4B6420E20D19005762A1 /* Follow */,
 				CDA97B5620B25F2000F46DA4 /* CommentViewController */,
+				CDE2F3B820E3524F005E1DE1 /* ChatViewController */,
 				CDA32A2120AA6041008A2AC1 /* ModalViewController */,
 			);
 			path = ViewController;
@@ -1234,6 +1286,7 @@
 				CDD0550420A5CF0100BEF482 /* ImageFilter */,
 				CDDE4B6A20E3122B005762A1 /* Follow */,
 				CDA97B5B20B263BE00F46DA4 /* CommentView */,
+				CDE2F3BB20E35B20005E1DE1 /* ChatView */,
 				CDA32A2420AA661A008A2AC1 /* ModalVIew */,
 				CDAFD76020DE1D2100AEDD83 /* RejectView */,
 				CDDE4B5720DF7636005762A1 /* NeedLoginView */,
@@ -1524,12 +1577,14 @@
 				F56634862075285D006CB81B /* ANIRecruitCategoryCell.swift in Sources */,
 				F57F7D4A2081F43F008A2645 /* ANINotiViewController.swift in Sources */,
 				F51D221220767F03009D1B26 /* UIColor.swift in Sources */,
+				CDE2F3BD20E35B33005E1DE1 /* ANIChatView.swift in Sources */,
 				F57F7D59208311C1008A2645 /* ANINotiView.swift in Sources */,
 				CDDE4B5C20E079B8005762A1 /* ANIListViewController.swift in Sources */,
 				F5C381FD2079F73F000BBB8C /* ANICommunityStoryCell.swift in Sources */,
 				F5F5300F20885E820076E938 /* ANIProfileTopCell.swift in Sources */,
 				F5B1EFC220725BDC000CFB0B /* ANITabBarController.swift in Sources */,
 				F53E87B72084608000B19A2F /* ANIUserSearchViewCell.swift in Sources */,
+				CDE2F40F20E464D5005E1DE1 /* FirebaseChatGroup.swift in Sources */,
 				CD6B675420A90F8A009BF63D /* ANIPlaceholderTextView.swift in Sources */,
 				CDA32A2720AA6652008A2AC1 /* ANIPopupPickerView.swift in Sources */,
 				F57F7D5D208313F0008A2645 /* Noti.swift in Sources */,
@@ -1575,6 +1630,7 @@
 				CDD0550E20A6B23B00BEF482 /* ANIImageFilterCell.swift in Sources */,
 				CDA32A2320AA6041008A2AC1 /* ANIPopupPickerViewController.swift in Sources */,
 				CDAFD75D20DC9EE800AEDD83 /* ANIOptionViewCell.swift in Sources */,
+				CDE2F3BA20E35268005E1DE1 /* ANIChatViewController.swift in Sources */,
 				CDDE4B6C20E31247005762A1 /* ANIFollowUserView.swift in Sources */,
 				F566348320752656006CB81B /* ANIRecruitCategoriesView.swift in Sources */,
 				CDAFD75720DC9B4D00AEDD83 /* ANIOptionViewController.swift in Sources */,
@@ -1599,8 +1655,11 @@
 				F53E87C82085F5FA00B19A2F /* ANIProfileMenuBarCell.swift in Sources */,
 				F57F7D572081FEBF008A2645 /* ANINotiMessageCell.swift in Sources */,
 				CDA97ACC20B000FF00F46DA4 /* ANIProfileEditFamilyView.swift in Sources */,
+				CDE2F41120E4660E005E1DE1 /* FirebaseChatMessage.swift in Sources */,
 				CDC6AE4820CF74C600A836F6 /* ANIOtherProfileCell.swift in Sources */,
+				CDE2F3BF20E35CBF005E1DE1 /* ANIMyChatViewCell.swift in Sources */,
 				F530AB1C207A45D900114E6B /* ANIStoryImagesCell.swift in Sources */,
+				CDE2F41520E47070005E1DE1 /* ANIChatBar.swift in Sources */,
 				CD6229DE20B64B9900E36875 /* ANISignUpView.swift in Sources */,
 				CDF7F16E208F2BEF00254A0F /* UIView.swift in Sources */,
 				CDDD04A420B269900094DBFA /* Comment.swift in Sources */,
@@ -1639,6 +1698,7 @@
 				F57F7D61208322D3008A2645 /* ANIMessageView.swift in Sources */,
 				CD9E52B120921EB400715F50 /* UIViewController.swift in Sources */,
 				CD033E4420D8D28D002FB770 /* ANISupportView.swift in Sources */,
+				CDE2F3C120E35CCE005E1DE1 /* ANIOtherChatViewCell.swift in Sources */,
 				CDA32A2F20ABD941008A2AC1 /* String.swift in Sources */,
 				F51D221020767E62009D1B26 /* ANIColor.swift in Sources */,
 				F5E9E221207692C60021D4CC /* ANIRecruitViewCell.swift in Sources */,
