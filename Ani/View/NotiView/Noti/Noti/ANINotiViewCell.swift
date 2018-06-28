@@ -8,13 +8,15 @@
 
 import UIKit
 
-class ANINotiViewCell: UICollectionViewCell {
+class ANINotiViewCell: UITableViewCell {
   
+  private let PROFILE_IMAGE_VIEW_HEIGHT: CGFloat = 50.0
   var profileImageView: UIImageView?
   var subTitleLabel: UILabel?
   
-  override init(frame: CGRect) {
-    super.init(frame: frame)
+  override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+    super.init(style: style, reuseIdentifier: reuseIdentifier)
+    
     setup()
   }
   
@@ -23,17 +25,19 @@ class ANINotiViewCell: UICollectionViewCell {
   }
   
   private func setup() {
+    self.selectionStyle = .none
     backgroundColor = .white
+    
     //profileImageView
     let profileImageView = UIImageView()
     profileImageView.backgroundColor = ANIColor.bg
+    profileImageView.layer.cornerRadius = PROFILE_IMAGE_VIEW_HEIGHT / 2
+    profileImageView.layer.masksToBounds = true
     addSubview(profileImageView)
     profileImageView.topToSuperview(offset: 10.0)
     profileImageView.leftToSuperview(offset: 10.0)
-    profileImageView.width(50.0)
-    profileImageView.height(50.0)
-    profileImageView.layer.cornerRadius = profileImageView.constraints[0].constant / 2
-    profileImageView.layer.masksToBounds = true
+    profileImageView.width(PROFILE_IMAGE_VIEW_HEIGHT)
+    profileImageView.height(PROFILE_IMAGE_VIEW_HEIGHT)
     self.profileImageView = profileImageView
 
     //subTitleLabel
@@ -46,5 +50,15 @@ class ANINotiViewCell: UICollectionViewCell {
     subTitleLabel.leftToRight(of: profileImageView, offset: 10.0)
     subTitleLabel.rightToSuperview(offset: 10.0)
     self.subTitleLabel = subTitleLabel
+    
+    //bottomSpace
+    let spaceView = UIView()
+    spaceView.backgroundColor = ANIColor.bg
+    addSubview(spaceView)
+    spaceView.topToBottom(of: profileImageView, offset: 10)
+    spaceView.leftToSuperview()
+    spaceView.rightToSuperview()
+    spaceView.height(10.0)
+    spaceView.bottomToSuperview()
   }
 }

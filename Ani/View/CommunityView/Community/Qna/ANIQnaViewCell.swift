@@ -20,16 +20,18 @@ protocol ANIQnaViewCellDelegate {
 class ANIQnaViewCell: UITableViewCell {
   private weak var tapArea: UIView?
   private weak var subTitleLabel: UILabel?
-  private weak var profileImageView: UIImageView?
-  private weak var userNameLabel: UILabel?
+  
   private var qnaImagesViewHeightConstraint: Constraint?
   private var qnaImagesViewHeight: CGFloat = 0.0
   private weak var qnaImagesView: ANIQnaImagesView?
+  
+  private weak var profileImageView: UIImageView?
+  private weak var userNameLabel: UILabel?
   private weak var loveButtonBG: UIView?
   private weak var loveButton: WCLShineButton?
   private weak var loveCountLabel: UILabel?
   private weak var commentButton: UIButton?
-  private var commentCountLabel: UILabel?
+  private weak var commentCountLabel: UILabel?
   
   var qna: FirebaseQna? {
     didSet {
