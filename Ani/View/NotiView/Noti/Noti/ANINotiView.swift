@@ -11,7 +11,8 @@ import UIKit
 
 class ANINotiView: UIView {
   
-  private weak var notiCollectionView: UICollectionView?
+  private weak var notiTableView: UITableView?
+  
   private var testNotiData = [Noti]()
   
   override init(frame: CGRect) {
@@ -30,20 +31,21 @@ class ANINotiView: UIView {
     if let windowUnrap = window {
       bottomSafeArea = windowUnrap.safeAreaInsets.bottom
     }
-    let flowLayout = UICollectionViewFlowLayout()
-    flowLayout.minimumLineSpacing = 10.0
-    let notiCollectionView = UICollectionView(frame: self.frame, collectionViewLayout: flowLayout)
+    
+    //notiTableView
+    let notiTableView = UITableView()
+    notiTableView.contentInset = UIEdgeInsets(top: ANICommunityViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: ANICommunityViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT + bottomSafeArea, right: 0)
+    notiTableView.scrollIndicatorInsets  = UIEdgeInsets(top: UIViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT + bottomSafeArea, right: 0)
     let id = NSStringFromClass(ANINotiViewCell.self)
-    notiCollectionView.register(ANINotiViewCell.self, forCellWithReuseIdentifier: id)
-    notiCollectionView.contentInset = UIEdgeInsets(top: ANICommunityViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: ANICommunityViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT + bottomSafeArea, right: 0)
-    notiCollectionView.scrollIndicatorInsets  = UIEdgeInsets(top: UIViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT + bottomSafeArea, right: 0)
-    notiCollectionView.backgroundColor = ANIColor.bg
-    notiCollectionView.alwaysBounceVertical = true
-    notiCollectionView.dataSource = self
-    notiCollectionView.delegate = self
-    addSubview(notiCollectionView)
-    notiCollectionView.edgesToSuperview()
-    self.notiCollectionView = notiCollectionView
+    notiTableView.register(ANINotiViewCell.self, forCellReuseIdentifier: id)
+    notiTableView.backgroundColor = ANIColor.bg
+    notiTableView.separatorStyle = .none
+    notiTableView.alwaysBounceVertical = true
+    notiTableView.dataSource = self
+    notiTableView.delegate = self
+    addSubview(notiTableView)
+    notiTableView.edgesToSuperview()
+    self.notiTableView = notiTableView
   }
   
   private func setupTestData() {
@@ -68,21 +70,26 @@ class ANINotiView: UIView {
   }
 }
 
-extension ANINotiView: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
-  func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+//MARK: UITableViewDataSource
+extension ANINotiView: UITableViewDataSource {
+  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     return testNotiData.count
   }
   
-  func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let id = NSStringFromClass(ANINotiViewCell.self)
-    let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! ANINotiViewCell
+    let cell = tableView.dequeueReusableCell(withIdentifier: id, for: indexPath) as! ANINotiViewCell
+    
     cell.profileImageView?.image = testNotiData[indexPath.item].user.profileImage
     cell.subTitleLabel?.text = "\(testNotiData[indexPath.item].user.name)さんが\(testNotiData[indexPath.item].subtitle)。"
+    
     return cell
   }
-  
-  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-    let size = CGSize(width: collectionView.frame.width, height: 70)
-    return size
+}
+
+//MARK: UITableViewDelegate
+extension ANINotiView: UITableViewDelegate {
+  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    
   }
 }

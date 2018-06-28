@@ -8,14 +8,16 @@
 
 import UIKit
 
-class ANIMessageViewCell: UICollectionViewCell {
+class ANIMessageViewCell: UITableViewCell {
   
+  private let PROFILE_IMAGE_VIEW_HEIGHT: CGFloat = 50.0
   var profileImageView: UIImageView?
   var userNameLabel: UILabel?
   var subTitleLabel: UILabel?
   
-  override init(frame: CGRect) {
-    super.init(frame: frame)
+  override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+    super.init(style: style, reuseIdentifier: reuseIdentifier)
+    
     setup()
   }
   
@@ -24,17 +26,19 @@ class ANIMessageViewCell: UICollectionViewCell {
   }
   
   private func setup() {
+    self.selectionStyle = .none
     backgroundColor = .white
+    
     //profileImageView
     let profileImageView = UIImageView()
     profileImageView.backgroundColor = ANIColor.bg
+    profileImageView.layer.cornerRadius = PROFILE_IMAGE_VIEW_HEIGHT / 2
+    profileImageView.layer.masksToBounds = true
     addSubview(profileImageView)
     profileImageView.topToSuperview(offset: 10.0)
     profileImageView.leftToSuperview(offset: 10.0)
-    profileImageView.width(50.0)
-    profileImageView.height(50.0)
-    profileImageView.layer.cornerRadius = profileImageView.constraints[0].constant / 2
-    profileImageView.layer.masksToBounds = true
+    profileImageView.width(PROFILE_IMAGE_VIEW_HEIGHT)
+    profileImageView.height(PROFILE_IMAGE_VIEW_HEIGHT)
     self.profileImageView = profileImageView
     
     //userNameLabel
@@ -56,5 +60,15 @@ class ANIMessageViewCell: UICollectionViewCell {
     subTitleLabel.left(to: userNameLabel)
     subTitleLabel.right(to: userNameLabel)
     self.subTitleLabel = subTitleLabel
+    
+    //bottomSpace
+    let spaceView = UIView()
+    spaceView.backgroundColor = ANIColor.bg
+    addSubview(spaceView)
+    spaceView.topToBottom(of: subTitleLabel, offset: 10)
+    spaceView.leftToSuperview()
+    spaceView.rightToSuperview()
+    spaceView.height(10.0)
+    spaceView.bottomToSuperview()
   }
 }

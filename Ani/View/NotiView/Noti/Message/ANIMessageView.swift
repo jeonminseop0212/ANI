@@ -10,7 +10,8 @@ import UIKit
 
 class ANIMessageView: UIView {
   
-  private weak var messageCollectionView: UICollectionView?
+  private weak var messageTableView: UITableView?
+  
   private var testMessageData = [Message]()
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -23,25 +24,27 @@ class ANIMessageView: UIView {
   }
   
   private func setup() {
+    self.backgroundColor = ANIColor.bg
     let window = UIApplication.shared.keyWindow
     var bottomSafeArea: CGFloat = 0.0
     if let windowUnrap = window {
       bottomSafeArea = windowUnrap.safeAreaInsets.bottom
     }
-    let flowLayout = UICollectionViewFlowLayout()
-    flowLayout.minimumLineSpacing = 10.0
-    let messageCollectionView = UICollectionView(frame: self.frame, collectionViewLayout: flowLayout)
+    
+    //messageTableView
+    let messageTableView = UITableView()
+    messageTableView.contentInset = UIEdgeInsets(top: ANICommunityViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT + bottomSafeArea, right: 0)
+    messageTableView.scrollIndicatorInsets  = UIEdgeInsets(top: UIViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT + bottomSafeArea, right: 0)
     let id = NSStringFromClass(ANIMessageViewCell.self)
-    messageCollectionView.register(ANIMessageViewCell.self, forCellWithReuseIdentifier: id)
-    messageCollectionView.contentInset = UIEdgeInsets(top: UIViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT + bottomSafeArea, right: 0)
-    messageCollectionView.scrollIndicatorInsets  = UIEdgeInsets(top: UIViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT + bottomSafeArea, right: 0)
-    messageCollectionView.backgroundColor = ANIColor.bg
-    messageCollectionView.alwaysBounceVertical = true
-    messageCollectionView.dataSource = self
-    messageCollectionView.delegate = self
-    addSubview(messageCollectionView)
-    messageCollectionView.edgesToSuperview()
-    self.messageCollectionView = messageCollectionView
+    messageTableView.register(ANIMessageViewCell.self, forCellReuseIdentifier: id)
+    messageTableView.backgroundColor = ANIColor.bg
+    messageTableView.separatorStyle = .none
+    messageTableView.alwaysBounceVertical = true
+    messageTableView.dataSource = self
+    messageTableView.delegate = self
+    addSubview(messageTableView)
+    messageTableView.edgesToSuperview()
+    self.messageTableView = messageTableView
   }
   
   private func setupTestData() {
@@ -66,22 +69,27 @@ class ANIMessageView: UIView {
   }
 }
 
-extension ANIMessageView: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
-  func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+//MARK: UITableViewDataSource
+extension ANIMessageView: UITableViewDataSource {
+  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     return testMessageData.count
   }
   
-  func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let id = NSStringFromClass(ANIMessageViewCell.self)
-    let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! ANIMessageViewCell
+    let cell = tableView.dequeueReusableCell(withIdentifier: id, for: indexPath) as! ANIMessageViewCell
+    
     cell.profileImageView?.image = testMessageData[indexPath.item].user.profileImage
     cell.userNameLabel?.text = testMessageData[indexPath.item].user.name
     cell.subTitleLabel?.text = testMessageData[indexPath.item].subtitle
+    
     return cell
   }
-  
-  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-    let size = CGSize(width: collectionView.frame.width, height: 80)
-    return size
+}
+
+//MARK: UITableViewDelegate
+extension ANIMessageView: UITableViewDelegate {
+  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    
   }
 }
