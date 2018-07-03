@@ -39,6 +39,9 @@ class ANIMessageViewCell: UITableViewCell {
   private func setup() {
     self.selectionStyle = .none
     backgroundColor = .white
+    self.isUserInteractionEnabled = true
+    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(cellTapped))
+    self.addGestureRecognizer(tapGesture)
     
     //profileImageView
     let profileImageView = UIImageView()
@@ -154,5 +157,11 @@ class ANIMessageViewCell: UITableViewCell {
         }
       }
     }
+  }
+  
+  @objc private func cellTapped() {
+    guard let user = self.user else { return }
+    
+    ANINotificationManager.postMessageCellTapped(user: user)
   }
 }

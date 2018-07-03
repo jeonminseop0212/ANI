@@ -104,4 +104,9 @@ class ANINotificationManager: NSObject {
     let name = NSNotification.Name.UIApplicationWillEnterForeground
     self.receive(notificationName: name, observer: observer, selector: selector)
   }
+  
+  //MARK: message cell tapped
+  private static let N_MESSAGE_CELL_TAPPED = "N_MESSAGE_CELL_TAPPED"
+  static func postMessageCellTapped(user: FirebaseUser) { self.post(name: N_MESSAGE_CELL_TAPPED, object: user, userInfo:nil) }
+  static func receive(messageCellTapped observer:Any, selector:Selector) { receive(name: N_MESSAGE_CELL_TAPPED, observer: observer, selector: selector) }
 }
