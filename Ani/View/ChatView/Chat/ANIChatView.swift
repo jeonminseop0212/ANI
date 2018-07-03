@@ -68,12 +68,19 @@ class ANIChatView: UIView {
             guard let chatTableView = self.chatTableView else { return }
             
             chatTableView.reloadData()
+            self.scrollToBottom()
           }
         } catch let error {
           print(error)
         }
       }
     }
+  }
+  
+  func scrollToBottom() {
+    guard let chatTableView = self.chatTableView else { return }
+    
+    chatTableView.scrollToRow(at: [0, messages.count - 1], at: .bottom, animated: false)
   }
 }
 

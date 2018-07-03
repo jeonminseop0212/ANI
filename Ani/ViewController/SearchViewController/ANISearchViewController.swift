@@ -59,7 +59,6 @@ class ANISearchViewController: UIViewController {
     let searchBar = UISearchBar()
     searchBar.placeholder = "Search"
     searchBar.textField?.backgroundColor = ANIColor.lightGray
-    //    searchBar.showsCancelButton = true
     searchBar.delegate = self
     searchBar.backgroundImage = UIImage()
     myNavigationBar.addSubview(searchBar)
