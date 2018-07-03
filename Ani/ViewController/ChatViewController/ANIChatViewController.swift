@@ -45,6 +45,8 @@ class ANIChatViewController: UIViewController {
     }
   }
   
+  private var isHaveGroup: Bool = false
+  
   var delegate: ANIChatViewControllerDelegate?
   
   override func viewDidLoad() {
@@ -150,6 +152,7 @@ class ANIChatViewController: UIViewController {
             
             if memberIdsDic.keys.contains(userId) {
               self.chatGroupId = chatGroupId
+              self.isHaveGroup = true
             } else if index == (chatGroupIds.count - 1), self.chatGroupId == nil {
               self.createGroup()
             }
@@ -196,6 +199,8 @@ class ANIChatViewController: UIViewController {
       
       if snapshot == "" {
         databaseRef.child(KEY_CHAT_GROUPS).child(chatGroupId).removeValue()
+        
+        self.chatGroupId = nil
       }
     }
   }
@@ -253,11 +258,15 @@ class ANIChatViewController: UIViewController {
   }
   
   @objc private func willResignActivity() {
-    removeGroup()
+    if !isHaveGroup {
+      removeGroup()
+    }
   }
   
   @objc private func willEnterForeground() {
-    checkGroup()
+    if !isHaveGroup {
+      checkGroup()
+    }
   }
   
   //MARK: Action

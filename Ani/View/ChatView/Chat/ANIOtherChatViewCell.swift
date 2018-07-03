@@ -16,11 +16,15 @@ class ANIOtherChatViewCell: UITableViewCell {
   private weak var base: UIView?
   private weak var messageLabel: UILabel?
   
-  var message: FirebaseChatMessage?
+  var message: FirebaseChatMessage? {
+    didSet {
+      reloadLayout()
+    }
+  }
   
   var user: FirebaseUser? {
     didSet {
-      reloadLayout()
+      reloadUserLayout()
     }
   }
   
@@ -42,10 +46,11 @@ class ANIOtherChatViewCell: UITableViewCell {
     profileImageView.layer.cornerRadius = PROFILE_IMAGE_VIEW_HEIGHT / 2
     profileImageView.layer.masksToBounds = true
     profileImageView.isUserInteractionEnabled = true
+    profileImageView.backgroundColor = ANIColor.bg
     let tapGesture = UITapGestureRecognizer(target: self, action: #selector(profileTapped))
     profileImageView.addGestureRecognizer(tapGesture)
     addSubview(profileImageView)
-    profileImageView.leftToSuperview(offset: 15.0)
+    profileImageView.leftToSuperview(offset: 10.0)
     profileImageView.topToSuperview(offset: 5.0)
     profileImageView.width(PROFILE_IMAGE_VIEW_HEIGHT)
     profileImageView.height(PROFILE_IMAGE_VIEW_HEIGHT)
@@ -57,10 +62,11 @@ class ANIOtherChatViewCell: UITableViewCell {
     base.layer.cornerRadius = 10.0
     base.layer.masksToBounds = true
     addSubview(base)
+    let width = UIScreen.main.bounds.width * 0.6
     base.top(to: profileImageView)
     base.leftToRight(of: profileImageView, offset: 10.0)
-    base.rightToSuperview(offset: 100.0)
-    base.bottomToSuperview(offset: 5.0)
+    base.width(min: 0.0, max: width)
+    base.bottomToSuperview(offset: -5.0)
     self.base = base
     
     //messageLabel
@@ -75,15 +81,19 @@ class ANIOtherChatViewCell: UITableViewCell {
   }
   
   private func reloadLayout() {
-    guard let profileImageView = self.profileImageView,
-          let messageLabel = self.messageLabel,
+    guard let messageLabel = self.messageLabel,
           let message = self.message,
-          let text = message.message,
+          let text = message.message else { return }
+    
+    messageLabel.text = text
+  }
+  
+  private func reloadUserLayout() {
+    guard let profileImageView = self.profileImageView,
           let user = self.user,
           let profileImageUrl = user.profileImageUrl else { return }
     
     profileImageView.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
-    messageLabel.text = text
   }
   
   @objc private func profileTapped() {

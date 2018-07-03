@@ -38,8 +38,11 @@ class ANIMyChatViewCell: UITableViewCell {
     base.layer.cornerRadius = 10.0
     base.layer.masksToBounds = true
     addSubview(base)
-    let baseInsets = UIEdgeInsets(top: 5.0, left: 100.0, bottom: 5.0, right: -15.0)
-    base.edgesToSuperview(insets: baseInsets)
+    let width = UIScreen.main.bounds.width * 0.7
+    base.topToSuperview(offset: 5.0)
+    base.rightToSuperview(offset: 10.0)
+    base.bottomToSuperview(offset: -5.0)
+    base.width(min: 0.0, max: width)
     self.base = base
     
     //messageLabel
