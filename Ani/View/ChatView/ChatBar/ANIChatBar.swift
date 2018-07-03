@@ -18,9 +18,11 @@ class ANIChatBar: UIView {
   private weak var chatTextViewBG: UIView?
   private weak var chatTextView: GrowingTextView?
   
-  private weak var chatContributionButton: UIButton?
+  private weak var postMessageButton: UIButton?
   
   var chatGroupId: String?
+  
+  var user: FirebaseUser?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -60,20 +62,20 @@ class ANIChatBar: UIView {
     chatTextViewBG.edgesToSuperview(excluding: .left, insets: bgInsets)
     self.chatTextViewBG = chatTextViewBG
     
-    //chatContributionButton
-    let chatContributionButton = UIButton()
-    chatContributionButton.setTitle("送信する", for: .normal)
-    chatContributionButton.setTitleColor(ANIColor.green, for: .normal)
-    chatContributionButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 15.0)
-    chatContributionButton.addTarget(self, action: #selector(contribute), for: .touchUpInside)
-    chatContributionButton.isEnabled = false
-    chatContributionButton.alpha = 0.3
-    chatTextViewBG.addSubview(chatContributionButton)
-    chatContributionButton.rightToSuperview(offset: 10.0)
-    chatContributionButton.centerY(to: profileImageView)
-    chatContributionButton.height(to: profileImageView)
-    chatContributionButton.width(60.0)
-    self.chatContributionButton = chatContributionButton
+    //postMessageButton
+    let postMessageButton = UIButton()
+    postMessageButton.setTitle("送信する", for: .normal)
+    postMessageButton.setTitleColor(ANIColor.green, for: .normal)
+    postMessageButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 15.0)
+    postMessageButton.addTarget(self, action: #selector(postMessage), for: .touchUpInside)
+    postMessageButton.isEnabled = false
+    postMessageButton.alpha = 0.3
+    chatTextViewBG.addSubview(postMessageButton)
+    postMessageButton.rightToSuperview(offset: 10.0)
+    postMessageButton.centerY(to: profileImageView)
+    postMessageButton.height(to: profileImageView)
+    postMessageButton.width(60.0)
+    self.postMessageButton = postMessageButton
     
     //chattTextView
     let chatTextView = GrowingTextView()
@@ -89,7 +91,7 @@ class ANIChatBar: UIView {
     chatTextViewBG.addSubview(chatTextView)
     let insets = UIEdgeInsets(top: 2.5, left: 5.0, bottom: 2.5, right: -5.0)
     chatTextView.edgesToSuperview(excluding: .right,insets: insets)
-    chatTextView.rightToLeft(of: chatContributionButton, offset: -5.0)
+    chatTextView.rightToLeft(of: postMessageButton, offset: -5.0)
     self.chatTextView = chatTextView
   }
   
@@ -112,38 +114,77 @@ class ANIChatBar: UIView {
   }
   
   private func updateCommentContributionButton(text: String) {
-    guard let chatContributionButton = self.chatContributionButton else { return }
+    guard let postMessageButton = self.postMessageButton else { return }
     
     if text.count > 0 {
-      chatContributionButton.isEnabled = true
-      chatContributionButton.alpha = 1.0
+      postMessageButton.isEnabled = true
+      postMessageButton.alpha = 1.0
     } else {
-      chatContributionButton.isEnabled = false
-      chatContributionButton.alpha = 0.3
+      postMessageButton.isEnabled = false
+      postMessageButton.alpha = 0.3
+    }
+  }
+  
+  private func updateChatGroupIds() {
+    guard let chatGroupId = self.chatGroupId else { return }
+    
+    let databaseRef = Database.database().reference()
+
+    DispatchQueue.global().async {
+      if let currentUserUid = ANISessionManager.shared.currentUserUid {
+        let detabaseUsersRef = databaseRef.child(KEY_USERS).child(currentUserUid).child(KEY_CHAT_GROUP_IDS)
+        let date = ANIFunction.shared.getToday()
+        let value: [String: String] = [chatGroupId: date]
+        detabaseUsersRef.updateChildValues(value)
+      }
+      
+      if let user = self.user, let userId = user.uid {
+        let detabaseUsersRef = databaseRef.child(KEY_USERS).child(userId).child(KEY_CHAT_GROUP_IDS)
+        let date = ANIFunction.shared.getToday()
+        let value: [String: String] = [chatGroupId: date]
+        detabaseUsersRef.updateChildValues(value)
+      }
     }
   }
   
   //MARK: action
-  @objc private func contribute() {
+  @objc private func postMessage() {
     guard let chatTextView = self.chatTextView,
           let text = chatTextView.text,
           let currentuserUid = ANISessionManager.shared.currentUserUid,
+          let user = self.user,
+          let userUid = user.uid,
           let chatGroupId = self.chatGroupId else { return }
 
     let date = ANIFunction.shared.getToday()
     let message = FirebaseChatMessage(userId: currentuserUid, message: text, date: date)
+    
+    if let chatGroupIds = user.chatGroupIds {
+      if !chatGroupIds.keys.contains(chatGroupId) {
+        updateChatGroupIds()
+      }
+    } else {
+      updateChatGroupIds()
+    }
 
     do {
-      if let data = try FirebaseEncoder().encode(message) as? [String : AnyObject] {
-        let detabaseRef = Database.database().reference()
+      if let message = try FirebaseEncoder().encode(message) as? [String : AnyObject] {
+        let databaseRef = Database.database().reference()
 
         DispatchQueue.global().async {
-          let databaseMessageRef = detabaseRef.child(KEY_CHAT_MESSAGES).child(chatGroupId).childByAutoId()
-          databaseMessageRef.updateChildValues(data)
+          let databaseMessageRef = databaseRef.child(KEY_CHAT_MESSAGES).child(chatGroupId).childByAutoId()
+          databaseMessageRef.updateChildValues(message)
 
-          let detabaseGroupRef = detabaseRef.child(KEY_CHAT_GROUPS).child(chatGroupId)
-          let value: [String: String] = [KEY_CHAT_UPDATE_DATE: date, KEY_CHAT_LAST_MESSAGE: text]
-          detabaseGroupRef.updateChildValues(value)
+          let detabaseGroupRef = databaseRef.child(KEY_CHAT_GROUPS).child(chatGroupId)
+          let groupValue: [String: String] = [KEY_CHAT_UPDATE_DATE: date, KEY_CHAT_LAST_MESSAGE: text]
+          detabaseGroupRef.updateChildValues(groupValue)
+          
+          let databaseCurrentUserRef = databaseRef.child(KEY_USERS).child(currentuserUid).child(KEY_CHAT_GROUP_IDS)
+          let userValue: [String: String] = [chatGroupId: date]
+          databaseCurrentUserRef.updateChildValues(userValue)
+          
+          let databaseUserRef = databaseRef.child(KEY_USERS).child(userUid).child(KEY_CHAT_GROUP_IDS)
+          databaseUserRef.updateChildValues(userValue)
         }
       }
     } catch let error {
@@ -151,7 +192,6 @@ class ANIChatBar: UIView {
     }
 
     chatTextView.text = ""
-    chatTextView.endEditing(true)
     updateCommentContributionButton(text: chatTextView.text)
   }
 }

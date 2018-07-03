@@ -73,7 +73,6 @@
 		CDD0550C20A5D29900BEF482 /* ANIImageFilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD0550B20A5D29900BEF482 /* ANIImageFilterView.swift */; };
 		CDD0550E20A6B23B00BEF482 /* ANIImageFilterCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD0550D20A6B23B00BEF482 /* ANIImageFilterCell.swift */; };
 		CDD0551020A6C64300BEF482 /* ANIFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD0550F20A6C64300BEF482 /* ANIFilter.swift */; };
-		CDDD04A420B269900094DBFA /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDD04A320B269900094DBFA /* Comment.swift */; };
 		CDDD04A620B26CD50094DBFA /* ANICommentContentCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDD04A520B26CD50094DBFA /* ANICommentContentCell.swift */; };
 		CDDD04A820B271090094DBFA /* ANICommentCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDD04A720B271090094DBFA /* ANICommentCell.swift */; };
 		CDDD04AC20B3B0AA0094DBFA /* ANICommentBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDD04AB20B3B0AA0094DBFA /* ANICommentBar.swift */; };
@@ -125,7 +124,6 @@
 		F57F7D5D208313F0008A2645 /* Noti.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57F7D5C208313F0008A2645 /* Noti.swift */; };
 		F57F7D5F208314DF008A2645 /* ANINotiViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57F7D5E208314DF008A2645 /* ANINotiViewCell.swift */; };
 		F57F7D61208322D3008A2645 /* ANIMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57F7D60208322D3008A2645 /* ANIMessageView.swift */; };
-		F57F7D63208323F9008A2645 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57F7D62208323F9008A2645 /* Message.swift */; };
 		F57F7D652083250D008A2645 /* ANIMessageViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57F7D642083250D008A2645 /* ANIMessageViewCell.swift */; };
 		F57F7D8820844A90008A2645 /* ANISearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57F7D8720844A8F008A2645 /* ANISearchViewController.swift */; };
 		F57F7D8C20844C41008A2645 /* ANISearchCategoriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57F7D8B20844C41008A2645 /* ANISearchCategoriesView.swift */; };
@@ -241,7 +239,6 @@
 		CDD0550B20A5D29900BEF482 /* ANIImageFilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIImageFilterView.swift; sourceTree = "<group>"; };
 		CDD0550D20A6B23B00BEF482 /* ANIImageFilterCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIImageFilterCell.swift; sourceTree = "<group>"; };
 		CDD0550F20A6C64300BEF482 /* ANIFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIFilter.swift; sourceTree = "<group>"; };
-		CDDD04A320B269900094DBFA /* Comment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Comment.swift; sourceTree = "<group>"; };
 		CDDD04A520B26CD50094DBFA /* ANICommentContentCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommentContentCell.swift; sourceTree = "<group>"; };
 		CDDD04A720B271090094DBFA /* ANICommentCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommentCell.swift; sourceTree = "<group>"; };
 		CDDD04AB20B3B0AA0094DBFA /* ANICommentBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommentBar.swift; sourceTree = "<group>"; };
@@ -295,7 +292,6 @@
 		F57F7D5C208313F0008A2645 /* Noti.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Noti.swift; sourceTree = "<group>"; };
 		F57F7D5E208314DF008A2645 /* ANINotiViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotiViewCell.swift; sourceTree = "<group>"; };
 		F57F7D60208322D3008A2645 /* ANIMessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIMessageView.swift; sourceTree = "<group>"; };
-		F57F7D62208323F9008A2645 /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 		F57F7D642083250D008A2645 /* ANIMessageViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIMessageViewCell.swift; sourceTree = "<group>"; };
 		F57F7D8720844A8F008A2645 /* ANISearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANISearchViewController.swift; sourceTree = "<group>"; };
 		F57F7D8B20844C41008A2645 /* ANISearchCategoriesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANISearchCategoriesView.swift; sourceTree = "<group>"; };
@@ -1231,8 +1227,6 @@
 				CDA32A2C20ABCE5F008A2AC1 /* RecruitInfo.swift */,
 				F5E9E22520769AD60021D4CC /* User.swift */,
 				F57F7D5C208313F0008A2645 /* Noti.swift */,
-				F57F7D62208323F9008A2645 /* Message.swift */,
-				CDDD04A320B269900094DBFA /* Comment.swift */,
 				CD0FAD0920BF8DFD00D8CD27 /* FirebaseUser.swift */,
 				CD0BFF1120C624EC00D5959B /* FirebaseRecruit.swift */,
 				CD0BFF1320C7619600D5959B /* FirebaseStory.swift */,
@@ -1590,7 +1584,6 @@
 				F57F7D5D208313F0008A2645 /* Noti.swift in Sources */,
 				CDDD04AC20B3B0AA0094DBFA /* ANICommentBar.swift in Sources */,
 				CDD0550620A5CF2200BEF482 /* ANIImageFilterPreviewView.swift in Sources */,
-				F57F7D63208323F9008A2645 /* Message.swift in Sources */,
 				CDDD04C520B53C870094DBFA /* ANILoginView.swift in Sources */,
 				CDA97AC620AFF34C00F46DA4 /* ANIProfileEditViewController.swift in Sources */,
 				CD92792220C0DCB400B1F006 /* ANIKey.swift in Sources */,
@@ -1662,7 +1655,6 @@
 				CDE2F41520E47070005E1DE1 /* ANIChatBar.swift in Sources */,
 				CD6229DE20B64B9900E36875 /* ANISignUpView.swift in Sources */,
 				CDF7F16E208F2BEF00254A0F /* UIView.swift in Sources */,
-				CDDD04A420B269900094DBFA /* Comment.swift in Sources */,
 				CDDE4B5920DF7658005762A1 /* ANINeedLoginView.swift in Sources */,
 				CDA32A7920AE6B17008A2AC1 /* ANIQnaImagesView.swift in Sources */,
 				CDD0550820A5D07600BEF482 /* ANIImageFilterPreviewCell.swift in Sources */,

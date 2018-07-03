@@ -10,15 +10,14 @@ import UIKit
 import TinyConstraints
 
 class ANiNotiMenuBar: UIView {
-  var menuCollectionView: UICollectionView?
-  private let menus = ["NOTI", "MESSAGE"]
+  weak var menuCollectionView: UICollectionView?
+  private let menus = ["通知", "メッセージ"]
   var horizontalBarleftConstraint:Constraint?
   var aniNotiViewController: ANINotiViewController?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()
-    setupHorizontalBar()
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -26,6 +25,7 @@ class ANiNotiMenuBar: UIView {
   }
   
   private func setup() {
+    //menuCollectionView
     self.backgroundColor = .white
     let flowlayout = UICollectionViewFlowLayout()
     let collectionView = UICollectionView(frame: self.frame, collectionViewLayout: flowlayout)
@@ -42,15 +42,14 @@ class ANiNotiMenuBar: UIView {
     collectionView.rightToSuperview()
     collectionView.height(ANICommunityViewController.NAVIGATION_BAR_HEIGHT)
     self.menuCollectionView = collectionView
-  }
-  
-  private func setupHorizontalBar() {
+    
+    //horizontalBar
     let horizontalBar = UIView()
     horizontalBar.backgroundColor = ANIColor.green
     addSubview(horizontalBar)
     horizontalBarleftConstraint = horizontalBar.leftToSuperview()
     horizontalBar.widthToSuperview(multiplier: 1/2)
-    horizontalBar.height(3.0)
+    horizontalBar.height(2.0)
     horizontalBar.bottomToSuperview()
   }
 }

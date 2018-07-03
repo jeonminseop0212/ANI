@@ -92,4 +92,16 @@ class ANINotificationManager: NSObject {
   private static let N_LOGIN = "N_LOGIN"
   static func postLogin() { self.post(name: N_LOGIN, object: nil, userInfo:nil) }
   static func receive(login observer:Any, selector:Selector) { receive(name: N_LOGIN, observer: observer, selector: selector) }
+  
+  //MARK: will resignActive
+  static func receive(applicationWillResignActive observer:Any, selector:Selector) {
+    let name = NSNotification.Name.UIApplicationWillResignActive
+    self.receive(notificationName: name, observer: observer, selector: selector)
+  }
+  
+  //MARK: enter background
+  static func receive(applicationWillEnterForeground observer:Any, selector:Selector) {
+    let name = NSNotification.Name.UIApplicationWillEnterForeground
+    self.receive(notificationName: name, observer: observer, selector: selector)
+  }
 }

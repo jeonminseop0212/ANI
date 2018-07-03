@@ -41,12 +41,27 @@ class ANIChatViewController: UIViewController {
       chatView.chatGroupId = chatGroupId
       chatView.user = user
       chatBar.chatGroupId = chatGroupId
+      chatBar.user = user
     }
   }
   
   var delegate: ANIChatViewControllerDelegate?
   
   override func viewDidLoad() {
+    setup()
+  }
+  
+  override func viewDidAppear(_ animated: Bool) {
+    UIApplication.shared.statusBarStyle = .default
+    setupNotification()
+  }
+  
+  override func viewWillDisappear(_ animated: Bool) {
+    removeNotifications()
+    removeGroup()
+  }
+    
+  private func setup() {
     //basic
     self.view.backgroundColor = .white
     self.navigationController?.setNavigationBarHidden(true, animated: false)
@@ -95,6 +110,10 @@ class ANIChatViewController: UIViewController {
     
     //chatBar
     let chatBar = ANIChatBar()
+    if let chatGroupId = self.chatGroupId {
+      chatBar.user = user
+      chatBar.chatGroupId = chatGroupId
+    }
     self.view.addSubview(chatBar)
     chatBar.leftToSuperview()
     chatBar.rightToSuperview()
@@ -104,6 +123,10 @@ class ANIChatViewController: UIViewController {
     
     //chatView
     let chatView = ANIChatView()
+    if let chatGroupId = self.chatGroupId {
+      chatView.user = user
+      chatView.chatGroupId = chatGroupId
+    }
     self.view.addSubview(chatView)
     chatView.topToBottom(of: myNavigationBar)
     chatView.leftToSuperview()
@@ -112,18 +135,8 @@ class ANIChatViewController: UIViewController {
     self.chatView = chatView
   }
   
-  override func viewDidAppear(_ animated: Bool) {
-    UIApplication.shared.statusBarStyle = .default
-    setupNotification()
-  }
-  
-  override func viewWillDisappear(_ animated: Bool) {
-    removeNotifications()
-  }
-  
   private func checkGroup() {
     guard let currentUser = ANISessionManager.shared.currentUser,
-          let currentUserUid = ANISessionManager.shared.currentUserUid,
           let user = self.user,
           let userId = user.uid else { return }
     
@@ -131,16 +144,14 @@ class ANIChatViewController: UIViewController {
       let databaseRef = Database.database().reference()
       
       DispatchQueue.global().async {
-        for chatGroupId in chatGroupIds {
-          databaseRef.child(KEY_CHAT_GROUPS).child(chatGroupId.key).child(KEY_CHAT_MEMBER_IDS).observeSingleEvent(of: .value) { (snapshot) in
+        for (index, chatGroupId) in chatGroupIds.keys.enumerated() {
+          databaseRef.child(KEY_CHAT_GROUPS).child(chatGroupId).child(KEY_CHAT_MEMBER_IDS).observeSingleEvent(of: .value) { (snapshot) in
             guard let memberIdsDic = snapshot.value as? [String: Bool] else { return }
             
-            for memberId in memberIdsDic.keys {
-              if memberId == userId {
-                self.chatGroupId = chatGroupId.key
-              } else if memberId != currentUserUid {
-                self.createGroup()
-              }
+            if memberIdsDic.keys.contains(userId) {
+              self.chatGroupId = chatGroupId
+            } else if index == (chatGroupIds.count - 1), self.chatGroupId == nil {
+              self.createGroup()
             }
           }
         }
@@ -160,31 +171,31 @@ class ANIChatViewController: UIViewController {
     let id = databaseChatGroupRef.key
     let memberIds = [userId: true, currentUserUid: true]
     let date = ANIFunction.shared.getToday()
-    let group = FirebaseChatGroup(groupId:id, memberIds: memberIds, updateDate: date, lastMessage: nil)
+    let group = FirebaseChatGroup(groupId:id, memberIds: memberIds, updateDate: date, lastMessage: "")
     
     DispatchQueue.global().async {
       do {
         if let data = try FirebaseEncoder().encode(group) as? [String : AnyObject] {
           databaseChatGroupRef.updateChildValues(data)
           
-          do {
-            if let currentUserUid = ANISessionManager.shared.currentUserUid {
-              let detabaseUsersRef = databaseRef.child(KEY_USERS).child(currentUserUid).child(KEY_CHAT_GROUP_IDS)
-              let value: [String: Bool] = [id: true]
-              detabaseUsersRef.updateChildValues(value)
-            }
-          }
-          
-          do {
-            if let user = self.user, let userId = user.uid {
-              let detabaseUsersRef = databaseRef.child(KEY_USERS).child(userId).child(KEY_CHAT_GROUP_IDS)
-              let value: [String: Bool] = [id: true]
-              detabaseUsersRef.updateChildValues(value)
-            }
-          }
+          self.chatGroupId = id
         }
       } catch let error {
         print(error)
+      }
+    }
+  }
+  
+  private func removeGroup() {
+    guard let chatGroupId = self.chatGroupId else { return }
+    
+    let databaseRef = Database.database().reference()
+    
+    databaseRef.child(KEY_CHAT_GROUPS).child(chatGroupId).child(KEY_CHAT_LAST_MESSAGE).observeSingleEvent(of: .value) { (snapshot) in
+      guard let snapshot = snapshot.value as? String else { return }
+      
+      if snapshot == "" {
+        databaseRef.child(KEY_CHAT_GROUPS).child(chatGroupId).removeValue()
       }
     }
   }
@@ -194,6 +205,8 @@ class ANIChatViewController: UIViewController {
     ANINotificationManager.receive(keyboardWillChangeFrame: self, selector: #selector(keyboardWillChangeFrame))
     ANINotificationManager.receive(keyboardWillHide: self, selector: #selector(keyboardWillHide))
     ANINotificationManager.receive(profileImageViewTapped: self, selector: #selector(pushOtherProfile))
+    ANINotificationManager.receive(applicationWillResignActive: self, selector: #selector(willResignActivity))
+    ANINotificationManager.receive(applicationWillEnterForeground: self, selector: #selector(willEnterForeground))
   }
   
   private func removeNotifications() {
@@ -237,6 +250,14 @@ class ANIChatViewController: UIViewController {
     otherProfileViewController.hidesBottomBarWhenPushed = true
     otherProfileViewController.userId = userId
     self.navigationController?.pushViewController(otherProfileViewController, animated: true)
+  }
+  
+  @objc private func willResignActivity() {
+    removeGroup()
+  }
+  
+  @objc private func willEnterForeground() {
+    checkGroup()
   }
   
   //MARK: Action
