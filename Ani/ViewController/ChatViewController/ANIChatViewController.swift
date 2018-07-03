@@ -47,6 +47,8 @@ class ANIChatViewController: UIViewController {
   
   private var isHaveGroup: Bool = false
   
+  var isPush: Bool = false
+  
   var delegate: ANIChatViewControllerDelegate?
   
   override func viewDidLoad() {
@@ -88,8 +90,13 @@ class ANIChatViewController: UIViewController {
     
     //backButton
     let backButton = UIButton()
-    let backButtonImage = UIImage(named: "dismissButton")?.withRenderingMode(.alwaysTemplate)
-    backButton.setImage(backButtonImage, for: .normal)
+    if isPush {
+      let backButtonImage = UIImage(named: "backButton")?.withRenderingMode(.alwaysTemplate)
+      backButton.setImage(backButtonImage, for: .normal)
+    } else {
+      let backButtonImage = UIImage(named: "dismissButton")?.withRenderingMode(.alwaysTemplate)
+      backButton.setImage(backButtonImage, for: .normal)
+    }
     backButton.tintColor = ANIColor.dark
     backButton.addTarget(self, action: #selector(back), for: .touchUpInside)
     myNavigationBase.addSubview(backButton)
@@ -273,6 +280,11 @@ class ANIChatViewController: UIViewController {
   @objc private func back() {
     self.view.endEditing(true)
     self.delegate?.chatViewWillDismiss()
-    self.dismiss(animated: true)
+    
+    if isPush {
+      self.navigationController?.popViewController(animated: true)
+    } else {
+      self.dismiss(animated: true)
+    }
   }
 }

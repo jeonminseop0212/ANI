@@ -25,6 +25,11 @@ class ANINotiViewController: UIViewController {
     UIApplication.shared.statusBarStyle = .default
     
     showNeedLoginView()
+    setupNotifications()
+  }
+  
+  override func viewWillDisappear(_ animated: Bool) {
+    removeNotifications()
   }
   
   private func setup() {
@@ -74,6 +79,14 @@ class ANINotiViewController: UIViewController {
     self.needLoginView = needLoginView
   }
   
+  private func setupNotifications() {
+    ANINotificationManager.receive(messageCellTapped: self, selector: #selector(pushChat))
+  }
+  
+  private func removeNotifications() {
+    ANINotificationManager.remove(self)
+  }
+  
   func scrollToMenuIndex(menuIndex: Int) {
     guard let containerCollectionView = self.containerCollectionView else { return }
     let indexPath = IndexPath(item: menuIndex, section: 0)
@@ -88,6 +101,16 @@ class ANINotiViewController: UIViewController {
     } else {
       needLoginView.isHidden = true
     }
+  }
+  
+  @objc func pushChat(_ notification: NSNotification) {
+    guard let user = notification.object as? FirebaseUser else { return }
+    
+    let chatViewController = ANIChatViewController()
+    chatViewController.user = user
+    chatViewController.isPush = true
+    chatViewController.hidesBottomBarWhenPushed = true
+    self.navigationController?.pushViewController(chatViewController, animated: true)
   }
 }
 

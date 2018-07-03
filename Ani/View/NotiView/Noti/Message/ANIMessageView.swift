@@ -47,7 +47,6 @@ class ANIMessageView: UIView {
     messageTableView.separatorStyle = .none
     messageTableView.alwaysBounceVertical = true
     messageTableView.dataSource = self
-    messageTableView.delegate = self
     messageTableView.alpha = 0.0
     addSubview(messageTableView)
     messageTableView.edgesToSuperview()
@@ -129,12 +128,5 @@ extension ANIMessageView: UITableViewDataSource {
     cell.observeGroup()
     
     return cell
-  }
-}
-
-//MARK: UITableViewDelegate
-extension ANIMessageView: UITableViewDelegate {
-  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    print(indexPath.row)
   }
 }

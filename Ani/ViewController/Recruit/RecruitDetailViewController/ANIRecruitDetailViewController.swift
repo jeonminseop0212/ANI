@@ -211,6 +211,7 @@ extension ANIRecruitDetailViewController: ANIButtonViewDelegate {
       let chatViewController = ANIChatViewController()
       let navigationContoller = UINavigationController(rootViewController: chatViewController)
       chatViewController.user = user
+      chatViewController.isPush = false
       chatViewController.delegate = self
       self.present(navigationContoller, animated: true, completion: nil)
     }
