@@ -57,7 +57,7 @@ class ANIChatViewController: UIViewController {
   
   override func viewDidAppear(_ animated: Bool) {
     UIApplication.shared.statusBarStyle = .default
-    setupNotification()
+    setupNotifications()
   }
   
   override func viewWillDisappear(_ animated: Bool) {
@@ -213,7 +213,7 @@ class ANIChatViewController: UIViewController {
   }
   
   //MARK: notification
-  private func setupNotification() {
+  private func setupNotifications() {
     ANINotificationManager.receive(keyboardWillChangeFrame: self, selector: #selector(keyboardWillChangeFrame))
     ANINotificationManager.receive(keyboardWillHide: self, selector: #selector(keyboardWillHide))
     ANINotificationManager.receive(profileImageViewTapped: self, selector: #selector(pushOtherProfile))
@@ -227,10 +227,11 @@ class ANIChatViewController: UIViewController {
   
   @objc private func keyboardWillChangeFrame(_ notification: Notification) {
     guard let keyboardFrame = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
-      let duration = notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as? TimeInterval,
-      let curve = notification.userInfo?[UIKeyboardAnimationCurveUserInfoKey] as? UInt,
-      let commentBarBottomConstraint = self.chatBarBottomConstraint,
-      let window = UIApplication.shared.keyWindow else { return }
+          let duration = notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as? TimeInterval,
+          let curve = notification.userInfo?[UIKeyboardAnimationCurveUserInfoKey] as? UInt,
+          let commentBarBottomConstraint = self.chatBarBottomConstraint,
+          let window = UIApplication.shared.keyWindow,
+          let chatView = self.chatView else { return }
     
     let h = keyboardFrame.height
     let bottomSafeArea = window.safeAreaInsets.bottom
@@ -240,13 +241,15 @@ class ANIChatViewController: UIViewController {
     UIView.animate(withDuration: duration, delay: 0, options: UIViewAnimationOptions(rawValue: curve), animations: {
       self.view.layoutIfNeeded()
     })
+    
+    chatView.scrollToBottom()
   }
   
   @objc private func keyboardWillHide(_ notification: Notification) {
     guard let duration = notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as? TimeInterval,
-      let curve = notification.userInfo?[UIKeyboardAnimationCurveUserInfoKey] as? UInt,
-      let commentBarOriginalBottomConstraintConstant = self.chatBarOriginalBottomConstraintConstant,
-      let commentBarBottomConstraint = self.chatBarBottomConstraint else { return }
+          let curve = notification.userInfo?[UIKeyboardAnimationCurveUserInfoKey] as? UInt,
+          let commentBarOriginalBottomConstraintConstant = self.chatBarOriginalBottomConstraintConstant,
+          let commentBarBottomConstraint = self.chatBarBottomConstraint else { return }
     
     commentBarBottomConstraint.constant = commentBarOriginalBottomConstraintConstant
     

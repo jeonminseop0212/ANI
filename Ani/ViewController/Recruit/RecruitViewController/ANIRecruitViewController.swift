@@ -150,6 +150,7 @@ class ANIRecruitViewController: UIViewController {
   @objc private func hideKeyboard() {
     guard let searchBar = self.searchBar,
       let searchBarTextField = searchBar.textField else { return }
+    
     if searchBarTextField.isFirstResponder {
       searchBarTextField.resignFirstResponder()
       searchBar.setShowsCancelButton(false, animated: true)

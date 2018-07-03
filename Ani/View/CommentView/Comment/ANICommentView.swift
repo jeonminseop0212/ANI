@@ -151,6 +151,7 @@ extension ANICommentView: UITableViewDataSource {
   }
 }
 
+//MAKR: UITableViewDelegate
 extension ANICommentView: UITableViewDelegate {
   func scrollViewDidScroll(_ scrollView: UIScrollView) {
     let scrollY = scrollView.contentOffset.y
