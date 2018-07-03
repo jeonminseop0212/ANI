@@ -79,6 +79,7 @@ class ANIListView: UIView {
     let qnaCellId = NSStringFromClass(ANIQnaViewCell.self)
     listTableView.register(ANIQnaViewCell.self, forCellReuseIdentifier: qnaCellId)
     listTableView.dataSource = self
+    listTableView.delegate = self
     listTableView.separatorStyle = .none
     listTableView.backgroundColor = ANIColor.bg
     listTableView.alpha = 0.0
@@ -320,7 +321,6 @@ extension ANIListView: UITableViewDataSource {
           let cell = tableView.dequeueReusableCell(withIdentifier: supportCellId, for: indexPath) as! ANISupportViewCell
           
           cell.story = loveStories[indexPath.row]
-          cell.observeStory()
           cell.delegate = self
           
           return cell
@@ -329,7 +329,6 @@ extension ANIListView: UITableViewDataSource {
           let cell = tableView.dequeueReusableCell(withIdentifier: storyCellId, for: indexPath) as! ANIStoryViewCell
           
           cell.story = loveStories[indexPath.row]
-          cell.observeStory()
           cell.delegate = self
           
           return cell
@@ -342,7 +341,6 @@ extension ANIListView: UITableViewDataSource {
       let cell = tableView.dequeueReusableCell(withIdentifier: qnaCellid, for: indexPath) as! ANIQnaViewCell
       
       cell.qna = loveQnas[indexPath.row]
-      cell.observeQna()
       cell.delegate = self
       
       return cell
@@ -354,6 +352,38 @@ extension ANIListView: UITableViewDataSource {
       cell.delegate = self
       
       return cell
+    }
+  }
+}
+
+//MARK: UITableViewDelegate
+extension ANIListView: UITableViewDelegate {
+  func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    guard let list = self.list else { return }
+    
+    switch list {
+    case .loveRecruit:
+      if let cell = cell as? ANIRecruitViewCell {
+        cell.unobserveLove()
+        cell.unobserveSupport()
+      }
+    case .loveStroy:
+      if !loveStories.isEmpty {
+        if loveStories[indexPath.row].recruitId != nil, let cell = cell as? ANISupportViewCell {
+          cell.unobserveLove()
+        } else if let cell = cell as? ANIStoryViewCell {
+          cell.unobserveLove()
+        }
+      }
+    case .loveQuestion:
+      if let cell = cell as? ANIRecruitViewCell {
+        cell.unobserveLove()
+      }
+    case .clipRecruit:
+      if let cell = cell as? ANIRecruitViewCell {
+        cell.unobserveLove()
+        cell.unobserveSupport()
+      }
     }
   }
 }

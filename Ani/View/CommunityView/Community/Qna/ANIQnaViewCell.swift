@@ -187,26 +187,6 @@ class ANIQnaViewCell: UITableViewCell {
     self.userNameLabel = userNameLabel
   }
   
-  func observeQna() {
-    guard let qna = self.qna,
-          let qnaId = qna.id else { return }
-    
-    let databaseRef = Database.database().reference()
-    
-    DispatchQueue.global().async {
-      databaseRef.child(KEY_QNAS).child(qnaId).observe(.value) { (snapshot) in
-        guard let value = snapshot.value else { return }
-        do {
-          let qna = try FirebaseDecoder().decode(FirebaseQna.self, from: value)
-          
-          self.qna = qna
-        } catch let error {
-          print(error)
-        }
-      }
-    }
-  }
-  
   private func reloadLayout() {
     guard let subTitleLabel = self.subTitleLabel,
           let qnaImagesView = self.qnaImagesView,
@@ -300,6 +280,16 @@ class ANIQnaViewCell: UITableViewCell {
           }
         }
       }
+    }
+  }
+  
+  func unobserveLove() {
+    guard let qna = self.qna,
+          let qnaId = qna.id else { return }
+    
+    let databaseRef = Database.database().reference()
+    DispatchQueue.global().async {
+      databaseRef.child(KEY_QNAS).child(qnaId).child(KEY_LOVE_IDS).removeAllObservers()
     }
   }
   

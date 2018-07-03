@@ -53,6 +53,7 @@ class ANIQnaView: UIView {
     let id = NSStringFromClass(ANIQnaViewCell.self)
     tableView.register(ANIQnaViewCell.self, forCellReuseIdentifier: id)
     tableView.dataSource = self
+    tableView.delegate = self
     tableView.separatorStyle = .none
     tableView.alpha = 0.0
     let refreshControl = UIRefreshControl()
@@ -150,11 +151,19 @@ extension ANIQnaView: UITableViewDataSource {
 
     if !qnas.isEmpty {
       cell.qna = qnas[indexPath.row]
-      cell.observeQna()
       cell.delegate = self
     }
     
     return cell
+  }
+}
+
+//MARK: UITableViewDelegate
+extension ANIQnaView: UITableViewDelegate {
+  func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    if let cell = cell as? ANIQnaViewCell {
+      cell.unobserveLove()
+    }
   }
 }
 

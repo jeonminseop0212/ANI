@@ -69,6 +69,7 @@ class ANIProfileBasicView: UIView {
     basicTableView.backgroundColor = ANIColor.bg
     basicTableView.separatorStyle = .none
     basicTableView.dataSource = self
+    basicTableView.delegate = self
     let topCellId = NSStringFromClass(ANIProfileTopCell.self)
     basicTableView.register(ANIProfileTopCell.self, forCellReuseIdentifier: topCellId)
     let profileCellId = NSStringFromClass(ANIProfileCell.self)
@@ -236,7 +237,6 @@ extension ANIProfileBasicView: UITableViewDataSource {
             let cell = tableView.dequeueReusableCell(withIdentifier: supportCellId, for: indexPath) as! ANISupportViewCell
             
             cell.story = stories[indexPath.row]
-            cell.observeStory()
             cell.delegate = self
             
             return cell
@@ -245,7 +245,6 @@ extension ANIProfileBasicView: UITableViewDataSource {
             let cell = tableView.dequeueReusableCell(withIdentifier: storyCellId, for: indexPath) as! ANIStoryViewCell
             
             cell.story = stories[indexPath.row]
-            cell.observeStory()
             cell.delegate = self
             
             return cell
@@ -258,11 +257,30 @@ extension ANIProfileBasicView: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: qnaCellid, for: indexPath) as! ANIQnaViewCell
         
         cell.qna = qnas[indexPath.row]
-        cell.observeQna()
         cell.delegate = self
 
         return cell
       }
+    }
+  }
+}
+
+//MARK: UITableViewDelegate
+extension ANIProfileBasicView: UITableViewDelegate {
+  func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    if contentType == .recruit, let cell = cell as? ANIRecruitViewCell {
+        cell.unobserveLove()
+        cell.unobserveSupport()
+    } else if contentType == .story {
+      if !stories.isEmpty {
+        if stories[indexPath.row].recruitId != nil, let cell = cell as? ANISupportViewCell {
+          cell.unobserveLove()
+        } else if let cell = cell as? ANIStoryViewCell {
+          cell.unobserveLove()
+        }
+      }
+    } else if contentType == .qna, let cell = cell as? ANIRecruitViewCell {
+      cell.unobserveLove()
     }
   }
 }

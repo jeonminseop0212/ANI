@@ -392,6 +392,16 @@ class ANIRecruitViewCell: UITableViewCell {
     }
   }
   
+  func unobserveLove() {
+    guard let recruit = self.recruit,
+          let recuritId = recruit.id else { return }
+    
+    let databaseRef = Database.database().reference()
+    DispatchQueue.global().async {
+      databaseRef.child(KEY_RECRUITS).child(recuritId).child(KEY_LOVE_IDS).removeAllObservers()
+    }
+  }
+  
   private func observeSupport() {
     guard let recruit = self.recruit,
           let recuritId = recruit.id else { return }
@@ -418,6 +428,15 @@ class ANIRecruitViewCell: UITableViewCell {
     }
   }
 
+  func unobserveSupport() {
+    guard let recruit = self.recruit,
+      let recuritId = recruit.id else { return }
+    
+    let databaseRef = Database.database().reference()
+    DispatchQueue.global().async {
+      databaseRef.child(KEY_RECRUITS).child(recuritId).child(KEY_SUPPORT_RECRUIT_IDS).removeAllObservers()
+    }
+  }
   
   private func isLoved() {
     guard let recruit = self.recruit,

@@ -140,6 +140,13 @@ extension ANIRecuruitView: UITableViewDelegate {
     let scrollY = scrollView.contentOffset.y
     self.delegate?.recruitViewDidScroll(scrollY: scrollY)
   }
+  
+  func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    if let cell = cell as? ANIRecruitViewCell {
+      cell.unobserveLove()
+      cell.unobserveSupport()
+    }
+  }
 }
 
 //MARK: ANIRecruitViewCellDelegate

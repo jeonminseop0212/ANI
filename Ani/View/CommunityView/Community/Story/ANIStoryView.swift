@@ -57,6 +57,7 @@ class ANIStoryView: UIView {
     tableView.separatorStyle = .none
     tableView.backgroundColor = ANIColor.bg
     tableView.dataSource = self
+    tableView.delegate = self
     tableView.alpha = 0.0
     let refreshControl = UIRefreshControl()
     refreshControl.addTarget(self, action: #selector(loadStory(sender:)), for: .valueChanged)
@@ -154,7 +155,6 @@ extension ANIStoryView: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: supportCellId, for: indexPath) as! ANISupportViewCell
         
         cell.story = stories[indexPath.row]
-        cell.observeStory()
         cell.delegate = self
         
         return cell
@@ -163,13 +163,25 @@ extension ANIStoryView: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: storyCellId, for: indexPath) as! ANIStoryViewCell
         
         cell.story = stories[indexPath.row]
-        cell.observeStory()
         cell.delegate = self
         
         return cell
       }
     } else {
       return UITableViewCell()
+    }
+  }
+}
+
+//MARK: UITableViewDelegate
+extension ANIStoryView: UITableViewDelegate {
+  func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    if !stories.isEmpty {
+      if stories[indexPath.row].recruitId != nil, let cell = cell as? ANISupportViewCell {
+        cell.unobserveLove()
+      } else if let cell = cell as? ANIStoryViewCell {
+        cell.unobserveLove()
+      }
     }
   }
 }

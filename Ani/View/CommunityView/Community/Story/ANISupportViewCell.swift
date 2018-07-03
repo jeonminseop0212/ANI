@@ -305,26 +305,6 @@ class ANISupportViewCell: UITableViewCell {
     self.line = line
   }
   
-  func observeStory() {
-    guard let story = self.story,
-      let storyId = story.id else { return }
-    
-    let databaseRef = Database.database().reference()
-    
-    DispatchQueue.global().async {
-      databaseRef.child(KEY_STORIES).child(storyId).observe(.value) { (snapshot) in
-        guard let value = snapshot.value else { return }
-        do {
-          let story = try FirebaseDecoder().decode(FirebaseStory.self, from: value)
-          
-          self.story = story
-        } catch let error {
-          print(error)
-        }
-      }
-    }
-  }
-  
   private func reloadLayout() {
     guard let messageLabel = self.messageLabel,
           let titleLabel = self.titleLabel,
@@ -471,6 +451,16 @@ class ANISupportViewCell: UITableViewCell {
           }
         }
       }
+    }
+  }
+  
+  func unobserveLove() {
+    guard let story = self.story,
+          let storyId = story.id else { return }
+    
+    let databaseRef = Database.database().reference()
+    DispatchQueue.global().async {
+      databaseRef.child(KEY_STORIES).child(storyId).child(KEY_LOVE_IDS).removeAllObservers()
     }
   }
   
