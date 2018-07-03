@@ -119,6 +119,8 @@ class ANIStoryView: UIView {
             } catch let error {
               print(error)
               
+              activityIndicatorView.stopAnimating()
+              
               if let sender = sender {
                 sender.endRefreshing()
               }
@@ -128,6 +130,7 @@ class ANIStoryView: UIView {
         
         if let sender = sender, snapshot.value as? [String: AnyObject] == nil {
           sender.endRefreshing()
+          activityIndicatorView.stopAnimating()
         }
       })
     }

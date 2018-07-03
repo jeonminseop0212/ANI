@@ -7,16 +7,22 @@
 //
 
 import UIKit
+import FirebaseDatabase
+import CodableFirebase
+import NVActivityIndicatorView
 
 class ANIMessageView: UIView {
   
   private weak var messageTableView: UITableView?
   
-  private var testMessageData = [Message]()
+  private var chatGroups = [FirebaseChatGroup]()
+  
+  private weak var activityIndicatorView: NVActivityIndicatorView?
+  
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()
-    setupTestData()
+    loadChatGroup()
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -42,46 +48,85 @@ class ANIMessageView: UIView {
     messageTableView.alwaysBounceVertical = true
     messageTableView.dataSource = self
     messageTableView.delegate = self
+    messageTableView.alpha = 0.0
     addSubview(messageTableView)
     messageTableView.edgesToSuperview()
     self.messageTableView = messageTableView
+    
+    //activityIndicatorView
+    let activityIndicatorView = NVActivityIndicatorView(frame: .zero, type: .lineScale, color: ANIColor.green, padding: 0)
+    addSubview(activityIndicatorView)
+    activityIndicatorView.width(40.0)
+    activityIndicatorView.height(40.0)
+    activityIndicatorView.centerInSuperview()
+    self.activityIndicatorView = activityIndicatorView
   }
   
-  private func setupTestData() {
-    let familyImages = [UIImage(named: "family1")!, UIImage(named: "family2")!, UIImage(named: "family3")!]
-    let user1 = User(id: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
-    let user2 = User(id: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
-    let user3 = User(id: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "団体", introduce: "団体で猫たちのためにボランティア活動をしています")
-    let message1 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user1)
-    let message2 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user2)
-    let message3 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user3)
-    let message4 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user1)
-    let message5 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user2)
-    let message6 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user3)
-    let message7 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user1)
-    let message8 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user2)
-    let message9 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user3)
-    let message10 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user1)
-    let message11 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user2)
-    let message12 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user3)
+  private func loadChatGroup() {
+    guard let crrentUserUid = ANISessionManager.shared.currentUserUid,
+          let activityIndicatorView = self.activityIndicatorView else { return }
     
-    self.testMessageData = [message1, message2, message3, message4, message5, message6, message7, message8, message9, message10, message11, message12]
+    let databaseRef = Database.database().reference()
+    
+    activityIndicatorView.startAnimating()
+
+    databaseRef.child(KEY_USERS).child(crrentUserUid).child(KEY_CHAT_GROUP_IDS).queryOrderedByValue().queryLimited(toFirst: 20).observe(.value) { (snapshot) in
+      if !self.chatGroups.isEmpty {
+        self.chatGroups.removeAll()
+      }
+      
+      for item in snapshot.children {
+        if let snapshot = item as? DataSnapshot {
+          databaseRef.child(KEY_CHAT_GROUPS).child(snapshot.key).observeSingleEvent(of: .value, with: { (snapshot) in
+            
+            guard let value = snapshot.value else { return }
+            do {
+              let group = try FirebaseDecoder().decode(FirebaseChatGroup.self, from: value)
+              self.chatGroups.insert(group, at: 0)
+              
+              DispatchQueue.main.async {
+                guard let messageTableView = self.messageTableView else { return }
+    
+                activityIndicatorView.stopAnimating()
+    
+                messageTableView.reloadData()
+    
+                UIView.animate(withDuration: 0.2, animations: {
+                  messageTableView.alpha = 1.0
+                })
+              }
+            } catch let error {
+              print(error)
+              
+              activityIndicatorView.stopAnimating()
+            }
+            if snapshot.value as? [String: AnyObject] == nil {
+              activityIndicatorView.stopAnimating()
+            }
+          })
+        }
+      }
+      
+      if snapshot.value as? [String: AnyObject] == nil {
+        activityIndicatorView.stopAnimating()
+      }
+    }
   }
 }
 
 //MARK: UITableViewDataSource
 extension ANIMessageView: UITableViewDataSource {
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return testMessageData.count
+    return chatGroups.count
   }
   
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let id = NSStringFromClass(ANIMessageViewCell.self)
     let cell = tableView.dequeueReusableCell(withIdentifier: id, for: indexPath) as! ANIMessageViewCell
     
-    cell.profileImageView?.image = testMessageData[indexPath.item].user.profileImage
-    cell.userNameLabel?.text = testMessageData[indexPath.item].user.name
-    cell.subTitleLabel?.text = testMessageData[indexPath.item].subtitle
+    cell.chatGroup = chatGroups[indexPath.row]
+    cell.loadUser()
+    cell.observeGroup()
     
     return cell
   }
@@ -90,6 +135,6 @@ extension ANIMessageView: UITableViewDataSource {
 //MARK: UITableViewDelegate
 extension ANIMessageView: UITableViewDelegate {
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    
+    print(indexPath.row)
   }
 }

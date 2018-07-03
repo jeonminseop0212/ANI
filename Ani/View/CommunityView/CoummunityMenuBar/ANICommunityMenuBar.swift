@@ -14,7 +14,7 @@ protocol ANICommunityMenuBarDelegate {
 }
 
 class ANICommunityMenuBar: UIView {
-  var menuCollectionView: UICollectionView?
+  weak var menuCollectionView: UICollectionView?
   private let menus = ["STORY", "Q&A"]
   var horizontalBarleftConstraint:Constraint?
   
@@ -23,7 +23,6 @@ class ANICommunityMenuBar: UIView {
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()
-    setupHorizontalBar()
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -31,6 +30,7 @@ class ANICommunityMenuBar: UIView {
   }
   
   private func setup() {
+    //menuCollectionView
     self.backgroundColor = .white    
     let flowlayout = UICollectionViewFlowLayout()
     let collectionView = UICollectionView(frame: self.frame, collectionViewLayout: flowlayout)
@@ -47,15 +47,14 @@ class ANICommunityMenuBar: UIView {
     collectionView.rightToSuperview()
     collectionView.height(UIViewController.NAVIGATION_BAR_HEIGHT)
     self.menuCollectionView = collectionView
-  }
-  
-  private func setupHorizontalBar() {
+    
+    //horizontalBar
     let horizontalBar = UIView()
     horizontalBar.backgroundColor = ANIColor.green
     addSubview(horizontalBar)
     horizontalBarleftConstraint = horizontalBar.leftToSuperview()
     horizontalBar.widthToSuperview(multiplier: 1/2)
-    horizontalBar.height(3.0)
+    horizontalBar.height(2.0)
     horizontalBar.bottomToSuperview()
   }
 }

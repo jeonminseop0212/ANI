@@ -116,6 +116,8 @@ class ANIQnaView: UIView {
             } catch let error {
               print(error)
               
+              activityIndicatorView.stopAnimating()
+              
               if let sender = sender {
                 sender.endRefreshing()
               }
@@ -124,6 +126,7 @@ class ANIQnaView: UIView {
         }
         
         if let sender = sender, snapshot.value as? [String: AnyObject] == nil {
+          activityIndicatorView.stopAnimating()
           sender.endRefreshing()
         }
       })
