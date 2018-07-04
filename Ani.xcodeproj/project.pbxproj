@@ -106,7 +106,6 @@
 		F521184C207A4421000B12C2 /* ANIStoryImagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F521184B207A4421000B12C2 /* ANIStoryImagesView.swift */; };
 		F530AB1C207A45D900114E6B /* ANIStoryImagesCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F530AB1B207A45D900114E6B /* ANIStoryImagesCell.swift */; };
 		F53E87B72084608000B19A2F /* ANIUserSearchViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F53E87B62084608000B19A2F /* ANIUserSearchViewCell.swift */; };
-		F53E87BA208468DF00B19A2F /* ANIStorySearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F53E87B9208468DF00B19A2F /* ANIStorySearchView.swift */; };
 		F53E87BD2085AFC700B19A2F /* ANIProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F53E87BC2085AFC700B19A2F /* ANIProfileViewController.swift */; };
 		F53E87C12085B19700B19A2F /* ANIFamilyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F53E87C02085B19700B19A2F /* ANIFamilyView.swift */; };
 		F53E87C32085B50900B19A2F /* ANIFamilyViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F53E87C22085B50900B19A2F /* ANIFamilyViewCell.swift */; };
@@ -274,7 +273,6 @@
 		F521184B207A4421000B12C2 /* ANIStoryImagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIStoryImagesView.swift; sourceTree = "<group>"; };
 		F530AB1B207A45D900114E6B /* ANIStoryImagesCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIStoryImagesCell.swift; sourceTree = "<group>"; };
 		F53E87B62084608000B19A2F /* ANIUserSearchViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIUserSearchViewCell.swift; sourceTree = "<group>"; };
-		F53E87B9208468DF00B19A2F /* ANIStorySearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIStorySearchView.swift; sourceTree = "<group>"; };
 		F53E87BC2085AFC700B19A2F /* ANIProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIProfileViewController.swift; sourceTree = "<group>"; };
 		F53E87C02085B19700B19A2F /* ANIFamilyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIFamilyView.swift; sourceTree = "<group>"; };
 		F53E87C22085B50900B19A2F /* ANIFamilyViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIFamilyViewCell.swift; sourceTree = "<group>"; };
@@ -942,14 +940,6 @@
 			path = ImagesView;
 			sourceTree = "<group>";
 		};
-		F53E87B82084687900B19A2F /* StorySearch */ = {
-			isa = PBXGroup;
-			children = (
-				F53E87B9208468DF00B19A2F /* ANIStorySearchView.swift */,
-			);
-			path = StorySearch;
-			sourceTree = "<group>";
-		};
 		F53E87BB2085AF9D00B19A2F /* ProfileViewController */ = {
 			isa = PBXGroup;
 			children = (
@@ -1079,7 +1069,6 @@
 			children = (
 				F57F7D8A20844C0C008A2645 /* SearchCategory */,
 				F57F7D8F20844D8C008A2645 /* UserSearch */,
-				F53E87B82084687900B19A2F /* StorySearch */,
 			);
 			path = SearchView;
 			sourceTree = "<group>";
@@ -1679,7 +1668,6 @@
 				CD033E4120D8D25E002FB770 /* ANISupportViewController.swift in Sources */,
 				F5E9E22620769AD60021D4CC /* User.swift in Sources */,
 				CD9E52BB2094614400715F50 /* ANIAreaButtonView.swift in Sources */,
-				F53E87BA208468DF00B19A2F /* ANIStorySearchView.swift in Sources */,
 				CDDE4B6720E20D3E005762A1 /* ANIFollowUserViewContoller.swift in Sources */,
 				CDDD04C020B53A8B0094DBFA /* ANIInitialView.swift in Sources */,
 				CDA32A2920ABBA21008A2AC1 /* ANIRecruitContributionImagesView.swift in Sources */,

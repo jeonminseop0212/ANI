@@ -114,7 +114,7 @@ class ANINotiViewController: UIViewController {
   }
 }
 
-extension ANINotiViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+extension ANINotiViewController: UICollectionViewDataSource {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
     return 2
   }
@@ -132,12 +132,18 @@ extension ANINotiViewController: UICollectionViewDataSource, UICollectionViewDel
       return cell
     }
   }
-  
+}
+
+//MARK: UICollectionViewDelegateFlowLayout
+extension ANINotiViewController: UICollectionViewDelegateFlowLayout {
   func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
     let size = CGSize(width: self.view.frame.width, height: self.view.frame.height)
     return size
   }
-  
+}
+
+//MARK: UICollectionViewDelegate
+extension ANINotiViewController: UICollectionViewDelegate {
   func scrollViewDidScroll(_ scrollView: UIScrollView) {
     guard let menuBar = self.menuBar, let horizontalBarleftConstraint = menuBar.horizontalBarleftConstraint else { return }
     horizontalBarleftConstraint.constant = scrollView.contentOffset.x / 2
@@ -147,6 +153,22 @@ extension ANINotiViewController: UICollectionViewDataSource, UICollectionViewDel
     guard let menuBar = self.menuBar else { return }
     let indexPath = IndexPath(item: Int(targetContentOffset.pointee.x / view.frame.width), section: 0)
     menuBar.menuCollectionView?.selectItem(at: indexPath, animated: true, scrollPosition: .left)
+  }
+  
+  func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+    if let cell = cell as? ANINotiNotiCell {
+      cell.isCellSelected = true
+    } else if let cell = cell as? ANINotiMessageCell {
+      cell.isCellSelected = true
+    }
+  }
+  
+  func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+    if let cell = cell as? ANINotiNotiCell {
+      cell.isCellSelected = false
+    } else if let cell = cell as? ANINotiMessageCell {
+      cell.isCellSelected = false
+    }
   }
 }
 

@@ -11,6 +11,14 @@ import UIKit
 class ANICommunityStoryCell: UICollectionViewCell {
   private weak var storyView: ANIStoryView?
   
+  var isCellSelected: Bool = false {
+    didSet {
+      guard let storyView = self.storyView else { return }
+      
+      storyView.isCellSelected = isCellSelected
+    }
+  }
+  
   var delegate: ANIStoryViewDelegate? {
     get { return self.storyView?.delegate }
     set(v) { self.storyView?.delegate = v }

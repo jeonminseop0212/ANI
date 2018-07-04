@@ -52,6 +52,23 @@ class ANINotificationManager: NSObject {
     self.receive(notificationName: name, observer: observer, selector: selector)
   }
   
+  //MARK: tab tapped
+  private static let N_RECRUIT_TAB_TAPPED = "N_RECRUIT_TAB_TAPPED"
+  static func postRecruitTabTapped() { self.post(name: N_RECRUIT_TAB_TAPPED, object: nil, userInfo:nil) }
+  static func receive(recruitTabTapped observer:Any, selector:Selector) { receive(name: N_RECRUIT_TAB_TAPPED, observer: observer, selector: selector) }
+  private static let N_COMMUNITY_TAB_TAPPED = "N_COMMUNITY_TAB_TAPPED"
+  static func postCommunityTabTapped() { self.post(name: N_COMMUNITY_TAB_TAPPED, object: nil, userInfo:nil) }
+  static func receive(communityTabTapped observer:Any, selector:Selector) { receive(name: N_COMMUNITY_TAB_TAPPED, observer: observer, selector: selector) }
+  private static let N_NOTI_TAB_TAPPED = "N_NOTI_TAB_TAPPED"
+  static func postNotiTabTapped() { self.post(name: N_NOTI_TAB_TAPPED, object: nil, userInfo:nil) }
+  static func receive(notiTabTapped observer:Any, selector:Selector) { receive(name: N_NOTI_TAB_TAPPED, observer: observer, selector: selector) }
+  private static let N_SEARCH_TAB_TAPPED = "N_SEARCH_TAB_TAPPED"
+  static func postSearchTabTapped() { self.post(name: N_SEARCH_TAB_TAPPED, object: nil, userInfo:nil) }
+  static func receive(searchTabTapped observer:Any, selector:Selector) { receive(name: N_SEARCH_TAB_TAPPED, observer: observer, selector: selector) }
+  private static let N_PROFILE_TAB_TAPPED = "N_PROFILE_TAB_TAPPED"
+  static func postProfileTabTapped() { self.post(name: N_PROFILE_TAB_TAPPED, object: nil, userInfo:nil) }
+  static func receive(profileTabTapped observer:Any, selector:Selector) { receive(name: N_PROFILE_TAB_TAPPED, observer: observer, selector: selector) }
+  
   //MARK: view scroll
   private static let N_VIEW_SCROLLED = "N_VIEW_SCROLLED"
   static func postViewScrolled() { self.post(name: N_VIEW_SCROLLED, object: nil, userInfo:nil) }

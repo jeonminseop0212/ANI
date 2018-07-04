@@ -24,6 +24,8 @@ class ANIQnaView: UIView {
   
   private weak var activityIndicatorView: NVActivityIndicatorView?
   
+  var isCellSelected: Bool = false
+  
   var delegate: ANIQnaViewDelegate?
   
   override init(frame: CGRect) {
@@ -76,6 +78,7 @@ class ANIQnaView: UIView {
   private func setupNotifications() {
     ANINotificationManager.receive(logout: self, selector: #selector(reloadQna))
     ANINotificationManager.receive(login: self, selector: #selector(reloadQna))
+    ANINotificationManager.receive(communityTabTapped: self, selector: #selector(scrollToTop))
   }
   
   @objc private func loadQna(sender: UIRefreshControl?) {
@@ -136,6 +139,14 @@ class ANIQnaView: UIView {
   
   @objc private func reloadQna() {
     loadQna(sender: nil)
+  }
+  
+  @objc private func scrollToTop() {
+    guard let qnaTableView = qnaTableView,
+          !qnas.isEmpty,
+          isCellSelected else { return }
+    
+    qnaTableView.scrollToRow(at: [0, 0], at: .top, animated: true)
   }
 }
 

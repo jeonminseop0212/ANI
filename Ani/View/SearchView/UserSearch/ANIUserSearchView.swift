@@ -14,13 +14,8 @@ protocol ANIUserSearchViewDelegate {
 
 class ANIUserSearchView: UIView {
   
-  weak var userTableView: UITableView? {
-    didSet {
-      guard let userTableView = self.userTableView else { return }
-      let topInset = UIViewController.NAVIGATION_BAR_HEIGHT + ANIRecruitViewController.CATEGORIES_VIEW_HEIGHT
-      userTableView.setContentOffset(CGPoint(x: 0, y: -topInset), animated: false)
-    }
-  }
+  private weak var userTableView: UITableView?
+  
   private var testUserSearchResult = [User]()
   
   var delegate: ANIUserSearchViewDelegate?
@@ -29,6 +24,7 @@ class ANIUserSearchView: UIView {
     super.init(frame: frame)
     setup()
     setupTestUser()
+    setupNotifications()
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -41,6 +37,7 @@ class ANIUserSearchView: UIView {
     let topInset = UIViewController.NAVIGATION_BAR_HEIGHT + ANIRecruitViewController.CATEGORIES_VIEW_HEIGHT
     tableView.contentInset = UIEdgeInsets(top: topInset, left: 0, bottom: 0, right: 0)
     tableView.scrollIndicatorInsets  = UIEdgeInsets(top: topInset, left: 0, bottom: 0, right: 0)
+    tableView.setContentOffset(CGPoint(x: 0, y: -topInset), animated: false)
     tableView.backgroundColor = .white
     let id = NSStringFromClass(ANIUserSearchViewCell.self)
     tableView.register(ANIUserSearchViewCell.self, forCellReuseIdentifier: id)
@@ -49,6 +46,10 @@ class ANIUserSearchView: UIView {
     addSubview(tableView)
     tableView.edgesToSuperview()
     self.userTableView = tableView
+  }
+  
+  private func setupNotifications() {
+    ANINotificationManager.receive(searchTabTapped: self, selector: #selector(scrollToTop))
   }
   
   private func setupTestUser() {
@@ -74,9 +75,17 @@ class ANIUserSearchView: UIView {
     
     testUserSearchResult = [user1, user2, user3, user4, user5, user6, user7, user8, user9, user10, user11, user12, user13, user14, user15, user16, user17, user18]
   }
+  
+  @objc private func scrollToTop() {
+    guard let userTableView = userTableView,
+          !testUserSearchResult.isEmpty else { return }
+    
+    userTableView.scrollToRow(at: [0, 0], at: .top, animated: true)
+  }
 }
 
-extension ANIUserSearchView: UITableViewDataSource, UITableViewDelegate {
+//MARK: UITableViewDataSource
+extension ANIUserSearchView: UITableViewDataSource {
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     return testUserSearchResult.count
   }
@@ -90,7 +99,10 @@ extension ANIUserSearchView: UITableViewDataSource, UITableViewDelegate {
     
     return cell
   }
-  
+}
+
+//MARK: UITableViewDelegate
+extension ANIUserSearchView: UITableViewDelegate {
   func scrollViewDidScroll(_ scrollView: UIScrollView) {
     ANINotificationManager.postViewScrolled()
     

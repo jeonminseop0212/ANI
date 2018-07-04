@@ -25,6 +25,8 @@ class ANIStoryView: UIView {
   
   private weak var activityIndicatorView: NVActivityIndicatorView?
   
+  var isCellSelected: Bool = false
+  
   var delegate: ANIStoryViewDelegate?
   
   override init(frame: CGRect) {
@@ -79,6 +81,7 @@ class ANIStoryView: UIView {
   private func setupNotifications() {
     ANINotificationManager.receive(logout: self, selector: #selector(reloadStory))
     ANINotificationManager.receive(login: self, selector: #selector(reloadStory))
+    ANINotificationManager.receive(communityTabTapped: self, selector: #selector(scrollToTop))
   }
   
   @objc private func loadStory(sender: UIRefreshControl?) {
@@ -139,6 +142,14 @@ class ANIStoryView: UIView {
   
   @objc private func reloadStory() {
     loadStory(sender: nil)
+  }
+  
+  @objc private func scrollToTop() {
+    guard let storyTableView = storyTableView,
+          !stories.isEmpty,
+          isCellSelected else { return }
+    
+    storyTableView.scrollToRow(at: [0, 0], at: .top, animated: true)
   }
 }
 
