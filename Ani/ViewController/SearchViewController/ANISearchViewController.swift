@@ -61,6 +61,7 @@ class ANISearchViewController: UIViewController {
     searchBar.textField?.backgroundColor = ANIColor.lightGray
     searchBar.delegate = self
     searchBar.backgroundImage = UIImage()
+    searchBar.tintColor = ANIColor.darkGray
     myNavigationBar.addSubview(searchBar)
     searchBar.topToSuperview()
     searchBar.leftToSuperview()
@@ -97,6 +98,7 @@ class ANISearchViewController: UIViewController {
   }
 }
 
+//MARK: UISearchBarDelegate
 extension ANISearchViewController: UISearchBarDelegate {
   func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
     guard let searchBarTextField = searchBar.textField else { return }
