@@ -65,6 +65,7 @@ class ANIRecuruitView: UIView {
   private func setupNotifications() {
     ANINotificationManager.receive(logout: self, selector: #selector(reloadRecruit))
     ANINotificationManager.receive(login: self, selector: #selector(reloadRecruit))
+    ANINotificationManager.receive(recruitTabTapped: self, selector: #selector(scrollToTop))
   }
   
   @objc private func loadRecruit(sender: UIRefreshControl?) {
@@ -109,6 +110,13 @@ class ANIRecuruitView: UIView {
   
   @objc private func reloadRecruit() {
     loadRecruit(sender: nil)
+  }
+  
+  @objc private func scrollToTop() {
+    guard let recruitTableView = recruitTableView,
+          !recruits.isEmpty else { return }
+    
+    recruitTableView.scrollToRow(at: [0, 0], at: .top, animated: true)
   }
 }
 

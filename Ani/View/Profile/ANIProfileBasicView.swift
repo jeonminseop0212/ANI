@@ -89,6 +89,7 @@ class ANIProfileBasicView: UIView {
   
   private func setupNotifications() {
     ANINotificationManager.receive(login: self, selector: #selector(reloadUser))
+    ANINotificationManager.receive(profileTabTapped: self, selector: #selector(scrollToTop))
   }
   
   private func loadRecruit() {
@@ -173,6 +174,12 @@ class ANIProfileBasicView: UIView {
     guard let currentUser = ANISessionManager.shared.currentUser else { return }
     
     self.currentUser = currentUser
+  }
+  
+  @objc private func scrollToTop() {
+    guard let basicTableView = basicTableView else { return }
+    
+    basicTableView.scrollToRow(at: [0, 0], at: .top, animated: true)
   }
 }
 

@@ -19,10 +19,13 @@ class ANIMessageView: UIView {
   
   private weak var activityIndicatorView: NVActivityIndicatorView?
   
+  var isCellSelected: Bool = false
+  
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()
     loadChatGroup()
+    setupNotifications()
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -59,6 +62,10 @@ class ANIMessageView: UIView {
     activityIndicatorView.height(40.0)
     activityIndicatorView.centerInSuperview()
     self.activityIndicatorView = activityIndicatorView
+  }
+  
+  private func setupNotifications() {
+    ANINotificationManager.receive(notiTabTapped: self, selector: #selector(scrollToTop))
   }
   
   private func loadChatGroup() {
@@ -110,6 +117,14 @@ class ANIMessageView: UIView {
         activityIndicatorView.stopAnimating()
       }
     }
+  }
+  
+  @objc private func scrollToTop() {
+    guard let messageTableView = messageTableView,
+          !chatGroups.isEmpty,
+          isCellSelected else { return }
+    
+    messageTableView.scrollToRow(at: [0, 0], at: .top, animated: true)
   }
 }
 

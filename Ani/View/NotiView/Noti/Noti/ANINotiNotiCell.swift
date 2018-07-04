@@ -12,6 +12,14 @@ class ANINotiNotiCell: UICollectionViewCell {
   
   private weak var notiView: ANINotiView?
   
+  var isCellSelected: Bool = false {
+    didSet {
+      guard let notiView = self.notiView else { return }
+      
+      notiView.isCellSelected = isCellSelected
+    }
+  }
+  
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()

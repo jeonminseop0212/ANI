@@ -14,6 +14,8 @@ import NVActivityIndicatorView
 
 class ANITabBarController: UITabBarController, NVActivityIndicatorViewable {
   
+  private var showingTabTag: Int = 0
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     //tabBar上の線を消す
@@ -76,26 +78,31 @@ class ANITabBarController: UITabBarController, NVActivityIndicatorViewable {
     let recruitVC = ANIRecruitViewController()
     recruitVC.tabBarItem.image = UIImage(named: "home")?.withRenderingMode(.alwaysOriginal)
     recruitVC.tabBarItem.selectedImage = UIImage(named: "homeSelected")?.withRenderingMode(.alwaysOriginal)
+    recruitVC.tabBarItem.tag = 0
     let recruitNV = UINavigationController(rootViewController: recruitVC)
     
     let communityVC = ANICommunityViewController()
     communityVC.tabBarItem.image = UIImage(named: "community")?.withRenderingMode(.alwaysOriginal)
     communityVC.tabBarItem.selectedImage = UIImage(named: "communitySelected")?.withRenderingMode(.alwaysOriginal)
+    communityVC.tabBarItem.tag = 1
     let communityNV = UINavigationController(rootViewController: communityVC)
     
     let notiVC = ANINotiViewController()
     notiVC.tabBarItem.image = UIImage(named: "noti")?.withRenderingMode(.alwaysOriginal)
     notiVC.tabBarItem.selectedImage = UIImage(named: "notiSelected")?.withRenderingMode(.alwaysOriginal)
+    notiVC.tabBarItem.tag = 2
     let notiNV = UINavigationController(rootViewController: notiVC)
     
     let searchVC = ANISearchViewController()
     searchVC.tabBarItem.image = UIImage(named: "search")?.withRenderingMode(.alwaysOriginal)
     searchVC.tabBarItem.selectedImage = UIImage(named: "searchSelected")?.withRenderingMode(.alwaysOriginal)
+    searchVC.tabBarItem.tag = 3
     let searchNV = UINavigationController(rootViewController: searchVC)
     
     let profileVC = ANIProfileViewController()
     profileVC.tabBarItem.image = UIImage(named: "profile")?.withRenderingMode(.alwaysOriginal)
     profileVC.tabBarItem.selectedImage = UIImage(named: "profileSelected")?.withRenderingMode(.alwaysOriginal)
+    profileVC.tabBarItem.tag = 4
     let profileNV = UINavigationController(rootViewController: profileVC)
     
     setViewControllers([recruitNV, communityNV, notiNV, searchNV, profileNV], animated: false)
@@ -111,5 +118,37 @@ class ANITabBarController: UITabBarController, NVActivityIndicatorViewable {
     let initialViewController = ANIInitialViewController()
     let initialNV = UINavigationController(rootViewController: initialViewController)
     self.present(initialNV, animated: true, completion: nil)
+  }
+  
+  override func tabBar(_ tabBar: UITabBar, didSelect item: UITabBarItem) {
+    switch item.tag {
+    case 0:
+      if showingTabTag == 0 {
+        ANINotificationManager.postRecruitTabTapped()
+      }
+      showingTabTag = 0
+    case 1:
+      if showingTabTag == 1 {
+        ANINotificationManager.postCommunityTabTapped()
+      }
+      showingTabTag = 1
+    case 2:
+      if showingTabTag == 2 {
+        ANINotificationManager.postNotiTabTapped()
+      }
+      showingTabTag = 2
+    case 3:
+      if showingTabTag == 3 {
+        ANINotificationManager.postSearchTabTapped()
+      }
+      showingTabTag = 3
+    case 4:
+      if showingTabTag == 4 {
+        ANINotificationManager.postProfileTabTapped()
+      }
+      showingTabTag = 4
+    default:
+      print("default tab")
+    }
   }
 }

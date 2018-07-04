@@ -15,10 +15,13 @@ class ANINotiView: UIView {
   
   private var testNotiData = [Noti]()
   
+  var isCellSelected: Bool = false
+  
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()
     setupTestData()
+    setupNotifications()
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -48,6 +51,10 @@ class ANINotiView: UIView {
     self.notiTableView = notiTableView
   }
   
+  private func setupNotifications() {
+    ANINotificationManager.receive(notiTabTapped: self, selector: #selector(scrollToTop))
+  }
+  
   private func setupTestData() {
     let familyImages = [UIImage(named: "family1")!, UIImage(named: "family2")!, UIImage(named: "family3")!]
     let user1 = User(id: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
@@ -67,6 +74,14 @@ class ANINotiView: UIView {
     let noti12 = Noti(subtitle: "あなたの投稿に『いいね』しました", user: user3)
     
     self.testNotiData = [noti1, noti2, noti3, noti4, noti5, noti6, noti7, noti8, noti9, noti10, noti11, noti12]
+  }
+  
+  @objc private func scrollToTop() {
+    guard let notiTableView = notiTableView,
+          !testNotiData.isEmpty,
+          isCellSelected else { return }
+    
+    notiTableView.scrollToRow(at: [0, 0], at: .top, animated: true)
   }
 }
 

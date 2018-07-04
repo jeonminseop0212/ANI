@@ -205,6 +205,22 @@ extension ANICommunityViewController: UICollectionViewDelegate {
     
     selectedIndex = indexPath.item
   }
+  
+  func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+    if let cell = cell as? ANICommunityStoryCell {
+      cell.isCellSelected = true
+    } else if let cell = cell as? ANICommunityQnaCell {
+      cell.isCellSelected = true
+    }
+  }
+  
+  func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+    if let cell = cell as? ANICommunityStoryCell {
+      cell.isCellSelected = false
+    } else if let cell = cell as? ANICommunityQnaCell {
+      cell.isCellSelected = false
+    }
+  }
 }
 
 //MARK: ANIButtonViewDelegate

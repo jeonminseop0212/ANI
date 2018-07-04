@@ -11,6 +11,14 @@ import UIKit
 class ANICommunityQnaCell: UICollectionViewCell {
   private weak var qnaView: ANIQnaView?
   
+  var isCellSelected: Bool = false {
+    didSet {
+      guard let qnaView = self.qnaView else { return }
+      
+      qnaView.isCellSelected = isCellSelected
+    }
+  }
+
   var delegate: ANIQnaViewDelegate? {
     get { return self.qnaView?.delegate }
     set(v) { self.qnaView?.delegate = v }
