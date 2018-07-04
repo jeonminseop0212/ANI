@@ -502,22 +502,22 @@ class ANIRecruitContributionView: UIView {
   
   func getRecruitInfo() -> RecruitInfo? {
     guard let headerImage = self.headerImage,
-    let titleTextView = self.titleTextView,
-    let basicInfoKindLabel = self.basicInfoKindLabel,
-    let kindText = basicInfoKindLabel.text,
-    let basicInfoAgeLabel = self.basicInfoAgeLabel,
-    let ageText = basicInfoAgeLabel.text,
-    let basicInfoSexLabel = self.basicInfoSexLabel,
-    let sexText = basicInfoSexLabel.text,
-    let basicInfoHomeLabel = self.basicInfoHomeLabel,
-    let homeText = basicInfoHomeLabel.text,
-    let basicInfoVaccineLabel = self.basicInfoVaccineLabel,
-    let vaccineText = basicInfoVaccineLabel.text,
-    let basicInfoCastrationLabel = self.basicInfoCastrationLabel,
-    let castrationText = basicInfoCastrationLabel.text,
-    let resonTextView = self.reasonTextView,
-    let introduceTextView = self.introduceTextView,
-    let passingTextView = self.passingTextView else { return nil }
+          let titleTextView = self.titleTextView,
+          let basicInfoKindLabel = self.basicInfoKindLabel,
+          let kindText = basicInfoKindLabel.text,
+          let basicInfoAgeLabel = self.basicInfoAgeLabel,
+          let ageText = basicInfoAgeLabel.text,
+          let basicInfoSexLabel = self.basicInfoSexLabel,
+          let sexText = basicInfoSexLabel.text,
+          let basicInfoHomeLabel = self.basicInfoHomeLabel,
+          let homeText = basicInfoHomeLabel.text,
+          let basicInfoVaccineLabel = self.basicInfoVaccineLabel,
+          let vaccineText = basicInfoVaccineLabel.text,
+          let basicInfoCastrationLabel = self.basicInfoCastrationLabel,
+          let castrationText = basicInfoCastrationLabel.text,
+          let resonTextView = self.reasonTextView,
+          let introduceTextView = self.introduceTextView,
+          let passingTextView = self.passingTextView else { return nil }
     
     let kind = kindText.substring(3...) == "選択" ? "" : kindText.substring(3...)
     let age = ageText.substring(3...) == "選択" ? "" : ageText.substring(3...)

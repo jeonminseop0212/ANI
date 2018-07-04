@@ -28,6 +28,8 @@ class ANISignUpViewController: UIViewController {
   private weak var rejectLabel: UILabel?
   private var isRejectAnimating: Bool = false
   
+  private let IMAGE_SIZE: CGSize = CGSize(width: 500.0, height: 500.0)
+  
   override func viewDidLoad() {
     setup()
     setupNotification()
@@ -266,6 +268,6 @@ extension ANISignUpViewController: ANIImageFilterViewControllerDelegate {
           let filteredImage = filteredImages[0],
           let signUpView = self.signUpView else { return }
     
-    signUpView.profileImage = filteredImage
+    signUpView.profileImage = filteredImage.resize(size: IMAGE_SIZE)
   }
 }

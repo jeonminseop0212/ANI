@@ -45,6 +45,8 @@ class ANIContributionViewController: UIViewController {
     }
   }
   
+  private let IMAGE_SIZE: CGSize = CGSize(width: 500.0, height: 500.0)
+  
   override func viewDidLoad() {
     setup()
     setupImagePickGalleryController()
@@ -397,7 +399,10 @@ extension ANIContributionViewController: ANIImageFilterViewControllerDelegate {
   func doneFilterImages(filteredImages: [UIImage?]) {
     guard !filteredImages.isEmpty else { return }
     
-    contentImages = filteredImages
+    contentImages.removeAll()
+    for filteredImage in filteredImages {
+      contentImages.append(filteredImage?.resize(size: IMAGE_SIZE))
+    }
   }
 }
 

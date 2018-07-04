@@ -55,6 +55,8 @@ class ANIRecruitContributionViewController: UIViewController {
   
   private var isHaderImagePick: Bool = false
   
+  private let IMAGE_SIZE: CGSize = CGSize(width: 500.0, height: 500.0)
+  
   private var isBack: Bool = false
   
   override func viewDidLoad() {
@@ -322,15 +324,11 @@ extension ANIRecruitContributionViewController: ANIImageFilterViewControllerDele
     
     if isHaderImagePick {
       if let filteredImage = filteredImages[0] {
-        recruitContributionView.headerImage = filteredImage
+        recruitContributionView.headerImage = filteredImage.resize(size: IMAGE_SIZE)
       }
     } else {
-      if recruitContributionView.introduceImages.isEmpty {
-        recruitContributionView.introduceImages = filteredImages
-      } else {
-        for filteredImage in filteredImages {
-          recruitContributionView.introduceImages.append(filteredImage)
-        }
+      for filteredImage in filteredImages {
+        recruitContributionView.introduceImages.append(filteredImage?.resize(size: IMAGE_SIZE))
       }
     }
   }

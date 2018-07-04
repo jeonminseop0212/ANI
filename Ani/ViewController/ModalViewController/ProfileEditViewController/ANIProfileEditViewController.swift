@@ -57,6 +57,8 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
   
   private var familyImagesChange: Bool = false
   
+  private let IMAGE_SIZE: CGSize = CGSize(width: 500.0, height: 500.0)
+  
   var delegate: ANIProfileEditViewControllerDelegate?
   
   override func viewDidLoad() {
@@ -458,18 +460,22 @@ extension ANIProfileEditViewController: ANIImageFilterViewControllerDelegate {
     if isFamilyAdd {
       if familyImages != nil {
         for image in filteredImages {
-          familyImages?.append(image)
+          familyImages?.append(image?.resize(size: IMAGE_SIZE))
         }
       } else {
-        familyImages = filteredImages
+        var resizeIamges = [UIImage?]()
+        for image in filteredImages {
+          resizeIamges.append(image?.resize(size: IMAGE_SIZE))
+        }
+        familyImages = resizeIamges
       }
       
       familyImagesChange = true
     } else {
       if editImageIndex == 0 {
-        profileImage = filteredImage
+        profileImage = filteredImage.resize(size: IMAGE_SIZE)
       } else if let editImageIndex = editImageIndex {
-        self.familyImages?[editImageIndex - 1] = filteredImage
+        self.familyImages?[editImageIndex - 1] = filteredImage.resize(size: IMAGE_SIZE)
         familyImagesChange = true
       }
     }
