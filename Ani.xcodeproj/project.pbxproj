@@ -128,7 +128,7 @@
 		F57F7D8820844A90008A2645 /* ANISearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57F7D8720844A8F008A2645 /* ANISearchViewController.swift */; };
 		F57F7D8C20844C41008A2645 /* ANISearchCategoriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57F7D8B20844C41008A2645 /* ANISearchCategoriesView.swift */; };
 		F57F7D8E20844C4E008A2645 /* ANISearchCategoryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57F7D8D20844C4E008A2645 /* ANISearchCategoryCell.swift */; };
-		F57F7D9120844DC2008A2645 /* ANIUserSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57F7D9020844DC2008A2645 /* ANIUserSearchView.swift */; };
+		F57F7D9120844DC2008A2645 /* ANISearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57F7D9020844DC2008A2645 /* ANISearchView.swift */; };
 		F5B1EF9120725964000CFB0B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B1EF9020725964000CFB0B /* AppDelegate.swift */; };
 		F5B1EF9320725964000CFB0B /* ANIRecruitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B1EF9220725964000CFB0B /* ANIRecruitViewController.swift */; };
 		F5B1EF9820725964000CFB0B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F5B1EF9720725964000CFB0B /* Assets.xcassets */; };
@@ -297,7 +297,7 @@
 		F57F7D8720844A8F008A2645 /* ANISearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANISearchViewController.swift; sourceTree = "<group>"; };
 		F57F7D8B20844C41008A2645 /* ANISearchCategoriesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANISearchCategoriesView.swift; sourceTree = "<group>"; };
 		F57F7D8D20844C4E008A2645 /* ANISearchCategoryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANISearchCategoryCell.swift; sourceTree = "<group>"; };
-		F57F7D9020844DC2008A2645 /* ANIUserSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIUserSearchView.swift; sourceTree = "<group>"; };
+		F57F7D9020844DC2008A2645 /* ANISearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANISearchView.swift; sourceTree = "<group>"; };
 		F5B1EF8D20725963000CFB0B /* Ani.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Ani.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5B1EF9020725964000CFB0B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F5B1EF9220725964000CFB0B /* ANIRecruitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitViewController.swift; sourceTree = "<group>"; };
@@ -1072,7 +1072,7 @@
 			isa = PBXGroup;
 			children = (
 				F57F7D8A20844C0C008A2645 /* SearchCategory */,
-				F57F7D8F20844D8C008A2645 /* UserSearch */,
+				F57F7D8F20844D8C008A2645 /* Search */,
 			);
 			path = SearchView;
 			sourceTree = "<group>";
@@ -1086,13 +1086,13 @@
 			path = SearchCategory;
 			sourceTree = "<group>";
 		};
-		F57F7D8F20844D8C008A2645 /* UserSearch */ = {
+		F57F7D8F20844D8C008A2645 /* Search */ = {
 			isa = PBXGroup;
 			children = (
-				F57F7D9020844DC2008A2645 /* ANIUserSearchView.swift */,
+				F57F7D9020844DC2008A2645 /* ANISearchView.swift */,
 				F53E87B62084608000B19A2F /* ANIUserSearchViewCell.swift */,
 			);
-			path = UserSearch;
+			path = Search;
 			sourceTree = "<group>";
 		};
 		F5B1EF8420725963000CFB0B = {
@@ -1661,7 +1661,7 @@
 				CD0BFF1420C7619600D5959B /* FirebaseStory.swift in Sources */,
 				CD0FAD0A20BF8DFD00D8CD27 /* FirebaseUser.swift in Sources */,
 				CDDD04BA20B538540094DBFA /* ANILoginViewController.swift in Sources */,
-				F57F7D9120844DC2008A2645 /* ANIUserSearchView.swift in Sources */,
+				F57F7D9120844DC2008A2645 /* ANISearchView.swift in Sources */,
 				CDDE4B6E20E31390005762A1 /* ANIFollowUserViewCell.swift in Sources */,
 				CDAFD75F20DE1D1B00AEDD83 /* ANIRejectView.swift in Sources */,
 				CD0BFF1820C7AD9C00D5959B /* FirebaseQna.swift in Sources */,
