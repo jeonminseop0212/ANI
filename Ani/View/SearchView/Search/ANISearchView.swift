@@ -46,6 +46,8 @@ class ANISearchView: UIView {
     }
   }
   
+  var searchText: String = ""
+  
   private weak var activityIndicatorView: NVActivityIndicatorView?
   
   var delegate: ANISearchViewDelegate?
@@ -184,7 +186,7 @@ extension ANISearchView {
 
     DispatchQueue.global().async {
       let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_USERS).queryLimited(toFirst: 20).observeSingleEvent(of: .value, with: { (snapshot) in
+      databaseRef.child(KEY_USERS).queryOrdered(byChild: KEY_USER_NAME).queryLimited(toFirst: 20).observeSingleEvent(of: .value, with: { (snapshot) in
         for item in snapshot.children {
           if let snapshot = item as? DataSnapshot, let value = snapshot.value {
             do {
