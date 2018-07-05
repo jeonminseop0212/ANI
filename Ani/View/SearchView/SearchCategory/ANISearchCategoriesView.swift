@@ -9,16 +9,21 @@
 import UIKit
 import TinyConstraints
 
+protocol ANISearchCategoriesViewDelegate {
+  func didSelectedCell(index: Int)
+}
+
 class ANISearchCategoriesView: UIView {
   
   weak var categoryCollectionView: UICollectionView?
   
-  private var testArr = [String]()
+  private var category = [SearchCategory.user.rawValue, SearchCategory.story.rawValue, SearchCategory.qna.rawValue]
+  
+  var delegate: ANISearchCategoriesViewDelegate?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()
-    setTestModel()
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -39,34 +44,41 @@ class ANISearchCategoriesView: UIView {
     collectionView.alwaysBounceHorizontal = true
     collectionView.dataSource = self
     collectionView.delegate = self
+    let selectedIndexPath = IndexPath(item: 0, section: 0)
+    collectionView.selectItem(at: selectedIndexPath, animated: false, scrollPosition: .left)
     addSubview(collectionView)
     collectionView.edgesToSuperview()
     self.categoryCollectionView = collectionView
   }
-  
-  private func setTestModel() {
-    let arr = ["ユーザー", "ストリー", "質問"]
-    self.testArr = arr
-  }
 }
 
-extension ANISearchCategoriesView: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+//MARK: UICollectionViewDataSource
+extension ANISearchCategoriesView: UICollectionViewDataSource {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-    return testArr.count
+    return category.count
   }
   
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     let id = NSStringFromClass(ANISearchCategoryCell.self)
     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! ANISearchCategoryCell
-    cell.categoryLabel?.text = testArr[indexPath.item]
-    cell.backgroundColor = ANIColor.lightGray
-    cell.layer.cornerRadius = cell.frame.height / 2
-    cell.layer.masksToBounds = true
+    
+    cell.categoryLabel?.text = category[indexPath.item]
+    
     return cell
   }
-  
+}
+
+//MARK: UICollectionViewDelegateFlowLayout
+extension ANISearchCategoriesView: UICollectionViewDelegateFlowLayout {
   func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-    let size = ANISearchCategoryCell.sizeWithCategory(category: testArr[indexPath.item])
+    let size = ANISearchCategoryCell.sizeWithCategory(category: category[indexPath.item])
     return size
+  }
+}
+
+//MARK: UICollectionViewDelegate
+extension ANISearchCategoriesView: UICollectionViewDelegate {
+  func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    self.delegate?.didSelectedCell(index: indexPath.item)
   }
 }

@@ -59,7 +59,8 @@ class ANICommunityMenuBar: UIView {
   }
 }
 
-extension ANICommunityMenuBar: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+//MARK: UICollectionViewDataSource
+extension ANICommunityMenuBar: UICollectionViewDataSource {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
     return 2
   }
@@ -71,15 +72,21 @@ extension ANICommunityMenuBar: UICollectionViewDataSource, UICollectionViewDeleg
     return cell
   }
   
+  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+    return 0
+  }
+}
+
+//MAKR: UICollectionViewDelegateFlowLayout
+extension ANICommunityMenuBar: UICollectionViewDelegateFlowLayout {
   func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
     let size = CGSize(width: collectionView.frame.width / 2, height: collectionView.frame.height)
     return size
   }
-  
-  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-    return 0
-  }
-  
+}
+
+//MARK: UICollectionViewDelegate
+extension ANICommunityMenuBar: UICollectionViewDelegate {
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
     self.delegate?.didSelectCell(index: indexPath)
   }
