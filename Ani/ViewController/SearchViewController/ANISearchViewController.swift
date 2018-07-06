@@ -34,6 +34,14 @@ class ANISearchViewController: UIViewController {
     }
   }
   
+  private var searchText: String = "" {
+    didSet {
+      guard let searchView = self.searchView else { return }
+
+      searchView.searchText = searchText
+    }
+  }
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     setup()
@@ -161,7 +169,7 @@ extension ANISearchViewController: UISearchBarDelegate {
   }
   
   func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-    //TODO: search
+    self.searchText = searchText
   }
 }
 
