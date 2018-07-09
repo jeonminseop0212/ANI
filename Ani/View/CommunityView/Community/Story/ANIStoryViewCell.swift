@@ -279,7 +279,7 @@ class ANIStoryViewCell: UITableViewCell {
   
   func unobserveLove() {
     guard let story = self.story,
-      let storyId = story.id else { return }
+          let storyId = story.id else { return }
     
     let databaseRef = Database.database().reference()
     DispatchQueue.global().async {
@@ -322,12 +322,12 @@ class ANIStoryViewCell: UITableViewCell {
       DispatchQueue.global().async {
         databaseRef.child(KEY_STORIES).child(storyId).child(KEY_LOVE_IDS).updateChildValues([currentUserId: true])
         let date = ANIFunction.shared.getToday()
-        databaseRef.child(KEY_USERS).child(currentUserId).child(KEY_LOVE_STORY_IDS).updateChildValues([storyId: date])
+        databaseRef.child(KEY_LOVE_STORY_IDS).child(currentUserId).updateChildValues([storyId: date])
       }
     } else {
       DispatchQueue.global().async {
         databaseRef.child(KEY_STORIES).child(storyId).child(KEY_LOVE_IDS).child(currentUserId).removeValue()
-        databaseRef.child(KEY_USERS).child(currentUserId).child(KEY_LOVE_STORY_IDS).child(storyId).removeValue()
+        databaseRef.child(KEY_LOVE_STORY_IDS).child(currentUserId).child(storyId).removeValue()
       }
     }
   }

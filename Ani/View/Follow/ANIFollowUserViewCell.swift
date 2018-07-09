@@ -118,20 +118,26 @@ class ANIFollowUserViewCell: UITableViewCell {
   
   private func isFollowed() {
     guard let user = self.user,
-          let followerIds = user.followerIds,
+          let userId = user.uid,
           let currentUserId = ANISessionManager.shared.currentUserUid,
           let followButton = self.followButton,
           let followLabel = self.followLabel else { return }
     
-    for id in followerIds.keys {
-      if id == currentUserId {
-        followButton.base?.backgroundColor = .clear
-        followLabel.text = "フォロー中"
-        followLabel.textColor = ANIColor.green
-      } else {
-        followButton.base?.backgroundColor = ANIColor.green
-        followLabel.text = "フォロー"
-        followLabel.textColor = .white
+    let databaseRef = Database.database().reference()
+    
+    databaseRef.child(KEY_FOLLOWING_USER_IDS).child(currentUserId).observeSingleEvent(of: .value) { (snapshot) in
+      guard let followingUser = snapshot.value as? [String: String] else { return }
+      
+      for id in followingUser.keys {
+        if id == userId {
+          followButton.base?.backgroundColor = .clear
+          followLabel.text = "フォロー中"
+          followLabel.textColor = ANIColor.green
+        } else {
+          followButton.base?.backgroundColor = ANIColor.green
+          followLabel.text = "フォロー"
+          followLabel.textColor = .white
+        }
       }
     }
   }

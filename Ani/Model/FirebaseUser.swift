@@ -15,10 +15,4 @@ struct FirebaseUser: Codable {
   var introduce: String?
   var profileImageUrl: String?
   var familyImageUrls: [String]?
-  var postRecruitIds: [String: Bool]?
-  var postStoryIds: [String: Bool]?
-  var postQnaIds: [String: Bool]?
-  var followingUserIds: [String: String]?
-  var followerIds: [String: String]?
-  var chatGroupIds: [String: String]?
 }

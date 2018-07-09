@@ -91,117 +91,6 @@ class ANIOtherProfileBasicView: UIView {
     basicTableView.edgesToSuperview()
     self.basicTableView = basicTableView
   }
-  
-  private func loadUser() {
-    guard let userId = self.userId else { return }
-    
-    DispatchQueue.global().async {
-      let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_USERS).child(userId).observeSingleEvent(of: .value, with: { (snapshot) in
-        
-        guard let value = snapshot.value else { return }
-        do {
-          let user = try FirebaseDecoder().decode(FirebaseUser.self, from: value)
-          
-          self.user = user
-        } catch let error {
-          print(error)
-        }
-      })
-    }
-  }
-  
-  private func loadRecruit() {
-    guard let user = self.user,
-          let uid = user.uid else { return }
-    
-    DispatchQueue.global().async {
-      let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_USERS).child(uid).child(KEY_POST_RECRUIT_IDS).queryLimited(toFirst: 20).observeSingleEvent(of: .value) { (snapshot) in
-        
-        for item in snapshot.children {
-          if let snapshot = item as? DataSnapshot {
-            databaseRef.child(KEY_RECRUITS).child(snapshot.key).observeSingleEvent(of: .value, with: { (snapshot) in
-    
-              guard let value = snapshot.value else { return }
-              do {
-                let recruit = try FirebaseDecoder().decode(FirebaseRecruit.self, from: value)
-                self.recruits.insert(recruit, at: 0)
-    
-                DispatchQueue.main.async {
-                  guard let basicTableView = self.basicTableView else { return }
-                  basicTableView.reloadData()
-                }
-              } catch let error {
-                print(error)
-              }
-            })
-          }
-        }
-      }
-    }
-  }
-  
-  private func loadStory() {
-    guard let user = self.user,
-          let uid = user.uid else { return }
-    
-    DispatchQueue.global().async {
-      let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_USERS).child(uid).child(KEY_POST_STORY_IDS).queryLimited(toFirst: 20).observeSingleEvent(of: .value) { (snapshot) in
-
-        for item in snapshot.children {
-          if let snapshot = item as? DataSnapshot {
-            databaseRef.child(KEY_STORIES).child(snapshot.key).observeSingleEvent(of: .value, with: { (snapshot) in
-              
-              guard let value = snapshot.value else { return }
-              do {
-                let story = try FirebaseDecoder().decode(FirebaseStory.self, from: value)
-                self.stories.insert(story, at: 0)
-                
-                DispatchQueue.main.async {
-                  guard let basicTableView = self.basicTableView else { return }
-                  basicTableView.reloadData()
-                }
-              } catch let error {
-                print(error)
-              }
-            })
-          }
-        }
-      }
-    }
-  }
-  
-  private func loadQna() {
-    guard let user = self.user,
-          let uid = user.uid else { return }
-    
-    DispatchQueue.global().async {
-      let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_USERS).child(uid).child(KEY_POST_QNA_IDS).queryLimited(toFirst: 20).observeSingleEvent(of: .value) { (snapshot) in
-
-        for item in snapshot.children {
-          if let snapshot = item as? DataSnapshot {
-            databaseRef.child(KEY_QNAS).child(snapshot.key).observeSingleEvent(of: .value, with: { (snapshot) in
-              guard let value = snapshot.value else { return }
-              do {
-                let qna = try FirebaseDecoder().decode(FirebaseQna.self, from: value)
-                self.qnas.insert(qna, at: 0)
-                
-                DispatchQueue.main.async {
-                  guard let basicTableView = self.basicTableView else { return }
-                  basicTableView.reloadData()
-                }
-              } catch let error {
-                print(error)
-              }
-            })
-          }
-        }
-      }
-    }
-  }
 }
 
 //MARK: UITableViewDataSource
@@ -383,5 +272,119 @@ extension ANIOtherProfileBasicView: ANISupportViewCellDelegate {
 extension ANIOtherProfileBasicView: ANIQnaViewCellDelegate {
   func cellTapped(qna: FirebaseQna, user: FirebaseUser) {
     self.delegate?.qnaViewCellDidSelect(selectedQna: qna, user: user)
+  }
+}
+
+//MARK: data
+extension ANIOtherProfileBasicView {
+  private func loadUser() {
+    guard let userId = self.userId else { return }
+    
+    DispatchQueue.global().async {
+      let databaseRef = Database.database().reference()
+      databaseRef.child(KEY_USERS).child(userId).observeSingleEvent(of: .value, with: { (snapshot) in
+        
+        guard let value = snapshot.value else { return }
+        do {
+          let user = try FirebaseDecoder().decode(FirebaseUser.self, from: value)
+          
+          self.user = user
+        } catch let error {
+          print(error)
+        }
+      })
+    }
+  }
+  
+  private func loadRecruit() {
+    guard let user = self.user,
+          let uid = user.uid else { return }
+    
+    DispatchQueue.global().async {
+      let databaseRef = Database.database().reference()
+      databaseRef.child(KEY_POST_RECRUIT_IDS).child(uid).queryLimited(toFirst: 20).observeSingleEvent(of: .value) { (snapshot) in
+        
+        for item in snapshot.children {
+          if let snapshot = item as? DataSnapshot {
+            databaseRef.child(KEY_RECRUITS).child(snapshot.key).observeSingleEvent(of: .value, with: { (snapshot) in
+              
+              guard let value = snapshot.value else { return }
+              do {
+                let recruit = try FirebaseDecoder().decode(FirebaseRecruit.self, from: value)
+                self.recruits.insert(recruit, at: 0)
+                
+                DispatchQueue.main.async {
+                  guard let basicTableView = self.basicTableView else { return }
+                  basicTableView.reloadData()
+                }
+              } catch let error {
+                print(error)
+              }
+            })
+          }
+        }
+      }
+    }
+  }
+  
+  private func loadStory() {
+    guard let user = self.user,
+          let uid = user.uid else { return }
+    
+    DispatchQueue.global().async {
+      let databaseRef = Database.database().reference()
+      databaseRef.child(KEY_POST_STORY_IDS).child(uid).queryLimited(toFirst: 20).observeSingleEvent(of: .value) { (snapshot) in
+        
+        for item in snapshot.children {
+          if let snapshot = item as? DataSnapshot {
+            databaseRef.child(KEY_STORIES).child(snapshot.key).observeSingleEvent(of: .value, with: { (snapshot) in
+              
+              guard let value = snapshot.value else { return }
+              do {
+                let story = try FirebaseDecoder().decode(FirebaseStory.self, from: value)
+                self.stories.insert(story, at: 0)
+                
+                DispatchQueue.main.async {
+                  guard let basicTableView = self.basicTableView else { return }
+                  basicTableView.reloadData()
+                }
+              } catch let error {
+                print(error)
+              }
+            })
+          }
+        }
+      }
+    }
+  }
+  
+  private func loadQna() {
+    guard let user = self.user,
+          let uid = user.uid else { return }
+    
+    DispatchQueue.global().async {
+      let databaseRef = Database.database().reference()
+      databaseRef.child(KEY_POST_QNA_IDS).child(uid).queryLimited(toFirst: 20).observeSingleEvent(of: .value) { (snapshot) in
+        
+        for item in snapshot.children {
+          if let snapshot = item as? DataSnapshot {
+            databaseRef.child(KEY_QNAS).child(snapshot.key).observeSingleEvent(of: .value, with: { (snapshot) in
+              guard let value = snapshot.value else { return }
+              do {
+                let qna = try FirebaseDecoder().decode(FirebaseQna.self, from: value)
+                self.qnas.insert(qna, at: 0)
+                
+                DispatchQueue.main.async {
+                  guard let basicTableView = self.basicTableView else { return }
+                  basicTableView.reloadData()
+                }
+              } catch let error {
+                print(error)
+              }
+            })
+          }
+        }
+      }
+    }
   }
 }

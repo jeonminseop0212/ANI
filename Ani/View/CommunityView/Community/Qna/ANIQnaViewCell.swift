@@ -328,12 +328,12 @@ class ANIQnaViewCell: UITableViewCell {
       DispatchQueue.global().async {
         databaseRef.child(KEY_QNAS).child(qnaId).child(KEY_LOVE_IDS).updateChildValues([currentUserId: true])
         let date = ANIFunction.shared.getToday()
-        databaseRef.child(KEY_USERS).child(currentUserId).child(KEY_LOVE_QNA_IDS).updateChildValues([qnaId: date])
+        databaseRef.child(KEY_LOVE_QNA_IDS).child(currentUserId).updateChildValues([qnaId: date])
       }
     } else {
       DispatchQueue.global().async {
         databaseRef.child(KEY_QNAS).child(qnaId).child(KEY_LOVE_IDS).child(currentUserId).removeValue()
-        databaseRef.child(KEY_USERS).child(currentUserId).child(KEY_LOVE_QNA_IDS).child(qnaId).removeValue()
+        databaseRef.child(KEY_LOVE_QNA_IDS).child(currentUserId).child(qnaId).removeValue()
       }
     }
   }

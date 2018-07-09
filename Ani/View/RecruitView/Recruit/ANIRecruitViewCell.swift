@@ -519,12 +519,12 @@ class ANIRecruitViewCell: UITableViewCell {
       DispatchQueue.global().async {
         databaseRef.child(KEY_RECRUITS).child(recuritId).child(KEY_LOVE_IDS).updateChildValues([currentUserId: true])
         let date = ANIFunction.shared.getToday()
-        databaseRef.child(KEY_USERS).child(currentUserId).child(KEY_LOVE_RECRUIT_IDS).updateChildValues([recuritId: date])
+        databaseRef.child(KEY_LOVE_RECRUIT_IDS).child(currentUserId).updateChildValues([recuritId: date])
       }
     } else {
       DispatchQueue.global().async {
         databaseRef.child(KEY_RECRUITS).child(recuritId).child(KEY_LOVE_IDS).child(currentUserId).removeValue()
-        databaseRef.child(KEY_USERS).child(currentUserId).child(KEY_LOVE_RECRUIT_IDS).child(recuritId).removeValue()
+        databaseRef.child(KEY_LOVE_RECRUIT_IDS).child(currentUserId).child(recuritId).removeValue()
       }
     }
   }
@@ -559,7 +559,7 @@ class ANIRecruitViewCell: UITableViewCell {
         DispatchQueue.global().async {
           databaseRef.child(KEY_RECRUITS).child(recuritId).child(KEY_CLIP_IDS).updateChildValues([currentUserId: true])
           let date = ANIFunction.shared.getToday()
-          databaseRef.child(KEY_USERS).child(currentUserId).child(KEY_CLIP_RECRUIT_IDS).updateChildValues([recuritId: date])
+          databaseRef.child(KEY_CLIP_RECRUIT_IDS).child(currentUserId).updateChildValues([recuritId: date])
         }
       } else {
         UIView.animate(withDuration: 0.15) {
@@ -568,7 +568,7 @@ class ANIRecruitViewCell: UITableViewCell {
         
         DispatchQueue.global().async {
           databaseRef.child(KEY_RECRUITS).child(recuritId).child(KEY_CLIP_IDS).child(currentUserId).removeValue()
-          databaseRef.child(KEY_USERS).child(currentUserId).child(KEY_CLIP_RECRUIT_IDS).child(recuritId).removeValue()
+          databaseRef.child(KEY_CLIP_RECRUIT_IDS).child(currentUserId).child(recuritId).removeValue()
         }
       }
     } else {

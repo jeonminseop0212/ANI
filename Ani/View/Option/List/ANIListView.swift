@@ -95,194 +95,6 @@ class ANIListView: UIView {
     activityIndicatorView.centerInSuperview()
     self.activityIndicatorView = activityIndicatorView
   }
-  
-  private func loadLoveRecruit() {
-    guard let currentUser = ANISessionManager.shared.currentUser,
-          let uid = currentUser.uid else { return }
-    
-    DispatchQueue.global().async {
-      let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_USERS).child(uid).child(KEY_LOVE_RECRUIT_IDS).queryOrderedByValue().queryLimited(toFirst: 20).observeSingleEvent(of: .value) { (snapshot) in
-
-        for item in snapshot.children {
-          if let snapshot = item as? DataSnapshot {
-            databaseRef.child(KEY_RECRUITS).child(snapshot.key).observeSingleEvent(of: .value, with: { (snapshot) in
-              
-              guard let value = snapshot.value else { return }
-              do {
-                let recruit = try FirebaseDecoder().decode(FirebaseRecruit.self, from: value)
-                self.loveRecruits.insert(recruit, at: 0)
-                
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
-                  guard let listTableView = self.listTableView,
-                        let activityIndicatorView = self.activityIndicatorView else { return }
-                  
-                  listTableView.reloadData()
-                  activityIndicatorView.stopAnimating()
-                  
-                  UIView.animate(withDuration: 0.2, animations: {
-                    listTableView.alpha = 1.0
-                  })
-                })
-              } catch let error {
-                guard let activityIndicatorView = self.activityIndicatorView else { return }
-                
-                print(error)
-                activityIndicatorView.stopAnimating()
-              }
-            })
-          }
-        }
-        
-        if snapshot.value as? [String: Any] == nil {
-          guard let activityIndicatorView = self.activityIndicatorView else { return }
-          
-          activityIndicatorView.stopAnimating()
-        }
-      }
-    }
-  }
-  
-  private func loadLoveStory() {
-    guard let currentUser = ANISessionManager.shared.currentUser,
-          let uid = currentUser.uid else { return }
-    
-    DispatchQueue.global().async {
-      let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_USERS).child(uid).child(KEY_LOVE_STORY_IDS).queryOrderedByValue().queryLimited(toFirst: 20).observeSingleEvent(of: .value) { (snapshot) in
-
-        for item in snapshot.children {
-          if let snapshot = item as? DataSnapshot {
-            databaseRef.child(KEY_STORIES).child(snapshot.key).observeSingleEvent(of: .value, with: { (snapshot) in
-              
-              guard let value = snapshot.value else { return }
-              do {
-                let story = try FirebaseDecoder().decode(FirebaseStory.self, from: value)
-                self.loveStories.insert(story, at: 0)
-                
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
-                  guard let listTableView = self.listTableView,
-                    let activityIndicatorView = self.activityIndicatorView else { return }
-                  
-                  listTableView.reloadData()
-                  activityIndicatorView.stopAnimating()
-                  
-                  UIView.animate(withDuration: 0.2, animations: {
-                    listTableView.alpha = 1.0
-                  })
-                })
-              } catch let error {
-                guard let activityIndicatorView = self.activityIndicatorView else { return }
-
-                print(error)
-                activityIndicatorView.stopAnimating()
-              }
-            })
-          }
-        }
-        
-        if snapshot.value as? [String: Any] == nil {
-          guard let activityIndicatorView = self.activityIndicatorView else { return }
-          
-          activityIndicatorView.stopAnimating()
-        }
-      }
-    }
-  }
-  
-  private func loadLoveQna() {
-    guard let currentUser = ANISessionManager.shared.currentUser,
-          let uid = currentUser.uid else { return }
-    
-    DispatchQueue.global().async {
-      let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_USERS).child(uid).child(KEY_LOVE_QNA_IDS).queryOrderedByValue().queryLimited(toFirst: 20).observeSingleEvent(of: .value) { (snapshot) in
-
-        for item in snapshot.children {
-          if let snapshot = item as? DataSnapshot {
-            databaseRef.child(KEY_QNAS).child(snapshot.key).observeSingleEvent(of: .value, with: { (snapshot) in
-              
-              guard let value = snapshot.value else { return }
-              do {
-                let qna = try FirebaseDecoder().decode(FirebaseQna.self, from: value)
-                self.loveQnas.insert(qna, at: 0)
-                
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
-                  guard let listTableView = self.listTableView,
-                    let activityIndicatorView = self.activityIndicatorView else { return }
-                  
-                  listTableView.reloadData()
-                  activityIndicatorView.stopAnimating()
-                  
-                  UIView.animate(withDuration: 0.2, animations: {
-                    listTableView.alpha = 1.0
-                  })
-                })
-              } catch let error {
-                guard let activityIndicatorView = self.activityIndicatorView else { return }
-
-                print(error)
-                activityIndicatorView.stopAnimating()
-              }
-            })
-          }
-        }
-        
-        if snapshot.value as? [String: Any] == nil {
-          guard let activityIndicatorView = self.activityIndicatorView else { return }
-          
-          activityIndicatorView.stopAnimating()
-        }
-      }
-    }
-  }
-  
-  private func loadClipRecruit() {
-    guard let currentUser = ANISessionManager.shared.currentUser,
-          let uid = currentUser.uid else { return }
-    
-    DispatchQueue.global().async {
-      let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_USERS).child(uid).child(KEY_CLIP_RECRUIT_IDS).queryOrderedByValue().queryLimited(toFirst: 20).observeSingleEvent(of: .value) { (snapshot) in
-        
-        for item in snapshot.children {
-          if let snapshot = item as? DataSnapshot {
-            databaseRef.child(KEY_RECRUITS).child(snapshot.key).observeSingleEvent(of: .value, with: { (snapshot) in
-              
-              guard let value = snapshot.value else { return }
-              do {
-                let recruit = try FirebaseDecoder().decode(FirebaseRecruit.self, from: value)
-                self.clipRecruits.insert(recruit, at: 0)
-                
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
-                  guard let listTableView = self.listTableView,
-                    let activityIndicatorView = self.activityIndicatorView else { return }
-                  
-                  listTableView.reloadData()
-                  activityIndicatorView.stopAnimating()
-                  
-                  UIView.animate(withDuration: 0.2, animations: {
-                    listTableView.alpha = 1.0
-                  })
-                })
-              } catch let error {
-                guard let activityIndicatorView = self.activityIndicatorView else { return }
-                
-                print(error)
-                activityIndicatorView.stopAnimating()
-              }
-            })
-          }
-        }
-        
-        if snapshot.value as? [String: Any] == nil {
-          guard let activityIndicatorView = self.activityIndicatorView else { return }
-          
-          activityIndicatorView.stopAnimating()
-        }
-      }
-    }
-  }
 }
 
 //MARK: UITableViewDataSource
@@ -425,5 +237,196 @@ extension ANIListView: ANISupportViewCellDelegate {
 extension ANIListView: ANIQnaViewCellDelegate {
   func cellTapped(qna: FirebaseQna, user: FirebaseUser) {
     self.delegate?.qnaViewCellDidSelect(selectedQna: qna, user: user)
+  }
+}
+
+//MARK: data
+extension ANIListView {
+  private func loadLoveRecruit() {
+    guard let currentUser = ANISessionManager.shared.currentUser,
+          let uid = currentUser.uid else { return }
+    
+    DispatchQueue.global().async {
+      let databaseRef = Database.database().reference()
+      databaseRef.child(KEY_LOVE_RECRUIT_IDS).child(uid).queryOrderedByValue().queryLimited(toFirst: 20).observeSingleEvent(of: .value) { (snapshot) in
+        
+        for item in snapshot.children {
+          if let snapshot = item as? DataSnapshot {
+            databaseRef.child(KEY_RECRUITS).child(snapshot.key).observeSingleEvent(of: .value, with: { (snapshot) in
+              
+              guard let value = snapshot.value else { return }
+              do {
+                let recruit = try FirebaseDecoder().decode(FirebaseRecruit.self, from: value)
+                self.loveRecruits.insert(recruit, at: 0)
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
+                  guard let listTableView = self.listTableView,
+                        let activityIndicatorView = self.activityIndicatorView else { return }
+                  
+                  listTableView.reloadData()
+                  activityIndicatorView.stopAnimating()
+                  
+                  UIView.animate(withDuration: 0.2, animations: {
+                    listTableView.alpha = 1.0
+                  })
+                })
+              } catch let error {
+                guard let activityIndicatorView = self.activityIndicatorView else { return }
+                
+                print(error)
+                activityIndicatorView.stopAnimating()
+              }
+            })
+          }
+        }
+        
+        if snapshot.value as? [String: Any] == nil {
+          guard let activityIndicatorView = self.activityIndicatorView else { return }
+          
+          activityIndicatorView.stopAnimating()
+        }
+      }
+    }
+  }
+  
+  private func loadLoveStory() {
+    guard let currentUser = ANISessionManager.shared.currentUser,
+          let uid = currentUser.uid else { return }
+    
+    DispatchQueue.global().async {
+      let databaseRef = Database.database().reference()
+      databaseRef.child(KEY_LOVE_STORY_IDS).child(uid).queryOrderedByValue().queryLimited(toFirst: 20).observeSingleEvent(of: .value) { (snapshot) in
+        
+        for item in snapshot.children {
+          if let snapshot = item as? DataSnapshot {
+            databaseRef.child(KEY_STORIES).child(snapshot.key).observeSingleEvent(of: .value, with: { (snapshot) in
+              
+              guard let value = snapshot.value else { return }
+              do {
+                let story = try FirebaseDecoder().decode(FirebaseStory.self, from: value)
+                self.loveStories.insert(story, at: 0)
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
+                  guard let listTableView = self.listTableView,
+                    let activityIndicatorView = self.activityIndicatorView else { return }
+                  
+                  listTableView.reloadData()
+                  activityIndicatorView.stopAnimating()
+                  
+                  UIView.animate(withDuration: 0.2, animations: {
+                    listTableView.alpha = 1.0
+                  })
+                })
+              } catch let error {
+                guard let activityIndicatorView = self.activityIndicatorView else { return }
+
+                print(error)
+                activityIndicatorView.stopAnimating()
+              }
+            })
+          }
+        }
+        
+        if snapshot.value as? [String: Any] == nil {
+          guard let activityIndicatorView = self.activityIndicatorView else { return }
+          
+          activityIndicatorView.stopAnimating()
+        }
+      }
+    }
+  }
+  
+  private func loadLoveQna() {
+    guard let currentUser = ANISessionManager.shared.currentUser,
+          let uid = currentUser.uid else { return }
+    
+    DispatchQueue.global().async {
+      let databaseRef = Database.database().reference()
+      databaseRef.child(KEY_LOVE_QNA_IDS).child(uid).queryOrderedByValue().queryLimited(toFirst: 20).observeSingleEvent(of: .value) { (snapshot) in
+        
+        for item in snapshot.children {
+          if let snapshot = item as? DataSnapshot {
+            databaseRef.child(KEY_QNAS).child(snapshot.key).observeSingleEvent(of: .value, with: { (snapshot) in
+              
+              guard let value = snapshot.value else { return }
+              do {
+                let qna = try FirebaseDecoder().decode(FirebaseQna.self, from: value)
+                self.loveQnas.insert(qna, at: 0)
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
+                  guard let listTableView = self.listTableView,
+                    let activityIndicatorView = self.activityIndicatorView else { return }
+                  
+                  listTableView.reloadData()
+                  activityIndicatorView.stopAnimating()
+                  
+                  UIView.animate(withDuration: 0.2, animations: {
+                    listTableView.alpha = 1.0
+                  })
+                })
+              } catch let error {
+                guard let activityIndicatorView = self.activityIndicatorView else { return }
+
+                print(error)
+                activityIndicatorView.stopAnimating()
+              }
+            })
+          }
+        }
+        
+        if snapshot.value as? [String: Any] == nil {
+          guard let activityIndicatorView = self.activityIndicatorView else { return }
+          
+          activityIndicatorView.stopAnimating()
+        }
+      }
+    }
+  }
+  
+  private func loadClipRecruit() {
+    guard let currentUser = ANISessionManager.shared.currentUser,
+          let uid = currentUser.uid else { return }
+    
+    DispatchQueue.global().async {
+      let databaseRef = Database.database().reference()
+      databaseRef.child(KEY_CLIP_RECRUIT_IDS).child(uid).queryOrderedByValue().queryLimited(toFirst: 20).observeSingleEvent(of: .value) { (snapshot) in
+        
+        for item in snapshot.children {
+          if let snapshot = item as? DataSnapshot {
+            databaseRef.child(KEY_RECRUITS).child(snapshot.key).observeSingleEvent(of: .value, with: { (snapshot) in
+              
+              guard let value = snapshot.value else { return }
+              do {
+                let recruit = try FirebaseDecoder().decode(FirebaseRecruit.self, from: value)
+                self.clipRecruits.insert(recruit, at: 0)
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
+                  guard let listTableView = self.listTableView,
+                    let activityIndicatorView = self.activityIndicatorView else { return }
+                  
+                  listTableView.reloadData()
+                  activityIndicatorView.stopAnimating()
+                  
+                  UIView.animate(withDuration: 0.2, animations: {
+                    listTableView.alpha = 1.0
+                  })
+                })
+              } catch let error {
+                guard let activityIndicatorView = self.activityIndicatorView else { return }
+                
+                print(error)
+                activityIndicatorView.stopAnimating()
+              }
+            })
+          }
+        }
+        
+        if snapshot.value as? [String: Any] == nil {
+          guard let activityIndicatorView = self.activityIndicatorView else { return }
+          
+          activityIndicatorView.stopAnimating()
+        }
+      }
+    }
   }
 }

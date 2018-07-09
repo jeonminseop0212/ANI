@@ -224,7 +224,7 @@ class ANIProfileCell: UITableViewCell {
     
     let databaseRef = Database.database().reference()
     
-    databaseRef.child(KEY_USERS).child(currentUserId).child(KEY_FOLLOWING_USER_IDS).observe(.value) { (snapshot) in
+    databaseRef.child(KEY_FOLLOWING_USER_IDS).child(currentUserId).observe(.value) { (snapshot) in
       if let followingUserIds = snapshot.value as? [String: String] {
         self.followingUserIds = followingUserIds
       } else {
@@ -232,7 +232,7 @@ class ANIProfileCell: UITableViewCell {
       }
     }
     
-    databaseRef.child(KEY_USERS).child(currentUserId).child(KEY_FOLLOWER_IDS).observe(.value) { (snapshot) in
+    databaseRef.child(KEY_FOLLOWER_IDS).child(currentUserId).observe(.value) { (snapshot) in
       if let followerIds = snapshot.value as? [String: String] {
         self.followerIds = followerIds
       } else {

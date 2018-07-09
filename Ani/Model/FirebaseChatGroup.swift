@@ -10,7 +10,7 @@ import UIKit
 
 struct FirebaseChatGroup: Codable {
   let groupId: String
-  let memberIds: [String: Bool]
+  let memberIds: [String: Bool]?
   let updateDate: String
   let lastMessage: String
 }

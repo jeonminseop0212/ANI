@@ -264,11 +264,10 @@ class ANIRecruitContributionViewController: UIViewController {
           databaseRecruitRef.updateChildValues(data)
           
           do {
-            let detabaseRef = Database.database().reference()
-            if let currentUser = ANISessionManager.shared.currentUser, let uid = currentUser.uid, let id = recruit.id {
-              let detabaseUsersRef = detabaseRef.child(KEY_USERS).child(uid).child(KEY_POST_RECRUIT_IDS)
+            let databaseRef = Database.database().reference()
+            if let currentUserUid = ANISessionManager.shared.currentUserUid, let id = recruit.id {
               let value: [String: Bool] = [id: true]
-              detabaseUsersRef.updateChildValues(value)
+              databaseRef.child(KEY_POST_RECRUIT_IDS).child(currentUserUid).updateChildValues(value)
             }
           }
         }
