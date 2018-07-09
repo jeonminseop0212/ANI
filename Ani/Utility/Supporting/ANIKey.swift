@@ -60,3 +60,10 @@ let KEY_CHAT_LAST_MESSAGE = "lastMessage"
 //chat message
 let KEY_CHAT_MESSAGES = "chatChatMessages"
 
+//noti
+let KEY_NOTIFICATIONS = "notifications"
+let KEY_NOTI_KIND_RECRUIT = "recruit"
+let KEY_NOTI_KIND_STROY = "story"
+let KEY_NOTI_KIND_QNA = "qna"
+let KEY_NORI_KIND_COMMET = "comment"
+let KEY_NOTI_KIND_FOLLOW = "follow"

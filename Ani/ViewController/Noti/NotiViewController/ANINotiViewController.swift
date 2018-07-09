@@ -81,6 +81,7 @@ class ANINotiViewController: UIViewController {
   
   private func setupNotifications() {
     ANINotificationManager.receive(messageCellTapped: self, selector: #selector(pushChat))
+    ANINotificationManager.receive(profileImageViewTapped: self, selector: #selector(pushOtherProfile))
   }
   
   private func removeNotifications() {
@@ -112,6 +113,22 @@ class ANINotiViewController: UIViewController {
     chatViewController.hidesBottomBarWhenPushed = true
     self.navigationController?.pushViewController(chatViewController, animated: true)
   }
+  
+  @objc private func pushOtherProfile(_ notification: NSNotification) {
+    guard let userId = notification.object as? String else { return }
+    
+    if let currentUserUid = ANISessionManager.shared.currentUserUid, currentUserUid == userId {
+      let profileViewController = ANIProfileViewController()
+      profileViewController.hidesBottomBarWhenPushed = true
+      self.navigationController?.pushViewController(profileViewController, animated: true)
+      profileViewController.isBackButtonHide = false
+    } else {
+      let otherProfileViewController = ANIOtherProfileViewController()
+      otherProfileViewController.hidesBottomBarWhenPushed = true
+      otherProfileViewController.userId = userId
+      self.navigationController?.pushViewController(otherProfileViewController, animated: true)
+    }
+  }
 }
 
 extension ANINotiViewController: UICollectionViewDataSource {
@@ -123,12 +140,17 @@ extension ANINotiViewController: UICollectionViewDataSource {
     if indexPath.item == 0 {
       let notiId = NSStringFromClass(ANINotiNotiCell.self)
       let cell = collectionView.dequeueReusableCell(withReuseIdentifier: notiId, for: indexPath) as! ANINotiNotiCell
+      
       cell.frame.origin.y = collectionView.frame.origin.y
+      cell.delegate = self
+      
       return cell
     } else {
       let messageId = NSStringFromClass(ANINotiMessageCell.self)
       let cell = collectionView.dequeueReusableCell(withReuseIdentifier: messageId, for: indexPath) as! ANINotiMessageCell
+      
       cell.frame.origin.y = collectionView.frame.origin.y
+      
       return cell
     }
   }
@@ -178,6 +200,27 @@ extension ANINotiViewController: ANINeedLoginViewDelegate {
     let initialViewController = ANIInitialViewController()
     let navigationController = UINavigationController(rootViewController: initialViewController)
     self.present(navigationController, animated: true, completion: nil)
+  }
+}
+
+//MARK: ANINotiNotiCellDelegate
+extension ANINotiViewController: ANINotiNotiCellDelegate {
+  func cellTapped(noti: FirebaseNotification) {
+    if noti.kind == KEY_NOTI_KIND_RECRUIT {
+      let notiDetailViewController = ANINotiDetailViewController()
+      notiDetailViewController.navigationTitle = "募集"
+      notiDetailViewController.notiKind = .recruit
+      notiDetailViewController.notiId = noti.notiId
+      self.navigationController?.pushViewController(notiDetailViewController, animated: true)
+    } else if noti.kind == KEY_NOTI_KIND_STROY {
+      //TODO
+    } else if noti.kind == KEY_NOTI_KIND_QNA {
+      
+    } else if noti.kind == KEY_NORI_KIND_COMMET {
+      
+    } else if noti.kind == KEY_NOTI_KIND_FOLLOW {
+      
+    }
   }
 }
 

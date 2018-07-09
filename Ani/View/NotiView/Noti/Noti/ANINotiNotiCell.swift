@@ -8,6 +8,10 @@
 
 import UIKit
 
+protocol ANINotiNotiCellDelegate {
+  func cellTapped(noti: FirebaseNotification)
+}
+
 class ANINotiNotiCell: UICollectionViewCell {
   
   private weak var notiView: ANINotiView?
@@ -20,6 +24,8 @@ class ANINotiNotiCell: UICollectionViewCell {
     }
   }
   
+  var delegate: ANINotiNotiCellDelegate?
+  
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()
@@ -31,8 +37,16 @@ class ANINotiNotiCell: UICollectionViewCell {
   
   private func setup() {
     let notiView = ANINotiView()
+    notiView.delegate = self
     addSubview(notiView)
     notiView.edgesToSuperview()
     self.notiView = notiView
+  }
+}
+
+//MARK: ANINotiViewDelegate
+extension ANINotiNotiCell: ANINotiViewDelegate {
+  func cellTapped(noti: FirebaseNotification) {
+    self.delegate?.cellTapped(noti: noti)
   }
 }

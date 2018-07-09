@@ -507,6 +507,44 @@ class ANIRecruitViewCell: UITableViewCell {
     }
   }
   
+  private func updateNoti() {
+    guard let recruit = self.recruit,
+          let recuritId = recruit.id,
+          let currentUser = ANISessionManager.shared.currentUser,
+          let currentUserName = currentUser.userName,
+          let currentUserId = ANISessionManager.shared.currentUserUid,
+          let user = self.user,
+          let userId = user.uid else { return }
+    
+    let databaseRef = Database.database().reference()
+    
+    DispatchQueue.global().async {
+      do {
+        let noti = "\(currentUserName)さんが「\(recruit.title)」募集を「いいね」しました。"
+        let notification = FirebaseNotification(userId: currentUserId, noti: noti, kind: KEY_NOTI_KIND_RECRUIT, notiId: recuritId)
+        if let data = try FirebaseEncoder().encode(notification) as? [String : AnyObject] {
+          
+          databaseRef.child(KEY_NOTIFICATIONS).child(userId).child(recuritId).updateChildValues(data)
+        }
+      } catch let error {
+        print(error)
+      }
+    }
+  }
+  
+  private func removeNoti() {
+    guard let recruit = self.recruit,
+          let recuritId = recruit.id,
+          let user = self.user,
+          let userId = user.uid else { return }
+    
+    let databaseRef = Database.database().reference()
+    
+    DispatchQueue.global().async {
+      databaseRef.child(KEY_NOTIFICATIONS).child(userId).child(recuritId).removeValue()
+    }
+  }
+  
   //MARK: action
   @objc private func love() {
     guard let recruit = self.recruit,
@@ -520,11 +558,15 @@ class ANIRecruitViewCell: UITableViewCell {
         databaseRef.child(KEY_RECRUITS).child(recuritId).child(KEY_LOVE_IDS).updateChildValues([currentUserId: true])
         let date = ANIFunction.shared.getToday()
         databaseRef.child(KEY_LOVE_RECRUIT_IDS).child(currentUserId).updateChildValues([recuritId: date])
+        
+        self.updateNoti()
       }
     } else {
       DispatchQueue.global().async {
         databaseRef.child(KEY_RECRUITS).child(recuritId).child(KEY_LOVE_IDS).child(currentUserId).removeValue()
         databaseRef.child(KEY_LOVE_RECRUIT_IDS).child(currentUserId).child(recuritId).removeValue()
+        
+        self.removeNoti()
       }
     }
   }

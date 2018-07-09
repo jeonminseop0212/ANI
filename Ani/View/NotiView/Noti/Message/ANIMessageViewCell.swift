@@ -20,6 +20,7 @@ class ANIMessageViewCell: UITableViewCell {
   
   var chatGroup: FirebaseChatGroup? {
     didSet {
+      loadUser()
       reloadLayout()
     }
   }
@@ -48,6 +49,9 @@ class ANIMessageViewCell: UITableViewCell {
     profileImageView.backgroundColor = ANIColor.bg
     profileImageView.layer.cornerRadius = PROFILE_IMAGE_VIEW_HEIGHT / 2
     profileImageView.layer.masksToBounds = true
+    profileImageView.isUserInteractionEnabled = true
+    let profileImageTapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped))
+    profileImageView.addGestureRecognizer(profileImageTapGesture)
     addSubview(profileImageView)
     profileImageView.topToSuperview(offset: 10.0)
     profileImageView.leftToSuperview(offset: 10.0)
@@ -116,7 +120,39 @@ class ANIMessageViewCell: UITableViewCell {
     userNameLabel.text = user.userName
   }
   
-  func loadUser() {
+  func observeGroup() {
+    guard let chatGroup = self.chatGroup else { return }
+    
+    let databaseRef = Database.database().reference()
+    databaseRef.child(KEY_CHAT_GROUPS).child(chatGroup.groupId).observe(.value) { (snapshot) in
+      if let groupValue = snapshot.value {
+        do {
+          let group = try FirebaseDecoder().decode(FirebaseChatGroup.self, from: groupValue)
+          self.chatGroup = group
+        } catch let error {
+          print(error)
+        }
+      }
+    }
+  }
+  
+  @objc private func cellTapped() {
+    guard let user = self.user else { return }
+    
+    ANINotificationManager.postMessageCellTapped(user: user)
+  }
+  
+  @objc private func profileImageViewTapped() {
+    guard let user = self.user,
+          let userId = user.uid else { return }
+    
+    ANINotificationManager.postProfileImageViewTapped(userId: userId)
+  }
+}
+
+//MARK: data
+extension ANIMessageViewCell {
+  private func loadUser() {
     guard let chatGroup = self.chatGroup,
           let currentUserUid = ANISessionManager.shared.currentUserUid,
           let memberIds = chatGroup.memberIds else { return }
@@ -142,27 +178,5 @@ class ANIMessageViewCell: UITableViewCell {
         }
       }
     }
-  }
-  
-  func observeGroup() {
-    guard let chatGroup = self.chatGroup else { return }
-    
-    let databaseRef = Database.database().reference()
-    databaseRef.child(KEY_CHAT_GROUPS).child(chatGroup.groupId).observe(.value) { (snapshot) in
-      if let groupValue = snapshot.value {
-        do {
-          let group = try FirebaseDecoder().decode(FirebaseChatGroup.self, from: groupValue)
-          self.chatGroup = group
-        } catch let error {
-          print(error)
-        }
-      }
-    }
-  }
-  
-  @objc private func cellTapped() {
-    guard let user = self.user else { return }
-    
-    ANINotificationManager.postMessageCellTapped(user: user)
   }
 }
