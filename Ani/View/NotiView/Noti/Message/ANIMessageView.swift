@@ -76,7 +76,7 @@ class ANIMessageView: UIView {
     
     activityIndicatorView.startAnimating()
 
-    databaseRef.child(KEY_USERS).child(crrentUserUid).child(KEY_CHAT_GROUP_IDS).queryOrderedByValue().queryLimited(toFirst: 20).observe(.value) { (snapshot) in
+    databaseRef.child(KEY_CHAT_GROUP_IDS).child(crrentUserUid).queryOrderedByValue().queryLimited(toFirst: 20).observe(.value) { (snapshot) in
       if !self.chatGroups.isEmpty {
         self.chatGroups.removeAll()
       }

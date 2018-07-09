@@ -24,6 +24,8 @@ class ANIChatBar: UIView {
   
   var user: FirebaseUser?
   
+  var isHaveGroup: Bool = false
+  
   override init(frame: CGRect) {
     super.init(frame: frame)
     
@@ -125,24 +127,17 @@ class ANIChatBar: UIView {
     }
   }
   
-  private func updateChatGroupIds() {
-    guard let chatGroupId = self.chatGroupId else { return }
+  private func checkMember() {
+    guard let user = self.user,
+          let userId = user.uid,
+          let currentUserUid = ANISessionManager.shared.currentUserUid else { return }
     
-    let databaseRef = Database.database().reference()
-
-    DispatchQueue.global().async {
-      if let currentUserUid = ANISessionManager.shared.currentUserUid {
-        let detabaseUsersRef = databaseRef.child(KEY_USERS).child(currentUserUid).child(KEY_CHAT_GROUP_IDS)
-        let date = ANIFunction.shared.getToday()
-        let value: [String: String] = [chatGroupId: date]
-        detabaseUsersRef.updateChildValues(value)
-      }
+    if !isHaveGroup {
+      let databaseRef = Database.database().reference()
       
-      if let user = self.user, let userId = user.uid {
-        let detabaseUsersRef = databaseRef.child(KEY_USERS).child(userId).child(KEY_CHAT_GROUP_IDS)
-        let date = ANIFunction.shared.getToday()
-        let value: [String: String] = [chatGroupId: date]
-        detabaseUsersRef.updateChildValues(value)
+      DispatchQueue.global().async {
+        let memberIds = [currentUserUid: true, userId: true]
+        databaseRef.child(KEY_CHAT_GROUPS).child(KEY_CHAT_MEMBER_IDS).updateChildValues(memberIds)
       }
     }
   }
@@ -152,20 +147,12 @@ class ANIChatBar: UIView {
     guard let chatTextView = self.chatTextView,
           let text = chatTextView.text,
           let currentuserUid = ANISessionManager.shared.currentUserUid,
-          let user = self.user,
-          let userUid = user.uid,
           let chatGroupId = self.chatGroupId else { return }
 
     let date = ANIFunction.shared.getToday()
     let message = FirebaseChatMessage(userId: currentuserUid, message: text, date: date)
     
-    if let chatGroupIds = user.chatGroupIds {
-      if !chatGroupIds.keys.contains(chatGroupId) {
-        updateChatGroupIds()
-      }
-    } else {
-      updateChatGroupIds()
-    }
+    checkMember()
 
     do {
       if let message = try FirebaseEncoder().encode(message) as? [String : AnyObject] {
@@ -178,13 +165,6 @@ class ANIChatBar: UIView {
           let detabaseGroupRef = databaseRef.child(KEY_CHAT_GROUPS).child(chatGroupId)
           let groupValue: [String: String] = [KEY_CHAT_UPDATE_DATE: date, KEY_CHAT_LAST_MESSAGE: text]
           detabaseGroupRef.updateChildValues(groupValue)
-          
-          let databaseCurrentUserRef = databaseRef.child(KEY_USERS).child(currentuserUid).child(KEY_CHAT_GROUP_IDS)
-          let userValue: [String: String] = [chatGroupId: date]
-          databaseCurrentUserRef.updateChildValues(userValue)
-          
-          let databaseUserRef = databaseRef.child(KEY_USERS).child(userUid).child(KEY_CHAT_GROUP_IDS)
-          databaseUserRef.updateChildValues(userValue)
         }
       }
     } catch let error {

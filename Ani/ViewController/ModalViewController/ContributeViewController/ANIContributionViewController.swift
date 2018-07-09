@@ -267,10 +267,9 @@ class ANIContributionViewController: UIViewController {
       }
       do {
         let detabaseRef = Database.database().reference()
-        if let currentUser = ANISessionManager.shared.currentUser, let uid = currentUser.uid, let id = story.id {
-          let detabaseUsersRef = detabaseRef.child(KEY_USERS).child(uid).child(KEY_POST_STORY_IDS)
+        if let currentUserUid = ANISessionManager.shared.currentUserUid, let id = story.id {
           let value: [String: Bool] = [id: true]
-          detabaseUsersRef.updateChildValues(value)
+          detabaseRef.child(KEY_POST_STORY_IDS).child(currentUserUid).updateChildValues(value)
         }
       }
     } catch let error {
@@ -286,9 +285,8 @@ class ANIContributionViewController: UIViewController {
       do {
         let detabaseRef = Database.database().reference()
         if let currentUser = ANISessionManager.shared.currentUser, let uid = currentUser.uid, let id = qna.id {
-          let detabaseUsersRef = detabaseRef.child(KEY_USERS).child(uid).child(KEY_POST_QNA_IDS)
           let value: [String: Bool] = [id: true]
-          detabaseUsersRef.updateChildValues(value)
+          detabaseRef.child(KEY_POST_QNA_IDS).child(uid).updateChildValues(value)
         }
       }
     } catch let error {

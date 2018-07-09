@@ -45,7 +45,13 @@ class ANIChatViewController: UIViewController {
     }
   }
   
-  private var isHaveGroup: Bool = false
+  private var isHaveGroup: Bool = false {
+    didSet {
+      guard let chatBar = self.chatBar else { return }
+      
+      chatBar.isHaveGroup = isHaveGroup
+    }
+  }
   
   var isPush: Bool = false
   
@@ -145,43 +151,39 @@ class ANIChatViewController: UIViewController {
   }
   
   private func checkGroup() {
-    guard let currentUser = ANISessionManager.shared.currentUser,
+    guard let currentUserUid = ANISessionManager.shared.currentUserUid,
           let user = self.user,
           let userId = user.uid else { return }
     
-    if let chatGroupIds = currentUser.chatGroupIds {
-      let databaseRef = Database.database().reference()
-      
-      DispatchQueue.global().async {
+    let databaseRef = Database.database().reference()
+    databaseRef.child(KEY_CHAT_GROUP_IDS).child(currentUserUid).observeSingleEvent(of: .value) { (snapshot) in
+      if let chatGroupIds = snapshot.value as? [String: String] {
         for (index, chatGroupId) in chatGroupIds.keys.enumerated() {
           databaseRef.child(KEY_CHAT_GROUPS).child(chatGroupId).child(KEY_CHAT_MEMBER_IDS).observeSingleEvent(of: .value) { (snapshot) in
-            guard let memberIdsDic = snapshot.value as? [String: Bool] else { return }
-            
-            if memberIdsDic.keys.contains(userId) {
-              self.chatGroupId = chatGroupId
-              self.isHaveGroup = true
-            } else if index == (chatGroupIds.count - 1), self.chatGroupId == nil {
+            if let memberIdsDic = snapshot.value as? [String: Bool] {
+              if memberIdsDic.keys.contains(userId) {
+                self.chatGroupId = chatGroupId
+                self.isHaveGroup = true
+              } else if index == (chatGroupIds.count - 1), self.chatGroupId == nil {
+                self.createGroup()
+              }
+            } else {
               self.createGroup()
             }
           }
         }
+      } else {
+        self.createGroup()
       }
-    } else {
-      createGroup()
     }
   }
   
   private func createGroup() {
-    guard let user = self.user,
-          let userId = user.uid,
-          let currentUserUid = ANISessionManager.shared.currentUserUid else { return }
-    
     let databaseRef = Database.database().reference()
     let databaseChatGroupRef = databaseRef.child(KEY_CHAT_GROUPS).childByAutoId()
     let id = databaseChatGroupRef.key
-    let memberIds = [userId: true, currentUserUid: true]
     let date = ANIFunction.shared.getToday()
-    let group = FirebaseChatGroup(groupId:id, memberIds: memberIds, updateDate: date, lastMessage: "")
+    let group = FirebaseChatGroup(groupId:id, memberIds: nil, updateDate: date, lastMessage: "")
     
     DispatchQueue.global().async {
       do {

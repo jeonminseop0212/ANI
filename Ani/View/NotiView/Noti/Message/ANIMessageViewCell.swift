@@ -118,9 +118,10 @@ class ANIMessageViewCell: UITableViewCell {
   
   func loadUser() {
     guard let chatGroup = self.chatGroup,
-          let currentUserUid = ANISessionManager.shared.currentUserUid else { return }
+          let currentUserUid = ANISessionManager.shared.currentUserUid,
+          let memberIds = chatGroup.memberIds else { return }
     
-    for memberId in chatGroup.memberIds.keys {
+    for memberId in memberIds.keys {
       if currentUserUid != memberId {
         DispatchQueue.global().async {
           let databaseRef = Database.database().reference()

@@ -117,20 +117,26 @@ class ANIUserSearchViewCell: UITableViewCell {
   
   private func isFollowed() {
     guard let user = self.user,
-          let followerIds = user.followerIds,
+          let userId = user.uid,
           let currentUserId = ANISessionManager.shared.currentUserUid,
           let followButton = self.followButton,
           let followLabel = self.followLabel else { return }
     
-    for id in followerIds.keys {
-      if id == currentUserId {
-        followButton.base?.backgroundColor = .clear
-        followLabel.text = "フォロー中"
-        followLabel.textColor = ANIColor.green
-      } else {
-        followButton.base?.backgroundColor = ANIColor.green
-        followLabel.text = "フォロー"
-        followLabel.textColor = .white
+    let databaseRef = Database.database().reference()
+    
+    databaseRef.child(KEY_FOLLOWING_USER_IDS).child(currentUserId).observeSingleEvent(of: .value) { (snapshot) in
+      guard let followingUser = snapshot.value as? [String: String] else { return }
+      
+      for id in followingUser.keys {
+        if id == userId {
+          followButton.base?.backgroundColor = .clear
+          followLabel.text = "フォロー中"
+          followLabel.textColor = ANIColor.green
+        } else {
+          followButton.base?.backgroundColor = ANIColor.green
+          followLabel.text = "フォロー"
+          followLabel.textColor = .white
+        }
       }
     }
   }
@@ -159,8 +165,8 @@ extension ANIUserSearchViewCell: ANIButtonViewDelegate {
       if followButton.base?.backgroundColor == ANIColor.green {
         DispatchQueue.global().async {
           let date = ANIFunction.shared.getToday()
-          databaseRef.child(KEY_USERS).child(currentUserUid).child(KEY_FOLLOWING_USER_IDS).updateChildValues([userId: date])
-          databaseRef.child(KEY_USERS).child(userId).child(KEY_FOLLOWER_IDS).updateChildValues([currentUserUid: date])
+          databaseRef.child(KEY_FOLLOWING_USER_IDS).child(currentUserUid).updateChildValues([userId: date])
+          databaseRef.child(KEY_FOLLOWER_IDS).child(userId).updateChildValues([currentUserUid: date])
         }
         
         followButton.base?.backgroundColor = .clear
@@ -168,8 +174,8 @@ extension ANIUserSearchViewCell: ANIButtonViewDelegate {
         followLabel.textColor = ANIColor.green
       } else {
         DispatchQueue.global().async {
-          databaseRef.child(KEY_USERS).child(currentUserUid).child(KEY_FOLLOWING_USER_IDS).child(userId).removeValue()
-          databaseRef.child(KEY_USERS).child(userId).child(KEY_FOLLOWER_IDS).child(currentUserUid).removeValue()
+          databaseRef.child(KEY_FOLLOWING_USER_IDS).child(currentUserUid).child(userId).removeValue()
+          databaseRef.child(KEY_FOLLOWER_IDS).child(userId).child(currentUserUid).removeValue()
         }
         
         followButton.base?.backgroundColor = ANIColor.green

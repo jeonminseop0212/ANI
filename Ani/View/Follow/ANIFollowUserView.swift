@@ -70,13 +70,46 @@ class ANIFollowUserView: UIView {
     activityIndicatorView.centerInSuperview()
     self.activityIndicatorView = activityIndicatorView
   }
+}
+
+//MARK: UITableViewDataSource
+extension ANIFollowUserView: UITableViewDataSource {
+  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    guard let followUserViewMode = self.followUserViewMode else { return 0 }
     
+    switch followUserViewMode {
+    case .following:
+      return followingUsers.count
+    case .follower:
+      return followers.count
+    }
+  }
+  
+  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    guard let followUserViewMode = self.followUserViewMode else { return UITableViewCell() }
+    
+    let id = NSStringFromClass(ANIFollowUserViewCell.self)
+    let cell = tableView.dequeueReusableCell(withIdentifier: id, for: indexPath) as! ANIFollowUserViewCell
+    
+    switch followUserViewMode {
+    case .following:
+      cell.user = followingUsers[indexPath.row]
+    case .follower:
+      cell.user = followers[indexPath.row]
+    }
+    
+    return cell
+  }
+}
+
+//MARK: data
+extension ANIFollowUserView {
   private func loadFollowingUser() {
     guard let userId = self.userId else { return }
     
     let databaseRef = Database.database().reference()
-    databaseRef.child(KEY_USERS).child(userId).child(KEY_FOLLOWING_USER_IDS).queryOrderedByValue().queryLimited(toFirst: 20).observeSingleEvent(of: .value) { (snapshot) in
-    
+    databaseRef.child(KEY_FOLLOWING_USER_IDS).child(userId).queryOrderedByValue().queryLimited(toFirst: 20).observeSingleEvent(of: .value) { (snapshot) in
+      
       for item in snapshot.children {
         if let snapshot = item as? DataSnapshot {
           databaseRef.child(KEY_USERS).child(snapshot.key).observeSingleEvent(of: .value, with: { (snapshot) in
@@ -119,8 +152,8 @@ class ANIFollowUserView: UIView {
     guard let userId = self.userId else { return }
     
     let databaseRef = Database.database().reference()
-    databaseRef.child(KEY_USERS).child(userId).child(KEY_FOLLOWER_IDS).queryOrderedByValue().queryLimited(toFirst: 20).observeSingleEvent(of: .value) { (snapshot) in
-    
+    databaseRef.child(KEY_FOLLOWER_IDS).child(userId).queryOrderedByValue().queryLimited(toFirst: 20).observeSingleEvent(of: .value) { (snapshot) in
+      
       for item in snapshot.children {
         if let snapshot = item as? DataSnapshot {
           databaseRef.child(KEY_USERS).child(snapshot.key).observeSingleEvent(of: .value, with: { (snapshot) in
@@ -132,7 +165,7 @@ class ANIFollowUserView: UIView {
               
               DispatchQueue.main.async {
                 guard let followUserTableView = self.followUserTableView,
-                      let activityIndicatorView = self.activityIndicatorView else { return }
+                  let activityIndicatorView = self.activityIndicatorView else { return }
                 
                 followUserTableView.reloadData()
                 activityIndicatorView.stopAnimating()
@@ -157,35 +190,5 @@ class ANIFollowUserView: UIView {
         activityIndicatorView.stopAnimating()
       }
     }
-  }
-}
-
-//MARK: UITableViewDataSource
-extension ANIFollowUserView: UITableViewDataSource {
-  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    guard let followUserViewMode = self.followUserViewMode else { return 0 }
-    
-    switch followUserViewMode {
-    case .following:
-      return followingUsers.count
-    case .follower:
-      return followers.count
-    }
-  }
-  
-  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    guard let followUserViewMode = self.followUserViewMode else { return UITableViewCell() }
-    
-    let id = NSStringFromClass(ANIFollowUserViewCell.self)
-    let cell = tableView.dequeueReusableCell(withIdentifier: id, for: indexPath) as! ANIFollowUserViewCell
-    
-    switch followUserViewMode {
-    case .following:
-      cell.user = followingUsers[indexPath.row]
-    case .follower:
-      cell.user = followers[indexPath.row]
-    }
-    
-    return cell
   }
 }
