@@ -68,6 +68,34 @@ class ANIMessageView: UIView {
     ANINotificationManager.receive(notiTabTapped: self, selector: #selector(scrollToTop))
   }
   
+  @objc private func scrollToTop() {
+    guard let messageTableView = messageTableView,
+          !chatGroups.isEmpty,
+          isCellSelected else { return }
+    
+    messageTableView.scrollToRow(at: [0, 0], at: .top, animated: true)
+  }
+}
+
+//MARK: UITableViewDataSource
+extension ANIMessageView: UITableViewDataSource {
+  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    return chatGroups.count
+  }
+  
+  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    let id = NSStringFromClass(ANIMessageViewCell.self)
+    let cell = tableView.dequeueReusableCell(withIdentifier: id, for: indexPath) as! ANIMessageViewCell
+    
+    cell.chatGroup = chatGroups[indexPath.row]
+    cell.observeGroup()
+    
+    return cell
+  }
+}
+
+//MARK: data
+extension ANIMessageView {
   private func loadChatGroup() {
     guard let crrentUserUid = ANISessionManager.shared.currentUserUid,
           let activityIndicatorView = self.activityIndicatorView else { return }
@@ -117,31 +145,5 @@ class ANIMessageView: UIView {
         activityIndicatorView.stopAnimating()
       }
     }
-  }
-  
-  @objc private func scrollToTop() {
-    guard let messageTableView = messageTableView,
-          !chatGroups.isEmpty,
-          isCellSelected else { return }
-    
-    messageTableView.scrollToRow(at: [0, 0], at: .top, animated: true)
-  }
-}
-
-//MARK: UITableViewDataSource
-extension ANIMessageView: UITableViewDataSource {
-  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return chatGroups.count
-  }
-  
-  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let id = NSStringFromClass(ANIMessageViewCell.self)
-    let cell = tableView.dequeueReusableCell(withIdentifier: id, for: indexPath) as! ANIMessageViewCell
-    
-    cell.chatGroup = chatGroups[indexPath.row]
-    cell.loadUser()
-    cell.observeGroup()
-    
-    return cell
   }
 }

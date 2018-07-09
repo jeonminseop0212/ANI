@@ -8,19 +8,27 @@
 //
 
 import UIKit
+import FirebaseDatabase
+import CodableFirebase
+
+protocol ANINotiViewDelegate {
+  func cellTapped(noti: FirebaseNotification)
+}
 
 class ANINotiView: UIView {
   
   private weak var notiTableView: UITableView?
   
-  private var testNotiData = [Noti]()
+  private var notifications = [FirebaseNotification]()
   
   var isCellSelected: Bool = false
+  
+  var delegate: ANINotiViewDelegate?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()
-    setupTestData()
+    loadNoti()
     setupNotifications()
   }
   
@@ -39,8 +47,10 @@ class ANINotiView: UIView {
     let notiTableView = UITableView()
     notiTableView.contentInset = UIEdgeInsets(top: ANICommunityViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: ANICommunityViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT + bottomSafeArea, right: 0)
     notiTableView.scrollIndicatorInsets  = UIEdgeInsets(top: UIViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT + bottomSafeArea, right: 0)
-    let id = NSStringFromClass(ANINotiViewCell.self)
-    notiTableView.register(ANINotiViewCell.self, forCellReuseIdentifier: id)
+    let basicNotiId = NSStringFromClass(ANIBasicNotiViewCell.self)
+    notiTableView.register(ANIBasicNotiViewCell.self, forCellReuseIdentifier: basicNotiId)
+    let followNotiId = NSStringFromClass(ANIFollowNotiViewCell.self)
+    notiTableView.register(ANIFollowNotiViewCell.self, forCellReuseIdentifier: followNotiId)
     notiTableView.backgroundColor = ANIColor.bg
     notiTableView.separatorStyle = .none
     notiTableView.alwaysBounceVertical = true
@@ -55,30 +65,9 @@ class ANINotiView: UIView {
     ANINotificationManager.receive(notiTabTapped: self, selector: #selector(scrollToTop))
   }
   
-  private func setupTestData() {
-    let familyImages = [UIImage(named: "family1")!, UIImage(named: "family2")!, UIImage(named: "family3")!]
-    let user1 = User(id: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
-    let user2 = User(id: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
-    let user3 = User(id: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "団体", introduce: "団体で猫たちのためにボランティア活動をしています")
-    let noti1 = Noti(subtitle: "あなたの投稿に『いいね』しました", user: user1)
-    let noti2 = Noti(subtitle: "あなたの投稿に『いいね』しました", user: user2)
-    let noti3 = Noti(subtitle: "あなたの投稿に『いいね』しました", user: user3)
-    let noti4 = Noti(subtitle: "あなたの投稿に『いいね』しました", user: user1)
-    let noti5 = Noti(subtitle: "あなたの投稿に『いいね』しました", user: user2)
-    let noti6 = Noti(subtitle: "あなたの投稿に『いいね』しました", user: user3)
-    let noti7 = Noti(subtitle: "あなたの投稿に『いいね』しました", user: user1)
-    let noti8 = Noti(subtitle: "あなたの投稿に『いいね』しました", user: user2)
-    let noti9 = Noti(subtitle: "あなたの投稿に『いいね』しました", user: user3)
-    let noti10 = Noti(subtitle: "あなたの投稿に『いいね』しました", user: user1)
-    let noti11 = Noti(subtitle: "あなたの投稿に『いいね』しました", user: user2)
-    let noti12 = Noti(subtitle: "あなたの投稿に『いいね』しました", user: user3)
-    
-    self.testNotiData = [noti1, noti2, noti3, noti4, noti5, noti6, noti7, noti8, noti9, noti10, noti11, noti12]
-  }
-  
   @objc private func scrollToTop() {
     guard let notiTableView = notiTableView,
-          !testNotiData.isEmpty,
+          !notifications.isEmpty,
           isCellSelected else { return }
     
     notiTableView.scrollToRow(at: [0, 0], at: .top, animated: true)
@@ -88,23 +77,62 @@ class ANINotiView: UIView {
 //MARK: UITableViewDataSource
 extension ANINotiView: UITableViewDataSource {
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return testNotiData.count
+    return notifications.count
   }
   
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let id = NSStringFromClass(ANINotiViewCell.self)
-    let cell = tableView.dequeueReusableCell(withIdentifier: id, for: indexPath) as! ANINotiViewCell
-    
-    cell.profileImageView?.image = testNotiData[indexPath.item].user.profileImage
-    cell.subTitleLabel?.text = "\(testNotiData[indexPath.item].user.name)さんが\(testNotiData[indexPath.item].subtitle)。"
-    
-    return cell
+    if notifications[indexPath.row].kind == KEY_NOTI_KIND_FOLLOW {
+      let followNotiId = NSStringFromClass(ANIFollowNotiViewCell.self)
+      let cell = tableView.dequeueReusableCell(withIdentifier: followNotiId, for: indexPath) as! ANIFollowNotiViewCell
+      
+      cell.noti = notifications[indexPath.row]
+      
+      return cell
+    } else {
+      let basicNotiId = NSStringFromClass(ANIBasicNotiViewCell.self)
+      let cell = tableView.dequeueReusableCell(withIdentifier: basicNotiId, for: indexPath) as! ANIBasicNotiViewCell
+      
+      cell.noti = notifications[indexPath.row]
+      
+      return cell
+    }
   }
 }
 
 //MARK: UITableViewDelegate
 extension ANINotiView: UITableViewDelegate {
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    if notifications[indexPath.row].kind != KEY_NOTI_KIND_FOLLOW {
+      self.delegate?.cellTapped(noti: notifications[indexPath.row])
+    }
+  }
+}
+
+//MARK: data
+extension ANINotiView {
+  private func loadNoti() {
+    guard let currentUserUid = ANISessionManager.shared.currentUserUid else { return }
     
+    let databaseRef = Database.database().reference()
+    
+    databaseRef.child(KEY_NOTIFICATIONS).child(currentUserUid).observeSingleEvent(of: .value) { (snapshot) in
+      for item in snapshot.children {
+        if let snapshot = item as? DataSnapshot {
+          guard let value = snapshot.value else { return }
+          
+          do {
+            let qna = try FirebaseDecoder().decode(FirebaseNotification.self, from: value)
+            self.notifications.insert(qna, at: 0)
+
+            DispatchQueue.main.async {
+              guard let notiTableView = self.notiTableView else { return }
+              notiTableView.reloadData()
+            }
+          } catch let error {
+            print(error)
+          }
+        }
+      }
+    }
   }
 }
