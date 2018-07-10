@@ -96,6 +96,7 @@ class ANINotiDetailViewController: UIViewController {
   //MARK: Notifications
   private func setupNotifications() {
     ANINotificationManager.receive(profileImageViewTapped: self, selector: #selector(pushOtherProfile))
+    ANINotificationManager.receive(imageCellTapped: self, selector: #selector(presentImageBrowser(_:)))
   }
   
   private func removeNotifications() {
@@ -120,6 +121,19 @@ class ANINotiDetailViewController: UIViewController {
       otherProfileViewController.userId = userId
       self.navigationController?.pushViewController(otherProfileViewController, animated: true)
     }
+  }
+  
+  @objc private func presentImageBrowser(_ notification: NSNotification) {
+    guard let item = notification.object as? (Int, [String]) else { return }
+    let selectedIndex = item.0
+    let imageUrls = item.1
+    let imageBrowserViewController = ANIImageBrowserViewController()
+    imageBrowserViewController.selectedIndex = selectedIndex
+    imageBrowserViewController.imageUrls = imageUrls
+    imageBrowserViewController.modalPresentationStyle = .overCurrentContext
+    imageBrowserViewController.delegate = self
+    //overCurrentContextだとtabBarが消えないのでtabBarからpresentする
+    self.tabBarController?.present(imageBrowserViewController, animated: false, completion: nil)
   }
 }
 
@@ -156,5 +170,21 @@ extension ANINotiDetailViewController: ANINotiDetailViewDelegate {
     recruitDetailViewController.recruit = recruit
     recruitDetailViewController.user = user
     self.navigationController?.pushViewController(recruitDetailViewController, animated: true)
+  }
+  
+  func qnaViewCellDidSelect(selectedQna: FirebaseQna, user: FirebaseUser) {
+    let commentViewController = ANICommentViewController()
+    commentViewController.hidesBottomBarWhenPushed = true
+    commentViewController.commentMode = CommentMode.qna
+    commentViewController.qna = selectedQna
+    commentViewController.user = user
+    self.navigationController?.pushViewController(commentViewController, animated: true)
+  }
+}
+
+//MARK: ANIImageBrowserViewControllerDelegate
+extension ANINotiDetailViewController: ANIImageBrowserViewControllerDelegate {
+  func imageBrowserDidDissmiss() {
+    UIApplication.shared.statusBarStyle = .default
   }
 }

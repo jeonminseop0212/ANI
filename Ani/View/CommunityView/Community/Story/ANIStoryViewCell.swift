@@ -310,6 +310,45 @@ class ANIStoryViewCell: UITableViewCell {
     }
   }
   
+  private func updateNoti() {
+    guard let story = self.story,
+          let storyId = story.id,
+          let currentUser = ANISessionManager.shared.currentUser,
+          let currentUserName = currentUser.userName,
+          let currentUserId = ANISessionManager.shared.currentUserUid,
+          let user = self.user,
+          let userId = user.uid else { return }
+    
+    let databaseRef = Database.database().reference()
+    
+    DispatchQueue.global().async {
+      do {
+        let noti = "\(currentUserName)さんが「\(story.story)」ストーリーを「いいね」しました。"
+        let date = ANIFunction.shared.getToday()
+        let notification = FirebaseNotification(userId: currentUserId, noti: noti, kind: KEY_NOTI_KIND_STROY, notiId: storyId, updateDate: date)
+        if let data = try FirebaseEncoder().encode(notification) as? [String: AnyObject] {
+          
+          databaseRef.child(KEY_NOTIFICATIONS).child(userId).child(storyId).updateChildValues(data)
+        }
+      } catch let error {
+        print(error)
+      }
+    }
+  }
+  
+  private func removeNoti() {
+    guard let story = self.story,
+          let storyId = story.id,
+          let user = self.user,
+          let userId = user.uid else { return }
+    
+    let databaseRef = Database.database().reference()
+    
+    DispatchQueue.global().async {
+      databaseRef.child(KEY_NOTIFICATIONS).child(userId).child(storyId).removeValue()
+    }
+  }
+  
   //MARK: action
   @objc private func love() {
     guard let story = self.story,
@@ -323,11 +362,15 @@ class ANIStoryViewCell: UITableViewCell {
         databaseRef.child(KEY_STORIES).child(storyId).child(KEY_LOVE_IDS).updateChildValues([currentUserId: true])
         let date = ANIFunction.shared.getToday()
         databaseRef.child(KEY_LOVE_STORY_IDS).child(currentUserId).updateChildValues([storyId: date])
+        
+        self.updateNoti()
       }
     } else {
       DispatchQueue.global().async {
         databaseRef.child(KEY_STORIES).child(storyId).child(KEY_LOVE_IDS).child(currentUserId).removeValue()
         databaseRef.child(KEY_LOVE_STORY_IDS).child(currentUserId).child(storyId).removeValue()
+        
+        self.removeNoti()
       }
     }
   }

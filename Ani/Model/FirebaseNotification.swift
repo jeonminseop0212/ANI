@@ -13,4 +13,5 @@ struct FirebaseNotification: Codable {
   let noti: String
   let kind: String
   let notiId: String
+  let updateDate: String
 }

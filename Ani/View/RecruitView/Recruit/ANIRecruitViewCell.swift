@@ -499,7 +499,8 @@ class ANIRecruitViewCell: UITableViewCell {
     DispatchQueue.global().async {
       do {
         let noti = "\(currentUserName)さんが「\(recruit.title)」募集を「いいね」しました。"
-        let notification = FirebaseNotification(userId: currentUserId, noti: noti, kind: KEY_NOTI_KIND_RECRUIT, notiId: recuritId)
+        let date = ANIFunction.shared.getToday()
+        let notification = FirebaseNotification(userId: currentUserId, noti: noti, kind: KEY_NOTI_KIND_RECRUIT, notiId: recuritId, updateDate: date)
         if let data = try FirebaseEncoder().encode(notification) as? [String: AnyObject] {
           
           databaseRef.child(KEY_NOTIFICATIONS).child(userId).child(recuritId).updateChildValues(data)

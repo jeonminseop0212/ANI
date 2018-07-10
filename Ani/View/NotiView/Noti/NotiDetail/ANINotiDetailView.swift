@@ -15,6 +15,7 @@ protocol ANINotiDetailViewDelegate {
   func supportButtonTapped(supportRecruit: FirebaseRecruit, user: FirebaseUser)
   func storyViewCellDidSelect(selectedStory: FirebaseStory, user: FirebaseUser)
   func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser)
+  func qnaViewCellDidSelect(selectedQna: FirebaseQna, user:FirebaseUser)
 }
 
 enum NotiKind {
@@ -112,7 +113,7 @@ extension ANINotiDetailView: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: storyCellId, for: indexPath) as! ANIStoryViewCell
         
         cell.story = story
-//        cell.delegate = self
+        cell.delegate = self
         
         return cell
       }
@@ -121,7 +122,7 @@ extension ANINotiDetailView: UITableViewDataSource {
       let cell = tableView.dequeueReusableCell(withIdentifier: qnaCellid, for: indexPath) as! ANIQnaViewCell
       
       cell.qna = qna
-//      cell.delegate = self
+      cell.delegate = self
       
       return cell
     }
@@ -157,6 +158,13 @@ extension ANINotiDetailView: ANISupportViewCellDelegate {
   
   func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser) {
     self.delegate?.supportCellRecruitTapped(recruit: recruit, user: user)
+  }
+}
+
+//MARK: ANIQnaViewCellDelegate
+extension ANINotiDetailView: ANIQnaViewCellDelegate {
+  func cellTapped(qna: FirebaseQna, user: FirebaseUser) {
+    self.delegate?.qnaViewCellDidSelect(selectedQna: qna, user: user)
   }
 }
 
