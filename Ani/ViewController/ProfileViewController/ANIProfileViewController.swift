@@ -211,9 +211,11 @@ extension ANIProfileViewController: ANIProfileBasicViewDelegate {
     self.navigationController?.pushViewController(followUserViewController, animated: true)
   }
   
-  func supportButtonTapped() {
+  func supportButtonTapped(supportRecruit: FirebaseRecruit, user: FirebaseUser) {
     let supportViewController = ANISupportViewController()
     supportViewController.modalPresentationStyle = .overCurrentContext
+    supportViewController.recruit = supportRecruit
+    supportViewController.user = user
     self.tabBarController?.present(supportViewController, animated: false, completion: nil)
   }
   

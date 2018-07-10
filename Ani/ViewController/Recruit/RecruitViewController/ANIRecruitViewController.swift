@@ -223,10 +223,11 @@ extension ANIRecruitViewController:ANIButtonViewDelegate {
 
 //ANIRecruitViewDelegate
 extension ANIRecruitViewController: ANIRecruitViewDelegate {
-  func supportButtonTapped(supportRecruit: FirebaseRecruit) {
+  func supportButtonTapped(supportRecruit: FirebaseRecruit, user: FirebaseUser) {
     let supportViewController = ANISupportViewController()
     supportViewController.modalPresentationStyle = .overCurrentContext
     supportViewController.recruit = supportRecruit
+    supportViewController.user = user
     self.tabBarController?.present(supportViewController, animated: false, completion: nil)
   }
   

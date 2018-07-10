@@ -213,7 +213,11 @@ extension ANINotiViewController: ANINotiNotiCellDelegate {
       notiDetailViewController.notiId = noti.notiId
       self.navigationController?.pushViewController(notiDetailViewController, animated: true)
     } else if noti.kind == KEY_NOTI_KIND_STROY {
-      //TODO
+      let notiDetailViewController = ANINotiDetailViewController()
+      notiDetailViewController.navigationTitle = "ストーリー"
+      notiDetailViewController.notiKind = .story
+      notiDetailViewController.notiId = noti.notiId
+      self.navigationController?.pushViewController(notiDetailViewController, animated: true)
     } else if noti.kind == KEY_NOTI_KIND_QNA {
       
     } else if noti.kind == KEY_NORI_KIND_COMMET {

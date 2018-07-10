@@ -13,7 +13,7 @@ import CodableFirebase
 
 protocol ANIRecruitViewCellDelegate {
   func cellTapped(recruit: FirebaseRecruit, user: FirebaseUser)
-  func supportButtonTapped(supportRecruit: FirebaseRecruit)
+  func supportButtonTapped(supportRecruit: FirebaseRecruit, user: FirebaseUser)
   func reject()
 }
 
@@ -346,28 +346,6 @@ class ANIRecruitViewCell: UITableViewCell {
     userNameLabel.text = userName
   }
   
-  private func loadUser() {
-    guard let recruit = self.recruit else { return }
-    
-    DispatchQueue.global().async {
-      let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_USERS).child(recruit.userId).observeSingleEvent(of: .value, with: { (userSnapshot) in
-        if let userValue = userSnapshot.value {
-          do {
-            let user = try FirebaseDecoder().decode(FirebaseUser.self, from: userValue)
-            self.user = user
-            
-            DispatchQueue.main.async {
-              self.reloadUserLayout(user: user)
-            }
-          } catch let error {
-            print(error)
-          }
-        }
-      })
-    }
-  }
-  
   private func observeLove() {
     guard let recruit = self.recruit,
           let recuritId = recruit.id else { return }
@@ -522,7 +500,7 @@ class ANIRecruitViewCell: UITableViewCell {
       do {
         let noti = "\(currentUserName)さんが「\(recruit.title)」募集を「いいね」しました。"
         let notification = FirebaseNotification(userId: currentUserId, noti: noti, kind: KEY_NOTI_KIND_RECRUIT, notiId: recuritId)
-        if let data = try FirebaseEncoder().encode(notification) as? [String : AnyObject] {
+        if let data = try FirebaseEncoder().encode(notification) as? [String: AnyObject] {
           
           databaseRef.child(KEY_NOTIFICATIONS).child(userId).child(recuritId).updateChildValues(data)
         }
@@ -573,11 +551,12 @@ class ANIRecruitViewCell: UITableViewCell {
   
   @objc private func support() {
     guard let supportButton = self.supportButton,
-          let recruit = self.recruit else { return }
+          let recruit = self.recruit,
+          let user = self.user else { return }
     
     if !ANISessionManager.shared.isAnonymous {
       if supportButton.tintColor == ANIColor.gray {
-        self.delegate?.supportButtonTapped(supportRecruit: recruit)
+        self.delegate?.supportButtonTapped(supportRecruit: recruit, user: user)
       }
     } else {
       self.delegate?.reject()
@@ -633,5 +612,30 @@ class ANIRecruitViewCell: UITableViewCell {
           let user = self.user else { return }
     
     self.delegate?.cellTapped(recruit: recruit, user: user)
+  }
+}
+
+//MARK: data
+extension ANIRecruitViewCell {
+  private func loadUser() {
+    guard let recruit = self.recruit else { return }
+    
+    DispatchQueue.global().async {
+      let databaseRef = Database.database().reference()
+      databaseRef.child(KEY_USERS).child(recruit.userId).observeSingleEvent(of: .value, with: { (userSnapshot) in
+        if let userValue = userSnapshot.value {
+          do {
+            let user = try FirebaseDecoder().decode(FirebaseUser.self, from: userValue)
+            self.user = user
+            
+            DispatchQueue.main.async {
+              self.reloadUserLayout(user: user)
+            }
+          } catch let error {
+            print(error)
+          }
+        }
+      })
+    }
   }
 }

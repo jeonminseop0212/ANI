@@ -10,6 +10,7 @@
 import UIKit
 import FirebaseDatabase
 import CodableFirebase
+import NVActivityIndicatorView
 
 protocol ANINotiViewDelegate {
   func cellTapped(noti: FirebaseNotification)
@@ -22,6 +23,8 @@ class ANINotiView: UIView {
   private var notifications = [FirebaseNotification]()
   
   var isCellSelected: Bool = false
+  
+  private weak var activityIndicatorView: NVActivityIndicatorView?
   
   var delegate: ANINotiViewDelegate?
   
@@ -53,12 +56,21 @@ class ANINotiView: UIView {
     notiTableView.register(ANIFollowNotiViewCell.self, forCellReuseIdentifier: followNotiId)
     notiTableView.backgroundColor = ANIColor.bg
     notiTableView.separatorStyle = .none
+    notiTableView.alpha = 0.0
     notiTableView.alwaysBounceVertical = true
     notiTableView.dataSource = self
     notiTableView.delegate = self
     addSubview(notiTableView)
     notiTableView.edgesToSuperview()
     self.notiTableView = notiTableView
+    
+    //activityIndicatorView
+    let activityIndicatorView = NVActivityIndicatorView(frame: .zero, type: .lineScale, color: ANIColor.green, padding: 0)
+    addSubview(activityIndicatorView)
+    activityIndicatorView.width(40.0)
+    activityIndicatorView.height(40.0)
+    activityIndicatorView.centerInSuperview()
+    self.activityIndicatorView = activityIndicatorView
   }
   
   private func setupNotifications() {
@@ -111,9 +123,12 @@ extension ANINotiView: UITableViewDelegate {
 //MARK: data
 extension ANINotiView {
   private func loadNoti() {
-    guard let currentUserUid = ANISessionManager.shared.currentUserUid else { return }
+    guard let currentUserUid = ANISessionManager.shared.currentUserUid,
+          let activityIndicatorView = self.activityIndicatorView else { return }
     
     let databaseRef = Database.database().reference()
+    
+    activityIndicatorView.startAnimating()
     
     databaseRef.child(KEY_NOTIFICATIONS).child(currentUserUid).observeSingleEvent(of: .value) { (snapshot) in
       for item in snapshot.children {
@@ -126,12 +141,27 @@ extension ANINotiView {
 
             DispatchQueue.main.async {
               guard let notiTableView = self.notiTableView else { return }
+              
+              activityIndicatorView.stopAnimating()
+
               notiTableView.reloadData()
+              
+              UIView.animate(withDuration: 0.2, animations: {
+                notiTableView.alpha = 1.0
+              })
             }
           } catch let error {
             print(error)
+            
+            activityIndicatorView.stopAnimating()
+          }
+          if snapshot.value as? [String: AnyObject] == nil {
+            activityIndicatorView.stopAnimating()
           }
         }
+      }
+      if snapshot.value as? [String: AnyObject] == nil {
+        activityIndicatorView.stopAnimating()
       }
     }
   }

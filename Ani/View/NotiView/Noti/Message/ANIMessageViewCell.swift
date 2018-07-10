@@ -22,10 +22,15 @@ class ANIMessageViewCell: UITableViewCell {
     didSet {
       loadUser()
       reloadLayout()
+      observeGroup()
     }
   }
   
-  private var user: FirebaseUser?
+  private var user: FirebaseUser? {
+    didSet {
+      reloadUserLayout()
+    }
+  }
   
   override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -111,16 +116,17 @@ class ANIMessageViewCell: UITableViewCell {
     subTitleLabel.text = chatGroup.lastMessage
   }
   
-  private func reloadUserLayout(user: FirebaseUser) {
+  private func reloadUserLayout() {
     guard let profileImageView = self.profileImageView,
           let userNameLabel = self.userNameLabel,
+          let user = self.user,
           let profileImageUrl = user.profileImageUrl else { return }
     
     profileImageView.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
     userNameLabel.text = user.userName
   }
   
-  func observeGroup() {
+  private func observeGroup() {
     guard let chatGroup = self.chatGroup else { return }
     
     let databaseRef = Database.database().reference()
@@ -133,6 +139,15 @@ class ANIMessageViewCell: UITableViewCell {
           print(error)
         }
       }
+    }
+  }
+  
+  func unobserveChatGroup() {
+    guard let chatGroup = self.chatGroup else { return }
+    
+    let databaseRef = Database.database().reference()
+    DispatchQueue.global().async {
+      databaseRef.child(KEY_CHAT_GROUPS).child(chatGroup.groupId).removeAllObservers()
     }
   }
   
@@ -166,10 +181,6 @@ extension ANIMessageViewCell {
               do {
                 let user = try FirebaseDecoder().decode(FirebaseUser.self, from: userValue)
                 self.user = user
-                
-                DispatchQueue.main.async {
-                  self.reloadUserLayout(user: user)
-                }
               } catch let error {
                 print(error)
               }
