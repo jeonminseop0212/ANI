@@ -511,19 +511,6 @@ class ANIRecruitViewCell: UITableViewCell {
     }
   }
   
-  private func removeNoti() {
-    guard let recruit = self.recruit,
-          let recuritId = recruit.id,
-          let user = self.user,
-          let userId = user.uid else { return }
-    
-    let databaseRef = Database.database().reference()
-    
-    DispatchQueue.global().async {
-      databaseRef.child(KEY_NOTIFICATIONS).child(userId).child(recuritId).removeValue()
-    }
-  }
-  
   //MARK: action
   @objc private func love() {
     guard let recruit = self.recruit,
@@ -543,9 +530,7 @@ class ANIRecruitViewCell: UITableViewCell {
     } else {
       DispatchQueue.global().async {
         databaseRef.child(KEY_RECRUITS).child(recuritId).child(KEY_LOVE_IDS).child(currentUserId).removeValue()
-        databaseRef.child(KEY_LOVE_RECRUIT_IDS).child(currentUserId).child(recuritId).removeValue()
-        
-        self.removeNoti()
+        databaseRef.child(KEY_LOVE_RECRUIT_IDS).child(currentUserId).child(recuritId).removeValue()        
       }
     }
   }

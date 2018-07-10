@@ -342,19 +342,6 @@ class ANIQnaViewCell: UITableViewCell {
     }
   }
   
-  private func removeNoti() {
-    guard let qna = self.qna,
-          let qnaId = qna.id,
-          let user = self.user,
-          let userId = user.uid else { return }
-    
-    let databaseRef = Database.database().reference()
-    
-    DispatchQueue.global().async {
-      databaseRef.child(KEY_NOTIFICATIONS).child(userId).child(qnaId).removeValue()
-    }
-  }
-  
   //MARK: action
   @objc private func love() {
     guard let qna = self.qna,
@@ -374,9 +361,7 @@ class ANIQnaViewCell: UITableViewCell {
     } else {
       DispatchQueue.global().async {
         databaseRef.child(KEY_QNAS).child(qnaId).child(KEY_LOVE_IDS).child(currentUserId).removeValue()
-        databaseRef.child(KEY_LOVE_QNA_IDS).child(currentUserId).child(qnaId).removeValue()
-        
-        self.removeNoti()
+        databaseRef.child(KEY_LOVE_QNA_IDS).child(currentUserId).child(qnaId).removeValue()        
       }
     }
   }
