@@ -24,6 +24,8 @@ class ANISupportView: UIView {
   
   var recruit: FirebaseRecruit?
   
+  var user: FirebaseUser?
+  
   var delegate: ANISupportViewDelegate?
   
   override init(frame: CGRect) {
@@ -92,6 +94,36 @@ class ANISupportView: UIView {
     messageTextView.bottomToTop(of: supportButton, offset: -15.0)
     self.messageTextView = messageTextView
   }
+  
+  private func updateNoti(storyId: String) {
+    guard let recruit = self.recruit,
+          let currentUser = ANISessionManager.shared.currentUser,
+          let currentUserName = currentUser.userName,
+          let currentUserId = ANISessionManager.shared.currentUserUid,
+          let user = self.user,
+          let userId = user.uid,
+          let messageTextView = self.messageTextView,
+          let message = messageTextView.text else { return }
+    
+    let databaseRef = Database.database().reference()
+    DispatchQueue.global().async {
+      do {
+        var noti = ""
+        if message != "" {
+          noti = "\(currentUserName)さんが「\(recruit.title)」募集を「応援」しました。\n\"\(message)\""
+        } else {
+          noti = "\(currentUserName)さんが「\(recruit.title)」募集を「応援」しました。"
+        }
+        let notification = FirebaseNotification(userId: currentUserId, noti: noti, kind: KEY_NOTI_KIND_STROY, notiId: storyId)
+        if let data = try FirebaseEncoder().encode(notification) as? [String: AnyObject] {
+          
+          databaseRef.child(KEY_NOTIFICATIONS).child(userId).childByAutoId().updateChildValues(data)
+        }
+      } catch let error {
+        print(error)
+      }
+    }
+  }
 }
 
 //MARK: ANIButtonViewDelegate
@@ -127,6 +159,8 @@ extension ANISupportView: ANIButtonViewDelegate {
       DispatchQueue.global().async {
         databaseRef.child(KEY_RECRUITS).child(recruitId).child(KEY_SUPPORT_RECRUIT_IDS).updateChildValues([uid: true])
       }
+      
+      updateNoti(storyId: id)
       
       self.delegate?.supportButtonTapped()
     }

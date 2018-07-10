@@ -133,9 +133,28 @@ extension ANINotiDetailViewController: ANINotiDetailViewDelegate {
     self.navigationController?.pushViewController(recruitDetailViewController, animated: true)
   }
   
-  func supportButtonTapped() {
+  func supportButtonTapped(supportRecruit: FirebaseRecruit, user: FirebaseUser) {
     let supportViewController = ANISupportViewController()
     supportViewController.modalPresentationStyle = .overCurrentContext
+    supportViewController.recruit = supportRecruit
+    supportViewController.user = user
     self.tabBarController?.present(supportViewController, animated: false, completion: nil)
+  }
+  
+  func storyViewCellDidSelect(selectedStory: FirebaseStory, user: FirebaseUser) {
+    let commentViewController = ANICommentViewController()
+    commentViewController.hidesBottomBarWhenPushed = true
+    commentViewController.commentMode = CommentMode.story
+    commentViewController.story = selectedStory
+    commentViewController.user = user
+    self.navigationController?.pushViewController(commentViewController, animated: true)
+  }
+  
+  func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser) {
+    let recruitDetailViewController = ANIRecruitDetailViewController()
+    recruitDetailViewController.hidesBottomBarWhenPushed = true
+    recruitDetailViewController.recruit = recruit
+    recruitDetailViewController.user = user
+    self.navigationController?.pushViewController(recruitDetailViewController, animated: true)
   }
 }

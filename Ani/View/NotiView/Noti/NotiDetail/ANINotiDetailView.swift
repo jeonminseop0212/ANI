@@ -12,7 +12,9 @@ import CodableFirebase
 
 protocol ANINotiDetailViewDelegate {
   func recruitViewCellDidSelect(selectedRecruit: FirebaseRecruit, user: FirebaseUser)
-  func supportButtonTapped()
+  func supportButtonTapped(supportRecruit: FirebaseRecruit, user: FirebaseUser)
+  func storyViewCellDidSelect(selectedStory: FirebaseStory, user: FirebaseUser)
+  func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser)
 }
 
 enum NotiKind {
@@ -102,7 +104,7 @@ extension ANINotiDetailView: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: supportCellId, for: indexPath) as! ANISupportViewCell
         
         cell.story = story
-//        cell.delegate = self
+        cell.delegate = self
         
         return cell
       } else {
@@ -128,8 +130,8 @@ extension ANINotiDetailView: UITableViewDataSource {
 
 //MARK: ANIRecruitViewCellDelegate
 extension ANINotiDetailView: ANIRecruitViewCellDelegate {
-  func supportButtonTapped(supportRecruit: FirebaseRecruit) {
-    self.delegate?.supportButtonTapped()
+  func supportButtonTapped(supportRecruit: FirebaseRecruit, user: FirebaseUser) {
+    self.delegate?.supportButtonTapped(supportRecruit: supportRecruit, user: user)
   }
   
   func cellTapped(recruit: FirebaseRecruit, user: FirebaseUser) {
@@ -137,6 +139,24 @@ extension ANINotiDetailView: ANIRecruitViewCellDelegate {
   }
   
   func reject() {
+  }
+}
+
+//MARK: ANIStoryViewCellDelegate
+extension ANINotiDetailView: ANIStoryViewCellDelegate {
+  func storyCellTapped(story: FirebaseStory, user: FirebaseUser) {
+    self.delegate?.storyViewCellDidSelect(selectedStory: story, user: user)
+  }
+}
+
+//MARK: ANISupportViewCellDelegate
+extension ANINotiDetailView: ANISupportViewCellDelegate {
+  func supportCellTapped(story: FirebaseStory, user: FirebaseUser) {
+    self.delegate?.storyViewCellDidSelect(selectedStory: story, user: user)
+  }
+  
+  func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser) {
+    self.delegate?.supportCellRecruitTapped(recruit: recruit, user: user)
   }
 }
 

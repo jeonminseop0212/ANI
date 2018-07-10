@@ -17,6 +17,8 @@ class ANISupportViewController: UIViewController {
   
   var recruit: FirebaseRecruit?
   
+  var user: FirebaseUser?
+  
   private var isKeyboardShow: Bool = false
   
   override func viewDidLoad() {
@@ -39,6 +41,9 @@ class ANISupportViewController: UIViewController {
     supportView.delegate = self
     if let recruit = self.recruit {
       supportView.recruit = recruit
+    }
+    if let user = self.user {
+      supportView.user = user
     }
     self.view.addSubview(supportView)
     supportViewCenterYConstraint = supportView.centerYToSuperview()

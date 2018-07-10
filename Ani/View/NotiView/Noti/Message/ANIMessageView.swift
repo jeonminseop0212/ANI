@@ -50,6 +50,7 @@ class ANIMessageView: UIView {
     messageTableView.separatorStyle = .none
     messageTableView.alwaysBounceVertical = true
     messageTableView.dataSource = self
+    messageTableView.delegate = self
     messageTableView.alpha = 0.0
     addSubview(messageTableView)
     messageTableView.edgesToSuperview()
@@ -88,9 +89,17 @@ extension ANIMessageView: UITableViewDataSource {
     let cell = tableView.dequeueReusableCell(withIdentifier: id, for: indexPath) as! ANIMessageViewCell
     
     cell.chatGroup = chatGroups[indexPath.row]
-    cell.observeGroup()
     
     return cell
+  }
+}
+
+//MARK: UITableViewDelegate
+extension ANIMessageView: UITableViewDelegate {
+  func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    if let cell = cell as? ANIMessageViewCell {
+      cell.unobserveChatGroup()
+    }
   }
 }
 
