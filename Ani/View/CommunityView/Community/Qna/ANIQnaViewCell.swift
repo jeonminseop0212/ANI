@@ -316,6 +316,45 @@ class ANIQnaViewCell: UITableViewCell {
     }
   }
   
+  private func updateNoti() {
+    guard let qna = self.qna,
+          let qnaId = qna.id,
+          let currentUser = ANISessionManager.shared.currentUser,
+          let currentUserName = currentUser.userName,
+          let currentUserId = ANISessionManager.shared.currentUserUid,
+          let user = self.user,
+          let userId = user.uid else { return }
+    
+    let databaseRef = Database.database().reference()
+    
+    DispatchQueue.global().async {
+      do {
+        let noti = "\(currentUserName)さんが「\(qna.qna)」質問を「いいね」しました。"
+        let date = ANIFunction.shared.getToday()
+        let notification = FirebaseNotification(userId: currentUserId, noti: noti, kind: KEY_NOTI_KIND_QNA, notiId: qnaId, updateDate: date)
+        if let data = try FirebaseEncoder().encode(notification) as? [String: AnyObject] {
+          
+          databaseRef.child(KEY_NOTIFICATIONS).child(userId).child(qnaId).updateChildValues(data)
+        }
+      } catch let error {
+        print(error)
+      }
+    }
+  }
+  
+  private func removeNoti() {
+    guard let qna = self.qna,
+          let qnaId = qna.id,
+          let user = self.user,
+          let userId = user.uid else { return }
+    
+    let databaseRef = Database.database().reference()
+    
+    DispatchQueue.global().async {
+      databaseRef.child(KEY_NOTIFICATIONS).child(userId).child(qnaId).removeValue()
+    }
+  }
+  
   //MARK: action
   @objc private func love() {
     guard let qna = self.qna,
@@ -329,11 +368,15 @@ class ANIQnaViewCell: UITableViewCell {
         databaseRef.child(KEY_QNAS).child(qnaId).child(KEY_LOVE_IDS).updateChildValues([currentUserId: true])
         let date = ANIFunction.shared.getToday()
         databaseRef.child(KEY_LOVE_QNA_IDS).child(currentUserId).updateChildValues([qnaId: date])
+        
+        self.updateNoti()
       }
     } else {
       DispatchQueue.global().async {
         databaseRef.child(KEY_QNAS).child(qnaId).child(KEY_LOVE_IDS).child(currentUserId).removeValue()
         databaseRef.child(KEY_LOVE_QNA_IDS).child(currentUserId).child(qnaId).removeValue()
+        
+        self.removeNoti()
       }
     }
   }

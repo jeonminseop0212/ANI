@@ -114,7 +114,8 @@ class ANISupportView: UIView {
         } else {
           noti = "\(currentUserName)さんが「\(recruit.title)」募集を「応援」しました。"
         }
-        let notification = FirebaseNotification(userId: currentUserId, noti: noti, kind: KEY_NOTI_KIND_STROY, notiId: storyId)
+        let date = ANIFunction.shared.getToday()
+        let notification = FirebaseNotification(userId: currentUserId, noti: noti, kind: KEY_NOTI_KIND_STROY, notiId: storyId, updateDate: date)
         if let data = try FirebaseEncoder().encode(notification) as? [String: AnyObject] {
           
           databaseRef.child(KEY_NOTIFICATIONS).child(userId).childByAutoId().updateChildValues(data)

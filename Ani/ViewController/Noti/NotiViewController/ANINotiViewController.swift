@@ -206,25 +206,25 @@ extension ANINotiViewController: ANINeedLoginViewDelegate {
 //MARK: ANINotiNotiCellDelegate
 extension ANINotiViewController: ANINotiNotiCellDelegate {
   func cellTapped(noti: FirebaseNotification) {
+    let notiDetailViewController = ANINotiDetailViewController()
+    notiDetailViewController.notiId = noti.notiId
+
     if noti.kind == KEY_NOTI_KIND_RECRUIT {
-      let notiDetailViewController = ANINotiDetailViewController()
       notiDetailViewController.navigationTitle = "募集"
       notiDetailViewController.notiKind = .recruit
-      notiDetailViewController.notiId = noti.notiId
-      self.navigationController?.pushViewController(notiDetailViewController, animated: true)
     } else if noti.kind == KEY_NOTI_KIND_STROY {
-      let notiDetailViewController = ANINotiDetailViewController()
       notiDetailViewController.navigationTitle = "ストーリー"
       notiDetailViewController.notiKind = .story
-      notiDetailViewController.notiId = noti.notiId
-      self.navigationController?.pushViewController(notiDetailViewController, animated: true)
     } else if noti.kind == KEY_NOTI_KIND_QNA {
-      
+      notiDetailViewController.navigationTitle = "Q&A"
+      notiDetailViewController.notiKind = .qna
     } else if noti.kind == KEY_NORI_KIND_COMMET {
       
     } else if noti.kind == KEY_NOTI_KIND_FOLLOW {
       
     }
+    
+    self.navigationController?.pushViewController(notiDetailViewController, animated: true)
   }
 }
 

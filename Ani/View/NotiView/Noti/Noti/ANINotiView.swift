@@ -130,7 +130,7 @@ extension ANINotiView {
     
     activityIndicatorView.startAnimating()
     
-    databaseRef.child(KEY_NOTIFICATIONS).child(currentUserUid).observeSingleEvent(of: .value) { (snapshot) in
+    databaseRef.child(KEY_NOTIFICATIONS).child(currentUserUid).queryOrdered(byChild: KEY_NOTI_UPDATE_DATE).queryLimited(toFirst: 20).observeSingleEvent(of: .value) { (snapshot) in
       for item in snapshot.children {
         if let snapshot = item as? DataSnapshot {
           guard let value = snapshot.value else { return }
