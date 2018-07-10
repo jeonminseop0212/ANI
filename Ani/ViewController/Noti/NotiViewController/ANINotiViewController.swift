@@ -220,8 +220,6 @@ extension ANINotiViewController: ANINotiNotiCellDelegate {
       notiDetailViewController.notiKind = .qna
     } else if noti.kind == KEY_NORI_KIND_COMMET {
       
-    } else if noti.kind == KEY_NOTI_KIND_FOLLOW {
-      
     }
     
     self.navigationController?.pushViewController(notiDetailViewController, animated: true)

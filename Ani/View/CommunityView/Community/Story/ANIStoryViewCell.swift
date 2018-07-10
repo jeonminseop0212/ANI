@@ -336,19 +336,6 @@ class ANIStoryViewCell: UITableViewCell {
     }
   }
   
-  private func removeNoti() {
-    guard let story = self.story,
-          let storyId = story.id,
-          let user = self.user,
-          let userId = user.uid else { return }
-    
-    let databaseRef = Database.database().reference()
-    
-    DispatchQueue.global().async {
-      databaseRef.child(KEY_NOTIFICATIONS).child(userId).child(storyId).removeValue()
-    }
-  }
-  
   //MARK: action
   @objc private func love() {
     guard let story = self.story,
@@ -368,9 +355,7 @@ class ANIStoryViewCell: UITableViewCell {
     } else {
       DispatchQueue.global().async {
         databaseRef.child(KEY_STORIES).child(storyId).child(KEY_LOVE_IDS).child(currentUserId).removeValue()
-        databaseRef.child(KEY_LOVE_STORY_IDS).child(currentUserId).child(storyId).removeValue()
-        
-        self.removeNoti()
+        databaseRef.child(KEY_LOVE_STORY_IDS).child(currentUserId).child(storyId).removeValue()        
       }
     }
   }

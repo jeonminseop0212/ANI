@@ -133,6 +133,8 @@ class ANIFollowUserViewCell: UITableViewCell {
           followButton.base?.backgroundColor = .clear
           followLabel.text = "フォロー中"
           followLabel.textColor = ANIColor.green
+          
+          return
         } else {
           followButton.base?.backgroundColor = ANIColor.green
           followLabel.text = "フォロー"

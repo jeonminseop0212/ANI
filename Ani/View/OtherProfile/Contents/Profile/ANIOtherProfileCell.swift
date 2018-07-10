@@ -8,6 +8,7 @@
 
 import UIKit
 import FirebaseDatabase
+import CodableFirebase
 
 protocol ANIOtherProfileCellDelegate {
   func followingTapped()
@@ -239,6 +240,8 @@ class ANIOtherProfileCell: UITableViewCell {
           followButton.base?.backgroundColor = .clear
           followLabel.text = "フォロー中"
           followLabel.textColor = ANIColor.green
+          
+          return
         } else {
           followButton.base?.backgroundColor = ANIColor.green
           followLabel.text = "フォロー"
@@ -294,11 +297,36 @@ class ANIOtherProfileCell: UITableViewCell {
           followButton.base?.backgroundColor = .clear
           followLabel.text = "フォロー中"
           followLabel.textColor = ANIColor.green
+          
+          return
         } else {
           followButton.base?.backgroundColor = ANIColor.green
           followLabel.text = "フォロー"
           followLabel.textColor = .white
         }
+      }
+    }
+  }
+  
+  private func updateNoti() {
+    guard let currentUser = ANISessionManager.shared.currentUser,
+          let currentUserName = currentUser.userName,
+          let currentUserId = ANISessionManager.shared.currentUserUid,
+          let user = self.user,
+          let userId = user.uid else { return }
+    
+    let databaseRef = Database.database().reference()
+    
+    DispatchQueue.global().async {
+      do {
+        let noti = "\(currentUserName)さんがあなたをフォローしました。"
+        let date = ANIFunction.shared.getToday()
+        let notification = FirebaseNotification(userId: currentUserId, noti: noti, kind: KEY_NOTI_KIND_FOLLOW, notiId: userId, updateDate: date)
+        if let data = try FirebaseEncoder().encode(notification) as? [String: AnyObject] {
+          databaseRef.child(KEY_NOTIFICATIONS).child(userId).child(currentUserId).updateChildValues(data)
+        }
+      } catch let error {
+        print(error)
       }
     }
   }
@@ -329,6 +357,8 @@ extension ANIOtherProfileCell: ANIButtonViewDelegate {
           let date = ANIFunction.shared.getToday()
           databaseRef.child(KEY_FOLLOWING_USER_IDS).child(currentUserUid).updateChildValues([userId: date])
           databaseRef.child(KEY_FOLLOWER_IDS).child(userId).updateChildValues([currentUserUid: date])
+          
+          self.updateNoti()
         }
       } else {
         DispatchQueue.global().async {

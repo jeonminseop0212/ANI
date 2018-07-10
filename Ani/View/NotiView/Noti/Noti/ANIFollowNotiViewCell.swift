@@ -15,6 +15,8 @@ class ANIFollowNotiViewCell: UITableViewCell {
   private let PROFILE_IMAGE_VIEW_HEIGHT: CGFloat = 50.0
   private weak var profileImageView: UIImageView?
   private weak var notiLabel: UILabel?
+  private weak var followButton: ANIAreaButtonView?
+  private weak var followLabel: UILabel?
   
   var noti: FirebaseNotification? {
     didSet {
@@ -25,6 +27,7 @@ class ANIFollowNotiViewCell: UITableViewCell {
   
   private var user: FirebaseUser? {
     didSet {
+      isFollowed()
       reloadUserLayout()
     }
   }
@@ -48,9 +51,9 @@ class ANIFollowNotiViewCell: UITableViewCell {
     
     //profileImageView
     let profileImageView = UIImageView()
-    profileImageView.backgroundColor = ANIColor.bg
     profileImageView.layer.cornerRadius = PROFILE_IMAGE_VIEW_HEIGHT / 2
     profileImageView.layer.masksToBounds = true
+    profileImageView.backgroundColor = ANIColor.bg
     addSubview(profileImageView)
     profileImageView.topToSuperview(offset: 10.0)
     profileImageView.leftToSuperview(offset: 10.0)
@@ -60,14 +63,39 @@ class ANIFollowNotiViewCell: UITableViewCell {
     
     //notiLabel
     let notiLabel = UILabel()
+    notiLabel.textColor = ANIColor.dark
     notiLabel.numberOfLines = 0
     notiLabel.font = UIFont.systemFont(ofSize: 14.0)
     notiLabel.textColor = ANIColor.subTitle
     addSubview(notiLabel)
     notiLabel.topToSuperview(offset: 10.0)
     notiLabel.leftToRight(of: profileImageView, offset: 10.0)
-    notiLabel.rightToSuperview(offset: 10.0)
     self.notiLabel = notiLabel
+    
+    //followButton
+    let followButton = ANIAreaButtonView()
+    followButton.baseCornerRadius = 10.0
+    followButton.base?.backgroundColor = ANIColor.green
+    followButton.base?.layer.borderWidth = 1.8
+    followButton.base?.layer.borderColor = ANIColor.green.cgColor
+    followButton.delegate = self
+    addSubview(followButton)
+    followButton.centerY(to: profileImageView)
+    followButton.leftToRight(of: notiLabel, offset: 10.0)
+    followButton.rightToSuperview(offset: 10.0)
+    followButton.width(85.0)
+    followButton.height(30.0)
+    self.followButton = followButton
+    
+    //followLabel
+    let followLabel = UILabel()
+    followLabel.font = UIFont.boldSystemFont(ofSize: 14)
+    followLabel.textColor = .white
+    followLabel.text = "フォロー"
+    followLabel.textAlignment = .center
+    followButton.addContent(followLabel)
+    followLabel.edgesToSuperview()
+    self.followLabel = followLabel
     
     //bottomSpace
     let spaceView = UIView()
@@ -99,6 +127,95 @@ class ANIFollowNotiViewCell: UITableViewCell {
     guard let noti = self.noti else { return }
     
     ANINotificationManager.postProfileImageViewTapped(userId: noti.userId)
+  }
+  
+  private func isFollowed() {
+    guard let user = self.user,
+          let userId = user.uid,
+          let currentUserId = ANISessionManager.shared.currentUserUid,
+          let followButton = self.followButton,
+          let followLabel = self.followLabel else { return }
+    
+    let databaseRef = Database.database().reference()
+    
+    databaseRef.child(KEY_FOLLOWING_USER_IDS).child(currentUserId).observeSingleEvent(of: .value) { (snapshot) in
+      guard let followingUser = snapshot.value as? [String: String] else { return }
+      
+      for id in followingUser.keys {
+        if id == userId {
+          followButton.base?.backgroundColor = .clear
+          followLabel.text = "フォロー中"
+          followLabel.textColor = ANIColor.green
+          
+          return
+        } else {
+          followButton.base?.backgroundColor = ANIColor.green
+          followLabel.text = "フォロー"
+          followLabel.textColor = .white
+        }
+      }
+    }
+  }
+  
+  private func updateNoti() {
+    guard let currentUser = ANISessionManager.shared.currentUser,
+          let currentUserName = currentUser.userName,
+          let currentUserId = ANISessionManager.shared.currentUserUid,
+          let user = self.user,
+          let userId = user.uid else { return }
+    
+    let databaseRef = Database.database().reference()
+    
+    DispatchQueue.global().async {
+      do {
+        let noti = "\(currentUserName)さんがあなたをフォローしました。"
+        let date = ANIFunction.shared.getToday()
+        let notification = FirebaseNotification(userId: currentUserId, noti: noti, kind: KEY_NOTI_KIND_FOLLOW, notiId: userId, updateDate: date)
+        if let data = try FirebaseEncoder().encode(notification) as? [String: AnyObject] {
+          databaseRef.child(KEY_NOTIFICATIONS).child(userId).child(currentUserId).updateChildValues(data)
+        }
+      } catch let error {
+        print(error)
+      }
+    }
+  }
+}
+
+//MARK: ANIButtonViewDelegate
+extension ANIFollowNotiViewCell: ANIButtonViewDelegate {
+  func buttonViewTapped(view: ANIButtonView) {
+    if view === followButton {
+      guard let currentUserUid = ANISessionManager.shared.currentUserUid,
+            let user = self.user,
+            let userId = user.uid,
+            let followButton = self.followButton,
+            let followLabel = self.followLabel else { return }
+      
+      let databaseRef = Database.database().reference()
+      
+      if followButton.base?.backgroundColor == ANIColor.green {
+        DispatchQueue.global().async {
+          let date = ANIFunction.shared.getToday()
+          databaseRef.child(KEY_FOLLOWING_USER_IDS).child(currentUserUid).updateChildValues([userId: date])
+          databaseRef.child(KEY_FOLLOWER_IDS).child(userId).updateChildValues([currentUserUid: date])
+          
+          self.updateNoti()
+        }
+        
+        followButton.base?.backgroundColor = .clear
+        followLabel.text = "フォロー中"
+        followLabel.textColor = ANIColor.green
+      } else {
+        DispatchQueue.global().async {
+          databaseRef.child(KEY_FOLLOWING_USER_IDS).child(currentUserUid).child(userId).removeValue()
+          databaseRef.child(KEY_FOLLOWER_IDS).child(userId).child(currentUserUid).removeValue()
+        }
+        
+        followButton.base?.backgroundColor = ANIColor.green
+        followLabel.text = "フォロー"
+        followLabel.textColor = .white
+      }
+    }
   }
 }
 
