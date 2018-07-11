@@ -9,6 +9,7 @@
 import UIKit
 import FirebaseDatabase
 import CodableFirebase
+import NVActivityIndicatorView
 
 protocol ANINotiDetailViewDelegate {
   func recruitViewCellDidSelect(selectedRecruit: FirebaseRecruit, user: FirebaseUser)
@@ -54,6 +55,8 @@ class ANINotiDetailView: UIView {
   private var qna: FirebaseQna?
   private var comment: FirebaseComment?
   
+  private weak var activityIndicatorView: NVActivityIndicatorView?
+  
   var delegate: ANINotiDetailViewDelegate?
   
   override init(frame: CGRect) {
@@ -81,11 +84,33 @@ class ANINotiDetailView: UIView {
     tableView.register(ANIQnaViewCell.self, forCellReuseIdentifier: qnaCellId)
     let commentCellId = NSStringFromClass(ANINotiCommentViewCell.self)
     tableView.register(ANINotiCommentViewCell.self, forCellReuseIdentifier: commentCellId)
+    tableView.alpha = 0.0
     tableView.dataSource = self
     tableView.delegate = self
     addSubview(tableView)
     tableView.edgesToSuperview()
     self.tableView = tableView
+    
+    //activityIndicatorView
+    let activityIndicatorView = NVActivityIndicatorView(frame: .zero, type: .lineScale, color: ANIColor.green, padding: 0)
+    addSubview(activityIndicatorView)
+    activityIndicatorView.width(40.0)
+    activityIndicatorView.height(40.0)
+    activityIndicatorView.centerInSuperview()
+    self.activityIndicatorView = activityIndicatorView
+  }
+  
+  private func loadDone() {
+    guard let tableView = self.tableView,
+          let activityIndicatorView = self.activityIndicatorView else { return }
+    
+    activityIndicatorView.stopAnimating()
+    
+    tableView.reloadData()
+    
+    UIView.animate(withDuration: 0.2, animations: {
+      tableView.alpha = 1.0
+    })
   }
 }
 
@@ -247,7 +272,11 @@ extension ANINotiDetailView: ANIQnaViewCellDelegate {
 //MARK: data
 extension ANINotiDetailView {
   private func loadRecruit(notiId: String) {
+    guard let activityIndicatorView = self.activityIndicatorView else { return }
+    
     let databaseRef = Database.database().reference()
+    
+    activityIndicatorView.startAnimating()
     
     DispatchQueue.global().async {
       databaseRef.child(KEY_RECRUITS).child(notiId).observeSingleEvent(of: .value, with: { (snapshot) in
@@ -258,19 +287,26 @@ extension ANINotiDetailView {
           self.recruit = recruit
           
           DispatchQueue.main.async {
-            guard let tableView = self.tableView else { return }
-            
-            tableView.reloadData()
+            self.loadDone()
           }
         } catch let error {
           print(error)
+          
+          activityIndicatorView.stopAnimating()
+        }
+        if snapshot.value as? [String: AnyObject] == nil {
+          activityIndicatorView.stopAnimating()
         }
       })
     }
   }
   
   private func loadStory(notiId: String) {
+    guard let activityIndicatorView = self.activityIndicatorView else { return }
+
     let databaseRef = Database.database().reference()
+    
+    activityIndicatorView.startAnimating()
 
     DispatchQueue.global().async {
       databaseRef.child(KEY_STORIES).child(notiId).observeSingleEvent(of: .value, with: { (snapshot) in
@@ -281,18 +317,26 @@ extension ANINotiDetailView {
           self.story = story
           
           DispatchQueue.main.async {
-            guard let tableView = self.tableView else { return }
-            tableView.reloadData()
+            self.loadDone()
           }
         } catch let error {
           print(error)
+          
+          activityIndicatorView.stopAnimating()
+        }
+        if snapshot.value as? [String: AnyObject] == nil {
+          activityIndicatorView.stopAnimating()
         }
       })
     }
   }
   
   private func loadQna(notiId: String) {
+    guard let activityIndicatorView = self.activityIndicatorView else { return }
+
     let databaseRef = Database.database().reference()
+    
+    activityIndicatorView.startAnimating()
     
     DispatchQueue.global().async {
       databaseRef.child(KEY_QNAS).child(notiId).observeSingleEvent(of: .value, with: { (snapshot) in
@@ -302,20 +346,27 @@ extension ANINotiDetailView {
           self.qna = qna
           
           DispatchQueue.main.async {
-            guard let tableView = self.tableView else { return }
-            tableView.reloadData()
+            self.loadDone()
           }
         } catch let error {
           print(error)
+          
+          activityIndicatorView.stopAnimating()
+        }
+        if snapshot.value as? [String: AnyObject] == nil {
+          activityIndicatorView.stopAnimating()
         }
       })
     }
   }
   
   private func loadComment(commentId: String) {
-    guard let noti = self.noti else { return }
+    guard let noti = self.noti,
+          let activityIndicatorView = self.activityIndicatorView else { return }
     
     let databaseRef = Database.database().reference()
+    
+    activityIndicatorView.startAnimating()
     
     DispatchQueue.global().async {
       databaseRef.child(KEY_COMMENTS).child(noti.notiId).child(commentId).observeSingleEvent(of: .value, with: { (snapshot) in
@@ -325,11 +376,15 @@ extension ANINotiDetailView {
           self.comment = comment
           
           DispatchQueue.main.async {
-            guard let tableView = self.tableView else { return }
-            tableView.reloadData()
+            self.loadDone()
           }
         } catch let error {
           print(error)
+          
+          activityIndicatorView.stopAnimating()
+        }
+        if snapshot.value as? [String: AnyObject] == nil {
+          activityIndicatorView.stopAnimating()
         }
       })
     }
