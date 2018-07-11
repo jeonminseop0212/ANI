@@ -13,6 +13,7 @@ import TinyConstraints
 
 class ANIBasicNotiViewCell: UITableViewCell {
   
+  private weak var stackView: UIStackView?
   private let PROFILE_IMAGE_VIEW_HEIGHT: CGFloat = 50.0
   private weak var profileImageView: UIImageView?
   private weak var notiLabel: UILabel?
@@ -25,7 +26,6 @@ class ANIBasicNotiViewCell: UITableViewCell {
     didSet {
       loadUser()
       reloadLayout()
-      updateSpaceViewTopView()
     }
   }
   
@@ -49,6 +49,17 @@ class ANIBasicNotiViewCell: UITableViewCell {
     self.selectionStyle = .none
     backgroundColor = .white
     
+    //stackView
+    let stackView = UIStackView()
+    stackView.alignment = .top
+    stackView.axis = .horizontal
+    stackView.spacing = 10.0
+    addSubview(stackView)
+    stackView.topToSuperview(offset: 10.0)
+    stackView.leftToSuperview(offset: 10.0)
+    stackView.rightToSuperview(offset: 10.0)
+    self.stackView = stackView
+    
     //profileImageView
     let profileImageView = UIImageView()
     profileImageView.backgroundColor = ANIColor.bg
@@ -57,9 +68,7 @@ class ANIBasicNotiViewCell: UITableViewCell {
     profileImageView.isUserInteractionEnabled = true
     let tapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped))
     profileImageView.addGestureRecognizer(tapGesture)
-    addSubview(profileImageView)
-    profileImageView.topToSuperview(offset: 10.0)
-    profileImageView.leftToSuperview(offset: 10.0)
+    stackView.addArrangedSubview(profileImageView)
     profileImageView.width(PROFILE_IMAGE_VIEW_HEIGHT)
     profileImageView.height(PROFILE_IMAGE_VIEW_HEIGHT)
     self.profileImageView = profileImageView
@@ -69,18 +78,14 @@ class ANIBasicNotiViewCell: UITableViewCell {
     notiLabel.numberOfLines = 0
     notiLabel.font = UIFont.systemFont(ofSize: 14.0)
     notiLabel.textColor = ANIColor.subTitle
-    addSubview(notiLabel)
-    notiLabel.topToSuperview(offset: 10.0)
-    notiLabel.leftToRight(of: profileImageView, offset: 10.0)
-    notiLabel.rightToSuperview(offset: 10.0)
+    stackView.addArrangedSubview(notiLabel)
     self.notiLabel = notiLabel
     
     //bottomSpace
     let spaceView = UIView()
     spaceView.backgroundColor = ANIColor.bg
     addSubview(spaceView)
-    spaceViewTopToProfileImageViewConstraint = spaceView.topToBottom(of: profileImageView, offset: 10, isActive: true)
-    spaceViewTopToNotiLabelConstraint = spaceView.topToBottom(of: notiLabel, offset: 10, isActive: false)
+    spaceView.topToBottom(of: stackView, offset: 10.0)
     spaceView.leftToSuperview()
     spaceView.rightToSuperview()
     spaceView.height(10.0)
@@ -101,24 +106,6 @@ class ANIBasicNotiViewCell: UITableViewCell {
           let profileImageUrl = user.profileImageUrl else { return }
     
     profileImageView.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
-  }
-  
-  private func updateSpaceViewTopView() {
-    guard let notiLabel = self.notiLabel,
-          let spaceViewTopToProfileImageViewConstraint = self.spaceViewTopToProfileImageViewConstraint,
-          let spaceViewTopToNotiLabelConstraint = self.spaceViewTopToNotiLabelConstraint else { return }
-    
-    layoutIfNeeded()
-    setNeedsLayout()
-    
-    let profileTopMargin: CGFloat = 10.0
-    if notiLabel.frame.maxY > PROFILE_IMAGE_VIEW_HEIGHT + profileTopMargin {
-      spaceViewTopToProfileImageViewConstraint.isActive = false
-      spaceViewTopToNotiLabelConstraint.isActive = true
-    } else {
-      spaceViewTopToNotiLabelConstraint.isActive = false
-      spaceViewTopToProfileImageViewConstraint.isActive = true
-    }
   }
   
   @objc private func profileImageViewTapped() {

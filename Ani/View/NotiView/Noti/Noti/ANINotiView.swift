@@ -31,7 +31,7 @@ class ANINotiView: UIView {
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()
-    loadNoti()
+    loadNoti(sender: nil)
     setupNotifications()
   }
   
@@ -60,6 +60,9 @@ class ANINotiView: UIView {
     notiTableView.alwaysBounceVertical = true
     notiTableView.dataSource = self
     notiTableView.delegate = self
+    let refreshControl = UIRefreshControl()
+    refreshControl.addTarget(self, action: #selector(loadNoti(sender:)), for: .valueChanged)
+    notiTableView.addSubview(refreshControl)
     addSubview(notiTableView)
     notiTableView.edgesToSuperview()
     self.notiTableView = notiTableView
@@ -93,20 +96,24 @@ extension ANINotiView: UITableViewDataSource {
   }
   
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    if notifications[indexPath.row].kind == KEY_NOTI_KIND_FOLLOW {
-      let followNotiId = NSStringFromClass(ANIFollowNotiViewCell.self)
-      let cell = tableView.dequeueReusableCell(withIdentifier: followNotiId, for: indexPath) as! ANIFollowNotiViewCell
-      
-      cell.noti = notifications[indexPath.row]
-      
-      return cell
+    if !notifications.isEmpty {
+      if notifications[indexPath.row].kind == KEY_NOTI_KIND_FOLLOW {
+        let followNotiId = NSStringFromClass(ANIFollowNotiViewCell.self)
+        let cell = tableView.dequeueReusableCell(withIdentifier: followNotiId, for: indexPath) as! ANIFollowNotiViewCell
+        
+        cell.noti = notifications[indexPath.row]
+        
+        return cell
+      } else {
+        let basicNotiId = NSStringFromClass(ANIBasicNotiViewCell.self)
+        let cell = tableView.dequeueReusableCell(withIdentifier: basicNotiId, for: indexPath) as! ANIBasicNotiViewCell
+        
+        cell.noti = notifications[indexPath.row]
+        
+        return cell
+      }
     } else {
-      let basicNotiId = NSStringFromClass(ANIBasicNotiViewCell.self)
-      let cell = tableView.dequeueReusableCell(withIdentifier: basicNotiId, for: indexPath) as! ANIBasicNotiViewCell
-      
-      cell.noti = notifications[indexPath.row]
-      
-      return cell
+      return UITableViewCell()
     }
   }
 }
@@ -122,13 +129,19 @@ extension ANINotiView: UITableViewDelegate {
 
 //MARK: data
 extension ANINotiView {
-  private func loadNoti() {
+  @objc private func loadNoti(sender: UIRefreshControl?) {
     guard let currentUserUid = ANISessionManager.shared.currentUserUid,
           let activityIndicatorView = self.activityIndicatorView else { return }
     
+    if !self.notifications.isEmpty {
+      self.notifications.removeAll()
+    }
+    
     let databaseRef = Database.database().reference()
     
-    activityIndicatorView.startAnimating()
+    if sender == nil {
+      activityIndicatorView.startAnimating()
+    }
     
     databaseRef.child(KEY_NOTIFICATIONS).child(currentUserUid).queryOrdered(byChild: KEY_NOTI_UPDATE_DATE).queryLimited(toFirst: 20).observeSingleEvent(of: .value) { (snapshot) in
       for item in snapshot.children {
@@ -141,27 +154,44 @@ extension ANINotiView {
 
             DispatchQueue.main.async {
               guard let notiTableView = self.notiTableView else { return }
-              
-              activityIndicatorView.stopAnimating()
 
               notiTableView.reloadData()
               
-              UIView.animate(withDuration: 0.2, animations: {
-                notiTableView.alpha = 1.0
-              })
+              if let sender = sender {
+                sender.endRefreshing()
+              } else {
+                activityIndicatorView.stopAnimating()
+                
+                UIView.animate(withDuration: 0.2, animations: {
+                  notiTableView.alpha = 1.0
+                })
+              }
+            
             }
           } catch let error {
             print(error)
             
-            activityIndicatorView.stopAnimating()
+            if let sender = sender {
+              sender.endRefreshing()
+            } else {
+              activityIndicatorView.stopAnimating()
+            }
           }
           if snapshot.value as? [String: AnyObject] == nil {
-            activityIndicatorView.stopAnimating()
+            if let sender = sender {
+              sender.endRefreshing()
+            } else {
+              activityIndicatorView.stopAnimating()
+            }
           }
         }
       }
       if snapshot.value as? [String: AnyObject] == nil {
-        activityIndicatorView.stopAnimating()
+        if let sender = sender {
+          sender.endRefreshing()
+        } else {
+          activityIndicatorView.stopAnimating()
+        }
       }
     }
   }
