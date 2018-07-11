@@ -12,9 +12,11 @@ import CodableFirebase
 
 class ANIFollowNotiViewCell: UITableViewCell {
   
+  private weak var stackView: UIStackView?
   private let PROFILE_IMAGE_VIEW_HEIGHT: CGFloat = 50.0
   private weak var profileImageView: UIImageView?
   private weak var notiLabel: UILabel?
+  
   private weak var followButton: ANIAreaButtonView?
   private weak var followLabel: UILabel?
   
@@ -49,14 +51,22 @@ class ANIFollowNotiViewCell: UITableViewCell {
     let tapGesture = UITapGestureRecognizer(target: self, action: #selector(cellTapped))
     self.addGestureRecognizer(tapGesture)
     
+    //stackView
+    let stackView = UIStackView()
+    stackView.alignment = .top
+    stackView.axis = .horizontal
+    stackView.spacing = 10.0
+    addSubview(stackView)
+    stackView.topToSuperview(offset: 10.0)
+    stackView.leftToSuperview(offset: 10.0)
+    self.stackView = stackView
+    
     //profileImageView
     let profileImageView = UIImageView()
     profileImageView.layer.cornerRadius = PROFILE_IMAGE_VIEW_HEIGHT / 2
     profileImageView.layer.masksToBounds = true
     profileImageView.backgroundColor = ANIColor.bg
-    addSubview(profileImageView)
-    profileImageView.topToSuperview(offset: 10.0)
-    profileImageView.leftToSuperview(offset: 10.0)
+    stackView.addArrangedSubview(profileImageView)
     profileImageView.width(PROFILE_IMAGE_VIEW_HEIGHT)
     profileImageView.height(PROFILE_IMAGE_VIEW_HEIGHT)
     self.profileImageView = profileImageView
@@ -67,9 +77,7 @@ class ANIFollowNotiViewCell: UITableViewCell {
     notiLabel.numberOfLines = 0
     notiLabel.font = UIFont.systemFont(ofSize: 14.0)
     notiLabel.textColor = ANIColor.subTitle
-    addSubview(notiLabel)
-    notiLabel.topToSuperview(offset: 10.0)
-    notiLabel.leftToRight(of: profileImageView, offset: 10.0)
+    stackView.addArrangedSubview(notiLabel)
     self.notiLabel = notiLabel
     
     //followButton
@@ -81,7 +89,7 @@ class ANIFollowNotiViewCell: UITableViewCell {
     followButton.delegate = self
     addSubview(followButton)
     followButton.centerY(to: profileImageView)
-    followButton.leftToRight(of: notiLabel, offset: 10.0)
+    followButton.leftToRight(of: stackView, offset: 10.0)
     followButton.rightToSuperview(offset: 10.0)
     followButton.width(85.0)
     followButton.height(30.0)
@@ -101,7 +109,7 @@ class ANIFollowNotiViewCell: UITableViewCell {
     let spaceView = UIView()
     spaceView.backgroundColor = ANIColor.bg
     addSubview(spaceView)
-    spaceView.topToBottom(of: profileImageView, offset: 10)
+    spaceView.topToBottom(of: stackView, offset: 10)
     spaceView.leftToSuperview()
     spaceView.rightToSuperview()
     spaceView.height(10.0)

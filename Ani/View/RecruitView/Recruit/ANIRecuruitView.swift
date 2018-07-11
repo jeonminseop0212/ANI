@@ -68,46 +68,6 @@ class ANIRecuruitView: UIView {
     ANINotificationManager.receive(recruitTabTapped: self, selector: #selector(scrollToTop))
   }
   
-  @objc private func loadRecruit(sender: UIRefreshControl?) {
-    if !self.recruits.isEmpty {
-      self.recruits.removeAll()
-    }
-    
-    DispatchQueue.global().async {
-      let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_RECRUITS).queryLimited(toFirst: 20).observeSingleEvent(of: .value, with: { (snapshot) in
-        
-        for item in snapshot.children {
-          if let snapshot = item as? DataSnapshot, let value = snapshot.value {
-            do {
-              let recruit = try FirebaseDecoder().decode(FirebaseRecruit.self, from: value)
-              self.recruits.insert(recruit, at: 0)
-              
-              DispatchQueue.main.async {
-                if let sender = sender {
-                  sender.endRefreshing()
-                }
-    
-                guard let recruitTableView = self.recruitTableView else { return }
-                recruitTableView.reloadData()
-              }
-            } catch let error {
-              print(error)
-              
-              if let sender = sender {
-                sender.endRefreshing()
-              }
-            }
-          }
-        }
-        
-        if let sender = sender, snapshot.value as? [String: AnyObject] == nil {
-          sender.endRefreshing()
-        }
-      })
-    }
-  }
-  
   @objc private func reloadRecruit() {
     loadRecruit(sender: nil)
   }
@@ -169,5 +129,48 @@ extension ANIRecuruitView: ANIRecruitViewCellDelegate {
   
   func reject() {
     self.delegate?.reject()
+  }
+}
+
+//MARK: data
+extension ANIRecuruitView {
+  @objc private func loadRecruit(sender: UIRefreshControl?) {
+    if !self.recruits.isEmpty {
+      self.recruits.removeAll()
+    }
+    
+    DispatchQueue.global().async {
+      let databaseRef = Database.database().reference()
+      databaseRef.child(KEY_RECRUITS).queryLimited(toFirst: 20).observeSingleEvent(of: .value, with: { (snapshot) in
+        
+        for item in snapshot.children {
+          if let snapshot = item as? DataSnapshot, let value = snapshot.value {
+            do {
+              let recruit = try FirebaseDecoder().decode(FirebaseRecruit.self, from: value)
+              self.recruits.insert(recruit, at: 0)
+              
+              DispatchQueue.main.async {
+                if let sender = sender {
+                  sender.endRefreshing()
+                }
+                
+                guard let recruitTableView = self.recruitTableView else { return }
+                recruitTableView.reloadData()
+              }
+            } catch let error {
+              print(error)
+              
+              if let sender = sender {
+                sender.endRefreshing()
+              }
+            }
+          }
+        }
+        
+        if let sender = sender, snapshot.value as? [String: AnyObject] == nil {
+          sender.endRefreshing()
+        }
+      })
+    }
   }
 }
