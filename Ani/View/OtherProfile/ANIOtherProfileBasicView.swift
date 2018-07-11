@@ -9,6 +9,7 @@
 import UIKit
 import FirebaseDatabase
 import CodableFirebase
+import NVActivityIndicatorView
 
 protocol ANIOtherProfileBasicViewDelegate {
   func followingTapped()
@@ -41,8 +42,11 @@ class ANIOtherProfileBasicView: UIView {
   
   private var qnas = [FirebaseQna]()
   
-  var user: FirebaseUser? {
+  private var isFollowed: Bool?
+  
+  private var user: FirebaseUser? {
     didSet {
+      checkFollowed()
       loadRecruit()
       loadStory()
       loadQna()
@@ -57,6 +61,8 @@ class ANIOtherProfileBasicView: UIView {
       loadUser()
     }
   }
+  
+  private weak var activityIndicatorView: NVActivityIndicatorView?
   
   var delegate: ANIOtherProfileBasicViewDelegate?
   
@@ -87,9 +93,56 @@ class ANIOtherProfileBasicView: UIView {
     basicTableView.register(ANISupportViewCell.self, forCellReuseIdentifier: supportCellId)
     let qnaCellid = NSStringFromClass(ANIQnaViewCell.self)
     basicTableView.register(ANIQnaViewCell.self, forCellReuseIdentifier: qnaCellid)
+    basicTableView.alpha = 0.0
     addSubview(basicTableView)
     basicTableView.edgesToSuperview()
     self.basicTableView = basicTableView
+    
+    //activityIndicatorView
+    let activityIndicatorView = NVActivityIndicatorView(frame: .zero, type: .lineScale, color: ANIColor.green, padding: 0)
+    addSubview(activityIndicatorView)
+    activityIndicatorView.width(40.0)
+    activityIndicatorView.height(40.0)
+    activityIndicatorView.centerInSuperview()
+    self.activityIndicatorView = activityIndicatorView
+  }
+  
+  private func checkFollowed() {
+    guard let user = self.user,
+          let userId = user.uid,
+          let currentUserId = ANISessionManager.shared.currentUserUid,
+          let activityIndicatorView = self.activityIndicatorView else { return }
+    
+    let databaseRef = Database.database().reference()
+    
+    DispatchQueue.global().async {
+      databaseRef.child(KEY_FOLLOWING_USER_IDS).child(currentUserId).observeSingleEvent(of: .value) { (snapshot) in
+        guard let followingUser = snapshot.value as? [String: String] else { return }
+        
+        for id in followingUser.keys {
+          if id == userId {
+            
+            self.isFollowed = true
+            
+            guard let basicTableView = self.basicTableView else { return }
+            
+            basicTableView.reloadData()
+            
+            activityIndicatorView.stopAnimating()
+            
+            UIView.animate(withDuration: 0.2, animations: {
+              basicTableView.alpha = 1.0
+            })
+          }
+        }
+        
+        if snapshot.value as? [String: Any] == nil {
+          guard let activityIndicatorView = self.activityIndicatorView else { return }
+          
+          activityIndicatorView.stopAnimating()
+        }
+      }
+    }
   }
 }
 
@@ -136,6 +189,9 @@ extension ANIOtherProfileBasicView: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: profileCellid, for: indexPath) as! ANIOtherProfileCell
         
         cell.user = user
+        if let isFollowed = self.isFollowed {
+          cell.isFollowed = isFollowed
+        }
         cell.delegate = self
         
         return cell
@@ -278,7 +334,10 @@ extension ANIOtherProfileBasicView: ANIQnaViewCellDelegate {
 //MARK: data
 extension ANIOtherProfileBasicView {
   private func loadUser() {
-    guard let userId = self.userId else { return }
+    guard let userId = self.userId,
+          let activityIndicatorView = self.activityIndicatorView else { return }
+    
+    activityIndicatorView.startAnimating()
     
     DispatchQueue.global().async {
       let databaseRef = Database.database().reference()
