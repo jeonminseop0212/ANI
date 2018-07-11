@@ -16,7 +16,7 @@ class ANIMessageViewCell: UITableViewCell {
   private weak var profileImageView: UIImageView?
   private weak var userNameLabel: UILabel?
   private weak var updateDateLabel: UILabel?
-  private weak var subTitleLabel: UILabel?
+  private weak var messageLabel: UILabel?
   
   var chatGroup: FirebaseChatGroup? {
     didSet {
@@ -85,22 +85,22 @@ class ANIMessageViewCell: UITableViewCell {
     updateDateLabel.width(70.0)
     self.updateDateLabel = updateDateLabel
     
-    //subTitleLabel
-    let subTitleLabel = UILabel()
-    subTitleLabel.numberOfLines = 2
-    subTitleLabel.font = UIFont.systemFont(ofSize: 14.0)
-    subTitleLabel.textColor = ANIColor.subTitle
-    addSubview(subTitleLabel)
-    subTitleLabel.topToBottom(of: userNameLabel, offset: 10.0)
-    subTitleLabel.left(to: userNameLabel)
-    subTitleLabel.rightToSuperview(offset: 10.0)
-    self.subTitleLabel = subTitleLabel
+    //messageLabel
+    let messageLabel = UILabel()
+    messageLabel.numberOfLines = 1
+    messageLabel.font = UIFont.systemFont(ofSize: 14.0)
+    messageLabel.textColor = ANIColor.subTitle
+    addSubview(messageLabel)
+    messageLabel.topToBottom(of: userNameLabel, offset: 10.0)
+    messageLabel.left(to: userNameLabel)
+    messageLabel.rightToSuperview(offset: 10.0)
+    self.messageLabel = messageLabel
     
     //bottomSpace
     let spaceView = UIView()
     spaceView.backgroundColor = ANIColor.bg
     addSubview(spaceView)
-    spaceView.topToBottom(of: subTitleLabel, offset: 10)
+    spaceView.topToBottom(of: profileImageView, offset: 10)
     spaceView.leftToSuperview()
     spaceView.rightToSuperview()
     spaceView.height(10.0)
@@ -109,11 +109,11 @@ class ANIMessageViewCell: UITableViewCell {
   
   private func reloadLayout() {
     guard let updateDateLabel = self.updateDateLabel,
-          let subTitleLabel = self.subTitleLabel,
+          let messageLabel = self.messageLabel,
           let chatGroup = self.chatGroup else { return }
     
     updateDateLabel.text = String(chatGroup.updateDate.prefix(10))
-    subTitleLabel.text = chatGroup.lastMessage
+    messageLabel.text = chatGroup.lastMessage
   }
   
   private func reloadUserLayout() {

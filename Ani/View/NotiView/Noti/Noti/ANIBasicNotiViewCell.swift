@@ -9,6 +9,7 @@
 import UIKit
 import FirebaseDatabase
 import CodableFirebase
+import TinyConstraints
 
 class ANIBasicNotiViewCell: UITableViewCell {
   
@@ -16,10 +17,15 @@ class ANIBasicNotiViewCell: UITableViewCell {
   private weak var profileImageView: UIImageView?
   private weak var notiLabel: UILabel?
   
+  private var spaceViewTopToProfileImageViewConstraint: Constraint?
+  private var spaceViewTopToNotiLabelConstraint: Constraint?
+  private weak var spaceView: UIView?
+  
   var noti: FirebaseNotification? {
     didSet {
       loadUser()
       reloadLayout()
+      updateSpaceViewTopView()
     }
   }
   
@@ -73,11 +79,13 @@ class ANIBasicNotiViewCell: UITableViewCell {
     let spaceView = UIView()
     spaceView.backgroundColor = ANIColor.bg
     addSubview(spaceView)
-    spaceView.topToBottom(of: profileImageView, offset: 10)
+    spaceViewTopToProfileImageViewConstraint = spaceView.topToBottom(of: profileImageView, offset: 10, isActive: true)
+    spaceViewTopToNotiLabelConstraint = spaceView.topToBottom(of: notiLabel, offset: 10, isActive: false)
     spaceView.leftToSuperview()
     spaceView.rightToSuperview()
     spaceView.height(10.0)
     spaceView.bottomToSuperview()
+    self.spaceView = spaceView
   }
   
   private func reloadLayout() {
@@ -93,6 +101,24 @@ class ANIBasicNotiViewCell: UITableViewCell {
           let profileImageUrl = user.profileImageUrl else { return }
     
     profileImageView.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
+  }
+  
+  private func updateSpaceViewTopView() {
+    guard let notiLabel = self.notiLabel,
+          let spaceViewTopToProfileImageViewConstraint = self.spaceViewTopToProfileImageViewConstraint,
+          let spaceViewTopToNotiLabelConstraint = self.spaceViewTopToNotiLabelConstraint else { return }
+    
+    layoutIfNeeded()
+    setNeedsLayout()
+    
+    let profileTopMargin: CGFloat = 10.0
+    if notiLabel.frame.maxY > PROFILE_IMAGE_VIEW_HEIGHT + profileTopMargin {
+      spaceViewTopToProfileImageViewConstraint.isActive = false
+      spaceViewTopToNotiLabelConstraint.isActive = true
+    } else {
+      spaceViewTopToNotiLabelConstraint.isActive = false
+      spaceViewTopToProfileImageViewConstraint.isActive = true
+    }
   }
   
   @objc private func profileImageViewTapped() {
