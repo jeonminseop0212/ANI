@@ -22,7 +22,6 @@ class ANIMessageViewCell: UITableViewCell {
     didSet {
       loadUser()
       reloadLayout()
-      observeGroup()
     }
   }
   
@@ -126,7 +125,7 @@ class ANIMessageViewCell: UITableViewCell {
     userNameLabel.text = user.userName
   }
   
-  private func observeGroup() {
+  func observeGroup() {
     guard let chatGroup = self.chatGroup else { return }
     
     let databaseRef = Database.database().reference()
