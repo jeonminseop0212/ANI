@@ -96,6 +96,12 @@ extension ANIMessageView: UITableViewDataSource {
 
 //MARK: UITableViewDelegate
 extension ANIMessageView: UITableViewDelegate {
+  func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    if let cell = cell as? ANIMessageViewCell {
+      cell.observeGroup()
+    }
+  }
+  
   func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
     if let cell = cell as? ANIMessageViewCell {
       cell.unobserveChatGroup()
