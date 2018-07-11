@@ -20,7 +20,7 @@ class ANINotiDetailViewController: UIViewController {
   var navigationTitle: String = ""
   
   var notiKind: NotiKind?
-  var notiId: String?
+  var noti: FirebaseNotification?
   
   override func viewDidLoad() {
     setup()
@@ -85,7 +85,7 @@ class ANINotiDetailViewController: UIViewController {
     //notiDetailView
     let notiDetailView = ANINotiDetailView()
     notiDetailView.notiKind = notiKind
-    notiDetailView.notiId = notiId
+    notiDetailView.noti = noti
     notiDetailView.delegate = self
     self.view.addSubview(notiDetailView)
     notiDetailView.topToBottom(of: myNavigationBase)

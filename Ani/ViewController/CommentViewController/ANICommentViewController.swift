@@ -107,6 +107,9 @@ class ANICommentViewController: UIViewController {
     
     //commentBar
     let commentBar = ANICommentBar()
+    if let user = self.user {
+      commentBar.user = user
+    }
     self.view.addSubview(commentBar)
     commentBar.leftToSuperview()
     commentBar.rightToSuperview()

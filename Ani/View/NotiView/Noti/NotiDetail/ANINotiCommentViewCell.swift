@@ -1,8 +1,8 @@
 //
-//  ANICommentCell.swift
+//  ANINotiCommentViewCell.swift
 //  Ani
 //
-//  Created by jeonminseop on 2018/05/21.
+//  Created by jeonminseop on 2018/07/10.
 //  Copyright © 2018年 JeonMinseop. All rights reserved.
 //
 
@@ -10,11 +10,15 @@ import UIKit
 import WCLShineButton
 import FirebaseDatabase
 import CodableFirebase
+import TinyConstraints
 
-class ANICommentCell: UITableViewCell {
+class ANINotiCommentViewCell: UITableViewCell {
+  private var headerLabelTopConstraing: Constraint?
+  private weak var headerLabel: UILabel?
   
+  private weak var base: UIView?
   private weak var commentLabel: UILabel?
-
+  
   private let PROFILE_IMAGE_VIEW_HEIGHT: CGFloat = 25.0
   private weak var profileImageView: UIImageView?
   private weak var userNameLabel: UILabel?
@@ -24,7 +28,20 @@ class ANICommentCell: UITableViewCell {
   private weak var commentButton: UIButton?
   private weak var commentCountLabel: UILabel?
   
-  private weak var line: UIImageView?
+  private weak var bottomLine: UIImageView?
+  
+  var notiKind: NotiKind? {
+    didSet {
+      guard let notiKind = self.notiKind,
+            let headerLabelTopConstraing = self.headerLabelTopConstraing else { return }
+      
+      if notiKind == .story {
+        headerLabelTopConstraing.constant = 10.0
+      } else if notiKind == .qna {
+        headerLabelTopConstraing.constant = 0.0
+      }
+    }
+  }
   
   var comment: FirebaseComment? {
     didSet {
@@ -48,13 +65,34 @@ class ANICommentCell: UITableViewCell {
   private func setup() {
     //basic
     self.selectionStyle = .none
+    self.backgroundColor = ANIColor.bg
+    
+    //headerLabel
+    let headerLabel = UILabel()
+    headerLabel.backgroundColor = ANIColor.bg
+    headerLabel.text = "新しいコメント"
+    headerLabel.textColor = ANIColor.dark
+    headerLabel.font = UIFont.boldSystemFont(ofSize: 15.0)
+    addSubview(headerLabel)
+    headerLabelTopConstraing = headerLabel.topToSuperview(offset: 10.0)
+    headerLabel.leftToSuperview(offset: 10.0)
+    headerLabel.rightToSuperview(offset: 10.0)
+    self.headerLabel = headerLabel
+    
+    //base
+    let base = UIView()
+    base.backgroundColor = .white
+    addSubview(base)
+    base.topToBottom(of: headerLabel, offset: 10.0)
+    base.edgesToSuperview(excluding: .top)
+    self.base = base
     
     //commentLabel
     let commentLabel = UILabel()
     commentLabel.textColor = ANIColor.dark
     commentLabel.font = UIFont.systemFont(ofSize: 15.0)
     commentLabel.numberOfLines = 0
-    addSubview(commentLabel)
+    base.addSubview(commentLabel)
     let insets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: -10.0)
     commentLabel.edgesToSuperview(excluding: .bottom, insets: insets)
     self.commentLabel = commentLabel
@@ -67,7 +105,7 @@ class ANICommentCell: UITableViewCell {
     profileImageView.isUserInteractionEnabled = true
     let tapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped))
     profileImageView.addGestureRecognizer(tapGesture)
-    addSubview(profileImageView)
+    base.addSubview(profileImageView)
     profileImageView.width(PROFILE_IMAGE_VIEW_HEIGHT)
     profileImageView.height(PROFILE_IMAGE_VIEW_HEIGHT)
     profileImageView.topToBottom(of: commentLabel, offset: 10.0)
@@ -78,7 +116,7 @@ class ANICommentCell: UITableViewCell {
     let commentCountLabel = UILabel()
     commentCountLabel.textColor = ANIColor.dark
     commentCountLabel.font = UIFont.boldSystemFont(ofSize: 14.0)
-    addSubview(commentCountLabel)
+    base.addSubview(commentCountLabel)
     commentCountLabel.centerY(to: profileImageView)
     commentCountLabel.rightToSuperview(offset: 10.0)
     commentCountLabel.width(20.0)
@@ -88,7 +126,7 @@ class ANICommentCell: UITableViewCell {
     //commentButton
     let commentButton = UIButton()
     commentButton.setImage(UIImage(named: "comment"), for: .normal)
-    addSubview(commentButton)
+    base.addSubview(commentButton)
     commentButton.centerY(to: profileImageView)
     commentButton.rightToLeft(of: commentCountLabel, offset: -10.0)
     commentButton.width(15.0)
@@ -99,7 +137,7 @@ class ANICommentCell: UITableViewCell {
     let loveCountLabel = UILabel()
     loveCountLabel.textColor = ANIColor.dark
     loveCountLabel.font = UIFont.boldSystemFont(ofSize: 14.0)
-    addSubview(loveCountLabel)
+    base.addSubview(loveCountLabel)
     loveCountLabel.centerY(to: profileImageView)
     loveCountLabel.rightToLeft(of: commentButton, offset: -10.0)
     loveCountLabel.width(20.0)
@@ -115,7 +153,7 @@ class ANICommentCell: UITableViewCell {
     loveButton.color = ANIColor.gray
     loveButton.image = .heart
     loveButton.addTarget(self, action: #selector(love), for: .valueChanged)
-    addSubview(loveButton)
+    base.addSubview(loveButton)
     loveButton.centerY(to: profileImageView)
     loveButton.rightToLeft(of: loveCountLabel, offset: -10.0)
     loveButton.width(15.0)
@@ -127,20 +165,20 @@ class ANICommentCell: UITableViewCell {
     userNameLabel.textColor = ANIColor.dark
     userNameLabel.font = UIFont.boldSystemFont(ofSize: 15.0)
     userNameLabel.numberOfLines = 0
-    addSubview(userNameLabel)
+    base.addSubview(userNameLabel)
     userNameLabel.leftToRight(of: profileImageView, offset: 10.0)
     userNameLabel.rightToLeft(of: loveButton, offset: -10.0)
     userNameLabel.centerY(to: profileImageView)
     self.userNameLabel = userNameLabel
     
-    //line
-    let line = UIImageView()
-    line.image = UIImage(named: "line")
-    addSubview(line)
-    line.height(0.5)
-    line.topToBottom(of: profileImageView, offset: 10.0)
-    line.edgesToSuperview(excluding: .top)
-    self.line = line
+    //bottomLine
+    let bottomLine = UIImageView()
+    bottomLine.image = UIImage(named: "line")
+    base.addSubview(bottomLine)
+    bottomLine.height(0.5)
+    bottomLine.topToBottom(of: profileImageView, offset: 10.0)
+    bottomLine.edgesToSuperview(excluding: .top)
+    self.bottomLine = bottomLine
   }
   
   private func reloadLayout() {
@@ -164,6 +202,20 @@ class ANICommentCell: UITableViewCell {
     userNameLabel.text = userName
   }
   
+  //MARK: action
+  @objc private func love() {
+    print("love")
+  }
+  
+  @objc private func profileImageViewTapped() {
+    guard let comment = self.comment else { return }
+    
+    ANINotificationManager.postProfileImageViewTapped(userId: comment.userId)
+  }
+}
+
+//MARK: data
+extension ANINotiCommentViewCell {
   private func loadUser() {
     guard let comment = self.comment else { return }
     
@@ -184,16 +236,5 @@ class ANICommentCell: UITableViewCell {
         }
       })
     }
-  }
-  
-  //MARK: action
-  @objc private func love() {
-    print("love")
-  }
-  
-  @objc private func profileImageViewTapped() {
-    guard let comment = self.comment else { return }
-    
-    ANINotificationManager.postProfileImageViewTapped(userId: comment.userId)
   }
 }
