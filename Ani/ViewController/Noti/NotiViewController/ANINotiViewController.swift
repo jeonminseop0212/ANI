@@ -207,7 +207,7 @@ extension ANINotiViewController: ANINeedLoginViewDelegate {
 extension ANINotiViewController: ANINotiNotiCellDelegate {
   func cellTapped(noti: FirebaseNotification) {
     let notiDetailViewController = ANINotiDetailViewController()
-    notiDetailViewController.notiId = noti.notiId
+    notiDetailViewController.noti = noti
 
     if noti.kind == KEY_NOTI_KIND_RECRUIT {
       notiDetailViewController.navigationTitle = "募集"

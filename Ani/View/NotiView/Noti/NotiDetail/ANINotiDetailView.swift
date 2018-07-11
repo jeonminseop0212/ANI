@@ -29,18 +29,22 @@ class ANINotiDetailView: UIView {
   private weak var tableView: UITableView?
   
   var notiKind: NotiKind?
-  var notiId: String? {
+  var noti: FirebaseNotification? {
     didSet {
-      guard let notiId = self.notiId,
+      guard let noti = self.noti,
             let notiKind = self.notiKind else { return }
       
       switch notiKind {
       case .recruit:
-        loadRecruit(notiId: notiId)
+        loadRecruit(notiId: noti.notiId)
       case .story:
-        loadStory(notiId: notiId)
+        loadStory(notiId: noti.notiId)
       case .qna:
-        loadQna(notiId: notiId)
+        loadQna(notiId: noti.notiId)
+      }
+      
+      if let commentId = noti.commentId {
+        loadComment(commentId: commentId)
       }
     }
   }
@@ -48,6 +52,7 @@ class ANINotiDetailView: UIView {
   private var recruit: FirebaseRecruit?
   private var story: FirebaseStory?
   private var qna: FirebaseQna?
+  private var comment: FirebaseComment?
   
   var delegate: ANINotiDetailViewDelegate?
   
@@ -66,15 +71,18 @@ class ANINotiDetailView: UIView {
     let tableView = UITableView()
     tableView.separatorStyle = .none
     tableView.backgroundColor = ANIColor.bg
-    let recruitCellid = NSStringFromClass(ANIRecruitViewCell.self)
-    tableView.register(ANIRecruitViewCell.self, forCellReuseIdentifier: recruitCellid)
-    let storyCellid = NSStringFromClass(ANIStoryViewCell.self)
-    tableView.register(ANIStoryViewCell.self, forCellReuseIdentifier: storyCellid)
+    let recruitCellId = NSStringFromClass(ANIRecruitViewCell.self)
+    tableView.register(ANIRecruitViewCell.self, forCellReuseIdentifier: recruitCellId)
+    let storyCellId = NSStringFromClass(ANIStoryViewCell.self)
+    tableView.register(ANIStoryViewCell.self, forCellReuseIdentifier: storyCellId)
     let supportCellId = NSStringFromClass(ANISupportViewCell.self)
     tableView.register(ANISupportViewCell.self, forCellReuseIdentifier: supportCellId)
-    let qnaCellid = NSStringFromClass(ANIQnaViewCell.self)
-    tableView.register(ANIQnaViewCell.self, forCellReuseIdentifier: qnaCellid)
+    let qnaCellId = NSStringFromClass(ANIQnaViewCell.self)
+    tableView.register(ANIQnaViewCell.self, forCellReuseIdentifier: qnaCellId)
+    let commentCellId = NSStringFromClass(ANINotiCommentViewCell.self)
+    tableView.register(ANINotiCommentViewCell.self, forCellReuseIdentifier: commentCellId)
     tableView.dataSource = self
+    tableView.delegate = self
     addSubview(tableView)
     tableView.edgesToSuperview()
     self.tableView = tableView
@@ -84,7 +92,25 @@ class ANINotiDetailView: UIView {
 //MARK: UITableViewDataSource
 extension ANINotiDetailView: UITableViewDataSource {
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return 1
+    guard let notiKind = self.notiKind,
+          let noti = self.noti else { return 0 }
+    
+    switch notiKind {
+    case .recruit:
+      return 1
+    case .story:
+      if noti.commentId != nil {
+        return 2
+      } else {
+        return 1
+      }
+    case .qna:
+      if noti.commentId != nil {
+        return 2
+      } else {
+        return 1
+      }
+    }
   }
   
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -92,8 +118,8 @@ extension ANINotiDetailView: UITableViewDataSource {
     
     switch notiKind {
     case .recruit:
-      let recruitCellid = NSStringFromClass(ANIRecruitViewCell.self)
-      let cell = tableView.dequeueReusableCell(withIdentifier: recruitCellid, for: indexPath) as! ANIRecruitViewCell
+      let recruitCellId = NSStringFromClass(ANIRecruitViewCell.self)
+      let cell = tableView.dequeueReusableCell(withIdentifier: recruitCellId, for: indexPath) as! ANIRecruitViewCell
       
       cell.recruit = recruit
       cell.delegate = self
@@ -101,30 +127,80 @@ extension ANINotiDetailView: UITableViewDataSource {
       return cell
     case .story:
       if story?.recruitId != nil {
-        let supportCellId = NSStringFromClass(ANISupportViewCell.self)
-        let cell = tableView.dequeueReusableCell(withIdentifier: supportCellId, for: indexPath) as! ANISupportViewCell
+        if indexPath.row == 0 {
+          let supportCellId = NSStringFromClass(ANISupportViewCell.self)
+          let cell = tableView.dequeueReusableCell(withIdentifier: supportCellId, for: indexPath) as! ANISupportViewCell
+          
+          cell.story = story
+          cell.delegate = self
+          
+          return cell
+        } else {
+          let commentCellId = NSStringFromClass(ANINotiCommentViewCell.self)
+          let cell = tableView.dequeueReusableCell(withIdentifier: commentCellId, for: indexPath) as! ANINotiCommentViewCell
+
+          cell.comment = comment
+          cell.notiKind = .story
+          
+          return cell
+        }
+      } else {
+        if indexPath.row == 0 {
+          let storyCellId = NSStringFromClass(ANIStoryViewCell.self)
+          let cell = tableView.dequeueReusableCell(withIdentifier: storyCellId, for: indexPath) as! ANIStoryViewCell
+          
+          cell.story = story
+          cell.delegate = self
+          
+          return cell
+        } else {
+          let commentCellId = NSStringFromClass(ANINotiCommentViewCell.self)
+          let cell = tableView.dequeueReusableCell(withIdentifier: commentCellId, for: indexPath) as! ANINotiCommentViewCell
+
+          cell.comment = comment
+          cell.notiKind = .story
+
+          return cell
+        }
+      }
+    case .qna:
+      if indexPath.row == 0 {
+        let qnaCellId = NSStringFromClass(ANIQnaViewCell.self)
+        let cell = tableView.dequeueReusableCell(withIdentifier: qnaCellId, for: indexPath) as! ANIQnaViewCell
         
-        cell.story = story
+        cell.qna = qna
         cell.delegate = self
         
         return cell
       } else {
-        let storyCellId = NSStringFromClass(ANIStoryViewCell.self)
-        let cell = tableView.dequeueReusableCell(withIdentifier: storyCellId, for: indexPath) as! ANIStoryViewCell
+        let commentCellId = NSStringFromClass(ANINotiCommentViewCell.self)
+        let cell = tableView.dequeueReusableCell(withIdentifier: commentCellId, for: indexPath) as! ANINotiCommentViewCell
         
-        cell.story = story
-        cell.delegate = self
-        
+        cell.comment = comment
+        cell.notiKind = .qna
+
         return cell
       }
-    case .qna:
-      let qnaCellid = NSStringFromClass(ANIQnaViewCell.self)
-      let cell = tableView.dequeueReusableCell(withIdentifier: qnaCellid, for: indexPath) as! ANIQnaViewCell
+    }
+  }
+}
+
+//MARK: UITableViewDelegate
+extension ANINotiDetailView: UITableViewDelegate {
+  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    if indexPath.row == 1  {
+      guard let notiKind = self.notiKind,
+            let currentUser = ANISessionManager.shared.currentUser else { return }
       
-      cell.qna = qna
-      cell.delegate = self
-      
-      return cell
+      if notiKind == .story {
+        guard let story = self.story else { return }
+        
+        self.delegate?.storyViewCellDidSelect(selectedStory: story, user: currentUser)
+      } else if notiKind == .qna {
+        guard let qna = self.qna else { return }
+
+        self.delegate?.qnaViewCellDidSelect(selectedQna: qna, user: currentUser)
+      }
     }
   }
 }
@@ -224,6 +300,29 @@ extension ANINotiDetailView {
         do {
           let qna = try FirebaseDecoder().decode(FirebaseQna.self, from: value)
           self.qna = qna
+          
+          DispatchQueue.main.async {
+            guard let tableView = self.tableView else { return }
+            tableView.reloadData()
+          }
+        } catch let error {
+          print(error)
+        }
+      })
+    }
+  }
+  
+  private func loadComment(commentId: String) {
+    guard let noti = self.noti else { return }
+    
+    let databaseRef = Database.database().reference()
+    
+    DispatchQueue.global().async {
+      databaseRef.child(KEY_COMMENTS).child(noti.notiId).child(commentId).observeSingleEvent(of: .value, with: { (snapshot) in
+        guard let value = snapshot.value else { return }
+        do {
+          let comment = try FirebaseDecoder().decode(FirebaseComment.self, from: value)
+          self.comment = comment
           
           DispatchQueue.main.async {
             guard let tableView = self.tableView else { return }

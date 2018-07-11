@@ -25,6 +25,8 @@ class ANICommentBar: UIView {
   var story: FirebaseStory?
   var qna: FirebaseQna?
     
+  var user: FirebaseUser?
+  
   override init(frame: CGRect) {
     super.init(frame: frame)
     
@@ -125,6 +127,49 @@ class ANICommentBar: UIView {
     }
   }
   
+  private func updateNoti(commentId: String, comment: String) {
+    guard let currentUser = ANISessionManager.shared.currentUser,
+          let currentUserName = currentUser.userName,
+          let currentUserId = ANISessionManager.shared.currentUserUid,
+          let user = self.user,
+          let userId = user.uid,
+          let commentMode = self.commentMode else { return }
+    
+    let databaseRef = Database.database().reference()
+    
+    DispatchQueue.global().async {
+      do {
+        var noti = ""
+        var kind = ""
+        var notiId = ""
+        if commentMode == .story {
+          guard let story = self.story,
+                let storyId = story.id else { return }
+          
+          noti = "\(currentUserName)さんが「\(story.story)」ストーリーにコメントしました。\n\"\(comment)\""
+          kind = KEY_NOTI_KIND_STROY
+          notiId = storyId
+        } else if commentMode == .qna {
+          guard let qna = self.qna,
+                let qnaId = qna.id else { return }
+          
+          noti = "\(currentUserName)さんが「\(qna.qna)」質問にコメントしました。\n\"\(comment)\""
+          kind = KEY_NOTI_KIND_QNA
+          notiId = qnaId
+        }
+        
+        let date = ANIFunction.shared.getToday()
+        let notification = FirebaseNotification(userId: currentUserId, noti: noti, kind: kind, notiId: notiId, commentId: commentId, updateDate: date)
+        if let data = try FirebaseEncoder().encode(notification) as? [String: AnyObject] {
+
+          databaseRef.child(KEY_NOTIFICATIONS).child(userId).childByAutoId().updateChildValues(data)
+        }
+      } catch let error {
+        print(error)
+      }
+    }
+  }
+  
   //MARK: action
   @objc private func contribute() {
     guard let commentTextView = self.commentTextView,
@@ -152,6 +197,8 @@ class ANICommentBar: UIView {
             let detabaseStoryRef = detabaseRef.child(KEY_STORIES).child(storyId).child(KEY_COMMENT_IDS)
             let value: [String: Bool] = [id: true]
             detabaseStoryRef.updateChildValues(value)
+            
+            self.updateNoti(commentId: id, comment: comment.comment)
           }
         case .qna:
           guard let qna = self.qna,
@@ -165,6 +212,8 @@ class ANICommentBar: UIView {
             let detabaseStoryRef = detabaseRef.child(KEY_QNAS).child(qnaId).child(KEY_COMMENT_IDS)
             let value: [String: Bool] = [id: true]
             detabaseStoryRef.updateChildValues(value)
+            
+            self.updateNoti(commentId: id, comment: comment.comment)
           }
         }
       }
