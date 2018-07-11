@@ -22,7 +22,7 @@ class ANIFollowUserView: UIView {
   var userId: String? {
     didSet {
       guard let followUserViewMode = self.followUserViewMode,
-        let activityIndicatorView = self.activityIndicatorView else { return }
+            let activityIndicatorView = self.activityIndicatorView else { return }
       
       activityIndicatorView.startAnimating()
       

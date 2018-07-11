@@ -35,7 +35,6 @@ class ANIOtherProfileCell: UITableViewCell {
   var user: FirebaseUser? {
     didSet {
       reloadLayout()
-      isFollowed()
       
       if let uid = user?.uid, userId == nil {
         userId = uid
@@ -55,6 +54,12 @@ class ANIOtherProfileCell: UITableViewCell {
     }
   }
   private var followerIds = [String: String]() {
+    didSet {
+      reloadFollowLayout()
+    }
+  }
+  
+  var isFollowed: Bool = false {
     didSet {
       reloadFollowLayout()
     }
@@ -241,7 +246,7 @@ class ANIOtherProfileCell: UITableViewCell {
           followLabel.text = "フォロー中"
           followLabel.textColor = ANIColor.green
           
-          return
+          break
         } else {
           followButton.base?.backgroundColor = ANIColor.green
           followLabel.text = "フォロー"
@@ -263,46 +268,20 @@ class ANIOtherProfileCell: UITableViewCell {
     
     let databaseRef = Database.database().reference()
     
-    databaseRef.child(KEY_FOLLOWING_USER_IDS).child(userId).observe(.value) { (snapshot) in
-      if let followingUserIds = snapshot.value as? [String: String] {
-        self.followingUserIds = followingUserIds
-      } else {
-        self.followingUserIds.removeAll()
-      }
-    }
-    
-    databaseRef.child(KEY_FOLLOWER_IDS).child(userId).observe(.value) { (snapshot) in
-      if let followerIds = snapshot.value as? [String: String] {
-        self.followerIds = followerIds
-      } else {
-        self.followerIds.removeAll()
-      }
-    }
-  }
-  
-  private func isFollowed() {
-    guard let user = self.user,
-          let userId = user.uid,
-          let currentUserId = ANISessionManager.shared.currentUserUid,
-          let followButton = self.followButton,
-          let followLabel = self.followLabel else { return }
-    
-    let databaseRef = Database.database().reference()
-    
-    databaseRef.child(KEY_FOLLOWING_USER_IDS).child(currentUserId).observeSingleEvent(of: .value) { (snapshot) in
-      guard let followingUser = snapshot.value as? [String: String] else { return }
-      
-      for id in followingUser.keys {
-        if id == userId {
-          followButton.base?.backgroundColor = .clear
-          followLabel.text = "フォロー中"
-          followLabel.textColor = ANIColor.green
-          
-          return
+    DispatchQueue.global().async {
+      databaseRef.child(KEY_FOLLOWING_USER_IDS).child(userId).observe(.value) { (snapshot) in
+        if let followingUserIds = snapshot.value as? [String: String] {
+          self.followingUserIds = followingUserIds
         } else {
-          followButton.base?.backgroundColor = ANIColor.green
-          followLabel.text = "フォロー"
-          followLabel.textColor = .white
+          self.followingUserIds.removeAll()
+        }
+      }
+      
+      databaseRef.child(KEY_FOLLOWER_IDS).child(userId).observe(.value) { (snapshot) in
+        if let followerIds = snapshot.value as? [String: String] {
+          self.followerIds = followerIds
+        } else {
+          self.followerIds.removeAll()
         }
       }
     }

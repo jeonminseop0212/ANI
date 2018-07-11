@@ -29,7 +29,7 @@ class ANIFollowNotiViewCell: UITableViewCell {
   
   private var user: FirebaseUser? {
     didSet {
-      isFollowed()
+      checkFollowed()
       reloadUserLayout()
     }
   }
@@ -86,6 +86,7 @@ class ANIFollowNotiViewCell: UITableViewCell {
     followButton.base?.backgroundColor = ANIColor.green
     followButton.base?.layer.borderWidth = 1.8
     followButton.base?.layer.borderColor = ANIColor.green.cgColor
+    followButton.alpha = 0.0
     followButton.delegate = self
     addSubview(followButton)
     followButton.centerY(to: profileImageView)
@@ -137,7 +138,7 @@ class ANIFollowNotiViewCell: UITableViewCell {
     ANINotificationManager.postProfileImageViewTapped(userId: noti.userId)
   }
   
-  private func isFollowed() {
+  private func checkFollowed() {
     guard let user = self.user,
           let userId = user.uid,
           let currentUserId = ANISessionManager.shared.currentUserUid,
@@ -146,20 +147,28 @@ class ANIFollowNotiViewCell: UITableViewCell {
     
     let databaseRef = Database.database().reference()
     
-    databaseRef.child(KEY_FOLLOWING_USER_IDS).child(currentUserId).observeSingleEvent(of: .value) { (snapshot) in
-      guard let followingUser = snapshot.value as? [String: String] else { return }
-      
-      for id in followingUser.keys {
-        if id == userId {
-          followButton.base?.backgroundColor = .clear
-          followLabel.text = "フォロー中"
-          followLabel.textColor = ANIColor.green
-          
-          return
-        } else {
-          followButton.base?.backgroundColor = ANIColor.green
-          followLabel.text = "フォロー"
-          followLabel.textColor = .white
+    DispatchQueue.global().async {
+      databaseRef.child(KEY_FOLLOWING_USER_IDS).child(currentUserId).observeSingleEvent(of: .value) { (snapshot) in
+        guard let followingUser = snapshot.value as? [String: String] else { return }
+        
+        for id in followingUser.keys {
+          if id == userId {
+            followButton.base?.backgroundColor = .clear
+            followLabel.text = "フォロー中"
+            followLabel.textColor = ANIColor.green
+            
+            break
+          } else {
+            followButton.base?.backgroundColor = ANIColor.green
+            followLabel.text = "フォロー"
+            followLabel.textColor = .white
+          }
+        }
+        
+        DispatchQueue.main.async {
+          UIView.animate(withDuration: 0.1, animations: {
+            followButton.alpha = 1.0
+          })
         }
       }
     }
