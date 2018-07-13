@@ -32,13 +32,29 @@ class ANISearchView: UIView {
   
   var selectedCategory: SearchCategory = .user {
     didSet {
-      search(category: selectedCategory, searchText: searchText)
+      if searchText != "" {
+        guard let tableView = self.tableView else { return }
+
+        UIView.animate(withDuration: 0.2) {
+          tableView.alpha = 0.0
+        }
+        
+        search(category: selectedCategory, searchText: searchText)
+      }
     }
   }
   
   var searchText: String = "" {
     didSet {
-      search(category: selectedCategory, searchText: searchText)
+      if searchText != "" {
+        guard let tableView = self.tableView else { return }
+        
+        UIView.animate(withDuration: 0.2) {
+          tableView.alpha = 0.0
+        }
+        
+        search(category: selectedCategory, searchText: searchText)
+      }
     }
   }
   
@@ -57,6 +73,8 @@ class ANISearchView: UIView {
   }
   
   private func setup() {
+    self.backgroundColor = ANIColor.bg
+    
     //tableView
     let tableView = UITableView()
     tableView.separatorStyle = .none
@@ -64,7 +82,7 @@ class ANISearchView: UIView {
     tableView.contentInset = UIEdgeInsets(top: topInset, left: 0, bottom: 0, right: 0)
     tableView.scrollIndicatorInsets  = UIEdgeInsets(top: topInset, left: 0, bottom: 0, right: 0)
     tableView.setContentOffset(CGPoint(x: 0, y: -topInset), animated: false)
-    tableView.backgroundColor = .white
+    tableView.backgroundColor = ANIColor.bg
     tableView.alpha = 0.0
     let userId = NSStringFromClass(ANIUserSearchViewCell.self)
     tableView.register(ANIUserSearchViewCell.self, forCellReuseIdentifier: userId)
@@ -171,18 +189,34 @@ extension ANISearchView {
   private func search(category: SearchCategory, searchText: String) {
     guard let activityIndicatorView = self.activityIndicatorView else { return }
     
-    //TODO: algolia add index ANI-stories, ANI-qnas
-    let index = ANISessionManager.shared.client.index(withName: "ANI-users")
+    var index: Index?
     
-    if !searchUsers.isEmpty {
-      searchUsers.removeAll()
+    switch category {
+    case .user:
+      index = ANISessionManager.shared.client.index(withName: KEY_USERS_INDEX)
+      
+      if !searchUsers.isEmpty {
+        searchUsers.removeAll()
+      }
+    case .story:
+      index = ANISessionManager.shared.client.index(withName: KEY_STORIES_INDEX)
+      
+      if !searchStories.isEmpty {
+        searchStories.removeAll()
+      }
+    case .qna:
+      index = ANISessionManager.shared.client.index(withName: KEY_QNAS_INDEX)
+      
+      if !searchQnas.isEmpty {
+        searchQnas.removeAll()
+      }
     }
     
     activityIndicatorView.startAnimating()
     
     DispatchQueue.global().async {
-      index.search(Query(query: searchText), completionHandler: { (content, error) -> Void in
-        if let content = content, let hits = content["hits"] as? [AnyObject] {
+      index?.search(Query(query: searchText), completionHandler: { (content, error) -> Void in
+        if let content = content, let hits = content[KEY_HITS] as? [AnyObject], !hits.isEmpty {
           for hit in hits {
             guard let hitDic = hit as? [String: AnyObject],
                   let currenUserUid = ANISessionManager.shared.currentUserUid else { return }
@@ -192,7 +226,7 @@ extension ANISearchView {
               case .user:
                 let user = try FirebaseDecoder().decode(FirebaseUser.self, from: hitDic)
                 
-                if user.uid != currenUserUid {
+                if user.uid != currenUserUid {                  
                   self.searchUsers.append(user)
                 }
               case .story:
@@ -227,7 +261,17 @@ extension ANISearchView {
             }
           }
         } else if let error = error {
+          guard let tableView = self.tableView else { return }
+          
+          tableView.reloadData()
+          
           print("error: \(error)")
+          
+          activityIndicatorView.stopAnimating()
+        } else {
+          guard let tableView = self.tableView else { return }
+          
+          tableView.reloadData()
           
           activityIndicatorView.stopAnimating()
         }

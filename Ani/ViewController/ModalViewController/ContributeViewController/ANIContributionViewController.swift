@@ -12,6 +12,7 @@ import TinyConstraints
 import FirebaseStorage
 import FirebaseDatabase
 import CodableFirebase
+import InstantSearchClient
 
 enum ContributionMode {
   case story
@@ -264,6 +265,8 @@ class ANIContributionViewController: UIViewController {
     do {
       if let data = try FirebaseEncoder().encode(story) as? [String : AnyObject] {
         databaseStoryRef.updateChildValues(data)
+        
+        pushDataAlgolia(data: data)
       }
       do {
         let detabaseRef = Database.database().reference()
@@ -281,6 +284,8 @@ class ANIContributionViewController: UIViewController {
     do {
       if let data = try FirebaseEncoder().encode(qna) as? [String : AnyObject] {
         databaseQnaRef.updateChildValues(data)
+        
+        pushDataAlgolia(data: data)
       }
       do {
         let detabaseRef = Database.database().reference()
@@ -291,6 +296,31 @@ class ANIContributionViewController: UIViewController {
       }
     } catch let error {
       print(error)
+    }
+  }
+  
+  private func pushDataAlgolia(data: [String: AnyObject]) {
+    guard let selectedContributionMode = self.selectedContributionMode else { return }
+    
+    var index: Index?
+    switch selectedContributionMode {
+    case .story:
+      index = ANISessionManager.shared.client.index(withName: KEY_STORIES_INDEX)
+    case .qna:
+      index = ANISessionManager.shared.client.index(withName: KEY_QNAS_INDEX)
+    }
+    
+    var newData = data
+    if let objectId = data[KEY_ID] {
+      newData.updateValue(objectId, forKey: KEY_OBJECT_ID)
+    }
+    
+    DispatchQueue.global().async {
+      index?.addObject(newData, completionHandler: { (content, error) -> Void in
+        if error == nil {
+          print("Object IDs: \(content!)")
+        }
+      })
     }
   }
   

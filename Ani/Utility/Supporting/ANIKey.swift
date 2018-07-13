@@ -9,6 +9,7 @@
 import Foundation
 
 let KEY_FIRST_LAUNCH = "firstLaunch"
+let KEY_ID = "id"
 
 //user
 let KEY_UID = "uid"
@@ -68,3 +69,11 @@ let KEY_NOTI_KIND_QNA = "qna"
 let KEY_NORI_KIND_COMMET = "comment"
 let KEY_NOTI_KIND_FOLLOW = "follow"
 let KEY_NOTI_UPDATE_DATE = "updateDate"
+
+//algolia
+let KEY_OBJECT_ID = "objectID"
+let KEY_USERS_INDEX = "ANI-users"
+let KEY_STORIES_INDEX = "ANI-stories"
+let KEY_QNAS_INDEX = "ANI-qnas"
+let KEY_HITS = "hits"
+

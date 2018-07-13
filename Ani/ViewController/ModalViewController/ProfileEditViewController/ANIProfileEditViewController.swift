@@ -214,6 +214,7 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
     
     userRef.updateChildValues(values)
     
+    pushDataAlgolia(data: values)
     
     databaseRef.child(KEY_USERS).child(uid).observe(.value, with: { (snapshot) in
         guard let value = snapshot.value else { return }
@@ -227,6 +228,24 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
           print(error)
         }
     })
+  }
+  
+  private func pushDataAlgolia(data: [String: AnyObject]) {
+    guard let objectId = ANISessionManager.shared.currentUserUid else { return }
+    
+    let index = ANISessionManager.shared.client.index(withName: KEY_USERS_INDEX)
+    
+    var newData = data
+    newData.updateValue(objectId as AnyObject, forKey: KEY_OBJECT_ID)
+    print("newData \(newData)")
+    
+    DispatchQueue.global().async {
+      index.saveObject(newData, completionHandler: { (content, error) -> Void in
+        if error == nil {
+          print("Object IDs: \(content!)")
+        }
+      })
+    }
   }
   
   private func deleteFamilyImages(urls: [String]) {

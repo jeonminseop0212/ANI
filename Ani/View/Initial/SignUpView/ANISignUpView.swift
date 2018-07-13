@@ -335,6 +335,8 @@ class ANISignUpView: UIView {
         return
       }
             
+      self.pushDataAlgolia(data: values)
+      
       ANISessionManager.shared.currentUserUid = Auth.auth().currentUser?.uid
       if let currentUserUid = ANISessionManager.shared.currentUserUid {
         DispatchQueue.global().async {
@@ -358,6 +360,23 @@ class ANISignUpView: UIView {
       }
       
       self.endEditing(true)
+    }
+  }
+  
+  private func pushDataAlgolia(data: [String: AnyObject]) {
+    let index = ANISessionManager.shared.client.index(withName: KEY_USERS_INDEX)
+    
+    var newData = data
+    if let objectId = data[KEY_UID] {
+      newData.updateValue(objectId, forKey: KEY_OBJECT_ID)
+    }
+    
+    DispatchQueue.global().async {
+      index.addObject(newData, completionHandler: { (content, error) -> Void in
+        if error == nil {
+          print("Object IDs: \(content!)")
+        }
+      })
     }
   }
   
