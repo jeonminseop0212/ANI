@@ -142,9 +142,12 @@ class ANISearchViewController: UIViewController {
 //MARK: UISearchBarDelegate
 extension ANISearchViewController: UISearchBarDelegate {
   func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-    guard let searchBarTextField = searchBar.textField else { return }
+    guard let searchBarTextField = searchBar.textField,
+          let text = searchBarTextField.text else { return }
     if searchBarTextField.isFirstResponder {
       searchBarTextField.resignFirstResponder()
+      
+      self.searchText = text
     }
   }
   
@@ -166,10 +169,6 @@ extension ANISearchViewController: UISearchBarDelegate {
       searchCancelButton.alpha = 1.0
     }
     return true
-  }
-  
-  func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-    self.searchText = searchText
   }
 }
 

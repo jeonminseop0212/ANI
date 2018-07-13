@@ -200,7 +200,7 @@ extension ANILoginView: ANIButtonViewDelegate {
             let password = passwordTextField.text else { return }
       
       let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.green)
-      NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData)
+      NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData, nil)
       
       self.endEditing(true)
       
@@ -208,7 +208,7 @@ extension ANILoginView: ANIButtonViewDelegate {
         if let errorUnrap = error {
           let nsError = errorUnrap as NSError
           
-          NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
+          NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
 
           print("nsError \(nsError)")
           if nsError.code == 17008 {
@@ -233,11 +233,11 @@ extension ANILoginView: ANIButtonViewDelegate {
                     ANISessionManager.shared.isAnonymous = false
                     self.delegate?.loginSuccess()
                     
-                    NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
+                    NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
                   }
                 } catch let error {
                   print(error)
-                  NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
+                  NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
                 }
               })
             }

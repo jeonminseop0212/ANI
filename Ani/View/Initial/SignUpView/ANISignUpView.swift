@@ -271,13 +271,13 @@ class ANISignUpView: UIView {
   
   private func signUp(adress: String, password: String) {
     let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.green)
-    NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData)
+    NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData, nil)
     
     Auth.auth().createUser(withEmail: adress, password: password) { (successUser, error) in
       if let errorUnrap = error {
         let nsError = errorUnrap as NSError
         
-        NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
+        NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
 
         if nsError.code == 17007 {
           self.delegate?.reject(notiText: "すでに存在するメールアドレスです！")
@@ -347,11 +347,11 @@ class ANISignUpView: UIView {
                 ANISessionManager.shared.isAnonymous = false
                 self.delegate?.signUpSuccess()
 
-                NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
+                NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
               }
             } catch let error {
               print(error)
-              NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
+              NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
             }
           })
         }
