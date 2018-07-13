@@ -39,7 +39,7 @@ class ANITabBarController: UITabBarController, NVActivityIndicatorViewable {
     ANISessionManager.shared.currentUserUid = Auth.auth().currentUser?.uid
     if let currentUserUid = ANISessionManager.shared.currentUserUid {
       let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.green)
-      NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData)
+      NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData, nil)
       
       DispatchQueue.global().async {
         Database.database().reference().child(KEY_USERS).child(currentUserUid).observe(.value, with: { (snapshot) in
@@ -50,11 +50,11 @@ class ANITabBarController: UITabBarController, NVActivityIndicatorViewable {
               ANISessionManager.shared.currentUser = user
               ANISessionManager.shared.isAnonymous = false
               
-              NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
+              NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
             }
           } catch let error {
             print(error)
-            NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
+            NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
           }
         })
       }

@@ -220,7 +220,7 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
         do {
           let user = try FirebaseDecoder().decode(FirebaseUser.self, from: value)
           ANISessionManager.shared.currentUser = user
-          NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
+          NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
           self.delegate?.didEdit()
           self.dismiss(animated: true, completion: nil)
         } catch let error {
@@ -318,7 +318,7 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
           let introduce = updateUser.introduce else { return }
     
     let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.green)
-    NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData)
+    NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData, nil)
     
     if familyImagesChange {
       if let familyUrls = currentUser.familyImageUrls {

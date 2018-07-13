@@ -10,6 +10,7 @@ import UIKit
 import FirebaseDatabase
 import CodableFirebase
 import NVActivityIndicatorView
+import InstantSearchClient
 
 protocol ANISearchViewDelegate {
   func searchViewDidScroll(scrollY: CGFloat)
@@ -31,22 +32,15 @@ class ANISearchView: UIView {
   
   var selectedCategory: SearchCategory = .user {
     didSet {
-      guard let tableView = self.tableView else { return }
-      
-      tableView.alpha = 0.0
-      
-      switch selectedCategory {
-      case .user:
-        loadUser()
-      case .story:
-        loadStory()
-      case .qna:
-        loadQna()
-      }
+      search(category: selectedCategory, searchText: searchText)
     }
   }
   
-  var searchText: String = ""
+  var searchText: String = "" {
+    didSet {
+      search(category: selectedCategory, searchText: searchText)
+    }
+  }
   
   private weak var activityIndicatorView: NVActivityIndicatorView?
   
@@ -55,7 +49,6 @@ class ANISearchView: UIView {
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()
-    loadUser()
     setupNotifications()
   }
   
@@ -72,6 +65,7 @@ class ANISearchView: UIView {
     tableView.scrollIndicatorInsets  = UIEdgeInsets(top: topInset, left: 0, bottom: 0, right: 0)
     tableView.setContentOffset(CGPoint(x: 0, y: -topInset), animated: false)
     tableView.backgroundColor = .white
+    tableView.alpha = 0.0
     let userId = NSStringFromClass(ANIUserSearchViewCell.self)
     tableView.register(ANIUserSearchViewCell.self, forCellReuseIdentifier: userId)
     let storyId = NSStringFromClass(ANIStoryViewCell.self)
@@ -172,141 +166,69 @@ extension ANISearchView: UITableViewDelegate {
   }
 }
 
-//MARK: data
+//MARK: search
 extension ANISearchView {
-  private func loadUser() {
-    guard let activityIndicatorView = self.activityIndicatorView,
-          let currenUserUid = ANISessionManager.shared.currentUserUid else { return }
-
+  private func search(category: SearchCategory, searchText: String) {
+    guard let activityIndicatorView = self.activityIndicatorView else { return }
+    
+    //TODO: algolia add index ANI-stories, ANI-qnas
+    let index = ANISessionManager.shared.client.index(withName: "ANI-users")
+    
     if !searchUsers.isEmpty {
       searchUsers.removeAll()
     }
     
     activityIndicatorView.startAnimating()
+    
+    DispatchQueue.global().async {
+      index.search(Query(query: searchText), completionHandler: { (content, error) -> Void in
+        if let content = content, let hits = content["hits"] as? [AnyObject] {
+          for hit in hits {
+            guard let hitDic = hit as? [String: AnyObject],
+                  let currenUserUid = ANISessionManager.shared.currentUserUid else { return }
+            
+            do {
+              switch category {
+              case .user:
+                let user = try FirebaseDecoder().decode(FirebaseUser.self, from: hitDic)
+                
+                if user.uid != currenUserUid {
+                  self.searchUsers.append(user)
+                }
+              case .story:
+                let story = try FirebaseDecoder().decode(FirebaseStory.self, from: hitDic)
+                
+                self.searchStories.append(story)
+              case .qna:
+                let qna = try FirebaseDecoder().decode(FirebaseQna.self, from: hitDic)
+                
+                self.searchQnas.append(qna)
+              }
+              
+              DispatchQueue.main.async {
+                guard let tableView = self.tableView else { return }
+                
+                activityIndicatorView.stopAnimating()
+                
+                tableView.reloadData()
+                
+                UIView.animate(withDuration: 0.2, animations: {
+                  tableView.alpha = 1.0
+                })
+              }
+            } catch let error {
+              guard let tableView = self.tableView else { return }
+              
+              tableView.reloadData()
 
-    DispatchQueue.global().async {
-      let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_USERS).queryOrdered(byChild: KEY_USER_NAME).queryLimited(toFirst: 20).observeSingleEvent(of: .value, with: { (snapshot) in
-        for item in snapshot.children {
-          if let snapshot = item as? DataSnapshot, let value = snapshot.value {
-            do {
-              let user = try FirebaseDecoder().decode(FirebaseUser.self, from: value)
-              if user.uid != currenUserUid {
-                self.searchUsers.append(user)
-              }
-              
-              DispatchQueue.main.async {
-                guard let tableView = self.tableView else { return }
-                
-                activityIndicatorView.stopAnimating()
-                
-                tableView.reloadData()
-                
-                UIView.animate(withDuration: 0.2, animations: {
-                  tableView.alpha = 1.0
-                })
-              }
-            } catch let error {
               print(error)
               
               activityIndicatorView.stopAnimating()
             }
           }
-        }
-        
-        if snapshot.value as? [String: AnyObject] == nil {
-          activityIndicatorView.stopAnimating()
-        }
-      })
-    }
-  }
-  
-  private func loadStory() {
-    guard let activityIndicatorView = self.activityIndicatorView else { return }
-    
-    if !searchStories.isEmpty {
-      searchStories.removeAll()
-    }
-    
-    activityIndicatorView.startAnimating()
-    
-    DispatchQueue.global().async {
-      let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_STORIES).queryLimited(toFirst: 20).observeSingleEvent(of: .value, with: { (snapshot) in
-        
-        for item in snapshot.children {
-          if let snapshot = item as? DataSnapshot, let value = snapshot.value {
-            do {
-              let story = try FirebaseDecoder().decode(FirebaseStory.self, from: value)
-              self.searchStories.insert(story, at: 0)
-              
-              DispatchQueue.main.async {
-                
-                guard let tableView = self.tableView else { return }
-                
-                activityIndicatorView.stopAnimating()
-                
-                tableView.reloadData()
-                
-                UIView.animate(withDuration: 0.2, animations: {
-                  tableView.alpha = 1.0
-                })
-              }
-            } catch let error {
-              print(error)
-              
-              activityIndicatorView.stopAnimating()
-            }
-          }
-        }
-        
-        if snapshot.value as? [String: AnyObject] == nil {
-          activityIndicatorView.stopAnimating()
-        }
-      })
-    }
-  }
-  
-  private func loadQna() {
-    guard let activityIndicatorView = self.activityIndicatorView else { return }
-    
-    if !searchQnas.isEmpty {
-      searchQnas.removeAll()
-    }
-    
-    activityIndicatorView.startAnimating()
-    
-    DispatchQueue.global().async {
-      let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_QNAS).queryLimited(toFirst: 20).observeSingleEvent(of: .value, with: { (snapshot) in
-        
-        for item in snapshot.children {
-          if let snapshot = item as? DataSnapshot, let value = snapshot.value {
-            do {
-              let qna = try FirebaseDecoder().decode(FirebaseQna.self, from: value)
-              self.searchQnas.insert(qna, at: 0)
-              
-              DispatchQueue.main.async {
-                
-                guard let tableView = self.tableView else { return }
-                
-                activityIndicatorView.stopAnimating()
-                
-                tableView.reloadData()
-                
-                UIView.animate(withDuration: 0.2, animations: {
-                  tableView.alpha = 1.0
-                })
-              }
-            } catch let error {
-              print(error)
-              
-              activityIndicatorView.stopAnimating()
-            }
-          }
-        }
-        
-        if snapshot.value as? [String: AnyObject] == nil {
+        } else if let error = error {
+          print("error: \(error)")
+          
           activityIndicatorView.stopAnimating()
         }
       })

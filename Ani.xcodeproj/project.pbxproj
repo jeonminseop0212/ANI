@@ -33,6 +33,7 @@
 		CD50A46720EC6A2500CFF16F /* UIIMage.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD50A46620EC6A2500CFF16F /* UIIMage.swift */; };
 		CD6229DC20B64A6400E36875 /* ANISignUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6229DB20B64A6400E36875 /* ANISignUpViewController.swift */; };
 		CD6229DE20B64B9900E36875 /* ANISignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6229DD20B64B9900E36875 /* ANISignUpView.swift */; };
+		CD6762DE20F8285E0098E033 /* InstantSearchClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD6762DD20F8285E0098E033 /* InstantSearchClient.framework */; };
 		CD6B675120A8844B009BF63D /* ANIRecruitContributionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6B675020A8844B009BF63D /* ANIRecruitContributionView.swift */; };
 		CD6B675420A90F8A009BF63D /* ANIPlaceholderTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6B675320A90F8A009BF63D /* ANIPlaceholderTextView.swift */; };
 		CD92792220C0DCB400B1F006 /* ANIKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD92792120C0DCB400B1F006 /* ANIKey.swift */; };
@@ -203,6 +204,7 @@
 		CD50A46820EC89BD00CFF16F /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		CD6229DB20B64A6400E36875 /* ANISignUpViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANISignUpViewController.swift; sourceTree = "<group>"; };
 		CD6229DD20B64B9900E36875 /* ANISignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANISignUpView.swift; sourceTree = "<group>"; };
+		CD6762DD20F8285E0098E033 /* InstantSearchClient.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = InstantSearchClient.framework; path = Carthage/Build/iOS/InstantSearchClient.framework; sourceTree = "<group>"; };
 		CD6B675020A8844B009BF63D /* ANIRecruitContributionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitContributionView.swift; sourceTree = "<group>"; };
 		CD6B675320A90F8A009BF63D /* ANIPlaceholderTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIPlaceholderTextView.swift; sourceTree = "<group>"; };
 		CD92792120C0DCB400B1F006 /* ANIKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIKey.swift; sourceTree = "<group>"; };
@@ -341,6 +343,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CD6762DE20F8285E0098E033 /* InstantSearchClient.framework in Frameworks */,
 				CD0BFF1020C6186500D5959B /* CodableFirebase.framework in Frameworks */,
 				CD047EBE20C4E9A000248958 /* NVActivityIndicatorView.framework in Frameworks */,
 				CDDD04AF20B4F8130094DBFA /* GrowingTextView.framework in Frameworks */,
@@ -1213,6 +1216,7 @@
 		F5B1EFC320726657000CFB0B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				CD6762DD20F8285E0098E033 /* InstantSearchClient.framework */,
 				CD0BFF0F20C6186500D5959B /* CodableFirebase.framework */,
 				CD047EBD20C4E9A000248958 /* NVActivityIndicatorView.framework */,
 				CDDD04AE20B4F8130094DBFA /* GrowingTextView.framework */,
@@ -1579,6 +1583,7 @@
 				"$(SRCROOT)/Carthage/Build/iOS/GrowingTextView.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/NVActivityIndicatorView.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/CodableFirebase.framework",
+				"$(SRCROOT)/Carthage/Build/iOS/InstantSearchClient.framework",
 			);
 			outputPaths = (
 			);

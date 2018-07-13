@@ -1,5 +1,6 @@
 github "KennethTsang/GrowingTextView" "0.5.6"
+github "algolia/algoliasearch-client-swift" "5.3.0"
 github "alickbass/CodableFirebase" "0.2.0"
 github "imwcl/WCLShineButton" "1.0.7"
-github "ninjaprox/NVActivityIndicatorView" "4.2.1"
+github "ninjaprox/NVActivityIndicatorView" "4.3.0"
 github "roberthein/TinyConstraints" "3.1.1"

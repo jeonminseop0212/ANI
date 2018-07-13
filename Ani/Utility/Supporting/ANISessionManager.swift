@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import InstantSearchClient
 
 class ANISessionManager: NSObject {
   static let shared = ANISessionManager()
@@ -15,4 +16,6 @@ class ANISessionManager: NSObject {
   var currentUserUid: String?
   
   var isAnonymous: Bool = false
+  
+  let client = Client(appID: "RBJYX5VF88", apiKey: "ebf262fa4367637cd49431402d70455c")
 }
