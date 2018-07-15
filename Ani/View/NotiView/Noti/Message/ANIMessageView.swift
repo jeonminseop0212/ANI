@@ -67,6 +67,7 @@ class ANIMessageView: UIView {
   
   private func setupNotifications() {
     ANINotificationManager.receive(notiTabTapped: self, selector: #selector(scrollToTop))
+    ANINotificationManager.receive(login: self, selector: #selector(reloadChatGroups))
   }
   
   @objc private func scrollToTop() {
@@ -75,6 +76,10 @@ class ANIMessageView: UIView {
           isCellSelected else { return }
     
     messageTableView.scrollToRow(at: [0, 0], at: .top, animated: true)
+  }
+  
+  @objc private func reloadChatGroups() {
+    loadChatGroup()
   }
 }
 

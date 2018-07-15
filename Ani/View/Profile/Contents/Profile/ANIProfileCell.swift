@@ -53,6 +53,7 @@ class ANIProfileCell: UITableViewCell {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     setup()
     observeUserFollow()
+    setupNotifications()
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -219,7 +220,7 @@ class ANIProfileCell: UITableViewCell {
     followerCountLabel.text = "\(followerIds.count)"
   }
   
-  func observeUserFollow() {
+  @objc func observeUserFollow() {
     guard let currentUserId = ANISessionManager.shared.currentUserUid else { return }
     
     let databaseRef = Database.database().reference()
@@ -239,6 +240,10 @@ class ANIProfileCell: UITableViewCell {
         self.followerIds.removeAll()
       }
     }
+  }
+  
+  private func setupNotifications() {
+    ANINotificationManager.receive(login: self, selector: #selector(observeUserFollow))
   }
   
   //MARK: action
