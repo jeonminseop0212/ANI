@@ -110,38 +110,63 @@ class ANIOtherProfileBasicView: UIView {
   private func checkFollowed() {
     guard let user = self.user,
           let userId = user.uid,
-          let currentUserId = ANISessionManager.shared.currentUserUid,
           let activityIndicatorView = self.activityIndicatorView else { return }
     
-    let databaseRef = Database.database().reference()
-    
-    DispatchQueue.global().async {
-      databaseRef.child(KEY_FOLLOWING_USER_IDS).child(currentUserId).observeSingleEvent(of: .value) { (snapshot) in
-        guard let followingUser = snapshot.value as? [String: String] else { return }
-        
-        for id in followingUser.keys {
-          if id == userId {
-            
-            self.isFollowed = true
-            
-            guard let basicTableView = self.basicTableView else { return }
-            
-            basicTableView.reloadData()
+    if let currentUserId = ANISessionManager.shared.currentUserUid {
+      let databaseRef = Database.database().reference()
+      
+      DispatchQueue.global().async {
+        databaseRef.child(KEY_FOLLOWING_USER_IDS).child(currentUserId).observeSingleEvent(of: .value) { (snapshot) in
+          guard let followingUser = snapshot.value as? [String: String] else { return }
+          
+          for id in followingUser.keys {
+            if id == userId {
+              
+              self.isFollowed = true
+              
+              guard let basicTableView = self.basicTableView else { return }
+              
+              basicTableView.reloadData()
+              
+              activityIndicatorView.stopAnimating()
+              
+              UIView.animate(withDuration: 0.2, animations: {
+                basicTableView.alpha = 1.0
+              })
+            } else {
+              self.isFollowed = false
+              
+              guard let basicTableView = self.basicTableView else { return }
+              
+              basicTableView.reloadData()
+              
+              activityIndicatorView.stopAnimating()
+              
+              UIView.animate(withDuration: 0.2, animations: {
+                basicTableView.alpha = 1.0
+              })
+            }
+          }
+          
+          if snapshot.value as? [String: Any] == nil {
+            guard let activityIndicatorView = self.activityIndicatorView else { return }
             
             activityIndicatorView.stopAnimating()
-            
-            UIView.animate(withDuration: 0.2, animations: {
-              basicTableView.alpha = 1.0
-            })
           }
         }
-        
-        if snapshot.value as? [String: Any] == nil {
-          guard let activityIndicatorView = self.activityIndicatorView else { return }
-          
-          activityIndicatorView.stopAnimating()
-        }
       }
+    } else {
+      self.isFollowed = false
+      
+      guard let basicTableView = self.basicTableView else { return }
+      
+      basicTableView.reloadData()
+      
+      activityIndicatorView.stopAnimating()
+      
+      UIView.animate(withDuration: 0.2, animations: {
+        basicTableView.alpha = 1.0
+      })
     }
   }
 }

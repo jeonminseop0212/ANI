@@ -136,6 +136,7 @@ class ANIOtherProfileViewController: UIViewController {
     imageBrowserViewController.selectedIndex = selectedIndex
     imageBrowserViewController.imageUrls = imageUrls
     imageBrowserViewController.modalPresentationStyle = .overCurrentContext
+    imageBrowserViewController.delegate = self
     //overCurrentContextだとtabBarが消えないのでtabBarからpresentする
     self.tabBarController?.present(imageBrowserViewController, animated: false, completion: nil)
   }
@@ -239,5 +240,12 @@ extension ANIOtherProfileViewController: ANIOtherProfileBasicViewDelegate {
         rejectTapView.isHidden = true
       })
     }
+  }
+}
+
+//MARK: ANIImageBrowserViewControllerDelegate
+extension ANIOtherProfileViewController: ANIImageBrowserViewControllerDelegate {
+  func imageBrowserDidDissmiss() {
+    UIApplication.shared.statusBarStyle = .default
   }
 }
