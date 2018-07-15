@@ -78,6 +78,7 @@ class ANINotiView: UIView {
   
   private func setupNotifications() {
     ANINotificationManager.receive(notiTabTapped: self, selector: #selector(scrollToTop))
+    ANINotificationManager.receive(login: self, selector: #selector(reloadNotifications))
   }
   
   @objc private func scrollToTop() {
@@ -86,6 +87,10 @@ class ANINotiView: UIView {
           isCellSelected else { return }
     
     notiTableView.scrollToRow(at: [0, 0], at: .top, animated: true)
+  }
+  
+  @objc private func reloadNotifications() {
+    loadNoti(sender: nil)
   }
 }
 
