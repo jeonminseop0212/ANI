@@ -10,6 +10,10 @@ import UIKit
 import FirebaseDatabase
 import CodableFirebase
 
+protocol ANIUserSearchViewCellDelegate {
+  func reject()
+}
+
 class ANIUserSearchViewCell: UITableViewCell {
   
   private weak var stackView: UIStackView?
@@ -27,6 +31,8 @@ class ANIUserSearchViewCell: UITableViewCell {
     }
   }
   
+  var delegate: ANIUserSearchViewCellDelegate?
+  
   override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     setup()
@@ -38,6 +44,9 @@ class ANIUserSearchViewCell: UITableViewCell {
   
   private func setup() {
     self.selectionStyle = .none
+    self.isUserInteractionEnabled = true
+    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped))
+    self.addGestureRecognizer(tapGesture)
     
     //stackView
     let stackView = UIStackView()
@@ -55,9 +64,6 @@ class ANIUserSearchViewCell: UITableViewCell {
     profileImageView.layer.cornerRadius = PROFILE_IMAGE_VIEW_HEIGHT / 2
     profileImageView.layer.masksToBounds = true
     profileImageView.backgroundColor = ANIColor.bg
-    profileImageView.isUserInteractionEnabled = true
-    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped))
-    profileImageView.addGestureRecognizer(tapGesture)
     stackView.addArrangedSubview(profileImageView)
     profileImageView.width(PROFILE_IMAGE_VIEW_HEIGHT)
     profileImageView.height(PROFILE_IMAGE_VIEW_HEIGHT)
@@ -120,36 +126,45 @@ class ANIUserSearchViewCell: UITableViewCell {
   private func checkFollowed() {
     guard let user = self.user,
           let userId = user.uid,
-          let currentUserId = ANISessionManager.shared.currentUserUid,
           let followButton = self.followButton,
           let followLabel = self.followLabel else { return }
     
-    let databaseRef = Database.database().reference()
-    
-    DispatchQueue.global().async {
-      databaseRef.child(KEY_FOLLOWING_USER_IDS).child(currentUserId).observeSingleEvent(of: .value) { (snapshot) in
-        guard let followingUser = snapshot.value as? [String: String] else { return }
-        
-        for id in followingUser.keys {
-          if id == userId {
-            followButton.base?.backgroundColor = .clear
-            followLabel.text = "フォロー中"
-            followLabel.textColor = ANIColor.green
-            
-            break
-          } else {
-            followButton.base?.backgroundColor = ANIColor.green
-            followLabel.text = "フォロー"
-            followLabel.textColor = .white
+    if let currentUserId = ANISessionManager.shared.currentUserUid {
+      let databaseRef = Database.database().reference()
+      
+      DispatchQueue.global().async {
+        databaseRef.child(KEY_FOLLOWING_USER_IDS).child(currentUserId).observeSingleEvent(of: .value) { (snapshot) in
+          guard let followingUser = snapshot.value as? [String: String] else { return }
+          
+          for id in followingUser.keys {
+            if id == userId {
+              followButton.base?.backgroundColor = .clear
+              followLabel.text = "フォロー中"
+              followLabel.textColor = ANIColor.green
+              
+              break
+            } else {
+              followButton.base?.backgroundColor = ANIColor.green
+              followLabel.text = "フォロー"
+              followLabel.textColor = .white
+            }
+          }
+          
+          DispatchQueue.main.async {
+            UIView.animate(withDuration: 0.1, animations: {
+              followButton.alpha = 1.0
+            })
           }
         }
-        
-        DispatchQueue.main.async {
-          UIView.animate(withDuration: 0.1, animations: {
-            followButton.alpha = 1.0
-          })
-        }
       }
+    } else {
+      followButton.base?.backgroundColor = ANIColor.green
+      followLabel.text = "フォロー"
+      followLabel.textColor = .white
+      
+      UIView.animate(withDuration: 0.1, animations: {
+        followButton.alpha = 1.0
+      })
     }
   }
   
@@ -189,35 +204,38 @@ class ANIUserSearchViewCell: UITableViewCell {
 extension ANIUserSearchViewCell: ANIButtonViewDelegate {
   func buttonViewTapped(view: ANIButtonView) {
     if view === followButton {
-      guard let currentUserUid = ANISessionManager.shared.currentUserUid,
-            let user = self.user,
+      guard let user = self.user,
             let userId = user.uid,
             let followButton = self.followButton,
             let followLabel = self.followLabel else { return }
       
-      let databaseRef = Database.database().reference()
-      
-      if followButton.base?.backgroundColor == ANIColor.green {
-        DispatchQueue.global().async {
-          let date = ANIFunction.shared.getToday()
-          databaseRef.child(KEY_FOLLOWING_USER_IDS).child(currentUserUid).updateChildValues([userId: date])
-          databaseRef.child(KEY_FOLLOWER_IDS).child(userId).updateChildValues([currentUserUid: date])
+      if let currentUserUid = ANISessionManager.shared.currentUserUid, !ANISessionManager.shared.isAnonymous {
+        let databaseRef = Database.database().reference()
+        
+        if followButton.base?.backgroundColor == ANIColor.green {
+          DispatchQueue.global().async {
+            let date = ANIFunction.shared.getToday()
+            databaseRef.child(KEY_FOLLOWING_USER_IDS).child(currentUserUid).updateChildValues([userId: date])
+            databaseRef.child(KEY_FOLLOWER_IDS).child(userId).updateChildValues([currentUserUid: date])
+            
+            self.updateNoti()
+          }
           
-          self.updateNoti()
+          followButton.base?.backgroundColor = .clear
+          followLabel.text = "フォロー中"
+          followLabel.textColor = ANIColor.green
+        } else {
+          DispatchQueue.global().async {
+            databaseRef.child(KEY_FOLLOWING_USER_IDS).child(currentUserUid).child(userId).removeValue()
+            databaseRef.child(KEY_FOLLOWER_IDS).child(userId).child(currentUserUid).removeValue()
+          }
+          
+          followButton.base?.backgroundColor = ANIColor.green
+          followLabel.text = "フォロー"
+          followLabel.textColor = .white
         }
-        
-        followButton.base?.backgroundColor = .clear
-        followLabel.text = "フォロー中"
-        followLabel.textColor = ANIColor.green
       } else {
-        DispatchQueue.global().async {
-          databaseRef.child(KEY_FOLLOWING_USER_IDS).child(currentUserUid).child(userId).removeValue()
-          databaseRef.child(KEY_FOLLOWER_IDS).child(userId).child(currentUserUid).removeValue()
-        }
-        
-        followButton.base?.backgroundColor = ANIColor.green
-        followLabel.text = "フォロー"
-        followLabel.textColor = .white
+        self.delegate?.reject()
       }
     }
   }

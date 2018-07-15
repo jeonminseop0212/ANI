@@ -14,6 +14,10 @@ import InstantSearchClient
 
 protocol ANISearchViewDelegate {
   func searchViewDidScroll(scrollY: CGFloat)
+  func storyViewCellDidSelect(selectedStory: FirebaseStory, user: FirebaseUser)
+  func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser)
+  func qnaViewCellDidSelect(selectedQna: FirebaseQna, user:FirebaseUser)
+  func reject()
 }
 
 enum SearchCategory: String {
@@ -140,6 +144,7 @@ extension ANISearchView: UITableViewDataSource {
       let cell = tableView.dequeueReusableCell(withIdentifier: userId, for: indexPath) as! ANIUserSearchViewCell
       
       cell.user = searchUsers[indexPath.row]
+      cell.delegate = self
       
       return cell
     case .story:
@@ -149,6 +154,7 @@ extension ANISearchView: UITableViewDataSource {
           let cell = tableView.dequeueReusableCell(withIdentifier: supportCellId, for: indexPath) as! ANISupportViewCell
           
           cell.story = searchStories[indexPath.row]
+          cell.delegate = self
           
           return cell
         } else {
@@ -156,6 +162,7 @@ extension ANISearchView: UITableViewDataSource {
           let cell = tableView.dequeueReusableCell(withIdentifier: storyCellId, for: indexPath) as! ANIStoryViewCell
           
           cell.story = searchStories[indexPath.row]
+          cell.delegate = self
           
           return cell
         }
@@ -167,6 +174,7 @@ extension ANISearchView: UITableViewDataSource {
       let cell = tableView.dequeueReusableCell(withIdentifier: qnaId, for: indexPath) as! ANIQnaViewCell
       
       cell.qna = searchQnas[indexPath.row]
+      cell.delegate = self
       
       return cell
     }
@@ -181,6 +189,52 @@ extension ANISearchView: UITableViewDelegate {
     //navigation bar animation
     let scrollY = scrollView.contentOffset.y
     self.delegate?.searchViewDidScroll(scrollY: scrollY)
+  }
+  
+  func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    if selectedCategory == .story {
+      if !searchStories.isEmpty {
+        if searchStories[indexPath.row].recruitId != nil, let cell = cell as? ANISupportViewCell {
+          cell.unobserveLove()
+        } else if let cell = cell as? ANIStoryViewCell {
+          cell.unobserveLove()
+        }
+      }
+    } else if selectedCategory == .qna, let cell = cell as? ANIRecruitViewCell {
+      cell.unobserveLove()
+    }
+  }
+}
+
+//MARK: ANIUserSearchViewCellDelegate
+extension ANISearchView: ANIUserSearchViewCellDelegate {
+  func reject() {
+    self.delegate?.reject()
+  }
+}
+
+//MARK: ANIStoryViewCellDelegate
+extension ANISearchView: ANIStoryViewCellDelegate {
+  func storyCellTapped(story: FirebaseStory, user: FirebaseUser) {
+    self.delegate?.storyViewCellDidSelect(selectedStory: story, user: user)
+  }
+}
+
+//MARK: ANISupportViewCellDelegate
+extension ANISearchView: ANISupportViewCellDelegate {
+  func supportCellTapped(story: FirebaseStory, user: FirebaseUser) {
+    self.delegate?.storyViewCellDidSelect(selectedStory: story, user: user)
+  }
+  
+  func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser) {
+    self.delegate?.supportCellRecruitTapped(recruit: recruit, user: user)
+  }
+}
+
+//MARK: ANIQnaViewCellDelegate
+extension ANISearchView: ANIQnaViewCellDelegate {
+  func cellTapped(qna: FirebaseQna, user: FirebaseUser) {
+    self.delegate?.qnaViewCellDidSelect(selectedQna: qna, user: user)
   }
 }
 
@@ -218,15 +272,18 @@ extension ANISearchView {
       index?.search(Query(query: searchText), completionHandler: { (content, error) -> Void in
         if let content = content, let hits = content[KEY_HITS] as? [AnyObject], !hits.isEmpty {
           for hit in hits {
-            guard let hitDic = hit as? [String: AnyObject],
-                  let currenUserUid = ANISessionManager.shared.currentUserUid else { return }
+            guard let hitDic = hit as? [String: AnyObject] else { return }
             
             do {
               switch category {
               case .user:
                 let user = try FirebaseDecoder().decode(FirebaseUser.self, from: hitDic)
                 
-                if user.uid != currenUserUid {                  
+                if let currenUserUid = ANISessionManager.shared.currentUserUid {
+                  if user.uid != currenUserUid {
+                    self.searchUsers.append(user)
+                  }
+                } else {
                   self.searchUsers.append(user)
                 }
               case .story:

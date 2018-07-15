@@ -233,13 +233,12 @@ class ANIOtherProfileCell: UITableViewCell {
   }
   
   private func reloadFollowLayout() {
-    guard let currentUserId = ANISessionManager.shared.currentUserUid,
-          let followButton = self.followButton,
+    guard let followButton = self.followButton,
           let followLabel = self.followLabel,
           let followingCountLabel = self.followingCountLabel,
           let followerCountLabel = self.followerCountLabel else { return }
     
-    if !followerIds.isEmpty {
+    if let currentUserId = ANISessionManager.shared.currentUserUid, !followerIds.isEmpty {
       for id in followerIds.keys {
         if id == currentUserId {
           followButton.base?.backgroundColor = .clear

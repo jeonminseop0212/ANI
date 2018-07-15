@@ -42,6 +42,12 @@ class ANISearchViewController: UIViewController {
     }
   }
   
+  private var rejectViewBottomConstraint: Constraint?
+  private var rejectViewBottomConstraintOriginalConstant: CGFloat?
+  private weak var rejectView: ANIRejectView?
+  private var isRejectAnimating: Bool = false
+  private var rejectTapView: UIView?
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     setup()
@@ -104,12 +110,35 @@ class ANISearchViewController: UIViewController {
     categoriesView.rightToSuperview()
     categoriesView.height(ANIRecruitViewController.CATEGORIES_VIEW_HEIGHT)
     self.categoriesView = categoriesView
+    
+    //rejectView
+    let rejectView = ANIRejectView()
+    rejectView.setRejectText("ログインが必要です。")
+    self.view.addSubview(rejectView)
+    rejectViewBottomConstraint = rejectView.bottomToTop(of: self.view)
+    rejectViewBottomConstraintOriginalConstant = rejectViewBottomConstraint?.constant
+    rejectView.leftToSuperview()
+    rejectView.rightToSuperview()
+    self.rejectView = rejectView
+    
+    //rejectTapView
+    let rejectTapView = UIView()
+    rejectTapView.isUserInteractionEnabled = true
+    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(rejectViewTapped))
+    rejectTapView.addGestureRecognizer(tapGesture)
+    rejectTapView.isHidden = true
+    rejectTapView.backgroundColor = .clear
+    self.view.addSubview(rejectTapView)
+    rejectTapView.size(to: rejectView)
+    rejectTapView.topToSuperview()
+    self.rejectTapView = rejectTapView
   }
   
   //MARK: Notifications
   private func setupNotifications() {
     ANINotificationManager.receive(viewScrolled: self, selector: #selector(hideKeyboard))
     ANINotificationManager.receive(profileImageViewTapped: self, selector: #selector(pushOtherProfile))
+    ANINotificationManager.receive(imageCellTapped: self, selector: #selector(presentImageBrowser(_:)))
   }
   
   private func removeNotifications() {
@@ -136,6 +165,26 @@ class ANISearchViewController: UIViewController {
     otherProfileViewController.hidesBottomBarWhenPushed = true
     otherProfileViewController.userId = userId
     self.navigationController?.pushViewController(otherProfileViewController, animated: true)
+  }
+  
+  @objc private func rejectViewTapped() {
+    let initialViewController = ANIInitialViewController()
+    let navigationController = UINavigationController(rootViewController: initialViewController)
+    self.present(navigationController, animated: true, completion: nil)
+  }
+  
+  @objc private func presentImageBrowser(_ notification: NSNotification) {
+    guard let item = notification.object as? (Int, [String]) else { return }
+    
+    let selectedIndex = item.0
+    let imageUrls = item.1
+    let imageBrowserViewController = ANIImageBrowserViewController()
+    imageBrowserViewController.selectedIndex = selectedIndex
+    imageBrowserViewController.imageUrls = imageUrls
+    imageBrowserViewController.modalPresentationStyle = .overCurrentContext
+    imageBrowserViewController.delegate = self
+    //overCurrentContextだとtabBarが消えないのでtabBarからpresentする
+    self.tabBarController?.present(imageBrowserViewController, animated: false, completion: nil)
   }
 }
 
@@ -203,6 +252,57 @@ extension ANISearchViewController: ANISearchViewDelegate {
       categoriesView?.categoryCollectionView?.alpha = 1.0
     }
   }
+  
+  func storyViewCellDidSelect(selectedStory: FirebaseStory, user: FirebaseUser) {
+    let commentViewController = ANICommentViewController()
+    commentViewController.hidesBottomBarWhenPushed = true
+    commentViewController.commentMode = CommentMode.story
+    commentViewController.story = selectedStory
+    commentViewController.user = user
+    self.navigationController?.pushViewController(commentViewController, animated: true)
+  }
+  
+  func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser) {
+    let recruitDetailViewController = ANIRecruitDetailViewController()
+    recruitDetailViewController.hidesBottomBarWhenPushed = true
+    recruitDetailViewController.recruit = recruit
+    recruitDetailViewController.user = user
+    self.navigationController?.pushViewController(recruitDetailViewController, animated: true)
+  }
+  
+  func qnaViewCellDidSelect(selectedQna: FirebaseQna, user: FirebaseUser) {
+    let commentViewController = ANICommentViewController()
+    commentViewController.hidesBottomBarWhenPushed = true
+    commentViewController.commentMode = CommentMode.qna
+    commentViewController.qna = selectedQna
+    commentViewController.user = user
+    self.navigationController?.pushViewController(commentViewController, animated: true)
+  }
+  
+  func reject() {
+    guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
+          !isRejectAnimating,
+          let rejectTapView = self.rejectTapView else { return }
+    
+    rejectViewBottomConstraint.constant = UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    rejectTapView.isHidden = false
+    
+    UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut, animations: {
+      self.isRejectAnimating = true
+      self.view.layoutIfNeeded()
+    }) { (complete) in
+      guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
+        let rejectViewBottomConstraintOriginalConstant = self.rejectViewBottomConstraintOriginalConstant else { return }
+      
+      rejectViewBottomConstraint.constant = rejectViewBottomConstraintOriginalConstant
+      UIView.animate(withDuration: 0.3, delay: 1.0, options: .curveEaseInOut, animations: {
+        self.view.layoutIfNeeded()
+      }, completion: { (complete) in
+        self.isRejectAnimating = false
+        rejectTapView.isHidden = true
+      })
+    }
+  }
 }
 
 //MARK: ANISearchCategoriesViewDelegate
@@ -211,3 +311,11 @@ extension ANISearchViewController: ANISearchCategoriesViewDelegate {
     selectedIndex = index
   }
 }
+
+//MARK: ANIImageBrowserViewControllerDelegate
+extension ANISearchViewController: ANIImageBrowserViewControllerDelegate {
+  func imageBrowserDidDissmiss() {
+    UIApplication.shared.statusBarStyle = .default
+  }
+}
+

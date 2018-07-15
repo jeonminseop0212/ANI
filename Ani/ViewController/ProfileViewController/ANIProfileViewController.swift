@@ -166,6 +166,7 @@ class ANIProfileViewController: UIViewController {
     imageBrowserViewController.selectedIndex = selectedIndex
     imageBrowserViewController.imageUrls = imageUrls
     imageBrowserViewController.modalPresentationStyle = .overCurrentContext
+    imageBrowserViewController.delegate = self
     //overCurrentContextだとtabBarが消えないのでtabBarからpresentする
     self.tabBarController?.present(imageBrowserViewController, animated: false, completion: nil)
   }
@@ -289,5 +290,12 @@ extension ANIProfileViewController: ANINeedLoginViewDelegate {
     let initialViewController = ANIInitialViewController()
     let navigationController = UINavigationController(rootViewController: initialViewController)
     self.present(navigationController, animated: true, completion: nil)
+  }
+}
+
+//MARK: ANIImageBrowserViewControllerDelegate
+extension ANIProfileViewController: ANIImageBrowserViewControllerDelegate {
+  func imageBrowserDidDissmiss() {
+    UIApplication.shared.statusBarStyle = .default
   }
 }
