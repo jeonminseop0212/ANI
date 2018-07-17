@@ -108,7 +108,7 @@ class ANISearchViewController: UIViewController {
     categoriesView.topToBottom(of: myNavigationBar)
     categoriesView.leftToSuperview()
     categoriesView.rightToSuperview()
-    categoriesView.height(ANIRecruitViewController.CATEGORIES_VIEW_HEIGHT)
+    categoriesView.height(ANIRecruitViewController.FILTERS_VIEW_HEIGHT)
     self.categoriesView = categoriesView
     
     //rejectView
@@ -226,7 +226,7 @@ extension ANISearchViewController: ANISearchViewDelegate {
   func searchViewDidScroll(scrollY: CGFloat) {
     guard let myNavigationBarTopConstroint = self.myNavigationBarTopConstroint else { return }
     
-    let topHeight = UIViewController.NAVIGATION_BAR_HEIGHT + ANIRecruitViewController.CATEGORIES_VIEW_HEIGHT
+    let topHeight = UIViewController.NAVIGATION_BAR_HEIGHT + ANIRecruitViewController.FILTERS_VIEW_HEIGHT
     let newScrollY = topHeight + scrollY
     
     //navigation animate

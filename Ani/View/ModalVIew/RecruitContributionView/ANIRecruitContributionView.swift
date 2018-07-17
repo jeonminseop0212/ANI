@@ -567,17 +567,17 @@ class ANIRecruitContributionView: UIView {
           let pickItem = notification.object as? String else { return }
 
     switch pickMode {
-    case BasicInfoPickMode.kind:
+    case .kind:
       basicInfoKindLabel.text = "種類：\(pickItem)"
-    case BasicInfoPickMode.age:
+    case .age:
       basicInfoAgeLabel.text = "年齢：\(pickItem)"
-    case BasicInfoPickMode.sex:
+    case .sex:
       basicInfoSexLabel.text = "性別：\(pickItem)"
-    case BasicInfoPickMode.home:
+    case .home:
       basicInfoHomeLabel.text = "お家：\(pickItem)"
-    case BasicInfoPickMode.vaccine:
+    case .vaccine:
       basicInfoVaccineLabel.text = "ワクチン：\(pickItem)"
-    case BasicInfoPickMode.castration:
+    case .castration:
       basicInfoCastrationLabel.text = "去勢：\(pickItem)"
     }
   }

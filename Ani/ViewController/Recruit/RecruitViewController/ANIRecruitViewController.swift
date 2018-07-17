@@ -14,12 +14,14 @@ class ANIRecruitViewController: UIViewController {
   private weak var myNavigationBar: UIView?
   private weak var myNavigationBarTopConstroint: Constraint?
 
-  private weak var categoriesView: ANIRecruitCategoriesView?
-  static let CATEGORIES_VIEW_HEIGHT: CGFloat = 47.0
+  private weak var filtersView: ANIRecruitFiltersView?
+  static let FILTERS_VIEW_HEIGHT: CGFloat = 47.0
   
   private weak var recruitView: ANIRecuruitView?
   
   private weak var searchBar: UISearchBar?
+  
+  private let pickUpItem = PickUpItem()
   
   private let CONTRIBUTION_BUTTON_HEIGHT:CGFloat = 55.0
   private weak var contributionButon: ANIImageButtonView?
@@ -52,15 +54,6 @@ class ANIRecruitViewController: UIViewController {
     self.navigationController?.setNavigationBarHidden(true, animated: false)
     self.navigationController?.navigationBar.isTranslucent = false
     
-    //navigation bar right item
-    let filterImage = UIImage(named: "filter")?.withRenderingMode(.alwaysOriginal)
-    let filterButton = UIButton(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
-    filterButton.setImage(filterImage, for: .normal)
-    filterButton.addTarget(self, action: #selector(filter), for: .touchUpInside)
-    let rightBarButton = UIBarButtonItem()
-    rightBarButton.customView = filterButton
-    navigationItem.rightBarButtonItem = rightBarButton
-    
     //rcruitView
     let recruitView = ANIRecuruitView()
     recruitView.delegate = self
@@ -92,14 +85,15 @@ class ANIRecruitViewController: UIViewController {
     searchBar.bottomToSuperview()
     self.searchBar = searchBar
     
-    //categoriesView
-    let categoriesView = ANIRecruitCategoriesView()
-    self.view.addSubview(categoriesView)
-    categoriesView.topToBottom(of: myNavigationBar)
-    categoriesView.leftToSuperview()
-    categoriesView.rightToSuperview()
-    categoriesView.height(ANIRecruitViewController.CATEGORIES_VIEW_HEIGHT)
-    self.categoriesView = categoriesView
+    //filtersView
+    let filtersView = ANIRecruitFiltersView()
+    filtersView.delegate = self
+    self.view.addSubview(filtersView)
+    filtersView.topToBottom(of: myNavigationBar)
+    filtersView.leftToSuperview()
+    filtersView.rightToSuperview()
+    filtersView.height(ANIRecruitViewController.FILTERS_VIEW_HEIGHT)
+    self.filtersView = filtersView
     
     //contributionButon
     let contributionButon = ANIImageButtonView()
@@ -178,10 +172,6 @@ class ANIRecruitViewController: UIViewController {
   }
   
   //MARK: Action
-  @objc private func filter() {
-    print("filtering")
-  }
-  
   @objc private func rejectViewTapped() {
     let initialViewController = ANIInitialViewController()
     let navigationController = UINavigationController(rootViewController: initialViewController)
@@ -242,7 +232,7 @@ extension ANIRecruitViewController: ANIRecruitViewDelegate {
   func recruitViewDidScroll(scrollY: CGFloat) {
     guard let myNavigationBarTopConstroint = self.myNavigationBarTopConstroint else { return }
     
-    let topHeight = UIViewController.NAVIGATION_BAR_HEIGHT + ANIRecruitViewController.CATEGORIES_VIEW_HEIGHT
+    let topHeight = UIViewController.NAVIGATION_BAR_HEIGHT + ANIRecruitViewController.FILTERS_VIEW_HEIGHT
     let newScrollY = topHeight + scrollY
     
     //navigation animate
@@ -253,11 +243,11 @@ extension ANIRecruitViewController: ANIRecruitViewDelegate {
         
         let alpha = 1 - (scrollY / topHeight)
         searchBar?.alpha = alpha
-        categoriesView?.categoryCollectionView?.alpha = alpha
+        filtersView?.filterCollectionView?.alpha = alpha
       } else {
         myNavigationBarTopConstroint.constant = -topHeight
         searchBar?.alpha = 0.0
-        categoriesView?.categoryCollectionView?.alpha = 0.0
+        filtersView?.filterCollectionView?.alpha = 0.0
         self.view.layoutIfNeeded()
       }
     } else {
@@ -265,7 +255,7 @@ extension ANIRecruitViewController: ANIRecruitViewDelegate {
       self.view.layoutIfNeeded()
       
       searchBar?.alpha = 1.0
-      categoriesView?.categoryCollectionView?.alpha = 1.0
+      filtersView?.filterCollectionView?.alpha = 1.0
     }
   }
   
@@ -292,5 +282,36 @@ extension ANIRecruitViewController: ANIRecruitViewDelegate {
         rejectTapView.isHidden = true
       })
     }
+  }
+}
+
+//MARK: ANIRecruitCategoriesViewDelegate
+extension ANIRecruitViewController: ANIRecruitFiltersViewDelegate {
+  func homeSelectButtonTapped() {
+    let popupPickerViewController = ANIPopupPickerViewController()
+    popupPickerViewController.pickerItem = pickUpItem.home
+    popupPickerViewController.modalPresentationStyle = .overCurrentContext
+    self.tabBarController?.present(popupPickerViewController, animated: false, completion: nil)
+  }
+  
+  func kindSelectButtonTapped() {
+    let popupPickerViewController = ANIPopupPickerViewController()
+    popupPickerViewController.pickerItem = pickUpItem.kind
+    popupPickerViewController.modalPresentationStyle = .overCurrentContext
+    self.tabBarController?.present(popupPickerViewController, animated: false, completion: nil)
+  }
+  
+  func ageSelectButtonTapped() {
+    let popupPickerViewController = ANIPopupPickerViewController()
+    popupPickerViewController.pickerItem = pickUpItem.age
+    popupPickerViewController.modalPresentationStyle = .overCurrentContext
+    self.tabBarController?.present(popupPickerViewController, animated: false, completion: nil)
+  }
+  
+  func sexSelectButtonTapped() {
+    let popupPickerViewController = ANIPopupPickerViewController()
+    popupPickerViewController.pickerItem = pickUpItem.sex
+    popupPickerViewController.modalPresentationStyle = .overCurrentContext
+    self.tabBarController?.present(popupPickerViewController, animated: false, completion: nil)
   }
 }

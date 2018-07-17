@@ -86,6 +86,7 @@ class ANIPopupPickerView: UIView {
   }
 }
 
+//MARK: UIPickerViewDataSource
 extension ANIPopupPickerView: UIPickerViewDataSource {
   func numberOfComponents(in pickerView: UIPickerView) -> Int {
     return 1
@@ -108,6 +109,7 @@ extension ANIPopupPickerView: UIPickerViewDataSource {
   }
 }
 
+//MARK: UIPickerViewDelegate
 extension ANIPopupPickerView: UIPickerViewDelegate {
   func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
     guard let pickerItem = self.pickerItem else { return "" }
