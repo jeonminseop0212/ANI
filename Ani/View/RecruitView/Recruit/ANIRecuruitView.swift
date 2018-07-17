@@ -29,6 +29,46 @@ class ANIRecuruitView: UIView {
   
   private var recruits = [FirebaseRecruit]()
   
+  var pickMode: FilterPickMode?
+  var pickItem: String? {
+    didSet {
+      guard let pickMode = self.pickMode,
+            let pickItem = self.pickItem else { return }
+      
+      switch pickMode {
+      case .home:
+        if pickItem == "選択しない" {
+          homeFilter = nil
+        } else {
+          homeFilter = pickItem
+        }
+      case .kind:
+        if pickItem == "選択しない" {
+          kindFilter = nil
+        } else {
+          kindFilter = pickItem
+        }
+      case .age:
+        if pickItem == "選択しない" {
+          ageFilter = nil
+        } else {
+          ageFilter = pickItem
+        }
+      case .sex:
+        if pickItem == "選択しない" {
+          sexFilter = nil
+        } else {
+          sexFilter = pickItem
+        }
+      }
+    }
+  }
+  
+  private var homeFilter: String?
+  private var kindFilter: String?
+  private var ageFilter: String?
+  private var sexFilter: String?
+  
   var delegate:ANIRecruitViewDelegate?
   
   override init(frame: CGRect) {

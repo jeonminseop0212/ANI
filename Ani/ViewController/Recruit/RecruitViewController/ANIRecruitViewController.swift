@@ -9,6 +9,13 @@
 import UIKit
 import TinyConstraints
 
+enum FilterPickMode: Int {
+  case home;
+  case kind;
+  case age;
+  case sex;
+}
+
 class ANIRecruitViewController: UIViewController {
   
   private weak var myNavigationBar: UIView?
@@ -22,6 +29,8 @@ class ANIRecruitViewController: UIViewController {
   private weak var searchBar: UISearchBar?
   
   private let pickUpItem = PickUpItem()
+  
+  private var pickMode: FilterPickMode?
   
   private let CONTRIBUTION_BUTTON_HEIGHT:CGFloat = 55.0
   private weak var contributionButon: ANIImageButtonView?
@@ -135,6 +144,7 @@ class ANIRecruitViewController: UIViewController {
   private func setupNotifications() {
     ANINotificationManager.receive(viewScrolled: self, selector: #selector(hideKeyboard))
     ANINotificationManager.receive(profileImageViewTapped: self, selector: #selector(pushOtherProfile))
+    ANINotificationManager.receive(pickerViewDidSelect: self, selector: #selector(updateFilter))
   }
   
   private func removeNotifications() {
@@ -169,6 +179,19 @@ class ANIRecruitViewController: UIViewController {
       otherProfileViewController.userId = userId
       self.navigationController?.pushViewController(otherProfileViewController, animated: true)
     }
+  }
+  
+  @objc private func updateFilter(_ notification: NSNotification) {
+    guard let pickMode = self.pickMode,
+          let pickItem = notification.object as? String,
+          let filtersView = self.filtersView,
+          let recruitView = self.recruitView else { return }
+    
+    filtersView.pickMode = pickMode
+    filtersView.pickItem = pickItem
+    
+    recruitView.pickMode = pickMode
+    recruitView.pickItem = pickItem
   }
   
   //MARK: Action
@@ -285,32 +308,40 @@ extension ANIRecruitViewController: ANIRecruitViewDelegate {
   }
 }
 
-//MARK: ANIRecruitCategoriesViewDelegate
+//MARK: ANIRecruitFiltersViewDelegate
 extension ANIRecruitViewController: ANIRecruitFiltersViewDelegate {
-  func homeSelectButtonTapped() {
+  func didSelectedItem(index: Int) {
     let popupPickerViewController = ANIPopupPickerViewController()
-    popupPickerViewController.pickerItem = pickUpItem.home
-    popupPickerViewController.modalPresentationStyle = .overCurrentContext
-    self.tabBarController?.present(popupPickerViewController, animated: false, completion: nil)
-  }
-  
-  func kindSelectButtonTapped() {
-    let popupPickerViewController = ANIPopupPickerViewController()
-    popupPickerViewController.pickerItem = pickUpItem.kind
-    popupPickerViewController.modalPresentationStyle = .overCurrentContext
-    self.tabBarController?.present(popupPickerViewController, animated: false, completion: nil)
-  }
-  
-  func ageSelectButtonTapped() {
-    let popupPickerViewController = ANIPopupPickerViewController()
-    popupPickerViewController.pickerItem = pickUpItem.age
-    popupPickerViewController.modalPresentationStyle = .overCurrentContext
-    self.tabBarController?.present(popupPickerViewController, animated: false, completion: nil)
-  }
-  
-  func sexSelectButtonTapped() {
-    let popupPickerViewController = ANIPopupPickerViewController()
-    popupPickerViewController.pickerItem = pickUpItem.sex
+
+    switch index {
+    case FilterPickMode.home.rawValue:
+      var home = pickUpItem.home
+      home.insert("選択しない", at: 0)
+      pickMode = .home
+      
+      popupPickerViewController.pickerItem = home
+    case FilterPickMode.kind.rawValue:
+      var kind = pickUpItem.kind
+      kind.insert("選択しない", at: 0)
+      pickMode = .kind
+      
+      popupPickerViewController.pickerItem = kind
+    case FilterPickMode.age.rawValue:
+      var age = pickUpItem.age
+      age.insert("選択しない", at: 0)
+      pickMode = .age
+      
+      popupPickerViewController.pickerItem = age
+    case FilterPickMode.sex.rawValue:
+      var sex = pickUpItem.sex
+      sex.insert("選択しない", at: 0)
+      pickMode = .sex
+      
+      popupPickerViewController.pickerItem = sex
+    default:
+      print("filter default")
+    }
+    
     popupPickerViewController.modalPresentationStyle = .overCurrentContext
     self.tabBarController?.present(popupPickerViewController, animated: false, completion: nil)
   }

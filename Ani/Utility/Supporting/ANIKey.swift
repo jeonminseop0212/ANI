@@ -39,6 +39,10 @@ let KEY_RECRUIT_INTRODUCE_IMAGES = "recruit_introduce_images"
 let KEY_RECRUITS = "recruits"
 let KEY_LOVE_IDS = "loveIds"
 let KEY_CLIP_IDS = "clipIds"
+let KEY_RECRUIT_HOME = "home"
+let KEY_RECRUIT_KIND = "kind"
+let KEY_RECRUIT_AGE = "age"
+let KEY_RECRUIT_SEX = "sex"
 
 //story
 let KEY_STORY_IMAGES = "story_images"
