@@ -11,6 +11,7 @@ pod 'Firebase/Database'
 pod 'Firebase/Auth'
 pod 'Firebase/Storage'
 pod 'FirebaseUI/Storage', '~> 3.0'
+pod 'Firebase/Firestore'
 
   target 'AniTests' do
     inherit! :search_paths
