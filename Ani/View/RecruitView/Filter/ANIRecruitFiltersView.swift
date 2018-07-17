@@ -10,10 +10,7 @@ import UIKit
 import TinyConstraints
 
 protocol ANIRecruitFiltersViewDelegate {
-  func homeSelectButtonTapped()
-  func kindSelectButtonTapped()
-  func ageSelectButtonTapped()
-  func sexSelectButtonTapped()
+  func didSelectedItem(index: Int)
 }
 
 class ANIRecruitFiltersView: UIView {
@@ -21,6 +18,44 @@ class ANIRecruitFiltersView: UIView {
   weak var filterCollectionView: UICollectionView?
   
   private var filters = ["お家", "種類", "年齢", "性別"]
+  
+  var pickMode: FilterPickMode?
+  var pickItem: String? {
+    didSet {
+      guard let pickMode = self.pickMode,
+            let pickItem = self.pickItem,
+            let filterCollectionView = self.filterCollectionView else { return }
+      
+      switch pickMode {
+      case .home:
+        if pickItem == "選択しない" {
+          filters[0] = "お家"
+        } else {
+          filters[0] = pickItem
+        }
+      case .kind:
+        if pickItem == "選択しない" {
+          filters[1] = "種類"
+        } else {
+          filters[1] = pickItem
+        }
+      case .age:
+        if pickItem == "選択しない" {
+          filters[2] = "年齢"
+        } else {
+          filters[2] = pickItem
+        }
+      case .sex:
+        if pickItem == "選択しない" {
+          filters[3] = "性別"
+        } else {
+          filters[3] = pickItem
+        }
+      }
+      
+      filterCollectionView.reloadData()
+    }
+  }
   
   var delegate: ANIRecruitFiltersViewDelegate?
   
@@ -84,14 +119,6 @@ extension ANIRecruitFiltersView: UICollectionViewDelegateFlowLayout {
 //MARK: UICollectionViewDelegate
 extension ANIRecruitFiltersView: UICollectionViewDelegate {
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-    if indexPath.item == 0 {
-      self.delegate?.homeSelectButtonTapped()
-    } else if indexPath.item == 1 {
-      self.delegate?.kindSelectButtonTapped()
-    } else if indexPath.item == 2 {
-      self.delegate?.ageSelectButtonTapped()
-    } else if indexPath.item == 3 {
-      self.delegate?.sexSelectButtonTapped()
-    }
+    self.delegate?.didSelectedItem(index: indexPath.item)
   }
 }
