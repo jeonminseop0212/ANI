@@ -82,7 +82,7 @@ class ANISearchView: UIView {
     //tableView
     let tableView = UITableView()
     tableView.separatorStyle = .none
-    let topInset = UIViewController.NAVIGATION_BAR_HEIGHT + ANIRecruitViewController.CATEGORIES_VIEW_HEIGHT
+    let topInset = UIViewController.NAVIGATION_BAR_HEIGHT + ANIRecruitViewController.FILTERS_VIEW_HEIGHT
     tableView.contentInset = UIEdgeInsets(top: topInset, left: 0, bottom: 0, right: 0)
     tableView.scrollIndicatorInsets  = UIEdgeInsets(top: topInset, left: 0, bottom: 0, right: 0)
     tableView.setContentOffset(CGPoint(x: 0, y: -topInset), animated: false)
