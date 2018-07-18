@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import FirebaseDatabase
+import FirebaseFirestore
 import FirebaseAuth
 import CodableFirebase
 import NVActivityIndicatorView
@@ -221,13 +221,23 @@ extension ANILoginView: ANIButtonViewDelegate {
             self.delegate?.reject(notiText: "ログインに失敗しました！")
           }
         } else {
+          let database = Firestore.firestore()
+          
           ANISessionManager.shared.currentUserUid = Auth.auth().currentUser?.uid
           if let currentUserUid = ANISessionManager.shared.currentUserUid {
             DispatchQueue.global().async {
-              Database.database().reference().child(KEY_USERS).child(currentUserUid).observe(.value, with: { (snapshot) in
-                guard let value = snapshot.value else { return }
+              database.collection(KEY_USERS).document(currentUserUid).addSnapshotListener({ (snapshot, error) in
+                if let error = error {
+                  print("Error adding document: \(error)")
+
+                  return
+                }
+                
+                guard let snapshot = snapshot, let value = snapshot.data() else { return }
+                                
                 do {
-                  let user = try FirebaseDecoder().decode(FirebaseUser.self, from: value)
+                  let user = try FirestoreDecoder().decode(FirebaseUser.self, from: value)
+                  
                   DispatchQueue.main.async {
                     ANISessionManager.shared.currentUser = user
                     ANISessionManager.shared.isAnonymous = false

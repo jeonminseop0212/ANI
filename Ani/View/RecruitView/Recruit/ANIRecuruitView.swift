@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import FirebaseDatabase
+import FirebaseFirestore
 import CodableFirebase
 
 protocol ANIRecruitViewDelegate {
@@ -180,34 +180,40 @@ extension ANIRecuruitView {
     }
     
     DispatchQueue.global().async {
-      let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_RECRUITS).queryLimited(toFirst: 20).observeSingleEvent(of: .value, with: { (snapshot) in
+      let database = Firestore.firestore()
+      
+      database.collection(KEY_RECRUITS).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+
+          return
+        }
         
-        for item in snapshot.children {
-          if let snapshot = item as? DataSnapshot, let value = snapshot.value {
-            do {
-              let recruit = try FirebaseDecoder().decode(FirebaseRecruit.self, from: value)
-              self.recruits.insert(recruit, at: 0)
-              
-              DispatchQueue.main.async {
-                if let sender = sender {
-                  sender.endRefreshing()
-                }
-                
-                guard let recruitTableView = self.recruitTableView else { return }
-                recruitTableView.reloadData()
-              }
-            } catch let error {
-              print(error)
-              
+        guard let snapshot = snapshot else { return }
+        
+        for document in snapshot.documents {
+          do {
+            let recruit = try FirebaseDecoder().decode(FirebaseRecruit.self, from: document.data())
+            self.recruits.append(recruit)
+
+            DispatchQueue.main.async {
               if let sender = sender {
                 sender.endRefreshing()
               }
+
+              guard let recruitTableView = self.recruitTableView else { return }
+              recruitTableView.reloadData()
+            }
+          } catch let error {
+            print(error)
+
+            if let sender = sender {
+              sender.endRefreshing()
             }
           }
         }
         
-        if let sender = sender, snapshot.value as? [String: AnyObject] == nil {
+        if let sender = sender, snapshot.documents.isEmpty {
           sender.endRefreshing()
         }
       })

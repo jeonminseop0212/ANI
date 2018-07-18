@@ -10,7 +10,7 @@ import UIKit
 import Gallery
 import TinyConstraints
 import FirebaseStorage
-import FirebaseDatabase
+import FirebaseFirestore
 import CodableFirebase
 
 enum BasicInfoPickMode {
@@ -259,19 +259,23 @@ class ANIRecruitContributionViewController: UIViewController {
     return croppedImages
   }
   
-  private func upateDatabase(recruit: FirebaseRecruit, databaseRecruitRef: DatabaseReference) {
+  private func upateDatabase(recruit: FirebaseRecruit, id: String) {
     if recruit.headerImageUrl != nil && recruit.introduceImageUrls != nil {
       do {
-        if let data = try FirebaseEncoder().encode(recruit) as? [String : AnyObject] {
-          databaseRecruitRef.updateChildValues(data)
-          
-          do {
-            let databaseRef = Database.database().reference()
-            if let currentUserUid = ANISessionManager.shared.currentUserUid, let id = recruit.id {
-              let value: [String: Bool] = [id: true]
-              databaseRef.child(KEY_POST_RECRUIT_IDS).child(currentUserUid).updateChildValues(value)
-            }
+        let database = Firestore.firestore()
+
+        let data = try FirestoreEncoder().encode(recruit) as [String: AnyObject]
+        database.collection(KEY_RECRUITS).document(id).setData(data) { error in
+          if let error = error {
+            print("Error set document: \(error)")
+            return
           }
+        }
+        
+        if let currentUserUid = ANISessionManager.shared.currentUserUid, let id = recruit.id {
+          let date = ANIFunction.shared.getToday()
+          let value: [String: String] = [id: date]
+          database.collection(KEY_POST_RECRUIT_IDS).document(currentUserUid).setData(value, options: .merge())
         }
       } catch let error {
         print(error)
@@ -449,10 +453,9 @@ extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
         
         let storageRef = Storage.storage().reference()
         
-        let detabaseRef = Database.database().reference()
-        let databaseRecruitRef = detabaseRef.child(KEY_RECRUITS).childByAutoId()
-        let id = databaseRecruitRef.key
-        var recruit = FirebaseRecruit(id: id, headerImageUrl: nil, title: recruitInfo.title, kind: recruitInfo.kind, age: recruitInfo.age, sex: recruitInfo.sex, home: recruitInfo.home, vaccine: recruitInfo.vaccine, castration: recruitInfo.castration, reason: recruitInfo.reason, introduce: recruitInfo.introduce, introduceImageUrls: nil, passing: recruitInfo.passing, isRecruit: true, userId: userId, loveIds: nil, supportIds: nil)
+        let id = NSUUID().uuidString
+        let date = ANIFunction.shared.getToday()
+        var recruit = FirebaseRecruit(id: id, headerImageUrl: nil, title: recruitInfo.title, kind: recruitInfo.kind, age: recruitInfo.age, sex: recruitInfo.sex, home: recruitInfo.home, vaccine: recruitInfo.vaccine, castration: recruitInfo.castration, reason: recruitInfo.reason, introduce: recruitInfo.introduce, introduceImageUrls: nil, passing: recruitInfo.passing, isRecruit: true, userId: userId, date: date)
         
         DispatchQueue.global().async {
           if let recruitHeaderImageData = UIImageJPEGRepresentation(recruitInfo.headerImage, 0.5) {
@@ -467,7 +470,7 @@ extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
                 recruit.headerImageUrl = recruitHeaderImageUrl.absoluteString
                 
                 DispatchQueue.main.async {
-                  self.upateDatabase(recruit: recruit, databaseRecruitRef: databaseRecruitRef)
+                  self.upateDatabase(recruit: recruit, id: id)
                 }
               }
             }
@@ -497,7 +500,7 @@ extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
                     recruit.introduceImageUrls = urls
                     
                     DispatchQueue.main.async {
-                      self.upateDatabase(recruit: recruit, databaseRecruitRef: databaseRecruitRef)
+                      self.upateDatabase(recruit: recruit, id: id)
                     }
                   }
                 }
