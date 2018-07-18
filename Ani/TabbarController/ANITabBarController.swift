@@ -8,7 +8,7 @@
 
 import UIKit
 import FirebaseAuth
-import FirebaseDatabase
+import FirebaseFirestore
 import CodableFirebase
 import NVActivityIndicatorView
 
@@ -41,11 +41,14 @@ class ANITabBarController: UITabBarController, NVActivityIndicatorViewable {
       let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.green)
       NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData, nil)
       
+      let database = Firestore.firestore()
       DispatchQueue.global().async {
-        Database.database().reference().child(KEY_USERS).child(currentUserUid).observe(.value, with: { (snapshot) in
-          guard let value = snapshot.value else { return }
+        database.collection(KEY_USERS).document(currentUserUid).addSnapshotListener({ (snapshot, error) in
+          guard let snapshot = snapshot, let value = snapshot.data() else { return }
+          
           do {
-            let user = try FirebaseDecoder().decode(FirebaseUser.self, from: value)
+            let user = try FirestoreDecoder().decode(FirebaseUser.self, from: value)
+            
             DispatchQueue.main.async {
               ANISessionManager.shared.currentUser = user
               ANISessionManager.shared.isAnonymous = false

@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import FirebaseDatabase
+import FirebaseFirestore
 import CodableFirebase
 
 protocol ANISupportViewDelegate {
@@ -105,7 +105,8 @@ class ANISupportView: UIView {
           let messageTextView = self.messageTextView,
           let message = messageTextView.text else { return }
     
-    let databaseRef = Database.database().reference()
+    let database = Firestore.firestore()
+    
     DispatchQueue.global().async {
       do {
         var noti = ""
@@ -116,9 +117,10 @@ class ANISupportView: UIView {
         }
         let date = ANIFunction.shared.getToday()
         let notification = FirebaseNotification(userId: currentUserId, noti: noti, kind: KEY_NOTI_KIND_STROY, notiId: storyId, commentId: nil, updateDate: date)
+        
         if let data = try FirebaseEncoder().encode(notification) as? [String: AnyObject] {
-          
-          databaseRef.child(KEY_NOTIFICATIONS).child(userId).childByAutoId().updateChildValues(data)
+          let id = NSUUID().uuidString
+          database.collection(KEY_NOTIFICATIONS).document(userId).setData([id : data], options: .merge())
         }
       } catch let error {
         print(error)
@@ -136,29 +138,26 @@ extension ANISupportView: ANIButtonViewDelegate {
             let messageTextView = self.messageTextView,
             let uid = ANISessionManager.shared.currentUserUid else { return }
       
-      let databaseRef = Database.database().reference()
-      let databaseStoryRef = databaseRef.child(KEY_STORIES).childByAutoId()
-      let id = databaseStoryRef.key
+      let database = Firestore.firestore()
+      let id = NSUUID().uuidString
       let story = FirebaseStory(id: id, storyImageUrls: nil, story: messageTextView.text, userId: uid, loveIds: nil, commentIds: nil, recruitId: recruitId, recruitTitle: recruit.title, recruitSubTitle: recruit.reason)
       
       DispatchQueue.global().async {
         do {
-          if let data = try FirebaseEncoder().encode(story) as? [String : AnyObject] {
-            databaseStoryRef.updateChildValues(data)
-          }
+          guard let data = try FirebaseEncoder().encode(story) as? [String : AnyObject] else { return }
           
-          if let id = story.id {
-            let detabaseUsersRef = databaseRef.child(KEY_USERS).child(uid).child(KEY_POST_STORY_IDS)
-            let value: [String: Bool] = [id: true]
-            detabaseUsersRef.updateChildValues(value)
-          }
+          database.collection(KEY_STORIES).document(id).setData(data)
+
+          let date = ANIFunction.shared.getToday()
+          let value: [String: String] = [id: date]
+          database.collection(KEY_POST_STORY_IDS).document(uid).setData(value, options: .merge())
         } catch let error {
           print(error)
         }
       }
       
       DispatchQueue.global().async {
-        databaseRef.child(KEY_RECRUITS).child(recruitId).child(KEY_SUPPORT_RECRUIT_IDS).updateChildValues([uid: true])
+        database.collection(KEY_RECRUITS).document(recruitId).collection(KEY_SUPPORT_RECRUIT_IDS).document(uid).setData([uid: true], options: .merge())
       }
       
       updateNoti(storyId: id)
