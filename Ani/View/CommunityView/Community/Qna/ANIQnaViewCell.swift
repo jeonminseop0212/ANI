@@ -39,12 +39,14 @@ class ANIQnaViewCell: UITableViewCell {
       loadUser()
       isLoved()
       observeLove()
+      observeComment()
     }
   }
   
   private var user: FirebaseUser?
   
   private var loveListener: ListenerRegistration?
+  private var commentListener: ListenerRegistration?
   
   var delegate: ANIQnaViewCellDelegate?
   
@@ -268,6 +270,37 @@ class ANIQnaViewCell: UITableViewCell {
     guard let loveListener = self.loveListener else { return }
     
     loveListener.remove()
+  }
+  
+  private func observeComment() {
+    guard let qna = self.qna,
+          let qnaId = qna.id,
+          let commentCountLabel = self.commentCountLabel else { return }
+    
+    let database = Firestore.firestore()
+    DispatchQueue.global().async {
+      self.commentListener = database.collection(KEY_QNAS).document(qnaId).collection(KEY_COMMENTS).addSnapshotListener({ (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
+        
+        DispatchQueue.main.async {
+          if let snapshot = snapshot {
+            commentCountLabel.text = "\(snapshot.documents.count)"
+          } else {
+            commentCountLabel.text = "0"
+          }
+        }
+      })
+    }
+  }
+  
+  func unobserveComment() {
+    guard let commentListener = self.commentListener else { return }
+    
+    commentListener.remove()
   }
   
   private func isLoved() {

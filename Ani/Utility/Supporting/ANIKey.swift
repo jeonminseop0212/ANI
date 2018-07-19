@@ -48,7 +48,6 @@ let KEY_RECRUIT_SEX = "sex"
 //story
 let KEY_STORY_IMAGES = "story_images"
 let KEY_STORIES = "stories"
-let KEY_COMMENT_IDS = "commentIds"
 
 //qna
 let KEY_QNA_IMAGES = "qna_images"

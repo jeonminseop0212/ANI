@@ -118,6 +118,7 @@ extension ANIQnaView: UITableViewDelegate {
   func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
     if let cell = cell as? ANIQnaViewCell {
       cell.unobserveLove()
+      cell.unobserveComment()
     }
   }
 }
@@ -159,7 +160,7 @@ extension ANIQnaView {
         
         for document in snapshot.documents {
           do {
-            let qna = try FirebaseDecoder().decode(FirebaseQna.self.self, from: document.data())
+            let qna = try FirestoreDecoder().decode(FirebaseQna.self.self, from: document.data())
             self.qnas.append(qna)
             
             DispatchQueue.main.async {

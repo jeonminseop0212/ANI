@@ -13,4 +13,5 @@ struct FirebaseComment: Codable {
   let comment: String
   let loveCount: Int
   let commentCount: Int
+  let date: String
 }

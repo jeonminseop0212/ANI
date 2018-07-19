@@ -193,7 +193,7 @@ extension ANIRecuruitView {
         
         for document in snapshot.documents {
           do {
-            let recruit = try FirebaseDecoder().decode(FirebaseRecruit.self, from: document.data())
+            let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: document.data())
             self.recruits.append(recruit)
 
             DispatchQueue.main.async {
