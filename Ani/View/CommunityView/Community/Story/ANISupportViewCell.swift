@@ -50,6 +50,7 @@ class ANISupportViewCell: UITableViewCell {
       loadUser()
       isLoved()
       observeLove()
+      observeComment()
     }
   }
   
@@ -64,6 +65,7 @@ class ANISupportViewCell: UITableViewCell {
   private var recruitUser: FirebaseUser?
   
   private var loveListener: ListenerRegistration?
+  private var commentListener: ListenerRegistration?
   
   override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -424,6 +426,37 @@ class ANISupportViewCell: UITableViewCell {
     loveListener.remove()
   }
   
+  private func observeComment() {
+    guard let story = self.story,
+      let storyId = story.id,
+      let commentCountLabel = self.commentCountLabel else { return }
+    
+    let database = Firestore.firestore()
+    DispatchQueue.global().async {
+      self.commentListener = database.collection(KEY_STORIES).document(storyId).collection(KEY_COMMENTS).addSnapshotListener({ (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
+        
+        DispatchQueue.main.async {
+          if let snapshot = snapshot {
+            commentCountLabel.text = "\(snapshot.documents.count)"
+          } else {
+            commentCountLabel.text = "0"
+          }
+        }
+      })
+    }
+  }
+  
+  func unobserveComment() {
+    guard let commentListener = self.commentListener else { return }
+    
+    commentListener.remove()
+  }
+  
   private func isLoved() {
     guard let story = self.story,
           let storyId = story.id,
@@ -469,10 +502,9 @@ class ANISupportViewCell: UITableViewCell {
         let noti = "\(currentUserName)さんが「\(story.story)」ストーリーを「いいね」しました。"
         let date = ANIFunction.shared.getToday()
         let notification = FirebaseNotification(userId: currentUserId, noti: noti, kind: KEY_NOTI_KIND_STROY, notiId: storyId, commentId: nil, updateDate: date)
-        if let data = try FirebaseEncoder().encode(notification) as? [String: AnyObject] {
+        let data = try FirestoreEncoder().encode(notification)
           
-          database.collection(KEY_NOTIFICATIONS).document(userId).setData([storyId : data], options: .merge())
-        }
+        database.collection(KEY_NOTIFICATIONS).document(userId).setData([storyId : data], options: .merge())
       } catch let error {
         print(error)
       }
@@ -580,7 +612,7 @@ extension ANISupportViewCell {
         guard let snapshot = snapshot, let data = snapshot.data() else { return }
         
         do {
-          let recruit = try FirebaseDecoder().decode(FirebaseRecruit.self, from: data)
+          let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: data)
           self.recruit = recruit
 
           DispatchQueue.main.async {

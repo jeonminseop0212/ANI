@@ -134,8 +134,10 @@ extension ANIStoryView: UITableViewDelegate {
     if !stories.isEmpty {
       if stories[indexPath.row].recruitId != nil, let cell = cell as? ANISupportViewCell {
         cell.unobserveLove()
+        cell.unobserveComment()
       } else if let cell = cell as? ANIStoryViewCell {
         cell.unobserveLove()
+        cell.unobserveComment()
       }
     }
   }
@@ -189,7 +191,7 @@ extension ANIStoryView {
         
         for document in snapshot.documents {
           do {
-            let story = try FirebaseDecoder().decode(FirebaseStory.self, from: document.data())
+            let story = try FirestoreDecoder().decode(FirebaseStory.self, from: document.data())
             self.stories.append(story)
             
             DispatchQueue.main.async {
