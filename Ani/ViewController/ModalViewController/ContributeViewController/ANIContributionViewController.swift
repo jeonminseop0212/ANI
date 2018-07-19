@@ -10,7 +10,7 @@ import UIKit
 import Gallery
 import TinyConstraints
 import FirebaseStorage
-import FirebaseDatabase
+import FirebaseFirestore
 import CodableFirebase
 import InstantSearchClient
 
@@ -188,14 +188,13 @@ class ANIContributionViewController: UIViewController {
                   urls.append(url.value)
                 }
                 
-                let detabaseRef = Database.database().reference()
-                let databaseStoryRef = detabaseRef.child(KEY_STORIES).childByAutoId()
-                let id = databaseStoryRef.key
+                let id = NSUUID().uuidString
+                let date = ANIFunction.shared.getToday()
                 let content = contriButionView.getContent()
-                let story = FirebaseStory(id: id, storyImageUrls: urls, story: content, userId: uid, loveIds: nil, commentIds: nil, recruitId: nil, recruitTitle: nil, recruitSubTitle: nil)
+                let story = FirebaseStory(id: id, storyImageUrls: urls, story: content, userId: uid, loveIds: nil, commentIds: nil, recruitId: nil, recruitTitle: nil, recruitSubTitle: nil, date: date)
                 
                 DispatchQueue.main.async {
-                  self.upateStroyDatabase(story: story, databaseStoryRef: databaseStoryRef)
+                  self.upateStroyDatabase(story: story, id: id)
                 }
               }
             }
@@ -215,14 +214,13 @@ class ANIContributionViewController: UIViewController {
     
     DispatchQueue.global().async {
       if self.contentImages.isEmpty {
-        let detabaseRef = Database.database().reference()
-        let databaseQnaRef = detabaseRef.child(KEY_QNAS).childByAutoId()
-        let id = databaseQnaRef.key
+        let id = NSUUID().uuidString
+        let date = ANIFunction.shared.getToday()
         let content = contriButionView.getContent()
-        let qna = FirebaseQna(id: id, qnaImageUrls: nil, qna: content, userId: uid, loveIds: nil, commentIds: nil)
+        let qna = FirebaseQna(id: id, qnaImageUrls: nil, qna: content, userId: uid, loveIds: nil, commentIds: nil, date: date)
         
         DispatchQueue.main.async {
-          self.upateQnaDatabase(qna: qna, databaseQnaRef: databaseQnaRef)
+          self.upateQnaDatabase(qna: qna, id: id)
         }
       } else {
         for (index, contentImage) in self.contentImages.enumerated() {
@@ -243,14 +241,13 @@ class ANIContributionViewController: UIViewController {
                     urls.append(url.value)
                   }
                   
-                  let detabaseRef = Database.database().reference()
-                  let databaseQnaRef = detabaseRef.child(KEY_QNAS).childByAutoId()
-                  let id = databaseQnaRef.key
+                  let id = NSUUID().uuidString
+                  let date = ANIFunction.shared.getToday()
                   let content = contriButionView.getContent()
-                  let qna = FirebaseQna(id: id, qnaImageUrls: urls, qna: content, userId: uid, loveIds: nil, commentIds: nil)
+                  let qna = FirebaseQna(id: id, qnaImageUrls: urls, qna: content, userId: uid, loveIds: nil, commentIds: nil, date: date)
                   
                   DispatchQueue.main.async {
-                    self.upateQnaDatabase(qna: qna, databaseQnaRef: databaseQnaRef)
+                    self.upateQnaDatabase(qna: qna, id: id)
                   }
                 }
               }
@@ -261,37 +258,49 @@ class ANIContributionViewController: UIViewController {
     }
   }
   
-  private func upateStroyDatabase(story: FirebaseStory, databaseStoryRef: DatabaseReference) {
+  private func upateStroyDatabase(story: FirebaseStory, id: String) {
     do {
+      let database = Firestore.firestore()
+
       if let data = try FirebaseEncoder().encode(story) as? [String : AnyObject] {
-        databaseStoryRef.updateChildValues(data)
+        database.collection(KEY_STORIES).document(id).setData(data) { error in
+          if let error = error {
+            print("Error set document: \(error)")
+            return
+          }
+        }
         
         pushDataAlgolia(data: data)
       }
-      do {
-        let detabaseRef = Database.database().reference()
-        if let currentUserUid = ANISessionManager.shared.currentUserUid, let id = story.id {
-          let value: [String: Bool] = [id: true]
-          detabaseRef.child(KEY_POST_STORY_IDS).child(currentUserUid).updateChildValues(value)
-        }
+      if let currentUserUid = ANISessionManager.shared.currentUserUid, let id = story.id {
+        let date = ANIFunction.shared.getToday()
+        let value: [String: String] = [id: date]
+        database.collection(KEY_POST_STORY_IDS).document(currentUserUid).setData(value, options: .merge())
       }
     } catch let error {
       print(error)
     }
   }
   
-  private func upateQnaDatabase(qna: FirebaseQna, databaseQnaRef: DatabaseReference) {
+  private func upateQnaDatabase(qna: FirebaseQna, id: String) {
     do {
+      let database = Firestore.firestore()
+
       if let data = try FirebaseEncoder().encode(qna) as? [String : AnyObject] {
-        databaseQnaRef.updateChildValues(data)
+        database.collection(KEY_QNAS).document(id).setData(data) { error in
+          if let error = error {
+            print("Error set document: \(error)")
+            return
+          }
+        }
         
         pushDataAlgolia(data: data)
       }
       do {
-        let detabaseRef = Database.database().reference()
         if let currentUser = ANISessionManager.shared.currentUser, let uid = currentUser.uid, let id = qna.id {
-          let value: [String: Bool] = [id: true]
-          detabaseRef.child(KEY_POST_QNA_IDS).child(uid).updateChildValues(value)
+          let date = ANIFunction.shared.getToday()
+          let value: [String: String] = [id: date]
+          database.collection(KEY_POST_QNA_IDS).document(uid).setData(value, options: .merge())
         }
       }
     } catch let error {
