@@ -272,10 +272,10 @@ class ANIContributionViewController: UIViewController {
         
         pushDataAlgolia(data: data)
       }
+      
       if let currentUserUid = ANISessionManager.shared.currentUserUid, let id = story.id {
         let date = ANIFunction.shared.getToday()
-        let value: [String: String] = [id: date]
-        database.collection(KEY_POST_STORY_IDS).document(currentUserUid).setData(value, options: .merge())
+        database.collection(KEY_USERS).document(currentUserUid).collection(KEY_POST_STORY_IDS).document(id).setData([KEY_DATE: date])
       }
     } catch let error {
       print(error)
@@ -296,12 +296,10 @@ class ANIContributionViewController: UIViewController {
         
         pushDataAlgolia(data: data)
       }
-      do {
-        if let currentUser = ANISessionManager.shared.currentUser, let uid = currentUser.uid, let id = qna.id {
-          let date = ANIFunction.shared.getToday()
-          let value: [String: String] = [id: date]
-          database.collection(KEY_POST_QNA_IDS).document(uid).setData(value, options: .merge())
-        }
+      
+      if let currentUserUid = ANISessionManager.shared.currentUserUid, let id = qna.id {
+        let date = ANIFunction.shared.getToday()
+        database.collection(KEY_USERS).document(currentUserUid).collection(KEY_POST_QNA_IDS).document(id).setData([KEY_DATE: date])
       }
     } catch let error {
       print(error)

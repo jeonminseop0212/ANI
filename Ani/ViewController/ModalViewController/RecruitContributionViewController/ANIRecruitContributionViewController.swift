@@ -259,7 +259,7 @@ class ANIRecruitContributionViewController: UIViewController {
     return croppedImages
   }
   
-  private func upateDatabase(recruit: FirebaseRecruit, id: String) {
+  private func updateDatabase(recruit: FirebaseRecruit, id: String) {
     if recruit.headerImageUrl != nil && recruit.introduceImageUrls != nil {
       do {
         let database = Firestore.firestore()
@@ -274,8 +274,7 @@ class ANIRecruitContributionViewController: UIViewController {
         
         if let currentUserUid = ANISessionManager.shared.currentUserUid, let id = recruit.id {
           let date = ANIFunction.shared.getToday()
-          let value: [String: String] = [id: date]
-          database.collection(KEY_POST_RECRUIT_IDS).document(currentUserUid).setData(value, options: .merge())
+          database.collection(KEY_USERS).document(currentUserUid).collection(KEY_POST_RECRUIT_IDS).document(id).setData([KEY_DATE: date])
         }
       } catch let error {
         print(error)
@@ -470,7 +469,7 @@ extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
                 recruit.headerImageUrl = recruitHeaderImageUrl.absoluteString
                 
                 DispatchQueue.main.async {
-                  self.upateDatabase(recruit: recruit, id: id)
+                  self.updateDatabase(recruit: recruit, id: id)
                 }
               }
             }
@@ -500,7 +499,7 @@ extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
                     recruit.introduceImageUrls = urls
                     
                     DispatchQueue.main.async {
-                      self.upateDatabase(recruit: recruit, id: id)
+                      self.updateDatabase(recruit: recruit, id: id)
                     }
                   }
                 }

@@ -350,7 +350,7 @@ class ANIQnaViewCell: UITableViewCell {
         let notification = FirebaseNotification(userId: currentUserId, noti: noti, kind: KEY_NOTI_KIND_QNA, notiId: qnaId, commentId: nil, updateDate: date)
         if let data = try FirebaseEncoder().encode(notification) as? [String: AnyObject] {
           
-          database.collection(KEY_NOTIFICATIONS).document(userId).setData([qnaId : data], options: .merge())
+          database.collection(KEY_USERS).document(userId).collection(KEY_NOTIFICATIONS).document(qnaId).setData(data)
         }
       } catch let error {
         print(error)
@@ -370,15 +370,16 @@ class ANIQnaViewCell: UITableViewCell {
     if loveButton.isSelected == true {
       DispatchQueue.global().async {
         database.collection(KEY_QNAS).document(qnaId).collection(KEY_LOVE_IDS).document(currentUserId).setData([currentUserId: true])
+        
         let date = ANIFunction.shared.getToday()
-        database.collection(KEY_LOVE_QNA_IDS).document(currentUserId).setData([qnaId: date], options: .merge())
+        database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_QNA_IDS).document(qnaId).setData([KEY_DATE: date])
         
         self.updateNoti()
       }
     } else {
       DispatchQueue.global().async {
         database.collection(KEY_QNAS).document(qnaId).collection(KEY_LOVE_IDS).document(currentUserId).delete()
-        database.collection(KEY_LOVE_QNA_IDS).document(currentUserId).updateData([qnaId: FieldValue.delete()])
+        database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_QNA_IDS).document(qnaId).delete()
       }
     }
   }
