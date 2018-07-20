@@ -189,8 +189,10 @@ extension ANIQnaView {
           }
         }
         
-        if let sender = sender, snapshot.documents.isEmpty {
-          sender.endRefreshing()
+        if snapshot.documents.isEmpty {
+          if let sender = sender {
+            sender.endRefreshing()
+          }
           
           activityIndicatorView.stopAnimating()
         }

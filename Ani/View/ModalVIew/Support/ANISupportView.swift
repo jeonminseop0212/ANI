@@ -118,10 +118,9 @@ class ANISupportView: UIView {
         let date = ANIFunction.shared.getToday()
         let notification = FirebaseNotification(userId: currentUserId, noti: noti, kind: KEY_NOTI_KIND_STROY, notiId: storyId, commentId: nil, updateDate: date)
         
-        if let data = try FirebaseEncoder().encode(notification) as? [String: AnyObject] {
-          let id = NSUUID().uuidString
-          database.collection(KEY_NOTIFICATIONS).document(userId).setData([id : data], options: .merge())
-        }
+        let data = try FirestoreEncoder().encode(notification)
+        let id = NSUUID().uuidString
+        database.collection(KEY_USERS).document(userId).collection(KEY_NOTIFICATIONS).document(id).setData(data)
       } catch let error {
         print(error)
       }
@@ -150,15 +149,15 @@ extension ANISupportView: ANIButtonViewDelegate {
           database.collection(KEY_STORIES).document(id).setData(data)
 
           let date = ANIFunction.shared.getToday()
-          let value: [String: String] = [id: date]
-          database.collection(KEY_POST_STORY_IDS).document(uid).setData(value, options: .merge())
+          let value: [String: String] = [KEY_DATE: date]
+          database.collection(KEY_USERS).document(uid).collection(KEY_POST_STORY_IDS).document(id).setData(value)
         } catch let error {
           print(error)
         }
       }
       
       DispatchQueue.global().async {
-        database.collection(KEY_RECRUITS).document(recruitId).collection(KEY_SUPPORT_RECRUIT_IDS).document(uid).setData([uid: true], options: .merge())
+        database.collection(KEY_RECRUITS).document(recruitId).collection(KEY_SUPPORT_IDS).document(uid).setData([uid: true], options: .merge())
       }
       
       updateNoti(storyId: id)

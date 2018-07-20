@@ -344,7 +344,7 @@ class ANIStoryViewCell: UITableViewCell {
         let notification = FirebaseNotification(userId: currentUserId, noti: noti, kind: KEY_NOTI_KIND_STROY, notiId: storyId, commentId: nil, updateDate: date)
         let data = try FirestoreEncoder().encode(notification)
           
-        database.collection(KEY_NOTIFICATIONS).document(userId).setData([storyId : data], options: .merge())
+        database.collection(KEY_USERS).document(userId).collection(KEY_NOTIFICATIONS).document(storyId).setData(data)
       } catch let error {
         print(error)
       }
@@ -364,14 +364,14 @@ class ANIStoryViewCell: UITableViewCell {
       DispatchQueue.global().async {
         database.collection(KEY_STORIES).document(storyId).collection(KEY_LOVE_IDS).document(currentUserId).setData([currentUserId: true])
         let date = ANIFunction.shared.getToday()
-        database.collection(KEY_LOVE_STORY_IDS).document(currentUserId).setData([storyId: date], options: .merge())
+        database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_STORY_IDS).document(storyId).setData([KEY_DATE: date])
         
         self.updateNoti()
       }
     } else {
       DispatchQueue.global().async {
         database.collection(KEY_STORIES).document(storyId).collection(KEY_LOVE_IDS).document(currentUserId).delete()
-        database.collection(KEY_LOVE_STORY_IDS).document(currentUserId).updateData([storyId: FieldValue.delete()])
+        database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_STORY_IDS).document(storyId).delete()
       }
     }
   }

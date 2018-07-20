@@ -375,7 +375,7 @@ class ANIRecruitViewCell: UITableViewCell {
     
     let database = Firestore.firestore()
     DispatchQueue.global().async {
-      self.supportListener = database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_SUPPORT_RECRUIT_IDS).addSnapshotListener({ (snapshot, error) in
+      self.supportListener = database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_SUPPORT_IDS).addSnapshotListener({ (snapshot, error) in
         if let error = error {
           print("Error get document: \(error)")
           
@@ -436,8 +436,9 @@ class ANIRecruitViewCell: UITableViewCell {
           let currentUserId = ANISessionManager.shared.currentUserUid else { return }
     
     let database = Firestore.firestore()
+    
     DispatchQueue.global().async {
-      database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_SUPPORT_RECRUIT_IDS).getDocuments(completion: { (snapshot, error) in
+      database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_SUPPORT_IDS).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           print("Error get document: \(error)")
           
@@ -465,6 +466,7 @@ class ANIRecruitViewCell: UITableViewCell {
           let currentUserId = ANISessionManager.shared.currentUserUid else { return }
 
     let database = Firestore.firestore()
+    
     DispatchQueue.global().async {
       database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_CLIP_IDS).getDocuments(completion: { (snapshot, error) in
         if let error = error {
@@ -506,7 +508,7 @@ class ANIRecruitViewCell: UITableViewCell {
         let notification = FirebaseNotification(userId: currentUserId, noti: noti, kind: KEY_NOTI_KIND_RECRUIT, notiId: recuritId, commentId: nil, updateDate: date)
         let data = try FirestoreEncoder().encode(notification)
 
-        database.collection(KEY_NOTIFICATIONS).document(userId).setData([recuritId : data], options: .merge())
+        database.collection(KEY_USERS).document(userId).collection(KEY_NOTIFICATIONS).document(recuritId).setData(data)
       } catch let error {
         print(error)
       }
@@ -525,15 +527,16 @@ class ANIRecruitViewCell: UITableViewCell {
     if loveButton.isSelected == true {
       DispatchQueue.global().async {
         database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_LOVE_IDS).document(currentUserId).setData([currentUserId: true])
+        
         let date = ANIFunction.shared.getToday()
-        database.collection(KEY_LOVE_RECRUIT_IDS).document(currentUserId).setData([recuritId: date], options: .merge())
+        database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_RECRUIT_IDS).document(recuritId).setData([KEY_DATE: date])
 
         self.updateNoti()
       }
     } else {
       DispatchQueue.global().async {
         database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_LOVE_IDS).document(currentUserId).delete()
-        database.collection(KEY_LOVE_RECRUIT_IDS).document(currentUserId).updateData([recuritId: FieldValue.delete()])
+        database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_RECRUIT_IDS).document(recuritId).delete()
       }
     }
   }
@@ -569,7 +572,7 @@ class ANIRecruitViewCell: UITableViewCell {
         DispatchQueue.global().async {
         database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_CLIP_IDS).document(currentUserId).setData([currentUserId: true])
           let date = ANIFunction.shared.getToday()
-          database.collection(KEY_CLIP_RECRUIT_IDS).document(currentUserId).setData([recuritId: date], options: .merge())
+          database.collection(KEY_USERS).document(currentUserId).collection(KEY_CLIP_RECRUIT_IDS).document(recuritId).setData([KEY_DATE: date])
         }
       } else {
         UIView.animate(withDuration: 0.15) {
@@ -578,7 +581,7 @@ class ANIRecruitViewCell: UITableViewCell {
         
         DispatchQueue.global().async {
           database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_CLIP_IDS).document(currentUserId).delete()
-          database.collection(KEY_CLIP_RECRUIT_IDS).document(currentUserId).updateData([recuritId: FieldValue.delete()])
+          database.collection(KEY_USERS).document(currentUserId).collection(KEY_CLIP_RECRUIT_IDS).document(recuritId).delete()
         }
       }
     } else {
