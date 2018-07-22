@@ -112,6 +112,7 @@ class ANIProfileViewController: UIViewController {
     //profileBasicView
     let profileBasicView = ANIProfileBasicView()
     profileBasicView.currentUser = currentUser
+    profileBasicView.loadData()
     profileBasicView.delegate = self
     self.view.addSubview(profileBasicView)
     profileBasicView.topToBottom(of: myNavigationBar)
@@ -280,6 +281,7 @@ extension ANIProfileViewController: ANIProfileBasicViewDelegate {
 extension ANIProfileViewController: ANIProfileEditViewControllerDelegate {
   func didEdit() {
     guard let profileBasicView = self.profileBasicView else { return }
+    
     profileBasicView.currentUser = currentUser
   }
 }

@@ -36,12 +36,13 @@ class ANIProfileCell: UITableViewCell {
     }
   }
   
+  var followListener: ListenerRegistration?
+  
   var delegate: ANIProfileCellDelegate?
     
   override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     setup()
-    observeUserFollow()
     setupNotifications()
   }
   
@@ -180,7 +181,7 @@ class ANIProfileCell: UITableViewCell {
     self.introductionLabel = introductionLabel
   }
   
-  private func reloadLayout() {
+  @objc private func reloadLayout() {
     guard let nameLabel = self.nameLabel,
           let groupLabel = self.groupLabel,
           let introduceBG = self.introduceBG,
@@ -199,15 +200,19 @@ class ANIProfileCell: UITableViewCell {
     } else {
       introduceBG.alpha = 0.0
     }
+    
+    observeFollow()
   }
   
-  @objc func observeUserFollow() {
+  private func observeFollow() {
     guard let currentUserId = ANISessionManager.shared.currentUserUid else { return }
+
+    followListener?.remove()
     
     let database = Firestore.firestore()
     
     DispatchQueue.global().async {
-      database.collection(KEY_USERS).document(currentUserId).collection(KEY_FOLLOWING_USER_IDS).addSnapshotListener({ (snapshot, error) in
+      self.followListener = database.collection(KEY_USERS).document(currentUserId).collection(KEY_FOLLOWING_USER_IDS).addSnapshotListener({ (snapshot, error) in
         if let error = error {
           print("Error get document: \(error)")
           
@@ -234,7 +239,7 @@ class ANIProfileCell: UITableViewCell {
   }
   
   private func setupNotifications() {
-    ANINotificationManager.receive(login: self, selector: #selector(observeUserFollow))
+    ANINotificationManager.receive(login: self, selector: #selector(reloadLayout))
   }
   
   //MARK: action

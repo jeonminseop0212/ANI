@@ -8,7 +8,6 @@
 
 import UIKit
 import FirebaseStorageUI
-import FirebaseDatabase
 
 class ANIFamilyView: UIView {
   
