@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import FirebaseDatabase
+import FirebaseFirestore
 import CodableFirebase
 import NVActivityIndicatorView
 
@@ -40,12 +40,16 @@ class ANINotiDetailView: UIView {
         loadRecruit(notiId: noti.notiId)
       case .story:
         loadStory(notiId: noti.notiId)
+        
+        if let commentId = noti.commentId {
+          loadComment(commentId: commentId, notiKind: .story)
+        }
       case .qna:
         loadQna(notiId: noti.notiId)
-      }
-      
-      if let commentId = noti.commentId {
-        loadComment(commentId: commentId)
+        
+        if let commentId = noti.commentId {
+          loadComment(commentId: commentId, notiKind: .qna)
+        }
       }
     }
   }
@@ -274,16 +278,22 @@ extension ANINotiDetailView {
   private func loadRecruit(notiId: String) {
     guard let activityIndicatorView = self.activityIndicatorView else { return }
     
-    let databaseRef = Database.database().reference()
+    let database = Firestore.firestore()
     
     activityIndicatorView.startAnimating()
     
     DispatchQueue.global().async {
-      databaseRef.child(KEY_RECRUITS).child(notiId).observeSingleEvent(of: .value, with: { (snapshot) in
+      database.collection(KEY_RECRUITS).document(notiId).getDocument(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
         
-        guard let value = snapshot.value else { return }
+        guard let snapshot = snapshot, let data = snapshot.data() else { return }
+        
         do {
-          let recruit = try FirebaseDecoder().decode(FirebaseRecruit.self, from: value)
+          let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: data)
           self.recruit = recruit
           
           DispatchQueue.main.async {
@@ -291,10 +301,7 @@ extension ANINotiDetailView {
           }
         } catch let error {
           print(error)
-          
-          activityIndicatorView.stopAnimating()
-        }
-        if snapshot.value as? [String: AnyObject] == nil {
+
           activityIndicatorView.stopAnimating()
         }
       })
@@ -304,16 +311,22 @@ extension ANINotiDetailView {
   private func loadStory(notiId: String) {
     guard let activityIndicatorView = self.activityIndicatorView else { return }
 
-    let databaseRef = Database.database().reference()
+    let database = Firestore.firestore()
     
     activityIndicatorView.startAnimating()
 
     DispatchQueue.global().async {
-      databaseRef.child(KEY_STORIES).child(notiId).observeSingleEvent(of: .value, with: { (snapshot) in
+      database.collection(KEY_STORIES).document(notiId).getDocument(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
         
-        guard let value = snapshot.value else { return }
+        guard let snapshot = snapshot, let data = snapshot.data() else { return }
+        
         do {
-          let story = try FirebaseDecoder().decode(FirebaseStory.self, from: value)
+          let story = try FirestoreDecoder().decode(FirebaseStory.self, from: data)
           self.story = story
           
           DispatchQueue.main.async {
@@ -324,9 +337,6 @@ extension ANINotiDetailView {
           
           activityIndicatorView.stopAnimating()
         }
-        if snapshot.value as? [String: AnyObject] == nil {
-          activityIndicatorView.stopAnimating()
-        }
       })
     }
   }
@@ -334,15 +344,22 @@ extension ANINotiDetailView {
   private func loadQna(notiId: String) {
     guard let activityIndicatorView = self.activityIndicatorView else { return }
 
-    let databaseRef = Database.database().reference()
+    let database = Firestore.firestore()
     
     activityIndicatorView.startAnimating()
     
     DispatchQueue.global().async {
-      databaseRef.child(KEY_QNAS).child(notiId).observeSingleEvent(of: .value, with: { (snapshot) in
-        guard let value = snapshot.value else { return }
+      database.collection(KEY_QNAS).document(notiId).getDocument(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
+        
+        guard let snapshot = snapshot, let data = snapshot.data() else { return }
+        
         do {
-          let qna = try FirebaseDecoder().decode(FirebaseQna.self, from: value)
+          let qna = try FirestoreDecoder().decode(FirebaseQna.self, from: data)
           self.qna = qna
           
           DispatchQueue.main.async {
@@ -350,29 +367,40 @@ extension ANINotiDetailView {
           }
         } catch let error {
           print(error)
-          
-          activityIndicatorView.stopAnimating()
-        }
-        if snapshot.value as? [String: AnyObject] == nil {
+
           activityIndicatorView.stopAnimating()
         }
       })
     }
   }
   
-  private func loadComment(commentId: String) {
+  private func loadComment(commentId: String, notiKind: NotiKind) {
     guard let noti = self.noti,
           let activityIndicatorView = self.activityIndicatorView else { return }
     
-    let databaseRef = Database.database().reference()
+    let database = Firestore.firestore()
     
     activityIndicatorView.startAnimating()
     
+    var collection: String = ""
+    if notiKind == .story {
+      collection = KEY_STORIES
+    } else if notiKind == .qna {
+      collection = KEY_QNAS
+    }
+    
     DispatchQueue.global().async {
-      databaseRef.child(KEY_COMMENTS).child(noti.notiId).child(commentId).observeSingleEvent(of: .value, with: { (snapshot) in
-        guard let value = snapshot.value else { return }
+      database.collection(collection).document(noti.notiId).collection(KEY_COMMENTS).document(commentId).getDocument(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
+        
+        guard let snapshot = snapshot, let data = snapshot.data() else { return }
+        
         do {
-          let comment = try FirebaseDecoder().decode(FirebaseComment.self, from: value)
+          let comment = try FirestoreDecoder().decode(FirebaseComment.self, from: data)
           self.comment = comment
           
           DispatchQueue.main.async {
@@ -381,9 +409,6 @@ extension ANINotiDetailView {
         } catch let error {
           print(error)
           
-          activityIndicatorView.stopAnimating()
-        }
-        if snapshot.value as? [String: AnyObject] == nil {
           activityIndicatorView.stopAnimating()
         }
       })
