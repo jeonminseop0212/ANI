@@ -262,20 +262,14 @@ class ANIContributionViewController: UIViewController {
     do {
       let database = Firestore.firestore()
 
-      if let data = try FirebaseEncoder().encode(story) as? [String : AnyObject] {
-        database.collection(KEY_STORIES).document(id).setData(data) { error in
-          if let error = error {
-            print("Error set document: \(error)")
-            return
-          }
+      let data = try FirestoreEncoder().encode(story)
+      database.collection(KEY_STORIES).document(id).setData(data) { error in
+        if let error = error {
+          print("Error set document: \(error)")
+          return
         }
         
-        pushDataAlgolia(data: data)
-      }
-      
-      if let currentUserUid = ANISessionManager.shared.currentUserUid, let id = story.id {
-        let date = ANIFunction.shared.getToday()
-        database.collection(KEY_USERS).document(currentUserUid).collection(KEY_POST_STORY_IDS).document(id).setData([KEY_DATE: date])
+        self.pushDataAlgolia(data: data as [String : AnyObject])
       }
     } catch let error {
       print(error)
@@ -286,20 +280,14 @@ class ANIContributionViewController: UIViewController {
     do {
       let database = Firestore.firestore()
 
-      if let data = try FirebaseEncoder().encode(qna) as? [String : AnyObject] {
-        database.collection(KEY_QNAS).document(id).setData(data) { error in
-          if let error = error {
-            print("Error set document: \(error)")
-            return
-          }
+      let data = try FirestoreEncoder().encode(qna)
+      database.collection(KEY_QNAS).document(id).setData(data) { error in
+        if let error = error {
+          print("Error set document: \(error)")
+          return
         }
         
-        pushDataAlgolia(data: data)
-      }
-      
-      if let currentUserUid = ANISessionManager.shared.currentUserUid, let id = qna.id {
-        let date = ANIFunction.shared.getToday()
-        database.collection(KEY_USERS).document(currentUserUid).collection(KEY_POST_QNA_IDS).document(id).setData([KEY_DATE: date])
+        self.pushDataAlgolia(data: data as [String : AnyObject])
       }
     } catch let error {
       print(error)

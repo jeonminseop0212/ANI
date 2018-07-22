@@ -126,6 +126,23 @@ class ANISupportView: UIView {
       }
     }
   }
+  
+  private func pushDataAlgolia(data: [String: AnyObject]) {
+    let index = ANISessionManager.shared.client.index(withName: KEY_STORIES_INDEX)
+    
+    var newData = data
+    if let objectId = data[KEY_ID] {
+      newData.updateValue(objectId, forKey: KEY_OBJECT_ID)
+    }
+    
+    DispatchQueue.global().async {
+      index.addObject(newData, completionHandler: { (content, error) -> Void in
+        if error == nil {
+          print("Object IDs: \(content!)")
+        }
+      })
+    }
+  }
 }
 
 //MARK: ANIButtonViewDelegate
@@ -144,13 +161,16 @@ extension ANISupportView: ANIButtonViewDelegate {
       
       DispatchQueue.global().async {
         do {
-          guard let data = try FirebaseEncoder().encode(story) as? [String : AnyObject] else { return }
+          let data = try FirestoreEncoder().encode(story)
           
-          database.collection(KEY_STORIES).document(id).setData(data)
-
-          let date = ANIFunction.shared.getToday()
-          let value: [String: String] = [KEY_DATE: date]
-          database.collection(KEY_USERS).document(uid).collection(KEY_POST_STORY_IDS).document(id).setData(value)
+          database.collection(KEY_STORIES).document(id).setData(data)  { error in
+            if let error = error {
+              print("Error set document: \(error)")
+              return
+            }
+            
+            self.pushDataAlgolia(data: data as [String : AnyObject])
+          }
         } catch let error {
           print(error)
         }

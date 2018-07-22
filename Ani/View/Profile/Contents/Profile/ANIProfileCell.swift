@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import FirebaseDatabase
+import FirebaseFirestore
 
 protocol ANIProfileCellDelegate {
   func followingTapped()
@@ -33,17 +33,6 @@ class ANIProfileCell: UITableViewCell {
   var user: FirebaseUser? {
     didSet {
       reloadLayout()
-    }
-  }
-  
-  private var followingUserIds = [String: String]() {
-    didSet {
-      reloadFollowLayout()
-    }
-  }
-  private var followerIds = [String: String](){
-    didSet {
-      reloadFollowLayout()
     }
   }
   
@@ -212,33 +201,35 @@ class ANIProfileCell: UITableViewCell {
     }
   }
   
-  private func reloadFollowLayout() {
-    guard let followingCountLabel = self.followingCountLabel,
-          let followerCountLabel = self.followerCountLabel else { return }
-    
-    followingCountLabel.text = "\(followingUserIds.count)"
-    followerCountLabel.text = "\(followerIds.count)"
-  }
-  
   @objc func observeUserFollow() {
     guard let currentUserId = ANISessionManager.shared.currentUserUid else { return }
     
-    let databaseRef = Database.database().reference()
+    let database = Firestore.firestore()
     
-    databaseRef.child(KEY_FOLLOWING_USER_IDS).child(currentUserId).observe(.value) { (snapshot) in
-      if let followingUserIds = snapshot.value as? [String: String] {
-        self.followingUserIds = followingUserIds
-      } else {
-        self.followingUserIds.removeAll()
-      }
-    }
-    
-    databaseRef.child(KEY_FOLLOWER_IDS).child(currentUserId).observe(.value) { (snapshot) in
-      if let followerIds = snapshot.value as? [String: String] {
-        self.followerIds = followerIds
-      } else {
-        self.followerIds.removeAll()
-      }
+    DispatchQueue.global().async {
+      database.collection(KEY_USERS).document(currentUserId).collection(KEY_FOLLOWING_USER_IDS).addSnapshotListener({ (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
+        
+        guard let snapshot = snapshot, let followingCountLabel = self.followingCountLabel else { return }
+        
+        followingCountLabel.text = "\(snapshot.documents.count)"
+      })
+      
+      database.collection(KEY_USERS).document(currentUserId).collection(KEY_FOLLOWER_IDS).addSnapshotListener({ (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
+        
+        guard let snapshot = snapshot, let followerCountLabel = self.followerCountLabel else { return }
+        
+        followerCountLabel.text = "\(snapshot.documents.count)"
+      })
     }
   }
   

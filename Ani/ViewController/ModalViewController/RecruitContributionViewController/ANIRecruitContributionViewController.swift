@@ -265,17 +265,8 @@ class ANIRecruitContributionViewController: UIViewController {
         let database = Firestore.firestore()
 
         let data = try FirestoreEncoder().encode(recruit) as [String: AnyObject]
-        database.collection(KEY_RECRUITS).document(id).setData(data) { error in
-          if let error = error {
-            print("Error set document: \(error)")
-            return
-          }
-        }
         
-        if let currentUserUid = ANISessionManager.shared.currentUserUid, let id = recruit.id {
-          let date = ANIFunction.shared.getToday()
-          database.collection(KEY_USERS).document(currentUserUid).collection(KEY_POST_RECRUIT_IDS).document(id).setData([KEY_DATE: date])
-        }
+        database.collection(KEY_RECRUITS).document(id).setData(data)
       } catch let error {
         print(error)
       }
