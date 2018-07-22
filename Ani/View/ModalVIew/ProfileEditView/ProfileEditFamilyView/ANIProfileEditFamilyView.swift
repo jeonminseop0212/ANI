@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import FirebaseDatabase
 
 protocol ANIProfileEditFamilyViewDelegate {
   func imagePickerCellTapped()
