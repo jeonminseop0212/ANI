@@ -163,7 +163,7 @@ class ANICommentBar: UIView {
         let id = NSUUID().uuidString
         let data = try FirestoreEncoder().encode(notification)
         
-        database.collection(KEY_NOTIFICATIONS).document(userId).setData([id : data], options: .merge())
+        database.collection(KEY_USERS).document(userId).collection(KEY_NOTIFICATIONS).document(id).setData(data)
       } catch let error {
         print(error)
       }

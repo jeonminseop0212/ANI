@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import FirebaseDatabase
+import FirebaseFirestore
 import CodableFirebase
 import TinyConstraints
 
@@ -120,16 +120,23 @@ extension ANIBasicNotiViewCell {
   func loadUser() {
     guard let noti = self.noti else { return }
     
+    let database = Firestore.firestore()
+
     DispatchQueue.global().async {
-      let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_USERS).child(noti.userId).observeSingleEvent(of: .value, with: { (userSnapshot) in
-        if let userValue = userSnapshot.value {
-          do {
-            let user = try FirebaseDecoder().decode(FirebaseUser.self, from: userValue)
-            self.user = user
-          } catch let error {
-            print(error)
-          }
+      database.collection(KEY_USERS).document(noti.userId).getDocument(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
+        
+        guard let snapshot = snapshot, let data = snapshot.data() else { return }
+        
+        do {
+          let user = try FirebaseDecoder().decode(FirebaseUser.self, from: data)
+          self.user = user
+        } catch let error {
+          print(error)
         }
       })
     }

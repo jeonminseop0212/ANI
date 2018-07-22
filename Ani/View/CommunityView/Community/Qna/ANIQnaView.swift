@@ -147,8 +147,9 @@ extension ANIQnaView {
       activityIndicatorView.startAnimating()
     }
     
+    let database = Firestore.firestore()
+    
     DispatchQueue.global().async {
-      let database = Firestore.firestore()
       database.collection(KEY_QNAS).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           print("Error get document: \(error)")

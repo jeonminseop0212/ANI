@@ -8,7 +8,7 @@
 //
 
 import UIKit
-import FirebaseDatabase
+import FirebaseFirestore
 import CodableFirebase
 import NVActivityIndicatorView
 
@@ -142,61 +142,58 @@ extension ANINotiView {
       self.notifications.removeAll()
     }
     
-    let databaseRef = Database.database().reference()
-    
     if sender == nil {
       activityIndicatorView.startAnimating()
     }
     
-    databaseRef.child(KEY_NOTIFICATIONS).child(currentUserUid).queryOrdered(byChild: KEY_NOTI_UPDATE_DATE).queryLimited(toFirst: 20).observeSingleEvent(of: .value) { (snapshot) in
-      for item in snapshot.children {
-        if let snapshot = item as? DataSnapshot {
-          guard let value = snapshot.value else { return }
+    let database = Firestore.firestore()
+    
+    database.collection(KEY_USERS).document(currentUserUid).collection(KEY_NOTIFICATIONS).order(by: KEY_NOTI_UPDATE_DATE, descending: true).limit(to: 20).getDocuments { (snapshot, error) in
+      if let error = error {
+        print("Error get document: \(error)")
+        
+        return
+      }
+      
+      guard let snapshot = snapshot else { return }
+      
+      for document in snapshot.documents {
+        do {
+          let notification = try FirestoreDecoder().decode(FirebaseNotification.self, from: document.data())
+          self.notifications.append(notification)
           
-          do {
-            let qna = try FirebaseDecoder().decode(FirebaseNotification.self, from: value)
-            self.notifications.insert(qna, at: 0)
-
-            DispatchQueue.main.async {
-              guard let notiTableView = self.notiTableView else { return }
-
-              notiTableView.reloadData()
-              
-              if let sender = sender {
-                sender.endRefreshing()
-              } else {
-                activityIndicatorView.stopAnimating()
-                
-                UIView.animate(withDuration: 0.2, animations: {
-                  notiTableView.alpha = 1.0
-                })
-              }
-            
-            }
-          } catch let error {
-            print(error)
-            
+          DispatchQueue.main.async {
             if let sender = sender {
               sender.endRefreshing()
-            } else {
-              activityIndicatorView.stopAnimating()
             }
+            
+            guard let notiTableView = self.notiTableView else { return }
+            
+            activityIndicatorView.stopAnimating()
+            
+            notiTableView.reloadData()
+            
+            UIView.animate(withDuration: 0.2, animations: {
+              notiTableView.alpha = 1.0
+            })
           }
-          if snapshot.value as? [String: AnyObject] == nil {
-            if let sender = sender {
-              sender.endRefreshing()
-            } else {
-              activityIndicatorView.stopAnimating()
-            }
+        } catch let error {
+          print(error)
+          
+          activityIndicatorView.stopAnimating()
+          
+          if let sender = sender {
+            sender.endRefreshing()
           }
         }
       }
-      if snapshot.value as? [String: AnyObject] == nil {
+      
+      if snapshot.documents.isEmpty {
         if let sender = sender {
           sender.endRefreshing()
-        } else {
-          activityIndicatorView.stopAnimating()
         }
+        
+        activityIndicatorView.stopAnimating()
       }
     }
   }
