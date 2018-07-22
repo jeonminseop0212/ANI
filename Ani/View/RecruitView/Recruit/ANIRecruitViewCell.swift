@@ -612,8 +612,9 @@ extension ANIRecruitViewCell {
   private func loadUser() {
     guard let recruit = self.recruit else { return }
     
+    let database = Firestore.firestore()
+    
     DispatchQueue.global().async {
-      let database = Firestore.firestore()
       database.collection(KEY_USERS).document(recruit.userId).getDocument(completion: { (snapshot, error) in
         if let error = error {
           print("Error get document: \(error)")
