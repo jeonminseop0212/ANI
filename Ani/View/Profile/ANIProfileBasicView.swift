@@ -43,9 +43,9 @@ class ANIProfileBasicView: UIView {
   
   var currentUser: FirebaseUser? {
     didSet {
-      loadRecruit()
-      loadStory()
-      loadQna()
+      guard let basicTableView = self.basicTableView else { return }
+      
+      basicTableView.reloadData()
     }
   }
   
@@ -100,6 +100,12 @@ class ANIProfileBasicView: UIView {
     
     basicTableView.scrollToRow(at: [0, 0], at: .top, animated: true)
   }
+  
+  func loadData() {
+    loadRecruit()
+    loadStory()
+    loadQna()
+  }
 }
 
 //MARK: UITableViewDataSource
@@ -128,9 +134,7 @@ extension ANIProfileBasicView: UITableViewDataSource {
   }
 
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let section = indexPath.section
-
-    if section == 0 {
+    if indexPath.section == 0 {
       let topCellId = NSStringFromClass(ANIProfileTopCell.self)
       let cell = tableView.dequeueReusableCell(withIdentifier: topCellId, for: indexPath) as! ANIProfileTopCell
       

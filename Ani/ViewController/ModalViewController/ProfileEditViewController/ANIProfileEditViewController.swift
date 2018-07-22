@@ -9,7 +9,7 @@
 import UIKit
 import Gallery
 import TinyConstraints
-import FirebaseDatabase
+import FirebaseFirestore
 import FirebaseStorage
 import CodableFirebase
 import NVActivityIndicatorView
@@ -208,26 +208,30 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
     })
   }
   
-  private func uploadUserIntoDatabase(uid: String, values: [String: AnyObject]) {
-    let databaseRef = Database.database().reference(fromURL: "https://ani-ios-1faa3.firebaseio.com/")
-    let userRef = databaseRef.child(KEY_USERS).child(uid)
-    
-    userRef.updateChildValues(values)
+  private func updateUserData(uid: String, values: [String: AnyObject]) {
+    let database = Firestore.firestore()
+    database.collection(KEY_USERS).document(uid).updateData(values)
     
     pushDataAlgolia(data: values)
-    
-    databaseRef.child(KEY_USERS).child(uid).observe(.value, with: { (snapshot) in
-        guard let value = snapshot.value else { return }
-        do {
-          let user = try FirebaseDecoder().decode(FirebaseUser.self, from: value)
-          ANISessionManager.shared.currentUser = user
-          NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
-          self.delegate?.didEdit()
-          self.dismiss(animated: true, completion: nil)
-        } catch let error {
-          print(error)
-        }
-    })
+
+    database.collection(KEY_USERS).document(uid).getDocument { (snapshot, error) in
+      if let error = error {
+        print("Error get document: \(error)")
+        
+        return
+      }
+      
+      guard let snapshot = snapshot, let data = snapshot.data() else { return }
+      
+      do {
+        let user = try FirestoreDecoder().decode(FirebaseUser.self, from: data)
+        ANISessionManager.shared.currentUser = user
+        self.delegate?.didEdit()
+        self.dismiss(animated: true, completion: nil)
+      } catch let error {
+        print(error)
+      }
+    }
   }
   
   private func pushDataAlgolia(data: [String: AnyObject]) {
@@ -328,28 +332,38 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
   }
   
   @objc private func edit() {
-    guard let profileEditView = self.profileEditView,
-          let currentUser = ANISessionManager.shared.currentUser,
-          let currentUserUid = ANISessionManager.shared.currentUserUid,
-          let updateUser = profileEditView.getUpdateUser(),
-          let userName = updateUser.userName,
-          let kind = updateUser.kind,
-          let introduce = updateUser.introduce else { return }
-    
-    let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.green)
-    NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData, nil)
+    guard let currentUser = ANISessionManager.shared.currentUser,
+          let currentUserUid = ANISessionManager.shared.currentUserUid else { return }
     
     if familyImagesChange {
+      let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.green)
+      NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData, nil)
+      
       if let familyUrls = currentUser.familyImageUrls {
         deleteFamilyImages(urls: familyUrls)
       }
       
       setFamilyImageUrls(completion: { (urls) in
-        let databaseRef = Database.database().reference()
-        databaseRef.child(KEY_USERS).child(currentUserUid).child(KEY_FAMILY_IMAGE_URLS).setValue(urls)
+        let database = Firestore.firestore()
+        database.collection(KEY_USERS).document(currentUserUid).updateData([KEY_FAMILY_IMAGE_URLS : urls])
+        
+        NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+        
+        self.setNewUserData()
       })
+    } else {
+      setNewUserData()
     }
-
+  }
+  
+  private func setNewUserData() {
+    guard let currentUserUid = ANISessionManager.shared.currentUserUid,
+          let profileEditView = self.profileEditView,
+          let updateUser = profileEditView.getUpdateUser(),
+          let userName = updateUser.userName,
+          let kind = updateUser.kind,
+          let introduce = updateUser.introduce else { return }
+    
     if let profileImage = self.profileImage, let profileImageData = UIImageJPEGRepresentation(profileImage, 0.5) {
       let storageRef = Storage.storage().reference()
       storageRef.child(KEY_PROFILE_IMAGES).child("\(currentUserUid).jpeg").putData(profileImageData, metadata: nil) { (metaData, error) in
@@ -360,12 +374,12 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
         
         if let profileImageUrl = metaData?.downloadURL() {
           let values = [KEY_USER_NAME: userName, KEY_KIND: kind, KEY_INTRODUCE: introduce, KEY_PROFILE_IMAGE_URL: profileImageUrl.absoluteString] as [String : AnyObject]
-          self.uploadUserIntoDatabase(uid: currentUserUid, values: values)
+          self.updateUserData(uid: currentUserUid, values: values)
         }
       }
     } else {
       let values = [KEY_USER_NAME: userName, KEY_KIND: kind, KEY_INTRODUCE: introduce] as [String : AnyObject]
-      self.uploadUserIntoDatabase(uid: currentUserUid, values: values)
+      self.updateUserData(uid: currentUserUid, values: values)
     }
   }
 }
