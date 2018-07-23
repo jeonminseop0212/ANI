@@ -210,43 +210,65 @@ extension ANIFollowUserView {
       
       guard let snapshot = snapshot else { return }
       
-      for document in snapshot.documents {
-        database.collection(KEY_USERS).document(document.documentID).getDocument(completion: { (userSnapshot, userError) in
-          if let error = error {
-            print("Error get user document: \(error)")
+      let group =  DispatchGroup()
+      var followUserTemp = [FirebaseUser?]()
+      
+      for (index, document) in snapshot.documents.enumerated() {
+        
+        group.enter()
+        followUserTemp.append(nil)
+        
+        DispatchQueue(label: "follow").async {
+
+          database.collection(KEY_USERS).document(document.documentID).getDocument(completion: { (userSnapshot, userError) in
+            if let error = error {
+              print("Error get user document: \(error)")
+              
+              return
+            }
             
-            return
-          }
-          
-          guard let userSnapshot = userSnapshot, let data = userSnapshot.data() else { return }
-          
-          do {
-            let user = try FirestoreDecoder().decode(FirebaseUser.self, from: data)
-            self.followers.append(user)
+            guard let userSnapshot = userSnapshot, let data = userSnapshot.data() else { return }
             
-            DispatchQueue.main.async {
+            do {
+              let user = try FirestoreDecoder().decode(FirebaseUser.self, from: data)
+              followUserTemp[index] = user
+              
+              group.leave()
+            } catch let error {
+              print(error)
+              activityIndicatorView.stopAnimating()
+              
               if let sender = sender {
                 sender.endRefreshing()
               }
-              
-              guard let followUserTableView = self.followUserTableView else { return }
-              
-              followUserTableView.reloadData()
-              activityIndicatorView.stopAnimating()
-              
-              UIView.animate(withDuration: 0.2, animations: {
-                followUserTableView.alpha = 1.0
-              })
             }
-          } catch let error {
-            print(error)
-            activityIndicatorView.stopAnimating()
-            
+          })
+        }
+      }
+      
+      group.notify(queue: DispatchQueue(label: "follow")) {
+        DispatchQueue.main.async {
+          DispatchQueue.main.async {
             if let sender = sender {
               sender.endRefreshing()
             }
+
+            guard let followUserTableView = self.followUserTableView else { return }
+            
+            for user in followUserTemp {
+              if let user = user {
+                self.followers.append(user)
+              }
+            }
+            
+            followUserTableView.reloadData()
+            activityIndicatorView.stopAnimating()
+
+            UIView.animate(withDuration: 0.2, animations: {
+              followUserTableView.alpha = 1.0
+            })
           }
-        })
+        }
       }
       
       if snapshot.documents.isEmpty {
