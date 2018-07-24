@@ -270,27 +270,27 @@ extension ANIListView {
           loveRecruitsTemp.append(nil)
           
           DispatchQueue(label: "loveRecruit").async {
-          database.collection(KEY_RECRUITS).document(document.documentID).getDocument(completion: { (recruitSnapshot, recruitError) in
-            if let recruitError = recruitError {
-              print("Error get document: \(recruitError)")
+            database.collection(KEY_RECRUITS).document(document.documentID).getDocument(completion: { (recruitSnapshot, recruitError) in
+              if let recruitError = recruitError {
+                print("Error get document: \(recruitError)")
+                
+                return
+              }
               
-              return
-            }
-            
-            guard let recruitSnapshot = recruitSnapshot, let data = recruitSnapshot.data() else { return }
-            
-            do {
-              let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: data)
-              loveRecruitsTemp[index] = recruit
+              guard let recruitSnapshot = recruitSnapshot, let data = recruitSnapshot.data() else { return }
               
-              group.leave()
-            } catch let error {
-              print(error)
-              
-              activityIndicatorView.stopAnimating()
-            }
-          })
-        }
+              do {
+                let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: data)
+                loveRecruitsTemp[index] = recruit
+                
+                group.leave()
+              } catch let error {
+                print(error)
+                
+                activityIndicatorView.stopAnimating()
+              }
+            })
+          }
         }
 
         group.notify(queue: DispatchQueue(label: "loveRecruit")) {

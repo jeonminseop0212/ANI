@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import FirebaseDatabase
+import FirebaseFirestore
 import CodableFirebase
 import NVActivityIndicatorView
 
@@ -50,7 +50,6 @@ class ANIMessageView: UIView {
     messageTableView.separatorStyle = .none
     messageTableView.alwaysBounceVertical = true
     messageTableView.dataSource = self
-    messageTableView.delegate = self
     messageTableView.alpha = 0.0
     addSubview(messageTableView)
     messageTableView.edgesToSuperview()
@@ -99,45 +98,35 @@ extension ANIMessageView: UITableViewDataSource {
   }
 }
 
-//MARK: UITableViewDelegate
-extension ANIMessageView: UITableViewDelegate {
-  func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-    if let cell = cell as? ANIMessageViewCell {
-      cell.observeGroup()
-    }
-  }
-  
-  func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-    if let cell = cell as? ANIMessageViewCell {
-      cell.unobserveChatGroup()
-    }
-  }
-}
-
 //MARK: data
 extension ANIMessageView {
   private func loadChatGroup() {
     guard let crrentUserUid = ANISessionManager.shared.currentUserUid,
           let activityIndicatorView = self.activityIndicatorView else { return }
     
-    let databaseRef = Database.database().reference()
+    let database = Firestore.firestore()
     
     activityIndicatorView.startAnimating()
-
-    databaseRef.child(KEY_CHAT_GROUP_IDS).child(crrentUserUid).queryOrderedByValue().queryLimited(toFirst: 20).observe(.value) { (snapshot) in
-      if !self.chatGroups.isEmpty {
-        self.chatGroups.removeAll()
-      }
-      
-      for item in snapshot.children {
-        if let snapshot = item as? DataSnapshot {
-          databaseRef.child(KEY_CHAT_GROUPS).child(snapshot.key).observeSingleEvent(of: .value, with: { (snapshot) in
-            
-            guard let value = snapshot.value else { return }
+    
+    DispatchQueue.global().async {
+      database.collection(KEY_CHAT_GROUPS).whereField(KEY_CHAT_MEMBER_IDS + "." + crrentUserUid, isEqualTo: true).addSnapshotListener({ (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
+        guard let snapshot = snapshot else { return }
+        
+        var chatGroupsTemp = self.chatGroups
+        snapshot.documentChanges.forEach({ (diff) in
+          if diff.type == .added {
             do {
-              let group = try FirebaseDecoder().decode(FirebaseChatGroup.self, from: value)
-              self.chatGroups.insert(group, at: 0)
+              let group = try FirebaseDecoder().decode(FirebaseChatGroup.self, from: diff.document.data())
+              chatGroupsTemp.append(group)
+              chatGroupsTemp.sort(by: {$0.updateDate > $1.updateDate})
               
+              self.chatGroups = chatGroupsTemp
+
               DispatchQueue.main.async {
                 guard let messageTableView = self.messageTableView else { return }
     
@@ -154,16 +143,37 @@ extension ANIMessageView {
               
               activityIndicatorView.stopAnimating()
             }
-            if snapshot.value as? [String: AnyObject] == nil {
-              activityIndicatorView.stopAnimating()
+          } else if diff.type == .modified {
+            do {
+              let group = try FirebaseDecoder().decode(FirebaseChatGroup.self, from: diff.document.data())
+              
+              for (index, chatGroupTemp) in chatGroupsTemp.enumerated() {
+                if chatGroupTemp.groupId == group.groupId {
+                  chatGroupsTemp[index] = group
+                  
+                  break
+                }
+              }
+              
+              chatGroupsTemp.sort(by: {$0.updateDate > $1.updateDate})
+              
+              self.chatGroups = chatGroupsTemp
+              
+              DispatchQueue.main.async {
+                guard let messageTableView = self.messageTableView else { return }
+                
+                messageTableView.reloadData()
+              }
+            } catch let error {
+              print(error)
             }
-          })
+          }
+        })
+        
+        if snapshot.documents.isEmpty {
+          activityIndicatorView.stopAnimating()
         }
-      }
-      
-      if snapshot.value as? [String: AnyObject] == nil {
-        activityIndicatorView.stopAnimating()
-      }
+      })
     }
   }
 }

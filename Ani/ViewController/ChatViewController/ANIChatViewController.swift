@@ -8,7 +8,7 @@
 
 import UIKit
 import TinyConstraints
-import FirebaseDatabase
+import FirebaseFirestore
 import CodableFirebase
 
 protocol ANIChatViewControllerDelegate {
@@ -155,43 +155,43 @@ class ANIChatViewController: UIViewController {
           let user = self.user,
           let userId = user.uid else { return }
     
-    let databaseRef = Database.database().reference()
-    databaseRef.child(KEY_CHAT_GROUP_IDS).child(currentUserUid).observeSingleEvent(of: .value) { (snapshot) in
-      if let chatGroupIds = snapshot.value as? [String: String] {
-        for (index, chatGroupId) in chatGroupIds.keys.enumerated() {
-          databaseRef.child(KEY_CHAT_GROUPS).child(chatGroupId).child(KEY_CHAT_MEMBER_IDS).observeSingleEvent(of: .value) { (snapshot) in
-            if let memberIdsDic = snapshot.value as? [String: Bool] {
-              if memberIdsDic.keys.contains(userId) {
-                self.chatGroupId = chatGroupId
-                self.isHaveGroup = true
-              } else if index == (chatGroupIds.count - 1), self.chatGroupId == nil {
-                self.createGroup()
-              }
-            } else {
-              self.createGroup()
-            }
-          }
+    let database = Firestore.firestore()
+
+    DispatchQueue.global().async {
+      database.collection(KEY_CHAT_GROUPS).whereField(KEY_CHAT_MEMBER_IDS + "." + currentUserUid, isEqualTo: true).whereField(KEY_CHAT_MEMBER_IDS + "." + userId, isEqualTo: true).getDocuments { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
         }
-      } else {
-        self.createGroup()
+        
+        guard let snapshot = snapshot else { return }
+        
+        for document in snapshot.documents {
+          self.chatGroupId = document.documentID
+          self.isHaveGroup = true
+        }
+        
+        if snapshot.documents.isEmpty {
+          self.createGroup()
+        }
       }
     }
   }
   
   private func createGroup() {
-    let databaseRef = Database.database().reference()
-    let databaseChatGroupRef = databaseRef.child(KEY_CHAT_GROUPS).childByAutoId()
-    let id = databaseChatGroupRef.key
+    let id = NSUUID().uuidString
     let date = ANIFunction.shared.getToday()
     let group = FirebaseChatGroup(groupId:id, memberIds: nil, updateDate: date, lastMessage: "")
     
+    let database = Firestore.firestore()
+
     DispatchQueue.global().async {
       do {
-        if let data = try FirebaseEncoder().encode(group) as? [String : AnyObject] {
-          databaseChatGroupRef.updateChildValues(data)
-          
-          self.chatGroupId = id
-        }
+        let data = try FirestoreEncoder().encode(group)
+        database.collection(KEY_CHAT_GROUPS).document(id).setData(data)
+
+        self.chatGroupId = id
       } catch let error {
         print(error)
       }
@@ -201,15 +201,29 @@ class ANIChatViewController: UIViewController {
   private func removeGroup() {
     guard let chatGroupId = self.chatGroupId else { return }
     
-    let databaseRef = Database.database().reference()
+    let database = Firestore.firestore()
     
-    databaseRef.child(KEY_CHAT_GROUPS).child(chatGroupId).child(KEY_CHAT_LAST_MESSAGE).observeSingleEvent(of: .value) { (snapshot) in
-      guard let snapshot = snapshot.value as? String else { return }
-      
-      if snapshot == "" {
-        databaseRef.child(KEY_CHAT_GROUPS).child(chatGroupId).removeValue()
+    DispatchQueue.global().async {
+      database.collection(KEY_CHAT_GROUPS).document(chatGroupId).getDocument { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
         
-        self.chatGroupId = nil
+        guard let snapshot = snapshot, let data = snapshot.data() else { return }
+        
+        do {
+          let chatGroup = try FirestoreDecoder().decode(FirebaseChatGroup.self, from: data)
+          
+          if chatGroup.lastMessage == "" {
+            database.collection(KEY_CHAT_GROUPS).document(chatGroupId).delete()
+            
+            self.chatGroupId = nil
+          }
+        } catch let error {
+          print(error)
+        }
       }
     }
   }

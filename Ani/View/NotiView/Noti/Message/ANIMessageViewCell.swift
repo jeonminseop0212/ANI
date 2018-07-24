@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import FirebaseDatabase
+import FirebaseFirestore
 import CodableFirebase
 
 class ANIMessageViewCell: UITableViewCell {
@@ -21,13 +21,13 @@ class ANIMessageViewCell: UITableViewCell {
   var chatGroup: FirebaseChatGroup? {
     didSet {
       loadUser()
-      reloadLayout()
     }
   }
   
   private var user: FirebaseUser? {
     didSet {
       reloadUserLayout()
+      reloadLayout()
     }
   }
   
@@ -125,31 +125,6 @@ class ANIMessageViewCell: UITableViewCell {
     userNameLabel.text = user.userName
   }
   
-  func observeGroup() {
-    guard let chatGroup = self.chatGroup else { return }
-    
-    let databaseRef = Database.database().reference()
-    databaseRef.child(KEY_CHAT_GROUPS).child(chatGroup.groupId).observe(.value) { (snapshot) in
-      if let groupValue = snapshot.value {
-        do {
-          let group = try FirebaseDecoder().decode(FirebaseChatGroup.self, from: groupValue)
-          self.chatGroup = group
-        } catch let error {
-          print(error)
-        }
-      }
-    }
-  }
-  
-  func unobserveChatGroup() {
-    guard let chatGroup = self.chatGroup else { return }
-    
-    let databaseRef = Database.database().reference()
-    DispatchQueue.global().async {
-      databaseRef.child(KEY_CHAT_GROUPS).child(chatGroup.groupId).removeAllObservers()
-    }
-  }
-  
   @objc private func cellTapped() {
     guard let user = self.user else { return }
     
@@ -173,16 +148,24 @@ extension ANIMessageViewCell {
     
     for memberId in memberIds.keys {
       if currentUserUid != memberId {
-        DispatchQueue.global().async {
-          let databaseRef = Database.database().reference()
-          databaseRef.child(KEY_USERS).child(memberId).observeSingleEvent(of: .value, with: { (userSnapshot) in
-            if let userValue = userSnapshot.value {
-              do {
-                let user = try FirebaseDecoder().decode(FirebaseUser.self, from: userValue)
-                self.user = user
-              } catch let error {
-                print(error)
-              }
+        
+        let database = Firestore.firestore()
+        DispatchQueue.global().async {          
+          database.collection(KEY_USERS).document(memberId).getDocument(completion: { (snapshot, error) in
+            if let error = error {
+              print("Error get document: \(error)")
+              
+              return
+            }
+            
+            guard let snapshot = snapshot, let data = snapshot.data() else { return }
+            
+            do {
+              let user = try FirebaseDecoder().decode(FirebaseUser.self, from: data)
+              
+              self.user = user
+            } catch let error {
+              print(error)
             }
           })
         }
