@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import FirebaseDatabase
+import FirebaseFirestore
 import CodableFirebase
 import NVActivityIndicatorView
 
@@ -21,16 +21,13 @@ class ANIFollowUserView: UIView {
   
   var userId: String? {
     didSet {
-      guard let followUserViewMode = self.followUserViewMode,
-            let activityIndicatorView = self.activityIndicatorView else { return }
-      
-      activityIndicatorView.startAnimating()
+      guard let followUserViewMode = self.followUserViewMode else { return }
       
       switch followUserViewMode {
       case .following:
-        loadFollowingUser()
+        loadFollowingUser(sender: nil)
       case .follower:
-        loadFollower()
+        loadFollower(sender: nil)
       }
     }
   }
@@ -58,6 +55,9 @@ class ANIFollowUserView: UIView {
     followUserTableView.separatorStyle = .none
     followUserTableView.alpha = 0.0
     followUserTableView.dataSource = self
+    let refreshControl = UIRefreshControl()
+    refreshControl.addTarget(self, action: #selector(reloadData(sender:)), for: .valueChanged)
+    followUserTableView.addSubview(refreshControl)
     addSubview(followUserTableView)
     followUserTableView.edgesToSuperview()
     self.followUserTableView = followUserTableView
@@ -69,6 +69,17 @@ class ANIFollowUserView: UIView {
     activityIndicatorView.height(40.0)
     activityIndicatorView.centerInSuperview()
     self.activityIndicatorView = activityIndicatorView
+  }
+  
+  @objc private func reloadData(sender: UIRefreshControl?) {
+    guard let followUserViewMode = self.followUserViewMode else { return }
+    
+    switch followUserViewMode {
+    case .following:
+      loadFollowingUser(sender: sender)
+    case .follower:
+      loadFollower(sender: sender)
+    }
   }
 }
 
@@ -104,88 +115,166 @@ extension ANIFollowUserView: UITableViewDataSource {
 
 //MARK: data
 extension ANIFollowUserView {
-  private func loadFollowingUser() {
-    guard let userId = self.userId else { return }
+  private func loadFollowingUser(sender: UIRefreshControl?) {
+    guard let userId = self.userId,
+          let activityIndicatorView = self.activityIndicatorView else { return }
     
-    let databaseRef = Database.database().reference()
-    databaseRef.child(KEY_FOLLOWING_USER_IDS).child(userId).queryOrderedByValue().queryLimited(toFirst: 20).observeSingleEvent(of: .value) { (snapshot) in
-      
-      for item in snapshot.children {
-        if let snapshot = item as? DataSnapshot {
-          databaseRef.child(KEY_USERS).child(snapshot.key).observeSingleEvent(of: .value, with: { (snapshot) in
-            guard let value = snapshot.value else { return }
-            
-            do {
-              let user = try FirebaseDecoder().decode(FirebaseUser.self, from: value)
-              self.followingUsers.insert(user, at: 0)
-              
-              DispatchQueue.main.async {
-                guard let followUserTableView = self.followUserTableView,
-                      let activityIndicatorView = self.activityIndicatorView else { return }
-                
-                followUserTableView.reloadData()
-                activityIndicatorView.stopAnimating()
-                
-                UIView.animate(withDuration: 0.2, animations: {
-                  followUserTableView.alpha = 1.0
-                })
-              }
-            } catch let error {
-              guard let activityIndicatorView = self.activityIndicatorView else { return }
-              
-              print(error)
-              activityIndicatorView.stopAnimating()
-            }
-          })
-        }
+    if !self.followingUsers.isEmpty {
+      self.followingUsers.removeAll()
+    }
+    
+    if sender == nil {
+      activityIndicatorView.startAnimating()
+    }
+    
+    let database = Firestore.firestore()
+    
+    database.collection(KEY_USERS).document(userId).collection(KEY_FOLLOWING_USER_IDS).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments { (snapshot, error) in
+      if let error = error {
+        print("Error get document: \(error)")
+        
+        return
       }
       
-      if snapshot.value as? [String: Any] == nil {
-        guard let activityIndicatorView = self.activityIndicatorView else { return }
+      guard let snapshot = snapshot else { return }
+      
+      for document in snapshot.documents {
+        database.collection(KEY_USERS).document(document.documentID).getDocument(completion: { (userSnapshot, userError) in
+          if let error = error {
+            print("Error get user document: \(error)")
+            
+            return
+          }
+          
+          guard let userSnapshot = userSnapshot, let data = userSnapshot.data() else { return }
+          
+          do {
+            let user = try FirestoreDecoder().decode(FirebaseUser.self, from: data)
+            self.followingUsers.append(user)
+
+            DispatchQueue.main.async {
+              if let sender = sender {
+                sender.endRefreshing()
+              }
+              
+              guard let followUserTableView = self.followUserTableView else { return }
+
+              followUserTableView.reloadData()
+              activityIndicatorView.stopAnimating()
+
+              UIView.animate(withDuration: 0.2, animations: {
+                followUserTableView.alpha = 1.0
+              })
+            }
+          } catch let error {
+            print(error)
+            activityIndicatorView.stopAnimating()
+            
+            if let sender = sender {
+              sender.endRefreshing()
+            }
+          }
+        })
+      }
+      
+      if snapshot.documents.isEmpty {
+        if let sender = sender {
+          sender.endRefreshing()
+        }
         
         activityIndicatorView.stopAnimating()
       }
     }
   }
   
-  private func loadFollower() {
-    guard let userId = self.userId else { return }
+  private func loadFollower(sender: UIRefreshControl?) {
+    guard let userId = self.userId,
+          let activityIndicatorView = self.activityIndicatorView else { return }
     
-    let databaseRef = Database.database().reference()
-    databaseRef.child(KEY_FOLLOWER_IDS).child(userId).queryOrderedByValue().queryLimited(toFirst: 20).observeSingleEvent(of: .value) { (snapshot) in
+    if !self.followers.isEmpty {
+      self.followers.removeAll()
+    }
+    
+    if sender == nil {
+      activityIndicatorView.startAnimating()
+    }
+    
+    let database = Firestore.firestore()
+    
+    database.collection(KEY_USERS).document(userId).collection(KEY_FOLLOWER_IDS).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments { (snapshot, error) in
+      if let error = error {
+        print("Error get document: \(error)")
+        
+        return
+      }
       
-      for item in snapshot.children {
-        if let snapshot = item as? DataSnapshot {
-          databaseRef.child(KEY_USERS).child(snapshot.key).observeSingleEvent(of: .value, with: { (snapshot) in
-            guard let value = snapshot.value else { return }
+      guard let snapshot = snapshot else { return }
+      
+      let group =  DispatchGroup()
+      var followUserTemp = [FirebaseUser?]()
+      
+      for (index, document) in snapshot.documents.enumerated() {
+        
+        group.enter()
+        followUserTemp.append(nil)
+        
+        DispatchQueue(label: "follow").async {
+
+          database.collection(KEY_USERS).document(document.documentID).getDocument(completion: { (userSnapshot, userError) in
+            if let error = error {
+              print("Error get user document: \(error)")
+              
+              return
+            }
+            
+            guard let userSnapshot = userSnapshot, let data = userSnapshot.data() else { return }
             
             do {
-              let user = try FirebaseDecoder().decode(FirebaseUser.self, from: value)
-              self.followers.insert(user, at: 0)
+              let user = try FirestoreDecoder().decode(FirebaseUser.self, from: data)
+              followUserTemp[index] = user
               
-              DispatchQueue.main.async {
-                guard let followUserTableView = self.followUserTableView,
-                  let activityIndicatorView = self.activityIndicatorView else { return }
-                
-                followUserTableView.reloadData()
-                activityIndicatorView.stopAnimating()
-                
-                UIView.animate(withDuration: 0.2, animations: {
-                  followUserTableView.alpha = 1.0
-                })
-              }
+              group.leave()
             } catch let error {
-              guard let activityIndicatorView = self.activityIndicatorView else { return }
-
               print(error)
               activityIndicatorView.stopAnimating()
+              
+              if let sender = sender {
+                sender.endRefreshing()
+              }
             }
           })
         }
       }
-    
-      if snapshot.value as? [String: Any] == nil {
-        guard let activityIndicatorView = self.activityIndicatorView else { return }
+      
+      group.notify(queue: DispatchQueue(label: "follow")) {
+        DispatchQueue.main.async {
+          DispatchQueue.main.async {
+            if let sender = sender {
+              sender.endRefreshing()
+            }
+
+            guard let followUserTableView = self.followUserTableView else { return }
+            
+            for user in followUserTemp {
+              if let user = user {
+                self.followers.append(user)
+              }
+            }
+            
+            followUserTableView.reloadData()
+            activityIndicatorView.stopAnimating()
+
+            UIView.animate(withDuration: 0.2, animations: {
+              followUserTableView.alpha = 1.0
+            })
+          }
+        }
+      }
+      
+      if snapshot.documents.isEmpty {
+        if let sender = sender {
+          sender.endRefreshing()
+        }
         
         activityIndicatorView.stopAnimating()
       }

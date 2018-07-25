@@ -8,7 +8,7 @@
 
 import UIKit
 import GrowingTextView
-import FirebaseDatabase
+import FirebaseFirestore
 import CodableFirebase
 
 class ANIChatBar: UIView {
@@ -130,14 +130,15 @@ class ANIChatBar: UIView {
   private func checkMember() {
     guard let user = self.user,
           let userId = user.uid,
-          let currentUserUid = ANISessionManager.shared.currentUserUid else { return }
+          let currentUserUid = ANISessionManager.shared.currentUserUid,
+          let chatGroupId = self.chatGroupId else { return }
     
     if !isHaveGroup {
-      let databaseRef = Database.database().reference()
+      let database = Firestore.firestore()
       
       DispatchQueue.global().async {
         let memberIds = [currentUserUid: true, userId: true]
-        databaseRef.child(KEY_CHAT_GROUPS).child(KEY_CHAT_MEMBER_IDS).updateChildValues(memberIds)
+        database.collection(KEY_CHAT_GROUPS).document(chatGroupId).updateData([KEY_CHAT_MEMBER_IDS: memberIds])
       }
     }
   }
@@ -154,18 +155,16 @@ class ANIChatBar: UIView {
     
     checkMember()
 
+    let database = Firestore.firestore()
+    
     do {
-      if let message = try FirebaseEncoder().encode(message) as? [String : AnyObject] {
-        let databaseRef = Database.database().reference()
+      let message = try FirestoreEncoder().encode(message)
+      
+      DispatchQueue.global().async {
+        database.collection(KEY_CHAT_GROUPS).document(chatGroupId).collection(KEY_CHAT_MESSAGES).addDocument(data: message)
 
-        DispatchQueue.global().async {
-          let databaseMessageRef = databaseRef.child(KEY_CHAT_MESSAGES).child(chatGroupId).childByAutoId()
-          databaseMessageRef.updateChildValues(message)
-
-          let detabaseGroupRef = databaseRef.child(KEY_CHAT_GROUPS).child(chatGroupId)
-          let groupValue: [String: String] = [KEY_CHAT_UPDATE_DATE: date, KEY_CHAT_LAST_MESSAGE: text]
-          detabaseGroupRef.updateChildValues(groupValue)
-        }
+        let value: [String: String] = [KEY_CHAT_UPDATE_DATE: date, KEY_CHAT_LAST_MESSAGE: text]
+        database.collection(KEY_CHAT_GROUPS).document(chatGroupId).updateData(value)
       }
     } catch let error {
       print(error)

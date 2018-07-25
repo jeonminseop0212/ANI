@@ -8,7 +8,7 @@
 
 import UIKit
 import WCLShineButton
-import FirebaseDatabase
+import FirebaseFirestore
 import CodableFirebase
 
 protocol ANISupportViewCellDelegate {
@@ -50,6 +50,7 @@ class ANISupportViewCell: UITableViewCell {
       loadUser()
       isLoved()
       observeLove()
+      observeComment()
     }
   }
   
@@ -62,6 +63,9 @@ class ANISupportViewCell: UITableViewCell {
   private var user: FirebaseUser?
 
   private var recruitUser: FirebaseUser?
+  
+  private var loveListener: ListenerRegistration?
+  private var commentListener: ListenerRegistration?
   
   override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -366,65 +370,26 @@ class ANISupportViewCell: UITableViewCell {
     sexLabel.text = recruit.sex
   }
   
-  private func loadUser() {
-    guard let story = self.story else { return }
-
-    DispatchQueue.global().async {
-      let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_USERS).child(story.userId).observeSingleEvent(of: .value, with: { (userSnapshot) in
-        if let userValue = userSnapshot.value {
-          do {
-            let user = try FirebaseDecoder().decode(FirebaseUser.self, from: userValue)
-            self.user = user
-
-            DispatchQueue.main.async {
-              self.reloadUserLayout(user: user)
-            }
-          } catch let error {
-            print(error)
-          }
-        }
-      })
-    }
-  }
-  
-  private func loadRecruit() {
-    guard let story = self.story,
-          let recruitId = story.recruitId else { return }
-
-    DispatchQueue.global().async {
-      let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_RECRUITS).child(recruitId).observeSingleEvent(of: .value, with: { (snapshot) in
-        if let recruitValue = snapshot.value {
-          do {
-            let recruit = try FirebaseDecoder().decode(FirebaseRecruit.self, from: recruitValue)
-            self.recruit = recruit
-
-            DispatchQueue.main.async {
-              self.reloadRecruitLayout(recruit: recruit)
-            }
-          } catch let error {
-            print(error)
-          }
-        }
-      })
-    }
-  }
-  
   private func loadRecruitUser() {
     guard let recruit = self.recruit else { return }
     
     DispatchQueue.global().async {
-      let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_USERS).child(recruit.userId).observeSingleEvent(of: .value, with: { (userSnapshot) in
-        if let userValue = userSnapshot.value {
-          do {
-            let recruitUser = try FirebaseDecoder().decode(FirebaseUser.self, from: userValue)
-            
-            self.recruitUser = recruitUser
-          } catch let error {
-            print(error)
-          }
+      let database = Firestore.firestore()
+      database.collection(KEY_USERS).document(recruit.userId).getDocument(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
+        
+        guard let snapshot = snapshot, let data = snapshot.data() else { return }
+        
+        do {
+          let recruitUser = try FirebaseDecoder().decode(FirebaseUser.self, from: data)
+          
+          self.recruitUser = recruitUser
+        } catch let error {
+          print(error)
         }
       })
     }
@@ -432,36 +397,64 @@ class ANISupportViewCell: UITableViewCell {
   
   private func observeLove() {
     guard let story = self.story,
-          let storyId = story.id else { return }
-
-    let databaseRef = Database.database().reference()
+          let storyId = story.id,
+          let loveCountLabel = self.loveCountLabel else { return }
+    
+    let database = Firestore.firestore()
     DispatchQueue.global().async {
-      databaseRef.child(KEY_STORIES).child(storyId).child(KEY_LOVE_IDS).observe(.value) { (snapshot) in
-        if let loveIds = snapshot.value as? [String: AnyObject] {
-          DispatchQueue.main.async {
-            guard let loveCountLabel = self.loveCountLabel else { return }
-
-            loveCountLabel.text = "\(loveIds.count)"
-          }
-        } else {
-          DispatchQueue.main.async {
-            guard let loveCountLabel = self.loveCountLabel else { return }
-
+      self.loveListener = database.collection(KEY_STORIES).document(storyId).collection(KEY_LOVE_IDS).addSnapshotListener({ (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
+        
+        DispatchQueue.main.async {
+          if let snapshot = snapshot {
+            loveCountLabel.text = "\(snapshot.documents.count)"
+          } else {
             loveCountLabel.text = "0"
           }
         }
-      }
+      })
     }
   }
   
   func unobserveLove() {
-    guard let story = self.story,
-          let storyId = story.id else { return }
+    guard let loveListener = self.loveListener else { return }
     
-    let databaseRef = Database.database().reference()
+    loveListener.remove()
+  }
+  
+  private func observeComment() {
+    guard let story = self.story,
+      let storyId = story.id,
+      let commentCountLabel = self.commentCountLabel else { return }
+    
+    let database = Firestore.firestore()
     DispatchQueue.global().async {
-      databaseRef.child(KEY_STORIES).child(storyId).child(KEY_LOVE_IDS).removeAllObservers()
+      self.commentListener = database.collection(KEY_STORIES).document(storyId).collection(KEY_COMMENTS).addSnapshotListener({ (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
+        
+        DispatchQueue.main.async {
+          if let snapshot = snapshot {
+            commentCountLabel.text = "\(snapshot.documents.count)"
+          } else {
+            commentCountLabel.text = "0"
+          }
+        }
+      })
     }
+  }
+  
+  func unobserveComment() {
+    guard let commentListener = self.commentListener else { return }
+    
+    commentListener.remove()
   }
   
   private func isLoved() {
@@ -469,21 +462,27 @@ class ANISupportViewCell: UITableViewCell {
           let storyId = story.id,
           let currentUserId = ANISessionManager.shared.currentUserUid else { return }
 
-    let databaseRef = Database.database().reference()
+    let database = Firestore.firestore()
     DispatchQueue.global().async {
-      databaseRef.child(KEY_STORIES).child(storyId).child(KEY_LOVE_IDS).observeSingleEvent(of: .value) { (snapshot) in
-        for item in snapshot.children {
-          if let snapshot = item as? DataSnapshot {
-            if snapshot.key == currentUserId {
-              DispatchQueue.main.async {
-                guard let loveButton = self.loveButton else { return }
-
-                loveButton.isSelected = true
-              }
+      database.collection(KEY_STORIES).document(storyId).collection(KEY_LOVE_IDS).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
+        
+        guard let snapshot = snapshot else { return }
+        
+        for document in snapshot.documents {
+          if document.documentID == currentUserId {
+            DispatchQueue.main.async {
+              guard let loveButton = self.loveButton else { return }
+              
+              loveButton.isSelected = true
             }
           }
         }
-      }
+      })
     }
   }
   
@@ -496,17 +495,16 @@ class ANISupportViewCell: UITableViewCell {
           let user = self.user,
           let userId = user.uid else { return }
     
-    let databaseRef = Database.database().reference()
+    let database = Firestore.firestore()
     
     DispatchQueue.global().async {
       do {
         let noti = "\(currentUserName)さんが「\(story.story)」ストーリーを「いいね」しました。"
         let date = ANIFunction.shared.getToday()
         let notification = FirebaseNotification(userId: currentUserId, noti: noti, kind: KEY_NOTI_KIND_STROY, notiId: storyId, commentId: nil, updateDate: date)
-        if let data = try FirebaseEncoder().encode(notification) as? [String: AnyObject] {
-          
-          databaseRef.child(KEY_NOTIFICATIONS).child(userId).child(storyId).updateChildValues(data)
-        }
+        let data = try FirestoreEncoder().encode(notification)
+        
+        database.collection(KEY_USERS).document(userId).collection(KEY_NOTIFICATIONS).document(storyId).setData(data)
       } catch let error {
         print(error)
       }
@@ -520,19 +518,20 @@ class ANISupportViewCell: UITableViewCell {
       let currentUserId = ANISessionManager.shared.currentUserUid,
       let loveButton = self.loveButton else { return }
     
-    let databaseRef = Database.database().reference()
+    let database = Firestore.firestore()
+    
     if loveButton.isSelected == true {
       DispatchQueue.global().async {
-        databaseRef.child(KEY_STORIES).child(storyId).child(KEY_LOVE_IDS).updateChildValues([currentUserId: true])
+        database.collection(KEY_STORIES).document(storyId).collection(KEY_LOVE_IDS).document(currentUserId).setData([currentUserId: true])
         let date = ANIFunction.shared.getToday()
-        databaseRef.child(KEY_LOVE_STORY_IDS).child(currentUserId).updateChildValues([storyId: date])
+        database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_STORY_IDS).document(storyId).setData([KEY_DATE: date])
         
         self.updateNoti()
       }
     } else {
       DispatchQueue.global().async {
-        databaseRef.child(KEY_STORIES).child(storyId).child(KEY_LOVE_IDS).child(currentUserId).removeValue()
-        databaseRef.child(KEY_LOVE_STORY_IDS).child(currentUserId).child(storyId).removeValue()        
+        database.collection(KEY_STORIES).document(storyId).collection(KEY_LOVE_IDS).document(currentUserId).delete()
+        database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_STORY_IDS).document(storyId).delete()
       }
     }
   }
@@ -563,5 +562,66 @@ class ANISupportViewCell: UITableViewCell {
           let recruitUser = self.recruitUser else { return }
     
     self.delegate?.supportCellRecruitTapped(recruit: recruit, user: recruitUser)
+  }
+}
+
+//MARK: data
+extension ANISupportViewCell {
+  private func loadUser() {
+    guard let story = self.story else { return }
+    
+    DispatchQueue.global().async {
+      let database = Firestore.firestore()
+      database.collection(KEY_USERS).document(story.userId).getDocument(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
+        
+        guard let snapshot = snapshot, let data = snapshot.data() else { return }
+        
+        do {
+          let user = try FirebaseDecoder().decode(FirebaseUser.self, from: data)
+          self.user = user
+          
+          DispatchQueue.main.async {
+            self.reloadUserLayout(user: user)
+          }
+        } catch let error {
+          print(error)
+        }
+      })
+    }
+  }
+  
+  private func loadRecruit() {
+    guard let story = self.story,
+          let recruitId = story.recruitId else { return }
+    
+    DispatchQueue.global().async {
+      let database = Firestore.firestore()
+      
+      database.collection(KEY_RECRUITS).document(recruitId).getDocument(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
+        
+        guard let snapshot = snapshot, let data = snapshot.data() else { return }
+        
+        do {
+          let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: data)
+          self.recruit = recruit
+
+          DispatchQueue.main.async {
+            self.reloadRecruitLayout(recruit: recruit)
+          }
+        } catch let error {
+          print(error)
+        }
+      })
+    }
   }
 }

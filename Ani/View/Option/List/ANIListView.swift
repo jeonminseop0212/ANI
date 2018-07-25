@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import FirebaseDatabase
+import FirebaseFirestore
 import CodableFirebase
 import NVActivityIndicatorView
 
@@ -183,13 +183,16 @@ extension ANIListView: UITableViewDelegate {
       if !loveStories.isEmpty {
         if loveStories[indexPath.row].recruitId != nil, let cell = cell as? ANISupportViewCell {
           cell.unobserveLove()
+          cell.unobserveComment()
         } else if let cell = cell as? ANIStoryViewCell {
           cell.unobserveLove()
+          cell.unobserveComment()
         }
       }
     case .loveQuestion:
-      if let cell = cell as? ANIRecruitViewCell {
+      if let cell = cell as? ANIQnaViewCell {
         cell.unobserveLove()
+        cell.unobserveComment()
       }
     case .clipRecruit:
       if let cell = cell as? ANIRecruitViewCell {
@@ -243,190 +246,310 @@ extension ANIListView: ANIQnaViewCellDelegate {
 //MARK: data
 extension ANIListView {
   private func loadLoveRecruit() {
-    guard let currentUser = ANISessionManager.shared.currentUser,
-          let uid = currentUser.uid else { return }
+    guard let currentUserId = ANISessionManager.shared.currentUserUid,
+          let activityIndicatorView = self.activityIndicatorView else { return }
+    
+    let database = Firestore.firestore()
     
     DispatchQueue.global().async {
-      let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_LOVE_RECRUIT_IDS).child(uid).queryOrderedByValue().queryLimited(toFirst: 20).observeSingleEvent(of: .value) { (snapshot) in
+      database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_RECRUIT_IDS).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
         
-        for item in snapshot.children {
-          if let snapshot = item as? DataSnapshot {
-            databaseRef.child(KEY_RECRUITS).child(snapshot.key).observeSingleEvent(of: .value, with: { (snapshot) in
+        guard let snapshot = snapshot else { return }
+        
+        let group =  DispatchGroup()
+        var loveRecruitsTemp = [FirebaseRecruit?]()
+        
+        for (index, document) in snapshot.documents.enumerated() {
+          
+          group.enter()
+          loveRecruitsTemp.append(nil)
+          
+          DispatchQueue(label: "loveRecruit").async {
+            database.collection(KEY_RECRUITS).document(document.documentID).getDocument(completion: { (recruitSnapshot, recruitError) in
+              if let recruitError = recruitError {
+                print("Error get document: \(recruitError)")
+                
+                return
+              }
               
-              guard let value = snapshot.value else { return }
+              guard let recruitSnapshot = recruitSnapshot, let data = recruitSnapshot.data() else { return }
+              
               do {
-                let recruit = try FirebaseDecoder().decode(FirebaseRecruit.self, from: value)
-                self.loveRecruits.insert(recruit, at: 0)
+                let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: data)
+                loveRecruitsTemp[index] = recruit
                 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
-                  guard let listTableView = self.listTableView,
-                        let activityIndicatorView = self.activityIndicatorView else { return }
-                  
-                  listTableView.reloadData()
-                  activityIndicatorView.stopAnimating()
-                  
-                  UIView.animate(withDuration: 0.2, animations: {
-                    listTableView.alpha = 1.0
-                  })
-                })
+                group.leave()
               } catch let error {
-                guard let activityIndicatorView = self.activityIndicatorView else { return }
-                
                 print(error)
+                
                 activityIndicatorView.stopAnimating()
               }
             })
           }
         }
+
+        group.notify(queue: DispatchQueue(label: "loveRecruit")) {
+          DispatchQueue.main.async {
+            guard let listTableView = self.listTableView else { return }
+            
+            for loveRecruit in loveRecruitsTemp {
+              if let loveRecruit = loveRecruit {
+                self.loveRecruits.append(loveRecruit)
+              }
+            }
+            
+            listTableView.reloadData()
+            
+            activityIndicatorView.stopAnimating()
+            
+            UIView.animate(withDuration: 0.2, animations: {
+              listTableView.alpha = 1.0
+            })
+          }
+        }
         
-        if snapshot.value as? [String: Any] == nil {
+        if snapshot.documents.isEmpty {
           guard let activityIndicatorView = self.activityIndicatorView else { return }
           
           activityIndicatorView.stopAnimating()
         }
-      }
+      })
     }
   }
   
   private func loadLoveStory() {
-    guard let currentUser = ANISessionManager.shared.currentUser,
-          let uid = currentUser.uid else { return }
+    guard let currentUserId = ANISessionManager.shared.currentUserUid,
+          let activityIndicatorView = self.activityIndicatorView else { return }
+    
+    let database = Firestore.firestore()
     
     DispatchQueue.global().async {
-      let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_LOVE_STORY_IDS).child(uid).queryOrderedByValue().queryLimited(toFirst: 20).observeSingleEvent(of: .value) { (snapshot) in
+      database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_STORY_IDS).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
         
-        for item in snapshot.children {
-          if let snapshot = item as? DataSnapshot {
-            databaseRef.child(KEY_STORIES).child(snapshot.key).observeSingleEvent(of: .value, with: { (snapshot) in
-              
-              guard let value = snapshot.value else { return }
-              do {
-                let story = try FirebaseDecoder().decode(FirebaseStory.self, from: value)
-                self.loveStories.insert(story, at: 0)
+        guard let snapshot = snapshot else { return }
+        
+        let group =  DispatchGroup()
+        var loveStoriesTemp = [FirebaseStory?]()
+        
+        for (index, document) in snapshot.documents.enumerated() {
+          
+          group.enter()
+          loveStoriesTemp.append(nil)
+          
+          DispatchQueue(label: "loveStory").async {
+            database.collection(KEY_STORIES).document(document.documentID).getDocument(completion: { (storySnapshot, storyError) in
+              if let storyError = storyError {
+                print("Error get document: \(storyError)")
                 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
-                  guard let listTableView = self.listTableView,
-                    let activityIndicatorView = self.activityIndicatorView else { return }
-                  
-                  listTableView.reloadData()
-                  activityIndicatorView.stopAnimating()
-                  
-                  UIView.animate(withDuration: 0.2, animations: {
-                    listTableView.alpha = 1.0
-                  })
-                })
+                return
+              }
+              
+              guard let storySnapshot = storySnapshot, let data = storySnapshot.data() else { return }
+              
+              do {
+                let story = try FirestoreDecoder().decode(FirebaseStory.self, from: data)
+                loveStoriesTemp[index] = story
+                
+                group.leave()
               } catch let error {
-                guard let activityIndicatorView = self.activityIndicatorView else { return }
-
                 print(error)
+                
                 activityIndicatorView.stopAnimating()
               }
             })
           }
         }
         
-        if snapshot.value as? [String: Any] == nil {
+        group.notify(queue: DispatchQueue(label: "loveStory")) {
+          DispatchQueue.main.async {
+            guard let listTableView = self.listTableView else { return }
+            
+            for loveStory in loveStoriesTemp {
+              if let loveStory = loveStory {
+                self.loveStories.append(loveStory)
+              }
+            }
+            
+            listTableView.reloadData()
+            
+            activityIndicatorView.stopAnimating()
+            
+            UIView.animate(withDuration: 0.2, animations: {
+              listTableView.alpha = 1.0
+            })
+          }
+        }
+        
+        if snapshot.documents.isEmpty {
           guard let activityIndicatorView = self.activityIndicatorView else { return }
           
           activityIndicatorView.stopAnimating()
         }
-      }
+      })
     }
   }
   
   private func loadLoveQna() {
-    guard let currentUser = ANISessionManager.shared.currentUser,
-          let uid = currentUser.uid else { return }
+    guard let currentUserId = ANISessionManager.shared.currentUserUid,
+          let activityIndicatorView = self.activityIndicatorView else { return }
+    
+    let database = Firestore.firestore()
     
     DispatchQueue.global().async {
-      let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_LOVE_QNA_IDS).child(uid).queryOrderedByValue().queryLimited(toFirst: 20).observeSingleEvent(of: .value) { (snapshot) in
+      database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_QNA_IDS).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
         
-        for item in snapshot.children {
-          if let snapshot = item as? DataSnapshot {
-            databaseRef.child(KEY_QNAS).child(snapshot.key).observeSingleEvent(of: .value, with: { (snapshot) in
-              
-              guard let value = snapshot.value else { return }
-              do {
-                let qna = try FirebaseDecoder().decode(FirebaseQna.self, from: value)
-                self.loveQnas.insert(qna, at: 0)
+        guard let snapshot = snapshot else { return }
+        
+        let group =  DispatchGroup()
+        var loveQnasTemp = [FirebaseQna?]()
+        
+        for (index, document) in snapshot.documents.enumerated() {
+          
+          group.enter()
+          loveQnasTemp.append(nil)
+          
+          DispatchQueue(label: "loveQna").async {
+            database.collection(KEY_QNAS).document(document.documentID).getDocument(completion: { (qnaSnapshot, qnaError) in
+              if let qnaError = qnaError {
+                print("Error get document: \(qnaError)")
                 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
-                  guard let listTableView = self.listTableView,
-                    let activityIndicatorView = self.activityIndicatorView else { return }
-                  
-                  listTableView.reloadData()
-                  activityIndicatorView.stopAnimating()
-                  
-                  UIView.animate(withDuration: 0.2, animations: {
-                    listTableView.alpha = 1.0
-                  })
-                })
+                return
+              }
+              
+              guard let qnaSnapshot = qnaSnapshot, let data = qnaSnapshot.data() else { return }
+              
+              do {
+                let qna = try FirestoreDecoder().decode(FirebaseQna.self, from: data)
+                loveQnasTemp[index] = qna
+                
+                group.leave()
               } catch let error {
-                guard let activityIndicatorView = self.activityIndicatorView else { return }
-
                 print(error)
+                
                 activityIndicatorView.stopAnimating()
               }
             })
           }
         }
         
-        if snapshot.value as? [String: Any] == nil {
+        group.notify(queue: DispatchQueue(label: "loveQna")) {
+          DispatchQueue.main.async {
+            guard let listTableView = self.listTableView else { return }
+            
+            for loveQna in loveQnasTemp {
+              if let loveQna = loveQna {
+                self.loveQnas.append(loveQna)
+              }
+            }
+            
+            listTableView.reloadData()
+            
+            activityIndicatorView.stopAnimating()
+            
+            UIView.animate(withDuration: 0.2, animations: {
+              listTableView.alpha = 1.0
+            })
+          }
+        }
+        
+        if snapshot.documents.isEmpty {
           guard let activityIndicatorView = self.activityIndicatorView else { return }
           
           activityIndicatorView.stopAnimating()
         }
-      }
+      })
     }
   }
   
   private func loadClipRecruit() {
-    guard let currentUser = ANISessionManager.shared.currentUser,
-          let uid = currentUser.uid else { return }
+    guard let currentUserId = ANISessionManager.shared.currentUserUid,
+          let activityIndicatorView = self.activityIndicatorView else { return }
+    
+    let database = Firestore.firestore()
     
     DispatchQueue.global().async {
-      let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_CLIP_RECRUIT_IDS).child(uid).queryOrderedByValue().queryLimited(toFirst: 20).observeSingleEvent(of: .value) { (snapshot) in
+      database.collection(KEY_USERS).document(currentUserId).collection(KEY_CLIP_RECRUIT_IDS).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
         
-        for item in snapshot.children {
-          if let snapshot = item as? DataSnapshot {
-            databaseRef.child(KEY_RECRUITS).child(snapshot.key).observeSingleEvent(of: .value, with: { (snapshot) in
+        guard let snapshot = snapshot else { return }
+        
+        let group =  DispatchGroup()
+        var clipRecruitsTemp = [FirebaseRecruit?]()
+        
+        for (index, document) in snapshot.documents.enumerated() {
+          
+          group.enter()
+          clipRecruitsTemp.append(nil)
+          
+          DispatchQueue(label: "clipRecruit").async {
+            database.collection(KEY_RECRUITS).document(document.documentID).getDocument(completion: { (recruitSnapshot, recruitError) in
+              if let recruitError = recruitError {
+                print("Error get document: \(recruitError)")
+                
+                return
+              }
               
-              guard let value = snapshot.value else { return }
+              guard let recruitSnapshot = recruitSnapshot, let data = recruitSnapshot.data() else { return }
+              
               do {
-                let recruit = try FirebaseDecoder().decode(FirebaseRecruit.self, from: value)
-                self.clipRecruits.insert(recruit, at: 0)
+                let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: data)
+                clipRecruitsTemp[index] = recruit
                 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
-                  guard let listTableView = self.listTableView,
-                    let activityIndicatorView = self.activityIndicatorView else { return }
-                  
-                  listTableView.reloadData()
-                  activityIndicatorView.stopAnimating()
-                  
-                  UIView.animate(withDuration: 0.2, animations: {
-                    listTableView.alpha = 1.0
-                  })
-                })
+                group.leave()
               } catch let error {
-                guard let activityIndicatorView = self.activityIndicatorView else { return }
-                
                 print(error)
+                
                 activityIndicatorView.stopAnimating()
               }
             })
           }
         }
         
-        if snapshot.value as? [String: Any] == nil {
+        group.notify(queue: DispatchQueue(label: "clipRecruit")) {
+          DispatchQueue.main.async {
+            guard let listTableView = self.listTableView else { return }
+            
+            for clipRecruit in clipRecruitsTemp {
+              if let clipRecruit = clipRecruit {
+                self.clipRecruits.append(clipRecruit)
+              }
+            }
+            
+            listTableView.reloadData()
+            
+            activityIndicatorView.stopAnimating()
+            
+            UIView.animate(withDuration: 0.2, animations: {
+              listTableView.alpha = 1.0
+            })
+          }
+        }
+        
+        if snapshot.documents.isEmpty {
           guard let activityIndicatorView = self.activityIndicatorView else { return }
           
           activityIndicatorView.stopAnimating()
         }
-      }
+      })
     }
   }
 }

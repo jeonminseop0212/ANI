@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import FirebaseDatabase
+import FirebaseFirestore
 import CodableFirebase
 import NVActivityIndicatorView
 
@@ -84,62 +84,6 @@ class ANIStoryView: UIView {
     ANINotificationManager.receive(communityTabTapped: self, selector: #selector(scrollToTop))
   }
   
-  @objc private func loadStory(sender: UIRefreshControl?) {
-    guard let activityIndicatorView = self.activityIndicatorView else { return }
-    
-    if !self.stories.isEmpty {
-      self.stories.removeAll()
-    }
-    
-    if sender == nil {
-      activityIndicatorView.startAnimating()
-    }
-    
-    DispatchQueue.global().async {
-      let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_STORIES).queryLimited(toFirst: 20).observeSingleEvent(of: .value, with: { (snapshot) in
-        
-        for item in snapshot.children {
-          if let snapshot = item as? DataSnapshot, let value = snapshot.value {
-            do {
-              let story = try FirebaseDecoder().decode(FirebaseStory.self, from: value)
-              self.stories.insert(story, at: 0)
-              
-              DispatchQueue.main.async {
-                if let sender = sender {
-                  sender.endRefreshing()
-                }
-                
-                guard let storyTableView = self.storyTableView else { return }
-                
-                activityIndicatorView.stopAnimating()
-                
-                storyTableView.reloadData()
-                
-                UIView.animate(withDuration: 0.2, animations: {
-                  storyTableView.alpha = 1.0
-                })
-              }
-            } catch let error {
-              print(error)
-              
-              activityIndicatorView.stopAnimating()
-              
-              if let sender = sender {
-                sender.endRefreshing()
-              }
-            }
-          }
-        }
-        
-        if let sender = sender, snapshot.value as? [String: AnyObject] == nil {
-          sender.endRefreshing()
-          activityIndicatorView.stopAnimating()
-        }
-      })
-    }
-  }
-  
   @objc private func reloadStory() {
     loadStory(sender: nil)
   }
@@ -190,8 +134,10 @@ extension ANIStoryView: UITableViewDelegate {
     if !stories.isEmpty {
       if stories[indexPath.row].recruitId != nil, let cell = cell as? ANISupportViewCell {
         cell.unobserveLove()
+        cell.unobserveComment()
       } else if let cell = cell as? ANIStoryViewCell {
         cell.unobserveLove()
+        cell.unobserveComment()
       }
     }
   }
@@ -216,5 +162,73 @@ extension ANIStoryView: ANISupportViewCellDelegate {
   
   func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser) {
     self.delegate?.supportCellRecruitTapped(recruit: recruit, user: user)
+  }
+}
+
+//MARK: data
+extension ANIStoryView {
+  @objc private func loadStory(sender: UIRefreshControl?) {
+    guard let activityIndicatorView = self.activityIndicatorView else { return }
+    
+    if !self.stories.isEmpty {
+      self.stories.removeAll()
+    }
+    
+    if sender == nil {
+      activityIndicatorView.startAnimating()
+    }
+    
+    let database = Firestore.firestore()
+
+    DispatchQueue.global().async {
+      database.collection(KEY_STORIES).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
+        
+        guard let snapshot = snapshot else { return }
+        
+        for document in snapshot.documents {
+          do {
+            let story = try FirestoreDecoder().decode(FirebaseStory.self, from: document.data())
+            self.stories.append(story)
+            
+            DispatchQueue.main.async {
+              if let sender = sender {
+                sender.endRefreshing()
+              }
+              
+              guard let storyTableView = self.storyTableView else { return }
+              
+              activityIndicatorView.stopAnimating()
+              
+              storyTableView.reloadData()
+              
+              UIView.animate(withDuration: 0.2, animations: {
+                storyTableView.alpha = 1.0
+              })
+            }
+          } catch let error {
+            print(error)
+            
+            activityIndicatorView.stopAnimating()
+            
+            if let sender = sender {
+              sender.endRefreshing()
+            }
+          }
+        }
+        
+        if snapshot.documents.isEmpty {
+          if let sender = sender {
+            sender.endRefreshing()
+          }
+          
+          activityIndicatorView.stopAnimating()
+        }
+      })
+    }
   }
 }

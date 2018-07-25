@@ -10,6 +10,7 @@ import Foundation
 
 let KEY_FIRST_LAUNCH = "firstLaunch"
 let KEY_ID = "id"
+let KEY_DATE = "date"
 
 //user
 let KEY_UID = "uid"
@@ -28,10 +29,11 @@ let KEY_LOVE_RECRUIT_IDS = "loveRecruitIds"
 let KEY_CLIP_RECRUIT_IDS = "clipRecruitIds"
 let KEY_LOVE_STORY_IDS = "loveStoryIds"
 let KEY_LOVE_QNA_IDS = "loveQnaIds"
-let KEY_SUPPORT_RECRUIT_IDS = "supportRecruitIds"
+let KEY_SUPPORT_IDS = "supportIds"
 let KEY_FOLLOWING_USER_IDS = "followingUserIds"
 let KEY_FOLLOWER_IDS = "followerIds"
 let KEY_CHAT_GROUP_IDS = "chatGroupIds"
+let KEY_USER_ID = "userId"
 
 //recruit
 let KEY_RECRUIT_HEADER_IMAGES = "recruit_header_images"
@@ -47,7 +49,6 @@ let KEY_RECRUIT_SEX = "sex"
 //story
 let KEY_STORY_IMAGES = "story_images"
 let KEY_STORIES = "stories"
-let KEY_COMMENT_IDS = "commentIds"
 
 //qna
 let KEY_QNA_IMAGES = "qna_images"

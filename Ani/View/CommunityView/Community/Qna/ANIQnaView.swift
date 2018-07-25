@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import FirebaseDatabase
+import FirebaseFirestore
 import CodableFirebase
 import NVActivityIndicatorView
 
@@ -81,62 +81,6 @@ class ANIQnaView: UIView {
     ANINotificationManager.receive(communityTabTapped: self, selector: #selector(scrollToTop))
   }
   
-  @objc private func loadQna(sender: UIRefreshControl?) {
-    guard let activityIndicatorView = self.activityIndicatorView else { return }
-    
-    if !self.qnas.isEmpty {
-      self.qnas.removeAll()
-    }
-    
-    if sender == nil {
-      activityIndicatorView.startAnimating()
-    }
-    
-    DispatchQueue.global().async {
-      let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_QNAS).queryLimited(toFirst: 20).observeSingleEvent(of: .value, with: { (snapshot) in
-        
-        for item in snapshot.children {
-          if let snapshot = item as? DataSnapshot, let value = snapshot.value {
-            do {
-              let qna = try FirebaseDecoder().decode(FirebaseQna.self, from: value)
-              self.qnas.insert(qna, at: 0)
-              
-              DispatchQueue.main.async {
-                if let sender = sender {
-                  sender.endRefreshing()
-                }
-                
-                guard let qnaTableView = self.qnaTableView else { return }
-                
-                activityIndicatorView.stopAnimating()
-
-                qnaTableView.reloadData()
-                
-                UIView.animate(withDuration: 0.2, animations: {
-                  qnaTableView.alpha = 1.0
-                })
-              }
-            } catch let error {
-              print(error)
-              
-              activityIndicatorView.stopAnimating()
-              
-              if let sender = sender {
-                sender.endRefreshing()
-              }
-            }
-          }
-        }
-        
-        if let sender = sender, snapshot.value as? [String: AnyObject] == nil {
-          activityIndicatorView.stopAnimating()
-          sender.endRefreshing()
-        }
-      })
-    }
-  }
-  
   @objc private func reloadQna() {
     loadQna(sender: nil)
   }
@@ -174,6 +118,7 @@ extension ANIQnaView: UITableViewDelegate {
   func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
     if let cell = cell as? ANIQnaViewCell {
       cell.unobserveLove()
+      cell.unobserveComment()
     }
   }
 }
@@ -186,5 +131,73 @@ extension ANIQnaView: ANIQnaViewCellDelegate {
   
   func reject() {
     self.delegate?.reject()
+  }
+}
+
+//MARK: data
+extension ANIQnaView {
+  @objc private func loadQna(sender: UIRefreshControl?) {
+    guard let activityIndicatorView = self.activityIndicatorView else { return }
+    
+    if !self.qnas.isEmpty {
+      self.qnas.removeAll()
+    }
+    
+    if sender == nil {
+      activityIndicatorView.startAnimating()
+    }
+    
+    let database = Firestore.firestore()
+    
+    DispatchQueue.global().async {
+      database.collection(KEY_QNAS).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
+        
+        guard let snapshot = snapshot else { return }
+        
+        for document in snapshot.documents {
+          do {
+            let qna = try FirestoreDecoder().decode(FirebaseQna.self.self, from: document.data())
+            self.qnas.append(qna)
+            
+            DispatchQueue.main.async {
+              if let sender = sender {
+                sender.endRefreshing()
+              }
+              
+              guard let qnaTableView = self.qnaTableView else { return }
+              
+              activityIndicatorView.stopAnimating()
+              
+              qnaTableView.reloadData()
+              
+              UIView.animate(withDuration: 0.2, animations: {
+                qnaTableView.alpha = 1.0
+              })
+            }
+          } catch let error {
+            print(error)
+            
+            activityIndicatorView.stopAnimating()
+            
+            if let sender = sender {
+              sender.endRefreshing()
+            }
+          }
+        }
+        
+        if snapshot.documents.isEmpty {
+          if let sender = sender {
+            sender.endRefreshing()
+          }
+          
+          activityIndicatorView.stopAnimating()
+        }
+      })
+    }
   }
 }

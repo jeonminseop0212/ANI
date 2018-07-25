@@ -7,7 +7,8 @@
 //
 
 import UIKit
-import FirebaseDatabase
+import FirebaseFirestore
+import CodableFirebase
 
 class ANIFollowUserViewCell: UITableViewCell {
   
@@ -124,14 +125,20 @@ class ANIFollowUserViewCell: UITableViewCell {
           let followButton = self.followButton,
           let followLabel = self.followLabel else { return }
     
-    let databaseRef = Database.database().reference()
+    let database = Firestore.firestore()
     
     DispatchQueue.global().async {
-      databaseRef.child(KEY_FOLLOWING_USER_IDS).child(currentUserId).observeSingleEvent(of: .value) { (snapshot) in
-        guard let followingUser = snapshot.value as? [String: String] else { return }
+      database.collection(KEY_USERS).document(currentUserId).collection(KEY_FOLLOWING_USER_IDS).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
         
-        for id in followingUser.keys {
-          if id == userId {
+        guard let snapshot = snapshot else { return }
+        
+        for document in snapshot.documents {
+          if document.documentID == userId {
             followButton.base?.backgroundColor = .clear
             followLabel.text = "フォロー中"
             followLabel.textColor = ANIColor.green
@@ -144,11 +151,40 @@ class ANIFollowUserViewCell: UITableViewCell {
           }
         }
         
+        if snapshot.documents.isEmpty {
+          followButton.base?.backgroundColor = ANIColor.green
+          followLabel.text = "フォロー"
+          followLabel.textColor = .white
+        }
+        
         DispatchQueue.main.async {
           UIView.animate(withDuration: 0.1, animations: {
             followButton.alpha = 1.0
           })
         }
+      })
+    }
+  }
+  
+  private func updateNoti() {
+    guard let currentUser = ANISessionManager.shared.currentUser,
+          let currentUserName = currentUser.userName,
+          let currentUserId = ANISessionManager.shared.currentUserUid,
+          let user = self.user,
+          let userId = user.uid else { return }
+    
+    let database = Firestore.firestore()
+    
+    DispatchQueue.global().async {
+      do {
+        let noti = "\(currentUserName)さんがあなたをフォローしました。"
+        let date = ANIFunction.shared.getToday()
+        let notification = FirebaseNotification(userId: currentUserId, noti: noti, kind: KEY_NOTI_KIND_FOLLOW, notiId: userId, commentId: nil, updateDate: date)
+        let data = try FirestoreEncoder().encode(notification)
+        
+        database.collection(KEY_USERS).document(userId).collection(KEY_NOTIFICATIONS).document(currentUserId).setData(data)
+      } catch let error {
+        print(error)
       }
     }
   }
@@ -172,13 +208,15 @@ extension ANIFollowUserViewCell: ANIButtonViewDelegate {
             let followButton = self.followButton,
             let followLabel = self.followLabel else { return }
       
-      let databaseRef = Database.database().reference()
+      let database = Firestore.firestore()
       
       if followButton.base?.backgroundColor == ANIColor.green {
         DispatchQueue.global().async {
           let date = ANIFunction.shared.getToday()
-          databaseRef.child(KEY_USERS).child(currentUserUid).child(KEY_FOLLOWING_USER_IDS).updateChildValues([userId: date])
-          databaseRef.child(KEY_USERS).child(userId).child(KEY_FOLLOWER_IDS).updateChildValues([currentUserUid: date])
+          database.collection(KEY_USERS).document(currentUserUid).collection(KEY_FOLLOWING_USER_IDS).document(userId).setData([KEY_DATE: date])
+          database.collection(KEY_USERS).document(userId).collection(KEY_FOLLOWER_IDS).document(currentUserUid).setData([KEY_DATE: date])
+          
+          self.updateNoti()
         }
         
         followButton.base?.backgroundColor = .clear
@@ -186,8 +224,8 @@ extension ANIFollowUserViewCell: ANIButtonViewDelegate {
         followLabel.textColor = ANIColor.green
       } else {
         DispatchQueue.global().async {
-          databaseRef.child(KEY_USERS).child(currentUserUid).child(KEY_FOLLOWING_USER_IDS).child(userId).removeValue()
-          databaseRef.child(KEY_USERS).child(userId).child(KEY_FOLLOWER_IDS).child(currentUserUid).removeValue()
+          database.collection(KEY_USERS).document(currentUserUid).collection(KEY_FOLLOWING_USER_IDS).document(userId).delete()
+          database.collection(KEY_USERS).document(userId).collection(KEY_FOLLOWER_IDS).document(currentUserUid).delete()
         }
         
         followButton.base?.backgroundColor = ANIColor.green

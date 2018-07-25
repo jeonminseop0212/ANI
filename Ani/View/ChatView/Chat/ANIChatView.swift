@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import FirebaseDatabase
+import FirebaseFirestore
 import CodableFirebase
 
 class ANIChatView: UIView {
@@ -50,37 +50,12 @@ class ANIChatView: UIView {
     self.chatTableView = chatTableView
   }
   
-  private func loadMessage() {
-    guard let chatGroupId = self.chatGroupId else { return }
-    
-    let databaseRef = Database.database().reference()
-    
-    DispatchQueue.global().async {
-      databaseRef.child(KEY_CHAT_MESSAGES).child(chatGroupId).queryOrderedByKey().queryLimited(toFirst: 20).observe(.childAdded) { (snapshot) in
-        guard let value = snapshot.value else { return }
-        
-        do {
-          let message = try FirebaseDecoder().decode(FirebaseChatMessage.self, from: value)
-          
-          self.messages.append(message)
-          
-          DispatchQueue.main.async {
-            guard let chatTableView = self.chatTableView else { return }
-            
-            chatTableView.reloadData()
-            self.scrollToBottom()
-          }
-        } catch let error {
-          print(error)
-        }
-      }
-    }
-  }
-  
   func scrollToBottom() {
     guard let chatTableView = self.chatTableView else { return }
     
-    chatTableView.scrollToRow(at: [0, messages.count - 1], at: .bottom, animated: false)
+    if !messages.isEmpty {
+      chatTableView.scrollToRow(at: [0, messages.count - 1], at: .bottom, animated: false)
+    }
   }
 }
 
@@ -108,6 +83,45 @@ extension ANIChatView: UITableViewDataSource {
       cell.user = self.user
       
       return cell
+    }
+  }
+}
+
+//MAKR: data
+extension ANIChatView {
+  private func loadMessage() {
+    guard let chatGroupId = self.chatGroupId else { return }
+    
+    let database = Firestore.firestore()
+    
+    DispatchQueue.global().async {
+      database.collection(KEY_CHAT_GROUPS).document(chatGroupId).collection(KEY_CHAT_MESSAGES).addSnapshotListener({ (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
+        guard let snapshot = snapshot else { return }
+        
+        snapshot.documentChanges.forEach({ (diff) in
+          if diff.type == .added {
+            do {
+              let message = try FirestoreDecoder().decode(FirebaseChatMessage.self, from: diff.document.data())
+              
+              self.messages.append(message)
+              
+              DispatchQueue.main.async {
+                guard let chatTableView = self.chatTableView else { return }
+                
+                chatTableView.reloadData()
+                self.scrollToBottom()
+              }
+            } catch let error {
+              print(error)
+            }
+          }
+        })
+      })
     }
   }
 }

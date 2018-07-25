@@ -8,8 +8,8 @@
 
 import UIKit
 import FirebaseAuth
-import FirebaseDatabase
 import FirebaseStorage
+import FirebaseFirestore
 import CodableFirebase
 import NVActivityIndicatorView
 
@@ -319,47 +319,55 @@ class ANISignUpView: UIView {
       }
       
       if let profileImageUrl = metaData?.downloadURL() {
-        let values = [KEY_UID: currentUser.uid, KEY_USER_NAME: userName, KEY_KIND: "個人", KEY_INTRODUCE: "", KEY_PROFILE_IMAGE_URL: profileImageUrl.absoluteString] as [String : AnyObject]
-        self.uploadUserIntoDatabase(uid: currentUser.uid, values: values)
+        let user = FirebaseUser(uid: currentUser.uid, userName: userName, kind: "個人", introduce: "", profileImageUrl: profileImageUrl.absoluteString, familyImageUrls: nil)
+        self.uploadUserIntoDatabase(uid: currentUser.uid, user: user)
       }
     }
   }
   
-  private func uploadUserIntoDatabase(uid: String, values: [String: AnyObject]) {
-    let databaseRef = Database.database().reference(fromURL: "https://ani-ios-1faa3.firebaseio.com/")
-    let userRef = databaseRef.child(KEY_USERS).child(uid)
+  private func uploadUserIntoDatabase(uid: String, user: FirebaseUser) {
+    let database = Firestore.firestore()
     
-    userRef.updateChildValues(values) { (error, ref) in
-      if error != nil {
-        print("dataError")
-        return
-      }
-            
-      self.pushDataAlgolia(data: values)
+    do {
+      let userData = try FirestoreEncoder().encode(user)
       
-      ANISessionManager.shared.currentUserUid = Auth.auth().currentUser?.uid
-      if let currentUserUid = ANISessionManager.shared.currentUserUid {
-        DispatchQueue.global().async {
-          Database.database().reference().child(KEY_USERS).child(currentUserUid).observe(.value, with: { (snapshot) in
-            guard let value = snapshot.value else { return }
-            do {
-              let user = try FirebaseDecoder().decode(FirebaseUser.self, from: value)
-              DispatchQueue.main.async {
-                ANISessionManager.shared.currentUser = user
-                ANISessionManager.shared.isAnonymous = false
-                self.delegate?.signUpSuccess()
-
+      database.collection(KEY_USERS).document(uid).setData(userData) { error in
+        if let error = error {
+          print("Error set document: \(error)")
+          return
+        }
+        
+        self.pushDataAlgolia(data: userData as [String: AnyObject])
+        
+        ANISessionManager.shared.currentUserUid = Auth.auth().currentUser?.uid
+        if let currentUserUid = ANISessionManager.shared.currentUserUid {
+          DispatchQueue.global().async {
+            database.collection(KEY_USERS).document(currentUserUid).addSnapshotListener({ (snapshot, error) in
+              guard let snapshot = snapshot, let value = snapshot.data() else { return }
+              
+              do {
+                let user = try FirestoreDecoder().decode(FirebaseUser.self, from: value)
+                
+                DispatchQueue.main.async {
+                  ANISessionManager.shared.currentUser = user
+                  ANISessionManager.shared.isAnonymous = false
+                  self.delegate?.signUpSuccess()
+                  
+                  NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+                }
+              } catch let error {
+                print(error)
                 NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
               }
-            } catch let error {
-              print(error)
-              NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
-            }
-          })
+            })
+          }
         }
       }
       
       self.endEditing(true)
+    } catch let error {
+      print(error)
+      NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
     }
   }
   

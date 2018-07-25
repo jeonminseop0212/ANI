@@ -73,8 +73,9 @@ class ANIPopupPickerViewController: UIViewController {
   }
 }
 
+//ANIPopupPickerViewDelegate
 extension ANIPopupPickerViewController: ANIPopupPickerViewDelegate {
-  func cancelButtonTapped() {
+  func okeyButtonTapped() {
     pickerViewDismiss()
   }
 }

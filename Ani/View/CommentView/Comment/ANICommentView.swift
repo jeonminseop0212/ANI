@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import FirebaseDatabase
+import FirebaseFirestore
 import CodableFirebase
 
 class ANICommentView: UIView {
@@ -54,59 +54,6 @@ class ANICommentView: UIView {
     addSubview(commentTableView)
     commentTableView.edgesToSuperview()
     self.commentTableView = commentTableView
-  }
-  
-  private func loadComment() {
-    guard let commentMode = self.commentMode else { return }
-    
-    let databaseRef = Database.database().reference()
-
-    switch commentMode {
-    case .story:
-      guard let story = self.story,
-            let storyId = story.id else { return }
-      
-      DispatchQueue.global().async {
-        
-        databaseRef.child(KEY_COMMENTS).child(storyId).observe(.childAdded) { (snapshot) in
-          guard let value = snapshot.value else { return }
-          do {
-            let comment = try FirebaseDecoder().decode(FirebaseComment.self, from: value)
-            
-            self.comments.append(comment)
-            DispatchQueue.main.async {
-              guard let commentTableView = self.commentTableView else { return }
-
-              commentTableView.reloadData()
-            }
-          } catch let error {
-            print(error)
-          }
-        }
-      }
-    case .qna:
-      guard let qna = self.qna,
-            let qnaId = qna.id else { return }
-      
-      DispatchQueue.global().async {
-        
-        databaseRef.child(KEY_COMMENTS).child(qnaId).observe(.childAdded) { (snapshot) in
-          guard let value = snapshot.value else { return }
-          do {
-            let comment = try FirebaseDecoder().decode(FirebaseComment.self, from: value)
-            
-            self.comments.append(comment)
-            DispatchQueue.main.async {
-              guard let commentTableView = self.commentTableView else { return }
-              
-              commentTableView.reloadData()
-            }
-          } catch let error {
-            print(error)
-          }
-        }
-      }
-    }
   }
 }
 
@@ -162,5 +109,81 @@ extension ANICommentView: UITableViewDelegate {
   
   func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
     originalScrollY = scrollView.contentOffset.y
+  }
+}
+
+//MARK: data
+extension ANICommentView {
+  private func loadComment() {
+    guard let commentMode = self.commentMode else { return }
+    
+    let database = Firestore.firestore()
+    
+    switch commentMode {
+    case .story:
+      guard let story = self.story,
+            let storyId = story.id else { return }
+      
+      DispatchQueue.global().async {
+        database.collection(KEY_STORIES).document(storyId).collection(KEY_COMMENTS).order(by: KEY_DATE, descending: false).addSnapshotListener({ (snapshot, error) in
+          if let error = error {
+            print("Error get document: \(error)")
+
+            return
+          }
+
+          guard let snapshot = snapshot else { return }
+          
+          snapshot.documentChanges.forEach({ (diff) in
+            if diff.type == .added {
+              do {
+                let comment = try FirestoreDecoder().decode(FirebaseComment.self, from: diff.document.data())
+                
+                self.comments.append(comment)
+                DispatchQueue.main.async {
+                  guard let commentTableView = self.commentTableView else { return }
+                  
+                  commentTableView.reloadData()
+                }
+              } catch let error {
+                print(error)
+              }
+            }
+          })
+        })
+      }
+    case .qna:
+      guard let qna = self.qna,
+            let qnaId = qna.id else { return }
+      
+      DispatchQueue.global().async {
+        database.collection(KEY_QNAS).document(qnaId).collection(KEY_COMMENTS).order(by: KEY_DATE, descending: false).addSnapshotListener({ (snapshot, error) in
+          if let error = error {
+            print("Error get document: \(error)")
+            
+            return
+          }
+          
+          guard let snapshot = snapshot else { return }
+          
+          snapshot.documentChanges.forEach({ (diff) in
+            if diff.type == .added {
+              do {
+                let comment = try FirestoreDecoder().decode(FirebaseComment.self, from: diff.document.data())
+                
+                self.comments.append(comment)
+                DispatchQueue.main.async {
+                  guard let commentTableView = self.commentTableView else { return }
+                  
+                  commentTableView.reloadData()
+                }
+              } catch let error {
+                print(error)
+              }
+            }
+          })
+        })
+      }
+    }
   }
 }

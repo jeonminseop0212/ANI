@@ -8,7 +8,7 @@
 
 import UIKit
 import WCLShineButton
-import FirebaseDatabase
+import FirebaseFirestore
 import CodableFirebase
 import TinyConstraints
 
@@ -219,20 +219,27 @@ extension ANINotiCommentViewCell {
   private func loadUser() {
     guard let comment = self.comment else { return }
     
+    let database = Firestore.firestore()
+    
     DispatchQueue.global().async {
-      let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_USERS).child(comment.userId).observeSingleEvent(of: .value, with: { (userSnapshot) in
-        if let userValue = userSnapshot.value {
-          do {
-            let user = try FirebaseDecoder().decode(FirebaseUser.self, from: userValue)
-            self.user = user
-            
-            DispatchQueue.main.async {
-              self.reloadUserLayout(user: user)
-            }
-          } catch let error {
-            print(error)
+      database.collection(KEY_USERS).document(comment.userId).getDocument(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
+        
+        guard let snapshot = snapshot, let data = snapshot.data() else { return }
+        
+        do {
+          let user = try FirebaseDecoder().decode(FirebaseUser.self, from: data)
+          self.user = user
+          
+          DispatchQueue.main.async {
+            self.reloadUserLayout(user: user)
           }
+        } catch let error {
+          print(error)
         }
       })
     }

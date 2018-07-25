@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import FirebaseDatabase
 import CodableFirebase
 import NVActivityIndicatorView
 import InstantSearchClient

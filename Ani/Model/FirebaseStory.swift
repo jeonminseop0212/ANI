@@ -18,5 +18,6 @@ struct FirebaseStory: Codable {
   let recruitId: String?
   let recruitTitle: String?
   let recruitSubTitle: String?
+  let date: String
 }
 

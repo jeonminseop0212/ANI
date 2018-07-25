@@ -8,7 +8,7 @@
 
 import UIKit
 import WCLShineButton
-import FirebaseDatabase
+import FirebaseFirestore
 import CodableFirebase
 import TinyConstraints
 
@@ -39,10 +39,14 @@ class ANIQnaViewCell: UITableViewCell {
       loadUser()
       isLoved()
       observeLove()
+      observeComment()
     }
   }
   
-  var user: FirebaseUser?
+  private var user: FirebaseUser?
+  
+  private var loveListener: ListenerRegistration?
+  private var commentListener: ListenerRegistration?
   
   var delegate: ANIQnaViewCellDelegate?
   
@@ -237,60 +241,66 @@ class ANIQnaViewCell: UITableViewCell {
     userNameLabel.text = userName
   }
   
-  private func loadUser() {
-    guard let qna = self.qna else { return }
+  private func observeLove() {
+    guard let qna = self.qna,
+          let qnaId = qna.id,
+          let loveCountLabel = self.loveCountLabel else { return }
     
+    let database = Firestore.firestore()
     DispatchQueue.global().async {
-      let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_USERS).child(qna.userId).observeSingleEvent(of: .value, with: { (userSnapshot) in
-        if let userValue = userSnapshot.value {
-          do {
-            let user = try FirebaseDecoder().decode(FirebaseUser.self, from: userValue)
-            self.user = user
-            
-            DispatchQueue.main.async {
-              self.reloadUserLayout(user: user)
-            }
-          } catch let error {
-            print(error)
+      self.loveListener = database.collection(KEY_QNAS).document(qnaId).collection(KEY_LOVE_IDS).addSnapshotListener({ (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
+        
+        DispatchQueue.main.async {
+          if let snapshot = snapshot {
+            loveCountLabel.text = "\(snapshot.documents.count)"
+          } else {
+            loveCountLabel.text = "0"
           }
         }
       })
     }
   }
   
-  private func observeLove() {
-    guard let qna = self.qna,
-          let qnaId = qna.id else { return }
+  func unobserveLove() {
+    guard let loveListener = self.loveListener else { return }
     
-    let databaseRef = Database.database().reference()
+    loveListener.remove()
+  }
+  
+  private func observeComment() {
+    guard let qna = self.qna,
+          let qnaId = qna.id,
+          let commentCountLabel = self.commentCountLabel else { return }
+    
+    let database = Firestore.firestore()
     DispatchQueue.global().async {
-      databaseRef.child(KEY_QNAS).child(qnaId).child(KEY_LOVE_IDS).observe(.value) { (snapshot) in
-        if let loveIds = snapshot.value as? [String: AnyObject] {
-          DispatchQueue.main.async {
-            guard let loveCountLabel = self.loveCountLabel else { return }
-            
-            loveCountLabel.text = "\(loveIds.count)"
-          }
-        } else {
-          DispatchQueue.main.async {
-            guard let loveCountLabel = self.loveCountLabel else { return }
-            
-            loveCountLabel.text = "0"
+      self.commentListener = database.collection(KEY_QNAS).document(qnaId).collection(KEY_COMMENTS).addSnapshotListener({ (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
+        
+        DispatchQueue.main.async {
+          if let snapshot = snapshot {
+            commentCountLabel.text = "\(snapshot.documents.count)"
+          } else {
+            commentCountLabel.text = "0"
           }
         }
-      }
+      })
     }
   }
   
-  func unobserveLove() {
-    guard let qna = self.qna,
-          let qnaId = qna.id else { return }
+  func unobserveComment() {
+    guard let commentListener = self.commentListener else { return }
     
-    let databaseRef = Database.database().reference()
-    DispatchQueue.global().async {
-      databaseRef.child(KEY_QNAS).child(qnaId).child(KEY_LOVE_IDS).removeAllObservers()
-    }
+    commentListener.remove()
   }
   
   private func isLoved() {
@@ -298,21 +308,27 @@ class ANIQnaViewCell: UITableViewCell {
           let qnaId = qna.id,
           let currentUserId = ANISessionManager.shared.currentUserUid else { return }
     
-    let databaseRef = Database.database().reference()
+    let database = Firestore.firestore()
     DispatchQueue.global().async {
-      databaseRef.child(KEY_QNAS).child(qnaId).child(KEY_LOVE_IDS).observeSingleEvent(of: .value) { (snapshot) in
-        for item in snapshot.children {
-          if let snapshot = item as? DataSnapshot {
-            if snapshot.key == currentUserId {
-              DispatchQueue.main.async {
-                guard let loveButton = self.loveButton else { return }
-                
-                loveButton.isSelected = true
-              }
+      database.collection(KEY_QNAS).document(qnaId).collection(KEY_LOVE_IDS).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
+        
+        guard let snapshot = snapshot else { return }
+        
+        for document in snapshot.documents {
+          if document.documentID == currentUserId {
+            DispatchQueue.main.async {
+              guard let loveButton = self.loveButton else { return }
+              
+              loveButton.isSelected = true
             }
           }
         }
-      }
+      })
     }
   }
   
@@ -325,7 +341,7 @@ class ANIQnaViewCell: UITableViewCell {
           let user = self.user,
           let userId = user.uid else { return }
     
-    let databaseRef = Database.database().reference()
+    let database = Firestore.firestore()
     
     DispatchQueue.global().async {
       do {
@@ -334,7 +350,7 @@ class ANIQnaViewCell: UITableViewCell {
         let notification = FirebaseNotification(userId: currentUserId, noti: noti, kind: KEY_NOTI_KIND_QNA, notiId: qnaId, commentId: nil, updateDate: date)
         if let data = try FirebaseEncoder().encode(notification) as? [String: AnyObject] {
           
-          databaseRef.child(KEY_NOTIFICATIONS).child(userId).child(qnaId).updateChildValues(data)
+          database.collection(KEY_USERS).document(userId).collection(KEY_NOTIFICATIONS).document(qnaId).setData(data)
         }
       } catch let error {
         print(error)
@@ -349,19 +365,21 @@ class ANIQnaViewCell: UITableViewCell {
           let currentUserId = ANISessionManager.shared.currentUserUid,
           let loveButton = self.loveButton else { return }
     
-    let databaseRef = Database.database().reference()
+    let database = Firestore.firestore()
+    
     if loveButton.isSelected == true {
       DispatchQueue.global().async {
-        databaseRef.child(KEY_QNAS).child(qnaId).child(KEY_LOVE_IDS).updateChildValues([currentUserId: true])
+        database.collection(KEY_QNAS).document(qnaId).collection(KEY_LOVE_IDS).document(currentUserId).setData([currentUserId: true])
+        
         let date = ANIFunction.shared.getToday()
-        databaseRef.child(KEY_LOVE_QNA_IDS).child(currentUserId).updateChildValues([qnaId: date])
+        database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_QNA_IDS).document(qnaId).setData([KEY_DATE: date])
         
         self.updateNoti()
       }
     } else {
       DispatchQueue.global().async {
-        databaseRef.child(KEY_QNAS).child(qnaId).child(KEY_LOVE_IDS).child(currentUserId).removeValue()
-        databaseRef.child(KEY_LOVE_QNA_IDS).child(currentUserId).child(qnaId).removeValue()        
+        database.collection(KEY_QNAS).document(qnaId).collection(KEY_LOVE_IDS).document(currentUserId).delete()
+        database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_QNA_IDS).document(qnaId).delete()
       }
     }
   }
@@ -384,6 +402,37 @@ class ANIQnaViewCell: UITableViewCell {
       self.delegate?.cellTapped(qna: qna, user: user)
     } else {
       self.delegate?.reject()
+    }
+  }
+}
+
+//MARK: data
+extension ANIQnaViewCell {
+  private func loadUser() {
+    guard let qna = self.qna else { return }
+    
+    DispatchQueue.global().async {
+      let database = Firestore.firestore()
+      database.collection(KEY_USERS).document(qna.userId).getDocument(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
+        
+        guard let snapshot = snapshot, let data = snapshot.data() else { return }
+        
+        do {
+          let user = try FirebaseDecoder().decode(FirebaseUser.self, from: data)
+          self.user = user
+          
+          DispatchQueue.main.async {
+            self.reloadUserLayout(user: user)
+          }
+        } catch let error {
+          print(error)
+        }
+      })
     }
   }
 }

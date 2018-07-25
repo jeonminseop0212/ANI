@@ -8,7 +8,7 @@
 
 import UIKit
 import GrowingTextView
-import FirebaseDatabase
+import FirebaseFirestore
 import CodableFirebase
 
 class ANICommentBar: UIView {
@@ -135,7 +135,7 @@ class ANICommentBar: UIView {
           let userId = user.uid,
           let commentMode = self.commentMode else { return }
     
-    let databaseRef = Database.database().reference()
+    let database = Firestore.firestore()
     
     DispatchQueue.global().async {
       do {
@@ -160,10 +160,10 @@ class ANICommentBar: UIView {
         
         let date = ANIFunction.shared.getToday()
         let notification = FirebaseNotification(userId: currentUserId, noti: noti, kind: kind, notiId: notiId, commentId: commentId, updateDate: date)
-        if let data = try FirebaseEncoder().encode(notification) as? [String: AnyObject] {
-
-          databaseRef.child(KEY_NOTIFICATIONS).child(userId).childByAutoId().updateChildValues(data)
-        }
+        let id = NSUUID().uuidString
+        let data = try FirestoreEncoder().encode(notification)
+        
+        database.collection(KEY_USERS).document(userId).collection(KEY_NOTIFICATIONS).document(id).setData(data)
       } catch let error {
         print(error)
       }
@@ -178,11 +178,12 @@ class ANICommentBar: UIView {
           let uid = currentuser.uid,
           let commentMode = self.commentMode else { return }
     
-    let comment = FirebaseComment(userId: uid, comment: text, loveCount: 0, commentCount: 0)
+    let date = ANIFunction.shared.getToday()
+    let comment = FirebaseComment(userId: uid, comment: text, loveCount: 0, commentCount: 0, date: date)
     
     do {
       if let data = try FirebaseEncoder().encode(comment) as? [String : AnyObject] {
-        let detabaseRef = Database.database().reference()
+        let database = Firestore.firestore()
         
         switch commentMode {
         case .story:
@@ -190,14 +191,9 @@ class ANICommentBar: UIView {
                 let storyId = story.id else { return }
           
           DispatchQueue.global().async {
-            let databaseCommentRef = detabaseRef.child(KEY_COMMENTS).child(storyId).childByAutoId()
-            let id = databaseCommentRef.key
-            databaseCommentRef.updateChildValues(data)
-            
-            let detabaseStoryRef = detabaseRef.child(KEY_STORIES).child(storyId).child(KEY_COMMENT_IDS)
-            let value: [String: Bool] = [id: true]
-            detabaseStoryRef.updateChildValues(value)
-            
+            let id = NSUUID().uuidString
+            database.collection(KEY_STORIES).document(storyId).collection(KEY_COMMENTS).document(id).setData(data)
+
             self.updateNoti(commentId: id, comment: comment.comment)
           }
         case .qna:
@@ -205,14 +201,9 @@ class ANICommentBar: UIView {
                 let qnaId = qna.id else { return }
           
           DispatchQueue.global().async {
-            let databaseCommentRef = detabaseRef.child(KEY_COMMENTS).child(qnaId).childByAutoId()
-            let id = databaseCommentRef.key
-            databaseCommentRef.updateChildValues(data)
-            
-            let detabaseStoryRef = detabaseRef.child(KEY_QNAS).child(qnaId).child(KEY_COMMENT_IDS)
-            let value: [String: Bool] = [id: true]
-            detabaseStoryRef.updateChildValues(value)
-            
+            let id = NSUUID().uuidString
+            database.collection(KEY_QNAS).document(qnaId).collection(KEY_COMMENTS).document(id).setData(data)
+
             self.updateNoti(commentId: id, comment: comment.comment)
           }
         }

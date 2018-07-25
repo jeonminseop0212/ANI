@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import FirebaseDatabase
+import FirebaseFirestore
 import CodableFirebase
 
 protocol ANIProfileBasicViewDelegate {
@@ -43,11 +43,8 @@ class ANIProfileBasicView: UIView {
   
   var currentUser: FirebaseUser? {
     didSet {
-      loadRecruit()
-      loadStory()
-      loadQna()
-
       guard let basicTableView = self.basicTableView else { return }
+      
       basicTableView.reloadData()
     }
   }
@@ -103,6 +100,12 @@ class ANIProfileBasicView: UIView {
     
     basicTableView.scrollToRow(at: [0, 0], at: .top, animated: true)
   }
+  
+  func loadData() {
+    loadRecruit()
+    loadStory()
+    loadQna()
+  }
 }
 
 //MARK: UITableViewDataSource
@@ -131,9 +134,7 @@ extension ANIProfileBasicView: UITableViewDataSource {
   }
 
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let section = indexPath.section
-
-    if section == 0 {
+    if indexPath.section == 0 {
       let topCellId = NSStringFromClass(ANIProfileTopCell.self)
       let cell = tableView.dequeueReusableCell(withIdentifier: topCellId, for: indexPath) as! ANIProfileTopCell
       
@@ -290,80 +291,107 @@ extension ANIProfileBasicView: ANIQnaViewCellDelegate {
 //MARK: data
 extension ANIProfileBasicView {
   private func loadRecruit() {
-    guard let currentUser = self.currentUser,
-          let uid = currentUser.uid else { return }
+    guard let currentUserId = ANISessionManager.shared.currentUserUid else { return }
+    
+    let database = Firestore.firestore()
     
     DispatchQueue.global().async {
-      let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_POST_RECRUIT_IDS).child(uid).queryLimited(toFirst: 20).observe(.childAdded) { (snapshot) in
-        databaseRef.child(KEY_RECRUITS).child(snapshot.key).observeSingleEvent(of: .value, with: { (snapshot) in
+      database.collection(KEY_RECRUITS).whereField(KEY_USER_ID, isEqualTo: currentUserId).order(by: KEY_DATE, descending: false).addSnapshotListener({ (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
           
-          guard let value = snapshot.value else { return }
-          do {
-            let recruit = try FirebaseDecoder().decode(FirebaseRecruit.self, from: value)
-            self.recruits.insert(recruit, at: 0)
-            
-            DispatchQueue.main.async {
-              guard let basicTableView = self.basicTableView else { return }
-              basicTableView.reloadData()
+          return
+        }
+        
+        guard let snapshot = snapshot else { return }
+        
+        snapshot.documentChanges.forEach({ (diff) in
+          if diff.type == .added {
+            do {
+              let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: diff.document.data())
+              
+              self.recruits.insert(recruit, at: 0)
+              
+              DispatchQueue.main.async {
+                guard let basicTableView = self.basicTableView else { return }
+                basicTableView.reloadData()
+              }
+            } catch let error {
+              print(error)
             }
-          } catch let error {
-            print(error)
           }
         })
-      }
+      })
     }
   }
   
   private func loadStory() {
-    guard let currentUser = self.currentUser,
-          let uid = currentUser.uid else { return }
+    guard let currentUserId = ANISessionManager.shared.currentUserUid else { return }
+    
+    let database = Firestore.firestore()
     
     DispatchQueue.global().async {
-      let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_POST_STORY_IDS).child(uid).queryLimited(toFirst: 20).observe(.childAdded) { (snapshot) in
-        databaseRef.child(KEY_STORIES).child(snapshot.key).observeSingleEvent(of: .value, with: { (snapshot) in
+      database.collection(KEY_STORIES).whereField(KEY_USER_ID, isEqualTo: currentUserId).order(by: KEY_DATE, descending: false).addSnapshotListener({ (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
           
-          guard let value = snapshot.value else { return }
-          do {
-            let story = try FirebaseDecoder().decode(FirebaseStory.self, from: value)
-            self.stories.insert(story, at: 0)
-            
-            DispatchQueue.main.async {
-              guard let basicTableView = self.basicTableView else { return }
-              basicTableView.reloadData()
+          return
+        }
+        
+        guard let snapshot = snapshot else { return }
+        
+        snapshot.documentChanges.forEach({ (diff) in
+          if diff.type == .added {
+            do {
+              let story = try FirestoreDecoder().decode(FirebaseStory.self, from: diff.document.data())
+              
+              self.stories.insert(story, at: 0)
+              
+              DispatchQueue.main.async {
+                guard let basicTableView = self.basicTableView else { return }
+                basicTableView.reloadData()
+              }
+            } catch let error {
+              print(error)
             }
-          } catch let error {
-            print(error)
           }
         })
-      }
+      })
     }
   }
   
   private func loadQna() {
-    guard let currentUser = self.currentUser,
-          let uid = currentUser.uid else { return }
+    guard let currentUserId = ANISessionManager.shared.currentUserUid else { return }
     
+    let database = Firestore.firestore()
+
     DispatchQueue.global().async {
-      let databaseRef = Database.database().reference()
-      databaseRef.child(KEY_POST_QNA_IDS).child(uid).queryLimited(toFirst: 20).observe(.childAdded) { (snapshot) in
-        databaseRef.child(KEY_QNAS).child(snapshot.key).observeSingleEvent(of: .value, with: { (snapshot) in
+      database.collection(KEY_QNAS).whereField(KEY_USER_ID, isEqualTo: currentUserId).order(by: KEY_DATE, descending: false).addSnapshotListener({ (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
           
-          guard let value = snapshot.value else { return }
-          do {
-            let qna = try FirebaseDecoder().decode(FirebaseQna.self, from: value)
-            self.qnas.insert(qna, at: 0)
-            
-            DispatchQueue.main.async {
-              guard let basicTableView = self.basicTableView else { return }
-              basicTableView.reloadData()
+          return
+        }
+        
+        guard let snapshot = snapshot else { return }
+        
+        snapshot.documentChanges.forEach({ (diff) in
+          if diff.type == .added {
+            do {
+              let qna = try FirestoreDecoder().decode(FirebaseQna.self, from: diff.document.data())
+              
+              self.qnas.insert(qna, at: 0)
+              DispatchQueue.main.async {
+                guard let basicTableView = self.basicTableView else { return }
+                
+                basicTableView.reloadData()
+              }
+            } catch let error {
+              print(error)
             }
-          } catch let error {
-            print(error)
           }
         })
-      }
+      })
     }
   }
 }
