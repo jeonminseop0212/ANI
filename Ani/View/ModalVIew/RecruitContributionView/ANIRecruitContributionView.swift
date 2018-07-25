@@ -564,8 +564,12 @@ class ANIRecruitContributionView: UIView {
           let basicInfoHomeLabel = self.basicInfoHomeLabel,
           let basicInfoVaccineLabel = self.basicInfoVaccineLabel,
           let basicInfoCastrationLabel = self.basicInfoCastrationLabel,
-          let pickItem = notification.object as? String else { return }
+          var pickItem = notification.object as? String else { return }
 
+    if pickItem == "" {
+      pickItem = "わからない"
+    }
+    
     switch pickMode {
     case .kind:
       basicInfoKindLabel.text = "種類：\(pickItem)"

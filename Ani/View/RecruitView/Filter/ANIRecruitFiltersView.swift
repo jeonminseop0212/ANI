@@ -28,25 +28,25 @@ class ANIRecruitFiltersView: UIView {
       
       switch pickMode {
       case .home:
-        if pickItem == "選択しない" {
+        if pickItem == "選択しない" || pickItem == "" {
           filters[0] = "お家"
         } else {
           filters[0] = pickItem
         }
       case .kind:
-        if pickItem == "選択しない" {
+        if pickItem == "選択しない" || pickItem == "" {
           filters[1] = "種類"
         } else {
           filters[1] = pickItem
         }
       case .age:
-        if pickItem == "選択しない" {
+        if pickItem == "選択しない" || pickItem == "" {
           filters[2] = "年齢"
         } else {
           filters[2] = pickItem
         }
       case .sex:
-        if pickItem == "選択しない" {
+        if pickItem == "選択しない" || pickItem == "" {
           filters[3] = "性別"
         } else {
           filters[3] = pickItem
