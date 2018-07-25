@@ -179,7 +179,8 @@ class ANICommentBar: UIView {
           let commentMode = self.commentMode else { return }
     
     let date = ANIFunction.shared.getToday()
-    let comment = FirebaseComment(userId: uid, comment: text, loveCount: 0, commentCount: 0, date: date)
+//    let comment = FirebaseComment(userId: uid, comment: text, loveCount: 0, commentCount: 0, date: date)
+    let comment = FirebaseComment(userId: uid, comment: text, date: date)
     
     do {
       if let data = try FirebaseEncoder().encode(comment) as? [String : AnyObject] {

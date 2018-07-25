@@ -23,10 +23,10 @@ class ANINotiCommentViewCell: UITableViewCell {
   private weak var profileImageView: UIImageView?
   private weak var userNameLabel: UILabel?
   
-  private weak var loveButton: WCLShineButton?
-  private weak var loveCountLabel: UILabel?
-  private weak var commentButton: UIButton?
-  private weak var commentCountLabel: UILabel?
+//  private weak var loveButton: WCLShineButton?
+//  private weak var loveCountLabel: UILabel?
+//  private weak var commentButton: UIButton?
+//  private weak var commentCountLabel: UILabel?
   
   private weak var bottomLine: UIImageView?
   
@@ -112,53 +112,53 @@ class ANINotiCommentViewCell: UITableViewCell {
     profileImageView.leftToSuperview(offset: 10.0)
     self.profileImageView = profileImageView
     
-    //commentCountLabel
-    let commentCountLabel = UILabel()
-    commentCountLabel.textColor = ANIColor.dark
-    commentCountLabel.font = UIFont.boldSystemFont(ofSize: 14.0)
-    base.addSubview(commentCountLabel)
-    commentCountLabel.centerY(to: profileImageView)
-    commentCountLabel.rightToSuperview(offset: 10.0)
-    commentCountLabel.width(20.0)
-    commentCountLabel.height(15.0)
-    self.commentCountLabel = commentCountLabel
-    
-    //commentButton
-    let commentButton = UIButton()
-    commentButton.setImage(UIImage(named: "comment"), for: .normal)
-    base.addSubview(commentButton)
-    commentButton.centerY(to: profileImageView)
-    commentButton.rightToLeft(of: commentCountLabel, offset: -10.0)
-    commentButton.width(15.0)
-    commentButton.height(15.0)
-    self.commentButton = commentButton
-    
-    //loveCountLabel
-    let loveCountLabel = UILabel()
-    loveCountLabel.textColor = ANIColor.dark
-    loveCountLabel.font = UIFont.boldSystemFont(ofSize: 14.0)
-    base.addSubview(loveCountLabel)
-    loveCountLabel.centerY(to: profileImageView)
-    loveCountLabel.rightToLeft(of: commentButton, offset: -10.0)
-    loveCountLabel.width(20.0)
-    loveCountLabel.height(15.0)
-    self.loveCountLabel = loveCountLabel
-    
-    //loveButton
-    var param = WCLShineParams()
-    param.bigShineColor = ANIColor.red
-    param.smallShineColor = ANIColor.pink
-    let loveButton = WCLShineButton(frame: CGRect(x: 0.0, y: 0.0, width: 15.0, height: 15.0), params: param)
-    loveButton.fillColor = ANIColor.red
-    loveButton.color = ANIColor.gray
-    loveButton.image = .heart
-    loveButton.addTarget(self, action: #selector(love), for: .valueChanged)
-    base.addSubview(loveButton)
-    loveButton.centerY(to: profileImageView)
-    loveButton.rightToLeft(of: loveCountLabel, offset: -10.0)
-    loveButton.width(15.0)
-    loveButton.height(15.0)
-    self.loveButton = loveButton
+//    //commentCountLabel
+//    let commentCountLabel = UILabel()
+//    commentCountLabel.textColor = ANIColor.dark
+//    commentCountLabel.font = UIFont.boldSystemFont(ofSize: 14.0)
+//    base.addSubview(commentCountLabel)
+//    commentCountLabel.centerY(to: profileImageView)
+//    commentCountLabel.rightToSuperview(offset: 10.0)
+//    commentCountLabel.width(20.0)
+//    commentCountLabel.height(15.0)
+//    self.commentCountLabel = commentCountLabel
+//
+//    //commentButton
+//    let commentButton = UIButton()
+//    commentButton.setImage(UIImage(named: "comment"), for: .normal)
+//    base.addSubview(commentButton)
+//    commentButton.centerY(to: profileImageView)
+//    commentButton.rightToLeft(of: commentCountLabel, offset: -10.0)
+//    commentButton.width(15.0)
+//    commentButton.height(15.0)
+//    self.commentButton = commentButton
+//
+//    //loveCountLabel
+//    let loveCountLabel = UILabel()
+//    loveCountLabel.textColor = ANIColor.dark
+//    loveCountLabel.font = UIFont.boldSystemFont(ofSize: 14.0)
+//    base.addSubview(loveCountLabel)
+//    loveCountLabel.centerY(to: profileImageView)
+//    loveCountLabel.rightToLeft(of: commentButton, offset: -10.0)
+//    loveCountLabel.width(20.0)
+//    loveCountLabel.height(15.0)
+//    self.loveCountLabel = loveCountLabel
+//
+//    //loveButton
+//    var param = WCLShineParams()
+//    param.bigShineColor = ANIColor.red
+//    param.smallShineColor = ANIColor.pink
+//    let loveButton = WCLShineButton(frame: CGRect(x: 0.0, y: 0.0, width: 15.0, height: 15.0), params: param)
+//    loveButton.fillColor = ANIColor.red
+//    loveButton.color = ANIColor.gray
+//    loveButton.image = .heart
+//    loveButton.addTarget(self, action: #selector(love), for: .valueChanged)
+//    base.addSubview(loveButton)
+//    loveButton.centerY(to: profileImageView)
+//    loveButton.rightToLeft(of: loveCountLabel, offset: -10.0)
+//    loveButton.width(15.0)
+//    loveButton.height(15.0)
+//    self.loveButton = loveButton
     
     //userNameLabel
     let userNameLabel = UILabel()
@@ -167,7 +167,8 @@ class ANINotiCommentViewCell: UITableViewCell {
     userNameLabel.numberOfLines = 0
     base.addSubview(userNameLabel)
     userNameLabel.leftToRight(of: profileImageView, offset: 10.0)
-    userNameLabel.rightToLeft(of: loveButton, offset: -10.0)
+    userNameLabel.rightToSuperview(offset: 10.0)
+//    userNameLabel.rightToLeft(of: loveButton, offset: -10.0)
     userNameLabel.centerY(to: profileImageView)
     self.userNameLabel = userNameLabel
     
@@ -183,13 +184,13 @@ class ANINotiCommentViewCell: UITableViewCell {
   
   private func reloadLayout() {
     guard let commentLabel = self.commentLabel,
-          let commentCountLabel = self.commentCountLabel,
-          let loveCountLabel = self.loveCountLabel,
+//          let commentCountLabel = self.commentCountLabel,
+//          let loveCountLabel = self.loveCountLabel,
           let comment = self.comment else { return }
     
     commentLabel.text = comment.comment
-    commentCountLabel.text = "\(comment.commentCount)"
-    loveCountLabel.text = "\(comment.loveCount)"
+//    commentCountLabel.text = "\(comment.commentCount)"
+//    loveCountLabel.text = "\(comment.loveCount)"
   }
   
   private func reloadUserLayout(user: FirebaseUser) {
