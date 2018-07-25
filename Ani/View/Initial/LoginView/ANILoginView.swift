@@ -104,6 +104,7 @@ class ANILoginView: UIView {
     emailTextField.backgroundColor = .clear
     emailTextField.placeholder = "IDまたはユーザーネーム"
     emailTextField.returnKeyType = .done
+    emailTextField.keyboardType = .emailAddress
     emailTextField.delegate = self
     emailTextFieldBG.addSubview(emailTextField)
     let insets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: -10.0)

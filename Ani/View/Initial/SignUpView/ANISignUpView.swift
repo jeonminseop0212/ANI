@@ -139,8 +139,9 @@ class ANISignUpView: UIView {
     adressTextField.font = UIFont.systemFont(ofSize: 18.0)
     adressTextField.textColor = ANIColor.dark
     adressTextField.backgroundColor = .clear
-    adressTextField.placeholder = "ex)ANI-ani"
+    adressTextField.placeholder = "ex)ANI-ani@ani.com"
     adressTextField.returnKeyType = .done
+    adressTextField.keyboardType = .emailAddress
     adressTextField.delegate = self
     adressTextFieldBG.addSubview(adressTextField)
     let insets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: -10.0)
