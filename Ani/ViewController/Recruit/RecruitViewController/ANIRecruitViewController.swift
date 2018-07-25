@@ -20,16 +20,14 @@ class ANIRecruitViewController: UIViewController {
   
   private weak var myNavigationBar: UIView?
   private weak var myNavigationBarTopConstroint: Constraint?
+  private weak var navigaitonTitleLabel: UILabel?
 
   private weak var filtersView: ANIRecruitFiltersView?
   static let FILTERS_VIEW_HEIGHT: CGFloat = 47.0
   
   private weak var recruitView: ANIRecuruitView?
   
-  private weak var searchBar: UISearchBar?
-  
   private let pickUpItem = PickUpItem()
-  
   private var pickMode: FilterPickMode?
   
   private let CONTRIBUTION_BUTTON_HEIGHT:CGFloat = 55.0
@@ -81,18 +79,14 @@ class ANIRecruitViewController: UIViewController {
     myNavigationBar.height(UIViewController.NAVIGATION_BAR_HEIGHT)
     self.myNavigationBar = myNavigationBar
     
-    //searchBar
-    let searchBar = UISearchBar()
-    searchBar.placeholder = "Search"
-    searchBar.textField?.backgroundColor = ANIColor.lightGray
-    searchBar.delegate = self
-    searchBar.backgroundImage = UIImage()
-    myNavigationBar.addSubview(searchBar)
-    searchBar.topToSuperview()
-    searchBar.leftToSuperview()
-    searchBar.rightToSuperview()
-    searchBar.bottomToSuperview()
-    self.searchBar = searchBar
+    //navigaitonTitleLabel
+    let navigaitonTitleLabel = UILabel()
+    navigaitonTitleLabel.text = "A N I"
+    navigaitonTitleLabel.textColor = ANIColor.dark
+    navigaitonTitleLabel.font = UIFont.boldSystemFont(ofSize: 22)
+    myNavigationBar.addSubview(navigaitonTitleLabel)
+    navigaitonTitleLabel.centerInSuperview()
+    self.navigaitonTitleLabel = navigaitonTitleLabel
     
     //filtersView
     let filtersView = ANIRecruitFiltersView()
@@ -142,27 +136,12 @@ class ANIRecruitViewController: UIViewController {
   
   //MARK: Notifications
   private func setupNotifications() {
-    ANINotificationManager.receive(viewScrolled: self, selector: #selector(hideKeyboard))
     ANINotificationManager.receive(profileImageViewTapped: self, selector: #selector(pushOtherProfile))
     ANINotificationManager.receive(pickerViewDidSelect: self, selector: #selector(updateFilter))
   }
   
   private func removeNotifications() {
     ANINotificationManager.remove(self)
-  }
-  
-  @objc private func hideKeyboard() {
-    guard let searchBar = self.searchBar,
-      let searchBarTextField = searchBar.textField else { return }
-    
-    if searchBarTextField.isFirstResponder {
-      searchBarTextField.resignFirstResponder()
-      searchBar.setShowsCancelButton(false, animated: true)
-      
-      if let searchCancelButton = searchBar.cancelButton {
-        searchCancelButton.alpha = 0.0
-      }
-    }
   }
   
   @objc private func pushOtherProfile(_ notification: NSNotification) {
@@ -202,23 +181,6 @@ class ANIRecruitViewController: UIViewController {
   }
 }
 
-//MARK: UISearchBarDelegate
-extension ANIRecruitViewController: UISearchBarDelegate {
-  func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-    guard let searchBarTextField = searchBar.textField else { return }
-    if searchBarTextField.isFirstResponder {
-      searchBarTextField.resignFirstResponder()
-    }
-  }
-  
-  func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-    guard let searchBarTextField = searchBar.textField else { return }
-    if searchBarTextField.isFirstResponder {
-      searchBarTextField.resignFirstResponder()
-    }
-  }
-}
-
 //MARK: ButtonViewDelegate
 extension ANIRecruitViewController:ANIButtonViewDelegate {
   func buttonViewTapped(view: ANIButtonView) {
@@ -253,7 +215,10 @@ extension ANIRecruitViewController: ANIRecruitViewDelegate {
   }
   
   func recruitViewDidScroll(scrollY: CGFloat) {
-    guard let myNavigationBarTopConstroint = self.myNavigationBarTopConstroint else { return }
+    guard let myNavigationBarTopConstroint = self.myNavigationBarTopConstroint,
+          let filtersView = self.filtersView,
+          let filterCollectionView = filtersView.filterCollectionView,
+          let navigaitonTitleLabel = self.navigaitonTitleLabel else { return }
     
     let topHeight = UIViewController.NAVIGATION_BAR_HEIGHT + ANIRecruitViewController.FILTERS_VIEW_HEIGHT
     let newScrollY = topHeight + scrollY
@@ -265,20 +230,20 @@ extension ANIRecruitViewController: ANIRecruitViewDelegate {
         self.view.layoutIfNeeded()
         
         let alpha = 1 - (scrollY / topHeight)
-        searchBar?.alpha = alpha
-        filtersView?.filterCollectionView?.alpha = alpha
+        navigaitonTitleLabel.alpha = alpha * alpha
+        filterCollectionView.alpha = alpha * alpha
       } else {
         myNavigationBarTopConstroint.constant = -topHeight
-        searchBar?.alpha = 0.0
-        filtersView?.filterCollectionView?.alpha = 0.0
+        navigaitonTitleLabel.alpha = 0.0
+        filterCollectionView.alpha = 0.0
         self.view.layoutIfNeeded()
       }
     } else {
       myNavigationBarTopConstroint.constant = 0.0
       self.view.layoutIfNeeded()
       
-      searchBar?.alpha = 1.0
-      filtersView?.filterCollectionView?.alpha = 1.0
+      navigaitonTitleLabel.alpha = 1.0
+      filterCollectionView.alpha = 1.0
     }
   }
   
