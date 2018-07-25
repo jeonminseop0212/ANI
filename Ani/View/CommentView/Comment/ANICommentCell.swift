@@ -126,7 +126,7 @@ class ANICommentCell: UITableViewCell {
     let userNameLabel = UILabel()
     userNameLabel.textColor = ANIColor.dark
     userNameLabel.font = UIFont.boldSystemFont(ofSize: 15.0)
-    userNameLabel.numberOfLines = 0
+    userNameLabel.numberOfLines = 2
     addSubview(userNameLabel)
     userNameLabel.leftToRight(of: profileImageView, offset: 10.0)
     userNameLabel.rightToLeft(of: loveButton, offset: -10.0)

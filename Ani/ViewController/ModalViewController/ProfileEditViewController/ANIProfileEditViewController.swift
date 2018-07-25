@@ -241,7 +241,6 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
     
     var newData = data
     newData.updateValue(objectId as AnyObject, forKey: KEY_OBJECT_ID)
-    print("newData \(newData)")
     
     DispatchQueue.global().async {
       index.saveObject(newData, completionHandler: { (content, error) -> Void in
