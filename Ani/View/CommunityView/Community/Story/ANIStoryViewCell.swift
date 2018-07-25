@@ -170,11 +170,11 @@ class ANIStoryViewCell: UITableViewCell {
     let userNameLabel = UILabel()
     userNameLabel.font = UIFont.systemFont(ofSize: 13.0)
     userNameLabel.textColor = ANIColor.subTitle
+    userNameLabel.numberOfLines = 2
     addSubview(userNameLabel)
     userNameLabel.leftToRight(of: profileImageView, offset: 10.0)
     userNameLabel.rightToLeft(of: loveButton, offset: -10.0)
     userNameLabel.centerY(to: profileImageView)
-    userNameLabel.height(20.0)
     self.userNameLabel = userNameLabel
     
     //line
