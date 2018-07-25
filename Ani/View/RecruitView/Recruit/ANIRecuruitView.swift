@@ -9,6 +9,7 @@
 import UIKit
 import FirebaseFirestore
 import CodableFirebase
+import NVActivityIndicatorView
 
 protocol ANIRecruitViewDelegate {
   func recruitCellTap(selectedRecruit: FirebaseRecruit, user: FirebaseUser)
@@ -37,30 +38,32 @@ class ANIRecuruitView: UIView {
       
       switch pickMode {
       case .home:
-        if pickItem == "選択しない" {
+        if pickItem == "選択しない" || pickItem == "" {
           homeFilter = nil
         } else {
           homeFilter = pickItem
         }
       case .kind:
-        if pickItem == "選択しない" {
+        if pickItem == "選択しない" || pickItem == "" {
           kindFilter = nil
         } else {
           kindFilter = pickItem
         }
       case .age:
-        if pickItem == "選択しない" {
+        if pickItem == "選択しない" || pickItem == "" {
           ageFilter = nil
         } else {
           ageFilter = pickItem
         }
       case .sex:
-        if pickItem == "選択しない" {
+        if pickItem == "選択しない" || pickItem == "" {
           sexFilter = nil
         } else {
           sexFilter = pickItem
         }
       }
+      
+      setupQuery()
     }
   }
   
@@ -68,6 +71,10 @@ class ANIRecuruitView: UIView {
   private var kindFilter: String?
   private var ageFilter: String?
   private var sexFilter: String?
+  
+  private var query: Query?
+  
+  private weak var activityIndicatorView: NVActivityIndicatorView?
   
   var delegate:ANIRecruitViewDelegate?
   
@@ -83,6 +90,7 @@ class ANIRecuruitView: UIView {
   }
   
   private func setup() {
+    //recruitTableView
     let tableView = UITableView()
     tableView.separatorStyle = .none
     let topInset = UIViewController.NAVIGATION_BAR_HEIGHT + ANIRecruitViewController.FILTERS_VIEW_HEIGHT
@@ -95,10 +103,23 @@ class ANIRecuruitView: UIView {
     tableView.delegate = self
     let refreshControl = UIRefreshControl()
     refreshControl.addTarget(self, action: #selector(loadRecruit(sender:)), for: .valueChanged)
+    tableView.alpha = 0.0
     tableView.addSubview(refreshControl)
     addSubview(tableView)
     tableView.edgesToSuperview()
     self.recruitTableView = tableView
+    
+    //activityIndicatorView
+    let activityIndicatorView = NVActivityIndicatorView(frame: .zero, type: .lineScale, color: ANIColor.green, padding: 0)
+    addSubview(activityIndicatorView)
+    activityIndicatorView.width(40.0)
+    activityIndicatorView.height(40.0)
+    activityIndicatorView.centerInSuperview()
+    self.activityIndicatorView = activityIndicatorView
+    
+    let database = Firestore.firestore()
+    
+    query = database.collection(KEY_RECRUITS)
   }
   
   //MARK: Notifications
@@ -117,6 +138,36 @@ class ANIRecuruitView: UIView {
           !recruits.isEmpty else { return }
     
     recruitTableView.scrollToRow(at: [0, 0], at: .top, animated: true)
+  }
+  
+  private func setupQuery() {
+    guard let recruitTableView = self.recruitTableView else { return }
+    
+    recruitTableView.alpha = 0.0
+    
+    let database = Firestore.firestore()
+
+    var queryTemp: Query = database.collection(KEY_RECRUITS)
+    
+    if let homeFilter = homeFilter {
+      queryTemp = queryTemp.whereField(KEY_RECRUIT_HOME, isEqualTo: homeFilter)
+    }
+    
+    if let kindFilter = kindFilter {
+      queryTemp = queryTemp.whereField(KEY_RECRUIT_KIND, isEqualTo: kindFilter)
+    }
+    
+    if let ageFilter = ageFilter {
+      queryTemp = queryTemp.whereField(KEY_RECRUIT_AGE, isEqualTo: ageFilter)
+    }
+    
+    if let sexFilter = sexFilter {
+      queryTemp = queryTemp.whereField(KEY_RECRUIT_SEX, isEqualTo: sexFilter)
+    }
+    
+    query = queryTemp
+    
+    loadRecruit(sender: nil)
   }
 }
 
@@ -175,14 +226,19 @@ extension ANIRecuruitView: ANIRecruitViewCellDelegate {
 //MARK: data
 extension ANIRecuruitView {
   @objc private func loadRecruit(sender: UIRefreshControl?) {
+    guard let query = self.query,
+          let activityIndicatorView = self.activityIndicatorView else { return }
+    
     if !self.recruits.isEmpty {
       self.recruits.removeAll()
     }
     
-    let database = Firestore.firestore()
-
+    if sender == nil {
+      activityIndicatorView.startAnimating()
+    }
+    
     DispatchQueue.global().async {
-      database.collection(KEY_RECRUITS).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments(completion: { (snapshot, error) in
+      query.order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           print("Error get document: \(error)")
 
@@ -202,10 +258,19 @@ extension ANIRecuruitView {
               }
 
               guard let recruitTableView = self.recruitTableView else { return }
+              
+              activityIndicatorView.stopAnimating()
+              
               recruitTableView.reloadData()
+              
+              UIView.animate(withDuration: 0.2, animations: {
+                recruitTableView.alpha = 1.0
+              })
             }
           } catch let error {
             print(error)
+            
+            activityIndicatorView.stopAnimating()
 
             if let sender = sender {
               sender.endRefreshing()
@@ -214,9 +279,15 @@ extension ANIRecuruitView {
         }
         
         if snapshot.documents.isEmpty {
+          guard let recruitTableView = self.recruitTableView else { return }
+          
+          activityIndicatorView.stopAnimating()
+          
+          recruitTableView.reloadData()
+          
           if let sender = sender {
             sender.endRefreshing()
-          }          
+          }
         }
       })
     }
