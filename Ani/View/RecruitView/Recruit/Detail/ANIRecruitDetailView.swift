@@ -199,7 +199,7 @@ class ANIRecruitDetailView: UIView {
     basicInfoBG.addSubview(basicInfoKindLabel)
     basicInfoKindLabel.topToSuperview(offset: 10.0)
     basicInfoKindLabel.leftToSuperview(offset: 10.0)
-    basicInfoKindLabel.rightToLeft(of: basicInfoLine, offset: 10.0)
+    basicInfoKindLabel.rightToLeft(of: basicInfoLine, offset: -10.0)
     self.basicInfoKindLabel = basicInfoKindLabel
     
     //basicInfoAgeLabel
@@ -221,7 +221,7 @@ class ANIRecruitDetailView: UIView {
     basicInfoBG.addSubview(basicInfoSexLabel)
     basicInfoSexLabel.topToBottom(of: basicInfoKindLabel, offset: 10.0)
     basicInfoSexLabel.leftToSuperview(offset: 10.0)
-    basicInfoSexLabel.rightToLeft(of: basicInfoLine, offset: 10.0)
+    basicInfoSexLabel.rightToLeft(of: basicInfoLine, offset: -10.0)
     self.basicInfoSexLabel = basicInfoSexLabel
 
     //basicInfoHomeLabel
@@ -243,7 +243,7 @@ class ANIRecruitDetailView: UIView {
     basicInfoBG.addSubview(basicInfoVaccineLabel)
     basicInfoVaccineLabel.topToBottom(of: basicInfoSexLabel, offset: 10.0)
     basicInfoVaccineLabel.leftToSuperview(offset: 10.0)
-    basicInfoVaccineLabel.rightToLeft(of: basicInfoLine, offset: 10.0)
+    basicInfoVaccineLabel.rightToLeft(of: basicInfoLine, offset: -10.0)
     basicInfoVaccineLabel.bottomToSuperview(offset: -10)
     self.basicInfoVaccineLabel = basicInfoVaccineLabel
     
