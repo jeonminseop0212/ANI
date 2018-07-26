@@ -199,8 +199,8 @@ class ANIRecruitContributionView: UIView {
     basicInfoKindSelectButton.delegate = self
     basicInfoKindSelectButton.image = UIImage(named: "basicInfoSelectButton")
     basicInfoBG.addSubview(basicInfoKindSelectButton)
-    basicInfoKindSelectButton.width(12.0)
-    basicInfoKindSelectButton.height(12.0)
+    basicInfoKindSelectButton.width(10.0)
+    basicInfoKindSelectButton.height(10.0)
     basicInfoKindSelectButton.rightToLeft(of: basicInfoLine, offset: -10.0)
     self.basicInfoKindSelectButton = basicInfoKindSelectButton
     
@@ -226,8 +226,8 @@ class ANIRecruitContributionView: UIView {
     basicInfoAgeSelectButton.delegate = self
     basicInfoAgeSelectButton.image = UIImage(named: "basicInfoSelectButton")
     basicInfoBG.addSubview(basicInfoAgeSelectButton)
-    basicInfoAgeSelectButton.width(12.0)
-    basicInfoAgeSelectButton.height(12.0)
+    basicInfoAgeSelectButton.width(10.0)
+    basicInfoAgeSelectButton.height(10.0)
     basicInfoAgeSelectButton.rightToSuperview(offset: 10.0)
     self.basicInfoAgeSelectButton = basicInfoAgeSelectButton
     
@@ -253,8 +253,8 @@ class ANIRecruitContributionView: UIView {
     basicInfoSexSelectButton.delegate = self
     basicInfoSexSelectButton.image = UIImage(named: "basicInfoSelectButton")
     basicInfoBG.addSubview(basicInfoSexSelectButton)
-    basicInfoSexSelectButton.width(12.0)
-    basicInfoSexSelectButton.height(12.0)
+    basicInfoSexSelectButton.width(10.0)
+    basicInfoSexSelectButton.height(10.0)
     basicInfoSexSelectButton.rightToLeft(of: basicInfoLine, offset: -10.0)
     self.basicInfoSexSelectButton = basicInfoSexSelectButton
     
@@ -280,8 +280,8 @@ class ANIRecruitContributionView: UIView {
     basicInfoHomeSelectButton.delegate = self
     basicInfoHomeSelectButton.image = UIImage(named: "basicInfoSelectButton")
     basicInfoBG.addSubview(basicInfoHomeSelectButton)
-    basicInfoHomeSelectButton.width(12.0)
-    basicInfoHomeSelectButton.height(12.0)
+    basicInfoHomeSelectButton.width(10.0)
+    basicInfoHomeSelectButton.height(10.0)
     basicInfoHomeSelectButton.rightToSuperview(offset: 10.0)
     self.basicInfoHomeSelectButton = basicInfoHomeSelectButton
     
@@ -307,8 +307,8 @@ class ANIRecruitContributionView: UIView {
     basicInfoVaccineSelectButton.delegate = self
     basicInfoVaccineSelectButton.image = UIImage(named: "basicInfoSelectButton")
     basicInfoBG.addSubview(basicInfoVaccineSelectButton)
-    basicInfoVaccineSelectButton.width(12.0)
-    basicInfoVaccineSelectButton.height(12.0)
+    basicInfoVaccineSelectButton.width(10.0)
+    basicInfoVaccineSelectButton.height(10.0)
     basicInfoVaccineSelectButton.rightToLeft(of: basicInfoLine, offset: -10.0)
     self.basicInfoVaccineSelectButton = basicInfoVaccineSelectButton
     
@@ -335,8 +335,8 @@ class ANIRecruitContributionView: UIView {
     basicInfoCastrationSelectButton.delegate = self
     basicInfoCastrationSelectButton.image = UIImage(named: "basicInfoSelectButton")
     basicInfoBG.addSubview(basicInfoCastrationSelectButton)
-    basicInfoCastrationSelectButton.width(12.0)
-    basicInfoCastrationSelectButton.height(12.0)
+    basicInfoCastrationSelectButton.width(10.0)
+    basicInfoCastrationSelectButton.height(10.0)
     basicInfoCastrationSelectButton.rightToSuperview(offset: 10.0)
     self.basicInfoCastrationSelectButton = basicInfoCastrationSelectButton
     

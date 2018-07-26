@@ -15,7 +15,7 @@ protocol ANICommunityMenuBarDelegate {
 
 class ANICommunityMenuBar: UIView {
   weak var menuCollectionView: UICollectionView?
-  private let menus = ["STORY", "Q&A"]
+  private let menus = ["ストーリー", "Q&A"]
   var horizontalBarleftConstraint:Constraint?
   
   var delegate: ANICommunityMenuBarDelegate?
