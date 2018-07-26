@@ -211,7 +211,7 @@ class ANIRecruitContributionViewController: UIViewController {
       Gallery.Config.Grid.FrameView.borderColor = ANIColor.green
       if Gallery.Config.Camera.oneImageMode {
         Gallery.Config.Grid.previewRatio = UIViewController.HEADER_IMAGE_VIEW_RATIO
-        Config.tabsToShow = [.imageTab, .cameraTab]
+        Gallery.Config.tabsToShow = [.imageTab, .cameraTab]
       }
       let galleryNV = UINavigationController(rootViewController: galleryUnrap)
       present(galleryNV, animated: animation, completion: nil)
@@ -319,11 +319,19 @@ extension ANIRecruitContributionViewController: ANIImageFilterViewControllerDele
     
     if isHaderImagePick {
       if let filteredImage = filteredImages[0] {
-        recruitContributionView.headerImage = filteredImage.resize(size: IMAGE_SIZE)
+        if Config.Grid.previewRatio == 1.0 {
+          recruitContributionView.headerImage = filteredImage.resizeSquare(size: IMAGE_SIZE)
+        } else {
+          recruitContributionView.headerImage = filteredImage.resize(size: IMAGE_SIZE)
+        }
       }
     } else {
       for filteredImage in filteredImages {
-        recruitContributionView.introduceImages.append(filteredImage?.resize(size: IMAGE_SIZE))
+        if Config.Grid.previewRatio == 1.0 {
+          recruitContributionView.introduceImages.append(filteredImage?.resizeSquare(size: IMAGE_SIZE))
+        } else {
+          recruitContributionView.introduceImages.append(filteredImage?.resize(size: IMAGE_SIZE))
+        }
       }
     }
   }

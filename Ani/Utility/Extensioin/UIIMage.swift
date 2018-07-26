@@ -23,4 +23,15 @@ extension UIImage {
     
     return resizedImage
   }
+  
+  func resizeSquare(size _size: CGSize) -> UIImage? {
+    let resizedSize = CGSize(width: _size.width, height: _size.width)
+    
+    UIGraphicsBeginImageContextWithOptions(resizedSize, false, 0.0)
+    draw(in: CGRect(origin: .zero, size: resizedSize))
+    let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
+    UIGraphicsEndImageContext()
+    
+    return resizedImage
+  }
 }

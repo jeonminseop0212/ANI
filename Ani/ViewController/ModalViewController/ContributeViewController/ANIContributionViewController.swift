@@ -148,8 +148,8 @@ class ANIContributionViewController: UIViewController {
     Gallery.Config.initialTab = .imageTab
     Gallery.Config.PageIndicator.backgroundColor = .white
     Gallery.Config.Camera.oneImageMode = false
-    Config.Camera.imageLimit = 10
-    Config.tabsToShow = [.imageTab, .cameraTab]
+    Gallery.Config.Camera.imageLimit = 10
+    Gallery.Config.tabsToShow = [.imageTab, .cameraTab]
     Gallery.Config.Font.Main.regular = UIFont.boldSystemFont(ofSize: 17)
     Gallery.Config.Grid.ArrowButton.tintColor = ANIColor.dark
     Gallery.Config.Grid.FrameView.borderColor = ANIColor.green
@@ -328,17 +328,24 @@ class ANIContributionViewController: UIViewController {
     var croppedImages = [UIImage]()
     
     for (index, image) in images.enumerated() {
-      let imageSize = image?.size
-      let scrollViewWidth = self.view.frame.width
-      let widthScale =  scrollViewWidth / (imageSize?.width)! * items[index].scale
-      let heightScale = scrollViewWidth / (imageSize?.height)! * items[index].scale
-      
-      let scale = 1 / min(widthScale, heightScale)
-      let visibleRect = CGRect(x: items[index].offset.x * scale, y: items[index].offset.y * scale, width: scrollViewWidth * scale, height: scrollViewWidth * scale * Config.Grid.previewRatio)
-      let ref: CGImage = (image?.cgImage?.cropping(to: visibleRect))!
-      let croppedImage:UIImage = UIImage(cgImage: ref)
-      
-      croppedImages.append(croppedImage)
+      if let image = image {
+        let imageSize = image.size
+        let scrollViewWidth = self.view.frame.width
+        let widthScale =  scrollViewWidth / imageSize.width * items[index].scale
+        let heightScale = scrollViewWidth / imageSize.height * items[index].scale
+        let scale = 1 / min(widthScale, heightScale)
+        
+        var visibleRect = CGRect(x: items[index].offset.x * scale, y: items[index].offset.y * scale, width: scrollViewWidth * scale, height: scrollViewWidth * scale * Config.Grid.previewRatio)
+        
+        if Config.Grid.previewRatio == 1.0 && scrollViewWidth * scale > imageSize.width {
+          visibleRect = CGRect(x: items[index].offset.x * scale, y: items[index].offset.y * scale, width: imageSize.width, height: imageSize.width)
+        }
+        
+        let ref: CGImage = (image.cgImage?.cropping(to: visibleRect))!
+        let croppedImage:UIImage = UIImage(cgImage: ref)
+        
+        croppedImages.append(croppedImage)
+      }
     }
     return croppedImages
   }
@@ -424,7 +431,11 @@ extension ANIContributionViewController: ANIImageFilterViewControllerDelegate {
     
     contentImages.removeAll()
     for filteredImage in filteredImages {
-      contentImages.append(filteredImage?.resize(size: IMAGE_SIZE))
+      if Config.Grid.previewRatio == 1.0 {
+        contentImages.append(filteredImage?.resizeSquare(size: IMAGE_SIZE))
+      } else {
+        contentImages.append(filteredImage?.resize(size: IMAGE_SIZE))
+      }
     }
   }
 }

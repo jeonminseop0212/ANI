@@ -26,6 +26,8 @@ class ANIQnaImagesCell: UICollectionViewCell {
     //imageView
     let imageView = UIImageView()
     imageView.backgroundColor = ANIColor.bg
+    imageView.contentMode = .scaleAspectFill
+    imageView.clipsToBounds = true
     imageView.layer.cornerRadius = 10.0
     imageView.layer.masksToBounds = true
     addSubview(imageView)
