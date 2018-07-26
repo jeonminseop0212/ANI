@@ -187,8 +187,8 @@ class ANIProfileEditView: UIView {
     kindSelectButton.delegate = self
     kindSelectButton.image = UIImage(named: "basicInfoSelectButton")
     kindBG.addSubview(kindSelectButton)
-    kindSelectButton.width(12.0)
-    kindSelectButton.height(12.0)
+    kindSelectButton.width(10.0)
+    kindSelectButton.height(10.0)
     kindSelectButton.centerY(to: kindLabel)
     kindSelectButton.leftToRight(of: kindLabel, offset: 10.0)
     self.kindSelectButton = kindSelectButton

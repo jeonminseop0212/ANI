@@ -21,8 +21,8 @@ protocol ANISearchViewDelegate {
 
 enum SearchCategory: String {
   case user = "ユーザー";
-  case story = "ストリー";
-  case qna = "質問";
+  case story = "ストーリー";
+  case qna = "Q&A";
 }
 
 class ANISearchView: UIView {

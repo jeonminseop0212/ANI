@@ -199,19 +199,19 @@ class ANIRecruitViewCell: UITableViewCell {
     clipButton.addTarget(self, action: #selector(clip), for: .touchUpInside)
     addSubview(clipButton)
     clipButton.centerY(to: profileImageView)
-    clipButton.rightToSuperview(offset: 20.0)
-    clipButton.width(21.0)
-    clipButton.height(21.0)
+    clipButton.rightToSuperview(offset: 10.0)
+    clipButton.width(20.0)
+    clipButton.height(20.0)
     self.clipButton = clipButton
     
     //loveCountLabel
     let loveCountLabel = UILabel()
-    loveCountLabel.font = UIFont.boldSystemFont(ofSize: 16.0)
+    loveCountLabel.font = UIFont.boldSystemFont(ofSize: 14.0)
     loveCountLabel.textColor = ANIColor.dark
     addSubview(loveCountLabel)
     loveCountLabel.centerY(to: profileImageView)
     loveCountLabel.rightToLeft(of: clipButton, offset: -10.0)
-    loveCountLabel.width(30.0)
+    loveCountLabel.width(25.0)
     loveCountLabel.height(20.0)
     self.loveCountLabel = loveCountLabel
     
@@ -246,12 +246,12 @@ class ANIRecruitViewCell: UITableViewCell {
     
     //supportCountLabel
     let supportCountLabel = UILabel()
-    supportCountLabel.font = UIFont.boldSystemFont(ofSize: 16.0)
+    supportCountLabel.font = UIFont.boldSystemFont(ofSize: 14.0)
     supportCountLabel.textColor = ANIColor.dark
     addSubview(supportCountLabel)
     supportCountLabel.centerY(to: profileImageView)
     supportCountLabel.rightToLeft(of: loveButton, offset: -10.0)
-    supportCountLabel.width(30.0)
+    supportCountLabel.width(25.0)
     supportCountLabel.height(20.0)
     self.supportCountLabel = supportCountLabel
     
@@ -263,8 +263,8 @@ class ANIRecruitViewCell: UITableViewCell {
     addSubview(supportButton)
     supportButton.centerY(to: profileImageView)
     supportButton.rightToLeft(of: supportCountLabel, offset: -10.0)
-    supportButton.width(21.0)
-    supportButton.height(21.0)
+    supportButton.width(20.0)
+    supportButton.height(20.0)
     self.supportButton = supportButton
     
     //userNameLabel
