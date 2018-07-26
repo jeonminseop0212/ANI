@@ -81,7 +81,8 @@ class ANIRecruitViewCell: UITableViewCell {
     //recruitImageView
     let recruitImageView = UIImageView()
     recruitImageView.backgroundColor = ANIColor.bg
-    recruitImageView.contentMode = .redraw
+    recruitImageView.contentMode = .scaleAspectFill
+    recruitImageView.clipsToBounds = true
     tapArea.addSubview(recruitImageView)
     let recruitImageViewHeight: CGFloat = UIScreen.main.bounds.width * UIViewController.HEADER_IMAGE_VIEW_RATIO
     recruitImageView.topToSuperview()

@@ -191,10 +191,8 @@ extension ANISignUpViewController: ANISignUpViewDelegate {
       Gallery.Config.initialTab = .imageTab
       Gallery.Config.PageIndicator.backgroundColor = .white
       Gallery.Config.Camera.oneImageMode = true
-      if Gallery.Config.Camera.oneImageMode {
-        Gallery.Config.Grid.previewRatio = UIViewController.HEADER_IMAGE_VIEW_RATIO
-        Config.tabsToShow = [.imageTab, .cameraTab]
-      }
+      Gallery.Config.Grid.previewRatio = 1.0
+      Gallery.Config.tabsToShow = [.imageTab, .cameraTab]
       Gallery.Config.Font.Main.regular = UIFont.boldSystemFont(ofSize: 17)
       Gallery.Config.Grid.ArrowButton.tintColor = ANIColor.dark
       Gallery.Config.Grid.FrameView.borderColor = ANIColor.green
@@ -268,6 +266,10 @@ extension ANISignUpViewController: ANIImageFilterViewControllerDelegate {
           let filteredImage = filteredImages[0],
           let signUpView = self.signUpView else { return }
     
-    signUpView.profileImage = filteredImage.resize(size: IMAGE_SIZE)
+    if Config.Grid.previewRatio == 1.0 {
+      signUpView.profileImage = filteredImage.resizeSquare(size: IMAGE_SIZE)
+    } else {
+      signUpView.profileImage = filteredImage.resize(size: IMAGE_SIZE)
+    }
   }
 }

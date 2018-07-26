@@ -9,7 +9,8 @@
 import UIKit
 
 class ANIStoryImagesCell: UICollectionViewCell {
-  var imageView: UIImageView?
+  weak var imageView: UIImageView?
+  
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()
@@ -22,7 +23,8 @@ class ANIStoryImagesCell: UICollectionViewCell {
   private func setup() {
     let imageView = UIImageView()
     imageView.backgroundColor = ANIColor.bg
-    imageView.contentMode = .scaleAspectFit
+    imageView.contentMode = .scaleAspectFill
+    imageView.clipsToBounds = true
     addSubview(imageView)
     imageView.edgesToSuperview()
     self.imageView = imageView

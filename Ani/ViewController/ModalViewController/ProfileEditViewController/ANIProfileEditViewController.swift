@@ -492,12 +492,20 @@ extension ANIProfileEditViewController: ANIImageFilterViewControllerDelegate {
     if isFamilyAdd {
       if familyImages != nil {
         for image in filteredImages {
-          familyImages?.append(image?.resize(size: IMAGE_SIZE))
+          if Config.Grid.previewRatio == 1.0 {
+            familyImages?.append(image?.resizeSquare(size: IMAGE_SIZE))
+          } else {
+            familyImages?.append(image?.resize(size: IMAGE_SIZE))
+          }
         }
       } else {
         var resizeIamges = [UIImage?]()
         for image in filteredImages {
-          resizeIamges.append(image?.resize(size: IMAGE_SIZE))
+          if Config.Grid.previewRatio == 1.0 {
+            resizeIamges.append(image?.resizeSquare(size: IMAGE_SIZE))
+          } else {
+            resizeIamges.append(image?.resize(size: IMAGE_SIZE))
+          }
         }
         familyImages = resizeIamges
       }
@@ -505,9 +513,17 @@ extension ANIProfileEditViewController: ANIImageFilterViewControllerDelegate {
       familyImagesChange = true
     } else {
       if editImageIndex == 0 {
-        profileImage = filteredImage.resize(size: IMAGE_SIZE)
+        if Config.Grid.previewRatio == 1.0 {
+          profileImage = filteredImage.resizeSquare(size: IMAGE_SIZE)
+        } else {
+          profileImage = filteredImage.resize(size: IMAGE_SIZE)
+        }
       } else if let editImageIndex = editImageIndex {
-        self.familyImages?[editImageIndex - 1] = filteredImage.resize(size: IMAGE_SIZE)
+        if Config.Grid.previewRatio == 1.0 {
+          self.familyImages?[editImageIndex - 1] = filteredImage.resizeSquare(size: IMAGE_SIZE)
+        } else {
+          self.familyImages?[editImageIndex - 1] = filteredImage.resize(size: IMAGE_SIZE)
+        }
         familyImagesChange = true
       }
     }
