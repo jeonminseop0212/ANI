@@ -240,7 +240,7 @@ class ANIRecruitContributionViewController: UIViewController {
     }
   }
   
-  func getCropImages(images: [UIImage?], items: [Image]) -> [UIImage] {
+  private func getCropImages(images: [UIImage?], items: [Image]) -> [UIImage] {
     var croppedImages = [UIImage]()
     
     for (index, image) in images.enumerated() {
@@ -250,7 +250,7 @@ class ANIRecruitContributionViewController: UIViewController {
       let heightScale = scrollViewWidth / (imageSize?.height)! * items[index].scale
       
       let scale = 1 / min(widthScale, heightScale)
-      let visibleRect = CGRect(x: items[index].offset.x * scale, y: items[index].offset.y * scale, width: scrollViewWidth * scale, height: scrollViewWidth * scale * Config.Grid.previewRatio)
+      let visibleRect = CGRect(x: floor(items[index].offset.x * scale), y: floor(items[index].offset.y * scale), width: scrollViewWidth * scale, height: scrollViewWidth * scale * Config.Grid.previewRatio)
       let ref: CGImage = (image?.cgImage?.cropping(to: visibleRect))!
       let croppedImage:UIImage = UIImage(cgImage: ref)
       
@@ -319,19 +319,11 @@ extension ANIRecruitContributionViewController: ANIImageFilterViewControllerDele
     
     if isHaderImagePick {
       if let filteredImage = filteredImages[0] {
-        if Config.Grid.previewRatio == 1.0 {
-          recruitContributionView.headerImage = filteredImage.resizeSquare(size: IMAGE_SIZE)
-        } else {
-          recruitContributionView.headerImage = filteredImage.resize(size: IMAGE_SIZE)
-        }
+        recruitContributionView.headerImage = filteredImage.resize(size: IMAGE_SIZE)
       }
     } else {
       for filteredImage in filteredImages {
-        if Config.Grid.previewRatio == 1.0 {
-          recruitContributionView.introduceImages.append(filteredImage?.resizeSquare(size: IMAGE_SIZE))
-        } else {
-          recruitContributionView.introduceImages.append(filteredImage?.resize(size: IMAGE_SIZE))
-        }
+        recruitContributionView.introduceImages.append(filteredImage?.resize(size: IMAGE_SIZE))
       }
     }
   }
@@ -506,6 +498,8 @@ extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
             }
           }
         }
+        
+        self.view.endEditing(true)
         
         self.dismiss(animated: true, completion: nil)
       } else {

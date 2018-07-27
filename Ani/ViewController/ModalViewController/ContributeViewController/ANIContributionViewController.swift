@@ -324,7 +324,7 @@ class ANIContributionViewController: UIViewController {
     present(imagePickgalleryNV, animated: animation, completion: nil)
   }
   
-  func getCropImages(images: [UIImage?], items: [Image]) -> [UIImage] {
+  private func getCropImages(images: [UIImage?], items: [Image]) -> [UIImage] {
     var croppedImages = [UIImage]()
     
     for (index, image) in images.enumerated() {
@@ -333,14 +333,10 @@ class ANIContributionViewController: UIViewController {
         let scrollViewWidth = self.view.frame.width
         let widthScale =  scrollViewWidth / imageSize.width * items[index].scale
         let heightScale = scrollViewWidth / imageSize.height * items[index].scale
+
         let scale = 1 / min(widthScale, heightScale)
         
-        var visibleRect = CGRect(x: items[index].offset.x * scale, y: items[index].offset.y * scale, width: scrollViewWidth * scale, height: scrollViewWidth * scale * Config.Grid.previewRatio)
-        
-        if Config.Grid.previewRatio == 1.0 && scrollViewWidth * scale > imageSize.width {
-          visibleRect = CGRect(x: items[index].offset.x * scale, y: items[index].offset.y * scale, width: imageSize.width, height: imageSize.width)
-        }
-        
+        let visibleRect = CGRect(x: floor(items[index].offset.x * scale), y: floor(items[index].offset.y * scale), width: scrollViewWidth * scale, height: scrollViewWidth * scale * Config.Grid.previewRatio)
         let ref: CGImage = (image.cgImage?.cropping(to: visibleRect))!
         let croppedImage:UIImage = UIImage(cgImage: ref)
         
@@ -385,6 +381,8 @@ class ANIContributionViewController: UIViewController {
   
   @objc private func contribute() {
     guard let selectedContributionMode = self.selectedContributionMode else { return }
+    
+    self.view.endEditing(true)
     
     switch selectedContributionMode {
     case .story:
@@ -431,11 +429,7 @@ extension ANIContributionViewController: ANIImageFilterViewControllerDelegate {
     
     contentImages.removeAll()
     for filteredImage in filteredImages {
-      if Config.Grid.previewRatio == 1.0 {
-        contentImages.append(filteredImage?.resizeSquare(size: IMAGE_SIZE))
-      } else {
-        contentImages.append(filteredImage?.resize(size: IMAGE_SIZE))
-      }
+      contentImages.append(filteredImage?.resize(size: IMAGE_SIZE))
     }
   }
 }

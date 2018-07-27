@@ -161,7 +161,7 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
     ANINotificationManager.receive(keyboardWillHide: self, selector: #selector(keyboardWillHide))
   }
   
-  func getCropImages(images: [UIImage?], items: [Image]) -> [UIImage] {
+  private func getCropImages(images: [UIImage?], items: [Image]) -> [UIImage] {
     var croppedImages = [UIImage]()
     
     for (index, image) in images.enumerated() {
@@ -171,7 +171,7 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
       let heightScale = scrollViewWidth / (imageSize?.height)! * items[index].scale
       
       let scale = 1 / min(widthScale, heightScale)
-      let visibleRect = CGRect(x: items[index].offset.x * scale, y: items[index].offset.y * scale, width: scrollViewWidth * scale, height: scrollViewWidth * scale * Config.Grid.previewRatio)
+      let visibleRect = CGRect(x: floor(items[index].offset.x * scale), y: floor(items[index].offset.y * scale), width: scrollViewWidth * scale, height: scrollViewWidth * scale * Config.Grid.previewRatio)
       let ref: CGImage = (image?.cgImage?.cropping(to: visibleRect))!
       let croppedImage:UIImage = UIImage(cgImage: ref)
       
@@ -492,20 +492,12 @@ extension ANIProfileEditViewController: ANIImageFilterViewControllerDelegate {
     if isFamilyAdd {
       if familyImages != nil {
         for image in filteredImages {
-          if Config.Grid.previewRatio == 1.0 {
-            familyImages?.append(image?.resizeSquare(size: IMAGE_SIZE))
-          } else {
-            familyImages?.append(image?.resize(size: IMAGE_SIZE))
-          }
+          familyImages?.append(image?.resize(size: IMAGE_SIZE))
         }
       } else {
         var resizeIamges = [UIImage?]()
         for image in filteredImages {
-          if Config.Grid.previewRatio == 1.0 {
-            resizeIamges.append(image?.resizeSquare(size: IMAGE_SIZE))
-          } else {
-            resizeIamges.append(image?.resize(size: IMAGE_SIZE))
-          }
+          resizeIamges.append(image?.resize(size: IMAGE_SIZE))
         }
         familyImages = resizeIamges
       }
@@ -513,17 +505,10 @@ extension ANIProfileEditViewController: ANIImageFilterViewControllerDelegate {
       familyImagesChange = true
     } else {
       if editImageIndex == 0 {
-        if Config.Grid.previewRatio == 1.0 {
-          profileImage = filteredImage.resizeSquare(size: IMAGE_SIZE)
-        } else {
-          profileImage = filteredImage.resize(size: IMAGE_SIZE)
-        }
+        profileImage = filteredImage.resize(size: IMAGE_SIZE)
       } else if let editImageIndex = editImageIndex {
-        if Config.Grid.previewRatio == 1.0 {
-          self.familyImages?[editImageIndex - 1] = filteredImage.resizeSquare(size: IMAGE_SIZE)
-        } else {
-          self.familyImages?[editImageIndex - 1] = filteredImage.resize(size: IMAGE_SIZE)
-        }
+        self.familyImages?[editImageIndex - 1] = filteredImage.resize(size: IMAGE_SIZE)
+        
         familyImagesChange = true
       }
     }

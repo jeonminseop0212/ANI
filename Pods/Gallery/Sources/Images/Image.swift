@@ -40,7 +40,7 @@ extension Image {
     
     PHImageManager.default().requestImage(
       for: asset,
-      targetSize: targetSize,
+      targetSize: PHImageManagerMaximumSize,
       contentMode: .default,
       options: options) { (image, _) in
         completion(image)

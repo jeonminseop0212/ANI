@@ -147,7 +147,7 @@ class ANISignUpViewController: UIViewController {
     })
   }
   
-  func getCropImages(images: [UIImage?], items: [Image]) -> [UIImage] {
+  private func getCropImages(images: [UIImage?], items: [Image]) -> [UIImage] {
     var croppedImages = [UIImage]()
     
     for (index, image) in images.enumerated() {
@@ -157,7 +157,7 @@ class ANISignUpViewController: UIViewController {
       let heightScale = scrollViewWidth / (imageSize?.height)! * items[index].scale
       
       let scale = 1 / min(widthScale, heightScale)
-      let visibleRect = CGRect(x: items[index].offset.x * scale, y: items[index].offset.y * scale, width: scrollViewWidth * scale, height: scrollViewWidth * scale * Config.Grid.previewRatio)
+      let visibleRect = CGRect(x: floor(items[index].offset.x * scale), y: floor(items[index].offset.y * scale), width: scrollViewWidth * scale, height: scrollViewWidth * scale * Config.Grid.previewRatio)
       let ref: CGImage = (image?.cgImage?.cropping(to: visibleRect))!
       let croppedImage:UIImage = UIImage(cgImage: ref)
       
@@ -266,10 +266,6 @@ extension ANISignUpViewController: ANIImageFilterViewControllerDelegate {
           let filteredImage = filteredImages[0],
           let signUpView = self.signUpView else { return }
     
-    if Config.Grid.previewRatio == 1.0 {
-      signUpView.profileImage = filteredImage.resizeSquare(size: IMAGE_SIZE)
-    } else {
-      signUpView.profileImage = filteredImage.resize(size: IMAGE_SIZE)
-    }
+    signUpView.profileImage = filteredImage.resize(size: IMAGE_SIZE)
   }
 }
