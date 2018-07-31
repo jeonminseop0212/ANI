@@ -33,10 +33,10 @@ extension Image {
     options.isNetworkAccessAllowed = true
     options.deliveryMode = .highQualityFormat
     
-    let targetSize = CGSize(
-      width: asset.pixelWidth,
-      height: asset.pixelHeight
-    )
+//    let targetSize = CGSize(
+//      width: asset.pixelWidth,
+//      height: asset.pixelHeight
+//    )
     
     PHImageManager.default().requestImage(
       for: asset,
