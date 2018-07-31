@@ -24,6 +24,8 @@ class ANIChatView: UIView {
   
   private var messages = [FirebaseChatMessage]()
   
+  private var beforeDate: String = ""
+  
   override init(frame: CGRect) {
     super.init(frame: frame)
     
@@ -57,6 +59,12 @@ class ANIChatView: UIView {
       chatTableView.scrollToRow(at: [0, messages.count - 1], at: .bottom, animated: false)
     }
   }
+  
+  private func getDate(date: String) -> String {
+    let resetDate = String(date.prefix(10))
+    
+    return resetDate
+  }
 }
 
 //MARK: UITableViewDataSource
@@ -73,6 +81,17 @@ extension ANIChatView: UITableViewDataSource {
       let cell = tableView.dequeueReusableCell(withIdentifier: myChatId, for: indexPath) as! ANIMyChatViewCell
       
       cell.message = messages[indexPath.row]
+      if let date = messages[indexPath.row].date {
+        if indexPath.row == 0 {
+          cell.chagedDate = getDate(date: date)
+        } else {
+          if let beforeDate = messages[indexPath.row - 1].date, getDate(date: beforeDate) != getDate(date: date) {
+            cell.chagedDate = getDate(date: date)
+          } else {
+            cell.chagedDate = nil
+          }
+        }
+      }
       
       return cell
     } else {
@@ -81,7 +100,17 @@ extension ANIChatView: UITableViewDataSource {
       
       cell.message = messages[indexPath.row]
       cell.user = self.user
-      
+      if let date = messages[indexPath.row].date {
+        if indexPath.row == 0 {
+          cell.chagedDate = getDate(date: date)
+        } else {
+          if let beforeDate = messages[indexPath.row - 1].date, getDate(date: beforeDate) != getDate(date: date) {
+            cell.chagedDate = date
+          } else {
+            cell.chagedDate = nil
+          }
+        }
+      }
       return cell
     }
   }
@@ -95,7 +124,7 @@ extension ANIChatView {
     let database = Firestore.firestore()
     
     DispatchQueue.global().async {
-      database.collection(KEY_CHAT_GROUPS).document(chatGroupId).collection(KEY_CHAT_MESSAGES).addSnapshotListener({ (snapshot, error) in
+      database.collection(KEY_CHAT_GROUPS).document(chatGroupId).collection(KEY_CHAT_MESSAGES).order(by: KEY_DATE).addSnapshotListener({ (snapshot, error) in
         if let error = error {
           print("Error get document: \(error)")
           
