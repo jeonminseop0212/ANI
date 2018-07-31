@@ -210,26 +210,33 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
   
   private func updateUserData(uid: String, values: [String: AnyObject]) {
     let database = Firestore.firestore()
-    database.collection(KEY_USERS).document(uid).updateData(values)
-    
-    pushDataAlgolia(data: values)
-
-    database.collection(KEY_USERS).document(uid).getDocument { (snapshot, error) in
+    database.collection(KEY_USERS).document(uid).updateData(values) { (error) in
       if let error = error {
-        print("Error get document: \(error)")
-        
-        return
+        print("update user error \(error)")
       }
       
-      guard let snapshot = snapshot, let data = snapshot.data() else { return }
+      self.pushDataAlgolia(data: values)
       
-      do {
-        let user = try FirestoreDecoder().decode(FirebaseUser.self, from: data)
-        ANISessionManager.shared.currentUser = user
-        self.delegate?.didEdit()
-        self.dismiss(animated: true, completion: nil)
-      } catch let error {
-        print(error)
+      database.collection(KEY_USERS).document(uid).getDocument { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
+        
+        guard let snapshot = snapshot, let data = snapshot.data() else { return }
+        
+        do {
+          let user = try FirestoreDecoder().decode(FirebaseUser.self, from: data)
+          ANISessionManager.shared.currentUser = user
+          
+          NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+          
+          self.delegate?.didEdit()
+          self.dismiss(animated: true, completion: nil)
+        } catch let error {
+          print(error)
+        }
       }
     }
   }
@@ -334,10 +341,10 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
     guard let currentUser = ANISessionManager.shared.currentUser,
           let currentUserUid = ANISessionManager.shared.currentUserUid else { return }
     
+    let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.green)
+    NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData, nil)
+
     if familyImagesChange {
-      let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.green)
-      NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData, nil)
-      
       if let familyUrls = currentUser.familyImageUrls {
         deleteFamilyImages(urls: familyUrls)
       }
@@ -345,8 +352,6 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
       setFamilyImageUrls(completion: { (urls) in
         let database = Firestore.firestore()
         database.collection(KEY_USERS).document(currentUserUid).updateData([KEY_FAMILY_IMAGE_URLS : urls])
-        
-        NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
         
         self.setNewUserData()
       })
