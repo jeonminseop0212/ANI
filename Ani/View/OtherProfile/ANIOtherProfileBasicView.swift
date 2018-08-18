@@ -20,14 +20,14 @@ protocol ANIOtherProfileBasicViewDelegate {
   func qnaViewCellDidSelect(selectedQna: FirebaseQna, user:FirebaseUser)
   func supportButtonTapped(supportRecruit: FirebaseRecruit, user: FirebaseUser)
   func reject()
+  func popupOptionView(isMe: Bool, contentType: ContentType, id: String)
 }
 
 class ANIOtherProfileBasicView: UIView {
   
   enum SectionType:Int { case top = 0; case content = 1 }
-  enum ContentType:Int { case profile; case recruit; case story; case qna;}
   
-  private var contentType:ContentType = .profile {
+  private var contentType: ContentType = .profile {
     didSet {
       self.basicTableView?.reloadData()
       self.layoutIfNeeded()
@@ -339,6 +339,10 @@ extension ANIOtherProfileBasicView: ANIRecruitViewCellDelegate {
 extension ANIOtherProfileBasicView: ANIStoryViewCellDelegate {
   func storyCellTapped(story: FirebaseStory, user: FirebaseUser) {
     self.delegate?.storyViewCellDidSelect(selectedStory: story, user: user)
+  }
+  
+  func popupOptionView(isMe: Bool, contentType: ContentType, id: String) {
+    self.delegate?.popupOptionView(isMe: isMe, contentType: contentType, id: id)
   }
 }
 

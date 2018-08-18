@@ -227,7 +227,11 @@ extension ANIFollowUserView {
               return
             }
             
-            guard let userSnapshot = userSnapshot, let data = userSnapshot.data() else { return }
+            guard let userSnapshot = userSnapshot, let data = userSnapshot.data() else {
+              group.leave()
+
+              return
+            }
             
             do {
               let user = try FirestoreDecoder().decode(FirebaseUser.self, from: data)
@@ -236,11 +240,8 @@ extension ANIFollowUserView {
               group.leave()
             } catch let error {
               print(error)
-              activityIndicatorView.stopAnimating()
               
-              if let sender = sender {
-                sender.endRefreshing()
-              }
+              group.leave()
             }
           })
         }

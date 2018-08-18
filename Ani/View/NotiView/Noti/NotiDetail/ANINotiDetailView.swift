@@ -17,6 +17,7 @@ protocol ANINotiDetailViewDelegate {
   func storyViewCellDidSelect(selectedStory: FirebaseStory, user: FirebaseUser)
   func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser)
   func qnaViewCellDidSelect(selectedQna: FirebaseQna, user:FirebaseUser)
+  func popupOptionView(isMe: Bool, contentType: ContentType, id: String)
 }
 
 enum NotiKind {
@@ -252,6 +253,10 @@ extension ANINotiDetailView: ANIRecruitViewCellDelegate {
 extension ANINotiDetailView: ANIStoryViewCellDelegate {
   func storyCellTapped(story: FirebaseStory, user: FirebaseUser) {
     self.delegate?.storyViewCellDidSelect(selectedStory: story, user: user)
+  }
+  
+  func popupOptionView(isMe: Bool, contentType: ContentType, id: String) {
+    self.delegate?.popupOptionView(isMe: isMe, contentType: contentType, id: id)
   }
 }
 

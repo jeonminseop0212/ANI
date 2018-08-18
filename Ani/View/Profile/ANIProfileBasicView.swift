@@ -19,12 +19,19 @@ protocol ANIProfileBasicViewDelegate {
   func qnaViewCellDidSelect(selectedQna: FirebaseQna, user:FirebaseUser)
   func supportButtonTapped(supportRecruit: FirebaseRecruit, user: FirebaseUser)
   func reject()
+  func popupOptionView(isMe: Bool, contentType: ContentType, id: String)
+}
+
+enum ContentType: Int {
+  case profile;
+  case recruit;
+  case story;
+  case qna;
 }
 
 class ANIProfileBasicView: UIView {
   
   enum SectionType:Int { case top = 0; case content = 1 }
-  enum ContentType:Int { case profile; case recruit; case story; case qna;}
   
   private var contentType:ContentType = .profile {
     didSet {
@@ -105,6 +112,40 @@ class ANIProfileBasicView: UIView {
     loadRecruit()
     loadStory()
     loadQna()
+  }
+  
+  func deleteData(id: String) {
+    guard let basicTableView = self.basicTableView else { return }
+    
+    var indexPath: IndexPath = [0, 0]
+    
+    switch contentType {
+    case .recruit:
+      for (index, recruit) in recruits.enumerated() {
+        if recruit.id == id {
+          recruits.remove(at: index)
+          indexPath = [1, index]
+        }
+      }
+    case .story:
+      for (index, story) in stories.enumerated() {
+        if story.id == id {
+          stories.remove(at: index)
+          indexPath = [1, index]
+        }
+      }
+    case .qna:
+      for (index, qna) in qnas.enumerated() {
+        if qna.id == id {
+          qnas.remove(at: index)
+          indexPath = [1, index]
+        }
+      }
+    default:
+      print("profile")
+    }
+    
+    basicTableView.deleteRows(at: [indexPath], with: .automatic)
   }
 }
 
@@ -267,6 +308,10 @@ extension ANIProfileBasicView: ANIRecruitViewCellDelegate {
 extension ANIProfileBasicView: ANIStoryViewCellDelegate {
   func storyCellTapped(story: FirebaseStory, user: FirebaseUser) {
     self.delegate?.storyViewCellDidSelect(selectedStory: story, user: user)
+  }
+  
+  func popupOptionView(isMe: Bool, contentType: ContentType, id: String) {
+    self.delegate?.popupOptionView(isMe: isMe, contentType: contentType, id: id)
   }
 }
 

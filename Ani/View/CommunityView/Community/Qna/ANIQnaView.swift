@@ -14,6 +14,7 @@ import NVActivityIndicatorView
 protocol ANIQnaViewDelegate {
   func qnaViewCellDidSelect(selectedQna: FirebaseQna, user: FirebaseUser)
   func reject()
+  func popupOptionView(isMe: Bool, contentType: ContentType, id: String)
 }
 
 class ANIQnaView: UIView {
@@ -79,6 +80,7 @@ class ANIQnaView: UIView {
     ANINotificationManager.receive(logout: self, selector: #selector(reloadQna))
     ANINotificationManager.receive(login: self, selector: #selector(reloadQna))
     ANINotificationManager.receive(communityTabTapped: self, selector: #selector(scrollToTop))
+    ANINotificationManager.receive(deleteQna: self, selector: #selector(deleteQna))
   }
   
   @objc private func reloadQna() {
@@ -91,6 +93,22 @@ class ANIQnaView: UIView {
           isCellSelected else { return }
     
     qnaTableView.scrollToRow(at: [0, 0], at: .top, animated: true)
+  }
+  
+  @objc private func deleteQna(_ notification: NSNotification) {
+    guard let id = notification.object as? String,
+          let qnaTableView = self.qnaTableView else { return }
+    
+    var indexPath: IndexPath = [0, 0]
+    
+    for (index, qna) in qnas.enumerated() {
+      if qna.id == id {
+        qnas.remove(at: index)
+        indexPath = [0, index]
+      }
+    }
+    
+    qnaTableView.deleteRows(at: [indexPath], with: .automatic)
   }
 }
 
@@ -125,6 +143,10 @@ extension ANIQnaView: UITableViewDelegate {
 
 //MARK: ANIQnaViewCellDelegate
 extension ANIQnaView: ANIQnaViewCellDelegate {
+  func popupOptionView(isMe: Bool, contentType: ContentType, id: String) {
+    self.delegate?.popupOptionView(isMe: isMe, contentType: contentType, id: id)
+  }
+  
   func cellTapped(qna: FirebaseQna, user: FirebaseUser) {
     self.delegate?.qnaViewCellDidSelect(selectedQna: qna, user: user)
   }

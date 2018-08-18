@@ -8,6 +8,9 @@
 
 import UIKit
 import TinyConstraints
+import FirebaseFirestore
+import CodableFirebase
+import FirebaseStorage
 
 class ANIProfileViewController: UIViewController {
   
@@ -29,6 +32,9 @@ class ANIProfileViewController: UIViewController {
   private var isRejectAnimating: Bool = false
   
   private var currentUser: FirebaseUser? { return ANISessionManager.shared.currentUser }
+  
+  private var contentType: ContentType?
+  private var contributionId: String?
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -275,6 +281,17 @@ extension ANIProfileViewController: ANIProfileBasicViewDelegate {
       })
     }
   }
+  
+  func popupOptionView(isMe: Bool, contentType: ContentType, id: String) {
+    self.contentType = contentType
+    self.contributionId = id
+    
+    let popupOptionViewController = ANIPopupOptionViewController()
+    popupOptionViewController.modalPresentationStyle = .overCurrentContext
+    popupOptionViewController.isMe = isMe
+    popupOptionViewController.delegate = self
+    self.tabBarController?.present(popupOptionViewController, animated: false, completion: nil)
+  }
 }
 
 //MARK: ANIProfileEditViewControllerDelegate
@@ -299,5 +316,128 @@ extension ANIProfileViewController: ANINeedLoginViewDelegate {
 extension ANIProfileViewController: ANIImageBrowserViewControllerDelegate {
   func imageBrowserDidDissmiss() {
     UIApplication.shared.statusBarStyle = .default
+  }
+}
+
+//MARK: ANIPopupOptionViewControllerDelegate
+extension ANIProfileViewController: ANIPopupOptionViewControllerDelegate {
+  func deleteContribution() {
+    let alertController = UIAlertController(title: nil, message: "投稿を削除しますか？", preferredStyle: .alert)
+    
+    let logoutAction = UIAlertAction(title: "削除", style: .default) { (action) in
+      self.deleteData()
+    }
+    let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
+    
+    alertController.addAction(logoutAction)
+    alertController.addAction(cancelAction)
+    
+    self.present(alertController, animated: true, completion: nil)
+  }
+  
+  func reportContribution() {
+  }
+}
+
+//MAKR: data
+extension ANIProfileViewController {
+  private func deleteData() {
+    guard let contentType = self.contentType, let contributionId = self.contributionId else { return }
+    
+    let database = Firestore.firestore()
+    
+    var collection = ""
+    
+    if contentType == .story {
+      collection = KEY_STORIES
+    } else if contentType == .qna {
+      collection = KEY_QNAS
+    }
+    
+    DispatchQueue.global().async {
+      database.collection(collection).document(contributionId).getDocument(completion: { (snapshot, error) in
+        if let error = error {
+          print("get document error \(error)")
+          
+          return
+        }
+        
+        database.collection(collection).document(contributionId).delete()
+        
+        DispatchQueue.main.async {
+          guard let profileBasicView = self.profileBasicView else { return }
+          
+          profileBasicView.deleteData(id: contributionId)
+        }
+        
+        guard let snapshot = snapshot, let data = snapshot.data() else { return }
+        
+        do {
+          if contentType == .story {
+            let story = try FirestoreDecoder().decode(FirebaseStory.self, from: data)
+            
+            if let urls = story.storyImageUrls {
+              for url in urls {
+                let storage = Storage.storage()
+                let storageRef = storage.reference(forURL: url)
+                
+                storageRef.delete { error in
+                  if let error = error {
+                    print(error)
+                  }
+                }
+              }
+            }
+          } else if contentType == .qna {
+            let qna = try FirestoreDecoder().decode(FirebaseQna.self, from: data)
+            
+            if let urls = qna.qnaImageUrls {
+              for url in urls {
+                let storage = Storage.storage()
+                let storageRef = storage.reference(forURL: url)
+                
+                storageRef.delete { error in
+                  if let error = error {
+                    print(error)
+                  }
+                }
+              }
+            }
+          }
+        } catch let error {
+          print(error)
+        }
+      })
+    }
+    
+    DispatchQueue.global().async {
+      database.collection(collection).document(contributionId).collection(KEY_LOVE_IDS).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          print("Get document error \(error)")
+          
+          return
+        }
+        
+        guard let snapshot = snapshot else { return }
+        
+        for document in snapshot.documents {
+          database.collection(collection).document(contributionId).collection(KEY_LOVE_IDS).document(document.documentID).delete()
+        }
+      })
+      
+      database.collection(collection).document(contributionId).collection(KEY_COMMENTS).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          print("Get document error \(error)")
+          
+          return
+        }
+        
+        guard let snapshot = snapshot else { return }
+        
+        for document in snapshot.documents {
+          database.collection(collection).document(contributionId).collection(KEY_COMMENTS).document(document.documentID).delete()
+        }
+      })
+    }
   }
 }

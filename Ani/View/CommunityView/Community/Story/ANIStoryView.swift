@@ -15,6 +15,7 @@ protocol ANIStoryViewDelegate {
   func storyViewCellDidSelect(selectedStory: FirebaseStory, user: FirebaseUser)
   func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser)
   func reject()
+  func popupOptionView(isMe: Bool, contentType: ContentType, id: String)
 }
 
 class ANIStoryView: UIView {
@@ -82,6 +83,7 @@ class ANIStoryView: UIView {
     ANINotificationManager.receive(logout: self, selector: #selector(reloadStory))
     ANINotificationManager.receive(login: self, selector: #selector(reloadStory))
     ANINotificationManager.receive(communityTabTapped: self, selector: #selector(scrollToTop))
+    ANINotificationManager.receive(deleteStory: self, selector: #selector(deleteStory))
   }
   
   @objc private func reloadStory() {
@@ -94,6 +96,22 @@ class ANIStoryView: UIView {
           isCellSelected else { return }
     
     storyTableView.scrollToRow(at: [0, 0], at: .top, animated: true)
+  }
+  
+  @objc private func deleteStory(_ notification: NSNotification) {
+    guard let id = notification.object as? String,
+          let storyTableView = self.storyTableView else { return }
+    
+    var indexPath: IndexPath = [0, 0]
+    
+    for (index, story) in stories.enumerated() {
+      if story.id == id {
+        stories.remove(at: index)
+        indexPath = [0, index]
+      }
+    }
+    
+    storyTableView.deleteRows(at: [indexPath], with: .automatic)
   }
 }
 
@@ -151,6 +169,10 @@ extension ANIStoryView: ANIStoryViewCellDelegate {
   
   func reject() {
     self.delegate?.reject()
+  }
+  
+  func popupOptionView(isMe: Bool, contentType: ContentType, id: String) {
+    self.delegate?.popupOptionView(isMe: isMe, contentType: contentType, id: id)
   }
 }
 
