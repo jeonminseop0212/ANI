@@ -126,4 +126,14 @@ class ANINotificationManager: NSObject {
   private static let N_MESSAGE_CELL_TAPPED = "N_MESSAGE_CELL_TAPPED"
   static func postMessageCellTapped(user: FirebaseUser) { self.post(name: N_MESSAGE_CELL_TAPPED, object: user, userInfo:nil) }
   static func receive(messageCellTapped observer:Any, selector:Selector) { receive(name: N_MESSAGE_CELL_TAPPED, observer: observer, selector: selector) }
+  
+  //MARK: delete story
+  private static let N_DELETE_STORY = "N_DELETE_STORY"
+  static func postDeleteStory(id: String) { self.post(name: N_DELETE_STORY, object: id, userInfo:nil) }
+  static func receive(deleteStory observer:Any, selector:Selector) { receive(name: N_DELETE_STORY, observer: observer, selector: selector) }
+  
+  //MARK: delete qna
+  private static let N_DELETE_QNA = "N_DELETE_QNA"
+  static func postDeleteQna(id: String) { self.post(name: N_DELETE_QNA, object: id, userInfo:nil) }
+  static func receive(deleteQna observer:Any, selector:Selector) { receive(name: N_DELETE_QNA, observer: observer, selector: selector) }
 }

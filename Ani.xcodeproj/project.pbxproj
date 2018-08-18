@@ -81,6 +81,8 @@
 		CDD0550C20A5D29900BEF482 /* ANIImageFilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD0550B20A5D29900BEF482 /* ANIImageFilterView.swift */; };
 		CDD0550E20A6B23B00BEF482 /* ANIImageFilterCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD0550D20A6B23B00BEF482 /* ANIImageFilterCell.swift */; };
 		CDD0551020A6C64300BEF482 /* ANIFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD0550F20A6C64300BEF482 /* ANIFilter.swift */; };
+		CDDC23B4210988AC00C9A8E5 /* ANIPopupOptionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDC23B3210988AC00C9A8E5 /* ANIPopupOptionViewController.swift */; };
+		CDDC23B721098A6000C9A8E5 /* ANIPopupOptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDC23B621098A6000C9A8E5 /* ANIPopupOptionView.swift */; };
 		CDDD04A620B26CD50094DBFA /* ANICommentContentCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDD04A520B26CD50094DBFA /* ANICommentContentCell.swift */; };
 		CDDD04A820B271090094DBFA /* ANICommentCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDD04A720B271090094DBFA /* ANICommentCell.swift */; };
 		CDDD04AC20B3B0AA0094DBFA /* ANICommentBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDD04AB20B3B0AA0094DBFA /* ANICommentBar.swift */; };
@@ -253,6 +255,8 @@
 		CDD0550B20A5D29900BEF482 /* ANIImageFilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIImageFilterView.swift; sourceTree = "<group>"; };
 		CDD0550D20A6B23B00BEF482 /* ANIImageFilterCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIImageFilterCell.swift; sourceTree = "<group>"; };
 		CDD0550F20A6C64300BEF482 /* ANIFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIFilter.swift; sourceTree = "<group>"; };
+		CDDC23B3210988AC00C9A8E5 /* ANIPopupOptionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIPopupOptionViewController.swift; sourceTree = "<group>"; };
+		CDDC23B621098A6000C9A8E5 /* ANIPopupOptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIPopupOptionView.swift; sourceTree = "<group>"; };
 		CDDD04A520B26CD50094DBFA /* ANICommentContentCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommentContentCell.swift; sourceTree = "<group>"; };
 		CDDD04A720B271090094DBFA /* ANICommentCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommentCell.swift; sourceTree = "<group>"; };
 		CDDD04AB20B3B0AA0094DBFA /* ANICommentBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICommentBar.swift; sourceTree = "<group>"; };
@@ -520,6 +524,7 @@
 				CDA32A3320AC1491008A2AC1 /* ContributeViewController */,
 				CDA32A8120AE7AE2008A2AC1 /* ImageBrowserViewController */,
 				CDA97AC420AFF33200F46DA4 /* ProfileEditViewController */,
+				CDDC23B22109888B00C9A8E5 /* PopupOptionViewController */,
 			);
 			path = ModalViewController;
 			sourceTree = "<group>";
@@ -533,6 +538,7 @@
 				CDA32A3620AD1E8F008A2AC1 /* ContributionView */,
 				CDA32A8420AE8DBC008A2AC1 /* ImageBrowserView */,
 				CDA97AC720AFFFD200F46DA4 /* ProfileEditView */,
+				CDDC23B521098A4000C9A8E5 /* PopupOption */,
 			);
 			path = ModalVIew;
 			sourceTree = "<group>";
@@ -726,6 +732,22 @@
 				CDD0550D20A6B23B00BEF482 /* ANIImageFilterCell.swift */,
 			);
 			path = Filter;
+			sourceTree = "<group>";
+		};
+		CDDC23B22109888B00C9A8E5 /* PopupOptionViewController */ = {
+			isa = PBXGroup;
+			children = (
+				CDDC23B3210988AC00C9A8E5 /* ANIPopupOptionViewController.swift */,
+			);
+			path = PopupOptionViewController;
+			sourceTree = "<group>";
+		};
+		CDDC23B521098A4000C9A8E5 /* PopupOption */ = {
+			isa = PBXGroup;
+			children = (
+				CDDC23B621098A6000C9A8E5 /* ANIPopupOptionView.swift */,
+			);
+			path = PopupOption;
 			sourceTree = "<group>";
 		};
 		CDDD04AA20B3B09C0094DBFA /* Comment */ = {
@@ -1645,6 +1667,7 @@
 				F53E87D02086EF6600B19A2F /* ANIProfileCell.swift in Sources */,
 				CDAFD75B20DC9D0000AEDD83 /* ANIOptionView.swift in Sources */,
 				CDA97ACE20B0018600F46DA4 /* ANIProfileEditFamilyCell.swift in Sources */,
+				CDDC23B721098A6000C9A8E5 /* ANIPopupOptionView.swift in Sources */,
 				CDA32A8620AE8DD4008A2AC1 /* ANIImageBrowserCell.swift in Sources */,
 				CDF7F171208F651E00254A0F /* ANIButtonView.swift in Sources */,
 				F57F7D8E20844C4E008A2645 /* ANISearchCategoryCell.swift in Sources */,
@@ -1747,6 +1770,7 @@
 				F5B1EF9120725964000CFB0B /* AppDelegate.swift in Sources */,
 				CDA32A8A20AEA7BC008A2AC1 /* ANIDraggableView.swift in Sources */,
 				CDDD04A620B26CD50094DBFA /* ANICommentContentCell.swift in Sources */,
+				CDDC23B4210988AC00C9A8E5 /* ANIPopupOptionViewController.swift in Sources */,
 				F57F7D8C20844C41008A2645 /* ANISearchCategoriesView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

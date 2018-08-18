@@ -82,3 +82,7 @@ let KEY_STORIES_INDEX = "ANI-stories"
 let KEY_QNAS_INDEX = "ANI-qnas"
 let KEY_HITS = "hits"
 
+//report
+let KEY_REPORTS = "reports"
+let KEY_REPORT = "report"
+

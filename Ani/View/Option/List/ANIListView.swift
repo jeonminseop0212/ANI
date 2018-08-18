@@ -17,6 +17,7 @@ protocol ANIListViewDelegate {
   func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser)
   func qnaViewCellDidSelect(selectedQna: FirebaseQna, user:FirebaseUser)
   func supportButtonTapped(supportRecruit: FirebaseRecruit, user: FirebaseUser)
+  func popupOptionView(isMe: Bool, contentType: ContentType, id: String)
 }
 
 class ANIListView: UIView {
@@ -94,6 +95,46 @@ class ANIListView: UIView {
     activityIndicatorView.height(40.0)
     activityIndicatorView.centerInSuperview()
     self.activityIndicatorView = activityIndicatorView
+  }
+  
+  func deleteData(id: String) {
+    guard let list = self.list,
+          let listTableView = self.listTableView else { return }
+    
+    var indexPath: IndexPath = [0, 0]
+    
+    switch list {
+    case .loveRecruit:
+      for (index, loveRecruit) in loveRecruits.enumerated() {
+        if loveRecruit.id == id {
+          loveRecruits.remove(at: index)
+          indexPath = [0, index]
+        }
+      }
+    case .loveStroy:
+      for (index, loveStory) in loveStories.enumerated() {
+        if loveStory.id == id {
+          loveStories.remove(at: index)
+          indexPath = [0, index]
+        }
+      }
+    case .loveQuestion:
+      for (index, loveQna) in loveQnas.enumerated() {
+        if loveQna.id == id {
+          loveQnas.remove(at: index)
+          indexPath = [0, index]
+        }
+      }
+    case .clipRecruit:
+      for (index, clipRecruit) in clipRecruits.enumerated() {
+        if clipRecruit.id == id {
+          clipRecruits.remove(at: index)
+          indexPath = [0, index]
+        }
+      }
+    }
+    
+    listTableView.deleteRows(at: [indexPath], with: .automatic)
   }
 }
 
@@ -222,6 +263,10 @@ extension ANIListView: ANIRecruitViewCellDelegate {
 extension ANIListView: ANIStoryViewCellDelegate {
   func storyCellTapped(story: FirebaseStory, user: FirebaseUser) {
     self.delegate?.storyViewCellDidSelect(selectedStory: story, user: user)
+  }
+  
+  func popupOptionView(isMe: Bool, contentType: ContentType, id: String) {
+    self.delegate?.popupOptionView(isMe: isMe, contentType: contentType, id: id)
   }
 }
 
@@ -354,7 +399,11 @@ extension ANIListView {
                 return
               }
               
-              guard let storySnapshot = storySnapshot, let data = storySnapshot.data() else { return }
+              guard let storySnapshot = storySnapshot, let data = storySnapshot.data() else {
+                group.leave()
+                
+                return
+              }
               
               do {
                 let story = try FirestoreDecoder().decode(FirebaseStory.self, from: data)
@@ -364,7 +413,7 @@ extension ANIListView {
               } catch let error {
                 print(error)
                 
-                activityIndicatorView.stopAnimating()
+                group.leave()                
               }
             })
           }
@@ -431,7 +480,10 @@ extension ANIListView {
                 return
               }
               
-              guard let qnaSnapshot = qnaSnapshot, let data = qnaSnapshot.data() else { return }
+              guard let qnaSnapshot = qnaSnapshot, let data = qnaSnapshot.data() else {
+                group.leave()
+                return
+              }
               
               do {
                 let qna = try FirestoreDecoder().decode(FirebaseQna.self, from: data)
@@ -441,7 +493,7 @@ extension ANIListView {
               } catch let error {
                 print(error)
                 
-                activityIndicatorView.stopAnimating()
+                group.leave()
               }
             })
           }
@@ -508,7 +560,11 @@ extension ANIListView {
                 return
               }
               
-              guard let recruitSnapshot = recruitSnapshot, let data = recruitSnapshot.data() else { return }
+              guard let recruitSnapshot = recruitSnapshot, let data = recruitSnapshot.data() else {
+                group.leave()
+                
+                return
+              }
               
               do {
                 let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: data)
@@ -518,7 +574,7 @@ extension ANIListView {
               } catch let error {
                 print(error)
                 
-                activityIndicatorView.stopAnimating()
+                group.leave()
               }
             })
           }

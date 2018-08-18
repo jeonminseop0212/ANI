@@ -15,6 +15,7 @@ import TinyConstraints
 protocol ANIQnaViewCellDelegate {
   func cellTapped(qna: FirebaseQna, user: FirebaseUser)
   func reject()
+  func popupOptionView(isMe: Bool, contentType: ContentType, id: String)
 }
 
 class ANIQnaViewCell: UITableViewCell {
@@ -32,6 +33,7 @@ class ANIQnaViewCell: UITableViewCell {
   private weak var loveCountLabel: UILabel?
   private weak var commentButton: UIButton?
   private weak var commentCountLabel: UILabel?
+  private weak var optionButton: UIButton?
   
   var qna: FirebaseQna? {
     didSet {
@@ -117,6 +119,18 @@ class ANIQnaViewCell: UITableViewCell {
     spaceView.rightToSuperview()
     spaceView.height(10.0)
     spaceView.bottomToSuperview()
+    
+    //optionButton
+    let optionButton = UIButton()
+    optionButton.setImage(UIImage(named: "optionButton")?.withRenderingMode(.alwaysTemplate), for: .normal)
+    optionButton.addTarget(self, action: #selector(showOption), for: .touchUpInside)
+    optionButton.tintColor = ANIColor.darkGray
+    addSubview(optionButton)
+    optionButton.centerY(to: profileImageView)
+    optionButton.rightToSuperview(offset: 10.0)
+    optionButton.width(25.0)
+    optionButton.height(25.0)
+    self.optionButton = optionButton
 
     //commentCountLabel
     let commentCountLabel = UILabel()
@@ -124,7 +138,7 @@ class ANIQnaViewCell: UITableViewCell {
     commentCountLabel.textColor = ANIColor.dark
     addSubview(commentCountLabel)
     commentCountLabel.centerY(to: profileImageView)
-    commentCountLabel.rightToSuperview(offset: 10.0)
+    commentCountLabel.rightToLeft(of: optionButton, offset: -10.0)
     commentCountLabel.width(25.0)
     commentCountLabel.height(20.0)
     self.commentCountLabel = commentCountLabel
@@ -402,6 +416,21 @@ class ANIQnaViewCell: UITableViewCell {
       self.delegate?.cellTapped(qna: qna, user: user)
     } else {
       self.delegate?.reject()
+    }
+  }
+  
+  @objc private func showOption() {
+    guard let user = self.user,
+          let currentUserId = ANISessionManager.shared.currentUserUid,
+          let qna = self.qna,
+          let qnaId = qna.id else { return }
+    
+    let contentType: ContentType = .qna
+    
+    if user.uid == currentUserId {
+      self.delegate?.popupOptionView(isMe: true, contentType: contentType, id: qnaId)
+    } else {
+      self.delegate?.popupOptionView(isMe: false, contentType: contentType, id: qnaId)
     }
   }
 }

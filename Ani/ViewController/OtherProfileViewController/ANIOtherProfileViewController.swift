@@ -8,6 +8,9 @@
 
 import UIKit
 import TinyConstraints
+import FirebaseFirestore
+import CodableFirebase
+import FirebaseStorage
 
 class ANIOtherProfileViewController: UIViewController {
   
@@ -25,6 +28,9 @@ class ANIOtherProfileViewController: UIViewController {
   private var rejectTapView: UIView?
   
   var userId: String?
+  
+  private var contentType: ContentType?
+  private var contributionId: String?
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -241,11 +247,65 @@ extension ANIOtherProfileViewController: ANIOtherProfileBasicViewDelegate {
       })
     }
   }
+  
+  func popupOptionView(isMe: Bool, contentType: ContentType, id: String) {
+    self.contentType = contentType
+    self.contributionId = id
+    
+    let popupOptionViewController = ANIPopupOptionViewController()
+    popupOptionViewController.modalPresentationStyle = .overCurrentContext
+    popupOptionViewController.isMe = isMe
+    popupOptionViewController.delegate = self
+    self.tabBarController?.present(popupOptionViewController, animated: false, completion: nil)
+  }
 }
 
 //MARK: ANIImageBrowserViewControllerDelegate
 extension ANIOtherProfileViewController: ANIImageBrowserViewControllerDelegate {
   func imageBrowserDidDissmiss() {
     UIApplication.shared.statusBarStyle = .default
+  }
+}
+
+//MARK: ANIPopupOptionViewControllerDelegate
+extension ANIOtherProfileViewController: ANIPopupOptionViewControllerDelegate {
+  func deleteContribution() {
+  }
+  
+  func reportContribution() {
+    let alertController = UIAlertController(title: nil, message: "投稿を通報しますか？", preferredStyle: .alert)
+    
+    let logoutAction = UIAlertAction(title: "通報", style: .default) { (action) in
+      self.reportData()
+    }
+    let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
+    
+    alertController.addAction(logoutAction)
+    alertController.addAction(cancelAction)
+    
+    self.present(alertController, animated: true, completion: nil)
+  }
+}
+
+//MAKR: data
+extension ANIOtherProfileViewController {
+  private func reportData() {
+    guard let contentType = self.contentType, let contributionId = self.contributionId else { return }
+    
+    let database = Firestore.firestore()
+    
+    var contentTypeString = ""
+    
+    if contentType == .recruit {
+      contentTypeString = "recurit"
+    } else if contentType == .story {
+      contentTypeString = "story"
+    } else if contentType == .qna {
+      contentTypeString = "qna"
+    }
+    
+    let date = ANIFunction.shared.getToday()
+    let values = ["contentType": contentTypeString, "date": date]
+    database.collection(KEY_REPORTS).document(contributionId).collection(KEY_REPORT).addDocument(data: values)
   }
 }

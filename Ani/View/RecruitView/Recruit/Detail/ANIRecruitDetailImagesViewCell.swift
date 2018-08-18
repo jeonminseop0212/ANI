@@ -26,7 +26,7 @@ class ANIRecruitDetailImagesViewCell: UICollectionViewCell {
     imageView.backgroundColor = ANIColor.bg
     imageView.layer.cornerRadius = 10.0
     imageView.layer.masksToBounds = true
-    imageView.contentMode = .scaleAspectFill
+    imageView.contentMode = .scaleAspectFit
     addSubview(imageView)
     imageView.edgesToSuperview()
     self.imageView = imageView

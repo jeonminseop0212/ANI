@@ -17,6 +17,7 @@ protocol ANISearchViewDelegate {
   func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser)
   func qnaViewCellDidSelect(selectedQna: FirebaseQna, user:FirebaseUser)
   func reject()
+  func popupOptionView(isMe: Bool, contentType: ContentType, id: String)
 }
 
 enum SearchCategory: String {
@@ -121,6 +122,30 @@ class ANISearchView: UIView {
     
     userTableView.scrollToRow(at: [0, 0], at: .top, animated: true)
   }
+  
+  func deleteData(id: String) {
+    guard let tableView = self.tableView else { return }
+    
+    var indexPath: IndexPath = [0, 0]
+    
+    if selectedCategory == .story {
+      for (index, searchStory) in searchStories.enumerated() {
+        if searchStory.id == id {
+          searchStories.remove(at: index)
+          indexPath = [0, index]
+        }
+      }
+    } else if selectedCategory == .qna {
+      for (index, searchQna) in searchQnas.enumerated() {
+        if searchQna.id == id {
+          searchQnas.remove(at: index)
+          indexPath = [0, index]
+        }
+      }
+    }
+    
+    tableView.deleteRows(at: [indexPath], with: .automatic)
+  }
 }
 
 //MARK: UITableViewDataSource
@@ -216,6 +241,10 @@ extension ANISearchView: ANIUserSearchViewCellDelegate {
 extension ANISearchView: ANIStoryViewCellDelegate {
   func storyCellTapped(story: FirebaseStory, user: FirebaseUser) {
     self.delegate?.storyViewCellDidSelect(selectedStory: story, user: user)
+  }
+  
+  func popupOptionView(isMe: Bool, contentType: ContentType, id: String) {
+    self.delegate?.popupOptionView(isMe: isMe, contentType: contentType, id: id)
   }
 }
 
