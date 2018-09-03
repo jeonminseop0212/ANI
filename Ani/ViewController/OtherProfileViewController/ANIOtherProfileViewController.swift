@@ -12,6 +12,10 @@ import FirebaseFirestore
 import CodableFirebase
 import FirebaseStorage
 
+protocol ANIOtherProfileViewControllerDelegate {
+  func popOtherProfileView()
+}
+
 class ANIOtherProfileViewController: UIViewController {
   
   private weak var myNavigationBar: UIView?
@@ -31,6 +35,8 @@ class ANIOtherProfileViewController: UIViewController {
   
   private var contentType: ContentType?
   private var contributionId: String?
+  
+  var delegate: ANIOtherProfileViewControllerDelegate?
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -150,6 +156,7 @@ class ANIOtherProfileViewController: UIViewController {
   //MARK: action
   @objc private func back() {
     self.navigationController?.popViewController(animated: true)
+    self.delegate?.popOtherProfileView()
   }
   
   @objc private func rejectViewTapped() {
