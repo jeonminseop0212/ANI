@@ -13,6 +13,10 @@ import CodableFirebase
 import FirebaseStorage
 import InstantSearchClient
 
+protocol ANIProfileViewControllerDelegate {
+  func popProfileView()
+}
+
 class ANIProfileViewController: UIViewController {
   
   private weak var myNavigationBar: UIView?
@@ -36,6 +40,8 @@ class ANIProfileViewController: UIViewController {
   
   private var contentType: ContentType?
   private var contributionId: String?
+  
+  var delegate: ANIProfileViewControllerDelegate?
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -189,6 +195,7 @@ class ANIProfileViewController: UIViewController {
   //MARK: action
   @objc private func back() {
     self.navigationController?.popViewController(animated: true)
+    self.delegate?.popProfileView()
   }
   
   @objc private func option() {

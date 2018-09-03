@@ -168,12 +168,14 @@ class ANIRecruitDetailViewController: UIViewController {
     if let currentUserUid = ANISessionManager.shared.currentUserUid, currentUserUid == userId {
       let profileViewController = ANIProfileViewController()
       profileViewController.hidesBottomBarWhenPushed = true
+      profileViewController.delegate = self
       self.navigationController?.pushViewController(profileViewController, animated: true)
       profileViewController.isBackButtonHide = false
     } else {
       let otherProfileViewController = ANIOtherProfileViewController()
       otherProfileViewController.hidesBottomBarWhenPushed = true
       otherProfileViewController.userId = userId
+      otherProfileViewController.delegate = self
       self.navigationController?.pushViewController(otherProfileViewController, animated: true)
     }
   }
@@ -372,6 +374,20 @@ extension ANIRecruitDetailViewController: ANIImageBrowserViewControllerDelegate 
 //MARK: ANIChatViewControllerDelegate
 extension ANIRecruitDetailViewController: ANIChatViewControllerDelegate {
   func chatViewWillDismiss() {
+    UIApplication.shared.statusBarStyle = statusBarStyle
+  }
+}
+
+//MARK: ANIProfileViewControllerDelegate
+extension ANIRecruitDetailViewController: ANIProfileViewControllerDelegate {
+  func popProfileView() {
+    UIApplication.shared.statusBarStyle = statusBarStyle
+  }
+}
+
+//MARK: ANIOtherProfileViewControllerDelegate
+extension ANIRecruitDetailViewController: ANIOtherProfileViewControllerDelegate {
+  func popOtherProfileView() {
     UIApplication.shared.statusBarStyle = statusBarStyle
   }
 }
