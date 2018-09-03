@@ -11,6 +11,7 @@ import TinyConstraints
 import FirebaseFirestore
 import CodableFirebase
 import FirebaseStorage
+import InstantSearchClient
 
 class ANISearchViewController: UIViewController {
   
@@ -391,6 +392,7 @@ extension ANISearchViewController {
         }
         
         database.collection(collection).document(contributionId).delete()
+        self.delegateDataAlgolia(contentType: contentType, contributionId: contributionId)
         
         DispatchQueue.main.async {
           guard let searchView = self.searchView else { return }
@@ -487,6 +489,20 @@ extension ANISearchViewController {
     let date = ANIFunction.shared.getToday()
     let values = ["contentType": contentTypeString, "date": date]
     database.collection(KEY_REPORTS).document(contributionId).collection(KEY_REPORT).addDocument(data: values)
+  }
+  
+  private func delegateDataAlgolia(contentType: ContentType, contributionId: String) {
+    var index: Index?
+    
+    if contentType == .story {
+      index = ANISessionManager.shared.client.index(withName: KEY_STORIES_INDEX)
+    } else if contentType == .qna {
+      index = ANISessionManager.shared.client.index(withName: KEY_QNAS_INDEX)
+    }
+    
+    DispatchQueue.global().async {
+      index?.deleteObject(withID: contributionId)
+    }
   }
 }
 

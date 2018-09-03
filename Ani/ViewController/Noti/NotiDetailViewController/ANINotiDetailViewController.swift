@@ -10,6 +10,7 @@ import UIKit
 import FirebaseFirestore
 import CodableFirebase
 import FirebaseStorage
+import InstantSearchClient
 
 class ANINotiDetailViewController: UIViewController {
   
@@ -250,6 +251,7 @@ extension ANINotiDetailViewController {
         }
         
         database.collection(collection).document(contributionId).delete()
+        self.delegateDataAlgolia(contentType: contentType, contributionId: contributionId)
         
         DispatchQueue.main.async {
           self.navigationController?.popViewController(animated: true)
@@ -323,6 +325,20 @@ extension ANINotiDetailViewController {
           database.collection(collection).document(contributionId).collection(KEY_COMMENTS).document(document.documentID).delete()
         }
       })
+    }
+  }
+  
+  private func delegateDataAlgolia(contentType: ContentType, contributionId: String) {
+    var index: Index?
+    
+    if contentType == .story {
+      index = ANISessionManager.shared.client.index(withName: KEY_STORIES_INDEX)
+    } else if contentType == .qna {
+      index = ANISessionManager.shared.client.index(withName: KEY_QNAS_INDEX)
+    }
+    
+    DispatchQueue.global().async {
+      index?.deleteObject(withID: contributionId)
     }
   }
 }
