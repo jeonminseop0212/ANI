@@ -406,6 +406,24 @@ extension ANIProfileBasicView {
             } catch let error {
               print(error)
             }
+          } else if diff.type == .removed {
+            do {
+              let deleteRecruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: diff.document.data())
+
+              for (index, recruit) in self.recruits.enumerated() {
+                if recruit.id == deleteRecruit.id {
+                  self.recruits.remove(at: index)
+                  
+                  DispatchQueue.main.async {
+                    guard let basicTableView = self.basicTableView else { return }
+                    basicTableView.reloadData()
+                    return
+                  }
+                }
+              }
+            } catch let error {
+              print(error)
+            }
           }
         })
       })
@@ -441,6 +459,24 @@ extension ANIProfileBasicView {
             } catch let error {
               print(error)
             }
+          } else if diff.type == .removed {
+            do {
+              let deleteStory = try FirestoreDecoder().decode(FirebaseStory.self, from: diff.document.data())
+              
+              for (index, story) in self.stories.enumerated() {
+                if story.id == deleteStory.id {
+                  self.stories.remove(at: index)
+                  
+                  DispatchQueue.main.async {
+                    guard let basicTableView = self.basicTableView else { return }
+                    basicTableView.reloadData()
+                    return
+                  }
+                }
+              }
+            } catch let error {
+              print(error)
+            }
           }
         })
       })
@@ -472,6 +508,24 @@ extension ANIProfileBasicView {
                 guard let basicTableView = self.basicTableView else { return }
                 
                 basicTableView.reloadData()
+              }
+            } catch let error {
+              print(error)
+            }
+          } else if diff.type == .removed {
+            do {
+              let deleteQna = try FirestoreDecoder().decode(FirebaseQna.self, from: diff.document.data())
+              
+              for (index, qna) in self.qnas.enumerated() {
+                if qna.id == deleteQna.id {
+                  self.qnas.remove(at: index)
+                  
+                  DispatchQueue.main.async {
+                    guard let basicTableView = self.basicTableView else { return }
+                    basicTableView.reloadData()
+                    return
+                  }
+                }
               }
             } catch let error {
               print(error)
