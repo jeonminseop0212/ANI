@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import FirebaseFirestore
+import TinyConstraints
 
 class ANIRecruitDetailViewController: UIViewController {
   
@@ -20,6 +22,12 @@ class ANIRecruitDetailViewController: UIViewController {
   private weak var applyButton: ANIAreaButtonView?
   private weak var applyButtonLabel: UILabel?
   
+  private var rejectViewBottomConstraint: Constraint?
+  private var rejectViewBottomConstraintOriginalConstant: CGFloat?
+  private weak var rejectView: ANIRejectView?
+  private var isRejectAnimating: Bool = false
+  private var rejectTapView: UIView?
+  
   private var statusBarStyle: UIStatusBarStyle = .default
   
   var recruit: FirebaseRecruit?
@@ -27,10 +35,15 @@ class ANIRecruitDetailViewController: UIViewController {
   var user: FirebaseUser?
   
   private var isBack: Bool = false
+  
+  private var isClipped: Bool = false
+  
+  private var clipButtonColor = UIColor()
 
   override func viewDidLoad() {
     super.viewDidLoad()
     setup()
+    checkClipped()
   }
   
   override func viewWillAppear(_ animated: Bool) {
@@ -116,6 +129,28 @@ class ANIRecruitDetailViewController: UIViewController {
     applyButton.addContent(applyButtonLabel)
     applyButtonLabel.edgesToSuperview()
     self.applyButtonLabel = applyButtonLabel
+    
+    //rejectView
+    let rejectView = ANIRejectView()
+    rejectView.setRejectText("ログインが必要です。")
+    self.view.addSubview(rejectView)
+    rejectViewBottomConstraint = rejectView.bottomToTop(of: self.view)
+    rejectViewBottomConstraintOriginalConstant = rejectViewBottomConstraint?.constant
+    rejectView.leftToSuperview()
+    rejectView.rightToSuperview()
+    self.rejectView = rejectView
+    
+    //rejectTapView
+    let rejectTapView = UIView()
+    rejectTapView.isUserInteractionEnabled = true
+    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(rejectViewTapped))
+    rejectTapView.addGestureRecognizer(tapGesture)
+    rejectTapView.isHidden = true
+    rejectTapView.backgroundColor = .clear
+    self.view.addSubview(rejectTapView)
+    rejectTapView.size(to: rejectView)
+    rejectTapView.topToSuperview()
+    self.rejectTapView = rejectTapView
   }
   
   //MARK: Notifications
@@ -152,6 +187,100 @@ class ANIRecruitDetailViewController: UIViewController {
     self.present(imageBrowserViewController, animated: false, completion: nil)
   }
   
+  private func clip() {
+    guard let recruit = self.recruit,
+          let recuritId = recruit.id,
+          let currentUserId = ANISessionManager.shared.currentUserUid,
+          let clipButton = self.clipButton else { return }
+
+    if !ANISessionManager.shared.isAnonymous {
+      let database = Firestore.firestore()
+
+      if !isClipped {
+        DispatchQueue.global().async {
+          database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_CLIP_IDS).document(currentUserId).setData([currentUserId: true])
+          let date = ANIFunction.shared.getToday()
+          database.collection(KEY_USERS).document(currentUserId).collection(KEY_CLIP_RECRUIT_IDS).document(recuritId).setData([KEY_DATE: date])
+
+          DispatchQueue.main.async {
+            UIView.animate(withDuration: 0.15) {
+              clipButton.tintColor = ANIColor.green
+              self.isClipped = true
+            }
+          }
+        }
+      } else {
+        DispatchQueue.global().async {
+          database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_CLIP_IDS).document(currentUserId).delete()
+          database.collection(KEY_USERS).document(currentUserId).collection(KEY_CLIP_RECRUIT_IDS).document(recuritId).delete()
+
+          DispatchQueue.main.async {
+            UIView.animate(withDuration: 0.15) {
+              clipButton.tintColor = self.clipButtonColor
+              self.isClipped = false
+            }
+          }
+        }
+      }
+    } else {
+      self.reject()
+    }
+  }
+  
+  private func checkClipped() {
+    guard let recruit = self.recruit,
+          let recuritId = recruit.id,
+          let currentUserId = ANISessionManager.shared.currentUserUid else { return }
+    
+    let database = Firestore.firestore()
+    
+    DispatchQueue.global().async {
+      database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_CLIP_IDS).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
+        
+        guard let snapshot = snapshot else { return }
+        
+        for document in snapshot.documents {
+          if document.documentID == currentUserId {
+            self.isClipped = true
+            UIView.animate(withDuration: 0.15) {
+              self.clipButton?.tintColor = ANIColor.green
+            }
+          }
+        }
+      })
+    }
+  }
+  
+  func reject() {
+    guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
+          !isRejectAnimating,
+          let rejectTapView = self.rejectTapView else { return }
+    
+    rejectViewBottomConstraint.constant = UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    rejectTapView.isHidden = false
+    
+    UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut, animations: {
+      self.isRejectAnimating = true
+      self.view.layoutIfNeeded()
+    }) { (complete) in
+      guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
+        let rejectViewBottomConstraintOriginalConstant = self.rejectViewBottomConstraintOriginalConstant else { return }
+      
+      rejectViewBottomConstraint.constant = rejectViewBottomConstraintOriginalConstant
+      UIView.animate(withDuration: 0.3, delay: 1.0, options: .curveEaseInOut, animations: {
+        self.view.layoutIfNeeded()
+      }, completion: { (complete) in
+        self.isRejectAnimating = false
+        rejectTapView.isHidden = true
+      })
+    }
+  }
+  
   //MARK: Action
   @objc private func back() {
     isBack = true
@@ -160,6 +289,12 @@ class ANIRecruitDetailViewController: UIViewController {
   
   @objc private func apply() {
     print("apply")
+  }
+  
+  @objc private func rejectViewTapped() {
+    let initialViewController = ANIInitialViewController()
+    let navigationController = UINavigationController(rootViewController: initialViewController)
+    self.present(navigationController, animated: true, completion: nil)
   }
 }
 
@@ -175,7 +310,10 @@ extension ANIRecruitDetailViewController: ANIRecruitDetailViewDelegate {
       let backGroundColorOffset: CGFloat = 1.0
       let tintColorOffset = 1.0 - offset
       backButton.tintColor = UIColor(hue: 0, saturation: 0, brightness: tintColorOffset, alpha: 1)
-      clipButton.tintColor = UIColor(hue: 0, saturation: 0, brightness: tintColorOffset, alpha: 1)
+      clipButtonColor = UIColor(hue: 0, saturation: 0, brightness: tintColorOffset, alpha: 1)
+      if !isClipped {
+        clipButton.tintColor = clipButtonColor
+      }
       myNavigationBar.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: backGroundColorOffset)
       UIApplication.shared.statusBarStyle = .default
       statusBarStyle = .default
@@ -184,10 +322,16 @@ extension ANIRecruitDetailViewController: ANIRecruitDetailViewDelegate {
       let ANIColorDarkBrightness: CGFloat = 0.18
       if tintColorOffset > ANIColorDarkBrightness {
         backButton.tintColor = UIColor(hue: 0, saturation: 0, brightness: tintColorOffset, alpha: 1)
-        clipButton.tintColor = UIColor(hue: 0, saturation: 0, brightness: tintColorOffset, alpha: 1)
+        clipButtonColor = UIColor(hue: 0, saturation: 0, brightness: tintColorOffset, alpha: 1)
+        if !isClipped {
+          clipButton.tintColor = clipButtonColor
+        }
       } else {
         backButton.tintColor = UIColor(hue: 0, saturation: 0, brightness: ANIColorDarkBrightness, alpha: 1)
-        clipButton.tintColor = UIColor(hue: 0, saturation: 0, brightness: ANIColorDarkBrightness, alpha: 1)
+        clipButtonColor = UIColor(hue: 0, saturation: 0, brightness: tintColorOffset, alpha: 1)
+        if !isClipped {
+          clipButton.tintColor = clipButtonColor
+        }
       }
      
       myNavigationBar.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: offset)
@@ -205,7 +349,7 @@ extension ANIRecruitDetailViewController: ANIRecruitDetailViewDelegate {
 extension ANIRecruitDetailViewController: ANIButtonViewDelegate {
   func buttonViewTapped(view: ANIButtonView) {
     if view === self.clipButton {
-      print("clip button tapped")
+      clip()
     }
     if view === self.applyButton {      
       let chatViewController = ANIChatViewController()
