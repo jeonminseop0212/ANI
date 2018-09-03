@@ -37,6 +37,8 @@ class ANIProfileBasicView: UIView {
     didSet {
       self.basicTableView?.reloadData()
       self.layoutIfNeeded()
+      
+      isMenuChange = false
     }
   }
   
@@ -55,6 +57,8 @@ class ANIProfileBasicView: UIView {
       basicTableView.reloadData()
     }
   }
+  
+  private var isMenuChange: Bool = false
   
   var delegate: ANIProfileBasicViewDelegate?
   
@@ -146,6 +150,36 @@ class ANIProfileBasicView: UIView {
     }
     
     basicTableView.deleteRows(at: [indexPath], with: .automatic)
+  }
+  
+  private func unobserveBeforeMenu() {
+    guard let basicTableView = self.basicTableView else { return }
+    
+    if contentType == .recruit {
+      for i in 0 ..< recruits.count {
+        if let recruitCell = basicTableView.cellForRow(at: [1, i]) as? ANIRecruitViewCell {
+          recruitCell.unobserveLove()
+          recruitCell.unobserveSupport()
+        }
+      }
+    } else if contentType == .story {
+      for i in 0 ..< stories.count {
+        if let storyCell = basicTableView.cellForRow(at: [1, i]) as? ANIStoryViewCell {
+          storyCell.unobserveLove()
+          storyCell.unobserveComment()
+        } else if let supportCell = basicTableView.cellForRow(at: [1, i]) as? ANISupportViewCell {
+          supportCell.unobserveLove()
+          supportCell.unobserveComment()
+        }
+      }
+    } else if contentType == .qna {
+      for i in 0 ..< qnas.count {
+        if let qnaCell = basicTableView.cellForRow(at: [1, i]) as? ANIQnaViewCell {
+          qnaCell.unobserveLove()
+          qnaCell.unobserveComment()
+        }
+      }
+    }
   }
 }
 
@@ -239,6 +273,8 @@ extension ANIProfileBasicView: UITableViewDataSource {
 //MARK: UITableViewDelegate
 extension ANIProfileBasicView: UITableViewDelegate {
   func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    guard !isMenuChange else { return }
+    
     if contentType == .recruit, let cell = cell as? ANIRecruitViewCell {
         cell.unobserveLove()
         cell.unobserveSupport()
@@ -246,12 +282,15 @@ extension ANIProfileBasicView: UITableViewDelegate {
       if !stories.isEmpty {
         if stories[indexPath.row].recruitId != nil, let cell = cell as? ANISupportViewCell {
           cell.unobserveLove()
+          cell.unobserveComment()
         } else if let cell = cell as? ANIStoryViewCell {
           cell.unobserveLove()
+          cell.unobserveComment()
         }
       }
-    } else if contentType == .qna, let cell = cell as? ANIRecruitViewCell {
+    } else if contentType == .qna, let cell = cell as? ANIQnaViewCell {
       cell.unobserveLove()
+      cell.unobserveComment()
     }
   }
 }
@@ -260,6 +299,9 @@ extension ANIProfileBasicView: UITableViewDelegate {
 extension ANIProfileBasicView: ANIProfileMenuBarDelegate {
   func didSelecteMenuItem(selectedIndex: Int) {
     guard let basicTableView = self.basicTableView else { return }
+    
+    isMenuChange = true
+    unobserveBeforeMenu()
     
     switch selectedIndex {
     case ContentType.profile.rawValue:
