@@ -11,6 +11,7 @@ import TinyConstraints
 import FirebaseFirestore
 import CodableFirebase
 import FirebaseStorage
+import InstantSearchClient
 
 class ANIProfileViewController: UIViewController {
   
@@ -363,6 +364,7 @@ extension ANIProfileViewController {
         }
         
         database.collection(collection).document(contributionId).delete()
+        self.delegateDataAlgolia(contentType: contentType, contributionId: contributionId)
         
         DispatchQueue.main.async {
           guard let profileBasicView = self.profileBasicView else { return }
@@ -438,6 +440,20 @@ extension ANIProfileViewController {
           database.collection(collection).document(contributionId).collection(KEY_COMMENTS).document(document.documentID).delete()
         }
       })
+    }
+  }
+  
+  private func delegateDataAlgolia(contentType: ContentType, contributionId: String) {
+    var index: Index?
+    
+    if contentType == .story {
+      index = ANISessionManager.shared.client.index(withName: KEY_STORIES_INDEX)
+    } else if contentType == .qna {
+      index = ANISessionManager.shared.client.index(withName: KEY_QNAS_INDEX)
+    }
+    
+    DispatchQueue.global().async {
+      index?.deleteObject(withID: contributionId)
     }
   }
 }

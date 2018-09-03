@@ -11,6 +11,7 @@ import TinyConstraints
 import FirebaseFirestore
 import CodableFirebase
 import FirebaseStorage
+import InstantSearchClient
 
 class ANICommunityViewController: UIViewController {
   
@@ -373,7 +374,7 @@ extension ANICommunityViewController: ANIPopupOptionViewControllerDelegate {
 //MAKR: data
 extension ANICommunityViewController {
   private func deleteData() {
-    guard let contentType = self.contentType, let contributionId = self.contributionId, let containerCollectionView = self.containerCollectionView else { return }
+    guard let contentType = self.contentType, let contributionId = self.contributionId else { return }
       
     let database = Firestore.firestore()
     
@@ -394,6 +395,7 @@ extension ANICommunityViewController {
         }
         
         database.collection(collection).document(contributionId).delete()
+        self.delegateDataAlgolia(contentType: contentType, contributionId: contributionId)
         
         DispatchQueue.main.async {
           if contentType == .story {
@@ -492,5 +494,19 @@ extension ANICommunityViewController {
     let date = ANIFunction.shared.getToday()
     let values = ["contentType": contentTypeString, "date": date]
     database.collection(KEY_REPORTS).document(contributionId).collection(KEY_REPORT).addDocument(data: values)
+  }
+  
+  private func delegateDataAlgolia(contentType: ContentType, contributionId: String) {
+    var index: Index?
+
+    if contentType == .story {
+      index = ANISessionManager.shared.client.index(withName: KEY_STORIES_INDEX)
+    } else if contentType == .qna {
+      index = ANISessionManager.shared.client.index(withName: KEY_QNAS_INDEX)
+    }
+
+    DispatchQueue.global().async {
+      index?.deleteObject(withID: contributionId)
+    }
   }
 }
