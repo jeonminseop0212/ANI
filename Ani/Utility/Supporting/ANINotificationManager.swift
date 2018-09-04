@@ -136,4 +136,9 @@ class ANINotificationManager: NSObject {
   private static let N_DELETE_QNA = "N_DELETE_QNA"
   static func postDeleteQna(id: String) { self.post(name: N_DELETE_QNA, object: id, userInfo:nil) }
   static func receive(deleteQna observer:Any, selector:Selector) { receive(name: N_DELETE_QNA, observer: observer, selector: selector) }
+  
+  //MARK: delete recruit
+  private static let N_DELETE_RECRUIT = "N_DELETE_RECRUIT"
+  static func postDeleteRecruit(id: String) { self.post(name: N_DELETE_RECRUIT, object: id, userInfo:nil) }
+  static func receive(deleteRecruit observer:Any, selector:Selector) { receive(name: N_DELETE_RECRUIT, observer: observer, selector: selector) }
 }

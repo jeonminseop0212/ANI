@@ -127,6 +127,7 @@ class ANIRecuruitView: UIView {
     ANINotificationManager.receive(logout: self, selector: #selector(reloadRecruit))
     ANINotificationManager.receive(login: self, selector: #selector(reloadRecruit))
     ANINotificationManager.receive(recruitTabTapped: self, selector: #selector(scrollToTop))
+    ANINotificationManager.receive(deleteRecruit: self, selector: #selector(deleteRecruit))
   }
   
   @objc private func reloadRecruit() {
@@ -168,6 +169,22 @@ class ANIRecuruitView: UIView {
     query = queryTemp
     
     loadRecruit(sender: nil)
+  }
+  
+  @objc private func deleteRecruit(_ notification: NSNotification) {
+    guard let id = notification.object as? String,
+          let recruitTableView = self.recruitTableView else { return }
+
+    var indexPath: IndexPath = [0, 0]
+
+    for (index, recruit) in recruits.enumerated() {
+      if recruit.id == id {
+        recruits.remove(at: index)
+        indexPath = [0, index]
+      }
+    }
+
+    recruitTableView.deleteRows(at: [indexPath], with: .automatic)
   }
 }
 

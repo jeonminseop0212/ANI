@@ -52,6 +52,7 @@ class ANIRecruitDetailView: UIView {
   private let INTRODUCE_IMAGES_VIEW_RATIO: CGFloat = 0.5
   private weak var introduceImagesView: ANIRecruitDetailImagesView?
   
+  private var passingBGBottomConstratins: Constraint?
   private weak var passingTitleLabel: UILabel?
   private weak var passingBG: UIView?
   private weak var passingLabel: UILabel?
@@ -352,7 +353,7 @@ class ANIRecruitDetailView: UIView {
     passingBG.topToBottom(of: passingTitleLabel, offset: 10.0)
     passingBG.leftToSuperview(offset: 10.0)
     passingBG.rightToSuperview(offset: 10.0)
-    passingBG.bottomToSuperview(offset: -10.0 - 10.0 - ANIRecruitDetailViewController.APPLY_BUTTON_HEIGHT)
+    passingBGBottomConstratins = passingBG.bottomToSuperview(offset: -10.0 - 10.0 - ANIRecruitDetailViewController.APPLY_BUTTON_HEIGHT)
     self.passingBG = passingBG
     
     //passingLabel
@@ -366,7 +367,8 @@ class ANIRecruitDetailView: UIView {
   }
   
   private func reloadLayout() {
-    guard let headerImageView = self.headerImageView,
+    guard let currentUserId = ANISessionManager.shared.currentUserUid,
+          let headerImageView = self.headerImageView,
           let titleLabel = self.titleLabel,
           let basicInfoKindLabel = self.basicInfoKindLabel,
           let basicInfoAgeLabel = self.basicInfoAgeLabel,
@@ -376,6 +378,7 @@ class ANIRecruitDetailView: UIView {
           let basicInfoCastrationLabel = self.basicInfoCastrationLabel,
           let reasonLabel = self.reasonLabel,
           let introduceLabel = self.introduceLabel,
+          let passingBGBottomConstratins = self.passingBGBottomConstratins,
           let passingLabel = self.passingLabel,
           let recruit = self.recruit,
           let headerImageUrl = recruit.headerImageUrl,
@@ -398,6 +401,10 @@ class ANIRecruitDetailView: UIView {
     self.introduceImageUrls = introduceImageUrls
     
     passingLabel.text = recruit.passing
+    
+    if currentUserId == recruit.userId {
+      passingBGBottomConstratins.constant = -10
+    }
   }
   
   private func reloadUserLayout() {
