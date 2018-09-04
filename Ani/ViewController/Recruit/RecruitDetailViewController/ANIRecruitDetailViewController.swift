@@ -9,11 +9,14 @@
 import UIKit
 import FirebaseFirestore
 import TinyConstraints
+import CodableFirebase
+import FirebaseStorage
 
 class ANIRecruitDetailViewController: UIViewController {
   
   private weak var myNavigationBar: UIView?
   private weak var backButton: UIButton?
+  private weak var optionButton: UIButton?
   private weak var clipButton: ANIImageButtonView?
   
   private weak var recruitDetailView: ANIRecruitDetailView?
@@ -107,12 +110,30 @@ class ANIRecruitDetailViewController: UIViewController {
     clipButton.bottomToSuperview()
     self.clipButton = clipButton
     
+    //optionButton
+    let optionButton = UIButton()
+    let optionButtonImage = UIImage(named: "optionButton")?.withRenderingMode(.alwaysTemplate)
+    optionButton.setImage(optionButtonImage, for: .normal)
+    optionButton.tintColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
+    optionButton.addTarget(self, action: #selector(option), for: .touchUpInside)
+    myNavigationBar.addSubview(optionButton)
+    optionButton.width(44.0)
+    optionButton.height(44.0)
+    optionButton.rightToLeft(of: clipButton)
+    optionButton.bottomToSuperview()
+    self.optionButton = optionButton
+    
     //applyButton
     let applyButton = ANIAreaButtonView()
     applyButton.base?.backgroundColor = ANIColor.green
     applyButton.baseCornerRadius = ANIRecruitDetailViewController.APPLY_BUTTON_HEIGHT / 2
     applyButton.dropShadow(opacity: 0.2)
     applyButton.delegate = self
+    if let currentUserId = ANISessionManager.shared.currentUserUid,
+      let recruit = self.recruit,
+      currentUserId == recruit.userId {
+      applyButton.isHidden = true
+    }
     self.view.addSubview(applyButton)
     applyButton.bottomToSuperview(offset: -10.0)
     applyButton.leftToSuperview(offset: 100.0)
@@ -298,6 +319,22 @@ class ANIRecruitDetailViewController: UIViewController {
     let navigationController = UINavigationController(rootViewController: initialViewController)
     self.present(navigationController, animated: true, completion: nil)
   }
+  
+  @objc private func option() {
+    guard let currentUserId = ANISessionManager.shared.currentUserUid,
+          let recruit = self.recruit else { return }
+      
+    let popupOptionViewController = ANIPopupOptionViewController()
+    popupOptionViewController.modalPresentationStyle = .overCurrentContext
+    if recruit.userId == currentUserId {
+      popupOptionViewController.isMe = true
+      popupOptionViewController.options = ["家族決定！😻", "募集中止", "編集する"]
+    } else {
+      popupOptionViewController.isMe = false
+    }
+    popupOptionViewController.delegate = self
+    self.tabBarController?.present(popupOptionViewController, animated: false, completion: nil)
+  }
 }
 
 //MARK: ANIRecruitDetailViewDelegate
@@ -305,6 +342,7 @@ extension ANIRecruitDetailViewController: ANIRecruitDetailViewDelegate {
   func recruitDetailViewDidScroll(offset: CGFloat) {
     guard let myNavigationBar = self.myNavigationBar,
           let backButton = self.backButton,
+          let optionButton = self.optionButton,
           let clipButton = self.clipButton,
           !isBack else { return }
     
@@ -312,6 +350,7 @@ extension ANIRecruitDetailViewController: ANIRecruitDetailViewDelegate {
       let backGroundColorOffset: CGFloat = 1.0
       let tintColorOffset = 1.0 - offset
       backButton.tintColor = UIColor(hue: 0, saturation: 0, brightness: tintColorOffset, alpha: 1)
+      optionButton.tintColor = UIColor(hue: 0, saturation: 0, brightness: tintColorOffset, alpha: 1)
       clipButtonColor = UIColor(hue: 0, saturation: 0, brightness: tintColorOffset, alpha: 1)
       if !isClipped {
         clipButton.tintColor = clipButtonColor
@@ -324,12 +363,14 @@ extension ANIRecruitDetailViewController: ANIRecruitDetailViewDelegate {
       let ANIColorDarkBrightness: CGFloat = 0.18
       if tintColorOffset > ANIColorDarkBrightness {
         backButton.tintColor = UIColor(hue: 0, saturation: 0, brightness: tintColorOffset, alpha: 1)
+        optionButton.tintColor = UIColor(hue: 0, saturation: 0, brightness: tintColorOffset, alpha: 1)
         clipButtonColor = UIColor(hue: 0, saturation: 0, brightness: tintColorOffset, alpha: 1)
         if !isClipped {
           clipButton.tintColor = clipButtonColor
         }
       } else {
         backButton.tintColor = UIColor(hue: 0, saturation: 0, brightness: ANIColorDarkBrightness, alpha: 1)
+        optionButton.tintColor = UIColor(hue: 0, saturation: 0, brightness: ANIColorDarkBrightness, alpha: 1)
         clipButtonColor = UIColor(hue: 0, saturation: 0, brightness: tintColorOffset, alpha: 1)
         if !isClipped {
           clipButton.tintColor = clipButtonColor
@@ -389,5 +430,166 @@ extension ANIRecruitDetailViewController: ANIProfileViewControllerDelegate {
 extension ANIRecruitDetailViewController: ANIOtherProfileViewControllerDelegate {
   func popOtherProfileView() {
     UIApplication.shared.statusBarStyle = statusBarStyle
+  }
+}
+
+//MARK: ANIPopupOptionViewControllerDelegate
+extension ANIRecruitDetailViewController: ANIPopupOptionViewControllerDelegate {
+  func deleteContribution() {
+    let alertController = UIAlertController(title: nil, message: "投稿を削除しますか？", preferredStyle: .alert)
+    
+    let deleteAction = UIAlertAction(title: "削除", style: .default) { (action) in
+      self.deleteData()
+    }
+    let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
+    
+    alertController.addAction(deleteAction)
+    alertController.addAction(cancelAction)
+    
+    self.present(alertController, animated: true, completion: nil)
+  }
+  
+  func reportContribution() {
+    let alertController = UIAlertController(title: nil, message: "投稿を通報しますか？", preferredStyle: .alert)
+    
+    let reportAction = UIAlertAction(title: "通報", style: .default) { (action) in
+      self.reportData()
+    }
+    let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
+    
+    alertController.addAction(reportAction)
+    alertController.addAction(cancelAction)
+    
+    self.present(alertController, animated: true, completion: nil)
+  }
+  
+  func optionTapped(index: Int) {
+    if index == 0 {
+      let alertController = UIAlertController(title: "家族決定おめでどうございます！", message: "決定でよろしければこの募集を中止してください", preferredStyle: .alert)
+      
+      let stopAction = UIAlertAction(title: "中止", style: .default) { (action) in
+        //TODO
+      }
+      let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
+      
+      alertController.addAction(stopAction)
+      alertController.addAction(cancelAction)
+      
+      self.present(alertController, animated: true, completion: nil)
+    } else if index == 1 {
+      let alertController = UIAlertController(title: nil, message: "この募集を中止しますか？", preferredStyle: .alert)
+      
+      let stopAction = UIAlertAction(title: "中止", style: .default) { (action) in
+        //TODO
+      }
+      let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
+      
+      alertController.addAction(stopAction)
+      alertController.addAction(cancelAction)
+      
+      self.present(alertController, animated: true, completion: nil)
+    } else if index == 2 {
+      //TODO
+    }
+  }
+}
+
+//MAKR: data
+extension ANIRecruitDetailViewController {
+  private func deleteData() {
+    guard let recruit = self.recruit,
+          let recruitId = recruit.id else { return }
+    
+    let database = Firestore.firestore()
+    
+    DispatchQueue.global().async {
+      database.collection(KEY_RECRUITS).document(recruitId).getDocument(completion: { (snapshot, error) in
+        if let error = error {
+          print("get document error \(error)")
+          
+          return
+        }
+        
+        database.collection(KEY_RECRUITS).document(recruitId).delete()
+        
+        DispatchQueue.main.async {
+          ANINotificationManager.postDeleteRecruit(id: recruitId)
+          self.navigationController?.popViewController(animated: true)
+        }
+        
+        guard let snapshot = snapshot, let data = snapshot.data() else { return }
+        
+        do {
+          let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: data)
+          if let headerImageUrl = recruit.headerImageUrl {
+            let storage = Storage.storage()
+            let storageRef = storage.reference(forURL: headerImageUrl)
+
+            storageRef.delete { error in
+              if let error = error {
+                print(error)
+              }
+            }
+          }
+          
+          if let introduceImageUrls = recruit.introduceImageUrls {
+            for url in introduceImageUrls {
+              let storage = Storage.storage()
+              let storageRef = storage.reference(forURL: url)
+
+              storageRef.delete { error in
+                if let error = error {
+                  print(error)
+                }
+              }
+            }
+          }
+        } catch let error {
+          print(error)
+        }
+      })
+    }
+    
+    DispatchQueue.global().async {
+      database.collection(KEY_RECRUITS).document(recruitId).collection(KEY_LOVE_IDS).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          print("Get document error \(error)")
+          
+          return
+        }
+        
+        guard let snapshot = snapshot else { return }
+        
+        for document in snapshot.documents {
+          database.collection(KEY_RECRUITS).document(recruitId).collection(KEY_LOVE_IDS).document(document.documentID).delete()
+        }
+      })
+      
+      database.collection(KEY_RECRUITS).document(recruitId).collection(KEY_CLIP_IDS).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          print("Get document error \(error)")
+          
+          return
+        }
+        
+        guard let snapshot = snapshot else { return }
+        
+        for document in snapshot.documents {
+          database.collection(KEY_RECRUITS).document(recruitId).collection(KEY_CLIP_IDS).document(document.documentID).delete()
+        }
+      })
+    }
+  }
+  
+  private func reportData() {
+    guard let recruit = self.recruit,
+          let recruitId = recruit.id else { return }
+
+    let database = Firestore.firestore()
+
+    let contentTypeString = "recurit"
+    let date = ANIFunction.shared.getToday()
+    let values = ["contentType": contentTypeString, "date": date]
+    database.collection(KEY_REPORTS).document(recruitId).collection(KEY_REPORT).addDocument(data: values)
   }
 }

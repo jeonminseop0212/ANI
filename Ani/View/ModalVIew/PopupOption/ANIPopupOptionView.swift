@@ -7,16 +7,20 @@
 //
 
 import UIKit
+import TinyConstraints
 
 protocol ANIPopupOptionViewDelegate {
   func cancelButtonTapped()
   func deleteContribution()
   func reportContribution()
+  func optionTapped(index: Int)
 }
 
 class ANIPopupOptionView: UIView {
   
   private weak var optionAreaBG: UIView?
+  private var optionTableViewHeightConstraint: Constraint?
+  private weak var optionTableView: UITableView?
   
   private let BUTTON_HEIGHT: CGFloat = 50.0
   private weak var redButton: UIButton?
@@ -28,6 +32,12 @@ class ANIPopupOptionView: UIView {
     }
   }
   
+  var options: [String]? {
+    didSet {
+      reloadOptionArea()
+    }
+  }
+
   var delegate: ANIPopupOptionViewDelegate?
   
   override init(frame: CGRect) {
@@ -64,20 +74,46 @@ class ANIPopupOptionView: UIView {
     redButton.layer.masksToBounds = true
     redButton.addTarget(self, action: #selector(redButtonTapped), for: .touchUpInside)
     addSubview(redButton)
-    redButton.edgesToSuperview(excluding: .bottom)
+    redButton.edgesToSuperview(excluding: [.top, .bottom])
     redButton.bottomToTop(of: cancelButton, offset: -10.0)
     redButton.height(BUTTON_HEIGHT)
     self.redButton = redButton
     
-//    //optionAreaBG
-//    let optionAreaBG = UIView()
-//    optionAreaBG.backgroundColor = .white
-//    optionAreaBG.layer.cornerRadius = 7.0
-//    optionAreaBG.layer.masksToBounds = true
-//    addSubview(optionAreaBG)
-//    optionAreaBG.edgesToSuperview(excluding: .bottom)
-//    optionAreaBG.bottomToTop(of: cancelButton, offset: -10.0)
-//    self.optionAreaBG = optionAreaBG
+    //optionAreaBG
+    let optionAreaBG = UIView()
+    optionAreaBG.backgroundColor = .white
+    optionAreaBG.layer.cornerRadius = 7.0
+    optionAreaBG.layer.masksToBounds = true
+    optionAreaBG.isHidden = true
+    addSubview(optionAreaBG)
+    optionAreaBG.edgesToSuperview(excluding: [.bottom])
+    optionAreaBG.bottomToTop(of: redButton, offset: -10.0)
+    self.optionAreaBG = optionAreaBG
+    
+    //optionTableView
+    let optionTableView = UITableView()
+    optionTableView.isScrollEnabled = false
+    optionTableView.separatorStyle = .none
+    optionTableView.dataSource = self
+    optionTableView.delegate = self
+    let identifiler = NSStringFromClass(ANIPopupOptionViewCell.self)
+    optionTableView.register(ANIPopupOptionViewCell.self, forCellReuseIdentifier: identifiler)
+    optionAreaBG.addSubview(optionTableView)
+    optionTableView.edgesToSuperview()
+    optionTableViewHeightConstraint = optionTableView.height(0)
+    self.optionTableView = optionTableView
+  }
+  
+  private func reloadOptionArea() {
+    guard let optionAreaBG = self.optionAreaBG,
+          let optionTableView = self.optionTableView,
+          let optionTableViewHeightConstraint = self.optionTableViewHeightConstraint else { return }
+    
+    if self.options != nil {
+      optionAreaBG.isHidden = false
+      optionTableView.reloadData()
+      optionTableViewHeightConstraint.constant = optionTableView.contentSize.height
+    }
   }
   
   private func reloadRedButton() {
@@ -104,5 +140,34 @@ class ANIPopupOptionView: UIView {
     } else {
       self.delegate?.reportContribution()
     }
+  }
+}
+
+//MARK: UITableViewDataSource
+extension ANIPopupOptionView: UITableViewDataSource {
+  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    if let options = self.options {
+      return options.count
+    } else {
+      return 0
+    }
+  }
+  
+  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    let identifiler = NSStringFromClass(ANIPopupOptionViewCell.self)
+    let cell = tableView.dequeueReusableCell(withIdentifier: identifiler, for: indexPath) as! ANIPopupOptionViewCell
+    
+    if let options = self.options {
+      cell.option = options[indexPath.row]
+    }
+    
+    return cell
+  }
+}
+
+//MARK: UITableViewDelegate
+extension ANIPopupOptionView: UITableViewDelegate {
+  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    self.delegate?.optionTapped(index: indexPath.row)
   }
 }

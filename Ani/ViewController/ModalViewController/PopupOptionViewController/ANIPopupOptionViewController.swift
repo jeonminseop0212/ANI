@@ -12,15 +12,20 @@ import TinyConstraints
 protocol ANIPopupOptionViewControllerDelegate {
   func deleteContribution()
   func reportContribution()
+  func optionTapped(index: Int)
 }
 
 class ANIPopupOptionViewController: UIViewController {
+  
+  private weak var backgroundView: UIView?
   
   private var popupOptionViewTopConstraintConstant: CGFloat?
   private weak var popupOptionViewTopConstratint: Constraint?
   private weak var popupOptionView: ANIPopupOptionView?
   
   var isMe: Bool?
+  
+  var options: [String]?
   
   var delegate: ANIPopupOptionViewControllerDelegate?
   
@@ -39,13 +44,23 @@ class ANIPopupOptionViewController: UIViewController {
   
   private func setup() {
     //basic
+    self.view.backgroundColor = .clear
+    
+    //backgroundView
+    let backgroundView = UIView()
     let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(viewTapped))
-    self.view.addGestureRecognizer(tapGestureRecognizer)
+    backgroundView.addGestureRecognizer(tapGestureRecognizer)
+    self.view.addSubview(backgroundView)
+    backgroundView.edgesToSuperview()
+    self.backgroundView = backgroundView
     
     //popupOptionView
     let popupOptionView = ANIPopupOptionView()
     if let isMe = isMe {
       popupOptionView.isMe = isMe
+    }
+    if let options = options {
+      popupOptionView.options = options
     }
     popupOptionView.delegate = self
     self.view.addSubview(popupOptionView)
@@ -57,7 +72,8 @@ class ANIPopupOptionViewController: UIViewController {
   }
   
   private func optionViewPop() {
-    guard let popupOptionViewTopConstratint = self.popupOptionViewTopConstratint,
+    guard let backgroundView = self.backgroundView,
+          let popupOptionViewTopConstratint = self.popupOptionViewTopConstratint,
           let window = UIApplication.shared.keyWindow,
           let popupOptionView = self.popupOptionView else { return }
     
@@ -66,19 +82,20 @@ class ANIPopupOptionViewController: UIViewController {
     popupOptionViewTopConstratint.constant = -(popupOptionView.frame.height + bottomSafeArea + bottomMargin)
     
     UIView.animate(withDuration: 0.2, delay: 0.0, options: .curveEaseInOut, animations: {
-      self.view.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.5)
+      backgroundView.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.5)
       self.view.layoutIfNeeded()
     }, completion: nil)
   }
   
-  private func optionViewDismiss(optionKind: OptionKind? = nil) {
-    guard let popupOptionViewTopConstratint = self.popupOptionViewTopConstratint,
+  private func optionViewDismiss(optionKind: OptionKind? = nil, optionIndex: Int? = nil) {
+    guard let backgroundView = self.backgroundView,
+          let popupOptionViewTopConstratint = self.popupOptionViewTopConstratint,
           let popupOptionViewTopConstraintConstant = self.popupOptionViewTopConstraintConstant else { return }
     
     popupOptionViewTopConstratint.constant = popupOptionViewTopConstraintConstant
     
     UIView.animate(withDuration: 0.2, delay: 0.0, options: .curveEaseInOut, animations: {
-      self.view.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.0)
+      backgroundView.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.0)
       self.view.layoutIfNeeded()
     }, completion: { (complete) in
       self.dismiss(animated: false, completion: {
@@ -88,6 +105,10 @@ class ANIPopupOptionViewController: UIViewController {
           } else if optionKind == .report {
             self.delegate?.reportContribution()
           }
+        }
+        
+        if let optionIndex = optionIndex {
+          self.delegate?.optionTapped(index: optionIndex)
         }
       })
     })
@@ -110,5 +131,9 @@ extension ANIPopupOptionViewController: ANIPopupOptionViewDelegate {
   
   func reportContribution() {
     optionViewDismiss(optionKind: .report)
+  }
+  
+  func optionTapped(index: Int) {
+    optionViewDismiss(optionIndex: index)
   }
 }

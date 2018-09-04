@@ -332,18 +332,21 @@ extension ANIProfileViewController: ANIPopupOptionViewControllerDelegate {
   func deleteContribution() {
     let alertController = UIAlertController(title: nil, message: "投稿を削除しますか？", preferredStyle: .alert)
     
-    let logoutAction = UIAlertAction(title: "削除", style: .default) { (action) in
+    let deleteAction = UIAlertAction(title: "削除", style: .default) { (action) in
       self.deleteData()
     }
     let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
     
-    alertController.addAction(logoutAction)
+    alertController.addAction(deleteAction)
     alertController.addAction(cancelAction)
     
     self.present(alertController, animated: true, completion: nil)
   }
   
   func reportContribution() {
+  }
+  
+  func optionTapped(index: Int) {
   }
 }
 
