@@ -131,7 +131,7 @@ class ANIRecruitDetailViewController: UIViewController {
     applyButton.delegate = self
     if let currentUserId = ANISessionManager.shared.currentUserUid,
       let recruit = self.recruit,
-      currentUserId == recruit.userId {
+      currentUserId == recruit.userId || recruit.recruitState != 0 {
       applyButton.isHidden = true
     }
     self.view.addSubview(applyButton)
@@ -468,7 +468,11 @@ extension ANIRecruitDetailViewController: ANIPopupOptionViewControllerDelegate {
       let alertController = UIAlertController(title: "家族決定おめでどうございます！", message: "決定でよろしければこの募集を中止してください", preferredStyle: .alert)
       
       let stopAction = UIAlertAction(title: "中止", style: .default) { (action) in
-        //TODO
+        if let recruit = self.recruit, let recruitId = recruit.id {
+          let database = Firestore.firestore()
+          
+          database.collection(KEY_RECRUITS).document(recruitId).updateData(["recruitState": 1])
+        }
       }
       let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
       
@@ -480,7 +484,11 @@ extension ANIRecruitDetailViewController: ANIPopupOptionViewControllerDelegate {
       let alertController = UIAlertController(title: nil, message: "この募集を中止しますか？", preferredStyle: .alert)
       
       let stopAction = UIAlertAction(title: "中止", style: .default) { (action) in
-        //TODO
+        if let recruit = self.recruit, let recruitId = recruit.id {
+          let database = Firestore.firestore()
+          
+          database.collection(KEY_RECRUITS).document(recruitId).updateData(["recruitState": 2])
+        }
       }
       let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
       

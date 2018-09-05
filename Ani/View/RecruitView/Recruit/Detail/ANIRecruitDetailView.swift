@@ -402,7 +402,7 @@ class ANIRecruitDetailView: UIView {
     
     passingLabel.text = recruit.passing
     
-    if currentUserId == recruit.userId {
+    if currentUserId == recruit.userId || recruit.recruitState != 0 {
       passingBGBottomConstratins.constant = -10
     }
   }

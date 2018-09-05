@@ -22,7 +22,7 @@ struct FirebaseRecruit: Codable {
   let introduce: String
   var introduceImageUrls: [String]?
   let passing: String
-  let isRecruit: Bool
+  let recruitState: Int
   let userId: String
   let date: String
 }

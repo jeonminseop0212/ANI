@@ -24,7 +24,7 @@ class ANISupportViewCell: UITableViewCell {
   private weak var recruitBase: UIView?
   private weak var recruitImageView: UIImageView?
   private weak var basicInfoStackView: UIStackView?
-  private weak var isRecruitLabel: UILabel?
+  private weak var recruitStateLabel: UILabel?
   private weak var homeLabel: UILabel?
   private weak var ageLabel: UILabel?
   private weak var sexLabel: UILabel?
@@ -134,17 +134,17 @@ class ANISupportViewCell: UITableViewCell {
     basicInfoStackView.rightToSuperview(offset: 10.0)
     self.basicInfoStackView = basicInfoStackView
     
-    //isRecruitLabel
-    let isRecruitLabel = UILabel()
-    isRecruitLabel.textColor = .white
-    isRecruitLabel.textAlignment = .center
-    isRecruitLabel.font = UIFont.boldSystemFont(ofSize: 13.0)
-    isRecruitLabel.layer.cornerRadius = 5.0
-    isRecruitLabel.layer.masksToBounds = true
-    isRecruitLabel.backgroundColor = ANIColor.green
-    basicInfoStackView.addArrangedSubview(isRecruitLabel)
-    isRecruitLabel.height(24.0)
-    self.isRecruitLabel = isRecruitLabel
+    //recruitStateLabel
+    let recruitStateLabel = UILabel()
+    recruitStateLabel.textColor = .white
+    recruitStateLabel.textAlignment = .center
+    recruitStateLabel.font = UIFont.boldSystemFont(ofSize: 13.0)
+    recruitStateLabel.layer.cornerRadius = 5.0
+    recruitStateLabel.layer.masksToBounds = true
+    recruitStateLabel.backgroundColor = ANIColor.green
+    basicInfoStackView.addArrangedSubview(recruitStateLabel)
+    recruitStateLabel.height(24.0)
+    self.recruitStateLabel = recruitStateLabel
     
     //homeLabel
     let homeLabel = UILabel()
@@ -357,14 +357,23 @@ class ANISupportViewCell: UITableViewCell {
   
   private func reloadRecruitLayout(recruit: FirebaseRecruit) {
     guard let recruitImageView = self.recruitImageView,
-          let isRecruitLabel = self.isRecruitLabel,
+          let recruitStateLabel = self.recruitStateLabel,
           let homeLabel = self.homeLabel,
           let ageLabel = self.ageLabel,
           let sexLabel = self.sexLabel,
           let headerImageUrl = recruit.headerImageUrl else { return }
     
     recruitImageView.sd_setImage(with: URL(string: headerImageUrl), completed: nil)
-    isRecruitLabel.text = recruit.isRecruit ? "募集中" : "決まり！"
+    if recruit.recruitState == 0 {
+      recruitStateLabel.text = "募集中"
+      recruitStateLabel.backgroundColor  = ANIColor.green
+    } else if recruit.recruitState == 1 {
+      recruitStateLabel.text = "家族決定"
+      recruitStateLabel.backgroundColor  = ANIColor.pink
+    } else if recruit.recruitState == 2 {
+      recruitStateLabel.text = "中止"
+      recruitStateLabel.backgroundColor  = ANIColor.darkGray
+    }
     homeLabel.text = recruit.home
     ageLabel.text = recruit.age
     sexLabel.text = recruit.sex
