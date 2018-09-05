@@ -29,6 +29,7 @@ enum NotiKind {
 class ANINotiDetailView: UIView {
   
   private weak var tableView: UITableView?
+  private weak var alertLabel: UILabel?
   
   var notiKind: NotiKind?
   var noti: FirebaseNotification? {
@@ -95,6 +96,19 @@ class ANINotiDetailView: UIView {
     addSubview(tableView)
     tableView.edgesToSuperview()
     self.tableView = tableView
+    
+    //alertLabel
+    let alertLabel = UILabel()
+    alertLabel.alpha = 0.0
+    alertLabel.text = "投稿が存在しません。"
+    alertLabel.font = UIFont.systemFont(ofSize: 17)
+    alertLabel.textColor = ANIColor.dark
+    alertLabel.textAlignment = .center
+    addSubview(alertLabel)
+    alertLabel.centerYToSuperview()
+    alertLabel.leftToSuperview(offset: 10.0)
+    alertLabel.rightToSuperview(offset: 10.0)
+    self.alertLabel = alertLabel
     
     //activityIndicatorView
     let activityIndicatorView = NVActivityIndicatorView(frame: .zero, type: .lineScale, color: ANIColor.green, padding: 0)
@@ -295,19 +309,27 @@ extension ANINotiDetailView {
           return
         }
         
-        guard let snapshot = snapshot, let data = snapshot.data() else { return }
-        
-        do {
-          let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: data)
-          self.recruit = recruit
-          
-          DispatchQueue.main.async {
-            self.loadDone()
+        if let snapshot = snapshot, let data = snapshot.data() {
+          do {
+            let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: data)
+            self.recruit = recruit
+            
+            DispatchQueue.main.async {
+              self.loadDone()
+            }
+          } catch let error {
+            print(error)
+            
+            activityIndicatorView.stopAnimating()
           }
-        } catch let error {
-          print(error)
-
+        } else {
+          guard let alertLabel = self.alertLabel else { return }
+          
           activityIndicatorView.stopAnimating()
+          
+          UIView.animate(withDuration: 0.2, animations: {
+            alertLabel.alpha = 1.0
+          })
         }
       })
     }
@@ -328,19 +350,27 @@ extension ANINotiDetailView {
           return
         }
         
-        guard let snapshot = snapshot, let data = snapshot.data() else { return }
-        
-        do {
-          let story = try FirestoreDecoder().decode(FirebaseStory.self, from: data)
-          self.story = story
-          
-          DispatchQueue.main.async {
-            self.loadDone()
+        if let snapshot = snapshot, let data = snapshot.data() {
+          do {
+            let story = try FirestoreDecoder().decode(FirebaseStory.self, from: data)
+            self.story = story
+            
+            DispatchQueue.main.async {
+              self.loadDone()
+            }
+          } catch let error {
+            print(error)
+            
+            activityIndicatorView.stopAnimating()
           }
-        } catch let error {
-          print(error)
+        } else {
+          guard let alertLabel = self.alertLabel else { return }
           
           activityIndicatorView.stopAnimating()
+
+          UIView.animate(withDuration: 0.2, animations: {
+            alertLabel.alpha = 1.0
+          })
         }
       })
     }
@@ -361,19 +391,27 @@ extension ANINotiDetailView {
           return
         }
         
-        guard let snapshot = snapshot, let data = snapshot.data() else { return }
-        
-        do {
-          let qna = try FirestoreDecoder().decode(FirebaseQna.self, from: data)
-          self.qna = qna
-          
-          DispatchQueue.main.async {
-            self.loadDone()
+        if let snapshot = snapshot, let data = snapshot.data() {
+          do {
+            let qna = try FirestoreDecoder().decode(FirebaseQna.self, from: data)
+            self.qna = qna
+            
+            DispatchQueue.main.async {
+              self.loadDone()
+            }
+          } catch let error {
+            print(error)
+            
+            activityIndicatorView.stopAnimating()
           }
-        } catch let error {
-          print(error)
-
+        } else {
+          guard let alertLabel = self.alertLabel else { return }
+          
           activityIndicatorView.stopAnimating()
+          
+          UIView.animate(withDuration: 0.2, animations: {
+            alertLabel.alpha = 1.0
+          })
         }
       })
     }
