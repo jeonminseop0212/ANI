@@ -11,6 +11,7 @@ import UIKit
 protocol ANIProfileEditFamilyViewDelegate {
   func imagePickerCellTapped()
   func imageEditButtonTapped(index: Int)
+  func familyImageDelete(index: Int)
 }
 
 class ANIProfileEditFamilyView: UIView {
@@ -88,8 +89,12 @@ extension ANIProfileEditFamilyView: UICollectionViewDataSource {
     let id = NSStringFromClass(ANIProfileEditFamilyCell.self)
     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! ANIProfileEditFamilyCell
     
+    cell.index = indexPath.row
+    cell.delegate = self
+    
     if indexPath.item == 0 {
       cell.imagePickImageView?.alpha = 1.0
+      cell.imageDeleteImageViewBG?.alpha = 0.0
       if let profileImage = self.profileImage {
         cell.familyImageView?.image = profileImage
       } else if let currentUser = currentUser, let profileImageUrl = currentUser.profileImageUrl {
@@ -99,21 +104,26 @@ extension ANIProfileEditFamilyView: UICollectionViewDataSource {
       if let familyImages = self.familyImages {
         if indexPath.item != familyImages.count + 1 {
           cell.imagePickImageView?.alpha = 1.0
+          cell.imageDeleteImageViewBG?.alpha = 1.0
           cell.familyImageView?.image = familyImages[indexPath.item - 1]
         } else {
           cell.imagePickImageView?.alpha = 0.0
+          cell.imageDeleteImageViewBG?.alpha = 0.0
           cell.familyImageView?.image = UIImage(named: "familyImageAdd")
         }
       } else if let currentUser = self.currentUser, let familyImageUrls = currentUser.familyImageUrls {
         if indexPath.item == familyImageUrls.count + 1 {
           cell.imagePickImageView?.alpha = 0.0
+          cell.imageDeleteImageViewBG?.alpha = 0.0
           cell.familyImageView?.image = UIImage(named: "familyImageAdd")
         } else {
           cell.imagePickImageView?.alpha = 1.0
+          cell.imageDeleteImageViewBG?.alpha = 1.0
           cell.familyImageView?.sd_setImage(with: URL(string: familyImageUrls[indexPath.item - 1]), completed: nil)
         }
       } else {
         cell.imagePickImageView?.alpha = 0.0
+        cell.imageDeleteImageViewBG?.alpha = 0.0
         cell.familyImageView?.image = UIImage(named: "familyImageAdd")
       }
     }
@@ -152,5 +162,12 @@ extension ANIProfileEditFamilyView: UICollectionViewDelegateFlowLayout {
   func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
     let size = CGSize(width: collectionView.frame.height, height: collectionView.frame.height)
     return size
+  }
+}
+
+//MARK: ANIProfileEditFamilyCellDelegate
+extension ANIProfileEditFamilyView: ANIProfileEditFamilyCellDelegate {
+  func imageDeleteImageViewBGTapped(index: Int) {
+    self.delegate?.familyImageDelete(index: index)
   }
 }

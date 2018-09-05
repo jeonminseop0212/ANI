@@ -8,6 +8,10 @@
 
 import UIKit
 
+protocol ANIProfileEditFamilyCellDelegate {
+  func imageDeleteImageViewBGTapped(index: Int)
+}
+
 class ANIProfileEditFamilyCell: UICollectionViewCell {
   
   private let FAMILY_IMAGE_VIEW_BG_HEIGHT: CGFloat = 80.0
@@ -15,6 +19,12 @@ class ANIProfileEditFamilyCell: UICollectionViewCell {
   weak var familyImageView: UIImageView?
   private let IMAGE_PICK_IMAGE_VIEW_HEGITH: CGFloat = 25.0
   weak var imagePickImageView: UIImageView?
+  private let IMAGE_DELETE_IMAGE_VIEW_BG_HEIGHT: CGFloat = 30.0
+  weak var imageDeleteImageViewBG: UIView?
+  private weak var imageDeleteImageView: UIImageView?
+  
+  var index: Int?
+  var delegate: ANIProfileEditFamilyCellDelegate?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -46,7 +56,6 @@ class ANIProfileEditFamilyCell: UICollectionViewCell {
     
     //imagePickImageView
     let imagePickImageView = UIImageView()
-    imagePickImageView.backgroundColor = ANIColor.bg
     imagePickImageView.contentMode = .scaleAspectFit
     imagePickImageView.image = UIImage(named: "imagePickButton")
     imagePickImageView.layer.cornerRadius = IMAGE_PICK_IMAGE_VIEW_HEGITH / 2
@@ -57,5 +66,32 @@ class ANIProfileEditFamilyCell: UICollectionViewCell {
     imagePickImageView.rightToSuperview()
     imagePickImageView.bottomToSuperview()
     self.imagePickImageView = imagePickImageView
+
+    //imageDeleteImageViewBG
+    let imageDeleteImageViewBG = UIView()
+    let deleteTapGesture = UITapGestureRecognizer(target: self, action: #selector(imageDeleteBGTapped))
+    imageDeleteImageViewBG.addGestureRecognizer(deleteTapGesture)
+    imageViewBG.addSubview(imageDeleteImageViewBG)
+    imageDeleteImageViewBG.topToSuperview()
+    imageDeleteImageViewBG.rightToSuperview()
+    imageDeleteImageViewBG.width(IMAGE_DELETE_IMAGE_VIEW_BG_HEIGHT)
+    imageDeleteImageViewBG.height(IMAGE_DELETE_IMAGE_VIEW_BG_HEIGHT)
+    self.imageDeleteImageViewBG = imageDeleteImageViewBG
+    
+    //imageDeleteImageView
+    let imageDeleteImageView = UIImageView()
+    imageDeleteImageView.image = UIImage(named: "imageDeleteButton")
+    imageDeleteImageViewBG.addSubview(imageDeleteImageView)
+    imageDeleteImageView.topToSuperview()
+    imageDeleteImageView.rightToSuperview()
+    imageDeleteImageView.width(IMAGE_PICK_IMAGE_VIEW_HEGITH)
+    imageDeleteImageView.height(IMAGE_PICK_IMAGE_VIEW_HEGITH)
+    self.imageDeleteImageView = imageDeleteImageView
+  }
+  
+  @objc private func imageDeleteBGTapped() {
+    guard let index = self.index else { return }
+    
+    self.delegate?.imageDeleteImageViewBGTapped(index: index)
   }
 }

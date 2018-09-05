@@ -329,6 +329,10 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
           }
         }
       }
+      
+      if familyImages.count == 0 {
+        completion?([])
+      }
     }
   }
   
@@ -351,7 +355,7 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
       
       setFamilyImageUrls(completion: { (urls) in
         let database = Firestore.firestore()
-        database.collection(KEY_USERS).document(currentUserUid).updateData([KEY_FAMILY_IMAGE_URLS : urls])
+        database.collection(KEY_USERS).document(currentUserUid).updateData([KEY_FAMILY_IMAGE_URLS: urls])
         
         self.setNewUserData()
       })
@@ -454,6 +458,17 @@ extension ANIProfileEditViewController: ANIProfileEditViewDelegate {
       isFamilyAdd = false
       editImageIndex = index
     }
+  }
+  
+  func familyImageDelete(index: Int) {
+    guard let familyImages = self.familyImages else { return }
+    
+    var imagesTemp = familyImages
+    imagesTemp.remove(at: index - 1)
+    
+    self.familyImages = imagesTemp
+    
+    familyImagesChange = true
   }
 }
 
