@@ -13,6 +13,7 @@ protocol ANIProfileEditViewDelegate {
   func editButtonEnable(enable: Bool)
   func imagePickerCellTapped()
   func imageEditCellTapped(index: Int)
+  func familyImageDelete(index: Int)
 }
 
 class ANIProfileEditView: UIView {
@@ -347,5 +348,9 @@ extension ANIProfileEditView: ANIProfileEditFamilyViewDelegate {
   
   func imageEditButtonTapped(index: Int) {
     self.delegate?.imageEditCellTapped(index: index)
+  }
+  
+  func familyImageDelete(index: Int) {
+    self.delegate?.familyImageDelete(index: index)
   }
 }
