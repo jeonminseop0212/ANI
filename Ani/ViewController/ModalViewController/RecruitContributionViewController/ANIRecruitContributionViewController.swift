@@ -12,6 +12,7 @@ import TinyConstraints
 import FirebaseStorage
 import FirebaseFirestore
 import CodableFirebase
+import NVActivityIndicatorView
 
 enum BasicInfoPickMode {
   case kind
@@ -20,6 +21,15 @@ enum BasicInfoPickMode {
   case home
   case vaccine
   case castration
+}
+
+enum RecruitContributionMode {
+  case new
+  case edit
+}
+
+protocol ANIRecruitContributionViewControllerDelegate {
+  func doneEditingRecruit(recruit: FirebaseRecruit)
 }
 
 class ANIRecruitContributionViewController: UIViewController {
@@ -61,6 +71,11 @@ class ANIRecruitContributionViewController: UIViewController {
   
   private var isBack: Bool = false
   
+  var recruitContributionMode: RecruitContributionMode = .new
+  var recruit: FirebaseRecruit?
+  
+  var delegate: ANIRecruitContributionViewControllerDelegate?
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     
@@ -80,6 +95,9 @@ class ANIRecruitContributionViewController: UIViewController {
     
     //recruitContributionView
     let recruitContributionView = ANIRecruitContributionView()
+    if recruitContributionMode == .edit, let recruit = self.recruit {
+      recruitContributionView.recruit = recruit
+    }
     recruitContributionView.headerMinHeight = UIViewController.STATUS_BAR_HEIGHT + UIViewController.NAVIGATION_BAR_HEIGHT
     recruitContributionView.delegate = self
     self.view.addSubview(recruitContributionView)
@@ -117,6 +135,9 @@ class ANIRecruitContributionViewController: UIViewController {
     contributeButton.baseCornerRadius = ANIRecruitContributionViewController.CONTRIBUTE_BUTTON_HEIGHT / 2
     contributeButton.dropShadow(opacity: 0.2)
     contributeButton.delegate = self
+    if recruitContributionMode == .edit {
+      contributeButton.alpha = 0.0
+    }
     self.view.addSubview(contributeButton)
     contributeButton.bottomToSuperview(offset: -10.0)
     contributeButton.leftToSuperview(offset: 100.0)
@@ -126,7 +147,11 @@ class ANIRecruitContributionViewController: UIViewController {
     
     //contributeButtonLabel
     let contributeButtonLabel = UILabel()
-    contributeButtonLabel.text = "投稿する"
+    if recruitContributionMode == .new {
+      contributeButtonLabel.text = "投稿する"
+    } else if recruitContributionMode == .edit {
+      contributeButtonLabel.text = "保存する"
+    }
     contributeButtonLabel.textAlignment = .center
     contributeButtonLabel.font = UIFont.boldSystemFont(ofSize: 17.0)
     contributeButtonLabel.textColor = .white
@@ -266,9 +291,50 @@ class ANIRecruitContributionViewController: UIViewController {
 
         let data = try FirestoreEncoder().encode(recruit) as [String: AnyObject]
         
-        database.collection(KEY_RECRUITS).document(id).setData(data)
+        if recruitContributionMode == .new {
+          database.collection(KEY_RECRUITS).document(id).setData(data)
+        } else if recruitContributionMode == .edit {
+          database.collection(KEY_RECRUITS).document(id).setData(data) { (error) in
+            if let error = error {
+              print(error)
+            } else {
+              NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+              
+              self.delegate?.doneEditingRecruit(recruit: recruit)
+              self.dismiss(animated: true, completion: nil)
+            }
+          }
+        }
       } catch let error {
         print(error)
+      }
+    }
+  }
+  
+  private func deleteStorage() {
+    guard let recruit = self.recruit else { return }
+    
+    if let headerImageUrl = recruit.headerImageUrl {
+      let storage = Storage.storage()
+      let storageRef = storage.reference(forURL: headerImageUrl)
+      
+      storageRef.delete { error in
+        if let error = error {
+          print(error)
+        }
+      }
+    }
+    
+    if let introduceImageUrls = recruit.introduceImageUrls {
+      for url in introduceImageUrls {
+        let storage = Storage.storage()
+        let storageRef = storage.reference(forURL: url)
+        
+        storageRef.delete { error in
+          if let error = error {
+            print(error)
+          }
+        }
       }
     }
   }
@@ -394,8 +460,11 @@ extension ANIRecruitContributionViewController: ANIRecruitContributionViewDelega
   }
   
   func homeSelectButtonTapped() {
+    var home = pickUpItem.home
+    home.insert("わからない", at: 0)
+
     let popupPickerViewController = ANIPopupPickerViewController()
-    popupPickerViewController.pickerItem = pickUpItem.home
+    popupPickerViewController.pickerItem = home
     pickMode = BasicInfoPickMode.home
     popupPickerViewController.modalPresentationStyle = .overCurrentContext
     present(popupPickerViewController, animated: false, completion: nil)
@@ -426,6 +495,14 @@ extension ANIRecruitContributionViewController: ANIRecruitContributionViewDelega
   func imagesPickCellTapped() {
     recruitIntroduceImagesPick(animation: true)
   }
+  
+  func doneEditLayout() {
+    guard let contributeButton = self.contributeButton else { return }
+    
+    UIView.animate(withDuration: 0.2, animations: {
+      contributeButton.alpha = 1.0
+    })
+  }
 }
 
 //MARK: ANIButtonViewDelegate
@@ -441,10 +518,25 @@ extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
       
       if recruitInfo.headerImage != UIImage(named: "headerDefault") && recruitInfo.title.count > 0 && recruitInfo.kind.count > 0 && recruitInfo.age.count > 0 && recruitInfo.age.count > 0 && recruitInfo.sex.count > 0 && recruitInfo.home.count > 0 && recruitInfo.vaccine.count > 0 && recruitInfo.castration.count > 0 && recruitInfo.reason.count > 0 && recruitInfo.introduce.count > 0 && recruitInfo.passing.count > 0 && !recruitInfo.introduceImages.isEmpty {
         
+        if recruitContributionMode == .edit {
+          let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.green)
+          NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData, nil)
+        }
+        
         let storageRef = Storage.storage().reference()
         
-        let id = NSUUID().uuidString
-        let date = ANIFunction.shared.getToday()
+        var id = ""
+        var date = ""
+        if recruitContributionMode == .new {
+          id = NSUUID().uuidString
+          date = ANIFunction.shared.getToday()
+        } else if recruitContributionMode == .edit, let recruit = self.recruit, let recruitId = recruit.id {
+          deleteStorage()
+          
+          id = recruitId
+          date = recruit.date
+        }
+        
         var recruit = FirebaseRecruit(id: id, headerImageUrl: nil, title: recruitInfo.title, kind: recruitInfo.kind, age: recruitInfo.age, sex: recruitInfo.sex, home: recruitInfo.home, vaccine: recruitInfo.vaccine, castration: recruitInfo.castration, reason: recruitInfo.reason, introduce: recruitInfo.introduce, introduceImageUrls: nil, passing: recruitInfo.passing, isRecruit: true, userId: userId, date: date)
         
         DispatchQueue.global().async {
@@ -501,7 +593,9 @@ extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
         
         self.view.endEditing(true)
         
-        self.dismiss(animated: true, completion: nil)
+        if recruitContributionMode == .new {
+          self.dismiss(animated: true, completion: nil)
+        }
       } else {
         rejectViewBottomConstraint.constant = UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
         UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut, animations: {

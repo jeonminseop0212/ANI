@@ -489,7 +489,14 @@ extension ANIRecruitDetailViewController: ANIPopupOptionViewControllerDelegate {
       
       self.present(alertController, animated: true, completion: nil)
     } else if index == 2 {
-      //TODO
+      let recruitContribtionViewController = ANIRecruitContributionViewController()
+      if let recruit = self.recruit {
+        recruitContribtionViewController.recruitContributionMode = .edit
+        recruitContribtionViewController.recruit = recruit
+        recruitContribtionViewController.delegate = self
+      }
+      let recruitContributionNV = UINavigationController(rootViewController: recruitContribtionViewController)
+      self.navigationController?.present(recruitContributionNV, animated: true, completion: nil)
     }
   }
 }
@@ -591,5 +598,15 @@ extension ANIRecruitDetailViewController {
     let date = ANIFunction.shared.getToday()
     let values = ["contentType": contentTypeString, "date": date]
     database.collection(KEY_REPORTS).document(recruitId).collection(KEY_REPORT).addDocument(data: values)
+  }
+}
+
+//MARK: ANIRecruitContributionViewControllerDelegate
+extension ANIRecruitDetailViewController: ANIRecruitContributionViewControllerDelegate {
+  func doneEditingRecruit(recruit: FirebaseRecruit) {
+    guard let recruitDetailView = self.recruitDetailView else { return }
+    
+    self.recruit = recruit
+    recruitDetailView.recruit = recruit
   }
 }

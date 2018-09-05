@@ -8,6 +8,7 @@
 
 import UIKit
 import TinyConstraints
+import NVActivityIndicatorView
 
 protocol ANIRecruitContributionViewDelegate {
   func recruitContributeViewDidScroll(offset: CGFloat)
@@ -19,6 +20,7 @@ protocol ANIRecruitContributionViewDelegate {
   func vaccineSelectButtonTapped()
   func castrationSelectButtonTapped()
   func imagesPickCellTapped()
+  func doneEditLayout()
 }
 
 class ANIRecruitContributionView: UIView {
@@ -65,6 +67,8 @@ class ANIRecruitContributionView: UIView {
   private weak var passingBG: UIView?
   private weak var passingTextView: ANIPlaceHolderTextView?
   
+  private weak var activityIndicatorView: NVActivityIndicatorView?
+  
   private let KEYBOARD_HIDE_TOOL_BAR_HEIGHT: CGFloat = 40.0
   
   var headerMinHeight: CGFloat?
@@ -84,12 +88,64 @@ class ANIRecruitContributionView: UIView {
   var pickMode: BasicInfoPickMode?
   private var selectedTextViewMaxY: CGFloat?
   
+  var recruit: FirebaseRecruit? {
+    didSet {
+      guard let recruit = self.recruit,
+            let headerImageUrl = recruit.headerImageUrl,
+            let introduceImageUrls = recruit.introduceImageUrls,
+            let scrollView = self.scrollView,
+            let headerImageView = self.headerImageView,
+            let headerImagePickupButton = self.headerImagePickupButton,
+            let activityIndicatorView = self.activityIndicatorView else { return }
+
+      activityIndicatorView.startAnimating()
+      
+      scrollView.alpha = 0.0
+      headerImageView.alpha = 0.0
+      headerImagePickupButton.alpha = 0.0
+      
+      let setUIImageGroup = DispatchGroup()
+      let queue1 = DispatchQueue(label: "header")
+      let queue2 = DispatchQueue(label: "introduce")
+      
+      queue1.async(group: setUIImageGroup) {
+        setUIImageGroup.enter()
+        self.setUIImageHeaderUrl(url: headerImageUrl) {
+          setUIImageGroup.leave()
+        }
+      }
+      queue2.async(group: setUIImageGroup) {
+        setUIImageGroup.enter()
+        self.setUIImagesFromUrls(urls: introduceImageUrls) {
+          setUIImageGroup.leave()
+        }
+      }
+      
+      setUIImageGroup.notify(queue: DispatchQueue.main) {
+        self.setNeedsUpdateConstraints()
+        activityIndicatorView.stopAnimating()
+        self.delegate?.doneEditLayout()
+        
+        UIView.animate(withDuration: 0.2, animations: {
+          scrollView.alpha = 1.0
+          headerImageView.alpha = 1.0
+          headerImagePickupButton.alpha = 1.0
+        })
+      }
+    }
+  }
+  
   var delegate: ANIRecruitContributionViewDelegate?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()
     setNotification()
+  }
+  
+  override func updateConstraints() {
+    reloadLayout()
+    super.updateConstraints()
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -477,14 +533,79 @@ class ANIRecruitContributionView: UIView {
     passingTextView.textColor = ANIColor.dark
     passingTextView.backgroundColor = .clear
     passingTextView.isScrollEnabled = false
-    passingTextView.placeHolder = "引渡し方法を入力いてください"
+    passingTextView.placeHolder = "引渡し方法を入力してください"
     passingTextView.delegate = self
     passingBG.addSubview(passingTextView)
     passingTextView.edgesToSuperview(insets: insets)
     self.passingTextView = passingTextView
     setHideButtonOnKeyboard(textView: passingTextView)
+    
+    //activityIndicatorView
+    let activityIndicatorView = NVActivityIndicatorView(frame: .zero, type: .lineScale, color: ANIColor.green, padding: 0)
+    addSubview(activityIndicatorView)
+    activityIndicatorView.width(40.0)
+    activityIndicatorView.height(40.0)
+    activityIndicatorView.centerInSuperview()
+    self.activityIndicatorView = activityIndicatorView
   }
   
+  private func reloadLayout() {
+    guard let recruit = self.recruit,
+          let titleTextView = self.titleTextView,
+          let basicInfoKindLabel = self.basicInfoKindLabel,
+          let basicInfoAgeLabel = self.basicInfoAgeLabel,
+          let basicInfoSexLabel = self.basicInfoSexLabel,
+          let basicInfoHomeLabel = self.basicInfoHomeLabel,
+          let basicInfoVaccineLabel = self.basicInfoVaccineLabel,
+          let basicInfoCastrationLabel = self.basicInfoCastrationLabel,
+          let reasonTextView = self.reasonTextView,
+          let introduceTextView = self.introduceTextView,
+          let passingTextView = self.passingTextView else { return }
+    
+    titleTextView.text = recruit.title
+    basicInfoKindLabel.text = "種類：" + recruit.kind
+    basicInfoAgeLabel.text = "年齢：" + recruit.age
+    basicInfoSexLabel.text = "性別：" + recruit.sex
+    basicInfoHomeLabel.text = "お家：" + recruit.home
+    basicInfoVaccineLabel.text = "ワクチン：" + recruit.vaccine
+    basicInfoCastrationLabel.text = "去勢：" + recruit.vaccine
+    reasonTextView.text = recruit.reason
+    introduceTextView.text = recruit.introduce
+    passingTextView.text = recruit.passing
+  }
+  
+  private func setUIImageHeaderUrl(url: String, completion:(()->())? = nil) {
+    if let url = URL(string: url) {
+      let data = try? Data(contentsOf: url)
+      
+      if let imageData = data, let image = UIImage(data: imageData) {
+        DispatchQueue.main.async {
+          self.headerImage = image
+        }
+        completion?()
+      }
+    }
+  }
+  
+  private func setUIImagesFromUrls(urls: [String], completion:(()->())? = nil) {
+    var images = [UIImage?]()
+    for introduceImageUrl in urls {
+      if let url = URL(string: introduceImageUrl) {
+        let data = try? Data(contentsOf: url)
+        
+        if let imageData = data, let image = UIImage(data: imageData) {
+          images.append(image)
+          
+          if images.count == urls.count {
+            DispatchQueue.main.async {
+              self.introduceImages = images
+            }
+            completion?()
+          }
+        }
+      }
+    }
+  }
   
   private func setNotification() {
     ANINotificationManager.receive(pickerViewDidSelect: self, selector: #selector(updateBasicInfo))
