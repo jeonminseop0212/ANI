@@ -16,6 +16,7 @@ protocol ANISupportViewCellDelegate {
   func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser)
   func reject()
   func loadedRecruit(recruit: FirebaseRecruit)
+  func popupOptionView(isMe: Bool, contentType: ContentType, id: String)
 }
 
 class ANISupportViewCell: UITableViewCell {
@@ -40,6 +41,7 @@ class ANISupportViewCell: UITableViewCell {
   private weak var loveCountLabel: UILabel?
   private weak var commentButton: UIButton?
   private weak var commentCountLabel: UILabel?
+  private weak var optionButton: UIButton?
   private weak var line: UIImageView?
   
   var delegate: ANISupportViewCellDelegate?
@@ -230,13 +232,25 @@ class ANISupportViewCell: UITableViewCell {
     profileImageView.layer.masksToBounds = true
     self.profileImageView = profileImageView
     
+    //optionButton
+    let optionButton = UIButton()
+    optionButton.setImage(UIImage(named: "optionButton")?.withRenderingMode(.alwaysTemplate), for: .normal)
+    optionButton.addTarget(self, action: #selector(showOption), for: .touchUpInside)
+    optionButton.tintColor = ANIColor.darkGray
+    addSubview(optionButton)
+    optionButton.centerY(to: profileImageView)
+    optionButton.rightToSuperview(offset: 10.0)
+    optionButton.width(25.0)
+    optionButton.height(25.0)
+    self.optionButton = optionButton
+    
     //commentCountLabel
     let commentCountLabel = UILabel()
     commentCountLabel.font = UIFont.boldSystemFont(ofSize: 14.0)
     commentCountLabel.textColor = ANIColor.dark
     addSubview(commentCountLabel)
     commentCountLabel.centerY(to: profileImageView)
-    commentCountLabel.rightToSuperview(offset: 10.0)
+    commentCountLabel.rightToLeft(of: optionButton, offset: -10.0)
     commentCountLabel.width(25.0)
     commentCountLabel.height(20.0)
     self.commentCountLabel = commentCountLabel
@@ -577,6 +591,21 @@ class ANISupportViewCell: UITableViewCell {
           let recruitUser = self.recruitUser else { return }
     
     self.delegate?.supportCellRecruitTapped(recruit: recruit, user: recruitUser)
+  }
+  
+  @objc private func showOption() {
+    guard let user = self.user,
+          let currentUserId = ANISessionManager.shared.currentUserUid,
+          let story = self.story,
+          let storyId = story.id else { return }
+    
+    let contentType: ContentType = .story
+    
+    if user.uid == currentUserId {
+      self.delegate?.popupOptionView(isMe: true, contentType: contentType, id: storyId)
+    } else {
+      self.delegate?.popupOptionView(isMe: false, contentType: contentType, id: storyId)
+    }
   }
 }
 
