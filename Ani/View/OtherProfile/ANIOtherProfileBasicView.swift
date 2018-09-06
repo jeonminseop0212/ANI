@@ -39,11 +39,10 @@ class ANIOtherProfileBasicView: UIView {
   private weak var basicTableView: UITableView?
   
   private var recruits = [FirebaseRecruit]()
-  
   private var stories = [FirebaseStory]()
-  
   private var qnas = [FirebaseQna]()
-  
+  private var supportRecruits = [FirebaseRecruit]()
+
   private var isFollowed: Bool?
   
   private var user: FirebaseUser? {
@@ -272,6 +271,16 @@ extension ANIOtherProfileBasicView: UITableViewDataSource {
             let supportCellId = NSStringFromClass(ANISupportViewCell.self)
             let cell = tableView.dequeueReusableCell(withIdentifier: supportCellId, for: indexPath) as! ANISupportViewCell
             
+            if let recruitId = stories[indexPath.row].recruitId, supportRecruits.count != 0 {
+              for supportRecruit in supportRecruits {
+                if let supportRecruitId = supportRecruit.id, supportRecruitId == recruitId {
+                  cell.recruit = supportRecruit
+                  break
+                }
+              }
+            } else {
+              cell.recruit = nil
+            }
             cell.story = stories[indexPath.row]
             cell.delegate = self
             
@@ -397,6 +406,10 @@ extension ANIOtherProfileBasicView: ANISupportViewCellDelegate {
   func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser) {
     self.delegate?.supportCellRecruitTapped(recruit: recruit, user: user)
   }
+  
+  func loadedRecruit(recruit: FirebaseRecruit) {
+    self.supportRecruits.append(recruit)
+  }
 }
 
 //MARK: ANIQnaViewCellDelegate
@@ -496,6 +509,9 @@ extension ANIOtherProfileBasicView {
     
     if !self.stories.isEmpty {
       self.stories.removeAll()
+    }
+    if !self.supportRecruits.isEmpty {
+      self.supportRecruits.removeAll()
     }
     
     let database = Firestore.firestore()

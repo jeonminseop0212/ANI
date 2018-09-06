@@ -45,10 +45,9 @@ class ANIProfileBasicView: UIView {
   private weak var basicTableView: UITableView?
   
   private var recruits = [FirebaseRecruit]()
-  
   private var stories = [FirebaseStory]()
-  
   private var qnas = [FirebaseQna]()
+  private var supportRecruits = [FirebaseRecruit]()
   
   var currentUser: FirebaseUser? {
     didSet {
@@ -241,6 +240,16 @@ extension ANIProfileBasicView: UITableViewDataSource {
             let supportCellId = NSStringFromClass(ANISupportViewCell.self)
             let cell = tableView.dequeueReusableCell(withIdentifier: supportCellId, for: indexPath) as! ANISupportViewCell
             
+            if let recruitId = stories[indexPath.row].recruitId, supportRecruits.count != 0 {
+              for supportRecruit in supportRecruits {
+                if let supportRecruitId = supportRecruit.id, supportRecruitId == recruitId {
+                  cell.recruit = supportRecruit
+                  break
+                }
+              }
+            } else {
+              cell.recruit = nil
+            }
             cell.story = stories[indexPath.row]
             cell.delegate = self
             
@@ -365,6 +374,10 @@ extension ANIProfileBasicView: ANISupportViewCellDelegate {
   
   func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser) {
     self.delegate?.supportCellRecruitTapped(recruit: recruit, user: user)
+  }
+  
+  func loadedRecruit(recruit: FirebaseRecruit) {
+    self.supportRecruits.append(recruit)
   }
 }
 

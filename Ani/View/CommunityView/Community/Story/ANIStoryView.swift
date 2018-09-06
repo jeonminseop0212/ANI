@@ -23,6 +23,7 @@ class ANIStoryView: UIView {
   private weak var storyTableView: UITableView?
   
   private var stories = [FirebaseStory]()
+  private var supportRecruits = [FirebaseRecruit]()
   
   private weak var activityIndicatorView: NVActivityIndicatorView?
   
@@ -127,6 +128,16 @@ extension ANIStoryView: UITableViewDataSource {
         let supportCellId = NSStringFromClass(ANISupportViewCell.self)
         let cell = tableView.dequeueReusableCell(withIdentifier: supportCellId, for: indexPath) as! ANISupportViewCell
         
+        if let recruitId = stories[indexPath.row].recruitId, supportRecruits.count != 0 {
+          for supportRecruit in supportRecruits {
+            if let supportRecruitId = supportRecruit.id, supportRecruitId == recruitId {
+              cell.recruit = supportRecruit
+              break
+            }
+          }
+        } else {
+          cell.recruit = nil
+        }
         cell.story = stories[indexPath.row]
         cell.delegate = self
         
@@ -185,6 +196,10 @@ extension ANIStoryView: ANISupportViewCellDelegate {
   func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser) {
     self.delegate?.supportCellRecruitTapped(recruit: recruit, user: user)
   }
+  
+  func loadedRecruit(recruit: FirebaseRecruit) {
+    self.supportRecruits.append(recruit)
+  }
 }
 
 //MARK: data
@@ -194,6 +209,9 @@ extension ANIStoryView {
     
     if !self.stories.isEmpty {
       self.stories.removeAll()
+    }
+    if !self.supportRecruits.isEmpty {
+      self.supportRecruits.removeAll()
     }
     
     if sender == nil {

@@ -33,6 +33,7 @@ class ANISearchView: UIView {
   private var searchUsers = [FirebaseUser]()
   private var searchStories = [FirebaseStory]()
   private var searchQnas = [FirebaseQna]()
+  private var supportRecruits = [FirebaseRecruit]()
   
   var selectedCategory: SearchCategory = .user {
     didSet {
@@ -177,6 +178,16 @@ extension ANISearchView: UITableViewDataSource {
           let supportCellId = NSStringFromClass(ANISupportViewCell.self)
           let cell = tableView.dequeueReusableCell(withIdentifier: supportCellId, for: indexPath) as! ANISupportViewCell
           
+          if let recruitId = searchStories[indexPath.row].recruitId, supportRecruits.count != 0 {
+            for supportRecruit in supportRecruits {
+              if let supportRecruitId = supportRecruit.id, supportRecruitId == recruitId {
+                cell.recruit = supportRecruit
+                break
+              }
+            }
+          } else {
+            cell.recruit = nil
+          }
           cell.story = searchStories[indexPath.row]
           cell.delegate = self
           
@@ -257,6 +268,10 @@ extension ANISearchView: ANISupportViewCellDelegate {
   func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser) {
     self.delegate?.supportCellRecruitTapped(recruit: recruit, user: user)
   }
+  
+  func loadedRecruit(recruit: FirebaseRecruit) {
+    self.supportRecruits.append(recruit)
+  }
 }
 
 //MARK: ANIQnaViewCellDelegate
@@ -285,6 +300,7 @@ extension ANISearchView {
       
       if !searchStories.isEmpty {
         searchStories.removeAll()
+        supportRecruits.removeAll()
       }
     case .qna:
       index = ANISessionManager.shared.client.index(withName: KEY_QNAS_INDEX)
