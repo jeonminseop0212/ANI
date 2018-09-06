@@ -15,6 +15,7 @@ protocol ANISupportViewCellDelegate {
   func supportCellTapped(story: FirebaseStory, user: FirebaseUser)
   func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser)
   func reject()
+  func loadedRecruit(recruit: FirebaseRecruit)
 }
 
 class ANISupportViewCell: UITableViewCell {
@@ -46,7 +47,9 @@ class ANISupportViewCell: UITableViewCell {
   var story: FirebaseStory? {
     didSet {
       reloadLayout()
-      loadRecruit()
+      if recruit == nil {
+        loadRecruit()
+      }
       loadUser()
       isLoved()
       observeLove()
@@ -54,9 +57,12 @@ class ANISupportViewCell: UITableViewCell {
     }
   }
   
-  private var recruit: FirebaseRecruit? {
+  var recruit: FirebaseRecruit? {
     didSet {
+      guard let recruit = self.recruit else { return }
+      
       loadRecruitUser()
+      reloadRecruitLayout(recruit: recruit)
     }
   }
   
@@ -623,10 +629,7 @@ extension ANISupportViewCell {
         do {
           let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: data)
           self.recruit = recruit
-
-          DispatchQueue.main.async {
-            self.reloadRecruitLayout(recruit: recruit)
-          }
+          self.delegate?.loadedRecruit(recruit: recruit)
         } catch let error {
           print(error)
         }

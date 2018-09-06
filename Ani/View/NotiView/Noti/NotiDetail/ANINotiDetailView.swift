@@ -283,6 +283,9 @@ extension ANINotiDetailView: ANISupportViewCellDelegate {
   func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser) {
     self.delegate?.supportCellRecruitTapped(recruit: recruit, user: user)
   }
+  
+  func loadedRecruit(recruit: FirebaseRecruit) {
+  }
 }
 
 //MARK: ANIQnaViewCellDelegate
