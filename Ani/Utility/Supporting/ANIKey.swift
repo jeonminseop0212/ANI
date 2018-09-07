@@ -68,11 +68,14 @@ let KEY_CHAT_MESSAGES = "chatChatMessages"
 
 //noti
 let KEY_NOTIFICATIONS = "notifications"
-let KEY_NOTI_KIND_RECRUIT = "recruit"
-let KEY_NOTI_KIND_STROY = "story"
-let KEY_NOTI_KIND_QNA = "qna"
-let KEY_NORI_KIND_COMMET = "comment"
+let KEY_CONTRIBUTION_KIND_RECRUIT = "recruit"
+let KEY_CONTRIBUTION_KIND_STROY = "story"
+let KEY_CONTRIBUTION_KIND_QNA = "qna"
+let KEY_CONTRIBUTION_KIND_USER = "user"
+let KEY_NOTI_KIND_COMMENT = "comment"
 let KEY_NOTI_KIND_FOLLOW = "follow"
+let KEY_NOTI_KIND_LOVE = "love"
+let KEY_NOTI_KIND_SUPPORT = "support"
 let KEY_NOTI_UPDATE_DATE = "updateDate"
 
 //algolia

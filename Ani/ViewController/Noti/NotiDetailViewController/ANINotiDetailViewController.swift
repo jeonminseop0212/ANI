@@ -23,6 +23,7 @@ class ANINotiDetailViewController: UIViewController {
   
   var navigationTitle: String = ""
   
+  var contributionKind: ContributionKind?
   var notiKind: NotiKind?
   var noti: FirebaseNotification?
   
@@ -91,6 +92,7 @@ class ANINotiDetailViewController: UIViewController {
     
     //notiDetailView
     let notiDetailView = ANINotiDetailView()
+    notiDetailView.contributionKind = contributionKind
     notiDetailView.notiKind = notiKind
     notiDetailView.noti = noti
     notiDetailView.delegate = self

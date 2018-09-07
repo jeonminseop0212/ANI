@@ -515,7 +515,7 @@ class ANIRecruitViewCell: UITableViewCell {
       do {
         let noti = "\(currentUserName)さんが「\(recruit.title)」募集を「いいね」しました。"
         let date = ANIFunction.shared.getToday()
-        let notification = FirebaseNotification(userId: currentUserId, noti: noti, kind: KEY_NOTI_KIND_RECRUIT, notiId: recuritId, commentId: nil, updateDate: date)
+        let notification = FirebaseNotification(userId: currentUserId, noti: noti, contributionKind: KEY_CONTRIBUTION_KIND_RECRUIT, notiKind: KEY_NOTI_KIND_LOVE, notiId: recuritId, commentId: nil, updateDate: date)
         let data = try FirestoreEncoder().encode(notification)
 
         database.collection(KEY_USERS).document(userId).collection(KEY_NOTIFICATIONS).document(recuritId).setData(data)

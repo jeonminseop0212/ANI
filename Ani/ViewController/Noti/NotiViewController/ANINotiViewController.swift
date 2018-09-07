@@ -208,18 +208,26 @@ extension ANINotiViewController: ANINotiNotiCellDelegate {
   func cellTapped(noti: FirebaseNotification) {
     let notiDetailViewController = ANINotiDetailViewController()
     notiDetailViewController.noti = noti
+    
+    if noti.notiKind == KEY_NOTI_KIND_FOLLOW {
+      notiDetailViewController.notiKind = .follow
+    } else if noti.notiKind == KEY_NOTI_KIND_LOVE {
+      notiDetailViewController.notiKind = .love
+    } else if noti.notiKind == KEY_NOTI_KIND_COMMENT {
+      notiDetailViewController.notiKind = .comment
+    } else if noti.notiKind == KEY_NOTI_KIND_SUPPORT {
+      notiDetailViewController.notiKind = .support
+    }
 
-    if noti.kind == KEY_NOTI_KIND_RECRUIT {
+    if noti.contributionKind == KEY_CONTRIBUTION_KIND_RECRUIT {
       notiDetailViewController.navigationTitle = "募集"
-      notiDetailViewController.notiKind = .recruit
-    } else if noti.kind == KEY_NOTI_KIND_STROY {
+      notiDetailViewController.contributionKind = .recruit
+    } else if noti.contributionKind == KEY_CONTRIBUTION_KIND_STROY {
       notiDetailViewController.navigationTitle = "ストーリー"
-      notiDetailViewController.notiKind = .story
-    } else if noti.kind == KEY_NOTI_KIND_QNA {
+      notiDetailViewController.contributionKind = .story
+    } else if noti.contributionKind == KEY_CONTRIBUTION_KIND_QNA {
       notiDetailViewController.navigationTitle = "Q&A"
-      notiDetailViewController.notiKind = .qna
-    } else if noti.kind == KEY_NORI_KIND_COMMET {
-      
+      notiDetailViewController.contributionKind = .qna
     }
     
     self.navigationController?.pushViewController(notiDetailViewController, animated: true)

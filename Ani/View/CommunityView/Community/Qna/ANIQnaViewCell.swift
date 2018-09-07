@@ -361,7 +361,7 @@ class ANIQnaViewCell: UITableViewCell {
       do {
         let noti = "\(currentUserName)さんが「\(qna.qna)」質問を「いいね」しました。"
         let date = ANIFunction.shared.getToday()
-        let notification = FirebaseNotification(userId: currentUserId, noti: noti, kind: KEY_NOTI_KIND_QNA, notiId: qnaId, commentId: nil, updateDate: date)
+        let notification = FirebaseNotification(userId: currentUserId, noti: noti, contributionKind: KEY_CONTRIBUTION_KIND_QNA, notiKind: KEY_NOTI_KIND_LOVE, notiId: qnaId, commentId: nil, updateDate: date)
         if let data = try FirebaseEncoder().encode(notification) as? [String: AnyObject] {
           
           database.collection(KEY_USERS).document(userId).collection(KEY_NOTIFICATIONS).document(qnaId).setData(data)
