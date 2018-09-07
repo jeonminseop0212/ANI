@@ -19,6 +19,8 @@ protocol ANIRecruitViewDelegate {
 }
 
 class ANIRecuruitView: UIView {
+  
+  private weak var reloadView: ANIReloadView?
 
   private weak var recruitTableView: UITableView? {
     didSet {
@@ -90,6 +92,18 @@ class ANIRecuruitView: UIView {
   }
   
   private func setup() {
+    //reloadView
+    let reloadView = ANIReloadView()
+    reloadView.alpha = 0.0
+    reloadView.messege = "募集がありません。"
+    reloadView.delegate = self
+    addSubview(reloadView)
+    reloadView.dropShadow()
+    reloadView.centerInSuperview()
+    reloadView.leftToSuperview(offset: 50.0)
+    reloadView.rightToSuperview(offset: 50.0)
+    self.reloadView = reloadView
+    
     //recruitTableView
     let tableView = UITableView()
     tableView.separatorStyle = .none
@@ -244,7 +258,11 @@ extension ANIRecuruitView: ANIRecruitViewCellDelegate {
 extension ANIRecuruitView {
   @objc private func loadRecruit(sender: UIRefreshControl?) {
     guard let query = self.query,
-          let activityIndicatorView = self.activityIndicatorView else { return }
+          let activityIndicatorView = self.activityIndicatorView,
+          let reloadView = self.reloadView,
+          let recruitTableView = self.recruitTableView else { return }
+    
+    reloadView.alpha = 0.0
     
     if !self.recruits.isEmpty {
       self.recruits.removeAll()
@@ -273,8 +291,6 @@ extension ANIRecuruitView {
               if let sender = sender {
                 sender.endRefreshing()
               }
-
-              guard let recruitTableView = self.recruitTableView else { return }
               
               activityIndicatorView.stopAnimating()
               
@@ -288,6 +304,10 @@ extension ANIRecuruitView {
             print(error)
             
             activityIndicatorView.stopAnimating()
+            
+            UIView.animate(withDuration: 0.2, animations: {
+              reloadView.alpha = 1.0
+            })
 
             if let sender = sender {
               sender.endRefreshing()
@@ -298,6 +318,10 @@ extension ANIRecuruitView {
         if snapshot.documents.isEmpty {
           guard let recruitTableView = self.recruitTableView else { return }
           
+          if !self.recruits.isEmpty {
+            self.recruits.removeAll()
+          }
+          
           activityIndicatorView.stopAnimating()
           
           recruitTableView.reloadData()
@@ -305,8 +329,22 @@ extension ANIRecuruitView {
           if let sender = sender {
             sender.endRefreshing()
           }
+          
+          recruitTableView.alpha = 0.0
+          
+          UIView.animate(withDuration: 0.2, animations: {
+            reloadView.alpha = 1.0
+          })
         }
       })
     }
+  }
+}
+
+
+//MARK: ANIReloadViewDelegate
+extension ANIRecuruitView: ANIReloadViewDelegate {
+  func reloadButtonTapped() {
+    loadRecruit(sender: nil)
   }
 }

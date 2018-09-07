@@ -27,6 +27,7 @@
 		CD0FAD0E20BFC02E00D8CD27 /* ANISessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0FAD0D20BFC02E00D8CD27 /* ANISessionManager.swift */; };
 		CD2C414520A556AE00581267 /* ANIRecruitContributionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2C414420A556AE00581267 /* ANIRecruitContributionViewController.swift */; };
 		CD2C414820A5A23C00581267 /* ANIImageFilterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2C414720A5A23C00581267 /* ANIImageFilterViewController.swift */; };
+		CD334E8221421C7F001C6289 /* ANIReloadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD334E8121421C7F001C6289 /* ANIReloadView.swift */; };
 		CD33BEDE20F31F9A00D2A367 /* ANINotiDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD33BEDD20F31F9A00D2A367 /* ANINotiDetailViewController.swift */; };
 		CD33BEE120F3212400D2A367 /* ANINotiDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD33BEE020F3212400D2A367 /* ANINotiDetailView.swift */; };
 		CD4F0EF720F481030093C543 /* ANINotiCommentViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD4F0EF620F481030093C543 /* ANINotiCommentViewCell.swift */; };
@@ -202,6 +203,7 @@
 		CD0FAD0D20BFC02E00D8CD27 /* ANISessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANISessionManager.swift; sourceTree = "<group>"; };
 		CD2C414420A556AE00581267 /* ANIRecruitContributionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitContributionViewController.swift; sourceTree = "<group>"; };
 		CD2C414720A5A23C00581267 /* ANIImageFilterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIImageFilterViewController.swift; sourceTree = "<group>"; };
+		CD334E8121421C7F001C6289 /* ANIReloadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIReloadView.swift; sourceTree = "<group>"; };
 		CD33BEDD20F31F9A00D2A367 /* ANINotiDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotiDetailViewController.swift; sourceTree = "<group>"; };
 		CD33BEE020F3212400D2A367 /* ANINotiDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotiDetailView.swift; sourceTree = "<group>"; };
 		CD4F0EF620F481030093C543 /* ANINotiCommentViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotiCommentViewCell.swift; sourceTree = "<group>"; };
@@ -444,6 +446,14 @@
 				CD2C414720A5A23C00581267 /* ANIImageFilterViewController.swift */,
 			);
 			path = ImageFilterViewController;
+			sourceTree = "<group>";
+		};
+		CD334E8021421C5F001C6289 /* ReloadView */ = {
+			isa = PBXGroup;
+			children = (
+				CD334E8121421C7F001C6289 /* ANIReloadView.swift */,
+			);
+			path = ReloadView;
 			sourceTree = "<group>";
 		};
 		CD33BEDB20F31F4C00D2A367 /* Noti */ = {
@@ -1345,6 +1355,7 @@
 				CDA32A2420AA661A008A2AC1 /* ModalVIew */,
 				CDAFD76020DE1D2100AEDD83 /* RejectView */,
 				CDDE4B5720DF7636005762A1 /* NeedLoginView */,
+				CD334E8021421C5F001C6289 /* ReloadView */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -1709,6 +1720,7 @@
 				CDF7F174208F658E00254A0F /* ANIImageButtonView.swift in Sources */,
 				CD08A72E20915BD700F0B72D /* ANIRecruitDetailView.swift in Sources */,
 				CDA32A7B20AE7007008A2AC1 /* ANIQnaImagesCell.swift in Sources */,
+				CD334E8221421C7F001C6289 /* ANIReloadView.swift in Sources */,
 				F5DF8365207A27DC00EA7FBE /* ANIStoryViewCell.swift in Sources */,
 				F5E9E22F2079AEC30021D4CC /* ANIOrientation.swift in Sources */,
 				CDDD04B320B50FEA0094DBFA /* ANIInitialViewController.swift in Sources */,

@@ -20,6 +20,8 @@ protocol ANIStoryViewDelegate {
 
 class ANIStoryView: UIView {
   
+  private weak var reloadView: ANIReloadView?
+  
   private weak var storyTableView: UITableView?
   
   private var stories = [FirebaseStory]()
@@ -49,6 +51,18 @@ class ANIStoryView: UIView {
     if let windowUnrap = window {
       bottomSafeArea = windowUnrap.safeAreaInsets.bottom
     }
+    
+    //reloadView
+    let reloadView = ANIReloadView()
+    reloadView.alpha = 0.0
+    reloadView.messege = "ストーリーがありません。"
+    reloadView.delegate = self
+    addSubview(reloadView)
+    reloadView.dropShadow()
+    reloadView.centerInSuperview()
+    reloadView.leftToSuperview(offset: 50.0)
+    reloadView.rightToSuperview(offset: 50.0)
+    self.reloadView = reloadView
     
     //tableView
     let tableView = UITableView()
@@ -205,7 +219,11 @@ extension ANIStoryView: ANISupportViewCellDelegate {
 //MARK: data
 extension ANIStoryView {
   @objc private func loadStory(sender: UIRefreshControl?) {
-    guard let activityIndicatorView = self.activityIndicatorView else { return }
+    guard let activityIndicatorView = self.activityIndicatorView,
+          let reloadView = self.reloadView,
+          let storyTableView = self.storyTableView else { return }
+
+    reloadView.alpha = 0.0
     
     if !self.stories.isEmpty {
       self.stories.removeAll()
@@ -240,8 +258,6 @@ extension ANIStoryView {
                 sender.endRefreshing()
               }
               
-              guard let storyTableView = self.storyTableView else { return }
-              
               activityIndicatorView.stopAnimating()
               
               storyTableView.reloadData()
@@ -255,6 +271,10 @@ extension ANIStoryView {
             
             activityIndicatorView.stopAnimating()
             
+            UIView.animate(withDuration: 0.2, animations: {
+              reloadView.alpha = 1.0
+            })
+            
             if let sender = sender {
               sender.endRefreshing()
             }
@@ -262,13 +282,30 @@ extension ANIStoryView {
         }
         
         if snapshot.documents.isEmpty {
+          if !self.stories.isEmpty {
+            self.stories.removeAll()
+          }
+          
           if let sender = sender {
             sender.endRefreshing()
           }
           
           activityIndicatorView.stopAnimating()
+          
+          storyTableView.alpha = 0.0
+          
+          UIView.animate(withDuration: 0.2, animations: {
+            reloadView.alpha = 1.0
+          })
         }
       })
     }
+  }
+}
+
+//MARK: ANIReloadViewDelegate
+extension ANIStoryView: ANIReloadViewDelegate {
+  func reloadButtonTapped() {
+    loadStory(sender: nil)
   }
 }

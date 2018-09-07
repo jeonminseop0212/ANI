@@ -18,8 +18,8 @@ protocol ANINotiViewDelegate {
 
 class ANINotiView: UIView {
   
-  private var RELOAD_BUTTON_HEIGHT: CGFloat = 60.0
-  private weak var reloadButton: ANIImageButtonView?
+  private weak var reloadView: ANIReloadView?
+  
   private weak var notiTableView: UITableView?
   
   private var notifications = [FirebaseNotification]()
@@ -48,16 +48,17 @@ class ANINotiView: UIView {
       bottomSafeArea = windowUnrap.safeAreaInsets.bottom
     }
     
-    //reloadButton
-    let reloadButton = ANIImageButtonView()
-    reloadButton.image = UIImage(named: "reloadButton")
-    reloadButton.delegate = self
-    reloadButton.alpha = 0.0
-    addSubview(reloadButton)
-    reloadButton.centerInSuperview()
-    reloadButton.width(RELOAD_BUTTON_HEIGHT)
-    reloadButton.height(RELOAD_BUTTON_HEIGHT)
-    self.reloadButton = reloadButton
+    //reloadView
+    let reloadView = ANIReloadView()
+    reloadView.alpha = 0.0
+    reloadView.messege = "通知がありません。"
+    reloadView.delegate = self
+    addSubview(reloadView)
+    reloadView.dropShadow()
+    reloadView.centerInSuperview()
+    reloadView.leftToSuperview(offset: 50.0)
+    reloadView.rightToSuperview(offset: 50.0)
+    self.reloadView = reloadView
     
     //notiTableView
     let notiTableView = UITableView()
@@ -150,10 +151,10 @@ extension ANINotiView {
   @objc private func loadNoti(sender: UIRefreshControl?) {
     guard let currentUserUid = ANISessionManager.shared.currentUserUid,
           let activityIndicatorView = self.activityIndicatorView,
-          let reloadButton = self.reloadButton,
+          let reloadView = self.reloadView,
           let notiTableView = self.notiTableView else { return }
 
-    reloadButton.alpha = 0.0
+    reloadView.alpha = 0.0
     
     if !self.notifications.isEmpty {
       self.notifications.removeAll()
@@ -198,7 +199,7 @@ extension ANINotiView {
           activityIndicatorView.stopAnimating()
           
           UIView.animate(withDuration: 0.2, animations: {
-            reloadButton.alpha = 1.0
+            reloadView.alpha = 1.0
           })
           
           if let sender = sender {
@@ -221,18 +222,16 @@ extension ANINotiView {
         notiTableView.alpha = 0.0
         
         UIView.animate(withDuration: 0.2, animations: {
-          reloadButton.alpha = 1.0
+          reloadView.alpha = 1.0
         })
       }
     }
   }
 }
 
-//MARK: ANIButtonViewDelegate
-extension ANINotiView: ANIButtonViewDelegate {
-  func buttonViewTapped(view: ANIButtonView) {
-    if view === reloadButton {
-      loadNoti(sender: nil)
-    }
+//MARK: ANIReloadViewDelegate
+extension ANINotiView: ANIReloadViewDelegate {
+  func reloadButtonTapped() {
+    loadNoti(sender: nil)
   }
 }

@@ -13,6 +13,8 @@ import NVActivityIndicatorView
 
 class ANIMessageView: UIView {
   
+  private weak var reloadView: ANIReloadView?
+  
   private weak var messageTableView: UITableView?
   
   private var chatGroups = [FirebaseChatGroup]()
@@ -39,6 +41,18 @@ class ANIMessageView: UIView {
     if let windowUnrap = window {
       bottomSafeArea = windowUnrap.safeAreaInsets.bottom
     }
+    
+    //reloadView
+    let reloadView = ANIReloadView()
+    reloadView.alpha = 0.0
+    reloadView.messege = "メッセージがありません。"
+    reloadView.delegate = self
+    addSubview(reloadView)
+    reloadView.dropShadow()
+    reloadView.centerInSuperview()
+    reloadView.leftToSuperview(offset: 50.0)
+    reloadView.rightToSuperview(offset: 50.0)
+    self.reloadView = reloadView
     
     //messageTableView
     let messageTableView = UITableView()
@@ -102,7 +116,11 @@ extension ANIMessageView: UITableViewDataSource {
 extension ANIMessageView {
   private func loadChatGroup() {
     guard let crrentUserUid = ANISessionManager.shared.currentUserUid,
-          let activityIndicatorView = self.activityIndicatorView else { return }
+          let activityIndicatorView = self.activityIndicatorView,
+          let reloadView = self.reloadView,
+          let messageTableView = self.messageTableView else { return }
+
+    reloadView.alpha = 0.0
     
     let database = Firestore.firestore()
     
@@ -128,8 +146,6 @@ extension ANIMessageView {
               self.chatGroups = chatGroupsTemp
 
               DispatchQueue.main.async {
-                guard let messageTableView = self.messageTableView else { return }
-    
                 activityIndicatorView.stopAnimating()
     
                 messageTableView.reloadData()
@@ -142,6 +158,10 @@ extension ANIMessageView {
               print(error)
               
               activityIndicatorView.stopAnimating()
+              
+              UIView.animate(withDuration: 0.2, animations: {
+                reloadView.alpha = 1.0
+              })
             }
           } else if diff.type == .modified {
             do {
@@ -159,9 +179,7 @@ extension ANIMessageView {
               
               self.chatGroups = chatGroupsTemp
               
-              DispatchQueue.main.async {
-                guard let messageTableView = self.messageTableView else { return }
-                
+              DispatchQueue.main.async {                
                 messageTableView.reloadData()
               }
             } catch let error {
@@ -172,7 +190,32 @@ extension ANIMessageView {
         
         if snapshot.documents.isEmpty {
           activityIndicatorView.stopAnimating()
+          
+          messageTableView.alpha = 0.0
+          
+          UIView.animate(withDuration: 0.2, animations: {
+            reloadView.alpha = 1.0
+          })
         }
+      })
+    }
+  }
+}
+
+//MARK: ANIReloadViewDelegate
+extension ANIMessageView: ANIReloadViewDelegate {
+  func reloadButtonTapped() {
+    guard let activityIndicatorView = self.activityIndicatorView,
+          let reloadView = self.reloadView else { return }
+    
+    reloadView.alpha = 0.0
+    activityIndicatorView.startAnimating()
+    
+    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+      activityIndicatorView.stopAnimating()
+      
+      UIView.animate(withDuration: 0.2, animations: {
+        reloadView.alpha = 1.0
       })
     }
   }
