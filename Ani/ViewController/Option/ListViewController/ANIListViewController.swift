@@ -43,6 +43,7 @@ class ANIListViewController: UIViewController {
     self.view.backgroundColor = .white
     self.navigationController?.setNavigationBarHidden(true, animated: false)
     self.navigationController?.navigationBar.isTranslucent = false
+    self.navigationController?.interactivePopGestureRecognizer?.delegate = self
     ANIOrientation.lockOrientation(.portrait)
     
     //myNavigationBar
@@ -360,5 +361,12 @@ extension ANIListViewController {
     DispatchQueue.global().async {
       index?.deleteObject(withID: contributionId)
     }
+  }
+}
+
+//MARK: UIGestureRecognizerDelegate
+extension ANIListViewController: UIGestureRecognizerDelegate {
+  func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+    return true
   }
 }

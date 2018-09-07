@@ -11,10 +11,6 @@ import TinyConstraints
 import FirebaseFirestore
 import CodableFirebase
 
-protocol ANIChatViewControllerDelegate {
-  func chatViewWillDismiss()
-}
-
 class ANIChatViewController: UIViewController {
   private weak var myNavigationBar: UIView?
   private weak var myNavigationBase: UIView?
@@ -55,8 +51,6 @@ class ANIChatViewController: UIViewController {
   
   var isPush: Bool = false
   
-  var delegate: ANIChatViewControllerDelegate?
-  
   override func viewDidLoad() {
     setup()
   }
@@ -76,6 +70,7 @@ class ANIChatViewController: UIViewController {
     self.view.backgroundColor = .white
     self.navigationController?.setNavigationBarHidden(true, animated: false)
     self.navigationController?.navigationBar.isTranslucent = false
+    self.navigationController?.interactivePopGestureRecognizer?.delegate = self
     
     //myNavigationBar
     let myNavigationBar = UIView()
@@ -298,12 +293,18 @@ class ANIChatViewController: UIViewController {
   //MARK: Action
   @objc private func back() {
     self.view.endEditing(true)
-    self.delegate?.chatViewWillDismiss()
     
     if isPush {
       self.navigationController?.popViewController(animated: true)
     } else {
       self.dismiss(animated: true)
     }
+  }
+}
+
+//MARK: UIGestureRecognizerDelegate
+extension ANIChatViewController: UIGestureRecognizerDelegate {
+  func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+    return true
   }
 }

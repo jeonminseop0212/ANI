@@ -37,6 +37,7 @@ class ANIImageFilterViewController: UIViewController {
     self.view.backgroundColor = .white
     self.navigationController?.setNavigationBarHidden(true, animated: false)
     self.navigationController?.navigationBar.isTranslucent = false
+    self.navigationController?.interactivePopGestureRecognizer?.delegate = self
     UIApplication.shared.isStatusBarHidden = true
 
     //myNavigationBar
@@ -126,6 +127,7 @@ class ANIImageFilterViewController: UIViewController {
   }
 }
 
+//MAKR: ANIImageFilterViewDelegate
 extension ANIImageFilterViewController: ANIImageFilterViewDelegate {
   func selectedFilter(filter: ANIFilter, selectedFilterIndex: Int) {
     guard let previewView = self.previewView else { return }
@@ -134,9 +136,17 @@ extension ANIImageFilterViewController: ANIImageFilterViewDelegate {
   }
 }
 
+//MARK: ANIImageFilterPreviewViewDelegate
 extension ANIImageFilterViewController: ANIImageFilterPreviewViewDelegate {
   func selectedPreviewItem(selectedFilterIndex: Int) {
     guard let filterView = self.filterView else { return }
     filterView.selectedItemFilterIndex = selectedFilterIndex
+  }
+}
+
+//MARK: UIGestureRecognizerDelegate
+extension ANIImageFilterViewController: UIGestureRecognizerDelegate {
+  func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+    return true
   }
 }

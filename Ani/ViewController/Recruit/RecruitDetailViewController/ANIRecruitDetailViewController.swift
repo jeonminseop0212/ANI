@@ -51,6 +51,8 @@ class ANIRecruitDetailViewController: UIViewController {
   
   override func viewWillAppear(_ animated: Bool) {
     setupNotifications()
+    self.setNeedsStatusBarAppearanceUpdate()
+    UIApplication.shared.statusBarStyle = statusBarStyle
   }
   
   override func viewWillDisappear(_ animated: Bool) {
@@ -62,6 +64,7 @@ class ANIRecruitDetailViewController: UIViewController {
     self.navigationController?.navigationBar.tintColor = .white
     self.navigationController?.setNavigationBarHidden(true, animated: false)
     self.navigationController?.navigationBar.isTranslucent = false
+    self.navigationController?.interactivePopGestureRecognizer?.delegate = self
     UIApplication.shared.statusBarStyle = .lightContent
 
     //recruitDetailView
@@ -189,14 +192,12 @@ class ANIRecruitDetailViewController: UIViewController {
     if let currentUserUid = ANISessionManager.shared.currentUserUid, currentUserUid == userId {
       let profileViewController = ANIProfileViewController()
       profileViewController.hidesBottomBarWhenPushed = true
-      profileViewController.delegate = self
       self.navigationController?.pushViewController(profileViewController, animated: true)
       profileViewController.isBackButtonHide = false
     } else {
       let otherProfileViewController = ANIOtherProfileViewController()
       otherProfileViewController.hidesBottomBarWhenPushed = true
       otherProfileViewController.userId = userId
-      otherProfileViewController.delegate = self
       self.navigationController?.pushViewController(otherProfileViewController, animated: true)
     }
   }
@@ -399,7 +400,6 @@ extension ANIRecruitDetailViewController: ANIButtonViewDelegate {
       let navigationContoller = UINavigationController(rootViewController: chatViewController)
       chatViewController.user = user
       chatViewController.isPush = false
-      chatViewController.delegate = self
       self.present(navigationContoller, animated: true, completion: nil)
     }
   }
@@ -408,27 +408,6 @@ extension ANIRecruitDetailViewController: ANIButtonViewDelegate {
 //MARK: ANIImageBrowserViewControllerDelegate
 extension ANIRecruitDetailViewController: ANIImageBrowserViewControllerDelegate {
   func imageBrowserDidDissmiss() {
-    UIApplication.shared.statusBarStyle = statusBarStyle
-  }
-}
-
-//MARK: ANIChatViewControllerDelegate
-extension ANIRecruitDetailViewController: ANIChatViewControllerDelegate {
-  func chatViewWillDismiss() {
-    UIApplication.shared.statusBarStyle = statusBarStyle
-  }
-}
-
-//MARK: ANIProfileViewControllerDelegate
-extension ANIRecruitDetailViewController: ANIProfileViewControllerDelegate {
-  func popProfileView() {
-    UIApplication.shared.statusBarStyle = statusBarStyle
-  }
-}
-
-//MARK: ANIOtherProfileViewControllerDelegate
-extension ANIRecruitDetailViewController: ANIOtherProfileViewControllerDelegate {
-  func popOtherProfileView() {
     UIApplication.shared.statusBarStyle = statusBarStyle
   }
 }
@@ -616,5 +595,12 @@ extension ANIRecruitDetailViewController: ANIRecruitContributionViewControllerDe
     
     self.recruit = recruit
     recruitDetailView.recruit = recruit
+  }
+}
+
+//MARK: UIGestureRecognizerDelegate
+extension ANIRecruitDetailViewController: UIGestureRecognizerDelegate {
+  func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+    return true
   }
 }
