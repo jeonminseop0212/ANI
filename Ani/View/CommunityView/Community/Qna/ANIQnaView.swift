@@ -19,6 +19,8 @@ protocol ANIQnaViewDelegate {
 
 class ANIQnaView: UIView {
   
+  private weak var reloadView: ANIReloadView?
+  
   private weak var qnaTableView: UITableView?
   
   private var qnas = [FirebaseQna]()
@@ -47,6 +49,18 @@ class ANIQnaView: UIView {
     if let windowUnrap = window {
       bottomSafeArea = windowUnrap.safeAreaInsets.bottom
     }
+    
+    //reloadView
+    let reloadView = ANIReloadView()
+    reloadView.alpha = 0.0
+    reloadView.messege = "Q&Aがありません。"
+    reloadView.delegate = self
+    addSubview(reloadView)
+    reloadView.dropShadow()
+    reloadView.centerInSuperview()
+    reloadView.leftToSuperview(offset: 50.0)
+    reloadView.rightToSuperview(offset: 50.0)
+    self.reloadView = reloadView
     
     //tableView
     let tableView = UITableView()
@@ -159,7 +173,11 @@ extension ANIQnaView: ANIQnaViewCellDelegate {
 //MARK: data
 extension ANIQnaView {
   @objc private func loadQna(sender: UIRefreshControl?) {
-    guard let activityIndicatorView = self.activityIndicatorView else { return }
+    guard let activityIndicatorView = self.activityIndicatorView,
+          let reloadView = self.reloadView,
+          let qnaTableView = self.qnaTableView else { return }
+    
+    reloadView.alpha = 0.0
     
     if !self.qnas.isEmpty {
       self.qnas.removeAll()
@@ -191,8 +209,6 @@ extension ANIQnaView {
                 sender.endRefreshing()
               }
               
-              guard let qnaTableView = self.qnaTableView else { return }
-              
               activityIndicatorView.stopAnimating()
               
               qnaTableView.reloadData()
@@ -206,6 +222,10 @@ extension ANIQnaView {
             
             activityIndicatorView.stopAnimating()
             
+            UIView.animate(withDuration: 0.2, animations: {
+              reloadView.alpha = 1.0
+            })
+            
             if let sender = sender {
               sender.endRefreshing()
             }
@@ -213,13 +233,30 @@ extension ANIQnaView {
         }
         
         if snapshot.documents.isEmpty {
+          if !self.qnas.isEmpty {
+            self.qnas.removeAll()
+          }
+          
           if let sender = sender {
             sender.endRefreshing()
           }
           
           activityIndicatorView.stopAnimating()
+          
+          qnaTableView.alpha = 0.0
+          
+          UIView.animate(withDuration: 0.2, animations: {
+            reloadView.alpha = 1.0
+          })
         }
       })
     }
+  }
+}
+
+//MARK: ANIReloadViewDelegate
+extension ANIQnaView: ANIReloadViewDelegate {
+  func reloadButtonTapped() {
+    loadQna(sender: nil)
   }
 }
