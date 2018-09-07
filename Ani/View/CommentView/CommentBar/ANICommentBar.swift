@@ -133,7 +133,8 @@ class ANICommentBar: UIView {
           let currentUserId = ANISessionManager.shared.currentUserUid,
           let user = self.user,
           let userId = user.uid,
-          let commentMode = self.commentMode else { return }
+          let commentMode = self.commentMode,
+          currentUserId != userId else { return }
     
     let database = Firestore.firestore()
     

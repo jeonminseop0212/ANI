@@ -507,7 +507,8 @@ class ANIRecruitViewCell: UITableViewCell {
           let currentUserName = currentUser.userName,
           let currentUserId = ANISessionManager.shared.currentUserUid,
           let user = self.user,
-          let userId = user.uid else { return }
+          let userId = user.uid,
+          currentUserId != userId else { return }
 
     let database = Firestore.firestore()
     
