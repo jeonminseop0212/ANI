@@ -76,15 +76,6 @@ class ANIProfileViewController: UIViewController {
     myNavigationBase.height(UIViewController.NAVIGATION_BAR_HEIGHT)
     self.myNavigationBase = myNavigationBase
     
-    //navigationTitleLabel
-    let navigationTitleLabel = UILabel()
-    navigationTitleLabel.text = "プロフィール"
-    navigationTitleLabel.textColor = ANIColor.dark
-    navigationTitleLabel.font = UIFont.boldSystemFont(ofSize: 17)
-    myNavigationBase.addSubview(navigationTitleLabel)
-    navigationTitleLabel.centerInSuperview()
-    self.navigationTitleLabel = navigationTitleLabel
-    
     //backButton
     let backButton = UIButton()
     let backButtonImage = UIImage(named: "backButton")?.withRenderingMode(.alwaysTemplate)
@@ -115,6 +106,21 @@ class ANIProfileViewController: UIViewController {
     optionButton.rightToSuperview()
     optionButton.centerYToSuperview()
     self.optionButton = optionButton
+    
+    //navigationTitleLabel
+    let navigationTitleLabel = UILabel()
+    if let currentUser = self.currentUser {
+      navigationTitleLabel.text = currentUser.userName
+    }
+    navigationTitleLabel.textAlignment = .center
+    navigationTitleLabel.textColor = ANIColor.dark
+    navigationTitleLabel.font = UIFont.boldSystemFont(ofSize: 17)
+    myNavigationBase.addSubview(navigationTitleLabel)
+    //    navigationTitleLabel.centerInSuperview()
+    navigationTitleLabel.centerYToSuperview()
+    navigationTitleLabel.leftToRight(of: backButton)
+    navigationTitleLabel.rightToLeft(of: optionButton)
+    self.navigationTitleLabel = navigationTitleLabel
     
     //profileBasicView
     let profileBasicView = ANIProfileBasicView()

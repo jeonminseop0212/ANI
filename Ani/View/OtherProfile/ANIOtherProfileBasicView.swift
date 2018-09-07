@@ -12,6 +12,7 @@ import CodableFirebase
 import NVActivityIndicatorView
 
 protocol ANIOtherProfileBasicViewDelegate {
+  func loadedUser(user: FirebaseUser)
   func followingTapped()
   func followerTapped()
   func recruitViewCellDidSelect(selectedRecruit: FirebaseRecruit, user: FirebaseUser)
@@ -143,11 +144,14 @@ class ANIOtherProfileBasicView: UIView {
           }
           
           DispatchQueue.main.async {
-            guard let basicTableView = self.basicTableView else { return }
+            guard let basicTableView = self.basicTableView,
+                  let user = self.user else { return }
             
             basicTableView.reloadData()
             
             activityIndicatorView.stopAnimating()
+            
+            self.delegate?.loadedUser(user: user)
             
             UIView.animate(withDuration: 0.2, animations: {
               basicTableView.alpha = 1.0
@@ -158,11 +162,14 @@ class ANIOtherProfileBasicView: UIView {
     } else {
       self.isFollowed = false
       
-      guard let basicTableView = self.basicTableView else { return }
+      guard let basicTableView = self.basicTableView,
+            let user = self.user else { return }
       
       basicTableView.reloadData()
       
       activityIndicatorView.stopAnimating()
+      
+      self.delegate?.loadedUser(user: user)
       
       UIView.animate(withDuration: 0.2, animations: {
         basicTableView.alpha = 1.0
