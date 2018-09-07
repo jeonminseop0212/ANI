@@ -71,15 +71,6 @@ class ANIOtherProfileViewController: UIViewController {
     myNavigationBase.height(UIViewController.NAVIGATION_BAR_HEIGHT)
     self.myNavigationBase = myNavigationBase
     
-    //navigationTitleLabel
-    let navigationTitleLabel = UILabel()
-    navigationTitleLabel.text = "プロフィール"
-    navigationTitleLabel.textColor = ANIColor.dark
-    navigationTitleLabel.font = UIFont.boldSystemFont(ofSize: 17)
-    myNavigationBase.addSubview(navigationTitleLabel)
-    navigationTitleLabel.centerInSuperview()
-    self.navigationTitleLabel = navigationTitleLabel
-    
     //backButton
     let backButton = UIButton()
     let backButtonImage = UIImage(named: "backButton")?.withRenderingMode(.alwaysTemplate)
@@ -92,6 +83,18 @@ class ANIOtherProfileViewController: UIViewController {
     backButton.leftToSuperview()
     backButton.centerYToSuperview()
     self.backButton = backButton
+    
+    //navigationTitleLabel
+    let navigationTitleLabel = UILabel()
+    navigationTitleLabel.text = "プロフィール"
+    navigationTitleLabel.textColor = ANIColor.dark
+    navigationTitleLabel.textAlignment = .center
+    navigationTitleLabel.font = UIFont.boldSystemFont(ofSize: 17)
+    myNavigationBase.addSubview(navigationTitleLabel)
+    navigationTitleLabel.centerYToSuperview()
+    navigationTitleLabel.leftToRight(of: backButton)
+    navigationTitleLabel.rightToSuperview(offset: 44.0)
+    self.navigationTitleLabel = navigationTitleLabel
     
     //profileBasicView
     let profileBasicView = ANIOtherProfileBasicView()
@@ -162,6 +165,13 @@ class ANIOtherProfileViewController: UIViewController {
 
 //MARK: ANIProfileBasicViewDelegate
 extension ANIOtherProfileViewController: ANIOtherProfileBasicViewDelegate {
+  func loadedUser(user: FirebaseUser) {
+    guard let navigationTitleLabel = self.navigationTitleLabel,
+          let userName = user.userName else { return }
+    
+    navigationTitleLabel.text = userName
+  }
+  
   func followingTapped() {
     guard let userId = self.userId else { return }
     
