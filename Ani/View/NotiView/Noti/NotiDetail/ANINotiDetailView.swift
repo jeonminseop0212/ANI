@@ -20,10 +20,17 @@ protocol ANINotiDetailViewDelegate {
   func popupOptionView(isMe: Bool, contentType: ContentType, id: String)
 }
 
-enum NotiKind {
+enum ContributionKind {
   case recruit;
   case story;
   case qna;
+}
+
+enum NotiKind {
+  case follow;
+  case love;
+  case comment;
+  case support;
 }
 
 class ANINotiDetailView: UIView {
@@ -31,26 +38,33 @@ class ANINotiDetailView: UIView {
   private weak var tableView: UITableView?
   private weak var alertLabel: UILabel?
   
+  var contributionKind: ContributionKind?
   var notiKind: NotiKind?
+  
   var noti: FirebaseNotification? {
     didSet {
       guard let noti = self.noti,
+            let contributionKind = self.contributionKind,
             let notiKind = self.notiKind else { return }
       
-      switch notiKind {
+      switch contributionKind {
       case .recruit:
         loadRecruit(notiId: noti.notiId)
       case .story:
         loadStory(notiId: noti.notiId)
         
-        if let commentId = noti.commentId {
-          loadComment(commentId: commentId, notiKind: .story)
+        if notiKind == .comment, let commentId = noti.commentId {
+            loadComment(commentId: commentId, contributionKind: .story)
+        } else if notiKind == .love {
+          loadLoveUserId()
         }
       case .qna:
         loadQna(notiId: noti.notiId)
         
-        if let commentId = noti.commentId {
-          loadComment(commentId: commentId, notiKind: .qna)
+        if notiKind == .comment, let commentId = noti.commentId {
+          loadComment(commentId: commentId, contributionKind: .qna)
+        } else if notiKind == .love {
+          loadLoveUserId()
         }
       }
     }
@@ -60,6 +74,7 @@ class ANINotiDetailView: UIView {
   private var story: FirebaseStory?
   private var qna: FirebaseQna?
   private var comment: FirebaseComment?
+  private var loveUsers: [FirebaseUser]?
   
   private weak var activityIndicatorView: NVActivityIndicatorView?
   
@@ -88,8 +103,12 @@ class ANINotiDetailView: UIView {
     tableView.register(ANISupportViewCell.self, forCellReuseIdentifier: supportCellId)
     let qnaCellId = NSStringFromClass(ANIQnaViewCell.self)
     tableView.register(ANIQnaViewCell.self, forCellReuseIdentifier: qnaCellId)
+    let headerCellId = NSStringFromClass(ANINotiHeaderViewCell.self)
+    tableView.register(ANINotiHeaderViewCell.self, forCellReuseIdentifier: headerCellId)
     let commentCellId = NSStringFromClass(ANINotiCommentViewCell.self)
     tableView.register(ANINotiCommentViewCell.self, forCellReuseIdentifier: commentCellId)
+    let userCellId = NSStringFromClass(ANIUserSearchViewCell.self)
+    tableView.register(ANIUserSearchViewCell.self, forCellReuseIdentifier: userCellId)
     tableView.alpha = 0.0
     tableView.dataSource = self
     tableView.delegate = self
@@ -136,21 +155,28 @@ class ANINotiDetailView: UIView {
 //MARK: UITableViewDataSource
 extension ANINotiDetailView: UITableViewDataSource {
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    guard let notiKind = self.notiKind,
-          let noti = self.noti else { return 0 }
-    
-    switch notiKind {
+    guard let contributionKind = self.contributionKind,
+          let notiKind = self.notiKind else { return 0 }
+
+    switch contributionKind {
     case .recruit:
+      if let loveUsers = self.loveUsers {
+        return 2 + loveUsers.count
+      }
       return 1
     case .story:
-      if noti.commentId != nil {
-        return 2
+      if notiKind == .comment {
+        return 3
+      } else if notiKind == .love, let loveUsers = self.loveUsers {
+        return 2 + loveUsers.count
       } else {
         return 1
       }
     case .qna:
-      if noti.commentId != nil {
-        return 2
+      if notiKind == .comment {
+        return 3
+      } else if notiKind == .love, let loveUsers = self.loveUsers {
+        return 2 + loveUsers.count
       } else {
         return 1
       }
@@ -158,17 +184,37 @@ extension ANINotiDetailView: UITableViewDataSource {
   }
   
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    guard let notiKind = self.notiKind else { return UITableViewCell() }
+    guard let contributionKind = self.contributionKind,
+          let noti = self.noti else { return UITableViewCell() }
     
-    switch notiKind {
+    switch contributionKind {
     case .recruit:
-      let recruitCellId = NSStringFromClass(ANIRecruitViewCell.self)
-      let cell = tableView.dequeueReusableCell(withIdentifier: recruitCellId, for: indexPath) as! ANIRecruitViewCell
-      
-      cell.recruit = recruit
-      cell.delegate = self
-      
-      return cell
+      if indexPath.row == 0 {
+        let recruitCellId = NSStringFromClass(ANIRecruitViewCell.self)
+        let cell = tableView.dequeueReusableCell(withIdentifier: recruitCellId, for: indexPath) as! ANIRecruitViewCell
+        
+        cell.recruit = recruit
+        cell.delegate = self
+        
+        return cell
+      } else if indexPath.row == 1 {
+        let headerCellId = NSStringFromClass(ANINotiHeaderViewCell.self)
+        let cell = tableView.dequeueReusableCell(withIdentifier: headerCellId, for: indexPath) as! ANINotiHeaderViewCell
+        
+        cell.contributionKind = contributionKind
+        cell.headerText = "いいねユーザー"
+        
+        return cell
+      } else {
+        let userCellId = NSStringFromClass(ANIUserSearchViewCell.self)
+        let cell = tableView.dequeueReusableCell(withIdentifier: userCellId, for: indexPath) as! ANIUserSearchViewCell
+        
+        if let loveUsers = loveUsers {
+          cell.user = loveUsers[indexPath.row - 2]
+        }
+        
+        return cell
+      }
     case .story:
       if story?.recruitId != nil {
         if indexPath.row == 0 {
@@ -179,12 +225,33 @@ extension ANINotiDetailView: UITableViewDataSource {
           cell.delegate = self
           
           return cell
-        } else {
+        } else if indexPath.row == 1 {
+          let headerCellId = NSStringFromClass(ANINotiHeaderViewCell.self)
+          let cell = tableView.dequeueReusableCell(withIdentifier: headerCellId, for: indexPath) as! ANINotiHeaderViewCell
+          
+          cell.contributionKind = contributionKind
+          
+          if noti.commentId != nil {
+            cell.headerText = "新しいコメント"
+          } else {
+            cell.headerText = "いいねユーザー"
+          }
+          
+          return cell
+        } else if noti.commentId != nil {
           let commentCellId = NSStringFromClass(ANINotiCommentViewCell.self)
           let cell = tableView.dequeueReusableCell(withIdentifier: commentCellId, for: indexPath) as! ANINotiCommentViewCell
 
           cell.comment = comment
-          cell.notiKind = .story
+          
+          return cell
+        } else {
+          let userCellId = NSStringFromClass(ANIUserSearchViewCell.self)
+          let cell = tableView.dequeueReusableCell(withIdentifier: userCellId, for: indexPath) as! ANIUserSearchViewCell
+          
+          if let loveUsers = loveUsers {
+            cell.user = loveUsers[indexPath.row - 2]
+          }
           
           return cell
         }
@@ -197,13 +264,34 @@ extension ANINotiDetailView: UITableViewDataSource {
           cell.delegate = self
           
           return cell
-        } else {
+        } else if indexPath.row == 1 {
+          let headerCellId = NSStringFromClass(ANINotiHeaderViewCell.self)
+          let cell = tableView.dequeueReusableCell(withIdentifier: headerCellId, for: indexPath) as! ANINotiHeaderViewCell
+          
+          cell.contributionKind = contributionKind
+          
+          if noti.commentId != nil {
+            cell.headerText = "新しいコメント"
+          } else {
+            cell.headerText = "いいねユーザー"
+          }
+          
+          return cell
+        } else if noti.commentId != nil  {
           let commentCellId = NSStringFromClass(ANINotiCommentViewCell.self)
           let cell = tableView.dequeueReusableCell(withIdentifier: commentCellId, for: indexPath) as! ANINotiCommentViewCell
 
           cell.comment = comment
-          cell.notiKind = .story
 
+          return cell
+        } else {
+          let userCellId = NSStringFromClass(ANIUserSearchViewCell.self)
+          let cell = tableView.dequeueReusableCell(withIdentifier: userCellId, for: indexPath) as! ANIUserSearchViewCell
+          
+          if let loveUsers = loveUsers {
+            cell.user = loveUsers[indexPath.row - 2]
+          }
+          
           return cell
         }
       }
@@ -216,13 +304,34 @@ extension ANINotiDetailView: UITableViewDataSource {
         cell.delegate = self
         
         return cell
-      } else {
+      } else if indexPath.row == 1 {
+        let headerCellId = NSStringFromClass(ANINotiHeaderViewCell.self)
+        let cell = tableView.dequeueReusableCell(withIdentifier: headerCellId, for: indexPath) as! ANINotiHeaderViewCell
+        
+        cell.contributionKind = contributionKind
+
+        if noti.commentId != nil {
+          cell.headerText = "新しいコメント"
+        } else {
+          cell.headerText = "いいねユーザー"
+        }
+        
+        return cell
+      } else if noti.commentId != nil {
         let commentCellId = NSStringFromClass(ANINotiCommentViewCell.self)
         let cell = tableView.dequeueReusableCell(withIdentifier: commentCellId, for: indexPath) as! ANINotiCommentViewCell
         
         cell.comment = comment
-        cell.notiKind = .qna
 
+        return cell
+      } else {
+        let userCellId = NSStringFromClass(ANIUserSearchViewCell.self)
+        let cell = tableView.dequeueReusableCell(withIdentifier: userCellId, for: indexPath) as! ANIUserSearchViewCell
+        
+        if let loveUsers = loveUsers {
+          cell.user = loveUsers[indexPath.row - 2]
+        }
+        
         return cell
       }
     }
@@ -233,14 +342,14 @@ extension ANINotiDetailView: UITableViewDataSource {
 extension ANINotiDetailView: UITableViewDelegate {
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     if indexPath.row == 1  {
-      guard let notiKind = self.notiKind,
+      guard let contributionKind = self.contributionKind,
             let currentUser = ANISessionManager.shared.currentUser else { return }
       
-      if notiKind == .story {
+      if contributionKind == .story {
         guard let story = self.story else { return }
         
         self.delegate?.storyViewCellDidSelect(selectedStory: story, user: currentUser)
-      } else if notiKind == .qna {
+      } else if contributionKind == .qna {
         guard let qna = self.qna else { return }
 
         self.delegate?.qnaViewCellDidSelect(selectedQna: qna, user: currentUser)
@@ -316,10 +425,6 @@ extension ANINotiDetailView {
           do {
             let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: data)
             self.recruit = recruit
-            
-            DispatchQueue.main.async {
-              self.loadDone()
-            }
           } catch let error {
             print(error)
             
@@ -339,7 +444,8 @@ extension ANINotiDetailView {
   }
   
   private func loadStory(notiId: String) {
-    guard let activityIndicatorView = self.activityIndicatorView else { return }
+    guard let activityIndicatorView = self.activityIndicatorView,
+          let notiKind = self.notiKind else { return }
 
     let database = Firestore.firestore()
     
@@ -358,8 +464,10 @@ extension ANINotiDetailView {
             let story = try FirestoreDecoder().decode(FirebaseStory.self, from: data)
             self.story = story
             
-            DispatchQueue.main.async {
-              self.loadDone()
+            if notiKind == .support {
+              DispatchQueue.main.async {
+                self.loadDone()
+              }
             }
           } catch let error {
             print(error)
@@ -398,10 +506,6 @@ extension ANINotiDetailView {
           do {
             let qna = try FirestoreDecoder().decode(FirebaseQna.self, from: data)
             self.qna = qna
-            
-            DispatchQueue.main.async {
-              self.loadDone()
-            }
           } catch let error {
             print(error)
             
@@ -420,18 +524,16 @@ extension ANINotiDetailView {
     }
   }
   
-  private func loadComment(commentId: String, notiKind: NotiKind) {
+  private func loadComment(commentId: String, contributionKind: ContributionKind) {
     guard let noti = self.noti,
           let activityIndicatorView = self.activityIndicatorView else { return }
     
     let database = Firestore.firestore()
     
-    activityIndicatorView.startAnimating()
-    
     var collection: String = ""
-    if notiKind == .story {
+    if contributionKind == .story {
       collection = KEY_STORIES
-    } else if notiKind == .qna {
+    } else if contributionKind == .qna {
       collection = KEY_QNAS
     }
     
@@ -458,6 +560,77 @@ extension ANINotiDetailView {
           activityIndicatorView.stopAnimating()
         }
       })
+    }
+  }
+  
+  private func loadLoveUserId() {
+    guard let noti = self.noti,
+          let contributionKind = self.contributionKind else { return }
+    
+    let database = Firestore.firestore()
+    
+    var collection: String = ""
+    if contributionKind == .story {
+      collection = KEY_STORIES
+    } else if contributionKind == .qna {
+      collection = KEY_QNAS
+    }
+    
+    var loveUserId = [String]()
+    DispatchQueue.global().async {
+      
+      database.collection(collection).document(noti.notiId).collection(KEY_LOVE_IDS).limit(to: 20).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
+        
+        guard let snapshot = snapshot else { return }
+        
+        for document in snapshot.documents {
+          for key in document.data().keys {
+            loveUserId.append(key)
+            
+            if loveUserId.count == snapshot.documents.count {
+              self.loadLoveUser(userIds: loveUserId)
+            }
+          }
+        }
+      })
+    }
+  }
+  
+  private func loadLoveUser(userIds: [String]) {
+    guard let activityIndicatorView = self.activityIndicatorView else { return }
+
+    let database = Firestore.firestore()
+
+    for userId in userIds {
+      DispatchQueue.global().async {
+        database.collection(KEY_USERS).document(userId).getDocument(completion: { (snapshot, error) in
+          guard let snapshot = snapshot, let data = snapshot.data() else { return }
+          
+          do {
+            let user = try FirestoreDecoder().decode(FirebaseUser.self, from: data)
+            if self.loveUsers != nil {
+              self.loveUsers?.append(user)
+            } else {
+              self.loveUsers = [user]
+            }
+            
+            if self.loveUsers?.count == userIds.count {
+              DispatchQueue.main.async {
+                self.loadDone()
+              }
+            }
+          } catch let error {
+            print(error)
+            
+            activityIndicatorView.stopAnimating()
+          }
+        })
+      }
     }
   }
 }

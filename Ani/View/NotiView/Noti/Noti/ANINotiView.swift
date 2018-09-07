@@ -102,7 +102,7 @@ extension ANINotiView: UITableViewDataSource {
   
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     if !notifications.isEmpty {
-      if notifications[indexPath.row].kind == KEY_NOTI_KIND_FOLLOW {
+      if notifications[indexPath.row].notiKind == KEY_NOTI_KIND_FOLLOW {
         let followNotiId = NSStringFromClass(ANIFollowNotiViewCell.self)
         let cell = tableView.dequeueReusableCell(withIdentifier: followNotiId, for: indexPath) as! ANIFollowNotiViewCell
         
@@ -126,7 +126,7 @@ extension ANINotiView: UITableViewDataSource {
 //MARK: UITableViewDelegate
 extension ANINotiView: UITableViewDelegate {
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    if notifications[indexPath.row].kind != KEY_NOTI_KIND_FOLLOW {
+    if notifications[indexPath.row].notiKind != KEY_NOTI_KIND_FOLLOW {
       self.delegate?.cellTapped(noti: notifications[indexPath.row])
     }
   }

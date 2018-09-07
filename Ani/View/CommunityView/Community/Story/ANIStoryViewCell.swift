@@ -355,7 +355,7 @@ class ANIStoryViewCell: UITableViewCell {
       do {
         let noti = "\(currentUserName)さんが「\(story.story)」ストーリーを「いいね」しました。"
         let date = ANIFunction.shared.getToday()
-        let notification = FirebaseNotification(userId: currentUserId, noti: noti, kind: KEY_NOTI_KIND_STROY, notiId: storyId, commentId: nil, updateDate: date)
+        let notification = FirebaseNotification(userId: currentUserId, noti: noti, contributionKind: KEY_CONTRIBUTION_KIND_STROY, notiKind: KEY_NOTI_KIND_LOVE, notiId: storyId, commentId: nil, updateDate: date)
         let data = try FirestoreEncoder().encode(notification)
           
         database.collection(KEY_USERS).document(userId).collection(KEY_NOTIFICATIONS).document(storyId).setData(data)

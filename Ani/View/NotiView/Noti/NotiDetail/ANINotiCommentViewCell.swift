@@ -10,11 +10,8 @@ import UIKit
 import WCLShineButton
 import FirebaseFirestore
 import CodableFirebase
-import TinyConstraints
 
 class ANINotiCommentViewCell: UITableViewCell {
-  private var headerLabelTopConstraing: Constraint?
-  private weak var headerLabel: UILabel?
   
   private weak var base: UIView?
   private weak var commentLabel: UILabel?
@@ -29,19 +26,6 @@ class ANINotiCommentViewCell: UITableViewCell {
 //  private weak var commentCountLabel: UILabel?
   
   private weak var bottomLine: UIImageView?
-  
-  var notiKind: NotiKind? {
-    didSet {
-      guard let notiKind = self.notiKind,
-            let headerLabelTopConstraing = self.headerLabelTopConstraing else { return }
-      
-      if notiKind == .story {
-        headerLabelTopConstraing.constant = 10.0
-      } else if notiKind == .qna {
-        headerLabelTopConstraing.constant = 0.0
-      }
-    }
-  }
   
   var comment: FirebaseComment? {
     didSet {
@@ -67,24 +51,11 @@ class ANINotiCommentViewCell: UITableViewCell {
     self.selectionStyle = .none
     self.backgroundColor = ANIColor.bg
     
-    //headerLabel
-    let headerLabel = UILabel()
-    headerLabel.backgroundColor = ANIColor.bg
-    headerLabel.text = "新しいコメント"
-    headerLabel.textColor = ANIColor.dark
-    headerLabel.font = UIFont.boldSystemFont(ofSize: 15.0)
-    addSubview(headerLabel)
-    headerLabelTopConstraing = headerLabel.topToSuperview(offset: 10.0)
-    headerLabel.leftToSuperview(offset: 10.0)
-    headerLabel.rightToSuperview(offset: 10.0)
-    self.headerLabel = headerLabel
-    
     //base
     let base = UIView()
     base.backgroundColor = .white
     addSubview(base)
-    base.topToBottom(of: headerLabel, offset: 10.0)
-    base.edgesToSuperview(excluding: .top)
+    base.edgesToSuperview()
     self.base = base
     
     //commentLabel

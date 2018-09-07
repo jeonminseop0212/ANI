@@ -140,26 +140,26 @@ class ANICommentBar: UIView {
     DispatchQueue.global().async {
       do {
         var noti = ""
-        var kind = ""
+        var contributionKind = ""
         var notiId = ""
         if commentMode == .story {
           guard let story = self.story,
                 let storyId = story.id else { return }
           
           noti = "\(currentUserName)さんが「\(story.story)」ストーリーにコメントしました。\n\"\(comment)\""
-          kind = KEY_NOTI_KIND_STROY
+          contributionKind = KEY_CONTRIBUTION_KIND_STROY
           notiId = storyId
         } else if commentMode == .qna {
           guard let qna = self.qna,
                 let qnaId = qna.id else { return }
           
           noti = "\(currentUserName)さんが「\(qna.qna)」質問にコメントしました。\n\"\(comment)\""
-          kind = KEY_NOTI_KIND_QNA
+          contributionKind = KEY_CONTRIBUTION_KIND_QNA
           notiId = qnaId
         }
         
         let date = ANIFunction.shared.getToday()
-        let notification = FirebaseNotification(userId: currentUserId, noti: noti, kind: kind, notiId: notiId, commentId: commentId, updateDate: date)
+        let notification = FirebaseNotification(userId: currentUserId, noti: noti, contributionKind: contributionKind, notiKind: KEY_NOTI_KIND_COMMENT, notiId: notiId, commentId: commentId, updateDate: date)
         let id = NSUUID().uuidString
         let data = try FirestoreEncoder().encode(notification)
         
