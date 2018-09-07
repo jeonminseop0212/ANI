@@ -18,6 +18,8 @@ protocol ANINotiViewDelegate {
 
 class ANINotiView: UIView {
   
+  private var RELOAD_BUTTON_HEIGHT: CGFloat = 60.0
+  private weak var reloadButton: ANIImageButtonView?
   private weak var notiTableView: UITableView?
   
   private var notifications = [FirebaseNotification]()
@@ -45,6 +47,17 @@ class ANINotiView: UIView {
     if let windowUnrap = window {
       bottomSafeArea = windowUnrap.safeAreaInsets.bottom
     }
+    
+    //reloadButton
+    let reloadButton = ANIImageButtonView()
+    reloadButton.image = UIImage(named: "reloadButton")
+    reloadButton.delegate = self
+    reloadButton.alpha = 0.0
+    addSubview(reloadButton)
+    reloadButton.centerInSuperview()
+    reloadButton.width(RELOAD_BUTTON_HEIGHT)
+    reloadButton.height(RELOAD_BUTTON_HEIGHT)
+    self.reloadButton = reloadButton
     
     //notiTableView
     let notiTableView = UITableView()
@@ -136,7 +149,11 @@ extension ANINotiView: UITableViewDelegate {
 extension ANINotiView {
   @objc private func loadNoti(sender: UIRefreshControl?) {
     guard let currentUserUid = ANISessionManager.shared.currentUserUid,
-          let activityIndicatorView = self.activityIndicatorView else { return }
+          let activityIndicatorView = self.activityIndicatorView,
+          let reloadButton = self.reloadButton,
+          let notiTableView = self.notiTableView else { return }
+
+    reloadButton.alpha = 0.0
     
     if !self.notifications.isEmpty {
       self.notifications.removeAll()
@@ -167,8 +184,6 @@ extension ANINotiView {
               sender.endRefreshing()
             }
             
-            guard let notiTableView = self.notiTableView else { return }
-            
             activityIndicatorView.stopAnimating()
             
             notiTableView.reloadData()
@@ -182,6 +197,10 @@ extension ANINotiView {
           
           activityIndicatorView.stopAnimating()
           
+          UIView.animate(withDuration: 0.2, animations: {
+            reloadButton.alpha = 1.0
+          })
+          
           if let sender = sender {
             sender.endRefreshing()
           }
@@ -189,12 +208,31 @@ extension ANINotiView {
       }
       
       if snapshot.documents.isEmpty {
+        if !self.notifications.isEmpty {
+          self.notifications.removeAll()
+        }
+        
         if let sender = sender {
           sender.endRefreshing()
         }
         
         activityIndicatorView.stopAnimating()
+        
+        notiTableView.alpha = 0.0
+        
+        UIView.animate(withDuration: 0.2, animations: {
+          reloadButton.alpha = 1.0
+        })
       }
+    }
+  }
+}
+
+//MARK: ANIButtonViewDelegate
+extension ANINotiView: ANIButtonViewDelegate {
+  func buttonViewTapped(view: ANIButtonView) {
+    if view === reloadButton {
+      loadNoti(sender: nil)
     }
   }
 }
