@@ -103,7 +103,8 @@ class ANISupportView: UIView {
           let user = self.user,
           let userId = user.uid,
           let messageTextView = self.messageTextView,
-          let message = messageTextView.text else { return }
+          let message = messageTextView.text,
+          currentUserId != userId else { return }
     
     let database = Firestore.firestore()
     
