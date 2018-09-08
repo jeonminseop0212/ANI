@@ -180,7 +180,7 @@ class ANIRecruitContributionViewController: UIViewController {
     
     //rejectLabel
     let rejectLabel = UILabel()
-    rejectLabel.text = "入力してない項目があります！"
+    rejectLabel.text = "入力していない項目があります！"
     rejectLabel.textColor = .white
     rejectLabel.textAlignment = .center
     rejectLabel.font = UIFont.boldSystemFont(ofSize: 16.0)

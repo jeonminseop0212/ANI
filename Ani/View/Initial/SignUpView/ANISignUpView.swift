@@ -271,9 +271,35 @@ class ANISignUpView: UIView {
   }
   
   private func signUp(adress: String, password: String) {
+    guard let userNameTextField = self.userNameTextField,
+          let userName = userNameTextField.text else { return }
+    
     let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.green)
     NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData, nil)
     
+    let database = Firestore.firestore()
+    DispatchQueue.global().async {
+      database.collection(KEY_USERS).whereField(KEY_USER_NAME, isEqualTo: userName).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
+        
+        guard let snapshot = snapshot else { return }
+        
+        if snapshot.documents.isEmpty {
+          self.createAccount(adress: adress, password: password)
+        } else {
+          NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+
+          self.delegate?.reject(notiText: "すでに存在するユーザーネームです！")
+        }
+      })
+    }
+  }
+  
+  private func createAccount(adress: String, password: String) {
     Auth.auth().createUser(withEmail: adress, password: password) { (successUser, error) in
       if let errorUnrap = error {
         let nsError = errorUnrap as NSError
@@ -427,7 +453,7 @@ extension ANISignUpView: ANIButtonViewDelegate {
           self.delegate?.reject(notiText: "パスワードが異なります！")
         }
       } else {
-        self.delegate?.reject(notiText: "入力してない項目があります！")
+        self.delegate?.reject(notiText: "入力していない項目があります！")
       }
     }
   }
