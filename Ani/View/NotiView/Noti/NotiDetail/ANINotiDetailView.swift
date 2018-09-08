@@ -425,6 +425,10 @@ extension ANINotiDetailView {
           do {
             let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: data)
             self.recruit = recruit
+            
+            DispatchQueue.main.async {
+              self.loadDone()
+            }
           } catch let error {
             print(error)
             
