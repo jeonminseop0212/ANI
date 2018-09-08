@@ -26,9 +26,11 @@ class ANIInitialViewController: UIViewController {
   
   private func setup() {
     //basic
+    ANIOrientation.lockOrientation(.portrait)
     self.view.backgroundColor = .white
     self.navigationController?.setNavigationBarHidden(true, animated: false)
     self.navigationController?.navigationBar.isTranslucent = false
+    self.navigationController?.interactivePopGestureRecognizer?.delegate = self
     
     //initialView
     let initialView = ANIInitialView()
@@ -54,5 +56,12 @@ extension ANIInitialViewController: ANIInitialViewDelegate {
   func startAnonymous() {
     self.dismiss(animated: true, completion: nil)
     ANISessionManager.shared.isAnonymous = true
+  }
+}
+
+//MARK: UIGestureRecognizerDelegate
+extension ANIInitialViewController: UIGestureRecognizerDelegate {
+  func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+    return true
   }
 }

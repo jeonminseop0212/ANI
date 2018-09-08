@@ -62,9 +62,6 @@ class ANIRecruitDetailViewController: UIViewController {
   private func setup() {
     //basic
     self.navigationController?.navigationBar.tintColor = .white
-    self.navigationController?.setNavigationBarHidden(true, animated: false)
-    self.navigationController?.navigationBar.isTranslucent = false
-    self.navigationController?.interactivePopGestureRecognizer?.delegate = self
     UIApplication.shared.statusBarStyle = .lightContent
 
     //recruitDetailView
@@ -595,12 +592,5 @@ extension ANIRecruitDetailViewController: ANIRecruitContributionViewControllerDe
     
     self.recruit = recruit
     recruitDetailView.recruit = recruit
-  }
-}
-
-//MARK: UIGestureRecognizerDelegate
-extension ANIRecruitDetailViewController: UIGestureRecognizerDelegate {
-  func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-    return true
   }
 }
