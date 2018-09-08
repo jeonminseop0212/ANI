@@ -41,9 +41,6 @@ class ANIFollowUserViewContoller: UIViewController {
   private func setup() {
     //basic
     self.view.backgroundColor = .white
-    self.navigationController?.setNavigationBarHidden(true, animated: false)
-    self.navigationController?.navigationBar.isTranslucent = false
-    ANIOrientation.lockOrientation(.portrait)
     
     //myNavigationBar
     let myNavigationBar = UIView()

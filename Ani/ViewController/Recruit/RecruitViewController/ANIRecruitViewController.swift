@@ -60,6 +60,7 @@ class ANIRecruitViewController: UIViewController {
     self.view.backgroundColor = .white
     self.navigationController?.setNavigationBarHidden(true, animated: false)
     self.navigationController?.navigationBar.isTranslucent = false
+    self.navigationController?.interactivePopGestureRecognizer?.delegate = self
     
     //rcruitView
     let recruitView = ANIRecuruitView()
@@ -309,5 +310,12 @@ extension ANIRecruitViewController: ANIRecruitFiltersViewDelegate {
     
     popupPickerViewController.modalPresentationStyle = .overCurrentContext
     self.tabBarController?.present(popupPickerViewController, animated: false, completion: nil)
+  }
+}
+
+//MARK: UIGestureRecognizerDelegate
+extension ANIRecruitViewController: UIGestureRecognizerDelegate {
+  func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+    return true
   }
 }

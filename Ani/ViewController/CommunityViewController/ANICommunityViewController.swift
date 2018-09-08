@@ -51,6 +51,8 @@ class ANICommunityViewController: UIViewController {
     //basic
     ANIOrientation.lockOrientation(.portrait)
     navigationController?.setNavigationBarHidden(true, animated: false)
+    self.navigationController?.navigationBar.isTranslucent = false
+    self.navigationController?.interactivePopGestureRecognizer?.delegate = self
     
     //container
     let flowLayout = UICollectionViewFlowLayout()
@@ -511,5 +513,12 @@ extension ANICommunityViewController {
     DispatchQueue.global().async {
       index?.deleteObject(withID: contributionId)
     }
+  }
+}
+
+//MARK: UIGestureRecognizerDelegate
+extension ANICommunityViewController: UIGestureRecognizerDelegate {
+  func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+    return true
   }
 }

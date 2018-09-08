@@ -75,6 +75,7 @@ class ANISearchViewController: UIViewController {
     self.view.backgroundColor = .white
     self.navigationController?.setNavigationBarHidden(true, animated: false)
     self.navigationController?.navigationBar.isTranslucent = false
+    self.navigationController?.interactivePopGestureRecognizer?.delegate = self
     
     //searchView
     let searchView = ANISearchView()
@@ -509,3 +510,9 @@ extension ANISearchViewController {
   }
 }
 
+//MARK: UIGestureRecognizerDelegate
+extension ANISearchViewController: UIGestureRecognizerDelegate {
+  func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+    return true
+  }
+}
