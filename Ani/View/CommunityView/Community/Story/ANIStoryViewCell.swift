@@ -16,6 +16,7 @@ protocol ANIStoryViewCellDelegate {
   func reject()
   func popupOptionView(isMe: Bool, contentType: ContentType, id: String)
   func loadedStoryIsLoved(indexPath: Int, isLoved: Bool)
+  func loadedStoryUser(user: FirebaseUser)
 }
 
 class ANIStoryViewCell: UITableViewCell {
@@ -37,7 +38,9 @@ class ANIStoryViewCell: UITableViewCell {
     didSet {
       guard let story = self.story else { return }
       
-      loadUser()
+      if user == nil {
+        loadUser()
+      }
       if story.isLoved == nil {
         isLoved()
       }
@@ -47,7 +50,15 @@ class ANIStoryViewCell: UITableViewCell {
     }
   }
   
-  private var user: FirebaseUser?
+  var user: FirebaseUser? {
+    didSet {
+      guard let user = self.user else { return }
+
+      DispatchQueue.main.async {
+        self.reloadUserLayout(user: user)
+      }
+    }
+  }
   
   private var loveListener: ListenerRegistration?
   private var commentListener: ListenerRegistration?
@@ -467,10 +478,7 @@ extension ANIStoryViewCell {
         do {
           let user = try FirebaseDecoder().decode(FirebaseUser.self, from: data)
           self.user = user
-          
-          DispatchQueue.main.async {
-            self.reloadUserLayout(user: user)
-          }
+          self.delegate?.loadedStoryUser(user: user)
         } catch let error {
           print(error)
         }

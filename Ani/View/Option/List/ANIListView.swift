@@ -50,6 +50,7 @@ class ANIListView: UIView {
   private var loveStories = [FirebaseStory]()
   private var loveQnas = [FirebaseQna]()
   private var supportRecruits = [FirebaseRecruit]()
+  private var users = [FirebaseUser]()
   
   private var clipRecruits = [FirebaseRecruit]()
   
@@ -162,6 +163,12 @@ extension ANIListView: UITableViewDataSource {
       let recruitCellid = NSStringFromClass(ANIRecruitViewCell.self)
       let cell = tableView.dequeueReusableCell(withIdentifier: recruitCellid, for: indexPath) as! ANIRecruitViewCell
       
+      for user in users {
+        if loveRecruits[indexPath.row].userId == user.uid {
+          cell.user = user
+          break
+        }
+      }
       cell.recruit = loveRecruits[indexPath.row]
       cell.delegate = self
       cell.indexPath = indexPath.row
@@ -183,6 +190,12 @@ extension ANIListView: UITableViewDataSource {
           } else {
             cell.recruit = nil
           }
+          for user in users {
+            if loveStories[indexPath.row].userId == user.uid {
+              cell.user = user
+              break
+            }
+          }
           cell.story = loveStories[indexPath.row]
           cell.delegate = self
           cell.indexPath = indexPath.row
@@ -192,6 +205,12 @@ extension ANIListView: UITableViewDataSource {
           let storyCellId = NSStringFromClass(ANIStoryViewCell.self)
           let cell = tableView.dequeueReusableCell(withIdentifier: storyCellId, for: indexPath) as! ANIStoryViewCell
           
+          for user in users {
+            if loveStories[indexPath.row].userId == user.uid {
+              cell.user = user
+              break
+            }
+          }
           cell.story = loveStories[indexPath.row]
           cell.delegate = self
           cell.indexPath = indexPath.row
@@ -206,6 +225,12 @@ extension ANIListView: UITableViewDataSource {
       let cell = tableView.dequeueReusableCell(withIdentifier: qnaCellid, for: indexPath) as! ANIQnaViewCell
       
       cell.qna = loveQnas[indexPath.row]
+      for user in users {
+        if loveQnas[indexPath.row].userId == user.uid {
+          cell.user = user
+          break
+        }
+      }
       cell.delegate = self
       cell.indexPath = indexPath.row
       
@@ -214,6 +239,12 @@ extension ANIListView: UITableViewDataSource {
       let recruitCellid = NSStringFromClass(ANIRecruitViewCell.self)
       let cell = tableView.dequeueReusableCell(withIdentifier: recruitCellid, for: indexPath) as! ANIRecruitViewCell
       
+      for user in users {
+        if loveQnas[indexPath.row].userId == user.uid {
+          cell.user = user
+          break
+        }
+      }
       cell.recruit = clipRecruits[indexPath.row]
       cell.delegate = self
       cell.indexPath = indexPath.row
@@ -313,6 +344,10 @@ extension ANIListView: ANIRecruitViewCellDelegate {
       self.clipRecruits[indexPath] = recruit
     }
   }
+  
+  func loadedRecruitUser(user: FirebaseUser) {
+    self.users.append(user)
+  }
 }
 
 //MARK: ANIStoryViewCellDelegate
@@ -333,6 +368,10 @@ extension ANIListView: ANIStoryViewCellDelegate {
       story.isLoved = isLoved
       self.loveStories[indexPath] = story
     }
+  }
+  
+  func loadedStoryUser(user: FirebaseUser) {
+    self.users.append(user)
   }
 }
 
@@ -365,6 +404,10 @@ extension ANIListView: ANIQnaViewCellDelegate {
       loveQna.isLoved = isLoved
       self.loveQnas[indexPath] = loveQna
     }
+  }
+  
+  func loadedQnaUser(user: FirebaseUser) {
+    self.users.append(user)
   }
 }
 

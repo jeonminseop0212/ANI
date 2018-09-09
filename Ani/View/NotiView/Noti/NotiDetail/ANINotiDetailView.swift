@@ -75,6 +75,7 @@ class ANINotiDetailView: UIView {
   private var qna: FirebaseQna?
   private var comment: FirebaseComment?
   private var loveUsers: [FirebaseUser]?
+  private var user: FirebaseUser?
   
   private weak var activityIndicatorView: NVActivityIndicatorView?
   
@@ -193,6 +194,9 @@ extension ANINotiDetailView: UITableViewDataSource {
         let recruitCellId = NSStringFromClass(ANIRecruitViewCell.self)
         let cell = tableView.dequeueReusableCell(withIdentifier: recruitCellId, for: indexPath) as! ANIRecruitViewCell
         
+        if let user = self.user {
+          cell.user = user
+        }
         cell.recruit = recruit
         cell.delegate = self
         cell.indexPath = indexPath.row
@@ -222,6 +226,9 @@ extension ANINotiDetailView: UITableViewDataSource {
           let supportCellId = NSStringFromClass(ANISupportViewCell.self)
           let cell = tableView.dequeueReusableCell(withIdentifier: supportCellId, for: indexPath) as! ANISupportViewCell
           
+          if let user = self.user {
+            cell.user = user
+          }
           cell.story = story
           cell.delegate = self
           cell.indexPath = indexPath.row
@@ -262,6 +269,9 @@ extension ANINotiDetailView: UITableViewDataSource {
           let storyCellId = NSStringFromClass(ANIStoryViewCell.self)
           let cell = tableView.dequeueReusableCell(withIdentifier: storyCellId, for: indexPath) as! ANIStoryViewCell
           
+          if let user = self.user {
+            cell.user = user
+          }
           cell.story = story
           cell.delegate = self
           cell.indexPath = indexPath.row
@@ -303,6 +313,9 @@ extension ANINotiDetailView: UITableViewDataSource {
         let qnaCellId = NSStringFromClass(ANIQnaViewCell.self)
         let cell = tableView.dequeueReusableCell(withIdentifier: qnaCellId, for: indexPath) as! ANIQnaViewCell
         
+        if let user = self.user {
+          cell.user = user
+        }
         cell.qna = qna
         cell.delegate = self
         cell.indexPath = indexPath.row
@@ -398,6 +411,10 @@ extension ANINotiDetailView: ANIRecruitViewCellDelegate {
     newRecruit.isSupported = isSupported
     self.recruit = newRecruit
   }
+  
+  func loadedRecruitUser(user: FirebaseUser) {
+    self.user = user
+  }
 }
 
 //MARK: ANIStoryViewCellDelegate
@@ -416,6 +433,10 @@ extension ANINotiDetailView: ANIStoryViewCellDelegate {
     var newStory = story
     newStory.isLoved = isLoved
     self.story = newStory
+  }
+  
+  func loadedStoryUser(user: FirebaseUser) {
+    self.user = user
   }
 }
 
@@ -445,6 +466,10 @@ extension ANINotiDetailView: ANIQnaViewCellDelegate {
     var newQna = qna
     newQna.isLoved = isLoved
     self.qna = newQna
+  }
+  
+  func loadedQnaUser(user: FirebaseUser) {
+    self.user = user
   }
 }
 

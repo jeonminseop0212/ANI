@@ -31,6 +31,7 @@ class ANIRecuruitView: UIView {
   }
   
   private var recruits = [FirebaseRecruit]()
+  private var users = [FirebaseUser]()
   
   var pickMode: FilterPickMode?
   var pickItem: String? {
@@ -213,6 +214,15 @@ extension ANIRecuruitView: UITableViewDataSource {
     let cell = tableView.dequeueReusableCell(withIdentifier: id, for: indexPath) as! ANIRecruitViewCell
     
     if !recruits.isEmpty {
+      for user in users {
+        if recruits[indexPath.row].userId == user.uid {
+          cell.user = user
+          break
+        }
+      }
+      if users.isEmpty {
+        cell.user = nil
+      }
       cell.recruit = recruits[indexPath.row]
       cell.delegate = self
       cell.indexPath = indexPath.row
@@ -271,6 +281,10 @@ extension ANIRecuruitView: ANIRecruitViewCellDelegate {
     recruit.isSupported = isSupported
     self.recruits[indexPath] = recruit
   }
+  
+  func loadedRecruitUser(user: FirebaseUser) {
+    self.users.append(user)
+  }
 }
 
 //MARK: data
@@ -285,6 +299,9 @@ extension ANIRecuruitView {
     
     if !self.recruits.isEmpty {
       self.recruits.removeAll()
+    }
+    if !self.users.isEmpty {
+      self.users.removeAll()
     }
     
     if sender == nil {

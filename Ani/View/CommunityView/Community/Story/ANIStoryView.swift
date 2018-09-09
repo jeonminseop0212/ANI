@@ -26,6 +26,7 @@ class ANIStoryView: UIView {
   
   private var stories = [FirebaseStory]()
   private var supportRecruits = [FirebaseRecruit]()
+  private var users = [FirebaseUser]()
   
   private weak var activityIndicatorView: NVActivityIndicatorView?
   
@@ -152,6 +153,15 @@ extension ANIStoryView: UITableViewDataSource {
         } else {
           cell.recruit = nil
         }
+        for user in users {
+          if stories[indexPath.row].userId == user.uid {
+            cell.user = user
+            break
+          }
+        }
+        if users.isEmpty {
+          cell.user = nil
+        }
         cell.story = stories[indexPath.row]
         cell.delegate = self
         cell.indexPath = indexPath.row
@@ -161,6 +171,15 @@ extension ANIStoryView: UITableViewDataSource {
         let storyCellId = NSStringFromClass(ANIStoryViewCell.self)
         let cell = tableView.dequeueReusableCell(withIdentifier: storyCellId, for: indexPath) as! ANIStoryViewCell
         
+        for user in users {
+          if stories[indexPath.row].userId == user.uid {
+            cell.user = user
+            break
+          }
+        }
+        if users.isEmpty {
+          cell.user = nil
+        }
         cell.story = stories[indexPath.row]
         cell.delegate = self
         cell.indexPath = indexPath.row
@@ -207,6 +226,10 @@ extension ANIStoryView: ANIStoryViewCellDelegate {
     story.isLoved = isLoved
     self.stories[indexPath] = story
   }
+  
+  func loadedStoryUser(user: FirebaseUser) {
+    self.users.append(user)
+  }
 }
 
 //MARK: ANISupportViewCellDelegate
@@ -238,6 +261,9 @@ extension ANIStoryView {
     }
     if !self.supportRecruits.isEmpty {
       self.supportRecruits.removeAll()
+    }
+    if !self.users.isEmpty {
+      self.users.removeAll()
     }
     
     if sender == nil {
