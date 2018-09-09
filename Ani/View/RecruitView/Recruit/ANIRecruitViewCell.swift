@@ -18,6 +18,7 @@ protocol ANIRecruitViewCellDelegate {
   func loadedRecruitIsLoved(indexPath: Int, isLoved: Bool)
   func loadedRecruitIsCliped(indexPath: Int, isCliped: Bool)
   func loadedRecruitIsSupported(indexPath: Int, isSupported: Bool)
+  func loadedRecruitUser(user: FirebaseUser)
 }
 
 class ANIRecruitViewCell: UITableViewCell {
@@ -45,7 +46,9 @@ class ANIRecruitViewCell: UITableViewCell {
     didSet {
       guard let recruit = self.recruit else { return }
       
-      loadUser()
+      if user == nil {
+        loadUser()
+      }
       if recruit.isLoved == nil {
         isLoved()
       }
@@ -63,7 +66,15 @@ class ANIRecruitViewCell: UITableViewCell {
   
   var indexPath: Int?
   
-  private var user: FirebaseUser?
+  var user: FirebaseUser? {
+    didSet {
+      guard let user = self.user else { return }
+      
+      DispatchQueue.main.async {
+        self.reloadUserLayout(user: user)
+      }
+    }
+  }
   
   private var loveListener: ListenerRegistration?
   private var supportListener: ListenerRegistration?
@@ -719,10 +730,7 @@ extension ANIRecruitViewCell {
         do {
           let user = try FirebaseDecoder().decode(FirebaseUser.self, from: data)
           self.user = user
-          
-          DispatchQueue.main.async {
-            self.reloadUserLayout(user: user)
-          }
+          self.delegate?.loadedRecruitUser(user: user)
         } catch let error {
           print(error)
         }

@@ -40,8 +40,11 @@ class ANIOtherProfileBasicView: UIView {
   private weak var basicTableView: UITableView?
   
   private var recruits = [FirebaseRecruit]()
+  private var recruitUsers = [FirebaseUser]()
   private var stories = [FirebaseStory]()
+  private var storyUsers = [FirebaseUser]()
   private var qnas = [FirebaseQna]()
+  private var qnaUsers = [FirebaseUser]()
   private var supportRecruits = [FirebaseRecruit]()
 
   private var isFollowed: Bool?
@@ -268,6 +271,15 @@ extension ANIOtherProfileBasicView: UITableViewDataSource {
         let recruitCellid = NSStringFromClass(ANIRecruitViewCell.self)
         let cell = tableView.dequeueReusableCell(withIdentifier: recruitCellid, for: indexPath) as! ANIRecruitViewCell
         
+        for user in recruitUsers {
+          if recruits[indexPath.row].userId == user.uid {
+            cell.user = user
+            break
+          }
+        }
+        if recruitUsers.isEmpty {
+          cell.user = nil
+        }
         cell.recruit = recruits[indexPath.row]
         cell.delegate = self
         cell.indexPath = indexPath.row
@@ -289,6 +301,15 @@ extension ANIOtherProfileBasicView: UITableViewDataSource {
             } else {
               cell.recruit = nil
             }
+            for user in storyUsers {
+              if stories[indexPath.row].userId == user.uid {
+                cell.user = user
+                break
+              }
+            }
+            if storyUsers.isEmpty {
+              cell.user = nil
+            }
             cell.story = stories[indexPath.row]
             cell.delegate = self
             cell.indexPath = indexPath.row
@@ -298,6 +319,15 @@ extension ANIOtherProfileBasicView: UITableViewDataSource {
             let storyCellId = NSStringFromClass(ANIStoryViewCell.self)
             let cell = tableView.dequeueReusableCell(withIdentifier: storyCellId, for: indexPath) as! ANIStoryViewCell
             
+            for user in storyUsers {
+              if stories[indexPath.row].userId == user.uid {
+                cell.user = user
+                break
+              }
+            }
+            if storyUsers.isEmpty {
+              cell.user = nil
+            }
             cell.story = stories[indexPath.row]
             cell.delegate = self
             cell.indexPath = indexPath.row
@@ -311,6 +341,15 @@ extension ANIOtherProfileBasicView: UITableViewDataSource {
         let qnaCellid = NSStringFromClass(ANIQnaViewCell.self)
         let cell = tableView.dequeueReusableCell(withIdentifier: qnaCellid, for: indexPath) as! ANIQnaViewCell
         
+        for user in qnaUsers {
+          if qnas[indexPath.row].userId == user.uid {
+            cell.user = user
+            break
+          }
+        }
+        if qnaUsers.isEmpty {
+          cell.user = nil
+        }
         cell.qna = qnas[indexPath.row]
         cell.delegate = self
         cell.indexPath = indexPath.row
@@ -413,6 +452,10 @@ extension ANIOtherProfileBasicView: ANIRecruitViewCellDelegate {
     recruit.isSupported = isSupported
     self.recruits[indexPath] = recruit
   }
+  
+  func loadedRecruitUser(user: FirebaseUser) {
+    self.recruitUsers.append(user)
+  }
 }
 
 //MARK: ANIStoryViewCellDelegate
@@ -429,6 +472,10 @@ extension ANIOtherProfileBasicView: ANIStoryViewCellDelegate {
     var story = self.stories[indexPath]
     story.isLoved = isLoved
     self.stories[indexPath] = story
+  }
+  
+  func loadedStoryUser(user: FirebaseUser) {
+    self.storyUsers.append(user)
   }
 }
 
@@ -457,6 +504,10 @@ extension ANIOtherProfileBasicView: ANIQnaViewCellDelegate {
     var qna = self.qnas[indexPath]
     qna.isLoved = isLoved
     self.qnas[indexPath] = qna
+  }
+  
+  func loadedQnaUser(user: FirebaseUser) {
+    self.qnaUsers.append(user)
   }
 }
 
@@ -499,6 +550,13 @@ extension ANIOtherProfileBasicView {
   private func loadRecruit(sender: UIRefreshControl?) {
     guard let user = self.user,
           let uid = user.uid else { return }
+    
+    if !self.recruits.isEmpty {
+      self.recruits.removeAll()
+    }
+    if !self.recruitUsers.isEmpty {
+      self.recruitUsers.removeAll()
+    }
     
     let database = Firestore.firestore()
     
@@ -554,6 +612,9 @@ extension ANIOtherProfileBasicView {
     if !self.supportRecruits.isEmpty {
       self.supportRecruits.removeAll()
     }
+    if !self.storyUsers.isEmpty {
+      self.storyUsers.removeAll()
+    }
     
     let database = Firestore.firestore()
     
@@ -605,6 +666,9 @@ extension ANIOtherProfileBasicView {
     
     if !self.qnas.isEmpty {
       self.qnas.removeAll()
+    }
+    if !self.qnaUsers.isEmpty {
+      self.qnaUsers.removeAll()
     }
     
     let database = Firestore.firestore()

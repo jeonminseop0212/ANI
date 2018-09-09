@@ -18,6 +18,7 @@ protocol ANISupportViewCellDelegate {
   func loadedRecruit(recruit: FirebaseRecruit)
   func popupOptionView(isMe: Bool, contentType: ContentType, id: String)
   func loadedStoryIsLoved(indexPath: Int, isLoved: Bool)
+  func loadedStoryUser(user: FirebaseUser)
 }
 
 class ANISupportViewCell: UITableViewCell {
@@ -51,10 +52,12 @@ class ANISupportViewCell: UITableViewCell {
     didSet {
       guard let story = self.story else { return }
       
+      if user == nil {
+        loadUser()
+      }
       if recruit == nil {
         loadRecruit()
       }
-      loadUser()
       if story.isLoved == nil {
         isLoved()
       }
@@ -73,7 +76,15 @@ class ANISupportViewCell: UITableViewCell {
     }
   }
   
-  private var user: FirebaseUser?
+  var user: FirebaseUser? {
+    didSet {
+      guard let user = self.user else { return }
+
+      DispatchQueue.main.async {
+        self.reloadUserLayout(user: user)
+      }
+    }
+  }
 
   private var recruitUser: FirebaseUser?
   
@@ -342,8 +353,6 @@ class ANISupportViewCell: UITableViewCell {
           let subTitleLabel = self.subTitleLabel,
           let loveButtonBG = self.loveButtonBG,
           let loveButton = self.loveButton,
-          let loveCountLabel = self.loveCountLabel,
-          let commentCountLabel = self.commentCountLabel,
           let story = self.story else { return }
     
     messageLabel.text = story.story
@@ -651,10 +660,7 @@ extension ANISupportViewCell {
         do {
           let user = try FirebaseDecoder().decode(FirebaseUser.self, from: data)
           self.user = user
-          
-          DispatchQueue.main.async {
-            self.reloadUserLayout(user: user)
-          }
+          self.delegate?.loadedStoryUser(user: user)
         } catch let error {
           print(error)
         }

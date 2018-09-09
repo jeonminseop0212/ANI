@@ -32,7 +32,9 @@ class ANISearchView: UIView {
   
   private var searchUsers = [FirebaseUser]()
   private var searchStories = [FirebaseStory]()
+  private var storyUsers = [FirebaseUser]()
   private var searchQnas = [FirebaseQna]()
+  private var qnaUsers = [FirebaseUser]()
   private var supportRecruits = [FirebaseRecruit]()
   
   var selectedCategory: SearchCategory = .user {
@@ -188,6 +190,12 @@ extension ANISearchView: UITableViewDataSource {
           } else {
             cell.recruit = nil
           }
+          for user in storyUsers {
+            if searchStories[indexPath.row].userId == user.uid {
+              cell.user = user
+              break
+            }
+          }
           cell.story = searchStories[indexPath.row]
           cell.delegate = self
           cell.indexPath = indexPath.row
@@ -197,6 +205,12 @@ extension ANISearchView: UITableViewDataSource {
           let storyCellId = NSStringFromClass(ANIStoryViewCell.self)
           let cell = tableView.dequeueReusableCell(withIdentifier: storyCellId, for: indexPath) as! ANIStoryViewCell
           
+          for user in storyUsers {
+            if searchStories[indexPath.row].userId == user.uid {
+              cell.user = user
+              break
+            }
+          }
           cell.story = searchStories[indexPath.row]
           cell.delegate = self
           cell.indexPath = indexPath.row
@@ -210,6 +224,12 @@ extension ANISearchView: UITableViewDataSource {
       let qnaId = NSStringFromClass(ANIQnaViewCell.self)
       let cell = tableView.dequeueReusableCell(withIdentifier: qnaId, for: indexPath) as! ANIQnaViewCell
       
+      for user in qnaUsers {
+        if searchQnas[indexPath.row].userId == user.uid {
+          cell.user = user
+          break
+        }
+      }
       cell.qna = searchQnas[indexPath.row]
       cell.delegate = self
       cell.indexPath = indexPath.row
@@ -266,6 +286,10 @@ extension ANISearchView: ANIStoryViewCellDelegate {
     searchStory.isLoved = isLoved
     self.searchStories[indexPath] = searchStory
   }
+  
+  func loadedStoryUser(user: FirebaseUser) {
+    self.storyUsers.append(user)
+  }
 }
 
 //MARK: ANISupportViewCellDelegate
@@ -293,6 +317,10 @@ extension ANISearchView: ANIQnaViewCellDelegate {
     var searchQna = self.searchQnas[indexPath]
     searchQna.isLoved = isLoved
     self.searchQnas[indexPath] = searchQna
+  }
+  
+  func loadedQnaUser(user: FirebaseUser) {
+    self.qnaUsers.append(user)
   }
 }
 

@@ -17,6 +17,7 @@ protocol ANIQnaViewCellDelegate {
   func reject()
   func popupOptionView(isMe: Bool, contentType: ContentType, id: String)
   func loadedQnaIsLoved(indexPath: Int, isLoved: Bool)
+  func loadedQnaUser(user: FirebaseUser)
 }
 
 class ANIQnaViewCell: UITableViewCell {
@@ -40,7 +41,9 @@ class ANIQnaViewCell: UITableViewCell {
     didSet {
       guard let qna = self.qna else { return }
       
-      loadUser()
+      if user == nil {
+        loadUser()
+      }
       if qna.isLoved == nil {
         isLoved()
       }
@@ -50,7 +53,15 @@ class ANIQnaViewCell: UITableViewCell {
     }
   }
   
-  private var user: FirebaseUser?
+  var user: FirebaseUser? {
+    didSet {
+      guard let user = self.user else { return }
+
+      DispatchQueue.main.async {
+        self.reloadUserLayout(user: user)
+      }
+    }
+  }
   
   private var loveListener: ListenerRegistration?
   private var commentListener: ListenerRegistration?
@@ -475,10 +486,7 @@ extension ANIQnaViewCell {
         do {
           let user = try FirebaseDecoder().decode(FirebaseUser.self, from: data)
           self.user = user
-          
-          DispatchQueue.main.async {
-            self.reloadUserLayout(user: user)
-          }
+          self.delegate?.loadedQnaUser(user: user)
         } catch let error {
           print(error)
         }

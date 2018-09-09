@@ -24,6 +24,7 @@ class ANIQnaView: UIView {
   private weak var qnaTableView: UITableView?
   
   private var qnas = [FirebaseQna]()
+  private var users = [FirebaseUser]()
   
   private weak var activityIndicatorView: NVActivityIndicatorView?
   
@@ -137,6 +138,15 @@ extension ANIQnaView: UITableViewDataSource {
     let cell = tableView.dequeueReusableCell(withIdentifier: id, for: indexPath) as! ANIQnaViewCell
 
     if !qnas.isEmpty {
+      for user in users {
+        if qnas[indexPath.row].userId == user.uid {
+          cell.user = user
+          break
+        }
+      }
+      if users.isEmpty {
+        cell.user = nil
+      }
       cell.qna = qnas[indexPath.row]
       cell.delegate = self
       cell.indexPath = indexPath.row
@@ -175,6 +185,10 @@ extension ANIQnaView: ANIQnaViewCellDelegate {
     qna.isLoved = isLoved
     self.qnas[indexPath] = qna
   }
+  
+  func loadedQnaUser(user: FirebaseUser) {
+    self.users.append(user)
+  }
 }
 
 //MARK: data
@@ -188,6 +202,9 @@ extension ANIQnaView {
     
     if !self.qnas.isEmpty {
       self.qnas.removeAll()
+    }
+    if !self.users.isEmpty {
+      self.users.removeAll()
     }
     
     if sender == nil {
