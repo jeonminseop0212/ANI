@@ -270,6 +270,7 @@ extension ANIOtherProfileBasicView: UITableViewDataSource {
         
         cell.recruit = recruits[indexPath.row]
         cell.delegate = self
+        cell.indexPath = indexPath.row
         
         return cell
       } else if contentType == .story {
@@ -290,6 +291,7 @@ extension ANIOtherProfileBasicView: UITableViewDataSource {
             }
             cell.story = stories[indexPath.row]
             cell.delegate = self
+            cell.indexPath = indexPath.row
             
             return cell
           } else {
@@ -298,6 +300,7 @@ extension ANIOtherProfileBasicView: UITableViewDataSource {
             
             cell.story = stories[indexPath.row]
             cell.delegate = self
+            cell.indexPath = indexPath.row
             
             return cell
           }
@@ -310,6 +313,7 @@ extension ANIOtherProfileBasicView: UITableViewDataSource {
         
         cell.qna = qnas[indexPath.row]
         cell.delegate = self
+        cell.indexPath = indexPath.row
         
         return cell
       }
@@ -391,6 +395,24 @@ extension ANIOtherProfileBasicView: ANIRecruitViewCellDelegate {
   func reject() {
     self.delegate?.reject()
   }
+  
+  func loadedRecruitIsLoved(indexPath: Int, isLoved: Bool) {
+    var recruit = self.recruits[indexPath]
+    recruit.isLoved = isLoved
+    self.recruits[indexPath] = recruit
+  }
+  
+  func loadedRecruitIsCliped(indexPath: Int, isCliped: Bool) {
+    var recruit = self.recruits[indexPath]
+    recruit.isCliped = isCliped
+    self.recruits[indexPath] = recruit
+  }
+  
+  func loadedRecruitIsSupported(indexPath: Int, isSupported: Bool) {
+    var recruit = self.recruits[indexPath]
+    recruit.isSupported = isSupported
+    self.recruits[indexPath] = recruit
+  }
 }
 
 //MARK: ANIStoryViewCellDelegate
@@ -401,6 +423,12 @@ extension ANIOtherProfileBasicView: ANIStoryViewCellDelegate {
   
   func popupOptionView(isMe: Bool, contentType: ContentType, id: String) {
     self.delegate?.popupOptionView(isMe: isMe, contentType: contentType, id: id)
+  }
+
+  func loadedStoryIsLoved(indexPath: Int, isLoved: Bool) {
+    var story = self.stories[indexPath]
+    story.isLoved = isLoved
+    self.stories[indexPath] = story
   }
 }
 
@@ -423,6 +451,12 @@ extension ANIOtherProfileBasicView: ANISupportViewCellDelegate {
 extension ANIOtherProfileBasicView: ANIQnaViewCellDelegate {
   func cellTapped(qna: FirebaseQna, user: FirebaseUser) {
     self.delegate?.qnaViewCellDidSelect(selectedQna: qna, user: user)
+  }
+  
+  func loadedQnaIsLoved(indexPath: Int, isLoved: Bool) {
+    var qna = self.qnas[indexPath]
+    qna.isLoved = isLoved
+    self.qnas[indexPath] = qna
   }
 }
 

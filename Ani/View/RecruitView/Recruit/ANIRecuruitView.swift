@@ -215,6 +215,7 @@ extension ANIRecuruitView: UITableViewDataSource {
     if !recruits.isEmpty {
       cell.recruit = recruits[indexPath.row]
       cell.delegate = self
+      cell.indexPath = indexPath.row
     }
     
     return cell
@@ -251,6 +252,24 @@ extension ANIRecuruitView: ANIRecruitViewCellDelegate {
   
   func reject() {
     self.delegate?.reject()
+  }
+  
+  func loadedRecruitIsLoved(indexPath: Int, isLoved: Bool) {
+    var recruit = self.recruits[indexPath]
+    recruit.isLoved = isLoved
+    self.recruits[indexPath] = recruit
+  }
+  
+  func loadedRecruitIsCliped(indexPath: Int, isCliped: Bool) {
+    var recruit = self.recruits[indexPath]
+    recruit.isCliped = isCliped
+    self.recruits[indexPath] = recruit
+  }
+  
+  func loadedRecruitIsSupported(indexPath: Int, isSupported: Bool) {
+    var recruit = self.recruits[indexPath]
+    recruit.isSupported = isSupported
+    self.recruits[indexPath] = recruit
   }
 }
 
@@ -316,8 +335,6 @@ extension ANIRecuruitView {
         }
         
         if snapshot.documents.isEmpty {
-          guard let recruitTableView = self.recruitTableView else { return }
-          
           if !self.recruits.isEmpty {
             self.recruits.removeAll()
           }

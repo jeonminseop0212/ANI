@@ -164,6 +164,7 @@ extension ANIListView: UITableViewDataSource {
       
       cell.recruit = loveRecruits[indexPath.row]
       cell.delegate = self
+      cell.indexPath = indexPath.row
       
       return cell
     case .loveStroy:
@@ -184,6 +185,7 @@ extension ANIListView: UITableViewDataSource {
           }
           cell.story = loveStories[indexPath.row]
           cell.delegate = self
+          cell.indexPath = indexPath.row
           
           return cell
         } else {
@@ -192,6 +194,7 @@ extension ANIListView: UITableViewDataSource {
           
           cell.story = loveStories[indexPath.row]
           cell.delegate = self
+          cell.indexPath = indexPath.row
           
           return cell
         }
@@ -204,6 +207,7 @@ extension ANIListView: UITableViewDataSource {
       
       cell.qna = loveQnas[indexPath.row]
       cell.delegate = self
+      cell.indexPath = indexPath.row
       
       return cell
     case .clipRecruit:
@@ -212,6 +216,7 @@ extension ANIListView: UITableViewDataSource {
       
       cell.recruit = clipRecruits[indexPath.row]
       cell.delegate = self
+      cell.indexPath = indexPath.row
       
       return cell
     }
@@ -266,6 +271,48 @@ extension ANIListView: ANIRecruitViewCellDelegate {
   func cellTapped(recruit: FirebaseRecruit, user: FirebaseUser) {
     self.delegate?.recruitViewCellDidSelect(selectedRecruit: recruit, user: user)
   }
+  
+  func loadedRecruitIsLoved(indexPath: Int, isLoved: Bool) {
+    guard let list = self.list else { return }
+
+    if list == .loveRecruit {
+      var recruit = self.loveRecruits[indexPath]
+      recruit.isLoved = isLoved
+      self.loveRecruits[indexPath] = recruit
+    } else if list == .clipRecruit {
+      var recruit = self.clipRecruits[indexPath]
+      recruit.isLoved = isLoved
+      self.clipRecruits[indexPath] = recruit
+    }
+  }
+  
+  func loadedRecruitIsCliped(indexPath: Int, isCliped: Bool) {
+    guard let list = self.list else { return }
+    
+    if list == .loveRecruit {
+      var recruit = self.loveRecruits[indexPath]
+      recruit.isCliped = isCliped
+      self.loveRecruits[indexPath] = recruit
+    } else if list == .clipRecruit {
+      var recruit = self.clipRecruits[indexPath]
+      recruit.isCliped = isCliped
+      self.clipRecruits[indexPath] = recruit
+    }
+  }
+  
+  func loadedRecruitIsSupported(indexPath: Int, isSupported: Bool) {
+    guard let list = self.list else { return }
+    
+    if list == .loveRecruit {
+      var recruit = self.loveRecruits[indexPath]
+      recruit.isSupported = isSupported
+      self.loveRecruits[indexPath] = recruit
+    } else if list == .clipRecruit {
+      var recruit = self.clipRecruits[indexPath]
+      recruit.isSupported = isSupported
+      self.clipRecruits[indexPath] = recruit
+    }
+  }
 }
 
 //MARK: ANIStoryViewCellDelegate
@@ -276,6 +323,16 @@ extension ANIListView: ANIStoryViewCellDelegate {
   
   func popupOptionView(isMe: Bool, contentType: ContentType, id: String) {
     self.delegate?.popupOptionView(isMe: isMe, contentType: contentType, id: id)
+  }
+  
+  func loadedStoryIsLoved(indexPath: Int, isLoved: Bool) {
+    guard let list = self.list else { return }
+
+    if list == .loveStroy {
+      var story = self.loveStories[indexPath]
+      story.isLoved = isLoved
+      self.loveStories[indexPath] = story
+    }
   }
 }
 
@@ -299,6 +356,16 @@ extension ANIListView: ANIQnaViewCellDelegate {
   func cellTapped(qna: FirebaseQna, user: FirebaseUser) {
     self.delegate?.qnaViewCellDidSelect(selectedQna: qna, user: user)
   }
+  
+  func loadedQnaIsLoved(indexPath: Int, isLoved: Bool) {
+    guard let list = self.list else { return }
+
+    if list == .loveQuestion {
+      var loveQna = self.loveQnas[indexPath]
+      loveQna.isLoved = isLoved
+      self.loveQnas[indexPath] = loveQna
+    }
+  }
 }
 
 //MARK: data
@@ -319,7 +386,7 @@ extension ANIListView {
         
         guard let snapshot = snapshot else { return }
         
-        let group =  DispatchGroup()
+        let group = DispatchGroup()
         var loveRecruitsTemp = [FirebaseRecruit?]()
         
         for (index, document) in snapshot.documents.enumerated() {
@@ -396,7 +463,7 @@ extension ANIListView {
         
         guard let snapshot = snapshot else { return }
         
-        let group =  DispatchGroup()
+        let group = DispatchGroup()
         var loveStoriesTemp = [FirebaseStory?]()
         
         for (index, document) in snapshot.documents.enumerated() {
@@ -477,7 +544,7 @@ extension ANIListView {
         
         guard let snapshot = snapshot else { return }
         
-        let group =  DispatchGroup()
+        let group = DispatchGroup()
         var loveQnasTemp = [FirebaseQna?]()
         
         for (index, document) in snapshot.documents.enumerated() {
@@ -557,7 +624,7 @@ extension ANIListView {
         
         guard let snapshot = snapshot else { return }
         
-        let group =  DispatchGroup()
+        let group = DispatchGroup()
         var clipRecruitsTemp = [FirebaseRecruit?]()
         
         for (index, document) in snapshot.documents.enumerated() {

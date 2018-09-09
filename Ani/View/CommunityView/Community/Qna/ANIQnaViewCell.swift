@@ -16,6 +16,7 @@ protocol ANIQnaViewCellDelegate {
   func cellTapped(qna: FirebaseQna, user: FirebaseUser)
   func reject()
   func popupOptionView(isMe: Bool, contentType: ContentType, id: String)
+  func loadedQnaIsLoved(indexPath: Int, isLoved: Bool)
 }
 
 class ANIQnaViewCell: UITableViewCell {
@@ -37,9 +38,13 @@ class ANIQnaViewCell: UITableViewCell {
   
   var qna: FirebaseQna? {
     didSet {
-      reloadLayout()
+      guard let qna = self.qna else { return }
+      
       loadUser()
-      isLoved()
+      if qna.isLoved == nil {
+        isLoved()
+      }
+      reloadLayout()
       observeLove()
       observeComment()
     }
@@ -49,6 +54,8 @@ class ANIQnaViewCell: UITableViewCell {
   
   private var loveListener: ListenerRegistration?
   private var commentListener: ListenerRegistration?
+  
+  var indexPath: Int?
   
   var delegate: ANIQnaViewCellDelegate?
   
@@ -210,8 +217,6 @@ class ANIQnaViewCell: UITableViewCell {
           let qnaImagesView = self.qnaImagesView,
           let loveButtonBG = self.loveButtonBG,
           let loveButton = self.loveButton,
-          let loveCountLabel = self.loveCountLabel,
-          let commentCountLabel = self.commentCountLabel,
           let qna = self.qna,
           let qnaImagesViewHeightConstraint = self.qnaImagesViewHeightConstraint else { return }
     
@@ -232,16 +237,12 @@ class ANIQnaViewCell: UITableViewCell {
       loveButton.isEnabled = true
     }
     loveButton.isSelected = false
-    if let loveIds = qna.loveIds {
-      loveCountLabel.text = "\(loveIds.count)"
-    } else {
-      loveCountLabel.text = "0"
-    }
-    
-    if let commentIds = qna.commentIds {
-      commentCountLabel.text = "\(commentIds.count)"
-    } else {
-      commentCountLabel.text = "0"
+    if let isLoved = qna.isLoved {
+      if isLoved {
+        loveButton.isSelected = true
+      } else {
+        loveButton.isSelected = false
+      }
     }
   }
   
@@ -260,6 +261,8 @@ class ANIQnaViewCell: UITableViewCell {
           let qnaId = qna.id,
           let loveCountLabel = self.loveCountLabel else { return }
     
+    loveCountLabel.text = "0"
+
     let database = Firestore.firestore()
     DispatchQueue.global().async {
       self.loveListener = database.collection(KEY_QNAS).document(qnaId).collection(KEY_LOVE_IDS).addSnapshotListener({ (snapshot, error) in
@@ -291,6 +294,8 @@ class ANIQnaViewCell: UITableViewCell {
           let qnaId = qna.id,
           let commentCountLabel = self.commentCountLabel else { return }
     
+    commentCountLabel.text = "0"
+
     let database = Firestore.firestore()
     DispatchQueue.global().async {
       self.commentListener = database.collection(KEY_QNAS).document(qnaId).collection(KEY_COMMENTS).addSnapshotListener({ (snapshot, error) in
@@ -333,13 +338,23 @@ class ANIQnaViewCell: UITableViewCell {
         
         guard let snapshot = snapshot else { return }
         
-        for document in snapshot.documents {
-          if document.documentID == currentUserId {
-            DispatchQueue.main.async {
+        var isLoved = false
+        
+        DispatchQueue.main.async {
+          for document in snapshot.documents {
+            if document.documentID == currentUserId {
               guard let loveButton = self.loveButton else { return }
               
               loveButton.isSelected = true
+              isLoved = true
+              break
+            } else {
+              isLoved = false
             }
+          }
+          
+          if let indexPath = self.indexPath {
+            self.delegate?.loadedQnaIsLoved(indexPath: indexPath, isLoved: isLoved)
           }
         }
       })
@@ -378,7 +393,8 @@ class ANIQnaViewCell: UITableViewCell {
     guard let qna = self.qna,
           let qnaId = qna.id,
           let currentUserId = ANISessionManager.shared.currentUserUid,
-          let loveButton = self.loveButton else { return }
+          let loveButton = self.loveButton,
+          let indexPath = self.indexPath else { return }
     
     let database = Firestore.firestore()
     
@@ -390,11 +406,15 @@ class ANIQnaViewCell: UITableViewCell {
         database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_QNA_IDS).document(qnaId).setData([KEY_DATE: date])
         
         self.updateNoti()
+        
+        self.delegate?.loadedQnaIsLoved(indexPath: indexPath, isLoved: true)
       }
     } else {
       DispatchQueue.global().async {
         database.collection(KEY_QNAS).document(qnaId).collection(KEY_LOVE_IDS).document(currentUserId).delete()
         database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_QNA_IDS).document(qnaId).delete()
+        
+        self.delegate?.loadedQnaIsLoved(indexPath: indexPath, isLoved: false)
       }
     }
   }

@@ -139,6 +139,7 @@ extension ANIQnaView: UITableViewDataSource {
     if !qnas.isEmpty {
       cell.qna = qnas[indexPath.row]
       cell.delegate = self
+      cell.indexPath = indexPath.row
     }
     
     return cell
@@ -167,6 +168,12 @@ extension ANIQnaView: ANIQnaViewCellDelegate {
   
   func reject() {
     self.delegate?.reject()
+  }
+  
+  func loadedQnaIsLoved(indexPath: Int, isLoved: Bool) {
+    var qna = self.qnas[indexPath]
+    qna.isLoved = isLoved
+    self.qnas[indexPath] = qna
   }
 }
 

@@ -15,6 +15,9 @@ protocol ANIRecruitViewCellDelegate {
   func cellTapped(recruit: FirebaseRecruit, user: FirebaseUser)
   func supportButtonTapped(supportRecruit: FirebaseRecruit, user: FirebaseUser)
   func reject()
+  func loadedRecruitIsLoved(indexPath: Int, isLoved: Bool)
+  func loadedRecruitIsCliped(indexPath: Int, isCliped: Bool)
+  func loadedRecruitIsSupported(indexPath: Int, isSupported: Bool)
 }
 
 class ANIRecruitViewCell: UITableViewCell {
@@ -40,15 +43,25 @@ class ANIRecruitViewCell: UITableViewCell {
   
   var recruit: FirebaseRecruit? {
     didSet {
-      reloadLayout()
+      guard let recruit = self.recruit else { return }
+      
       loadUser()
-      isLoved()
-      isSupported()
-      isClipped()
+      if recruit.isLoved == nil {
+        isLoved()
+      }
+      if recruit.isSupported == nil {
+        isSupported()
+      }
+      if recruit.isCliped == nil {
+        isClipped()
+      }
+      reloadLayout()
       observeLove()
       observeSupport()
     }
   }
+  
+  var indexPath: Int?
   
   private var user: FirebaseUser?
   
@@ -324,6 +337,13 @@ class ANIRecruitViewCell: UITableViewCell {
     subTitleLabel.text = recruit.reason
     
     supportButton.tintColor = ANIColor.gray
+    if let isSupported = recruit.isSupported {
+      if isSupported {
+        supportButton.tintColor = ANIColor.moreDarkGray
+      } else {
+        supportButton.tintColor = ANIColor.gray
+      }
+    }
     
     if ANISessionManager.shared.isAnonymous {
       loveButtonBG.isUserInteractionEnabled = true
@@ -333,8 +353,22 @@ class ANIRecruitViewCell: UITableViewCell {
       loveButton.isEnabled = true
     }
     loveButton.isSelected = false
+    if let isLoved = recruit.isLoved {
+      if isLoved {
+        loveButton.isSelected = true
+      } else {
+        loveButton.isSelected = false
+      }
+    }
     
     clipButton.tintColor = ANIColor.gray
+    if let isCliped = recruit.isCliped {
+      if isCliped {
+        clipButton.tintColor = ANIColor.moreDarkGray
+      } else {
+        clipButton.tintColor = ANIColor.gray
+      }
+    }
   }
   
   private func reloadUserLayout(user: FirebaseUser) {
@@ -351,6 +385,8 @@ class ANIRecruitViewCell: UITableViewCell {
     guard let recruit = self.recruit,
           let recuritId = recruit.id,
           let loveCountLabel = self.loveCountLabel else { return }
+    
+    loveCountLabel.text = "0"
 
     let database = Firestore.firestore()
     DispatchQueue.global().async {
@@ -382,6 +418,8 @@ class ANIRecruitViewCell: UITableViewCell {
     guard let recruit = self.recruit,
           let recuritId = recruit.id,
           let supportCountLabel = self.supportCountLabel else { return }
+    
+    supportCountLabel.text = "0"
     
     let database = Firestore.firestore()
     DispatchQueue.global().async {
@@ -426,14 +464,24 @@ class ANIRecruitViewCell: UITableViewCell {
         }
         
         guard let snapshot = snapshot else { return }
+
+        var isLoved = false
         
-        for document in snapshot.documents {
-          if document.documentID == currentUserId {
-            DispatchQueue.main.async {
+        DispatchQueue.main.async {
+          for document in snapshot.documents {
+            if document.documentID == currentUserId {
               guard let loveButton = self.loveButton else { return }
               
               loveButton.isSelected = true
+              isLoved = true
+              break
+            } else {
+              isLoved = false
             }
+          }
+          
+          if let indexPath = self.indexPath {
+            self.delegate?.loadedRecruitIsLoved(indexPath: indexPath, isLoved: isLoved)
           }
         }
       })
@@ -443,7 +491,9 @@ class ANIRecruitViewCell: UITableViewCell {
   private func isSupported() {
     guard let recruit = self.recruit,
           let recuritId = recruit.id,
-          let currentUserId = ANISessionManager.shared.currentUserUid else { return }
+          let currentUserId = ANISessionManager.shared.currentUserUid,
+          let supportButton = self.supportButton else { return }
+
     
     let database = Firestore.firestore()
     
@@ -457,13 +507,21 @@ class ANIRecruitViewCell: UITableViewCell {
         
         guard let snapshot = snapshot else { return }
         
-        for document in snapshot.documents {
-          if document.documentID == currentUserId {
-            DispatchQueue.main.async {
-              guard let supportButton = self.supportButton else { return }
-              
+        var isSuport = false
+
+        DispatchQueue.main.async {
+          for document in snapshot.documents {
+            if document.documentID == currentUserId {
               supportButton.tintColor = ANIColor.moreDarkGray
+              isSuport = true
+              break
+            } else {
+              isSuport = false
             }
+          }
+          
+          if let indexPath = self.indexPath {
+            self.delegate?.loadedRecruitIsSupported(indexPath: indexPath, isSupported: isSuport)
           }
         }
       })
@@ -487,13 +545,23 @@ class ANIRecruitViewCell: UITableViewCell {
         
         guard let snapshot = snapshot else { return }
         
-        for document in snapshot.documents {
-          if document.documentID == currentUserId {
-            DispatchQueue.main.async {
+        var isCliped = false
+        
+        DispatchQueue.main.async {
+          for document in snapshot.documents {
+            if document.documentID == currentUserId {
               guard let clipButton = self.clipButton else { return }
               
               clipButton.tintColor = ANIColor.moreDarkGray
+              isCliped = true
+              break
+            } else {
+              isCliped = false
             }
+          }
+          
+          if let indexPath = self.indexPath {
+            self.delegate?.loadedRecruitIsCliped(indexPath: indexPath, isCliped: isCliped)
           }
         }
       })
@@ -531,7 +599,8 @@ class ANIRecruitViewCell: UITableViewCell {
     guard let recruit = self.recruit,
           let recuritId = recruit.id,
           let currentUserId = ANISessionManager.shared.currentUserUid,
-          let loveButton = self.loveButton else { return }
+          let loveButton = self.loveButton,
+          let indexPath = self.indexPath else { return }
 
     let database = Firestore.firestore()
     
@@ -543,11 +612,15 @@ class ANIRecruitViewCell: UITableViewCell {
         database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_RECRUIT_IDS).document(recuritId).setData([KEY_DATE: date])
 
         self.updateNoti()
+        
+        self.delegate?.loadedRecruitIsLoved(indexPath: indexPath, isLoved: true)
       }
     } else {
       DispatchQueue.global().async {
         database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_LOVE_IDS).document(currentUserId).delete()
         database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_RECRUIT_IDS).document(recuritId).delete()
+        
+        self.delegate?.loadedRecruitIsLoved(indexPath: indexPath, isLoved: false)
       }
     }
   }
@@ -555,14 +628,17 @@ class ANIRecruitViewCell: UITableViewCell {
   @objc private func support() {
     guard let supportButton = self.supportButton,
           let recruit = self.recruit,
-          let user = self.user else { return }
+          let user = self.user,
+          let indexPath = self.indexPath else { return }
     
     if !ANISessionManager.shared.isAnonymous {
       if supportButton.tintColor == ANIColor.gray {
         self.delegate?.supportButtonTapped(supportRecruit: recruit, user: user)
+        self.delegate?.loadedRecruitIsSupported(indexPath: indexPath, isSupported: true)
       }
     } else {
       self.delegate?.reject()
+      self.delegate?.loadedRecruitIsSupported(indexPath: indexPath, isSupported: false)
     }
   }
   
@@ -570,7 +646,8 @@ class ANIRecruitViewCell: UITableViewCell {
     guard let recruit = self.recruit,
           let recuritId = recruit.id,
           let currentUserId = ANISessionManager.shared.currentUserUid,
-          let clipButton = self.clipButton else { return }
+          let clipButton = self.clipButton,
+          let indexPath = self.indexPath else { return }
     
     if !ANISessionManager.shared.isAnonymous {
       let database = Firestore.firestore()
@@ -584,6 +661,8 @@ class ANIRecruitViewCell: UITableViewCell {
         database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_CLIP_IDS).document(currentUserId).setData([currentUserId: true])
           let date = ANIFunction.shared.getToday()
           database.collection(KEY_USERS).document(currentUserId).collection(KEY_CLIP_RECRUIT_IDS).document(recuritId).setData([KEY_DATE: date])
+          
+          self.delegate?.loadedRecruitIsCliped(indexPath: indexPath, isCliped: true)
         }
       } else {
         UIView.animate(withDuration: 0.15) {
@@ -593,6 +672,8 @@ class ANIRecruitViewCell: UITableViewCell {
         DispatchQueue.global().async {
           database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_CLIP_IDS).document(currentUserId).delete()
           database.collection(KEY_USERS).document(currentUserId).collection(KEY_CLIP_RECRUIT_IDS).document(recuritId).delete()
+          
+          self.delegate?.loadedRecruitIsCliped(indexPath: indexPath, isCliped: false)
         }
       }
     } else {
