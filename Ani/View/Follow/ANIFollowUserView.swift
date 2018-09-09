@@ -210,7 +210,7 @@ extension ANIFollowUserView {
       
       guard let snapshot = snapshot else { return }
       
-      let group =  DispatchGroup()
+      let group = DispatchGroup()
       var followUserTemp = [FirebaseUser?]()
       
       for (index, document) in snapshot.documents.enumerated() {

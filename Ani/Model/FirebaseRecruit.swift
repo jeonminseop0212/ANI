@@ -25,4 +25,7 @@ struct FirebaseRecruit: Codable {
   let recruitState: Int
   let userId: String
   let date: String
+  var isLoved: Bool?
+  var isCliped: Bool?
+  var isSupported: Bool?
 }

@@ -154,6 +154,7 @@ extension ANIStoryView: UITableViewDataSource {
         }
         cell.story = stories[indexPath.row]
         cell.delegate = self
+        cell.indexPath = indexPath.row
         
         return cell
       } else {
@@ -162,6 +163,7 @@ extension ANIStoryView: UITableViewDataSource {
         
         cell.story = stories[indexPath.row]
         cell.delegate = self
+        cell.indexPath = indexPath.row
         
         return cell
       }
@@ -198,6 +200,12 @@ extension ANIStoryView: ANIStoryViewCellDelegate {
   
   func popupOptionView(isMe: Bool, contentType: ContentType, id: String) {
     self.delegate?.popupOptionView(isMe: isMe, contentType: contentType, id: id)
+  }
+  
+  func loadedStoryIsLoved(indexPath: Int, isLoved: Bool) {
+    var story = self.stories[indexPath]
+    story.isLoved = isLoved
+    self.stories[indexPath] = story
   }
 }
 

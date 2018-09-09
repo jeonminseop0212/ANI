@@ -190,6 +190,7 @@ extension ANISearchView: UITableViewDataSource {
           }
           cell.story = searchStories[indexPath.row]
           cell.delegate = self
+          cell.indexPath = indexPath.row
           
           return cell
         } else {
@@ -198,6 +199,7 @@ extension ANISearchView: UITableViewDataSource {
           
           cell.story = searchStories[indexPath.row]
           cell.delegate = self
+          cell.indexPath = indexPath.row
           
           return cell
         }
@@ -210,6 +212,7 @@ extension ANISearchView: UITableViewDataSource {
       
       cell.qna = searchQnas[indexPath.row]
       cell.delegate = self
+      cell.indexPath = indexPath.row
       
       return cell
     }
@@ -257,6 +260,12 @@ extension ANISearchView: ANIStoryViewCellDelegate {
   func popupOptionView(isMe: Bool, contentType: ContentType, id: String) {
     self.delegate?.popupOptionView(isMe: isMe, contentType: contentType, id: id)
   }
+  
+  func loadedStoryIsLoved(indexPath: Int, isLoved: Bool) {
+    var searchStory = self.searchStories[indexPath]
+    searchStory.isLoved = isLoved
+    self.searchStories[indexPath] = searchStory
+  }
 }
 
 //MARK: ANISupportViewCellDelegate
@@ -278,6 +287,12 @@ extension ANISearchView: ANISupportViewCellDelegate {
 extension ANISearchView: ANIQnaViewCellDelegate {
   func cellTapped(qna: FirebaseQna, user: FirebaseUser) {
     self.delegate?.qnaViewCellDidSelect(selectedQna: qna, user: user)
+  }
+  
+  func loadedQnaIsLoved(indexPath: Int, isLoved: Bool) {
+    var searchQna = self.searchQnas[indexPath]
+    searchQna.isLoved = isLoved
+    self.searchQnas[indexPath] = searchQna
   }
 }
 

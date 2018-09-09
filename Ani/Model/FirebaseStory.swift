@@ -19,5 +19,6 @@ struct FirebaseStory: Codable {
   let recruitTitle: String?
   let recruitSubTitle: String?
   let date: String
+  var isLoved: Bool?
 }
 
