@@ -18,6 +18,7 @@ class ANIOtherProfileViewController: UIViewController {
   private weak var myNavigationBase: UIView?
   private weak var navigationTitleLabel: UILabel?
   private weak var backButton: UIButton?
+  private weak var optionButton: UIButton?
   
   private weak var profileBasicView: ANIOtherProfileBasicView?
   
@@ -30,8 +31,7 @@ class ANIOtherProfileViewController: UIViewController {
   var userId: String?
   
   private var contentType: ContentType?
-  private var contributionId: String?
-  
+  private var reportId: String?
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -81,6 +81,19 @@ class ANIOtherProfileViewController: UIViewController {
     backButton.centerYToSuperview()
     self.backButton = backButton
     
+    //optionButton
+    let optionButton = UIButton()
+    let optionButtonImage = UIImage(named: "optionButton")?.withRenderingMode(.alwaysTemplate)
+    optionButton.setImage(optionButtonImage, for: .normal)
+    optionButton.tintColor = ANIColor.dark
+    optionButton.addTarget(self, action: #selector(option), for: .touchUpInside)
+    myNavigationBase.addSubview(optionButton)
+    optionButton.width(50.0)
+    optionButton.height(44.0)
+    optionButton.rightToSuperview()
+    optionButton.centerYToSuperview()
+    self.optionButton = optionButton
+    
     //navigationTitleLabel
     let navigationTitleLabel = UILabel()
     navigationTitleLabel.text = "プロフィール"
@@ -90,7 +103,7 @@ class ANIOtherProfileViewController: UIViewController {
     myNavigationBase.addSubview(navigationTitleLabel)
     navigationTitleLabel.centerYToSuperview()
     navigationTitleLabel.leftToRight(of: backButton)
-    navigationTitleLabel.rightToSuperview(offset: 44.0)
+    navigationTitleLabel.rightToLeft(of: optionButton)
     self.navigationTitleLabel = navigationTitleLabel
     
     //profileBasicView
@@ -157,6 +170,17 @@ class ANIOtherProfileViewController: UIViewController {
     let initialViewController = ANIInitialViewController()
     let navigationController = UINavigationController(rootViewController: initialViewController)
     self.present(navigationController, animated: true, completion: nil)
+  }
+  
+  @objc private func option() {
+    self.contentType = .user
+    self.reportId = userId
+    
+    let popupOptionViewController = ANIPopupOptionViewController()
+    popupOptionViewController.modalPresentationStyle = .overCurrentContext
+    popupOptionViewController.isMe = false
+    popupOptionViewController.delegate = self
+    self.tabBarController?.present(popupOptionViewController, animated: false, completion: nil)
   }
 }
 
@@ -258,7 +282,7 @@ extension ANIOtherProfileViewController: ANIOtherProfileBasicViewDelegate {
   
   func popupOptionView(isMe: Bool, contentType: ContentType, id: String) {
     self.contentType = contentType
-    self.contributionId = id
+    self.reportId = id
     
     let popupOptionViewController = ANIPopupOptionViewController()
     popupOptionViewController.modalPresentationStyle = .overCurrentContext
@@ -281,7 +305,16 @@ extension ANIOtherProfileViewController: ANIPopupOptionViewControllerDelegate {
   }
   
   func reportContribution() {
-    let alertController = UIAlertController(title: nil, message: "投稿を通報しますか？", preferredStyle: .alert)
+    guard let contentType = self.contentType else { return }
+    
+    var message = ""
+    if contentType == .user {
+      message = "ユーザーを通報しますか？"
+    } else {
+      message = "投稿を通報しますか？"
+    }
+    
+    let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
     
     let reportAction = UIAlertAction(title: "通報", style: .default) { (action) in
       self.reportData()
@@ -301,7 +334,7 @@ extension ANIOtherProfileViewController: ANIPopupOptionViewControllerDelegate {
 //MAKR: data
 extension ANIOtherProfileViewController {
   private func reportData() {
-    guard let contentType = self.contentType, let contributionId = self.contributionId else { return }
+    guard let contentType = self.contentType, let reportId = self.reportId else { return }
     
     let database = Firestore.firestore()
     
@@ -313,10 +346,12 @@ extension ANIOtherProfileViewController {
       contentTypeString = "story"
     } else if contentType == .qna {
       contentTypeString = "qna"
+    } else if contentType == .user {
+      contentTypeString = "user"
     }
     
     let date = ANIFunction.shared.getToday()
     let values = ["contentType": contentTypeString, "date": date]
-    database.collection(KEY_REPORTS).document(contributionId).collection(KEY_REPORT).addDocument(data: values)
+    database.collection(KEY_REPORTS).document(reportId).collection(KEY_REPORT).addDocument(data: values)
   }
 }

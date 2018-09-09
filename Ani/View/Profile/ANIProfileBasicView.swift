@@ -27,6 +27,7 @@ enum ContentType: Int {
   case recruit;
   case story;
   case qna;
+  case user;
 }
 
 class ANIProfileBasicView: UIView {
