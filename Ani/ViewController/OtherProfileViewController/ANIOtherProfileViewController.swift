@@ -19,6 +19,9 @@ class ANIOtherProfileViewController: UIViewController {
   private weak var navigationTitleLabel: UILabel?
   private weak var backButton: UIButton?
   private weak var optionButton: UIButton?
+  private weak var messageButton: UIButton?
+  private let MESSAGE_RIGTHT_GRADATION_VIEW_WIDTH: CGFloat = 35.0
+  private weak var messageRightGradationView: UIView?
   
   private weak var profileBasicView: ANIOtherProfileBasicView?
   
@@ -28,6 +31,7 @@ class ANIOtherProfileViewController: UIViewController {
   private var isRejectAnimating: Bool = false
   private var rejectTapView: UIView?
   
+  private var user: FirebaseUser?
   var userId: String?
   
   private var contentType: ContentType?
@@ -88,23 +92,52 @@ class ANIOtherProfileViewController: UIViewController {
     optionButton.tintColor = ANIColor.dark
     optionButton.addTarget(self, action: #selector(option), for: .touchUpInside)
     myNavigationBase.addSubview(optionButton)
-    optionButton.width(50.0)
+    optionButton.width(40.0)
     optionButton.height(44.0)
-    optionButton.rightToSuperview()
+    optionButton.rightToSuperview(offset: 5.0)
     optionButton.centerYToSuperview()
     self.optionButton = optionButton
+    
+    //messageButton
+    let messageButton = UIButton()
+    let messageButtonImage = UIImage(named: "messageButton")?.withRenderingMode(.alwaysTemplate)
+    messageButton.setImage(messageButtonImage, for: .normal)
+    messageButton.tintColor = ANIColor.dark
+    messageButton.addTarget(self, action: #selector(message), for: .touchUpInside)
+    myNavigationBase.addSubview(messageButton)
+    messageButton.width(30.0)
+    messageButton.height(44.0)
+    messageButton.rightToLeft(of: optionButton)
+    messageButton.centerYToSuperview()
+    self.messageButton = messageButton
     
     //navigationTitleLabel
     let navigationTitleLabel = UILabel()
     navigationTitleLabel.text = "プロフィール"
     navigationTitleLabel.textColor = ANIColor.dark
     navigationTitleLabel.textAlignment = .center
+    navigationTitleLabel.lineBreakMode = .byCharWrapping
     navigationTitleLabel.font = UIFont.boldSystemFont(ofSize: 17)
     myNavigationBase.addSubview(navigationTitleLabel)
     navigationTitleLabel.centerYToSuperview()
-    navigationTitleLabel.leftToRight(of: backButton)
-    navigationTitleLabel.rightToLeft(of: optionButton)
+    navigationTitleLabel.leftToRight(of: backButton, offset: 35.0)
+    navigationTitleLabel.rightToLeft(of: messageButton, offset: -5.0)
     self.navigationTitleLabel = navigationTitleLabel
+    
+    //messageRightGradationView
+    let messageRightGradationView = UIView()
+    let gradiationLayer = CAGradientLayer()
+    gradiationLayer.startPoint = CGPoint(x: 0.8, y: 0.5)
+    gradiationLayer.endPoint = CGPoint(x: 0, y: 0.5)
+    gradiationLayer.frame = CGRect(x: 0, y: 0, width: MESSAGE_RIGTHT_GRADATION_VIEW_WIDTH, height: UIViewController.NAVIGATION_BAR_HEIGHT)
+    gradiationLayer.colors = [UIColor.white.cgColor, UIColor.white.withAlphaComponent(0).cgColor]
+    messageRightGradationView.layer.addSublayer(gradiationLayer)
+    myNavigationBase.addSubview(messageRightGradationView)
+    messageRightGradationView.rightToLeft(of: messageButton, offset: 0.0)
+    messageRightGradationView.width(MESSAGE_RIGTHT_GRADATION_VIEW_WIDTH)
+    messageRightGradationView.topToSuperview()
+    messageRightGradationView.bottomToSuperview()
+    self.messageRightGradationView = messageRightGradationView
     
     //profileBasicView
     let profileBasicView = ANIOtherProfileBasicView()
@@ -182,6 +215,14 @@ class ANIOtherProfileViewController: UIViewController {
     popupOptionViewController.delegate = self
     self.tabBarController?.present(popupOptionViewController, animated: false, completion: nil)
   }
+  
+  @objc private func message() {
+    let chatViewController = ANIChatViewController()
+    let navigationContoller = UINavigationController(rootViewController: chatViewController)
+    chatViewController.user = user
+    chatViewController.isPush = false
+    self.present(navigationContoller, animated: true, completion: nil)
+  }
 }
 
 //MARK: ANIProfileBasicViewDelegate
@@ -190,6 +231,7 @@ extension ANIOtherProfileViewController: ANIOtherProfileBasicViewDelegate {
     guard let navigationTitleLabel = self.navigationTitleLabel,
           let userName = user.userName else { return }
     
+    self.user = user
     navigationTitleLabel.text = userName
   }
   
