@@ -20,6 +20,8 @@ class ANIProfileViewController: UIViewController {
   private weak var navigationTitleLabel: UILabel?
   private weak var backButton: UIButton?
   private weak var optionButton: UIButton?
+  private let OPTION_RIGTHT_GRADATION_VIEW_WIDTH: CGFloat = 35.0
+  private weak var optionRightGradationView: UIView?
   
   private weak var needLoginView: ANINeedLoginView?
   
@@ -102,9 +104,9 @@ class ANIProfileViewController: UIViewController {
     optionButton.tintColor = ANIColor.dark
     optionButton.addTarget(self, action: #selector(option), for: .touchUpInside)
     myNavigationBase.addSubview(optionButton)
-    optionButton.width(50.0)
+    optionButton.width(40.0)
     optionButton.height(44.0)
-    optionButton.rightToSuperview()
+    optionButton.rightToSuperview(offset: 5.0)
     optionButton.centerYToSuperview()
     self.optionButton = optionButton
     
@@ -121,6 +123,21 @@ class ANIProfileViewController: UIViewController {
     navigationTitleLabel.leftToRight(of: backButton)
     navigationTitleLabel.rightToLeft(of: optionButton)
     self.navigationTitleLabel = navigationTitleLabel
+    
+    //optionRightGradationView
+    let optionRightGradationView = UIView()
+    let gradiationLayer = CAGradientLayer()
+    gradiationLayer.startPoint = CGPoint(x: 0.8, y: 0.5)
+    gradiationLayer.endPoint = CGPoint(x: 0, y: 0.5)
+    gradiationLayer.frame = CGRect(x: 0, y: 0, width: OPTION_RIGTHT_GRADATION_VIEW_WIDTH, height: UIViewController.NAVIGATION_BAR_HEIGHT)
+    gradiationLayer.colors = [UIColor.white.cgColor, UIColor.white.withAlphaComponent(0).cgColor]
+    optionRightGradationView.layer.addSublayer(gradiationLayer)
+    myNavigationBase.addSubview(optionRightGradationView)
+    optionRightGradationView.rightToLeft(of: optionButton, offset: 0.0)
+    optionRightGradationView.width(OPTION_RIGTHT_GRADATION_VIEW_WIDTH)
+    optionRightGradationView.topToSuperview()
+    optionRightGradationView.bottomToSuperview()
+    self.optionRightGradationView = optionRightGradationView
     
     //profileBasicView
     let profileBasicView = ANIProfileBasicView()

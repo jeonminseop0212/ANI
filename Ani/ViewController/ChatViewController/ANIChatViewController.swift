@@ -68,6 +68,10 @@ class ANIChatViewController: UIViewController {
   private func setup() {
     //basic
     self.view.backgroundColor = .white
+    self.navigationController?.setNavigationBarHidden(true, animated: false)
+    self.navigationController?.navigationBar.isTranslucent = false
+    self.navigationController?.interactivePopGestureRecognizer?.delegate = self
+    ANIOrientation.lockOrientation(.portrait)
     
     //myNavigationBar
     let myNavigationBar = UIView()
@@ -296,5 +300,12 @@ class ANIChatViewController: UIViewController {
     } else {
       self.dismiss(animated: true)
     }
+  }
+}
+
+//MARK: UIGestureRecognizerDelegate
+extension ANIChatViewController: UIGestureRecognizerDelegate {
+  func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+    return true
   }
 }
