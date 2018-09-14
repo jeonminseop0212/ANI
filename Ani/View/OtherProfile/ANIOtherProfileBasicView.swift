@@ -147,14 +147,11 @@ class ANIOtherProfileBasicView: UIView {
           }
           
           DispatchQueue.main.async {
-            guard let basicTableView = self.basicTableView,
-                  let user = self.user else { return }
+            guard let basicTableView = self.basicTableView else { return }
             
             basicTableView.reloadData()
             
             activityIndicatorView.stopAnimating()
-            
-            self.delegate?.loadedUser(user: user)
             
             UIView.animate(withDuration: 0.2, animations: {
               basicTableView.alpha = 1.0
@@ -165,14 +162,11 @@ class ANIOtherProfileBasicView: UIView {
     } else {
       self.isFollowed = false
       
-      guard let basicTableView = self.basicTableView,
-            let user = self.user else { return }
+      guard let basicTableView = self.basicTableView else { return }
       
       basicTableView.reloadData()
       
       activityIndicatorView.stopAnimating()
-      
-      self.delegate?.loadedUser(user: user)
       
       UIView.animate(withDuration: 0.2, animations: {
         basicTableView.alpha = 1.0
@@ -536,6 +530,8 @@ extension ANIOtherProfileBasicView {
         do {
           let user = try FirebaseDecoder().decode(FirebaseUser.self, from: data)
           self.user = user
+          
+          self.delegate?.loadedUser(user: user)
           
           guard let basicTableView = self.basicTableView else { return }
           
