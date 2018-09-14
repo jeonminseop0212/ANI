@@ -321,9 +321,12 @@ extension ANIProfileViewController: ANIProfileBasicViewDelegate {
 //MARK: ANIProfileEditViewControllerDelegate
 extension ANIProfileViewController: ANIProfileEditViewControllerDelegate {
   func didEdit() {
-    guard let profileBasicView = self.profileBasicView else { return }
+    guard let profileBasicView = self.profileBasicView,
+          let navigationTitleLabel = self.navigationTitleLabel,
+          let currentUser = self.currentUser else { return }
     
     profileBasicView.currentUser = currentUser
+    navigationTitleLabel.text = currentUser.userName
   }
 }
 
