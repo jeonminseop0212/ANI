@@ -367,8 +367,7 @@ class ANIRecruitDetailView: UIView {
   }
   
   private func reloadLayout() {
-    guard let currentUserId = ANISessionManager.shared.currentUserUid,
-          let headerImageView = self.headerImageView,
+    guard let headerImageView = self.headerImageView,
           let titleLabel = self.titleLabel,
           let basicInfoKindLabel = self.basicInfoKindLabel,
           let basicInfoAgeLabel = self.basicInfoAgeLabel,
@@ -402,7 +401,7 @@ class ANIRecruitDetailView: UIView {
     
     passingLabel.text = recruit.passing
     
-    if currentUserId == recruit.userId || recruit.recruitState != 0 {
+    if let currentUserId = ANISessionManager.shared.currentUserUid, currentUserId == recruit.userId || recruit.recruitState != 0 {
       passingBGBottomConstratins.constant = -10
     }
   }
