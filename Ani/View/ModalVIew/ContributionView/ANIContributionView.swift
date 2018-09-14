@@ -37,7 +37,18 @@ class ANIContributionView: UIView {
     }
   }
   
-  var selectedContributionMode: ContributionMode?
+  var selectedContributionMode: ContributionMode? {
+    didSet {
+      guard let selectedContributionMode = self.selectedContributionMode,
+            let contentTextView = self.contentTextView else { return }
+      
+      if selectedContributionMode == .story {
+        contentTextView.placeHolder = "どんな話でも大丈夫です*^_^*"
+      } else if selectedContributionMode == .qna {
+        contentTextView.placeHolder = "どんな質問でも大丈夫です*^_^*"
+      }
+    }
+  }
   
   private let KEYBOARD_HIDE_TOOL_BAR_HEIGHT: CGFloat = 40.0
   
@@ -71,7 +82,6 @@ class ANIContributionView: UIView {
     let contentTextView = ANIPlaceHolderTextView()
     contentTextView.textColor = ANIColor.dark
     contentTextView.font = UIFont.systemFont(ofSize: 17.0)
-    contentTextView.placeHolder = "どんな話でも構いません*^_^*"
     contentTextView.isScrollEnabled = false
     contentTextView.delegate = self
     contentView.addSubview(contentTextView)
