@@ -217,11 +217,15 @@ class ANIOtherProfileViewController: UIViewController {
   }
   
   @objc private func message() {
-    let chatViewController = ANIChatViewController()
-    let navigationContoller = UINavigationController(rootViewController: chatViewController)
-    chatViewController.user = user
-    chatViewController.isPush = false
-    self.present(navigationContoller, animated: true, completion: nil)
+    if !ANISessionManager.shared.isAnonymous {
+      let chatViewController = ANIChatViewController()
+      let navigationContoller = UINavigationController(rootViewController: chatViewController)
+      chatViewController.user = user
+      chatViewController.isPush = false
+      self.present(navigationContoller, animated: true, completion: nil)
+    } else {
+      reject()
+    }
   }
 }
 
