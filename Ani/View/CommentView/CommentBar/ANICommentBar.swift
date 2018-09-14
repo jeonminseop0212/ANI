@@ -102,12 +102,14 @@ class ANICommentBar: UIView {
     ANINotificationManager.receive(viewScrolled: self, selector: #selector(keyboardHide))
   }
   
-  private func setProfileImage() {
-    guard let currentUser = ANISessionManager.shared.currentUser,
-          let profileImageUrl = currentUser.profileImageUrl,
-          let profileImageView = self.profileImageView else { return }
+  func setProfileImage() {
+    guard let profileImageView = self.profileImageView else { return }
     
-    profileImageView.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
+    if let currentUser = ANISessionManager.shared.currentUser, let profileImageUrl = currentUser.profileImageUrl {
+      profileImageView.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
+    } else {
+      profileImageView.image = UIImage()
+    }
   }
   
   @objc private func keyboardHide() {
@@ -180,7 +182,6 @@ class ANICommentBar: UIView {
           let commentMode = self.commentMode else { return }
     
     let date = ANIFunction.shared.getToday()
-//    let comment = FirebaseComment(userId: uid, comment: text, loveCount: 0, commentCount: 0, date: date)
     let comment = FirebaseComment(userId: uid, comment: text, date: date)
     
     do {

@@ -444,11 +444,7 @@ class ANIQnaViewCell: UITableViewCell {
     guard let qna = self.qna,
           let user = self.user else { return }
     
-    if !ANISessionManager.shared.isAnonymous {
-      self.delegate?.cellTapped(qna: qna, user: user)
-    } else {
-      self.delegate?.reject()
-    }
+    self.delegate?.cellTapped(qna: qna, user: user)
   }
   
   @objc private func showOption() {
