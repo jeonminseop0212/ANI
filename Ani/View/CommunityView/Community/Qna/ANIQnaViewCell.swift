@@ -453,13 +453,12 @@ class ANIQnaViewCell: UITableViewCell {
   
   @objc private func showOption() {
     guard let user = self.user,
-          let currentUserId = ANISessionManager.shared.currentUserUid,
           let qna = self.qna,
           let qnaId = qna.id else { return }
     
     let contentType: ContentType = .qna
     
-    if user.uid == currentUserId {
+    if let currentUserId = ANISessionManager.shared.currentUserUid, user.uid == currentUserId {
       self.delegate?.popupOptionView(isMe: true, contentType: contentType, id: qnaId)
     } else {
       self.delegate?.popupOptionView(isMe: false, contentType: contentType, id: qnaId)

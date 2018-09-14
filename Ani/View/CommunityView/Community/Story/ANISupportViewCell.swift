@@ -627,13 +627,12 @@ class ANISupportViewCell: UITableViewCell {
   
   @objc private func showOption() {
     guard let user = self.user,
-          let currentUserId = ANISessionManager.shared.currentUserUid,
           let story = self.story,
           let storyId = story.id else { return }
     
     let contentType: ContentType = .story
     
-    if user.uid == currentUserId {
+    if let currentUserId = ANISessionManager.shared.currentUserUid, user.uid == currentUserId {
       self.delegate?.popupOptionView(isMe: true, contentType: contentType, id: storyId)
     } else {
       self.delegate?.popupOptionView(isMe: false, contentType: contentType, id: storyId)

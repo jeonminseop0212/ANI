@@ -362,7 +362,11 @@ extension ANICommunityViewController: ANIPopupOptionViewControllerDelegate {
     let alertController = UIAlertController(title: nil, message: "投稿を通報しますか？", preferredStyle: .alert)
     
     let reportAction = UIAlertAction(title: "通報", style: .default) { (action) in
-      self.reportData()
+      if !ANISessionManager.shared.isAnonymous {
+        self.reportData()
+      } else {
+        self.reject()
+      }
     }
     let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
     
