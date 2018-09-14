@@ -97,19 +97,6 @@ class ANIRecruitDetailViewController: UIViewController {
     backButton.bottomToSuperview()
     self.backButton = backButton
     
-    //clipButton
-    let clipButton = ANIImageButtonView()
-    let clipButtonImage = UIImage(named: "clipButton")?.withRenderingMode(.alwaysTemplate)
-    clipButton.image = clipButtonImage
-    clipButton.delegate = self
-    clipButton.tintColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
-    myNavigationBar.addSubview(clipButton)
-    clipButton.width(44.0)
-    clipButton.height(44.0)
-    clipButton.rightToSuperview()
-    clipButton.bottomToSuperview()
-    self.clipButton = clipButton
-    
     //optionButton
     let optionButton = UIButton()
     let optionButtonImage = UIImage(named: "optionButton")?.withRenderingMode(.alwaysTemplate)
@@ -117,11 +104,24 @@ class ANIRecruitDetailViewController: UIViewController {
     optionButton.tintColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
     optionButton.addTarget(self, action: #selector(option), for: .touchUpInside)
     myNavigationBar.addSubview(optionButton)
-    optionButton.width(44.0)
+    optionButton.width(40.0)
     optionButton.height(44.0)
-    optionButton.rightToLeft(of: clipButton)
+    optionButton.rightToSuperview(offset: 5.0)
     optionButton.bottomToSuperview()
     self.optionButton = optionButton
+    
+    //clipButton
+    let clipButton = ANIImageButtonView()
+    let clipButtonImage = UIImage(named: "clipButton")?.withRenderingMode(.alwaysTemplate)
+    clipButton.image = clipButtonImage
+    clipButton.delegate = self
+    clipButton.tintColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
+    myNavigationBar.addSubview(clipButton)
+    clipButton.width(30.0)
+    clipButton.height(44.0)
+    clipButton.rightToLeft(of: optionButton)
+    clipButton.bottomToSuperview()
+    self.clipButton = clipButton
     
     //applyButton
     let applyButton = ANIAreaButtonView()
