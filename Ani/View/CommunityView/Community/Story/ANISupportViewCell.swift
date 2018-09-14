@@ -611,11 +611,7 @@ class ANISupportViewCell: UITableViewCell {
     guard let story = self.story,
           let user = self.user else { return }
     
-    if !ANISessionManager.shared.isAnonymous {
-      self.delegate?.supportCellTapped(story: story, user: user)
-    } else {
-      self.delegate?.reject()
-    }
+    self.delegate?.supportCellTapped(story: story, user: user)
   }
   
   @objc private func recruitTapped() {

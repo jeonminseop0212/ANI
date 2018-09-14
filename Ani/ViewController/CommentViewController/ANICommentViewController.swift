@@ -28,6 +28,13 @@ class ANICommentViewController: UIViewController {
   private var commentBarBottomConstraint: Constraint?
   private var commentBarOriginalBottomConstraintConstant: CGFloat?
   private weak var commentBar: ANICommentBar?
+  private weak var anonymousCommentTapView: UIView?
+  
+  private var rejectViewBottomConstraint: Constraint?
+  private var rejectViewBottomConstraintOriginalConstant: CGFloat?
+  private weak var rejectView: ANIRejectView?
+  private var isRejectAnimating: Bool = false
+  private var rejectTapView: UIView?
     
   var commentMode: CommentMode?
   
@@ -114,6 +121,19 @@ class ANICommentViewController: UIViewController {
     commentBarOriginalBottomConstraintConstant = commentBarBottomConstraint?.constant
     self.commentBar = commentBar
     
+    //anonymousCommentTapView
+    let anonymousCommentTapView = UIView()
+    if !ANISessionManager.shared.isAnonymous {
+      anonymousCommentTapView.isUserInteractionEnabled = false
+    } else {
+      anonymousCommentTapView.isUserInteractionEnabled = true
+    }
+    let anonymousCommentTapGesture = UITapGestureRecognizer(target: self, action: #selector(reject))
+    anonymousCommentTapView.addGestureRecognizer(anonymousCommentTapGesture)
+    self.view.addSubview(anonymousCommentTapView)
+    anonymousCommentTapView.edges(to: commentBar)
+    self.anonymousCommentTapView = anonymousCommentTapView
+    
     //commentView
     let commentView = ANICommentView()
     self.view.addSubview(commentView)
@@ -122,6 +142,28 @@ class ANICommentViewController: UIViewController {
     commentView.rightToSuperview()
     commentView.bottomToTop(of: commentBar)
     self.commentView = commentView
+    
+    //rejectView
+    let rejectView = ANIRejectView()
+    rejectView.setRejectText("ログインが必要です。")
+    self.view.addSubview(rejectView)
+    rejectViewBottomConstraint = rejectView.bottomToTop(of: self.view)
+    rejectViewBottomConstraintOriginalConstant = rejectViewBottomConstraint?.constant
+    rejectView.leftToSuperview()
+    rejectView.rightToSuperview()
+    self.rejectView = rejectView
+    
+    //rejectTapView
+    let rejectTapView = UIView()
+    rejectTapView.isUserInteractionEnabled = true
+    let rejectTapGesture = UITapGestureRecognizer(target: self, action: #selector(rejectViewTapped))
+    rejectTapView.addGestureRecognizer(rejectTapGesture)
+    rejectTapView.isHidden = true
+    rejectTapView.backgroundColor = .clear
+    self.view.addSubview(rejectTapView)
+    rejectTapView.size(to: rejectView)
+    rejectTapView.topToSuperview()
+    self.rejectTapView = rejectTapView
   }
   
   private func passingData() {
@@ -155,6 +197,8 @@ class ANICommentViewController: UIViewController {
     ANINotificationManager.receive(keyboardWillChangeFrame: self, selector: #selector(keyboardWillChangeFrame))
     ANINotificationManager.receive(keyboardWillHide: self, selector: #selector(keyboardWillHide))
     ANINotificationManager.receive(profileImageViewTapped: self, selector: #selector(pushOtherProfile))
+    ANINotificationManager.receive(login: self, selector: #selector(setAnonymousCommentTapViewUserInteractionEnabled))
+    ANINotificationManager.receive(logout: self, selector: #selector(setAnonymousCommentTapViewUserInteractionEnabled))
   }
   
   private func removeNotifications() {
@@ -207,8 +251,52 @@ class ANICommentViewController: UIViewController {
     }
   }
   
+  @objc private func setAnonymousCommentTapViewUserInteractionEnabled() {
+    guard let anonymousCommentTapView = self.anonymousCommentTapView,
+          let commentBar = self.commentBar else { return }
+    
+    commentBar.setProfileImage()
+    
+    if !ANISessionManager.shared.isAnonymous {
+      anonymousCommentTapView.isUserInteractionEnabled = false
+    } else {
+      anonymousCommentTapView.isUserInteractionEnabled = true
+    }
+  }
+  
+  @objc private func reject() {
+    guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
+      !isRejectAnimating,
+      let rejectTapView = self.rejectTapView else { return }
+    
+    rejectViewBottomConstraint.constant = UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    rejectTapView.isHidden = false
+    
+    UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut, animations: {
+      self.isRejectAnimating = true
+      self.view.layoutIfNeeded()
+    }) { (complete) in
+      guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
+        let rejectViewBottomConstraintOriginalConstant = self.rejectViewBottomConstraintOriginalConstant else { return }
+      
+      rejectViewBottomConstraint.constant = rejectViewBottomConstraintOriginalConstant
+      UIView.animate(withDuration: 0.3, delay: 1.0, options: .curveEaseInOut, animations: {
+        self.view.layoutIfNeeded()
+      }, completion: { (complete) in
+        self.isRejectAnimating = false
+        rejectTapView.isHidden = true
+      })
+    }
+  }
+  
   //MARK: Action
   @objc private func back() {
     self.navigationController?.popViewController(animated: true)
+  }
+  
+  @objc private func rejectViewTapped() {
+    let initialViewController = ANIInitialViewController()
+    let navigationController = UINavigationController(rootViewController: initialViewController)
+    self.present(navigationController, animated: true, completion: nil)
   }
 }

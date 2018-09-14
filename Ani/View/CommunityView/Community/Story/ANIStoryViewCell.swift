@@ -436,11 +436,7 @@ class ANIStoryViewCell: UITableViewCell {
     guard let story = self.story,
           let user = self.user else { return }
     
-    if !ANISessionManager.shared.isAnonymous {
-      self.delegate?.storyCellTapped(story: story, user: user)
-    } else {
-      self.delegate?.reject()
-    }
+    self.delegate?.storyCellTapped(story: story, user: user)
   }
   
   @objc private func showOption() {
