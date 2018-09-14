@@ -319,12 +319,11 @@ class ANIRecruitDetailViewController: UIViewController {
   }
   
   @objc private func option() {
-    guard let currentUserId = ANISessionManager.shared.currentUserUid,
-          let recruit = self.recruit else { return }
+    guard let recruit = self.recruit else { return }
       
     let popupOptionViewController = ANIPopupOptionViewController()
     popupOptionViewController.modalPresentationStyle = .overCurrentContext
-    if recruit.userId == currentUserId {
+    if let currentUserId = ANISessionManager.shared.currentUserUid, recruit.userId == currentUserId {
       popupOptionViewController.isMe = true
       popupOptionViewController.options = ["家族決定！😻", "募集中止", "編集する"]
     } else {
@@ -429,7 +428,11 @@ extension ANIRecruitDetailViewController: ANIPopupOptionViewControllerDelegate {
     let alertController = UIAlertController(title: nil, message: "投稿を通報しますか？", preferredStyle: .alert)
     
     let reportAction = UIAlertAction(title: "通報", style: .default) { (action) in
-      self.reportData()
+      if !ANISessionManager.shared.isAnonymous {
+        self.reportData()
+      } else {
+        self.reject()
+      }
     }
     let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
     
