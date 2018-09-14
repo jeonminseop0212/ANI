@@ -13,6 +13,7 @@ import CodableFirebase
 protocol ANIOtherProfileCellDelegate {
   func followingTapped()
   func followerTapped()
+  func reject()
 }
 
 class ANIOtherProfileCell: UITableViewCell {
@@ -306,35 +307,38 @@ class ANIOtherProfileCell: UITableViewCell {
 extension ANIOtherProfileCell: ANIButtonViewDelegate {
   func buttonViewTapped(view: ANIButtonView) {
     if view === self.followButton {
-      guard let currentUserUid = ANISessionManager.shared.currentUserUid,
-            let user = self.user,
+      guard let user = self.user,
             let userId = user.uid,
             let followButton = self.followButton,
             let followLabel = self.followLabel else { return }
       
       let database = Firestore.firestore()
       
-      if followButton.base?.backgroundColor == ANIColor.green {
-        DispatchQueue.global().async {
-          let date = ANIFunction.shared.getToday()
-          database.collection(KEY_USERS).document(currentUserUid).collection(KEY_FOLLOWING_USER_IDS).document(userId).setData([KEY_DATE: date])
-          database.collection(KEY_USERS).document(userId).collection(KEY_FOLLOWER_IDS).document(currentUserUid).setData([KEY_DATE: date])
+      if let currentUserUid = ANISessionManager.shared.currentUserUid, !ANISessionManager.shared.isAnonymous {
+        if followButton.base?.backgroundColor == ANIColor.green {
+          DispatchQueue.global().async {
+            let date = ANIFunction.shared.getToday()
+            database.collection(KEY_USERS).document(currentUserUid).collection(KEY_FOLLOWING_USER_IDS).document(userId).setData([KEY_DATE: date])
+            database.collection(KEY_USERS).document(userId).collection(KEY_FOLLOWER_IDS).document(currentUserUid).setData([KEY_DATE: date])
+            
+            self.updateNoti()
+          }
           
-          self.updateNoti()
+          followButton.base?.backgroundColor = .clear
+          followLabel.text = "フォロー中"
+          followLabel.textColor = ANIColor.green
+        } else {
+          DispatchQueue.global().async {
+            database.collection(KEY_USERS).document(currentUserUid).collection(KEY_FOLLOWING_USER_IDS).document(userId).delete()
+            database.collection(KEY_USERS).document(userId).collection(KEY_FOLLOWER_IDS).document(currentUserUid).delete()
+          }
+          
+          followButton.base?.backgroundColor = ANIColor.green
+          followLabel.text = "フォロー"
+          followLabel.textColor = .white
         }
-        
-        followButton.base?.backgroundColor = .clear
-        followLabel.text = "フォロー中"
-        followLabel.textColor = ANIColor.green
       } else {
-        DispatchQueue.global().async {
-          database.collection(KEY_USERS).document(currentUserUid).collection(KEY_FOLLOWING_USER_IDS).document(userId).delete()
-          database.collection(KEY_USERS).document(userId).collection(KEY_FOLLOWER_IDS).document(currentUserUid).delete()
-        }
-        
-        followButton.base?.backgroundColor = ANIColor.green
-        followLabel.text = "フォロー"
-        followLabel.textColor = .white
+        self.delegate?.reject()
       }
     }
   }
