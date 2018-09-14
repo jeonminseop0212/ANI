@@ -215,7 +215,7 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
         print("update user error \(error)")
       }
       
-      self.pushDataAlgolia(data: values)
+      self.updateDataAlgolia(data: values)
       
       database.collection(KEY_USERS).document(uid).getDocument { (snapshot, error) in
         if let error = error {
@@ -241,16 +241,13 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
     }
   }
   
-  private func pushDataAlgolia(data: [String: AnyObject]) {
+  private func updateDataAlgolia(data: [String: AnyObject]) {
     guard let objectId = ANISessionManager.shared.currentUserUid else { return }
     
     let index = ANISessionManager.shared.client.index(withName: KEY_USERS_INDEX)
     
-    var newData = data
-    newData.updateValue(objectId as AnyObject, forKey: KEY_OBJECT_ID)
-    
     DispatchQueue.global().async {
-      index.saveObject(newData, completionHandler: { (content, error) -> Void in
+      index.partialUpdateObject(data, withID: objectId, completionHandler: { (content, error) -> Void in
         if error == nil {
           print("Object IDs: \(content!)")
         }
