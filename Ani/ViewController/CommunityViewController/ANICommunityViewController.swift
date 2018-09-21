@@ -61,6 +61,7 @@ class ANICommunityViewController: UIViewController {
     flowLayout.minimumInteritemSpacing = 0
     flowLayout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
     let containerCollectionView = UICollectionView(frame: self.view.frame, collectionViewLayout: flowLayout)
+    containerCollectionView.contentInsetAdjustmentBehavior = .never
     containerCollectionView.dataSource = self
     containerCollectionView.delegate = self
     containerCollectionView.showsHorizontalScrollIndicator = false

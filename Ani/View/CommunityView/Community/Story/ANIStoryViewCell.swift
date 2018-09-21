@@ -91,9 +91,7 @@ class ANIStoryViewCell: UITableViewCell {
     //storyImagesView
     let storyImagesView = ANIStoryImagesView()
     tapArea.addSubview(storyImagesView)
-    storyImagesView.topToSuperview()
-    storyImagesView.leftToSuperview()
-    storyImagesView.rightToSuperview()
+    storyImagesView.edgesToSuperview(excluding: .bottom)
     self.storyImagesView = storyImagesView
 
     //storyLabel

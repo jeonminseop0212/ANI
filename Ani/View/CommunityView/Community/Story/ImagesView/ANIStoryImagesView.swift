@@ -22,7 +22,7 @@ class ANIStoryImagesView: UIView {
         subview.removeFromSuperview()
       }
       setup()
-      setupPageControlHeight(imageUrls: imageUrls)
+//      setupPageControlHeight(imageUrls: imageUrls)
     }
   }
   
@@ -38,10 +38,9 @@ class ANIStoryImagesView: UIView {
     //iamgesCollectionView
     let flowLayot = UICollectionViewFlowLayout()
     flowLayot.scrollDirection = .horizontal
-    flowLayot.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
     flowLayot.minimumLineSpacing = 0
     flowLayot.minimumInteritemSpacing = 0
-    let imagesCollectionView = UICollectionView(frame: self.frame, collectionViewLayout: flowLayot)
+    let imagesCollectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayot)
     imagesCollectionView.delegate = self
     imagesCollectionView.dataSource = self
     imagesCollectionView.isPagingEnabled = true
@@ -50,10 +49,8 @@ class ANIStoryImagesView: UIView {
     let id = NSStringFromClass(ANIStoryImagesCell.self)
     imagesCollectionView.register(ANIStoryImagesCell.self, forCellWithReuseIdentifier: id)
     addSubview(imagesCollectionView)
-    imagesCollectionView.topToSuperview()
-    imagesCollectionView.leftToSuperview()
-    imagesCollectionView.rightToSuperview()
     imagesCollectionView.height(UIScreen.main.bounds.width)
+    imagesCollectionView.edgesToSuperview(excluding: .bottom)
     self.imagesCollectionView = imagesCollectionView
     
     //pageControl
