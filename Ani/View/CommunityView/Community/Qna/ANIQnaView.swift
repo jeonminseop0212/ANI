@@ -65,8 +65,8 @@ class ANIQnaView: UIView {
     
     //tableView
     let tableView = UITableView()
-    tableView.contentInset = UIEdgeInsets(top: ANICommunityViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: ANICommunityViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT + bottomSafeArea, right: 0)
-    tableView.scrollIndicatorInsets  = UIEdgeInsets(top: ANICommunityViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: ANICommunityViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT + bottomSafeArea, right: 0)
+    tableView.contentInset = UIEdgeInsets(top: ANICommunityViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: bottomSafeArea, right: 0)
+    tableView.scrollIndicatorInsets  = UIEdgeInsets(top: ANICommunityViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: bottomSafeArea, right: 0)
     tableView.backgroundColor = ANIColor.bg
     let id = NSStringFromClass(ANIQnaViewCell.self)
     tableView.register(ANIQnaViewCell.self, forCellReuseIdentifier: id)
