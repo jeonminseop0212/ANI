@@ -33,6 +33,9 @@ class ANIRecuruitView: UIView {
   private var recruits = [FirebaseRecruit]()
   private var users = [FirebaseUser]()
   
+  private var lastRecruit: QueryDocumentSnapshot?
+  private var isLoading: Bool = false
+  
   var pickMode: FilterPickMode?
   var pickItem: String? {
     didSet {
@@ -81,6 +84,8 @@ class ANIRecuruitView: UIView {
   
   var delegate:ANIRecruitViewDelegate?
   
+  var cellHeight = [IndexPath: CGFloat]()
+  
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()
@@ -119,6 +124,7 @@ class ANIRecuruitView: UIView {
     let refreshControl = UIRefreshControl()
     refreshControl.addTarget(self, action: #selector(loadRecruit(sender:)), for: .valueChanged)
     tableView.alpha = 0.0
+    tableView.rowHeight = UITableViewAutomaticDimension
     tableView.addSubview(refreshControl)
     addSubview(tableView)
     tableView.edgesToSuperview()
@@ -248,6 +254,24 @@ extension ANIRecuruitView: UITableViewDelegate {
       cell.unobserveSupport()
     }
   }
+  
+  func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    let element = self.recruits.count - 4
+    if !isLoading, indexPath.row >= element {
+      loadMoreRecruit()
+      self.isLoading = true
+    }
+    
+    self.cellHeight[indexPath] = cell.frame.size.height
+  }
+  
+  func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+    if let height = self.cellHeight[indexPath] {
+      return height
+    } else {
+      return UITableViewAutomaticDimension
+    }
+  }
 }
 
 //MARK: ANIRecruitViewCellDelegate
@@ -309,14 +333,19 @@ extension ANIRecuruitView {
     }
     
     DispatchQueue.global().async {
-      query.order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments(completion: { (snapshot, error) in
+      self.isLoading = true
+
+      query.order(by: KEY_DATE, descending: true).limit(to: 15).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           print("Error get document: \(error)")
 
           return
         }
         
-        guard let snapshot = snapshot else { return }
+        guard let snapshot = snapshot,
+              let lastRecruit = snapshot.documents.last else { return }
+        
+        self.lastRecruit = lastRecruit
         
         for document in snapshot.documents {
           do {
@@ -335,6 +364,8 @@ extension ANIRecuruitView {
               UIView.animate(withDuration: 0.2, animations: {
                 recruitTableView.alpha = 1.0
               })
+              
+              self.isLoading = false
             }
           } catch let error {
             print(error)
@@ -348,6 +379,8 @@ extension ANIRecuruitView {
             if let sender = sender {
               sender.endRefreshing()
             }
+            
+            self.isLoading = false
           }
         }
         
@@ -369,6 +402,48 @@ extension ANIRecuruitView {
           UIView.animate(withDuration: 0.2, animations: {
             reloadView.alpha = 1.0
           })
+          
+          self.isLoading = false
+        }
+      })
+    }
+  }
+  
+  private func loadMoreRecruit() {
+    guard let query = self.query,
+          let recruitTableView = self.recruitTableView,
+          let lastRecruit = self.lastRecruit,
+          !isLoading else { return }
+    
+    DispatchQueue.global().async {
+      query.order(by: KEY_DATE, descending: true).start(afterDocument: lastRecruit).limit(to: 15).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
+        
+        guard let snapshot = snapshot,
+              let lastRecruit = snapshot.documents.last else { return }
+        
+        self.lastRecruit = lastRecruit
+        
+        for (index, document) in snapshot.documents.enumerated() {
+          do {
+            let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: document.data())
+            self.recruits.append(recruit)
+            
+            DispatchQueue.main.async {
+              if index + 1 == snapshot.documents.count {
+                recruitTableView.reloadData()
+                
+                self.isLoading = false
+              }
+            }
+          } catch let error {
+            print(error)
+            self.isLoading = false
+          }
         }
       })
     }

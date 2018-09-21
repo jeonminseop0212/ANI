@@ -28,11 +28,16 @@ class ANIStoryView: UIView {
   private var supportRecruits = [FirebaseRecruit]()
   private var users = [FirebaseUser]()
   
+  private var lastStory: QueryDocumentSnapshot?
+  private var isLoading: Bool = false
+  
   private weak var activityIndicatorView: NVActivityIndicatorView?
   
   var isCellSelected: Bool = false
   
   var delegate: ANIStoryViewDelegate?
+  
+  var cellHeight = [IndexPath: CGFloat]()
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -78,6 +83,7 @@ class ANIStoryView: UIView {
     tableView.dataSource = self
     tableView.delegate = self
     tableView.alpha = 0.0
+    tableView.rowHeight = UITableViewAutomaticDimension
     let refreshControl = UIRefreshControl()
     refreshControl.addTarget(self, action: #selector(loadStory(sender:)), for: .valueChanged)
     tableView.addSubview(refreshControl)
@@ -205,6 +211,24 @@ extension ANIStoryView: UITableViewDelegate {
       }
     }
   }
+  
+  func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    let element = self.stories.count - 4
+    if !isLoading, indexPath.row >= element {
+      loadMoreStory()
+      self.isLoading = true
+    }
+    
+    self.cellHeight[indexPath] = cell.frame.size.height
+  }
+  
+  func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+    if let height = self.cellHeight[indexPath] {
+      return height
+    } else {
+      return UITableViewAutomaticDimension
+    }
+  }
 }
 
 //MARK: ANIStoryViewCellDelegate
@@ -273,14 +297,19 @@ extension ANIStoryView {
     let database = Firestore.firestore()
 
     DispatchQueue.global().async {
-      database.collection(KEY_STORIES).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments(completion: { (snapshot, error) in
+      self.isLoading = true
+      
+      database.collection(KEY_STORIES).order(by: KEY_DATE, descending: true).limit(to: 10).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           print("Error get document: \(error)")
           
           return
         }
         
-        guard let snapshot = snapshot else { return }
+        guard let snapshot = snapshot,
+              let lastStory = snapshot.documents.last else { return }
+        
+        self.lastStory = lastStory
         
         for document in snapshot.documents {
           do {
@@ -299,6 +328,8 @@ extension ANIStoryView {
               UIView.animate(withDuration: 0.2, animations: {
                 storyTableView.alpha = 1.0
               })
+              
+              self.isLoading = false
             }
           } catch let error {
             print(error)
@@ -312,6 +343,8 @@ extension ANIStoryView {
             if let sender = sender {
               sender.endRefreshing()
             }
+            
+            self.isLoading = false
           }
         }
         
@@ -331,6 +364,49 @@ extension ANIStoryView {
           UIView.animate(withDuration: 0.2, animations: {
             reloadView.alpha = 1.0
           })
+          
+          self.isLoading = false
+        }
+      })
+    }
+  }
+  
+  private func loadMoreStory() {
+    guard let storyTableView = self.storyTableView,
+          let lastStory = self.lastStory,
+          !isLoading else { return }
+    
+    let database = Firestore.firestore()
+    
+    DispatchQueue.global().async {
+      database.collection(KEY_STORIES).order(by: KEY_DATE, descending: true).start(afterDocument: lastStory).limit(to: 10).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
+        
+        guard let snapshot = snapshot,
+              let lastStory = snapshot.documents.last else { return }
+        
+        self.lastStory = lastStory
+
+        for (index, document) in snapshot.documents.enumerated() {
+          do {
+            let story = try FirestoreDecoder().decode(FirebaseStory.self, from: document.data())
+            self.stories.append(story)
+            
+            DispatchQueue.main.async {
+              if index + 1 == snapshot.documents.count {
+                storyTableView.reloadData()
+                
+                self.isLoading = false
+              }
+            }
+          } catch let error {
+            print(error)
+            self.isLoading = false
+          }
         }
       })
     }
