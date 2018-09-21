@@ -30,7 +30,12 @@ class ANIQnaView: UIView {
   
   var isCellSelected: Bool = false
   
+  private var lastQna: QueryDocumentSnapshot?
+  private var isLoading: Bool = false
+  
   var delegate: ANIQnaViewDelegate?
+  
+  var cellHeight = [IndexPath: CGFloat]()
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -74,6 +79,7 @@ class ANIQnaView: UIView {
     tableView.delegate = self
     tableView.separatorStyle = .none
     tableView.alpha = 0.0
+    tableView.rowHeight = UITableViewAutomaticDimension
     let refreshControl = UIRefreshControl()
     refreshControl.addTarget(self, action: #selector(loadQna(sender:)), for: .valueChanged)
     tableView.addSubview(refreshControl)
@@ -164,6 +170,24 @@ extension ANIQnaView: UITableViewDelegate {
       cell.unobserveComment()
     }
   }
+  
+  func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    let element = self.qnas.count - 4
+    if !isLoading, indexPath.row >= element {
+      loadMoreQna()
+      self.isLoading = true
+    }
+    
+    self.cellHeight[indexPath] = cell.frame.size.height
+  }
+  
+  func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+    if let height = self.cellHeight[indexPath] {
+      return height
+    } else {
+      return UITableViewAutomaticDimension
+    }
+  }
 }
 
 //MARK: ANIQnaViewCellDelegate
@@ -214,6 +238,8 @@ extension ANIQnaView {
     let database = Firestore.firestore()
     
     DispatchQueue.global().async {
+      self.isLoading = true
+
       database.collection(KEY_QNAS).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           print("Error get document: \(error)")
@@ -221,7 +247,10 @@ extension ANIQnaView {
           return
         }
         
-        guard let snapshot = snapshot else { return }
+        guard let snapshot = snapshot,
+              let lastQna = snapshot.documents.last else { return }
+        
+        self.lastQna = lastQna
         
         for document in snapshot.documents {
           do {
@@ -240,6 +269,8 @@ extension ANIQnaView {
               UIView.animate(withDuration: 0.2, animations: {
                 qnaTableView.alpha = 1.0
               })
+              
+              self.isLoading = false
             }
           } catch let error {
             print(error)
@@ -253,6 +284,8 @@ extension ANIQnaView {
             if let sender = sender {
               sender.endRefreshing()
             }
+            
+            self.isLoading = false
           }
         }
         
@@ -272,6 +305,49 @@ extension ANIQnaView {
           UIView.animate(withDuration: 0.2, animations: {
             reloadView.alpha = 1.0
           })
+          
+          self.isLoading = false
+        }
+      })
+    }
+  }
+  
+  private func loadMoreQna() {
+    guard let qnaTableView = self.qnaTableView,
+          let lastQna = self.lastQna,
+          !isLoading else { return }
+    
+    let database = Firestore.firestore()
+    
+    DispatchQueue.global().async {
+      database.collection(KEY_QNAS).order(by: KEY_DATE, descending: true).start(afterDocument: lastQna).limit(to: 20).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
+        
+        guard let snapshot = snapshot,
+              let lastQna = snapshot.documents.last else { return }
+        
+        self.lastQna = lastQna
+        
+        for (index, document) in snapshot.documents.enumerated() {
+          do {
+            let qna = try FirestoreDecoder().decode(FirebaseQna.self, from: document.data())
+            self.qnas.append(qna)
+            
+            DispatchQueue.main.async {
+              if index + 1 == snapshot.documents.count {
+                qnaTableView.reloadData()
+                
+                self.isLoading = false
+              }
+            }
+          } catch let error {
+            print(error)
+            self.isLoading = false
+          }
         }
       })
     }

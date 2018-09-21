@@ -24,11 +24,16 @@ class ANINotiView: UIView {
   
   private var notifications = [FirebaseNotification]()
   
+  private var lastNoti: QueryDocumentSnapshot?
+  private var isLoading: Bool = false
+  
   var isCellSelected: Bool = false
   
   private weak var activityIndicatorView: NVActivityIndicatorView?
   
   var delegate: ANINotiViewDelegate?
+  
+  var cellHeight = [IndexPath: CGFloat]()
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -71,6 +76,7 @@ class ANINotiView: UIView {
     notiTableView.backgroundColor = ANIColor.bg
     notiTableView.separatorStyle = .none
     notiTableView.alpha = 0.0
+    notiTableView.rowHeight = UITableViewAutomaticDimension
     notiTableView.alwaysBounceVertical = true
     notiTableView.dataSource = self
     notiTableView.delegate = self
@@ -144,6 +150,24 @@ extension ANINotiView: UITableViewDelegate {
       self.delegate?.cellTapped(noti: notifications[indexPath.row])
     }
   }
+  
+  func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    let element = self.notifications.count - 4
+    if !isLoading, indexPath.row >= element {
+      loadMoreNoti()
+      self.isLoading = true
+    }
+    
+    self.cellHeight[indexPath] = cell.frame.size.height
+  }
+  
+  func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+    if let height = self.cellHeight[indexPath] {
+      return height
+    } else {
+      return UITableViewAutomaticDimension
+    }
+  }
 }
 
 //MARK: data
@@ -166,65 +190,119 @@ extension ANINotiView {
     
     let database = Firestore.firestore()
     
-    database.collection(KEY_USERS).document(currentUserUid).collection(KEY_NOTIFICATIONS).order(by: KEY_NOTI_UPDATE_DATE, descending: true).limit(to: 20).getDocuments { (snapshot, error) in
-      if let error = error {
-        print("Error get document: \(error)")
-        
-        return
-      }
+    DispatchQueue.global().async {
+      self.isLoading = true
       
-      guard let snapshot = snapshot else { return }
-      
-      for document in snapshot.documents {
-        do {
-          let notification = try FirestoreDecoder().decode(FirebaseNotification.self, from: document.data())
-          self.notifications.append(notification)
+      database.collection(KEY_USERS).document(currentUserUid).collection(KEY_NOTIFICATIONS).order(by: KEY_NOTI_UPDATE_DATE, descending: true).limit(to: 20).getDocuments { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
           
-          DispatchQueue.main.async {
+          return
+        }
+        
+        guard let snapshot = snapshot,
+              let lastNoti = snapshot.documents.last else { return }
+        
+        self.lastNoti = lastNoti
+        
+        for document in snapshot.documents {
+          do {
+            let notification = try FirestoreDecoder().decode(FirebaseNotification.self, from: document.data())
+            self.notifications.append(notification)
+            
+            DispatchQueue.main.async {
+              if let sender = sender {
+                sender.endRefreshing()
+              }
+              
+              activityIndicatorView.stopAnimating()
+              
+              notiTableView.reloadData()
+              
+              UIView.animate(withDuration: 0.2, animations: {
+                notiTableView.alpha = 1.0
+              })
+              
+              self.isLoading = false
+            }
+          } catch let error {
+            print(error)
+            
+            activityIndicatorView.stopAnimating()
+            
+            UIView.animate(withDuration: 0.2, animations: {
+              reloadView.alpha = 1.0
+            })
+            
             if let sender = sender {
               sender.endRefreshing()
             }
             
-            activityIndicatorView.stopAnimating()
-            
-            notiTableView.reloadData()
-            
-            UIView.animate(withDuration: 0.2, animations: {
-              notiTableView.alpha = 1.0
-            })
+            self.isLoading = false
           }
-        } catch let error {
-          print(error)
+        }
+        
+        if snapshot.documents.isEmpty {
+          if !self.notifications.isEmpty {
+            self.notifications.removeAll()
+          }
+          
+          if let sender = sender {
+            sender.endRefreshing()
+          }
           
           activityIndicatorView.stopAnimating()
+          
+          notiTableView.alpha = 0.0
           
           UIView.animate(withDuration: 0.2, animations: {
             reloadView.alpha = 1.0
           })
           
-          if let sender = sender {
-            sender.endRefreshing()
+          self.isLoading = false
+        }
+      }
+    }
+  }
+  
+  private func loadMoreNoti() {
+    guard let notiTableView = self.notiTableView,
+          let lastNoti = self.lastNoti,
+          !isLoading else { return }
+    
+    let database = Firestore.firestore()
+    
+    DispatchQueue.global().async {
+      database.collection(KEY_STORIES).order(by: KEY_DATE, descending: true).start(afterDocument: lastNoti).limit(to: 10).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
+        
+        guard let snapshot = snapshot,
+              let lastNoti = snapshot.documents.last else { return }
+        
+        self.lastNoti = lastNoti
+        
+        for (index, document) in snapshot.documents.enumerated() {
+          do {
+            let noti = try FirestoreDecoder().decode(FirebaseNotification.self, from: document.data())
+            self.notifications.append(noti)
+            
+            DispatchQueue.main.async {
+              if index + 1 == snapshot.documents.count {
+                notiTableView.reloadData()
+                
+                self.isLoading = false
+              }
+            }
+          } catch let error {
+            print(error)
+            self.isLoading = false
           }
         }
-      }
-      
-      if snapshot.documents.isEmpty {
-        if !self.notifications.isEmpty {
-          self.notifications.removeAll()
-        }
-        
-        if let sender = sender {
-          sender.endRefreshing()
-        }
-        
-        activityIndicatorView.stopAnimating()
-        
-        notiTableView.alpha = 0.0
-        
-        UIView.animate(withDuration: 0.2, animations: {
-          reloadView.alpha = 1.0
-        })
-      }
+      })
     }
   }
 }
