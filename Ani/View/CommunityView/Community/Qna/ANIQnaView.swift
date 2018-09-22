@@ -31,6 +31,7 @@ class ANIQnaView: UIView {
   var isCellSelected: Bool = false
   
   private var lastQna: QueryDocumentSnapshot?
+  private var isLastQnaPage: Bool = false
   private var isLoading: Bool = false
   
   var delegate: ANIQnaViewDelegate?
@@ -238,6 +239,7 @@ extension ANIQnaView {
     
     DispatchQueue.global().async {
       self.isLoading = true
+      self.isLastQnaPage = false
 
       database.collection(KEY_QNAS).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments(completion: { (snapshot, error) in
         if let error = error {
@@ -314,7 +316,8 @@ extension ANIQnaView {
   private func loadMoreQna() {
     guard let qnaTableView = self.qnaTableView,
           let lastQna = self.lastQna,
-          !isLoading else { return }
+          !isLoading,
+          !isLastQnaPage else { return }
     
     let database = Firestore.firestore()
     
@@ -328,8 +331,12 @@ extension ANIQnaView {
           return
         }
         
-        guard let snapshot = snapshot,
-              let lastQna = snapshot.documents.last else { return }
+        guard let snapshot = snapshot else { return }
+        guard let lastQna = snapshot.documents.last else {
+          self.isLastQnaPage = true
+          self.isLoading = false
+          return
+        }
         
         self.lastQna = lastQna
         

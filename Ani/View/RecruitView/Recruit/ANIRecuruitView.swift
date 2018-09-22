@@ -33,6 +33,7 @@ class ANIRecuruitView: UIView {
   private var recruits = [FirebaseRecruit]()
   private var users = [FirebaseUser]()
   
+  private var isLastRecruitPage: Bool = false
   private var lastRecruit: QueryDocumentSnapshot?
   private var isLoading: Bool = false
   
@@ -333,6 +334,7 @@ extension ANIRecuruitView {
     
     DispatchQueue.global().async {
       self.isLoading = true
+      self.isLastRecruitPage = false
 
       query.order(by: KEY_DATE, descending: true).limit(to: 15).getDocuments(completion: { (snapshot, error) in
         if let error = error {
@@ -412,7 +414,8 @@ extension ANIRecuruitView {
     guard let query = self.query,
           let recruitTableView = self.recruitTableView,
           let lastRecruit = self.lastRecruit,
-          !isLoading else { return }
+          !isLoading,
+          !isLastRecruitPage else { return }
     
     DispatchQueue.global().async {
       self.isLoading = true
@@ -424,8 +427,12 @@ extension ANIRecuruitView {
           return
         }
         
-        guard let snapshot = snapshot,
-              let lastRecruit = snapshot.documents.last else { return }
+        guard let snapshot = snapshot else { return }
+        guard let lastRecruit = snapshot.documents.last else {
+          self.isLastRecruitPage = true
+          self.isLoading = false
+          return
+        }
         
         self.lastRecruit = lastRecruit
         
