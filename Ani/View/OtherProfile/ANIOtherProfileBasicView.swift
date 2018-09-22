@@ -391,30 +391,27 @@ extension ANIOtherProfileBasicView: UITableViewDelegate {
   }
   
   func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-    switch contentType {
-    case .recruit:
+    if contentType == .recruit {
       let element = self.recruits.count - 4
       if !isLoading, indexPath.row >= element {
         loadMoreRecruit()
       }
       
       self.recruitCellHeight[indexPath] = cell.frame.size.height
-    case .story:
+    } else if contentType == .story {
       let element = self.stories.count - 4
       if !isLoading, indexPath.row >= element {
         loadMoreStory()
       }
       
       self.storyCellHeight[indexPath] = cell.frame.size.height
-    case .qna:
+    } else if contentType == .qna {
       let element = self.qnas.count - 4
       if !isLoading, indexPath.row >= element {
         loadMoreQna()
       }
       
       self.qnaCellHeight[indexPath] = cell.frame.size.height
-    default:
-      print("default")
     }
   }
   
@@ -610,7 +607,8 @@ extension ANIOtherProfileBasicView {
   
   private func loadRecruit(sender: UIRefreshControl?) {
     guard let user = self.user,
-          let uid = user.uid else { return }
+          let uid = user.uid,
+          !isLoading else { return }
     
     if !self.recruits.isEmpty {
       self.recruits.removeAll()
@@ -727,7 +725,8 @@ extension ANIOtherProfileBasicView {
   
   private func loadStory(sender: UIRefreshControl?) {
     guard let user = self.user,
-          let uid = user.uid else { return }
+          let uid = user.uid,
+          !isLoading else { return }
     
     if !self.stories.isEmpty {
       self.stories.removeAll()
@@ -847,7 +846,8 @@ extension ANIOtherProfileBasicView {
   
   private func loadQna(sender: UIRefreshControl?) {
     guard let user = self.user,
-          let uid = user.uid else { return }
+          let uid = user.uid,
+          !isLoading else { return }
     
     if !self.qnas.isEmpty {
       self.qnas.removeAll()
