@@ -39,10 +39,13 @@ class ANIOtherProfileBasicView: UIView {
   
   private weak var basicTableView: UITableView?
   
+  private var lastRecruit: QueryDocumentSnapshot?
   private var recruits = [FirebaseRecruit]()
   private var recruitUsers = [FirebaseUser]()
+  private var lastStory: QueryDocumentSnapshot?
   private var stories = [FirebaseStory]()
   private var storyUsers = [FirebaseUser]()
+  private var lastQna: QueryDocumentSnapshot?
   private var qnas = [FirebaseQna]()
   private var qnaUsers = [FirebaseUser]()
   private var supportRecruits = [FirebaseRecruit]()
@@ -67,6 +70,14 @@ class ANIOtherProfileBasicView: UIView {
   private weak var activityIndicatorView: NVActivityIndicatorView?
   
   private var isMenuChange: Bool = false
+  
+  private var isLoading: Bool = false
+  private var isLastRecruitPage: Bool = false
+  private var isLastStoryPage: Bool = false
+  private var isLastQnaPage: Bool = false
+  private var recruitCellHeight = [IndexPath: CGFloat]()
+  private var storyCellHeight = [IndexPath: CGFloat]()
+  private var qnaCellHeight = [IndexPath: CGFloat]()
   
   var delegate: ANIOtherProfileBasicViewDelegate?
   
@@ -98,6 +109,7 @@ class ANIOtherProfileBasicView: UIView {
     let qnaCellid = NSStringFromClass(ANIQnaViewCell.self)
     basicTableView.register(ANIQnaViewCell.self, forCellReuseIdentifier: qnaCellid)
     basicTableView.alpha = 0.0
+    basicTableView.rowHeight = UITableViewAutomaticDimension
     let refreshControl = UIRefreshControl()
     refreshControl.addTarget(self, action: #selector(reloadData(sender:)), for: .valueChanged)
     basicTableView.addSubview(refreshControl)
@@ -377,6 +389,59 @@ extension ANIOtherProfileBasicView: UITableViewDelegate {
       cell.unobserveComment()
     }
   }
+  
+  func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    switch contentType {
+    case .recruit:
+      let element = self.recruits.count - 4
+      if !isLoading, indexPath.row >= element {
+        loadMoreRecruit()
+      }
+      
+      self.recruitCellHeight[indexPath] = cell.frame.size.height
+    case .story:
+      let element = self.stories.count - 4
+      if !isLoading, indexPath.row >= element {
+        loadMoreStory()
+      }
+      
+      self.storyCellHeight[indexPath] = cell.frame.size.height
+    case .qna:
+      let element = self.qnas.count - 4
+      if !isLoading, indexPath.row >= element {
+        loadMoreQna()
+      }
+      
+      self.qnaCellHeight[indexPath] = cell.frame.size.height
+    default:
+      print("default")
+    }
+  }
+  
+  func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+    switch contentType {
+    case .recruit:
+      if let height = self.recruitCellHeight[indexPath] {
+        return height
+      } else {
+        return UITableViewAutomaticDimension
+      }
+    case .story:
+      if let height = self.storyCellHeight[indexPath] {
+        return height
+      } else {
+        return UITableViewAutomaticDimension
+      }
+    case .qna:
+      if let height = self.qnaCellHeight[indexPath] {
+        return height
+      } else {
+        return UITableViewAutomaticDimension
+      }
+    default:
+      return UITableViewAutomaticDimension
+    }
+  }
 }
 
 //MARK: ANIProfileMenuBarDelegate
@@ -557,14 +622,20 @@ extension ANIOtherProfileBasicView {
     let database = Firestore.firestore()
     
     DispatchQueue.global().async {
-      database.collection(KEY_RECRUITS).whereField(KEY_USER_ID, isEqualTo: uid).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments(completion: { (snapshot, error) in
+      self.isLoading = true
+      self.isLastStoryPage = false
+      
+      database.collection(KEY_RECRUITS).whereField(KEY_USER_ID, isEqualTo: uid).order(by: KEY_DATE, descending: true).limit(to: 15).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           print("Error get document: \(error)")
           
           return
         }
         
-        guard let snapshot = snapshot else { return }
+        guard let snapshot = snapshot,
+              let lastRecruit = snapshot.documents.last else { return }
+        
+        self.lastRecruit = lastRecruit
         
         for document in snapshot.documents {
           do {
@@ -579,6 +650,8 @@ extension ANIOtherProfileBasicView {
               guard let basicTableView = self.basicTableView else { return }
               
               basicTableView.reloadData()
+              
+              self.isLoading = false
             }
           } catch let error {
             print(error)
@@ -586,12 +659,66 @@ extension ANIOtherProfileBasicView {
             if let sender = sender {
               sender.endRefreshing()
             }
+            
+            self.isLoading = false
           }
         }
         
         if snapshot.documents.isEmpty {
           if let sender = sender {
             sender.endRefreshing()
+          }
+          
+          self.isLoading = false
+        }
+      })
+    }
+  }
+  
+  private func loadMoreRecruit() {
+    guard let basicTableView = self.basicTableView,
+          let lastRecruit = self.lastRecruit,
+          let user = self.user,
+          let uid = user.uid,
+          !isLoading,
+          !isLastRecruitPage else { return }
+    
+    let database = Firestore.firestore()
+    
+    DispatchQueue.global().async {
+      self.isLoading = true
+      
+      database.collection(KEY_RECRUITS).whereField(KEY_USER_ID, isEqualTo: uid).order(by: KEY_DATE, descending: true).start(afterDocument: lastRecruit).limit(to: 15).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
+
+        guard let snapshot = snapshot else { return }
+        guard let lastRecruit = snapshot.documents.last else {
+          self.isLastRecruitPage = true
+          self.isLoading = false
+          return
+        }
+        
+        self.lastRecruit = lastRecruit
+        
+        for (index, document) in snapshot.documents.enumerated() {
+          do {
+            let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: document.data())
+            self.recruits.append(recruit)
+            
+            DispatchQueue.main.async {
+              if index + 1 == snapshot.documents.count {
+                basicTableView.reloadData()
+                
+                self.isLoading = false
+              }
+            }
+          } catch let error {
+            print(error)
+            self.isLoading = false
           }
         }
       })
@@ -615,14 +742,20 @@ extension ANIOtherProfileBasicView {
     let database = Firestore.firestore()
     
     DispatchQueue.global().async {
-      database.collection(KEY_STORIES).whereField(KEY_USER_ID, isEqualTo: uid).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments(completion: { (snapshot, error) in
+      self.isLoading = true
+      self.isLastStoryPage = false
+
+      database.collection(KEY_STORIES).whereField(KEY_USER_ID, isEqualTo: uid).order(by: KEY_DATE, descending: true).limit(to: 10).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           print("Error get document: \(error)")
           
           return
         }
         
-        guard let snapshot = snapshot else { return }
+        guard let snapshot = snapshot,
+              let lastStory = snapshot.documents.last else { return }
+        
+        self.lastStory = lastStory
         
         for document in snapshot.documents {
           do {
@@ -637,6 +770,8 @@ extension ANIOtherProfileBasicView {
               guard let basicTableView = self.basicTableView else { return }
               
               basicTableView.reloadData()
+              
+              self.isLoading = false
             }
           } catch let error {
             print(error)
@@ -644,12 +779,66 @@ extension ANIOtherProfileBasicView {
             if let sender = sender {
               sender.endRefreshing()
             }
+            
+            self.isLoading = false
           }
         }
         
         if snapshot.documents.isEmpty {
           if let sender = sender {
             sender.endRefreshing()
+          }
+          
+          self.isLoading = false
+        }
+      })
+    }
+  }
+  
+  private func loadMoreStory() {
+    guard let basicTableView = self.basicTableView,
+          let lastStory = self.lastStory,
+          let user = self.user,
+          let uid = user.uid,
+          !isLoading,
+          !isLastStoryPage else { return }
+    
+    let database = Firestore.firestore()
+    
+    DispatchQueue.global().async {
+      self.isLoading = true
+      
+      database.collection(KEY_STORIES).whereField(KEY_USER_ID, isEqualTo: uid).order(by: KEY_DATE, descending: true).start(afterDocument: lastStory).limit(to: 10).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
+        
+        guard let snapshot = snapshot else { return }
+        guard let lastStory = snapshot.documents.last else {
+          self.isLastStoryPage = true
+          self.isLoading = false
+          return
+        }
+        
+        self.lastStory = lastStory
+        
+        for (index, document) in snapshot.documents.enumerated() {
+          do {
+            let story = try FirestoreDecoder().decode(FirebaseStory.self, from: document.data())
+            self.stories.append(story)
+            
+            DispatchQueue.main.async {
+              if index + 1 == snapshot.documents.count {
+                basicTableView.reloadData()
+                
+                self.isLoading = false
+              }
+            }
+          } catch let error {
+            print(error)
+            self.isLoading = false
           }
         }
       })
@@ -670,6 +859,9 @@ extension ANIOtherProfileBasicView {
     let database = Firestore.firestore()
     
     DispatchQueue.global().async {
+      self.isLoading = true
+      self.isLastQnaPage = false
+
       database.collection(KEY_QNAS).whereField(KEY_USER_ID, isEqualTo: uid).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           print("Error get document: \(error)")
@@ -677,7 +869,10 @@ extension ANIOtherProfileBasicView {
           return
         }
         
-        guard let snapshot = snapshot else { return }
+        guard let snapshot = snapshot,
+              let lastQna = snapshot.documents.last else { return }
+        
+        self.lastQna = lastQna
         
         for document in snapshot.documents {
           do {
@@ -692,6 +887,8 @@ extension ANIOtherProfileBasicView {
               guard let basicTableView = self.basicTableView else { return }
               
               basicTableView.reloadData()
+              
+              self.isLoading = false
             }
           } catch let error {
             print(error)
@@ -699,12 +896,66 @@ extension ANIOtherProfileBasicView {
             if let sender = sender {
               sender.endRefreshing()
             }
+            
+            self.isLoading = false
           }
         }
         
         if snapshot.documents.isEmpty {
           if let sender = sender {
             sender.endRefreshing()
+          }
+          
+          self.isLoading = false
+        }
+      })
+    }
+  }
+  
+  private func loadMoreQna() {
+    guard let basicTableView = self.basicTableView,
+          let lastQna = self.lastQna,
+          let user = self.user,
+          let uid = user.uid,
+          !isLoading,
+          !isLastQnaPage else { return }
+    
+    let database = Firestore.firestore()
+    
+    DispatchQueue.global().async {
+      self.isLoading = true
+      
+      database.collection(KEY_QNAS).whereField(KEY_USER_ID, isEqualTo: uid).order(by: KEY_DATE, descending: true).start(afterDocument: lastQna).limit(to: 20).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          
+          return
+        }
+        
+        guard let snapshot = snapshot else { return }
+        guard let lastQna = snapshot.documents.last else {
+          self.isLastQnaPage = true
+          self.isLoading = false
+          return
+        }
+        
+        self.lastQna = lastQna
+        
+        for (index, document) in snapshot.documents.enumerated() {
+          do {
+            let qna = try FirestoreDecoder().decode(FirebaseQna.self, from: document.data())
+            self.qnas.append(qna)
+            
+            DispatchQueue.main.async {
+              if index + 1 == snapshot.documents.count {
+                basicTableView.reloadData()
+                
+                self.isLoading = false
+              }
+            }
+          } catch let error {
+            print(error)
+            self.isLoading = false
           }
         }
       })

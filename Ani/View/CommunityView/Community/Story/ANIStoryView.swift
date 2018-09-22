@@ -28,6 +28,7 @@ class ANIStoryView: UIView {
   private var supportRecruits = [FirebaseRecruit]()
   private var users = [FirebaseUser]()
   
+  private var isLastStoryPage: Bool = false
   private var lastStory: QueryDocumentSnapshot?
   private var isLoading: Bool = false
   
@@ -297,6 +298,7 @@ extension ANIStoryView {
 
     DispatchQueue.global().async {
       self.isLoading = true
+      self.isLastStoryPage = false
       
       database.collection(KEY_STORIES).order(by: KEY_DATE, descending: true).limit(to: 10).getDocuments(completion: { (snapshot, error) in
         if let error = error {
@@ -373,7 +375,8 @@ extension ANIStoryView {
   private func loadMoreStory() {
     guard let storyTableView = self.storyTableView,
           let lastStory = self.lastStory,
-          !isLoading else { return }
+          !isLoading,
+          !isLastStoryPage else { return }
     
     let database = Firestore.firestore()
     
@@ -387,8 +390,12 @@ extension ANIStoryView {
           return
         }
         
-        guard let snapshot = snapshot,
-              let lastStory = snapshot.documents.last else { return }
+        guard let snapshot = snapshot else { return }
+        guard let lastStory = snapshot.documents.last else {
+          self.isLastStoryPage = true
+          self.isLoading = false
+          return
+        }
         
         self.lastStory = lastStory
 
