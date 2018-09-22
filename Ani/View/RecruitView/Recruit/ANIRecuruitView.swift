@@ -84,7 +84,7 @@ class ANIRecuruitView: UIView {
   
   var delegate:ANIRecruitViewDelegate?
   
-  var cellHeight = [IndexPath: CGFloat]()
+  private var cellHeight = [IndexPath: CGFloat]()
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -259,7 +259,6 @@ extension ANIRecuruitView: UITableViewDelegate {
     let element = self.recruits.count - 4
     if !isLoading, indexPath.row >= element {
       loadMoreRecruit()
-      self.isLoading = true
     }
     
     self.cellHeight[indexPath] = cell.frame.size.height
@@ -416,6 +415,8 @@ extension ANIRecuruitView {
           !isLoading else { return }
     
     DispatchQueue.global().async {
+      self.isLoading = true
+      
       query.order(by: KEY_DATE, descending: true).start(afterDocument: lastRecruit).limit(to: 15).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           print("Error get document: \(error)")

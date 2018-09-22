@@ -65,6 +65,16 @@ class ANISearchView: UIView {
     }
   }
   
+  private var index: Index?
+  private var nbPages = UInt()
+  private var page: UInt = 0
+  private let query = Query()
+  private var isLoading: Bool = false
+  
+  private var userCellHeight = [IndexPath: CGFloat]()
+  private var storyCellHeight = [IndexPath: CGFloat]()
+  private var qnaCellHeight = [IndexPath: CGFloat]()
+  
   private weak var activityIndicatorView: NVActivityIndicatorView?
   
   var delegate: ANISearchViewDelegate?
@@ -102,6 +112,7 @@ class ANISearchView: UIView {
     tableView.dataSource = self
     tableView.delegate = self
     tableView.alpha = 0.0
+    tableView.rowHeight = UITableViewAutomaticDimension
     addSubview(tableView)
     tableView.edgesToSuperview()
     self.tableView = tableView
@@ -262,6 +273,55 @@ extension ANISearchView: UITableViewDelegate {
       cell.unobserveLove()
     }
   }
+  
+  func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    switch selectedCategory {
+    case .user:
+      let element = self.searchUsers.count - 4
+      if !isLoading, indexPath.row >= element {
+        loadMoreSearch()
+      }
+      
+      self.userCellHeight[indexPath] = cell.frame.size.height
+    case .story:
+      let element = self.searchStories.count - 4
+      if !isLoading, indexPath.row >= element {
+        loadMoreSearch()
+      }
+      
+      self.storyCellHeight[indexPath] = cell.frame.size.height
+    case .qna:
+      let element = self.searchQnas.count - 4
+      if !isLoading, indexPath.row >= element {
+        loadMoreSearch()
+      }
+      
+      self.qnaCellHeight[indexPath] = cell.frame.size.height
+    }
+  }
+  
+  func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+    switch selectedCategory {
+    case .user:
+      if let height = self.userCellHeight[indexPath] {
+        return height
+      } else {
+        return UITableViewAutomaticDimension
+      }
+    case .story:
+      if let height = self.storyCellHeight[indexPath] {
+        return height
+      } else {
+        return UITableViewAutomaticDimension
+      }
+    case .qna:
+      if let height = self.qnaCellHeight[indexPath] {
+        return height
+      } else {
+        return UITableViewAutomaticDimension
+      }
+    }
+  }
 }
 
 //MARK: ANIUserSearchViewCellDelegate
@@ -324,16 +384,19 @@ extension ANISearchView: ANIQnaViewCellDelegate {
   }
 }
 
-//MARK: search
+//MARK: data
 extension ANISearchView {
   private func search(category: SearchCategory, searchText: String) {
     guard let activityIndicatorView = self.activityIndicatorView else { return }
     
-    var index: Index?
-    
     switch category {
     case .user:
       index = ANISessionManager.shared.client.index(withName: KEY_USERS_INDEX)
+      
+      query.query = searchText
+      query.hitsPerPage = 20
+      page = 0
+      query.page = page
       
       if !searchUsers.isEmpty {
         searchUsers.removeAll()
@@ -341,12 +404,22 @@ extension ANISearchView {
     case .story:
       index = ANISessionManager.shared.client.index(withName: KEY_STORIES_INDEX)
       
+      query.query = searchText
+      query.hitsPerPage = 5
+      page = 0
+      query.page = page
+      
       if !searchStories.isEmpty {
         searchStories.removeAll()
         supportRecruits.removeAll()
       }
     case .qna:
       index = ANISessionManager.shared.client.index(withName: KEY_QNAS_INDEX)
+      
+      query.query = searchText
+      query.hitsPerPage = 20
+      page = 0
+      query.page = page
       
       if !searchQnas.isEmpty {
         searchQnas.removeAll()
@@ -356,10 +429,18 @@ extension ANISearchView {
     activityIndicatorView.startAnimating()
     
     DispatchQueue.global().async {
-      index?.search(Query(query: searchText), completionHandler: { (content, error) -> Void in
+      guard let index = self.index,
+            let tableView = self.tableView else { return }
+      
+      self.isLoading = true
+      
+      index.search(self.query, completionHandler: { (content, error) -> Void in
         if let content = content, let hits = content[KEY_HITS] as? [AnyObject], !hits.isEmpty {
-          for hit in hits {
-            guard let hitDic = hit as? [String: AnyObject] else { return }
+          for (hitIndex, hit) in hits.enumerated() {
+            guard let hitDic = hit as? [String: AnyObject],
+                  let nbPages = content["nbPages"] as? UInt else { return }
+            
+            self.nbPages = nbPages
             
             do {
               switch category {
@@ -384,40 +465,116 @@ extension ANISearchView {
               }
               
               DispatchQueue.main.async {
-                guard let tableView = self.tableView else { return }
-                
-                activityIndicatorView.stopAnimating()
-                
-                tableView.reloadData()
-                
-                UIView.animate(withDuration: 0.2, animations: {
-                  tableView.alpha = 1.0
-                })
+                if hitIndex + 1 == hits.count {
+                  activityIndicatorView.stopAnimating()
+                  
+                  tableView.reloadData()
+                  
+                  UIView.animate(withDuration: 0.2, animations: {
+                    tableView.alpha = 1.0
+                  })
+                  
+                  self.isLoading = false
+                }
               }
             } catch let error {
-              guard let tableView = self.tableView else { return }
-              
               tableView.reloadData()
 
               print(error)
               
               activityIndicatorView.stopAnimating()
+              
+              self.isLoading = false
             }
           }
         } else if let error = error {
-          guard let tableView = self.tableView else { return }
-          
           tableView.reloadData()
           
           print("error: \(error)")
           
           activityIndicatorView.stopAnimating()
-        } else {
-          guard let tableView = self.tableView else { return }
           
+          self.isLoading = false
+        } else {
           tableView.reloadData()
           
           activityIndicatorView.stopAnimating()
+          
+          self.isLoading = false
+        }
+      })
+    }
+  }
+  
+  private func loadMoreSearch() {
+    guard page + 1 < nbPages,
+          let index = self.index,
+          !isLoading,
+          let tableView = self.tableView else { return }
+    
+    page = page + 1
+    query.page = page
+    isLoading = true
+    
+    DispatchQueue.global().async {
+      index.search(self.query, completionHandler: { (content, error) -> Void in
+        if let content = content, let hits = content[KEY_HITS] as? [AnyObject], !hits.isEmpty {
+          for (hitIndex, hit) in hits.enumerated() {
+            guard let hitDic = hit as? [String: AnyObject] else { return }
+            
+            do {
+              switch self.selectedCategory {
+              case .user:
+                let user = try FirebaseDecoder().decode(FirebaseUser.self, from: hitDic)
+                
+                if !self.searchUsers.contains(where: { $0.uid == user.uid }) {
+                  if let currenUserUid = ANISessionManager.shared.currentUserUid {
+                    if user.uid != currenUserUid {
+                      self.searchUsers.append(user)
+                    }
+                  } else {
+                    self.searchUsers.append(user)
+                  }
+                }
+              case .story:
+                let story = try FirebaseDecoder().decode(FirebaseStory.self, from: hitDic)
+                
+                if !self.searchStories.contains(where: { $0.id == story.id }) {
+                  self.searchStories.append(story)
+                }
+              case .qna:
+                let qna = try FirebaseDecoder().decode(FirebaseQna.self, from: hitDic)
+                
+                if !self.searchQnas.contains(where: { $0.id == qna.id }) {
+                  self.searchQnas.append(qna)
+                }
+              }
+              
+              DispatchQueue.main.async {
+                if hitIndex + 1 == hits.count {
+                  tableView.reloadData()
+                  
+                  self.isLoading = false
+                }
+              }
+            } catch let error {
+              tableView.reloadData()
+              
+              print(error)
+              
+              self.isLoading = false
+            }
+          }
+        } else if let error = error {
+          tableView.reloadData()
+          
+          print("error: \(error)")
+          
+          self.isLoading = false
+        } else {
+          tableView.reloadData()
+          
+          self.isLoading = false
         }
       })
     }

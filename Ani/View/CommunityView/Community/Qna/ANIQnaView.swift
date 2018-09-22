@@ -35,7 +35,7 @@ class ANIQnaView: UIView {
   
   var delegate: ANIQnaViewDelegate?
   
-  var cellHeight = [IndexPath: CGFloat]()
+  private var cellHeight = [IndexPath: CGFloat]()
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -175,7 +175,6 @@ extension ANIQnaView: UITableViewDelegate {
     let element = self.qnas.count - 4
     if !isLoading, indexPath.row >= element {
       loadMoreQna()
-      self.isLoading = true
     }
     
     self.cellHeight[indexPath] = cell.frame.size.height
@@ -320,6 +319,8 @@ extension ANIQnaView {
     let database = Firestore.firestore()
     
     DispatchQueue.global().async {
+      self.isLoading = true
+      
       database.collection(KEY_QNAS).order(by: KEY_DATE, descending: true).start(afterDocument: lastQna).limit(to: 20).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           print("Error get document: \(error)")

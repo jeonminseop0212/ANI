@@ -37,7 +37,7 @@ class ANIStoryView: UIView {
   
   var delegate: ANIStoryViewDelegate?
   
-  var cellHeight = [IndexPath: CGFloat]()
+  private var cellHeight = [IndexPath: CGFloat]()
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -216,7 +216,6 @@ extension ANIStoryView: UITableViewDelegate {
     let element = self.stories.count - 4
     if !isLoading, indexPath.row >= element {
       loadMoreStory()
-      self.isLoading = true
     }
     
     self.cellHeight[indexPath] = cell.frame.size.height
@@ -379,6 +378,8 @@ extension ANIStoryView {
     let database = Firestore.firestore()
     
     DispatchQueue.global().async {
+      self.isLoading = true
+      
       database.collection(KEY_STORIES).order(by: KEY_DATE, descending: true).start(afterDocument: lastStory).limit(to: 10).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           print("Error get document: \(error)")
