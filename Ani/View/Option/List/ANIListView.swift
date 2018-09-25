@@ -50,9 +50,15 @@ class ANIListView: UIView {
   private var loveStories = [FirebaseStory]()
   private var loveQnas = [FirebaseQna]()
   private var supportRecruits = [FirebaseRecruit]()
+  private var clipRecruits = [FirebaseRecruit]()
+  
   private var users = [FirebaseUser]()
   
-  private var clipRecruits = [FirebaseRecruit]()
+  private var isLastPage: Bool = false
+  private var lastContent: QueryDocumentSnapshot?
+  private var isLoading: Bool = false
+
+  private var cellHeight = [IndexPath: CGFloat]()
   
   var delegate: ANIListViewDelegate?
   
@@ -84,6 +90,7 @@ class ANIListView: UIView {
     listTableView.separatorStyle = .none
     listTableView.backgroundColor = ANIColor.bg
     listTableView.alpha = 0.0
+    listTableView.rowHeight = UITableViewAutomaticDimension
     addSubview(listTableView)
     listTableView.edgesToSuperview()
     self.listTableView = listTableView
@@ -240,7 +247,7 @@ extension ANIListView: UITableViewDataSource {
       let cell = tableView.dequeueReusableCell(withIdentifier: recruitCellid, for: indexPath) as! ANIRecruitViewCell
       
       for user in users {
-        if loveQnas[indexPath.row].userId == user.uid {
+        if clipRecruits[indexPath.row].userId == user.uid {
           cell.user = user
           break
         }
@@ -285,6 +292,43 @@ extension ANIListView: UITableViewDelegate {
         cell.unobserveLove()
         cell.unobserveSupport()
       }
+    }
+  }
+  
+  func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    guard let list = self.list else { return }
+    
+    switch list {
+    case .loveRecruit:
+      let element = self.loveRecruits.count - 4
+      if !isLoading, indexPath.row >= element {
+        loadMoreLoveRecruit()
+      }
+    case .loveStroy:
+      let element = self.loveStories.count - 4
+      if !isLoading, indexPath.row >= element {
+        loadMoreLoveStory()
+      }
+    case .loveQuestion:
+      let element = self.loveQnas.count - 4
+      if !isLoading, indexPath.row >= element {
+        loadMoreLoveQna()
+      }
+    case .clipRecruit:
+      let element = self.clipRecruits.count - 4
+      if !isLoading, indexPath.row >= element {
+        loadMoreClipRecruit()
+      }
+    }
+    
+    self.cellHeight[indexPath] = cell.frame.size.height
+  }
+  
+  func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+    if let height = self.cellHeight[indexPath] {
+      return height
+    } else {
+      return UITableViewAutomaticDimension
     }
   }
 }
@@ -420,14 +464,24 @@ extension ANIListView {
     let database = Firestore.firestore()
     
     DispatchQueue.global().async {
-      database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_RECRUIT_IDS).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments(completion: { (snapshot, error) in
+      self.isLoading = true
+      self.isLastPage = false
+      
+      database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_RECRUIT_IDS).order(by: KEY_DATE, descending: true).limit(to: 15).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           print("Error get document: \(error)")
-          
+          self.isLoading = false
+
           return
         }
         
-        guard let snapshot = snapshot else { return }
+        guard let snapshot = snapshot,
+              let lastContent = snapshot.documents.last else {
+                self.isLoading = false
+                activityIndicatorView.stopAnimating()
+                return }
+        
+        self.lastContent = lastContent
         
         let group = DispatchGroup()
         var loveRecruitsTemp = [FirebaseRecruit?]()
@@ -441,6 +495,7 @@ extension ANIListView {
             database.collection(KEY_RECRUITS).document(document.documentID).getDocument(completion: { (recruitSnapshot, recruitError) in
               if let recruitError = recruitError {
                 print("Error get document: \(recruitError)")
+                self.isLoading = false
                 
                 return
               }
@@ -456,6 +511,8 @@ extension ANIListView {
                 print(error)
                 
                 activityIndicatorView.stopAnimating()
+                
+                self.isLoading = false
               }
             })
           }
@@ -478,13 +535,97 @@ extension ANIListView {
             UIView.animate(withDuration: 0.2, animations: {
               listTableView.alpha = 1.0
             })
+            
+            self.isLoading = false
           }
         }
         
         if snapshot.documents.isEmpty {
-          guard let activityIndicatorView = self.activityIndicatorView else { return }
-          
           activityIndicatorView.stopAnimating()
+          
+          self.isLoading = false
+        }
+      })
+    }
+  }
+  
+  private func loadMoreLoveRecruit() {
+    guard let listTableView = self.listTableView,
+          let lastContent = self.lastContent,
+          let currentUserId = ANISessionManager.shared.currentUserUid,
+          !isLoading,
+          !isLastPage else { return }
+    
+    let database = Firestore.firestore()
+    
+    DispatchQueue.global().async {
+      self.isLoading = true
+      
+      database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_RECRUIT_IDS).order(by: KEY_DATE, descending: true).start(afterDocument: lastContent).limit(to: 15).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          self.isLoading = false
+          
+          return
+        }
+
+        guard let snapshot = snapshot else { return }
+        guard let lastContent = snapshot.documents.last else {
+          self.isLastPage = true
+          self.isLoading = false
+          return
+        }
+        
+        self.lastContent = lastContent
+        
+        let group = DispatchGroup()
+        var loveRecruitsTemp = [FirebaseRecruit?]()
+        
+        for (index, document) in snapshot.documents.enumerated() {
+          
+          group.enter()
+          loveRecruitsTemp.append(nil)
+          
+          DispatchQueue(label: "loveRecruit").async {
+            database.collection(KEY_RECRUITS).document(document.documentID).getDocument(completion: { (recruitSnapshot, recruitError) in
+              if let recruitError = recruitError {
+                print("Error get document: \(recruitError)")
+                self.isLoading = false
+                
+                return
+              }
+              
+              guard let recruitSnapshot = recruitSnapshot, let data = recruitSnapshot.data() else { return }
+              
+              do {
+                let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: data)
+                loveRecruitsTemp[index] = recruit
+                
+                group.leave()
+              } catch let error {
+                print(error)
+                
+                group.leave()
+              }
+            })
+          }
+        }
+        
+        group.notify(queue: DispatchQueue(label: "loveRecruit")) {
+          DispatchQueue.main.async {
+            for loveRecruit in loveRecruitsTemp {
+              if let loveRecruit = loveRecruit {
+                self.loveRecruits.append(loveRecruit)
+              }
+            }
+            listTableView.reloadData()
+            
+            self.isLoading = false
+          }
+        }
+        
+        if snapshot.documents.isEmpty {
+          self.isLoading = false
         }
       })
     }
@@ -497,14 +638,24 @@ extension ANIListView {
     let database = Firestore.firestore()
     
     DispatchQueue.global().async {
-      database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_STORY_IDS).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments(completion: { (snapshot, error) in
+      self.isLoading = true
+      self.isLastPage = false
+      
+      database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_STORY_IDS).order(by: KEY_DATE, descending: true).limit(to: 10).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           print("Error get document: \(error)")
+          self.isLoading = false
           
           return
         }
         
-        guard let snapshot = snapshot else { return }
+        guard let snapshot = snapshot,
+              let lastContent = snapshot.documents.last else {
+                self.isLoading = false
+                activityIndicatorView.stopAnimating()
+                return }
+        
+        self.lastContent = lastContent
         
         let group = DispatchGroup()
         var loveStoriesTemp = [FirebaseStory?]()
@@ -518,6 +669,7 @@ extension ANIListView {
             database.collection(KEY_STORIES).document(document.documentID).getDocument(completion: { (storySnapshot, storyError) in
               if let storyError = storyError {
                 print("Error get document: \(storyError)")
+                self.isLoading = false
                 
                 return
               }
@@ -559,13 +711,97 @@ extension ANIListView {
             UIView.animate(withDuration: 0.2, animations: {
               listTableView.alpha = 1.0
             })
+            
+            self.isLoading = false
+          }
+        }
+        
+        if snapshot.documents.isEmpty {          
+          activityIndicatorView.stopAnimating()
+          
+          self.isLoading = false
+        }
+      })
+    }
+  }
+  
+  private func loadMoreLoveStory() {
+    guard let listTableView = self.listTableView,
+          let lastContent = self.lastContent,
+          let currentUserId = ANISessionManager.shared.currentUserUid,
+          !isLoading,
+          !isLastPage else { return }
+    
+    let database = Firestore.firestore()
+    
+    DispatchQueue.global().async {
+      self.isLoading = true
+      
+      database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_STORY_IDS).order(by: KEY_DATE, descending: true).start(afterDocument: lastContent).limit(to: 10).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          self.isLoading = false
+          
+          return
+        }
+        
+        guard let snapshot = snapshot else { return }
+        guard let lastContent = snapshot.documents.last else {
+          self.isLastPage = true
+          self.isLoading = false
+          return
+        }
+        
+        self.lastContent = lastContent
+        
+        let group = DispatchGroup()
+        var loveStoriesTemp = [FirebaseStory?]()
+        
+        for (index, document) in snapshot.documents.enumerated() {
+          
+          group.enter()
+          loveStoriesTemp.append(nil)
+          
+          DispatchQueue(label: "loveStory").async {
+            database.collection(KEY_STORIES).document(document.documentID).getDocument(completion: { (storySnapshot, storyError) in
+              if let storyError = storyError {
+                print("Error get document: \(storyError)")
+                self.isLoading = false
+                
+                return
+              }
+              
+              guard let storySnapshot = storySnapshot, let data = storySnapshot.data() else { return }
+              
+              do {
+                let story = try FirestoreDecoder().decode(FirebaseStory.self, from: data)
+                loveStoriesTemp[index] = story
+                
+                group.leave()
+              } catch let error {
+                print(error)
+                
+                group.leave()
+              }
+            })
+          }
+        }
+        
+        group.notify(queue: DispatchQueue(label: "loveStory")) {
+          DispatchQueue.main.async {
+            for loveStory in loveStoriesTemp {
+              if let loveStory = loveStory {
+                self.loveStories.append(loveStory)
+              }
+            }
+            listTableView.reloadData()
+            
+            self.isLoading = false
           }
         }
         
         if snapshot.documents.isEmpty {
-          guard let activityIndicatorView = self.activityIndicatorView else { return }
-          
-          activityIndicatorView.stopAnimating()
+          self.isLoading = false
         }
       })
     }
@@ -578,14 +814,24 @@ extension ANIListView {
     let database = Firestore.firestore()
     
     DispatchQueue.global().async {
+      self.isLoading = true
+      self.isLastPage = false
+      
       database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_QNA_IDS).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           print("Error get document: \(error)")
+          self.isLoading = false
           
           return
         }
         
-        guard let snapshot = snapshot else { return }
+        guard let snapshot = snapshot,
+              let lastContent = snapshot.documents.last else {
+                self.isLoading = false
+                activityIndicatorView.stopAnimating()
+                return }
+        
+        self.lastContent = lastContent
         
         let group = DispatchGroup()
         var loveQnasTemp = [FirebaseQna?]()
@@ -599,7 +845,7 @@ extension ANIListView {
             database.collection(KEY_QNAS).document(document.documentID).getDocument(completion: { (qnaSnapshot, qnaError) in
               if let qnaError = qnaError {
                 print("Error get document: \(qnaError)")
-                
+                self.isLoading = false
                 return
               }
               
@@ -639,13 +885,97 @@ extension ANIListView {
             UIView.animate(withDuration: 0.2, animations: {
               listTableView.alpha = 1.0
             })
+            
+            self.isLoading = false
           }
         }
         
         if snapshot.documents.isEmpty {
-          guard let activityIndicatorView = self.activityIndicatorView else { return }
-          
           activityIndicatorView.stopAnimating()
+          
+          self.isLoading = false
+        }
+      })
+    }
+  }
+  
+  private func loadMoreLoveQna() {
+    guard let listTableView = self.listTableView,
+          let lastContent = self.lastContent,
+          let currentUserId = ANISessionManager.shared.currentUserUid,
+          !isLoading,
+          !isLastPage else { return }
+    
+    let database = Firestore.firestore()
+    
+    DispatchQueue.global().async {
+      self.isLoading = true
+      
+      database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_QNA_IDS).order(by: KEY_DATE, descending: true).start(afterDocument: lastContent).limit(to: 20).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          self.isLoading = false
+          
+          return
+        }
+        
+        guard let snapshot = snapshot else { return }
+        guard let lastContent = snapshot.documents.last else {
+          self.isLastPage = true
+          self.isLoading = false
+          return
+        }
+        
+        self.lastContent = lastContent
+        
+        let group = DispatchGroup()
+        var loveQnasTemp = [FirebaseQna?]()
+        
+        for (index, document) in snapshot.documents.enumerated() {
+          
+          group.enter()
+          loveQnasTemp.append(nil)
+          
+          DispatchQueue(label: "loveQna").async {
+            database.collection(KEY_QNAS).document(document.documentID).getDocument(completion: { (qnaSnapshot, qnaError) in
+              if let qnaError = qnaError {
+                print("Error get document: \(qnaError)")
+                self.isLoading = false
+                
+                return
+              }
+              
+              guard let qnaSnapshot = qnaSnapshot, let data = qnaSnapshot.data() else { return }
+              
+              do {
+                let qna = try FirestoreDecoder().decode(FirebaseQna.self, from: data)
+                loveQnasTemp[index] = qna
+                
+                group.leave()
+              } catch let error {
+                print(error)
+                
+                group.leave()
+              }
+            })
+          }
+        }
+        
+        group.notify(queue: DispatchQueue(label: "loveQna")) {
+          DispatchQueue.main.async {
+            for loveQna in loveQnasTemp {
+              if let loveQna = loveQna {
+                self.loveQnas.append(loveQna)
+              }
+            }
+            listTableView.reloadData()
+            
+            self.isLoading = false
+          }
+        }
+        
+        if snapshot.documents.isEmpty {
+          self.isLoading = false
         }
       })
     }
@@ -658,14 +988,24 @@ extension ANIListView {
     let database = Firestore.firestore()
     
     DispatchQueue.global().async {
-      database.collection(KEY_USERS).document(currentUserId).collection(KEY_CLIP_RECRUIT_IDS).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments(completion: { (snapshot, error) in
+      self.isLoading = true
+      self.isLastPage = false
+      
+      database.collection(KEY_USERS).document(currentUserId).collection(KEY_CLIP_RECRUIT_IDS).order(by: KEY_DATE, descending: true).limit(to: 15).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           print("Error get document: \(error)")
+          self.isLoading = false
           
           return
         }
         
-        guard let snapshot = snapshot else { return }
+        guard let snapshot = snapshot,
+              let lastContent = snapshot.documents.last else {
+                self.isLoading = false
+                activityIndicatorView.stopAnimating()
+                return }
+        
+        self.lastContent = lastContent
         
         let group = DispatchGroup()
         var clipRecruitsTemp = [FirebaseRecruit?]()
@@ -679,6 +1019,7 @@ extension ANIListView {
             database.collection(KEY_RECRUITS).document(document.documentID).getDocument(completion: { (recruitSnapshot, recruitError) in
               if let recruitError = recruitError {
                 print("Error get document: \(recruitError)")
+                self.isLoading = false
                 
                 return
               }
@@ -720,13 +1061,97 @@ extension ANIListView {
             UIView.animate(withDuration: 0.2, animations: {
               listTableView.alpha = 1.0
             })
+            
+            self.isLoading = false
           }
         }
         
         if snapshot.documents.isEmpty {
-          guard let activityIndicatorView = self.activityIndicatorView else { return }
-          
           activityIndicatorView.stopAnimating()
+          
+          self.isLoading = false
+        }
+      })
+    }
+  }
+  
+  private func loadMoreClipRecruit() {
+    guard let listTableView = self.listTableView,
+          let lastContent = self.lastContent,
+          let currentUserId = ANISessionManager.shared.currentUserUid,
+          !isLoading,
+          !isLastPage else { return }
+    
+    let database = Firestore.firestore()
+    
+    DispatchQueue.global().async {
+      self.isLoading = true
+      
+      database.collection(KEY_USERS).document(currentUserId).collection(KEY_CLIP_RECRUIT_IDS).order(by: KEY_DATE, descending: true).start(afterDocument: lastContent).limit(to: 15).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          self.isLoading = false
+          
+          return
+        }
+        
+        guard let snapshot = snapshot else { return }
+        guard let lastContent = snapshot.documents.last else {
+          self.isLastPage = true
+          self.isLoading = false
+          return
+        }
+        
+        self.lastContent = lastContent
+        
+        let group = DispatchGroup()
+        var clipRecruitsTemp = [FirebaseRecruit?]()
+        
+        for (index, document) in snapshot.documents.enumerated() {
+          
+          group.enter()
+          clipRecruitsTemp.append(nil)
+          
+          DispatchQueue(label: "clipRecruit").async {
+            database.collection(KEY_RECRUITS).document(document.documentID).getDocument(completion: { (recruitSnapshot, recruitError) in
+              if let recruitError = recruitError {
+                print("Error get document: \(recruitError)")
+                self.isLoading = false
+                
+                return
+              }
+              
+              guard let recruitSnapshot = recruitSnapshot, let data = recruitSnapshot.data() else { return }
+              
+              do {
+                let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: data)
+                clipRecruitsTemp[index] = recruit
+                
+                group.leave()
+              } catch let error {
+                print(error)
+                
+                group.leave()
+              }
+            })
+          }
+        }
+        
+        group.notify(queue: DispatchQueue(label: "clipRecruit")) {
+          DispatchQueue.main.async {
+            for clipRecruit in clipRecruitsTemp {
+              if let clipRecruit = clipRecruit {
+                self.clipRecruits.append(clipRecruit)
+              }
+            }
+            listTableView.reloadData()
+            
+            self.isLoading = false
+          }
+        }
+        
+        if snapshot.documents.isEmpty {
+          self.isLoading = false
         }
       })
     }

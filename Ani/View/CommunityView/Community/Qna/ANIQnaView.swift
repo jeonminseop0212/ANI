@@ -132,6 +132,28 @@ class ANIQnaView: UIView {
     
     qnaTableView.deleteRows(at: [indexPath], with: .automatic)
   }
+  
+  private func showReloadView(sender: UIRefreshControl?) {
+    guard let activityIndicatorView = self.activityIndicatorView,
+          let reloadView = self.reloadView,
+          let qnaTableView = self.qnaTableView else { return }
+    
+    activityIndicatorView.stopAnimating()
+    
+    qnaTableView.reloadData()
+    
+    if let sender = sender {
+      sender.endRefreshing()
+    }
+    
+    qnaTableView.alpha = 0.0
+    
+    UIView.animate(withDuration: 0.2, animations: {
+      reloadView.alpha = 1.0
+    })
+    
+    self.isLoading = false
+  }
 }
 
 //MARK: UITableViewDataSource
@@ -244,12 +266,15 @@ extension ANIQnaView {
       database.collection(KEY_QNAS).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           print("Error get document: \(error)")
+          self.isLoading = false
           
           return
         }
         
         guard let snapshot = snapshot,
-              let lastQna = snapshot.documents.last else { return }
+              let lastQna = snapshot.documents.last else {
+                self.showReloadView(sender: sender)
+                return }
         
         self.lastQna = lastQna
         
@@ -295,19 +320,7 @@ extension ANIQnaView {
             self.qnas.removeAll()
           }
           
-          if let sender = sender {
-            sender.endRefreshing()
-          }
-          
-          activityIndicatorView.stopAnimating()
-          
-          qnaTableView.alpha = 0.0
-          
-          UIView.animate(withDuration: 0.2, animations: {
-            reloadView.alpha = 1.0
-          })
-          
-          self.isLoading = false
+          self.showReloadView(sender: sender)
         }
       })
     }
@@ -327,6 +340,7 @@ extension ANIQnaView {
       database.collection(KEY_QNAS).order(by: KEY_DATE, descending: true).start(afterDocument: lastQna).limit(to: 20).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           print("Error get document: \(error)")
+          self.isLoading = false
           
           return
         }
