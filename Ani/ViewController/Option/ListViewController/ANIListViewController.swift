@@ -231,11 +231,14 @@ extension ANIListViewController {
     let database = Firestore.firestore()
     
     var collection = ""
+    var loveIDsCollection = ""
     
     if contentType == .story {
       collection = KEY_STORIES
+      loveIDsCollection = KEY_LOVE_STORY_IDS
     } else if contentType == .qna {
       collection = KEY_QNAS
+      loveIDsCollection = KEY_LOVE_QNA_IDS
     }
     
     DispatchQueue.global().async {
@@ -306,6 +309,7 @@ extension ANIListViewController {
         guard let snapshot = snapshot else { return }
         
         for document in snapshot.documents {
+          database.collection(KEY_USERS).document(document.documentID).collection(loveIDsCollection).document(contributionId).delete()
           database.collection(collection).document(contributionId).collection(KEY_LOVE_IDS).document(document.documentID).delete()
         }
       })

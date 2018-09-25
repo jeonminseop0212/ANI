@@ -555,6 +555,7 @@ extension ANIRecruitDetailViewController {
         guard let snapshot = snapshot else { return }
         
         for document in snapshot.documents {
+          database.collection(KEY_USERS).document(document.documentID).collection(KEY_LOVE_RECRUIT_IDS).document(recruitId).delete()
           database.collection(KEY_RECRUITS).document(recruitId).collection(KEY_LOVE_IDS).document(document.documentID).delete()
         }
       })
