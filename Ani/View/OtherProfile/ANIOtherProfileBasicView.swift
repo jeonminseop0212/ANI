@@ -277,13 +277,14 @@ extension ANIOtherProfileBasicView: UITableViewDataSource {
         let recruitCellid = NSStringFromClass(ANIRecruitViewCell.self)
         let cell = tableView.dequeueReusableCell(withIdentifier: recruitCellid, for: indexPath) as! ANIRecruitViewCell
         
-        for user in recruitUsers {
-          if recruits[indexPath.row].userId == user.uid {
-            cell.user = user
-            break
+        if recruitUsers.contains(where: { $0.uid == recruits[indexPath.row].userId }) {
+          for user in recruitUsers {
+            if recruits[indexPath.row].userId == user.uid {
+              cell.user = user
+              break
+            }
           }
-        }
-        if recruitUsers.isEmpty {
+        } else {
           cell.user = nil
         }
         cell.recruit = recruits[indexPath.row]
@@ -307,13 +308,14 @@ extension ANIOtherProfileBasicView: UITableViewDataSource {
             } else {
               cell.recruit = nil
             }
-            for user in storyUsers {
-              if stories[indexPath.row].userId == user.uid {
-                cell.user = user
-                break
+            if storyUsers.contains(where: { $0.uid == stories[indexPath.row].userId }) {
+              for user in storyUsers {
+                if stories[indexPath.row].userId == user.uid {
+                  cell.user = user
+                  break
+                }
               }
-            }
-            if storyUsers.isEmpty {
+            } else {
               cell.user = nil
             }
             cell.story = stories[indexPath.row]
@@ -325,13 +327,14 @@ extension ANIOtherProfileBasicView: UITableViewDataSource {
             let storyCellId = NSStringFromClass(ANIStoryViewCell.self)
             let cell = tableView.dequeueReusableCell(withIdentifier: storyCellId, for: indexPath) as! ANIStoryViewCell
             
-            for user in storyUsers {
-              if stories[indexPath.row].userId == user.uid {
-                cell.user = user
-                break
+            if storyUsers.contains(where: { $0.uid == stories[indexPath.row].userId }) {
+              for user in storyUsers {
+                if stories[indexPath.row].userId == user.uid {
+                  cell.user = user
+                  break
+                }
               }
-            }
-            if storyUsers.isEmpty {
+            } else {
               cell.user = nil
             }
             cell.story = stories[indexPath.row]
@@ -347,13 +350,14 @@ extension ANIOtherProfileBasicView: UITableViewDataSource {
         let qnaCellid = NSStringFromClass(ANIQnaViewCell.self)
         let cell = tableView.dequeueReusableCell(withIdentifier: qnaCellid, for: indexPath) as! ANIQnaViewCell
         
-        for user in qnaUsers {
-          if qnas[indexPath.row].userId == user.uid {
-            cell.user = user
-            break
+        if qnaUsers.contains(where: { $0.uid == qnas[indexPath.row].userId }) {
+          for user in qnaUsers {
+            if qnas[indexPath.row].userId == user.uid {
+              cell.user = user
+              break
+            }
           }
-        }
-        if qnaUsers.isEmpty {
+        } else {
           cell.user = nil
         }
         cell.qna = qnas[indexPath.row]

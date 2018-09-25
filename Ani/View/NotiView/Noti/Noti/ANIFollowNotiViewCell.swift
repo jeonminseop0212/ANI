@@ -10,6 +10,10 @@ import UIKit
 import FirebaseFirestore
 import CodableFirebase
 
+protocol ANIFollowNotiViewCellDelegate {
+  func loadedNotiUser(user: FirebaseUser)
+}
+
 class ANIFollowNotiViewCell: UITableViewCell {
   
   private weak var stackView: UIStackView?
@@ -22,17 +26,21 @@ class ANIFollowNotiViewCell: UITableViewCell {
   
   var noti: FirebaseNotification? {
     didSet {
-      loadUser()
+      if user == nil {
+        loadUser()
+      }
       reloadLayout()
     }
   }
   
-  private var user: FirebaseUser? {
+  var user: FirebaseUser? {
     didSet {
       checkFollowed()
       reloadUserLayout()
     }
   }
+  
+  var delegate: ANIFollowNotiViewCellDelegate?
   
   override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -269,6 +277,7 @@ extension ANIFollowNotiViewCell {
         do {
           let user = try FirebaseDecoder().decode(FirebaseUser.self, from: data)
           self.user = user
+          self.delegate?.loadedNotiUser(user: user)
         } catch let error {
           print(error)
         }

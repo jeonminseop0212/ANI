@@ -11,6 +11,10 @@ import FirebaseFirestore
 import CodableFirebase
 import TinyConstraints
 
+protocol ANIBasicNotiViewCellDelegate {
+  func loadedNotiUser(user: FirebaseUser)
+}
+
 class ANIBasicNotiViewCell: UITableViewCell {
   
   private weak var stackView: UIStackView?
@@ -24,16 +28,20 @@ class ANIBasicNotiViewCell: UITableViewCell {
   
   var noti: FirebaseNotification? {
     didSet {
-      loadUser()
+      if user == nil {
+        loadUser()
+      }
       reloadLayout()
     }
   }
   
-  private var user: FirebaseUser? {
+  var user: FirebaseUser? {
     didSet {
       reloadUserLayout()
     }
   }
+  
+  var delegate: ANIBasicNotiViewCellDelegate?
   
   override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -135,6 +143,7 @@ extension ANIBasicNotiViewCell {
         do {
           let user = try FirebaseDecoder().decode(FirebaseUser.self, from: data)
           self.user = user
+          self.delegate?.loadedNotiUser(user: user)
         } catch let error {
           print(error)
         }

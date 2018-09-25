@@ -201,11 +201,15 @@ extension ANISearchView: UITableViewDataSource {
           } else {
             cell.recruit = nil
           }
-          for user in storyUsers {
-            if searchStories[indexPath.row].userId == user.uid {
-              cell.user = user
-              break
+          if storyUsers.contains(where: { $0.uid == searchStories[indexPath.row].userId }) {
+            for user in storyUsers {
+              if searchStories[indexPath.row].userId == user.uid {
+                cell.user = user
+                break
+              }
             }
+          } else {
+            cell.user = nil
           }
           cell.story = searchStories[indexPath.row]
           cell.delegate = self
@@ -216,11 +220,15 @@ extension ANISearchView: UITableViewDataSource {
           let storyCellId = NSStringFromClass(ANIStoryViewCell.self)
           let cell = tableView.dequeueReusableCell(withIdentifier: storyCellId, for: indexPath) as! ANIStoryViewCell
           
-          for user in storyUsers {
-            if searchStories[indexPath.row].userId == user.uid {
-              cell.user = user
-              break
+          if storyUsers.contains(where: { $0.uid == searchStories[indexPath.row].userId }) {
+            for user in storyUsers {
+              if searchStories[indexPath.row].userId == user.uid {
+                cell.user = user
+                break
+              }
             }
+          } else {
+            cell.user = nil
           }
           cell.story = searchStories[indexPath.row]
           cell.delegate = self
@@ -235,11 +243,15 @@ extension ANISearchView: UITableViewDataSource {
       let qnaId = NSStringFromClass(ANIQnaViewCell.self)
       let cell = tableView.dequeueReusableCell(withIdentifier: qnaId, for: indexPath) as! ANIQnaViewCell
       
-      for user in qnaUsers {
-        if searchQnas[indexPath.row].userId == user.uid {
-          cell.user = user
-          break
+      if qnaUsers.contains(where: { $0.uid == searchQnas[indexPath.row].userId }) {
+        for user in qnaUsers {
+          if searchQnas[indexPath.row].userId == user.uid {
+            cell.user = user
+            break
+          }
         }
+      } else {
+        cell.user = nil
       }
       cell.qna = searchQnas[indexPath.row]
       cell.delegate = self

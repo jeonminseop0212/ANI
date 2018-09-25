@@ -243,13 +243,14 @@ extension ANIRecuruitView: UITableViewDataSource {
     let cell = tableView.dequeueReusableCell(withIdentifier: id, for: indexPath) as! ANIRecruitViewCell
     
     if !recruits.isEmpty {
-      for user in users {
-        if recruits[indexPath.row].userId == user.uid {
-          cell.user = user
-          break
+      if users.contains(where: { $0.uid == recruits[indexPath.row].userId }) {
+        for user in users {
+          if recruits[indexPath.row].userId == user.uid {
+            cell.user = user
+            break
+          }
         }
-      }
-      if users.isEmpty {
+      } else {
         cell.user = nil
       }
       cell.recruit = recruits[indexPath.row]
