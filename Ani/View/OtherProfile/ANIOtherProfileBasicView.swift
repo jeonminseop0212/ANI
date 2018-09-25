@@ -611,8 +611,7 @@ extension ANIOtherProfileBasicView {
   
   private func loadRecruit(sender: UIRefreshControl?) {
     guard let user = self.user,
-          let uid = user.uid,
-          !isLoading else { return }
+          let uid = user.uid else { return }
     
     if !self.recruits.isEmpty {
       self.recruits.removeAll()
@@ -731,8 +730,7 @@ extension ANIOtherProfileBasicView {
   
   private func loadStory(sender: UIRefreshControl?) {
     guard let user = self.user,
-          let uid = user.uid,
-          !isLoading else { return }
+          let uid = user.uid else { return }
     
     if !self.stories.isEmpty {
       self.stories.removeAll()
@@ -854,8 +852,7 @@ extension ANIOtherProfileBasicView {
   
   private func loadQna(sender: UIRefreshControl?) {
     guard let user = self.user,
-          let uid = user.uid,
-          !isLoading else { return }
+          let uid = user.uid else { return }
     
     if !self.qnas.isEmpty {
       self.qnas.removeAll()

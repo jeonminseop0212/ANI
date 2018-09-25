@@ -45,10 +45,13 @@ class ANIProfileBasicView: UIView {
   
   private weak var basicTableView: UITableView?
   
+  private var lastRecruit: QueryDocumentSnapshot?
   private var recruits = [FirebaseRecruit]()
   private var recruitUsers = [FirebaseUser]()
+  private var lastStory: QueryDocumentSnapshot?
   private var stories = [FirebaseStory]()
   private var storyUsers = [FirebaseUser]()
+  private var lastQna: QueryDocumentSnapshot?
   private var qnas = [FirebaseQna]()
   private var qnaUsers = [FirebaseUser]()
   private var supportRecruits = [FirebaseRecruit]()
@@ -73,6 +76,14 @@ class ANIProfileBasicView: UIView {
   
   private var isMenuChange: Bool = false
   
+  private var isLoading: Bool = false
+  private var isLastRecruitPage: Bool = false
+  private var isLastStoryPage: Bool = false
+  private var isLastQnaPage: Bool = false
+  private var recruitCellHeight = [IndexPath: CGFloat]()
+  private var storyCellHeight = [IndexPath: CGFloat]()
+  private var qnaCellHeight = [IndexPath: CGFloat]()
+  
   var delegate: ANIProfileBasicViewDelegate?
   
   override init(frame: CGRect) {
@@ -91,6 +102,7 @@ class ANIProfileBasicView: UIView {
     basicTableView.separatorStyle = .none
     basicTableView.dataSource = self
     basicTableView.delegate = self
+    basicTableView.rowHeight = UITableViewAutomaticDimension
     let topCellId = NSStringFromClass(ANIProfileTopCell.self)
     basicTableView.register(ANIProfileTopCell.self, forCellReuseIdentifier: topCellId)
     let profileCellId = NSStringFromClass(ANIProfileCell.self)
@@ -126,9 +138,15 @@ class ANIProfileBasicView: UIView {
   }
   
   func loadData() {
-    loadRecruit()
-    loadStory()
-    loadQna()
+    loadRecruit() {
+      self.observeRecruit()
+    }
+    loadStory() {
+      self.observeStory()
+    }
+    loadQna() {
+      self.observeQna()
+    }
   }
   
   func deleteData(id: String) {
@@ -360,6 +378,56 @@ extension ANIProfileBasicView: UITableViewDelegate {
       cell.unobserveComment()
     }
   }
+  
+  func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    if contentType == .recruit {
+      let element = self.recruits.count - 4
+      if !isLoading, indexPath.row >= element {
+        loadMoreRecruit()
+      }
+      
+      self.recruitCellHeight[indexPath] = cell.frame.size.height
+    } else if contentType == .story {
+      let element = self.stories.count - 4
+      if !isLoading, indexPath.row >= element {
+        loadMoreStory()
+      }
+      
+      self.storyCellHeight[indexPath] = cell.frame.size.height
+    } else if contentType == .qna {
+      let element = self.qnas.count - 4
+      if !isLoading, indexPath.row >= element {
+        loadMoreQna()
+      }
+      
+      self.qnaCellHeight[indexPath] = cell.frame.size.height
+    }
+  }
+  
+  func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+    switch contentType {
+    case .recruit:
+      if let height = self.recruitCellHeight[indexPath] {
+        return height
+      } else {
+        return UITableViewAutomaticDimension
+      }
+    case .story:
+      if let height = self.storyCellHeight[indexPath] {
+        return height
+      } else {
+        return UITableViewAutomaticDimension
+      }
+    case .qna:
+      if let height = self.qnaCellHeight[indexPath] {
+        return height
+      } else {
+        return UITableViewAutomaticDimension
+      }
+    default:
+      return UITableViewAutomaticDimension
+    }
+  }
 }
 
 //MARK: ANIProfileMenuBarDelegate
@@ -490,31 +558,366 @@ extension ANIProfileBasicView: ANIQnaViewCellDelegate {
 
 //MARK: data
 extension ANIProfileBasicView {
-  private func loadRecruit() {
+  private func loadRecruit(completion:(()->())? = nil) {
+    guard let currentUserId = ANISessionManager.shared.currentUserUid else { return }
+    
+    if !self.recruits.isEmpty {
+      self.recruits.removeAll()
+    }
+    if !self.recruitUsers.isEmpty {
+      self.recruitUsers.removeAll()
+    }
+    
+    let database = Firestore.firestore()
+    
+    DispatchQueue.global().async {
+      self.isLoading = true
+      self.isLastStoryPage = false
+      
+      database.collection(KEY_RECRUITS).whereField(KEY_USER_ID, isEqualTo: currentUserId).order(by: KEY_DATE, descending: true).limit(to: 15).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          self.isLoading = false
+          
+          return
+        }
+        
+        guard let snapshot = snapshot,
+              let lastRecruit = snapshot.documents.last else { return }
+        
+        self.lastRecruit = lastRecruit
+        
+        for (index, document) in snapshot.documents.enumerated() {
+          do {
+            let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: document.data())
+            self.recruits.append(recruit)
+            
+            DispatchQueue.main.async {
+              guard let basicTableView = self.basicTableView else { return }
+              
+              basicTableView.reloadData()
+              
+              self.isLoading = false
+              
+              if index + 1 == snapshot.documents.count {
+                completion?()
+              }
+            }
+          } catch let error {
+            print(error)
+            
+            self.isLoading = false
+          }
+        }
+        
+        if snapshot.documents.isEmpty {
+          self.isLoading = false
+          
+          completion?()
+        }
+      })
+    }
+  }
+  
+  private func loadMoreRecruit() {
+    guard let basicTableView = self.basicTableView,
+          let lastRecruit = self.lastRecruit,
+          let currentUserId = ANISessionManager.shared.currentUserUid,
+          !isLoading,
+          !isLastRecruitPage else { return }
+    
+    let database = Firestore.firestore()
+    
+    DispatchQueue.global().async {
+      self.isLoading = true
+      
+      database.collection(KEY_RECRUITS).whereField(KEY_USER_ID, isEqualTo: currentUserId).order(by: KEY_DATE, descending: true).start(afterDocument: lastRecruit).limit(to: 15).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          self.isLoading = false
+          
+          return
+        }
+        
+        guard let snapshot = snapshot else { return }
+        guard let lastRecruit = snapshot.documents.last else {
+          self.isLastRecruitPage = true
+          self.isLoading = false
+          return
+        }
+        
+        self.lastRecruit = lastRecruit
+        
+        for (index, document) in snapshot.documents.enumerated() {
+          do {
+            let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: document.data())
+            self.recruits.append(recruit)
+            
+            DispatchQueue.main.async {
+              if index + 1 == snapshot.documents.count {
+                basicTableView.reloadData()
+                
+                self.isLoading = false
+              }
+            }
+          } catch let error {
+            print(error)
+            self.isLoading = false
+          }
+        }
+      })
+    }
+  }
+  
+  private func loadStory(completion:(()->())? = nil) {
+    guard let currentUserId = ANISessionManager.shared.currentUserUid else { return }
+    
+    if !self.stories.isEmpty {
+      self.stories.removeAll()
+    }
+    if !self.supportRecruits.isEmpty {
+      self.supportRecruits.removeAll()
+    }
+    if !self.storyUsers.isEmpty {
+      self.storyUsers.removeAll()
+    }
+    
+    let database = Firestore.firestore()
+    
+    DispatchQueue.global().async {
+      self.isLoading = true
+      self.isLastStoryPage = false
+      
+      database.collection(KEY_STORIES).whereField(KEY_USER_ID, isEqualTo: currentUserId).order(by: KEY_DATE, descending: true).limit(to: 10).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          self.isLoading = false
+          
+          return
+        }
+        
+        guard let snapshot = snapshot,
+              let lastStory = snapshot.documents.last else { return }
+        
+        self.lastStory = lastStory
+        
+        for (index, document) in snapshot.documents.enumerated() {
+          do {
+            let story = try FirestoreDecoder().decode(FirebaseStory.self, from: document.data())
+            self.stories.append(story)
+            
+            DispatchQueue.main.async {
+              guard let basicTableView = self.basicTableView else { return }
+              
+              basicTableView.reloadData()
+              
+              self.isLoading = false
+              
+              if index + 1 == snapshot.documents.count {
+                completion?()
+              }
+            }
+          } catch let error {
+            print(error)
+            
+            self.isLoading = false
+          }
+        }
+        
+        if snapshot.documents.isEmpty {
+          self.isLoading = false
+        }
+      })
+    }
+  }
+  
+  private func loadMoreStory() {
+    guard let basicTableView = self.basicTableView,
+          let lastStory = self.lastStory,
+          let currentUserId = ANISessionManager.shared.currentUserUid,
+          !isLoading,
+          !isLastStoryPage else { return }
+    
+    let database = Firestore.firestore()
+    
+    DispatchQueue.global().async {
+      self.isLoading = true
+      
+      database.collection(KEY_STORIES).whereField(KEY_USER_ID, isEqualTo: currentUserId).order(by: KEY_DATE, descending: true).start(afterDocument: lastStory).limit(to: 10).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          self.isLoading = false
+          
+          return
+        }
+        
+        guard let snapshot = snapshot else { return }
+        guard let lastStory = snapshot.documents.last else {
+          self.isLastStoryPage = true
+          self.isLoading = false
+          return
+        }
+        
+        self.lastStory = lastStory
+        
+        for (index, document) in snapshot.documents.enumerated() {
+          do {
+            let story = try FirestoreDecoder().decode(FirebaseStory.self, from: document.data())
+            self.stories.append(story)
+            
+            DispatchQueue.main.async {
+              if index + 1 == snapshot.documents.count {
+                basicTableView.reloadData()
+                
+                self.isLoading = false
+              }
+            }
+          } catch let error {
+            print(error)
+            self.isLoading = false
+          }
+        }
+      })
+    }
+  }
+  
+  private func loadQna(completion:(()->())? = nil) {
+    guard let currentUserId = ANISessionManager.shared.currentUserUid else { return }
+    
+    if !self.qnas.isEmpty {
+      self.qnas.removeAll()
+    }
+    if !self.qnaUsers.isEmpty {
+      self.qnaUsers.removeAll()
+    }
+    
+    let database = Firestore.firestore()
+    
+    DispatchQueue.global().async {
+      self.isLoading = true
+      self.isLastQnaPage = false
+      
+      database.collection(KEY_QNAS).whereField(KEY_USER_ID, isEqualTo: currentUserId).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          self.isLoading = false
+          
+          return
+        }
+        
+        guard let snapshot = snapshot,
+              let lastQna = snapshot.documents.last else { return }
+        
+        self.lastQna = lastQna
+        
+        for (index, document) in snapshot.documents.enumerated() {
+          do {
+            let qna = try FirestoreDecoder().decode(FirebaseQna.self.self, from: document.data())
+            self.qnas.append(qna)
+            
+            DispatchQueue.main.async {
+              guard let basicTableView = self.basicTableView else { return }
+              
+              basicTableView.reloadData()
+              
+              self.isLoading = false
+              
+              if index + 1 == snapshot.documents.count {
+                completion?()
+              }
+            }
+          } catch let error {
+            print(error)
+
+            self.isLoading = false
+          }
+        }
+        
+        if snapshot.documents.isEmpty {
+          self.isLoading = false
+        }
+      })
+    }
+  }
+  
+  private func loadMoreQna() {
+    guard let basicTableView = self.basicTableView,
+          let lastQna = self.lastQna,
+          let currentUserId = ANISessionManager.shared.currentUserUid,
+          !isLoading,
+          !isLastQnaPage else { return }
+    
+    let database = Firestore.firestore()
+    
+    DispatchQueue.global().async {
+      self.isLoading = true
+      
+      database.collection(KEY_QNAS).whereField(KEY_USER_ID, isEqualTo: currentUserId).order(by: KEY_DATE, descending: true).start(afterDocument: lastQna).limit(to: 20).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          print("Error get document: \(error)")
+          self.isLoading = false
+          
+          return
+        }
+        
+        guard let snapshot = snapshot else { return }
+        guard let lastQna = snapshot.documents.last else {
+          self.isLastQnaPage = true
+          self.isLoading = false
+          return
+        }
+        
+        self.lastQna = lastQna
+        
+        for (index, document) in snapshot.documents.enumerated() {
+          do {
+            let qna = try FirestoreDecoder().decode(FirebaseQna.self, from: document.data())
+            self.qnas.append(qna)
+            
+            DispatchQueue.main.async {
+              if index + 1 == snapshot.documents.count {
+                basicTableView.reloadData()
+                
+                self.isLoading = false
+              }
+            }
+          } catch let error {
+            print(error)
+            self.isLoading = false
+          }
+        }
+      })
+    }
+  }
+  
+  private func observeRecruit() {
     guard let currentUserId = ANISessionManager.shared.currentUserUid else { return }
     
     let database = Firestore.firestore()
     
     DispatchQueue.global().async {
-      database.collection(KEY_RECRUITS).whereField(KEY_USER_ID, isEqualTo: currentUserId).order(by: KEY_DATE, descending: false).addSnapshotListener({ (snapshot, error) in
+      database.collection(KEY_RECRUITS).whereField(KEY_USER_ID, isEqualTo: currentUserId).addSnapshotListener({ (snapshot, error) in
         if let error = error {
           print("Error get document: \(error)")
           
           return
         }
         
-        guard let snapshot = snapshot else { return }
-        
+        guard let snapshot = snapshot,
+              snapshot.documentChanges.count == 1 else { return }
+
         snapshot.documentChanges.forEach({ (diff) in
           if diff.type == .added {
             do {
               let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: diff.document.data())
               
-              self.recruits.insert(recruit, at: 0)
-              
-              DispatchQueue.main.async {
-                guard let basicTableView = self.basicTableView else { return }
-                basicTableView.reloadData()
+              if !self.recruits.contains(where: {$0.id == recruit.id }) {
+                self.recruits.insert(recruit, at: 0)
+                
+                DispatchQueue.main.async {
+                  guard let basicTableView = self.basicTableView else { return }
+                  basicTableView.reloadData()
+                }
               }
             } catch let error {
               print(error)
@@ -537,37 +940,42 @@ extension ANIProfileBasicView {
             } catch let error {
               print(error)
             }
+          } else if diff.type == .modified {
+            
           }
         })
       })
     }
   }
   
-  private func loadStory() {
+  private func observeStory() {
     guard let currentUserId = ANISessionManager.shared.currentUserUid else { return }
     
     let database = Firestore.firestore()
     
     DispatchQueue.global().async {
-      database.collection(KEY_STORIES).whereField(KEY_USER_ID, isEqualTo: currentUserId).order(by: KEY_DATE, descending: false).addSnapshotListener({ (snapshot, error) in
+      database.collection(KEY_STORIES).whereField(KEY_USER_ID, isEqualTo: currentUserId).addSnapshotListener({ (snapshot, error) in
         if let error = error {
           print("Error get document: \(error)")
           
           return
         }
         
-        guard let snapshot = snapshot else { return }
+        guard let snapshot = snapshot,
+              snapshot.documentChanges.count == 1 else { return }
         
         snapshot.documentChanges.forEach({ (diff) in
           if diff.type == .added {
             do {
               let story = try FirestoreDecoder().decode(FirebaseStory.self, from: diff.document.data())
               
-              self.stories.insert(story, at: 0)
-              
-              DispatchQueue.main.async {
-                guard let basicTableView = self.basicTableView else { return }
-                basicTableView.reloadData()
+              if !self.stories.contains(where: {$0.id == story.id }) {
+                self.stories.insert(story, at: 0)
+                
+                DispatchQueue.main.async {
+                  guard let basicTableView = self.basicTableView else { return }
+                  basicTableView.reloadData()
+                }
               }
             } catch let error {
               print(error)
@@ -596,31 +1004,35 @@ extension ANIProfileBasicView {
     }
   }
   
-  private func loadQna() {
+  private func observeQna() {
     guard let currentUserId = ANISessionManager.shared.currentUserUid else { return }
     
     let database = Firestore.firestore()
 
     DispatchQueue.global().async {
-      database.collection(KEY_QNAS).whereField(KEY_USER_ID, isEqualTo: currentUserId).order(by: KEY_DATE, descending: false).addSnapshotListener({ (snapshot, error) in
+      database.collection(KEY_QNAS).whereField(KEY_USER_ID, isEqualTo: currentUserId).addSnapshotListener({ (snapshot, error) in
         if let error = error {
           print("Error get document: \(error)")
           
           return
         }
         
-        guard let snapshot = snapshot else { return }
+        guard let snapshot = snapshot,
+              snapshot.documentChanges.count == 1 else { return }
         
         snapshot.documentChanges.forEach({ (diff) in
           if diff.type == .added {
             do {
               let qna = try FirestoreDecoder().decode(FirebaseQna.self, from: diff.document.data())
               
-              self.qnas.insert(qna, at: 0)
-              DispatchQueue.main.async {
-                guard let basicTableView = self.basicTableView else { return }
+              if !self.qnas.contains(where: {$0.id == qna.id }) {
+                self.qnas.insert(qna, at: 0)
                 
-                basicTableView.reloadData()
+                DispatchQueue.main.async {
+                  guard let basicTableView = self.basicTableView else { return }
+                  
+                  basicTableView.reloadData()
+                }
               }
             } catch let error {
               print(error)
