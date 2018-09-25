@@ -212,14 +212,14 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
     let database = Firestore.firestore()
     database.collection(KEY_USERS).document(uid).updateData(values) { (error) in
       if let error = error {
-        print("update user error \(error)")
+        DLog("update user error \(error)")
       }
       
       self.updateDataAlgolia(data: values)
       
       database.collection(KEY_USERS).document(uid).getDocument { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           
           return
         }
@@ -235,7 +235,7 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
           self.delegate?.didEdit()
           self.dismiss(animated: true, completion: nil)
         } catch let error {
-          print(error)
+          DLog(error)
         }
       }
     }
@@ -249,7 +249,7 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
     DispatchQueue.global().async {
       index.partialUpdateObject(data, withID: objectId, completionHandler: { (content, error) -> Void in
         if error == nil {
-          print("Object IDs: \(content!)")
+          DLog("Object IDs: \(content!)")
         }
       })
     }
@@ -262,7 +262,7 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
       
       storageRef.delete { error in
         if let error = error {
-          print(error)
+          DLog(error)
         }
       }
     }
@@ -307,7 +307,7 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
             let storageRef = Storage.storage().reference()
             storageRef.child(KEY_FAMILY_IMAGES).child(uuid).putData(familyImageData, metadata: nil) { (metaData, error) in
               if error != nil {
-                print("storageError")
+                DLog("storageError")
                 return
               }
               
@@ -373,7 +373,7 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
       let storageRef = Storage.storage().reference()
       storageRef.child(KEY_PROFILE_IMAGES).child("\(currentUserUid).jpeg").putData(profileImageData, metadata: nil) { (metaData, error) in
         if error != nil {
-          print("storageError")
+          DLog("storageError")
           return
         }
         

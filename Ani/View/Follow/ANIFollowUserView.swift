@@ -131,7 +131,7 @@ extension ANIFollowUserView {
     
     database.collection(KEY_USERS).document(userId).collection(KEY_FOLLOWING_USER_IDS).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments { (snapshot, error) in
       if let error = error {
-        print("Error get document: \(error)")
+        DLog("Error get document: \(error)")
         
         return
       }
@@ -141,7 +141,7 @@ extension ANIFollowUserView {
       for document in snapshot.documents {
         database.collection(KEY_USERS).document(document.documentID).getDocument(completion: { (userSnapshot, userError) in
           if let error = error {
-            print("Error get user document: \(error)")
+            DLog("Error get user document: \(error)")
             
             return
           }
@@ -167,7 +167,7 @@ extension ANIFollowUserView {
               })
             }
           } catch let error {
-            print(error)
+            DLog(error)
             activityIndicatorView.stopAnimating()
             
             if let sender = sender {
@@ -203,7 +203,7 @@ extension ANIFollowUserView {
     
     database.collection(KEY_USERS).document(userId).collection(KEY_FOLLOWER_IDS).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments { (snapshot, error) in
       if let error = error {
-        print("Error get document: \(error)")
+        DLog("Error get document: \(error)")
         
         return
       }
@@ -222,7 +222,7 @@ extension ANIFollowUserView {
 
           database.collection(KEY_USERS).document(document.documentID).getDocument(completion: { (userSnapshot, userError) in
             if let error = error {
-              print("Error get user document: \(error)")
+              DLog("Error get user document: \(error)")
               
               return
             }
@@ -239,7 +239,7 @@ extension ANIFollowUserView {
               
               group.leave()
             } catch let error {
-              print(error)
+              DLog(error)
               
               group.leave()
             }

@@ -296,7 +296,7 @@ class ANIRecruitContributionViewController: UIViewController {
         } else if recruitContributionMode == .edit {
           database.collection(KEY_RECRUITS).document(id).setData(data) { (error) in
             if let error = error {
-              print(error)
+              DLog(error)
             } else {
               NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
               
@@ -306,7 +306,7 @@ class ANIRecruitContributionViewController: UIViewController {
           }
         }
       } catch let error {
-        print(error)
+        DLog(error)
       }
     }
   }
@@ -320,7 +320,7 @@ class ANIRecruitContributionViewController: UIViewController {
       
       storageRef.delete { error in
         if let error = error {
-          print(error)
+          DLog(error)
         }
       }
     }
@@ -332,7 +332,7 @@ class ANIRecruitContributionViewController: UIViewController {
         
         storageRef.delete { error in
           if let error = error {
-            print(error)
+            DLog(error)
           }
         }
       }
@@ -544,7 +544,7 @@ extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
             let uuid = NSUUID().uuidString
             storageRef.child(KEY_RECRUIT_HEADER_IMAGES).child(uuid).putData(recruitHeaderImageData, metadata: nil) { (metaData, error) in
               if error != nil {
-                print("storageError")
+                DLog("storageError")
                 return
               }
               
@@ -566,7 +566,7 @@ extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
               let uuid = NSUUID().uuidString
               storageRef.child(KEY_RECRUIT_INTRODUCE_IMAGES).child(uuid).putData(introduceImageData, metadata: nil) { (metaData, error) in
                 if error != nil {
-                  print("storageError")
+                  DLog("storageError")
                   return
                 }
                 

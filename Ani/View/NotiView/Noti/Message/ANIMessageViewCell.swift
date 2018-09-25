@@ -160,7 +160,7 @@ extension ANIMessageViewCell {
         DispatchQueue.global().async {          
           database.collection(KEY_USERS).document(memberId).getDocument(completion: { (snapshot, error) in
             if let error = error {
-              print("Error get document: \(error)")
+              DLog("Error get document: \(error)")
               
               return
             }
@@ -172,7 +172,7 @@ extension ANIMessageViewCell {
               
               self.user = user
             } catch let error {
-              print(error)
+              DLog(error)
             }
           })
         }

@@ -177,7 +177,7 @@ class ANIProfileBasicView: UIView {
         }
       }
     default:
-      print("profile")
+      DLog("profile")
     }
     
     basicTableView.deleteRows(at: [indexPath], with: .automatic)
@@ -448,7 +448,7 @@ extension ANIProfileBasicView: ANIProfileMenuBarDelegate {
     case ContentType.qna.rawValue:
       contentType = .qna
     default:
-      print("default")
+      DLog("default")
     }
 
     basicTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
@@ -576,7 +576,7 @@ extension ANIProfileBasicView {
       
       database.collection(KEY_RECRUITS).whereField(KEY_USER_ID, isEqualTo: currentUserId).order(by: KEY_DATE, descending: true).limit(to: 15).getDocuments(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           self.isLoading = false
           
           return
@@ -604,7 +604,7 @@ extension ANIProfileBasicView {
               }
             }
           } catch let error {
-            print(error)
+            DLog(error)
             
             self.isLoading = false
           }
@@ -633,7 +633,7 @@ extension ANIProfileBasicView {
       
       database.collection(KEY_RECRUITS).whereField(KEY_USER_ID, isEqualTo: currentUserId).order(by: KEY_DATE, descending: true).start(afterDocument: lastRecruit).limit(to: 15).getDocuments(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           self.isLoading = false
           
           return
@@ -661,7 +661,7 @@ extension ANIProfileBasicView {
               }
             }
           } catch let error {
-            print(error)
+            DLog(error)
             self.isLoading = false
           }
         }
@@ -690,7 +690,7 @@ extension ANIProfileBasicView {
       
       database.collection(KEY_STORIES).whereField(KEY_USER_ID, isEqualTo: currentUserId).order(by: KEY_DATE, descending: true).limit(to: 10).getDocuments(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           self.isLoading = false
           
           return
@@ -718,7 +718,7 @@ extension ANIProfileBasicView {
               }
             }
           } catch let error {
-            print(error)
+            DLog(error)
             
             self.isLoading = false
           }
@@ -745,7 +745,7 @@ extension ANIProfileBasicView {
       
       database.collection(KEY_STORIES).whereField(KEY_USER_ID, isEqualTo: currentUserId).order(by: KEY_DATE, descending: true).start(afterDocument: lastStory).limit(to: 10).getDocuments(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           self.isLoading = false
           
           return
@@ -773,7 +773,7 @@ extension ANIProfileBasicView {
               }
             }
           } catch let error {
-            print(error)
+            DLog(error)
             self.isLoading = false
           }
         }
@@ -799,7 +799,7 @@ extension ANIProfileBasicView {
       
       database.collection(KEY_QNAS).whereField(KEY_USER_ID, isEqualTo: currentUserId).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           self.isLoading = false
           
           return
@@ -827,7 +827,7 @@ extension ANIProfileBasicView {
               }
             }
           } catch let error {
-            print(error)
+            DLog(error)
 
             self.isLoading = false
           }
@@ -854,7 +854,7 @@ extension ANIProfileBasicView {
       
       database.collection(KEY_QNAS).whereField(KEY_USER_ID, isEqualTo: currentUserId).order(by: KEY_DATE, descending: true).start(afterDocument: lastQna).limit(to: 20).getDocuments(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           self.isLoading = false
           
           return
@@ -882,7 +882,7 @@ extension ANIProfileBasicView {
               }
             }
           } catch let error {
-            print(error)
+            DLog(error)
             self.isLoading = false
           }
         }
@@ -898,7 +898,7 @@ extension ANIProfileBasicView {
     DispatchQueue.global().async {
       database.collection(KEY_RECRUITS).whereField(KEY_USER_ID, isEqualTo: currentUserId).addSnapshotListener({ (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           
           return
         }
@@ -920,7 +920,7 @@ extension ANIProfileBasicView {
                 }
               }
             } catch let error {
-              print(error)
+              DLog(error)
             }
           } else if diff.type == .removed {
             do {
@@ -938,7 +938,7 @@ extension ANIProfileBasicView {
                 }
               }
             } catch let error {
-              print(error)
+              DLog(error)
             }
           } else if diff.type == .modified {
             do {
@@ -958,7 +958,7 @@ extension ANIProfileBasicView {
                 }
               }
             } catch let error {
-              print(error)
+              DLog(error)
             }
           }
         })
@@ -974,7 +974,7 @@ extension ANIProfileBasicView {
     DispatchQueue.global().async {
       database.collection(KEY_STORIES).whereField(KEY_USER_ID, isEqualTo: currentUserId).addSnapshotListener({ (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           
           return
         }
@@ -996,7 +996,7 @@ extension ANIProfileBasicView {
                 }
               }
             } catch let error {
-              print(error)
+              DLog(error)
             }
           } else if diff.type == .removed {
             do {
@@ -1014,7 +1014,7 @@ extension ANIProfileBasicView {
                 }
               }
             } catch let error {
-              print(error)
+              DLog(error)
             }
           }
         })
@@ -1030,7 +1030,7 @@ extension ANIProfileBasicView {
     DispatchQueue.global().async {
       database.collection(KEY_QNAS).whereField(KEY_USER_ID, isEqualTo: currentUserId).addSnapshotListener({ (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           
           return
         }
@@ -1053,7 +1053,7 @@ extension ANIProfileBasicView {
                 }
               }
             } catch let error {
-              print(error)
+              DLog(error)
             }
           } else if diff.type == .removed {
             do {
@@ -1071,7 +1071,7 @@ extension ANIProfileBasicView {
                 }
               }
             } catch let error {
-              print(error)
+              DLog(error)
             }
           }
         })

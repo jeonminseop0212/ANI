@@ -127,7 +127,7 @@ extension ANICommentView {
       DispatchQueue.global().async {
         database.collection(KEY_STORIES).document(storyId).collection(KEY_COMMENTS).order(by: KEY_DATE, descending: false).addSnapshotListener({ (snapshot, error) in
           if let error = error {
-            print("Error get document: \(error)")
+            DLog("Error get document: \(error)")
 
             return
           }
@@ -146,7 +146,7 @@ extension ANICommentView {
                   commentTableView.reloadData()
                 }
               } catch let error {
-                print(error)
+                DLog(error)
               }
             }
           })
@@ -159,7 +159,7 @@ extension ANICommentView {
       DispatchQueue.global().async {
         database.collection(KEY_QNAS).document(qnaId).collection(KEY_COMMENTS).order(by: KEY_DATE, descending: false).addSnapshotListener({ (snapshot, error) in
           if let error = error {
-            print("Error get document: \(error)")
+            DLog("Error get document: \(error)")
             
             return
           }
@@ -178,7 +178,7 @@ extension ANICommentView {
                   commentTableView.reloadData()
                 }
               } catch let error {
-                print(error)
+                DLog(error)
               }
             }
           })

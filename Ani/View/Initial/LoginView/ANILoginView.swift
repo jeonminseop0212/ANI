@@ -211,7 +211,7 @@ extension ANILoginView: ANIButtonViewDelegate {
           
           NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
 
-          print("nsError \(nsError)")
+          DLog("nsError \(nsError)")
           if nsError.code == 17008 {
             self.delegate?.reject(notiText: "存在しないメールアドレスです！")
           } else if nsError.code == 17009 {
@@ -229,7 +229,7 @@ extension ANILoginView: ANIButtonViewDelegate {
             DispatchQueue.global().async {
               database.collection(KEY_USERS).document(currentUserUid).addSnapshotListener({ (snapshot, error) in
                 if let error = error {
-                  print("Error adding document: \(error)")
+                  DLog("Error adding document: \(error)")
 
                   return
                 }
@@ -247,7 +247,7 @@ extension ANILoginView: ANIButtonViewDelegate {
                     NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
                   }
                 } catch let error {
-                  print(error)
+                  DLog(error)
                   NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
                 }
               })

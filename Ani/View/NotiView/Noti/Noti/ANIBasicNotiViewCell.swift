@@ -135,7 +135,7 @@ extension ANIBasicNotiViewCell {
     DispatchQueue.global().async {
       database.collection(KEY_USERS).document(noti.userId).getDocument(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           
           return
         }
@@ -147,7 +147,7 @@ extension ANIBasicNotiViewCell {
           self.user = user
           self.delegate?.loadedNotiUser(user: user)
         } catch let error {
-          print(error)
+          DLog(error)
         }
       })
     }

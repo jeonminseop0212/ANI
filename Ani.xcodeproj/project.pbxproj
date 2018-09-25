@@ -30,6 +30,7 @@
 		CD334E8221421C7F001C6289 /* ANIReloadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD334E8121421C7F001C6289 /* ANIReloadView.swift */; };
 		CD33BEDE20F31F9A00D2A367 /* ANINotiDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD33BEDD20F31F9A00D2A367 /* ANINotiDetailViewController.swift */; };
 		CD33BEE120F3212400D2A367 /* ANINotiDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD33BEE020F3212400D2A367 /* ANINotiDetailView.swift */; };
+		CD3DBF97215A31F50010A219 /* Macros.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD3DBF96215A31F50010A219 /* Macros.swift */; };
 		CD4F0EF720F481030093C543 /* ANINotiCommentViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD4F0EF620F481030093C543 /* ANINotiCommentViewCell.swift */; };
 		CD50A46720EC6A2500CFF16F /* UIIMage.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD50A46620EC6A2500CFF16F /* UIIMage.swift */; };
 		CD529783213E17F7001609DB /* ANIPopupOptionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD529782213E17F7001609DB /* ANIPopupOptionViewCell.swift */; };
@@ -40,6 +41,7 @@
 		CD6762E020FD75AC0098E033 /* PickUpItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6762DF20FD75AC0098E033 /* PickUpItem.swift */; };
 		CD6B675120A8844B009BF63D /* ANIRecruitContributionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6B675020A8844B009BF63D /* ANIRecruitContributionView.swift */; };
 		CD6B675420A90F8A009BF63D /* ANIPlaceholderTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6B675320A90F8A009BF63D /* ANIPlaceholderTextView.swift */; };
+		CD8FE7D4215A690A00D3281A /* GoogleService-Info-release.plist in Resources */ = {isa = PBXBuildFile; fileRef = CD8FE7D3215A690900D3281A /* GoogleService-Info-release.plist */; };
 		CD92792220C0DCB400B1F006 /* ANIKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD92792120C0DCB400B1F006 /* ANIKey.swift */; };
 		CD9E52B120921EB400715F50 /* UIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD9E52B020921EB400715F50 /* UIViewController.swift */; };
 		CD9E52B32094304700715F50 /* ANIRecruitDetailImagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD9E52B22094304700715F50 /* ANIRecruitDetailImagesView.swift */; };
@@ -206,6 +208,7 @@
 		CD334E8121421C7F001C6289 /* ANIReloadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIReloadView.swift; sourceTree = "<group>"; };
 		CD33BEDD20F31F9A00D2A367 /* ANINotiDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotiDetailViewController.swift; sourceTree = "<group>"; };
 		CD33BEE020F3212400D2A367 /* ANINotiDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotiDetailView.swift; sourceTree = "<group>"; };
+		CD3DBF96215A31F50010A219 /* Macros.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Macros.swift; sourceTree = "<group>"; };
 		CD4F0EF620F481030093C543 /* ANINotiCommentViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotiCommentViewCell.swift; sourceTree = "<group>"; };
 		CD50A46620EC6A2500CFF16F /* UIIMage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIIMage.swift; sourceTree = "<group>"; };
 		CD50A46820EC89BD00CFF16F /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
@@ -217,6 +220,7 @@
 		CD6762DF20FD75AC0098E033 /* PickUpItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickUpItem.swift; sourceTree = "<group>"; };
 		CD6B675020A8844B009BF63D /* ANIRecruitContributionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitContributionView.swift; sourceTree = "<group>"; };
 		CD6B675320A90F8A009BF63D /* ANIPlaceholderTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIPlaceholderTextView.swift; sourceTree = "<group>"; };
+		CD8FE7D3215A690900D3281A /* GoogleService-Info-release.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info-release.plist"; sourceTree = "<group>"; };
 		CD92792120C0DCB400B1F006 /* ANIKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIKey.swift; sourceTree = "<group>"; };
 		CD9E52B020921EB400715F50 /* UIViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewController.swift; sourceTree = "<group>"; };
 		CD9E52B22094304700715F50 /* ANIRecruitDetailImagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitDetailImagesView.swift; sourceTree = "<group>"; };
@@ -319,7 +323,7 @@
 		F57F7D8B20844C41008A2645 /* ANISearchCategoriesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANISearchCategoriesView.swift; sourceTree = "<group>"; };
 		F57F7D8D20844C4E008A2645 /* ANISearchCategoryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANISearchCategoryCell.swift; sourceTree = "<group>"; };
 		F57F7D9020844DC2008A2645 /* ANISearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANISearchView.swift; sourceTree = "<group>"; };
-		F5B1EF8D20725963000CFB0B /* Ani.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Ani.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F5B1EF8D20725963000CFB0B /* d_Ani.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = d_Ani.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5B1EF9020725964000CFB0B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F5B1EF9220725964000CFB0B /* ANIRecruitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitViewController.swift; sourceTree = "<group>"; };
 		F5B1EF9720725964000CFB0B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -492,6 +496,7 @@
 				CD0FAD0D20BFC02E00D8CD27 /* ANISessionManager.swift */,
 				CD92792120C0DCB400B1F006 /* ANIKey.swift */,
 				CDDE4B6220E0A985005762A1 /* ANIfunction.swift */,
+				CD3DBF96215A31F50010A219 /* Macros.swift */,
 			);
 			path = Supporting;
 			sourceTree = "<group>";
@@ -1187,7 +1192,7 @@
 		F5B1EF8E20725963000CFB0B /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				F5B1EF8D20725963000CFB0B /* Ani.app */,
+				F5B1EF8D20725963000CFB0B /* d_Ani.app */,
 				F5B1EFA120725964000CFB0B /* AniTests.xctest */,
 				F5B1EFAC20725964000CFB0B /* AniUITests.xctest */,
 			);
@@ -1205,6 +1210,7 @@
 				F51D220E20767E49009D1B26 /* Utility */,
 				F5B1EF9C20725964000CFB0B /* Info.plist */,
 				CD0FAD0420BF7B9D00D8CD27 /* GoogleService-Info.plist */,
+				CD8FE7D3215A690900D3281A /* GoogleService-Info-release.plist */,
 			);
 			path = Ani;
 			sourceTree = "<group>";
@@ -1410,6 +1416,7 @@
 				F5B1EF8B20725963000CFB0B /* Resources */,
 				F5B1EFC62072666A000CFB0B /* ShellScript */,
 				D8894B36BCEAEA49086B4D2B /* [CP] Embed Pods Frameworks */,
+				CD3DBF9A215A67B90010A219 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -1417,7 +1424,7 @@
 			);
 			name = Ani;
 			productName = Ani;
-			productReference = F5B1EF8D20725963000CFB0B /* Ani.app */;
+			productReference = F5B1EF8D20725963000CFB0B /* d_Ani.app */;
 			productType = "com.apple.product-type.application";
 		};
 		F5B1EFA020725964000CFB0B /* AniTests */ = {
@@ -1511,6 +1518,7 @@
 			files = (
 				F5B1EF9B20725964000CFB0B /* LaunchScreen.storyboard in Resources */,
 				F5B1EF9820725964000CFB0B /* Assets.xcassets in Resources */,
+				CD8FE7D4215A690A00D3281A /* GoogleService-Info-release.plist in Resources */,
 				CD0FAD0520BF7B9E00D8CD27 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1585,6 +1593,19 @@
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
+		};
+		CD3DBF9A215A67B90010A219 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [ \"${CONFIGURATION}\" == \"Release\" ]; then\ncp \"${PROJECT_DIR}/${PROJECT_NAME}/GoogleService-Info-release.plist\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/GoogleService-Info.plist\"\necho \"Production GoogleService-Info copied.\"\nelse\ncp \"${PROJECT_DIR}/${PROJECT_NAME}/GoogleService-Info.plist\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/GoogleService-Info.plist\"\necho \"Development GoogleService-Info copied.\"\nfi";
 		};
 		D8894B36BCEAEA49086B4D2B /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1667,6 +1688,7 @@
 				CDE2F40F20E464D5005E1DE1 /* FirebaseChatGroup.swift in Sources */,
 				CD9E963320F2EF8600AD4F64 /* FirebaseNotification.swift in Sources */,
 				CD6B675420A90F8A009BF63D /* ANIPlaceholderTextView.swift in Sources */,
+				CD3DBF97215A31F50010A219 /* Macros.swift in Sources */,
 				CDA32A2720AA6652008A2AC1 /* ANIPopupPickerView.swift in Sources */,
 				CDDD04AC20B3B0AA0094DBFA /* ANICommentBar.swift in Sources */,
 				CDD0550620A5CF2200BEF482 /* ANIImageFilterPreviewView.swift in Sources */,
@@ -1961,8 +1983,8 @@
 				);
 				INFOPLIST_FILE = Ani/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.gmail-jeonminsopdev.Ani";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.gmail-jeonminsopdev.Ani.dev";
+				PRODUCT_NAME = "d_$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

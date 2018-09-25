@@ -406,7 +406,7 @@ class ANIRecruitViewCell: UITableViewCell {
     DispatchQueue.global().async {
       self.loveListener = database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_LOVE_IDS).addSnapshotListener({ (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           
           return
         }
@@ -439,7 +439,7 @@ class ANIRecruitViewCell: UITableViewCell {
     DispatchQueue.global().async {
       self.supportListener = database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_SUPPORT_IDS).addSnapshotListener({ (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           
           return
         }
@@ -472,7 +472,7 @@ class ANIRecruitViewCell: UITableViewCell {
     DispatchQueue.global().async {
       database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_LOVE_IDS).getDocuments(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           
           return
         }
@@ -514,7 +514,7 @@ class ANIRecruitViewCell: UITableViewCell {
     DispatchQueue.global().async {
       database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_SUPPORT_IDS).getDocuments(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           
           return
         }
@@ -552,7 +552,7 @@ class ANIRecruitViewCell: UITableViewCell {
     DispatchQueue.global().async {
       database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_CLIP_IDS).getDocuments(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           
           return
         }
@@ -603,7 +603,7 @@ class ANIRecruitViewCell: UITableViewCell {
 
         database.collection(KEY_USERS).document(userId).collection(KEY_NOTIFICATIONS).document(recuritId).setData(data)
       } catch let error {
-        print(error)
+        DLog(error)
       }
     }
   }
@@ -723,7 +723,7 @@ extension ANIRecruitViewCell {
     DispatchQueue.global().async {
       database.collection(KEY_USERS).document(recruit.userId).getDocument(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
 
           return
         }
@@ -735,7 +735,7 @@ extension ANIRecruitViewCell {
           self.user = user
           self.delegate?.loadedRecruitUser(user: user)
         } catch let error {
-          print(error)
+          DLog(error)
         }
       })
     }

@@ -281,7 +281,7 @@ class ANISignUpView: UIView {
     DispatchQueue.global().async {
       database.collection(KEY_USERS).whereField(KEY_USER_NAME, isEqualTo: userName).getDocuments(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           
           return
         }
@@ -324,7 +324,7 @@ class ANISignUpView: UIView {
   private func login(adress: String, password: String) {
     Auth.auth().signIn(withEmail: adress, password: password) { (successUser, error) in
       if let errorUnrap = error {
-        print("loginError \(errorUnrap.localizedDescription)")
+        DLog("loginError \(errorUnrap.localizedDescription)")
       } else {
         self.uploadUserData()
       }
@@ -341,7 +341,7 @@ class ANISignUpView: UIView {
     let storageRef = Storage.storage().reference()
     storageRef.child(KEY_PROFILE_IMAGES).child("\(currentUser.uid).jpeg").putData(profileImageData, metadata: nil) { (metaData, error) in
       if error != nil {
-        print("storageError")
+        DLog("storageError")
         return
       }
       
@@ -360,7 +360,7 @@ class ANISignUpView: UIView {
       
       database.collection(KEY_USERS).document(uid).setData(userData) { error in
         if let error = error {
-          print("Error set document: \(error)")
+          DLog("Error set document: \(error)")
           return
         }
         
@@ -383,7 +383,7 @@ class ANISignUpView: UIView {
                   NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
                 }
               } catch let error {
-                print(error)
+                DLog(error)
                 NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
               }
             })
@@ -393,7 +393,7 @@ class ANISignUpView: UIView {
       
       self.endEditing(true)
     } catch let error {
-      print(error)
+      DLog(error)
       NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
     }
   }
@@ -409,7 +409,7 @@ class ANISignUpView: UIView {
     DispatchQueue.global().async {
       index.addObject(newData, completionHandler: { (content, error) -> Void in
         if error == nil {
-          print("Object IDs: \(content!)")
+          DLog("Object IDs: \(content!)")
         }
       })
     }

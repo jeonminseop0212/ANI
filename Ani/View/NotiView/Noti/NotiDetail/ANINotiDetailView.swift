@@ -485,7 +485,7 @@ extension ANINotiDetailView {
     DispatchQueue.global().async {
       database.collection(KEY_RECRUITS).document(notiId).getDocument(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           
           return
         }
@@ -499,7 +499,7 @@ extension ANINotiDetailView {
               self.loadDone()
             }
           } catch let error {
-            print(error)
+            DLog(error)
             
             activityIndicatorView.stopAnimating()
           }
@@ -527,7 +527,7 @@ extension ANINotiDetailView {
     DispatchQueue.global().async {
       database.collection(KEY_STORIES).document(notiId).getDocument(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           
           return
         }
@@ -543,7 +543,7 @@ extension ANINotiDetailView {
               }
             }
           } catch let error {
-            print(error)
+            DLog(error)
             
             activityIndicatorView.stopAnimating()
           }
@@ -570,7 +570,7 @@ extension ANINotiDetailView {
     DispatchQueue.global().async {
       database.collection(KEY_QNAS).document(notiId).getDocument(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           
           return
         }
@@ -580,7 +580,7 @@ extension ANINotiDetailView {
             let qna = try FirestoreDecoder().decode(FirebaseQna.self, from: data)
             self.qna = qna
           } catch let error {
-            print(error)
+            DLog(error)
             
             activityIndicatorView.stopAnimating()
           }
@@ -613,7 +613,7 @@ extension ANINotiDetailView {
     DispatchQueue.global().async {
       database.collection(collection).document(noti.notiId).collection(KEY_COMMENTS).document(commentId).getDocument(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           
           return
         }
@@ -628,7 +628,7 @@ extension ANINotiDetailView {
             self.loadDone()
           }
         } catch let error {
-          print(error)
+          DLog(error)
           
           activityIndicatorView.stopAnimating()
         }
@@ -654,7 +654,7 @@ extension ANINotiDetailView {
       
       database.collection(collection).document(noti.notiId).collection(KEY_LOVE_IDS).limit(to: 20).getDocuments(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           
           return
         }
@@ -698,7 +698,7 @@ extension ANINotiDetailView {
               }
             }
           } catch let error {
-            print(error)
+            DLog(error)
             
             activityIndicatorView.stopAnimating()
           }

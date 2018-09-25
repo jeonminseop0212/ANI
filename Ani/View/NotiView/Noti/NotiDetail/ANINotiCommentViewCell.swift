@@ -176,7 +176,7 @@ class ANINotiCommentViewCell: UITableViewCell {
   
   //MARK: action
   @objc private func love() {
-    print("love")
+    DLog("love")
   }
   
   @objc private func profileImageViewTapped() {
@@ -196,7 +196,7 @@ extension ANINotiCommentViewCell {
     DispatchQueue.global().async {
       database.collection(KEY_USERS).document(comment.userId).getDocument(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           
           return
         }
@@ -211,7 +211,7 @@ extension ANINotiCommentViewCell {
             self.reloadUserLayout(user: user)
           }
         } catch let error {
-          print(error)
+          DLog(error)
         }
       })
     }

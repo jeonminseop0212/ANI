@@ -357,7 +357,7 @@ extension ANIListView: UITableViewDelegate {
 //MARK: ANIRecruitViewCellDelegate
 extension ANIListView: ANIRecruitViewCellDelegate {
   func reject() {
-    print("reject")
+    DLog("reject")
   }
   
   func supportButtonTapped(supportRecruit: FirebaseRecruit, user: FirebaseUser) {
@@ -490,7 +490,7 @@ extension ANIListView {
       
       database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_RECRUIT_IDS).order(by: KEY_DATE, descending: true).limit(to: 15).getDocuments(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           self.isLoading = false
 
           return
@@ -515,7 +515,7 @@ extension ANIListView {
           DispatchQueue(label: "loveRecruit").async {
             database.collection(KEY_RECRUITS).document(document.documentID).getDocument(completion: { (recruitSnapshot, recruitError) in
               if let recruitError = recruitError {
-                print("Error get document: \(recruitError)")
+                DLog("Error get document: \(recruitError)")
                 self.isLoading = false
                 
                 return
@@ -529,7 +529,7 @@ extension ANIListView {
                 
                 group.leave()
               } catch let error {
-                print(error)
+                DLog(error)
                 
                 activityIndicatorView.stopAnimating()
                 
@@ -584,7 +584,7 @@ extension ANIListView {
       
       database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_RECRUIT_IDS).order(by: KEY_DATE, descending: true).start(afterDocument: lastContent).limit(to: 15).getDocuments(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           self.isLoading = false
           
           return
@@ -610,7 +610,7 @@ extension ANIListView {
           DispatchQueue(label: "loveRecruit").async {
             database.collection(KEY_RECRUITS).document(document.documentID).getDocument(completion: { (recruitSnapshot, recruitError) in
               if let recruitError = recruitError {
-                print("Error get document: \(recruitError)")
+                DLog("Error get document: \(recruitError)")
                 self.isLoading = false
                 
                 return
@@ -624,7 +624,7 @@ extension ANIListView {
                 
                 group.leave()
               } catch let error {
-                print(error)
+                DLog(error)
                 
                 group.leave()
               }
@@ -664,7 +664,7 @@ extension ANIListView {
       
       database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_STORY_IDS).order(by: KEY_DATE, descending: true).limit(to: 10).getDocuments(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           self.isLoading = false
           
           return
@@ -689,7 +689,7 @@ extension ANIListView {
           DispatchQueue(label: "loveStory").async {
             database.collection(KEY_STORIES).document(document.documentID).getDocument(completion: { (storySnapshot, storyError) in
               if let storyError = storyError {
-                print("Error get document: \(storyError)")
+                DLog("Error get document: \(storyError)")
                 self.isLoading = false
                 
                 return
@@ -707,7 +707,7 @@ extension ANIListView {
                 
                 group.leave()
               } catch let error {
-                print(error)
+                DLog(error)
                 
                 group.leave()                
               }
@@ -760,7 +760,7 @@ extension ANIListView {
       
       database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_STORY_IDS).order(by: KEY_DATE, descending: true).start(afterDocument: lastContent).limit(to: 10).getDocuments(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           self.isLoading = false
           
           return
@@ -786,7 +786,7 @@ extension ANIListView {
           DispatchQueue(label: "loveStory").async {
             database.collection(KEY_STORIES).document(document.documentID).getDocument(completion: { (storySnapshot, storyError) in
               if let storyError = storyError {
-                print("Error get document: \(storyError)")
+                DLog("Error get document: \(storyError)")
                 self.isLoading = false
                 
                 return
@@ -800,7 +800,7 @@ extension ANIListView {
                 
                 group.leave()
               } catch let error {
-                print(error)
+                DLog(error)
                 
                 group.leave()
               }
@@ -840,7 +840,7 @@ extension ANIListView {
       
       database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_QNA_IDS).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           self.isLoading = false
           
           return
@@ -865,7 +865,7 @@ extension ANIListView {
           DispatchQueue(label: "loveQna").async {
             database.collection(KEY_QNAS).document(document.documentID).getDocument(completion: { (qnaSnapshot, qnaError) in
               if let qnaError = qnaError {
-                print("Error get document: \(qnaError)")
+                DLog("Error get document: \(qnaError)")
                 self.isLoading = false
                 return
               }
@@ -881,7 +881,7 @@ extension ANIListView {
                 
                 group.leave()
               } catch let error {
-                print(error)
+                DLog(error)
                 
                 group.leave()
               }
@@ -934,7 +934,7 @@ extension ANIListView {
       
       database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_QNA_IDS).order(by: KEY_DATE, descending: true).start(afterDocument: lastContent).limit(to: 20).getDocuments(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           self.isLoading = false
           
           return
@@ -960,7 +960,7 @@ extension ANIListView {
           DispatchQueue(label: "loveQna").async {
             database.collection(KEY_QNAS).document(document.documentID).getDocument(completion: { (qnaSnapshot, qnaError) in
               if let qnaError = qnaError {
-                print("Error get document: \(qnaError)")
+                DLog("Error get document: \(qnaError)")
                 self.isLoading = false
                 
                 return
@@ -974,7 +974,7 @@ extension ANIListView {
                 
                 group.leave()
               } catch let error {
-                print(error)
+                DLog(error)
                 
                 group.leave()
               }
@@ -1014,7 +1014,7 @@ extension ANIListView {
       
       database.collection(KEY_USERS).document(currentUserId).collection(KEY_CLIP_RECRUIT_IDS).order(by: KEY_DATE, descending: true).limit(to: 15).getDocuments(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           self.isLoading = false
           
           return
@@ -1039,7 +1039,7 @@ extension ANIListView {
           DispatchQueue(label: "clipRecruit").async {
             database.collection(KEY_RECRUITS).document(document.documentID).getDocument(completion: { (recruitSnapshot, recruitError) in
               if let recruitError = recruitError {
-                print("Error get document: \(recruitError)")
+                DLog("Error get document: \(recruitError)")
                 self.isLoading = false
                 
                 return
@@ -1057,7 +1057,7 @@ extension ANIListView {
                 
                 group.leave()
               } catch let error {
-                print(error)
+                DLog(error)
                 
                 group.leave()
               }
@@ -1110,7 +1110,7 @@ extension ANIListView {
       
       database.collection(KEY_USERS).document(currentUserId).collection(KEY_CLIP_RECRUIT_IDS).order(by: KEY_DATE, descending: true).start(afterDocument: lastContent).limit(to: 15).getDocuments(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           self.isLoading = false
           
           return
@@ -1136,7 +1136,7 @@ extension ANIListView {
           DispatchQueue(label: "clipRecruit").async {
             database.collection(KEY_RECRUITS).document(document.documentID).getDocument(completion: { (recruitSnapshot, recruitError) in
               if let recruitError = recruitError {
-                print("Error get document: \(recruitError)")
+                DLog("Error get document: \(recruitError)")
                 self.isLoading = false
                 
                 return
@@ -1150,7 +1150,7 @@ extension ANIListView {
                 
                 group.leave()
               } catch let error {
-                print(error)
+                DLog(error)
                 
                 group.leave()
               }

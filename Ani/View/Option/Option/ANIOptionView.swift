@@ -119,7 +119,7 @@ extension ANIOptionView: UITableViewDelegate {
         self.delegate?.logoutTapped()
       }
     default:
-      print("default")
+      DLog("default")
     }
   }
 }

@@ -103,7 +103,7 @@ extension ANIOptionViewController: ANIOptionViewDelegate {
         
         self.navigationController?.popViewController(animated: true)
       } catch let signOutError as NSError {
-        print("signOutError \(signOutError)")
+        DLog("signOutError \(signOutError)")
       }
     }
     let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)

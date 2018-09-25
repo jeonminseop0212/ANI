@@ -324,7 +324,7 @@ extension ANIStoryView {
       
       database.collection(KEY_STORIES).order(by: KEY_DATE, descending: true).limit(to: 10).getDocuments(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           self.isLoading = false
           
           return
@@ -358,7 +358,7 @@ extension ANIStoryView {
               self.isLoading = false
             }
           } catch let error {
-            print(error)
+            DLog(error)
             
             activityIndicatorView.stopAnimating()
             
@@ -398,7 +398,7 @@ extension ANIStoryView {
       
       database.collection(KEY_STORIES).order(by: KEY_DATE, descending: true).start(afterDocument: lastStory).limit(to: 10).getDocuments(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           self.isLoading = false
           
           return
@@ -426,7 +426,7 @@ extension ANIStoryView {
               }
             }
           } catch let error {
-            print(error)
+            DLog(error)
             self.isLoading = false
           }
         }

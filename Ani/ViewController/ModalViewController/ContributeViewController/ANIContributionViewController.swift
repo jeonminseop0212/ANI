@@ -175,7 +175,7 @@ class ANIContributionViewController: UIViewController {
           let uuid = UUID().uuidString
           storageRef.child(KEY_STORY_IMAGES).child(uuid).putData(contentImageData, metadata: nil) { (metaData, error) in
             if error != nil {
-              print("storageError")
+              DLog("storageError")
               return
             }
             
@@ -188,12 +188,12 @@ class ANIContributionViewController: UIViewController {
                   urls.append(url.value)
                 }
                 
-                let id = NSUUID().uuidString
-                let date = ANIFunction.shared.getToday()
-                let content = contriButionView.getContent()
-                let story = FirebaseStory(id: id, storyImageUrls: urls, story: content, userId: uid, loveIds: nil, commentIds: nil, recruitId: nil, recruitTitle: nil, recruitSubTitle: nil, date: date, isLoved: nil)
-                
                 DispatchQueue.main.async {
+                  let id = NSUUID().uuidString
+                  let date = ANIFunction.shared.getToday()
+                  let content = contriButionView.getContent()
+                  let story = FirebaseStory(id: id, storyImageUrls: urls, story: content, userId: uid, loveIds: nil, commentIds: nil, recruitId: nil, recruitTitle: nil, recruitSubTitle: nil, date: date, isLoved: nil)
+                
                   self.upateStroyDatabase(story: story, id: id)
                 }
               }
@@ -214,12 +214,12 @@ class ANIContributionViewController: UIViewController {
     
     DispatchQueue.global().async {
       if self.contentImages.isEmpty {
-        let id = NSUUID().uuidString
-        let date = ANIFunction.shared.getToday()
-        let content = contriButionView.getContent()
-        let qna = FirebaseQna(id: id, qnaImageUrls: nil, qna: content, userId: uid, loveIds: nil, commentIds: nil, date: date, isLoved: nil)
-        
         DispatchQueue.main.async {
+          let id = NSUUID().uuidString
+          let date = ANIFunction.shared.getToday()
+          let content = contriButionView.getContent()
+          let qna = FirebaseQna(id: id, qnaImageUrls: nil, qna: content, userId: uid, loveIds: nil, commentIds: nil, date: date, isLoved: nil)
+        
           self.upateQnaDatabase(qna: qna, id: id)
         }
       } else {
@@ -228,7 +228,7 @@ class ANIContributionViewController: UIViewController {
             let uuid = UUID().uuidString
             storageRef.child(KEY_QNA_IMAGES).child(uuid).putData(contentImageData, metadata: nil) { (metaData, error) in
               if error != nil {
-                print("storageError")
+                DLog("storageError")
                 return
               }
               
@@ -241,12 +241,12 @@ class ANIContributionViewController: UIViewController {
                     urls.append(url.value)
                   }
                   
-                  let id = NSUUID().uuidString
-                  let date = ANIFunction.shared.getToday()
-                  let content = contriButionView.getContent()
-                  let qna = FirebaseQna(id: id, qnaImageUrls: urls, qna: content, userId: uid, loveIds: nil, commentIds: nil, date: date, isLoved: nil)
-                  
                   DispatchQueue.main.async {
+                    let id = NSUUID().uuidString
+                    let date = ANIFunction.shared.getToday()
+                    let content = contriButionView.getContent()
+                    let qna = FirebaseQna(id: id, qnaImageUrls: urls, qna: content, userId: uid, loveIds: nil, commentIds: nil, date: date, isLoved: nil)
+                  
                     self.upateQnaDatabase(qna: qna, id: id)
                   }
                 }
@@ -265,14 +265,14 @@ class ANIContributionViewController: UIViewController {
       let data = try FirestoreEncoder().encode(story)
       database.collection(KEY_STORIES).document(id).setData(data) { error in
         if let error = error {
-          print("Error set document: \(error)")
+          DLog("Error set document: \(error)")
           return
         }
         
         self.pushDataAlgolia(data: data as [String : AnyObject])
       }
     } catch let error {
-      print(error)
+      DLog(error)
     }
   }
   
@@ -283,14 +283,14 @@ class ANIContributionViewController: UIViewController {
       let data = try FirestoreEncoder().encode(qna)
       database.collection(KEY_QNAS).document(id).setData(data) { error in
         if let error = error {
-          print("Error set document: \(error)")
+          DLog("Error set document: \(error)")
           return
         }
         
         self.pushDataAlgolia(data: data as [String : AnyObject])
       }
     } catch let error {
-      print(error)
+      DLog(error)
     }
   }
   
@@ -313,7 +313,7 @@ class ANIContributionViewController: UIViewController {
     DispatchQueue.global().async {
       index?.addObject(newData, completionHandler: { (content, error) -> Void in
         if error == nil {
-          print("Object IDs: \(content!)")
+          DLog("Object IDs: \(content!)")
         }
       })
     }

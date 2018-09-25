@@ -250,7 +250,7 @@ extension ANINotiDetailViewController {
     DispatchQueue.global().async {
       database.collection(collection).document(contributionId).getDocument(completion: { (snapshot, error) in
         if let error = error {
-          print("get document error \(error)")
+          DLog("get document error \(error)")
           
           return
         }
@@ -275,7 +275,7 @@ extension ANINotiDetailViewController {
                 
                 storageRef.delete { error in
                   if let error = error {
-                    print(error)
+                    DLog(error)
                   }
                 }
               }
@@ -290,14 +290,14 @@ extension ANINotiDetailViewController {
                 
                 storageRef.delete { error in
                   if let error = error {
-                    print(error)
+                    DLog(error)
                   }
                 }
               }
             }
           }
         } catch let error {
-          print(error)
+          DLog(error)
         }
       })
     }
@@ -305,7 +305,7 @@ extension ANINotiDetailViewController {
     DispatchQueue.global().async {
       database.collection(collection).document(contributionId).collection(KEY_LOVE_IDS).getDocuments(completion: { (snapshot, error) in
         if let error = error {
-          print("Get document error \(error)")
+          DLog("Get document error \(error)")
           
           return
         }
@@ -320,7 +320,7 @@ extension ANINotiDetailViewController {
       
       database.collection(collection).document(contributionId).collection(KEY_COMMENTS).getDocuments(completion: { (snapshot, error) in
         if let error = error {
-          print("Get document error \(error)")
+          DLog("Get document error \(error)")
           
           return
         }
