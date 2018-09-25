@@ -58,7 +58,7 @@ class ANIQnaViewCell: UITableViewCell {
       guard let user = self.user else { return }
 
       DispatchQueue.main.async {
-        self.reloadUserLayout(user: user)
+        self.reloadUserLayout()
       }
     }
   }
@@ -257,14 +257,21 @@ class ANIQnaViewCell: UITableViewCell {
     }
   }
   
-  private func reloadUserLayout(user: FirebaseUser) {
+  private func reloadUserLayout() {
     guard let userNameLabel = self.userNameLabel,
-          let profileImageView = self.profileImageView,
-          let profileImageUrl = user.profileImageUrl,
-          let userName = user.userName else { return }
+          let profileImageView = self.profileImageView else { return }
     
-    profileImageView.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
-    userNameLabel.text = userName
+    if let user = self.user, let profileImageUrl = user.profileImageUrl {
+      profileImageView.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
+    } else {
+      profileImageView.image = UIImage()
+    }
+    
+    if let user = self.user, let userName = user.userName {
+      userNameLabel.text = userName
+    } else {
+      userNameLabel.text = ""
+    }
   }
   
   private func observeLove() {

@@ -103,12 +103,19 @@ class ANIUserSearchViewCell: UITableViewCell {
   
   private func reloadLayout() {
     guard let profileImageView = self.profileImageView,
-          let userNameLabel = self.userNameLabel,
-          let user = self.user,
-          let profileImageUrl = user.profileImageUrl else { return }
+          let userNameLabel = self.userNameLabel else { return }
     
-    profileImageView.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
-    userNameLabel.text = user.userName
+    if let user = self.user, let profileImageUrl = user.profileImageUrl {
+      profileImageView.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
+    } else {
+      profileImageView.image = UIImage()
+    }
+    
+    if let user = self.user, let userName = user.userName {
+      userNameLabel.text = userName
+    } else {
+      userNameLabel.text = ""
+    }
   }
   
   private func reloadFollowButtonLayout() {
