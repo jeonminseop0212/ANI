@@ -941,7 +941,25 @@ extension ANIProfileBasicView {
               print(error)
             }
           } else if diff.type == .modified {
-            
+            do {
+              let changeRecruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: diff.document.data())
+              
+              if self.recruits.contains(where: {$0.id == changeRecruit.id }) {
+                for (index, recruit) in self.recruits.enumerated() {
+                  if recruit.id == changeRecruit.id {
+                    self.recruits[index] = changeRecruit
+                    break
+                  }
+                }
+                
+                DispatchQueue.main.async {
+                  guard let basicTableView = self.basicTableView else { return }
+                  basicTableView.reloadData()
+                }
+              }
+            } catch let error {
+              print(error)
+            }
           }
         })
       })
