@@ -133,11 +133,13 @@ class ANIFollowNotiViewCell: UITableViewCell {
   }
   
   private func reloadUserLayout() {
-    guard let profileImageView = self.profileImageView,
-          let user = self.user,
-          let profileImageUrl = user.profileImageUrl else { return }
+    guard let profileImageView = self.profileImageView else { return }
     
-    profileImageView.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
+    if let user = self.user, let profileImageUrl = user.profileImageUrl {
+      profileImageView.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
+    } else {
+      profileImageView.image = UIImage()
+    }
   }
   
   @objc private func cellTapped() {
