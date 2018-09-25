@@ -214,7 +214,7 @@ class ANIProfileCell: UITableViewCell {
     DispatchQueue.global().async {
       self.followListener = database.collection(KEY_USERS).document(currentUserId).collection(KEY_FOLLOWING_USER_IDS).addSnapshotListener({ (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           
           return
         }
@@ -226,7 +226,7 @@ class ANIProfileCell: UITableViewCell {
       
       database.collection(KEY_USERS).document(currentUserId).collection(KEY_FOLLOWER_IDS).addSnapshotListener({ (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           
           return
         }

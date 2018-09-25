@@ -305,7 +305,7 @@ extension ANIRecruitViewController: ANIRecruitFiltersViewDelegate {
       
       popupPickerViewController.pickerItem = sex
     default:
-      print("filter default")
+      DLog("filter default")
     }
     
     popupPickerViewController.modalPresentationStyle = .overCurrentContext

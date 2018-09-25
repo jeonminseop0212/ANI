@@ -172,7 +172,7 @@ class ANICommentCell: UITableViewCell {
       let database = Firestore.firestore()
       database.collection(KEY_USERS).document(comment.userId).getDocument(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           
           return
         }
@@ -187,7 +187,7 @@ class ANICommentCell: UITableViewCell {
             self.reloadUserLayout(user: user)
           }
         } catch let error {
-          print(error)
+          DLog(error)
         }
       })
     }
@@ -196,7 +196,7 @@ class ANICommentCell: UITableViewCell {
   //MARK: action
   @objc private func love() {
     //TODO
-    print("love")
+    DLog("love")
   }
   
   @objc private func profileImageViewTapped() {

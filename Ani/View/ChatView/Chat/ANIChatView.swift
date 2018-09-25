@@ -126,7 +126,7 @@ extension ANIChatView {
     DispatchQueue.global().async {
       database.collection(KEY_CHAT_GROUPS).document(chatGroupId).collection(KEY_CHAT_MESSAGES).order(by: KEY_DATE).addSnapshotListener({ (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           
           return
         }
@@ -146,7 +146,7 @@ extension ANIChatView {
                 self.scrollToBottom()
               }
             } catch let error {
-              print(error)
+              DLog(error)
             }
           }
         })

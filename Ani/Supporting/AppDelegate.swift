@@ -17,7 +17,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
     
-    FirebaseApp.configure()
+    var firebasePlistName = ""
+    
+    if IS_DEBUG {
+      firebasePlistName = "GoogleService-Info"
+    } else {
+      firebasePlistName = "GoogleService-Info-release"
+    }
+    if let path = Bundle.main.path(forResource: firebasePlistName, ofType: "plist"), let firbaseOptions = FirebaseOptions(contentsOfFile: path) {
+      FirebaseApp.configure(options: firbaseOptions)
+    }
     
     window = UIWindow(frame: UIScreen.main.bounds)
     window?.rootViewController = ANITabBarController()

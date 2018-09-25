@@ -123,7 +123,7 @@ class ANISupportView: UIView {
         let id = NSUUID().uuidString
         database.collection(KEY_USERS).document(userId).collection(KEY_NOTIFICATIONS).document(id).setData(data)
       } catch let error {
-        print(error)
+        DLog(error)
       }
     }
   }
@@ -139,7 +139,7 @@ class ANISupportView: UIView {
     DispatchQueue.global().async {
       index.addObject(newData, completionHandler: { (content, error) -> Void in
         if error == nil {
-          print("Object IDs: \(content!)")
+          DLog("Object IDs: \(content!)")
         }
       })
     }
@@ -166,14 +166,14 @@ extension ANISupportView: ANIButtonViewDelegate {
           
           database.collection(KEY_STORIES).document(id).setData(data)  { error in
             if let error = error {
-              print("Error set document: \(error)")
+              DLog("Error set document: \(error)")
               return
             }
             
             self.pushDataAlgolia(data: data as [String : AnyObject])
           }
         } catch let error {
-          print(error)
+          DLog(error)
         }
       }
       

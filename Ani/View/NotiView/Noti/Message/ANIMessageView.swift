@@ -129,7 +129,7 @@ extension ANIMessageView {
     DispatchQueue.global().async {
       database.collection(KEY_CHAT_GROUPS).whereField(KEY_CHAT_MEMBER_IDS + "." + crrentUserUid, isEqualTo: true).addSnapshotListener({ (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           
           return
         }
@@ -155,7 +155,7 @@ extension ANIMessageView {
                 })
               }
             } catch let error {
-              print(error)
+              DLog(error)
               
               activityIndicatorView.stopAnimating()
               
@@ -183,7 +183,7 @@ extension ANIMessageView {
                 messageTableView.reloadData()
               }
             } catch let error {
-              print(error)
+              DLog(error)
             }
           }
         })

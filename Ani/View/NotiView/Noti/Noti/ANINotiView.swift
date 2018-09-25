@@ -242,7 +242,7 @@ extension ANINotiView {
       
       database.collection(KEY_USERS).document(currentUserUid).collection(KEY_NOTIFICATIONS).order(by: KEY_NOTI_UPDATE_DATE, descending: true).limit(to: 20).getDocuments { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           self.isLoading = false
           
           return
@@ -276,7 +276,7 @@ extension ANINotiView {
               self.isLoading = false
             }
           } catch let error {
-            print(error)
+            DLog(error)
             
             activityIndicatorView.stopAnimating()
             
@@ -317,7 +317,7 @@ extension ANINotiView {
       
       database.collection(KEY_USERS).document(currentUserUid).collection(KEY_NOTIFICATIONS).order(by: KEY_NOTI_UPDATE_DATE, descending: true).start(afterDocument: lastNoti).limit(to: 20).getDocuments { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           self.isLoading = false
 
           return
@@ -344,7 +344,7 @@ extension ANINotiView {
               }
             }
           } catch let error {
-            print(error)
+            DLog(error)
             self.isLoading = false
           }
         }

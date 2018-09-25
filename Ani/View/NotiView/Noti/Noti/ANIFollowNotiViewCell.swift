@@ -160,7 +160,7 @@ class ANIFollowNotiViewCell: UITableViewCell {
     DispatchQueue.global().async {
       database.collection(KEY_USERS).document(currentUserId).collection(KEY_FOLLOWING_USER_IDS).getDocuments(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           
           return
         }
@@ -215,7 +215,7 @@ class ANIFollowNotiViewCell: UITableViewCell {
         
         database.collection(KEY_USERS).document(userId).collection(KEY_NOTIFICATIONS).document(currentUserId).setData(data)
       } catch let error {
-        print(error)
+        DLog(error)
       }
     }
   }
@@ -269,7 +269,7 @@ extension ANIFollowNotiViewCell {
     DispatchQueue.global().async {
       database.collection(KEY_USERS).document(noti.userId).getDocument(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           
           return
         }
@@ -281,7 +281,7 @@ extension ANIFollowNotiViewCell {
           self.user = user
           self.delegate?.loadedNotiUser(user: user)
         } catch let error {
-          print(error)
+          DLog(error)
         }
       })
     }

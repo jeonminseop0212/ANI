@@ -7,34 +7,34 @@
 	<key>AD_UNIT_ID_FOR_INTERSTITIAL_TEST</key>
 	<string>ca-app-pub-3940256099942544/4411468910</string>
 	<key>CLIENT_ID</key>
-	<string>614974892806-fqsq81erp2gn90p0o3ivilmeut0it8vv.apps.googleusercontent.com</string>
+	<string>504196481868-fc8aebks5fnuq16vgk1h5oj8p598cl08.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.614974892806-fqsq81erp2gn90p0o3ivilmeut0it8vv</string>
+	<string>com.googleusercontent.apps.504196481868-fc8aebks5fnuq16vgk1h5oj8p598cl08</string>
 	<key>API_KEY</key>
-	<string>AIzaSyCwrMRApw--IKds7lPnOyZfz2WL7BkpqJY</string>
+	<string>AIzaSyByK7zLxjtkuzT1j8MWHD4PjFky5SzVcZA</string>
 	<key>GCM_SENDER_ID</key>
-	<string>614974892806</string>
+	<string>504196481868</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.gmail-jeonminsopdev.Ani.dev</string>
+	<string>com.gmail-jeonminsopdev.Ani</string>
 	<key>PROJECT_ID</key>
-	<string>ani-ios-1faa3</string>
+	<string>ani-release</string>
 	<key>STORAGE_BUCKET</key>
-	<string>ani-ios-1faa3.appspot.com</string>
+	<string>ani-release.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
-	<true/>
+	<true></true>
 	<key>IS_ANALYTICS_ENABLED</key>
-	<false/>
+	<false></false>
 	<key>IS_APPINVITE_ENABLED</key>
-	<false/>
+	<false></false>
 	<key>IS_GCM_ENABLED</key>
-	<true/>
+	<true></true>
 	<key>IS_SIGNIN_ENABLED</key>
-	<true/>
+	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:614974892806:ios:9d983b895bdba4a6</string>
+	<string>1:504196481868:ios:9d983b895bdba4a6</string>
 	<key>DATABASE_URL</key>
-	<string>https://ani-ios-1faa3.firebaseio.com</string>
+	<string>https://ani-release.firebaseio.com</string>
 </dict>
 </plist>

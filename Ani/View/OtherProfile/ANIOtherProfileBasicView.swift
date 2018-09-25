@@ -137,7 +137,7 @@ class ANIOtherProfileBasicView: UIView {
       DispatchQueue.global().async {
         database.collection(KEY_USERS).document(currentUserId).collection(KEY_FOLLOWING_USER_IDS).getDocuments(completion: { (snapshot, error) in
           if let error = error {
-            print("Error get document: \(error)")
+            DLog("Error get document: \(error)")
             
             return
           }
@@ -463,7 +463,7 @@ extension ANIOtherProfileBasicView: ANIProfileMenuBarDelegate {
     case ContentType.qna.rawValue:
       contentType = .qna
     default:
-      print("default")
+      DLog("default")
     }
     
     basicTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
@@ -586,7 +586,7 @@ extension ANIOtherProfileBasicView {
     DispatchQueue.global().async {
       database.collection(KEY_USERS).document(userId).getDocument(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           
           return
         }
@@ -603,7 +603,7 @@ extension ANIOtherProfileBasicView {
           
           basicTableView.reloadData()
         } catch let error {
-          print(error)
+          DLog(error)
         }
       })
     }
@@ -628,7 +628,7 @@ extension ANIOtherProfileBasicView {
       
       database.collection(KEY_RECRUITS).whereField(KEY_USER_ID, isEqualTo: uid).order(by: KEY_DATE, descending: true).limit(to: 15).getDocuments(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           self.isLoading = false
 
           return
@@ -656,7 +656,7 @@ extension ANIOtherProfileBasicView {
               self.isLoading = false
             }
           } catch let error {
-            print(error)
+            DLog(error)
             
             if let sender = sender {
               sender.endRefreshing()
@@ -692,7 +692,7 @@ extension ANIOtherProfileBasicView {
       
       database.collection(KEY_RECRUITS).whereField(KEY_USER_ID, isEqualTo: uid).order(by: KEY_DATE, descending: true).start(afterDocument: lastRecruit).limit(to: 15).getDocuments(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           self.isLoading = false
           
           return
@@ -720,7 +720,7 @@ extension ANIOtherProfileBasicView {
               }
             }
           } catch let error {
-            print(error)
+            DLog(error)
             self.isLoading = false
           }
         }
@@ -750,7 +750,7 @@ extension ANIOtherProfileBasicView {
 
       database.collection(KEY_STORIES).whereField(KEY_USER_ID, isEqualTo: uid).order(by: KEY_DATE, descending: true).limit(to: 10).getDocuments(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           self.isLoading = false
           
           return
@@ -778,7 +778,7 @@ extension ANIOtherProfileBasicView {
               self.isLoading = false
             }
           } catch let error {
-            print(error)
+            DLog(error)
             
             if let sender = sender {
               sender.endRefreshing()
@@ -814,7 +814,7 @@ extension ANIOtherProfileBasicView {
       
       database.collection(KEY_STORIES).whereField(KEY_USER_ID, isEqualTo: uid).order(by: KEY_DATE, descending: true).start(afterDocument: lastStory).limit(to: 10).getDocuments(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           self.isLoading = false
           
           return
@@ -842,7 +842,7 @@ extension ANIOtherProfileBasicView {
               }
             }
           } catch let error {
-            print(error)
+            DLog(error)
             self.isLoading = false
           }
         }
@@ -869,7 +869,7 @@ extension ANIOtherProfileBasicView {
 
       database.collection(KEY_QNAS).whereField(KEY_USER_ID, isEqualTo: uid).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           self.isLoading = false
           
           return
@@ -897,7 +897,7 @@ extension ANIOtherProfileBasicView {
               self.isLoading = false
             }
           } catch let error {
-            print(error)
+            DLog(error)
             
             if let sender = sender {
               sender.endRefreshing()
@@ -933,7 +933,7 @@ extension ANIOtherProfileBasicView {
       
       database.collection(KEY_QNAS).whereField(KEY_USER_ID, isEqualTo: uid).order(by: KEY_DATE, descending: true).start(afterDocument: lastQna).limit(to: 20).getDocuments(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           self.isLoading = false
           
           return
@@ -961,7 +961,7 @@ extension ANIOtherProfileBasicView {
               }
             }
           } catch let error {
-            print(error)
+            DLog(error)
             self.isLoading = false
           }
         }

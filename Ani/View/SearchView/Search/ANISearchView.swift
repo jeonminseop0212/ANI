@@ -494,7 +494,7 @@ extension ANISearchView {
             } catch let error {
               tableView.reloadData()
 
-              print(error)
+              DLog(error)
               
               activityIndicatorView.stopAnimating()
               
@@ -504,7 +504,7 @@ extension ANISearchView {
         } else if let error = error {
           tableView.reloadData()
           
-          print("error: \(error)")
+          DLog("error: \(error)")
           
           activityIndicatorView.stopAnimating()
           
@@ -576,7 +576,7 @@ extension ANISearchView {
             } catch let error {
               tableView.reloadData()
               
-              print(error)
+              DLog(error)
               
               self.isLoading = false
             }
@@ -584,7 +584,7 @@ extension ANISearchView {
         } else if let error = error {
           tableView.reloadData()
           
-          print("error: \(error)")
+          DLog("error: \(error)")
           
           self.isLoading = false
         } else {

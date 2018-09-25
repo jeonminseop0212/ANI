@@ -52,8 +52,6 @@ class ANIStoryViewCell: UITableViewCell {
   
   var user: FirebaseUser? {
     didSet {
-      guard let user = self.user else { return }
-
       DispatchQueue.main.async {
         self.reloadUserLayout()
       }
@@ -277,7 +275,7 @@ class ANIStoryViewCell: UITableViewCell {
     DispatchQueue.global().async {
       self.loveListener = database.collection(KEY_STORIES).document(storyId).collection(KEY_LOVE_IDS).addSnapshotListener({ (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           
           return
         }
@@ -310,7 +308,7 @@ class ANIStoryViewCell: UITableViewCell {
     DispatchQueue.global().async {
       self.commentListener = database.collection(KEY_STORIES).document(storyId).collection(KEY_COMMENTS).addSnapshotListener({ (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           
           return
         }
@@ -341,7 +339,7 @@ class ANIStoryViewCell: UITableViewCell {
     DispatchQueue.global().async {
       database.collection(KEY_STORIES).document(storyId).collection(KEY_LOVE_IDS).getDocuments(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           
           return
         }
@@ -392,7 +390,7 @@ class ANIStoryViewCell: UITableViewCell {
           
         database.collection(KEY_USERS).document(userId).collection(KEY_NOTIFICATIONS).document(storyId).setData(data)
       } catch let error {
-        print(error)
+        DLog(error)
       }
     }
   }
@@ -468,7 +466,7 @@ extension ANIStoryViewCell {
       let database = Firestore.firestore()
       database.collection(KEY_USERS).document(story.userId).getDocument(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           
           return
         }
@@ -480,7 +478,7 @@ extension ANIStoryViewCell {
           self.user = user
           self.delegate?.loadedStoryUser(user: user)
         } catch let error {
-          print(error)
+          DLog(error)
         }
       })
     }

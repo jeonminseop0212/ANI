@@ -167,7 +167,7 @@ class ANIChatBar: UIView {
         database.collection(KEY_CHAT_GROUPS).document(chatGroupId).updateData(value)
       }
     } catch let error {
-      print(error)
+      DLog(error)
     }
 
     chatTextView.text = ""

@@ -50,7 +50,7 @@ class ANITabBarController: UITabBarController {
               ANISessionManager.shared.isAnonymous = false
             }
           } catch let error {
-            print(error)
+            DLog(error)
           }
         })
       }
@@ -58,7 +58,7 @@ class ANITabBarController: UITabBarController {
       do {
         try Auth.auth().signOut()
       } catch let signOutError as NSError {
-        print("signOutError \(signOutError)")
+        DLog("signOutError \(signOutError)")
       }
       
       ANISessionManager.shared.isAnonymous = true
@@ -144,7 +144,7 @@ class ANITabBarController: UITabBarController {
       }
       showingTabTag = 4
     default:
-      print("default tab")
+      DLog("default tab")
     }
   }
 }

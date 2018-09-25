@@ -168,7 +168,7 @@ class ANICommentBar: UIView {
         
         database.collection(KEY_USERS).document(userId).collection(KEY_NOTIFICATIONS).document(id).setData(data)
       } catch let error {
-        print(error)
+        DLog(error)
       }
     }
   }
@@ -212,7 +212,7 @@ class ANICommentBar: UIView {
         }
       }
     } catch let error {
-      print(error)
+      DLog(error)
     }
     
     commentTextView.text = ""

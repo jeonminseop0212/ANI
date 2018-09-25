@@ -245,7 +245,7 @@ class ANIOtherProfileCell: UITableViewCell {
     DispatchQueue.global().async {
       database.collection(KEY_USERS).document(userId).collection(KEY_FOLLOWING_USER_IDS).addSnapshotListener({ (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           
           return
         }
@@ -257,7 +257,7 @@ class ANIOtherProfileCell: UITableViewCell {
       
       database.collection(KEY_USERS).document(userId).collection(KEY_FOLLOWER_IDS).addSnapshotListener({ (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           
           return
         }
@@ -288,7 +288,7 @@ class ANIOtherProfileCell: UITableViewCell {
         
         database.collection(KEY_USERS).document(userId).collection(KEY_NOTIFICATIONS).document(currentUserId).setData(data)
       } catch let error {
-        print(error)
+        DLog(error)
       }
     }
   }

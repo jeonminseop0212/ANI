@@ -258,7 +258,7 @@ class ANIRecruitDetailViewController: UIViewController {
     DispatchQueue.global().async {
       database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_CLIP_IDS).getDocuments(completion: { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           
           return
         }
@@ -309,7 +309,7 @@ class ANIRecruitDetailViewController: UIViewController {
   }
   
   @objc private func apply() {
-    print("apply")
+    DLog("apply")
   }
   
   @objc private func rejectViewTapped() {
@@ -499,7 +499,7 @@ extension ANIRecruitDetailViewController {
     DispatchQueue.global().async {
       database.collection(KEY_RECRUITS).document(recruitId).getDocument(completion: { (snapshot, error) in
         if let error = error {
-          print("get document error \(error)")
+          DLog("get document error \(error)")
           
           return
         }
@@ -521,7 +521,7 @@ extension ANIRecruitDetailViewController {
 
             storageRef.delete { error in
               if let error = error {
-                print(error)
+                DLog(error)
               }
             }
           }
@@ -533,13 +533,13 @@ extension ANIRecruitDetailViewController {
 
               storageRef.delete { error in
                 if let error = error {
-                  print(error)
+                  DLog(error)
                 }
               }
             }
           }
         } catch let error {
-          print(error)
+          DLog(error)
         }
       })
     }
@@ -547,7 +547,7 @@ extension ANIRecruitDetailViewController {
     DispatchQueue.global().async {
       database.collection(KEY_RECRUITS).document(recruitId).collection(KEY_LOVE_IDS).getDocuments(completion: { (snapshot, error) in
         if let error = error {
-          print("Get document error \(error)")
+          DLog("Get document error \(error)")
           
           return
         }
@@ -562,7 +562,7 @@ extension ANIRecruitDetailViewController {
       
       database.collection(KEY_RECRUITS).document(recruitId).collection(KEY_CLIP_IDS).getDocuments(completion: { (snapshot, error) in
         if let error = error {
-          print("Get document error \(error)")
+          DLog("Get document error \(error)")
           
           return
         }

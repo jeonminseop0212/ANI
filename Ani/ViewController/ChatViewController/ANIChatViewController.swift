@@ -156,7 +156,7 @@ class ANIChatViewController: UIViewController {
     DispatchQueue.global().async {
       database.collection(KEY_CHAT_GROUPS).whereField(KEY_CHAT_MEMBER_IDS + "." + currentUserUid, isEqualTo: true).whereField(KEY_CHAT_MEMBER_IDS + "." + userId, isEqualTo: true).getDocuments { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           
           return
         }
@@ -189,7 +189,7 @@ class ANIChatViewController: UIViewController {
 
         self.chatGroupId = id
       } catch let error {
-        print(error)
+        DLog(error)
       }
     }
   }
@@ -202,7 +202,7 @@ class ANIChatViewController: UIViewController {
     DispatchQueue.global().async {
       database.collection(KEY_CHAT_GROUPS).document(chatGroupId).getDocument { (snapshot, error) in
         if let error = error {
-          print("Error get document: \(error)")
+          DLog("Error get document: \(error)")
           
           return
         }
@@ -218,7 +218,7 @@ class ANIChatViewController: UIViewController {
             self.chatGroupId = nil
           }
         } catch let error {
-          print(error)
+          DLog(error)
         }
       }
     }
