@@ -136,6 +136,26 @@ class ANIStoryView: UIView {
     
     storyTableView.deleteRows(at: [indexPath], with: .automatic)
   }
+  
+  private func showReloadView(sender: UIRefreshControl?) {
+    guard let activityIndicatorView = self.activityIndicatorView,
+          let reloadView = self.reloadView,
+          let storyTableView = self.storyTableView else { return }
+    
+    if let sender = sender {
+      sender.endRefreshing()
+    }
+    
+    activityIndicatorView.stopAnimating()
+    
+    storyTableView.alpha = 0.0
+    
+    UIView.animate(withDuration: 0.2, animations: {
+      reloadView.alpha = 1.0
+    })
+    
+    self.isLoading = false
+  }
 }
 
 //MARK: UITableViewDataSource
@@ -303,12 +323,15 @@ extension ANIStoryView {
       database.collection(KEY_STORIES).order(by: KEY_DATE, descending: true).limit(to: 10).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           print("Error get document: \(error)")
+          self.isLoading = false
           
           return
         }
         
         guard let snapshot = snapshot,
-              let lastStory = snapshot.documents.last else { return }
+              let lastStory = snapshot.documents.last else {
+                self.showReloadView(sender: sender)
+                return }
         
         self.lastStory = lastStory
         
@@ -354,19 +377,7 @@ extension ANIStoryView {
             self.stories.removeAll()
           }
           
-          if let sender = sender {
-            sender.endRefreshing()
-          }
-          
-          activityIndicatorView.stopAnimating()
-          
-          storyTableView.alpha = 0.0
-          
-          UIView.animate(withDuration: 0.2, animations: {
-            reloadView.alpha = 1.0
-          })
-          
-          self.isLoading = false
+          self.showReloadView(sender: sender)
         }
       })
     }
@@ -386,6 +397,7 @@ extension ANIStoryView {
       database.collection(KEY_STORIES).order(by: KEY_DATE, descending: true).start(afterDocument: lastStory).limit(to: 10).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           print("Error get document: \(error)")
+          self.isLoading = false
           
           return
         }

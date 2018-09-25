@@ -24,6 +24,7 @@ class ANINotiView: UIView {
   
   private var notifications = [FirebaseNotification]()
   
+  private var isLastNotiPage: Bool = false
   private var lastNoti: QueryDocumentSnapshot?
   private var isLoading: Bool = false
   
@@ -112,6 +113,28 @@ class ANINotiView: UIView {
   @objc private func reloadNotifications() {
     loadNoti(sender: nil)
   }
+  
+  private func showReloadView(sender: UIRefreshControl?) {
+    guard let activityIndicatorView = self.activityIndicatorView,
+          let reloadView = self.reloadView,
+          let notiTableView = self.notiTableView else { return }
+    
+    activityIndicatorView.stopAnimating()
+    
+    notiTableView.reloadData()
+    
+    if let sender = sender {
+      sender.endRefreshing()
+    }
+    
+    notiTableView.alpha = 0.0
+    
+    UIView.animate(withDuration: 0.2, animations: {
+      reloadView.alpha = 1.0
+    })
+    
+    self.isLoading = false
+  }
 }
 
 //MARK: UITableViewDataSource
@@ -191,16 +214,20 @@ extension ANINotiView {
     
     DispatchQueue.global().async {
       self.isLoading = true
+      self.isLastNotiPage = false
       
       database.collection(KEY_USERS).document(currentUserUid).collection(KEY_NOTIFICATIONS).order(by: KEY_NOTI_UPDATE_DATE, descending: true).limit(to: 20).getDocuments { (snapshot, error) in
         if let error = error {
           print("Error get document: \(error)")
+          self.isLoading = false
           
           return
         }
         
         guard let snapshot = snapshot,
-              let lastNoti = snapshot.documents.last else { return }
+              let lastNoti = snapshot.documents.last else {
+                self.showReloadView(sender: sender)
+                return }
         
         self.lastNoti = lastNoti
         
@@ -246,44 +273,38 @@ extension ANINotiView {
             self.notifications.removeAll()
           }
           
-          if let sender = sender {
-            sender.endRefreshing()
-          }
-          
-          activityIndicatorView.stopAnimating()
-          
-          notiTableView.alpha = 0.0
-          
-          UIView.animate(withDuration: 0.2, animations: {
-            reloadView.alpha = 1.0
-          })
-          
-          self.isLoading = false
+          self.showReloadView(sender: sender)
         }
       }
     }
   }
   
   private func loadMoreNoti() {
-    guard let notiTableView = self.notiTableView,
+    guard let currentUserUid = ANISessionManager.shared.currentUserUid,
+          let notiTableView = self.notiTableView,
           let lastNoti = self.lastNoti,
-          !isLoading else { return }
+          !isLoading,
+          !isLastNotiPage else { return }
     
     let database = Firestore.firestore()
     
     DispatchQueue.global().async {
       self.isLoading = true
       
-      database.collection(KEY_STORIES).order(by: KEY_DATE, descending: true).start(afterDocument: lastNoti).limit(to: 10).getDocuments(completion: { (snapshot, error) in
+      database.collection(KEY_USERS).document(currentUserUid).collection(KEY_NOTIFICATIONS).order(by: KEY_NOTI_UPDATE_DATE, descending: true).start(afterDocument: lastNoti).limit(to: 20).getDocuments { (snapshot, error) in
         if let error = error {
           print("Error get document: \(error)")
-          
+          self.isLoading = false
+
           return
         }
         
-        guard let snapshot = snapshot,
-              let lastNoti = snapshot.documents.last else { return }
-        
+        guard let snapshot = snapshot else { return }
+        guard let lastNoti = snapshot.documents.last else {
+          self.isLastNotiPage = true
+          self.isLoading = false
+          return }
+
         self.lastNoti = lastNoti
         
         for (index, document) in snapshot.documents.enumerated() {
@@ -303,7 +324,7 @@ extension ANINotiView {
             self.isLoading = false
           }
         }
-      })
+      }
     }
   }
 }

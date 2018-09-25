@@ -394,7 +394,7 @@ extension ANISearchView {
       index = ANISessionManager.shared.client.index(withName: KEY_USERS_INDEX)
       
       query.query = searchText
-      query.hitsPerPage = 20
+      query.hitsPerPage = 30
       page = 0
       query.page = page
       
@@ -405,7 +405,7 @@ extension ANISearchView {
       index = ANISessionManager.shared.client.index(withName: KEY_STORIES_INDEX)
       
       query.query = searchText
-      query.hitsPerPage = 5
+      query.hitsPerPage = 20
       page = 0
       query.page = page
       
@@ -417,7 +417,7 @@ extension ANISearchView {
       index = ANISessionManager.shared.client.index(withName: KEY_QNAS_INDEX)
       
       query.query = searchText
-      query.hitsPerPage = 20
+      query.hitsPerPage = 30
       page = 0
       query.page = page
       
@@ -438,7 +438,9 @@ extension ANISearchView {
         if let content = content, let hits = content[KEY_HITS] as? [AnyObject], !hits.isEmpty {
           for (hitIndex, hit) in hits.enumerated() {
             guard let hitDic = hit as? [String: AnyObject],
-                  let nbPages = content["nbPages"] as? UInt else { return }
+                  let nbPages = content["nbPages"] as? UInt else {
+                    self.isLoading = false
+                    return }
             
             self.nbPages = nbPages
             
@@ -520,7 +522,9 @@ extension ANISearchView {
       index.search(self.query, completionHandler: { (content, error) -> Void in
         if let content = content, let hits = content[KEY_HITS] as? [AnyObject], !hits.isEmpty {
           for (hitIndex, hit) in hits.enumerated() {
-            guard let hitDic = hit as? [String: AnyObject] else { return }
+            guard let hitDic = hit as? [String: AnyObject] else {
+              self.isLoading = false
+              return }
             
             do {
               switch self.selectedCategory {
