@@ -180,13 +180,14 @@ extension ANIStoryView: UITableViewDataSource {
         } else {
           cell.recruit = nil
         }
-        for user in users {
-          if stories[indexPath.row].userId == user.uid {
-            cell.user = user
-            break
+        if users.contains(where: { $0.uid == stories[indexPath.row].userId }) {
+          for user in users {
+            if stories[indexPath.row].userId == user.uid {
+              cell.user = user
+              break
+            }
           }
-        }
-        if users.isEmpty {
+        } else {
           cell.user = nil
         }
         cell.story = stories[indexPath.row]
@@ -198,13 +199,14 @@ extension ANIStoryView: UITableViewDataSource {
         let storyCellId = NSStringFromClass(ANIStoryViewCell.self)
         let cell = tableView.dequeueReusableCell(withIdentifier: storyCellId, for: indexPath) as! ANIStoryViewCell
         
-        for user in users {
-          if stories[indexPath.row].userId == user.uid {
-            cell.user = user
-            break
+        if users.contains(where: { $0.uid == stories[indexPath.row].userId }) {
+          for user in users {
+            if stories[indexPath.row].userId == user.uid {
+              cell.user = user
+              break
+            }
           }
-        }
-        if users.isEmpty {
+        } else {
           cell.user = nil
         }
         cell.story = stories[indexPath.row]

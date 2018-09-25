@@ -169,12 +169,16 @@ extension ANIListView: UITableViewDataSource {
     case .loveRecruit:
       let recruitCellid = NSStringFromClass(ANIRecruitViewCell.self)
       let cell = tableView.dequeueReusableCell(withIdentifier: recruitCellid, for: indexPath) as! ANIRecruitViewCell
-      
-      for user in users {
-        if loveRecruits[indexPath.row].userId == user.uid {
-          cell.user = user
-          break
+
+      if users.contains(where: { $0.uid == loveRecruits[indexPath.row].userId }) {
+        for user in users {
+          if loveRecruits[indexPath.row].userId == user.uid {
+            cell.user = user
+            break
+          }
         }
+      } else {
+        cell.user = nil
       }
       cell.recruit = loveRecruits[indexPath.row]
       cell.delegate = self
@@ -197,11 +201,16 @@ extension ANIListView: UITableViewDataSource {
           } else {
             cell.recruit = nil
           }
-          for user in users {
-            if loveStories[indexPath.row].userId == user.uid {
-              cell.user = user
-              break
+
+          if users.contains(where: { $0.uid == loveStories[indexPath.row].userId }) {
+            for user in users {
+              if loveStories[indexPath.row].userId == user.uid {
+                cell.user = user
+                break
+              }
             }
+          } else {
+            cell.user = nil
           }
           cell.story = loveStories[indexPath.row]
           cell.delegate = self
@@ -212,11 +221,15 @@ extension ANIListView: UITableViewDataSource {
           let storyCellId = NSStringFromClass(ANIStoryViewCell.self)
           let cell = tableView.dequeueReusableCell(withIdentifier: storyCellId, for: indexPath) as! ANIStoryViewCell
           
-          for user in users {
-            if loveStories[indexPath.row].userId == user.uid {
-              cell.user = user
-              break
+          if users.contains(where: { $0.uid == loveStories[indexPath.row].userId }) {
+            for user in users {
+              if loveStories[indexPath.row].userId == user.uid {
+                cell.user = user
+                break
+              }
             }
+          } else {
+            cell.user = nil
           }
           cell.story = loveStories[indexPath.row]
           cell.delegate = self
@@ -231,13 +244,17 @@ extension ANIListView: UITableViewDataSource {
       let qnaCellid = NSStringFromClass(ANIQnaViewCell.self)
       let cell = tableView.dequeueReusableCell(withIdentifier: qnaCellid, for: indexPath) as! ANIQnaViewCell
       
-      cell.qna = loveQnas[indexPath.row]
-      for user in users {
-        if loveQnas[indexPath.row].userId == user.uid {
-          cell.user = user
-          break
+      if users.contains(where: { $0.uid == loveQnas[indexPath.row].userId }) {
+        for user in users {
+          if loveQnas[indexPath.row].userId == user.uid {
+            cell.user = user
+            break
+          }
         }
+      } else {
+        cell.user = nil
       }
+      cell.qna = loveQnas[indexPath.row]
       cell.delegate = self
       cell.indexPath = indexPath.row
       
@@ -246,11 +263,15 @@ extension ANIListView: UITableViewDataSource {
       let recruitCellid = NSStringFromClass(ANIRecruitViewCell.self)
       let cell = tableView.dequeueReusableCell(withIdentifier: recruitCellid, for: indexPath) as! ANIRecruitViewCell
       
-      for user in users {
-        if clipRecruits[indexPath.row].userId == user.uid {
-          cell.user = user
-          break
+      if users.contains(where: { $0.uid == clipRecruits[indexPath.row].userId }) {
+        for user in users {
+          if clipRecruits[indexPath.row].userId == user.uid {
+            cell.user = user
+            break
+          }
         }
+      } else {
+        cell.user = nil
       }
       cell.recruit = clipRecruits[indexPath.row]
       cell.delegate = self

@@ -167,13 +167,14 @@ extension ANIQnaView: UITableViewDataSource {
     let cell = tableView.dequeueReusableCell(withIdentifier: id, for: indexPath) as! ANIQnaViewCell
 
     if !qnas.isEmpty {
-      for user in users {
-        if qnas[indexPath.row].userId == user.uid {
-          cell.user = user
-          break
+      if users.contains(where: { $0.uid == qnas[indexPath.row].userId }) {
+        for user in users {
+          if qnas[indexPath.row].userId == user.uid {
+            cell.user = user
+            break
+          }
         }
-      }
-      if users.isEmpty {
+      } else {
         cell.user = nil
       }
       cell.qna = qnas[indexPath.row]

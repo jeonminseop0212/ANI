@@ -24,6 +24,8 @@ class ANINotiView: UIView {
   
   private var notifications = [FirebaseNotification]()
   
+  private var users = [FirebaseUser]()
+  
   private var isLastNotiPage: Bool = false
   private var lastNoti: QueryDocumentSnapshot?
   private var isLoading: Bool = false
@@ -149,14 +151,36 @@ extension ANINotiView: UITableViewDataSource {
         let followNotiId = NSStringFromClass(ANIFollowNotiViewCell.self)
         let cell = tableView.dequeueReusableCell(withIdentifier: followNotiId, for: indexPath) as! ANIFollowNotiViewCell
         
+        if users.contains(where: { $0.uid == notifications[indexPath.row].userId }) {
+          for user in users {
+            if notifications[indexPath.row].userId == user.uid {
+              cell.user = user
+              break
+            }
+          }
+        } else {
+          cell.user = nil
+        }
         cell.noti = notifications[indexPath.row]
+        cell.delegate = self
         
         return cell
       } else {
         let basicNotiId = NSStringFromClass(ANIBasicNotiViewCell.self)
         let cell = tableView.dequeueReusableCell(withIdentifier: basicNotiId, for: indexPath) as! ANIBasicNotiViewCell
         
+        if users.contains(where: { $0.uid == notifications[indexPath.row].userId }) {
+          for user in users {
+            if notifications[indexPath.row].userId == user.uid {
+              cell.user = user
+              break
+            }
+          }
+        } else {
+          cell.user = nil
+        }
         cell.noti = notifications[indexPath.row]
+        cell.delegate = self
         
         return cell
       }
@@ -333,5 +357,12 @@ extension ANINotiView {
 extension ANINotiView: ANIReloadViewDelegate {
   func reloadButtonTapped() {
     loadNoti(sender: nil)
+  }
+}
+
+//MARK: ANIBasicNotiViewCellDelegate
+extension ANINotiView: ANIBasicNotiViewCellDelegate, ANIFollowNotiViewCellDelegate {
+  func loadedNotiUser(user: FirebaseUser) {
+    self.users.append(user)
   }
 }
