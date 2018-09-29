@@ -1,9 +1,9 @@
 {
-  "commitish" : "5.3.0",
+  "commitish" : "6.0.0",
   "iOS" : [
     {
       "name" : "InstantSearchClient",
-      "hash" : "13b05f1c2cbe934305bec954f9b74b58de2f73f2ad433de75d30f37cd7f37133"
+      "hash" : "99e656f52c9c98f0f3c36b6a931b0d66b2dd99c4e9762ca706dfcff1e5e990da"
     }
   ]
 }
