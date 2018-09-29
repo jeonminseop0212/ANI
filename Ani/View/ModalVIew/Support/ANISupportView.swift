@@ -53,7 +53,7 @@ class ANISupportView: UIView {
     addSubview(titleLabel)
     titleLabel.topToSuperview(offset: 15.0)
     titleLabel.leftToSuperview(offset: 15.0)
-    titleLabel.rightToSuperview(offset: 15.0)
+    titleLabel.rightToSuperview(offset: -15.0)
     self.titleLabel = titleLabel
     
     //supportButton
@@ -65,7 +65,7 @@ class ANISupportView: UIView {
     addSubview(supportButton)
     supportButton.bottomToSuperview(offset: -10.0)
     supportButton.leftToSuperview(offset: 100.0)
-    supportButton.rightToSuperview(offset: 100.0)
+    supportButton.rightToSuperview(offset: -100.0)
     supportButton.height(SUPPORT_BUTTON_HEIGHT)
     self.supportButton = supportButton
     
@@ -90,7 +90,7 @@ class ANISupportView: UIView {
     addSubview(messageTextView)
     messageTextView.topToBottom(of: titleLabel, offset: 15.0)
     messageTextView.leftToSuperview(offset: 15.0)
-    messageTextView.rightToSuperview(offset: 15.0)
+    messageTextView.rightToSuperview(offset: -15.0)
     messageTextView.bottomToTop(of: supportButton, offset: -15.0)
     self.messageTextView = messageTextView
   }

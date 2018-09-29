@@ -126,7 +126,7 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
     editButtonBG.alpha = 1.0
     myNavigationBase.addSubview(editButtonBG)
     editButtonBG.centerYToSuperview()
-    editButtonBG.rightToSuperview(offset: 10.0)
+    editButtonBG.rightToSuperview(offset: -10.0)
     editButtonBG.width(70.0)
     editButtonBG.height(UIViewController.NAVIGATION_BAR_HEIGHT - 10.0)
     self.editButtonBG = editButtonBG

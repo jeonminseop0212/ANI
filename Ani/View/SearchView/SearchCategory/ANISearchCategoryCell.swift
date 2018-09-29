@@ -38,7 +38,7 @@ class ANISearchCategoryCell: UICollectionViewCell {
     categoryLabel.font = UIFont.boldSystemFont(ofSize: 14)
     categoryLabel.textColor = ANIColor.subTitle
     base.addSubview(categoryLabel)
-    let insets = UIEdgeInsets(top: 5.0, left: 15.0, bottom: 5.0, right: -15.0)
+    let insets = UIEdgeInsets(top: 5.0, left: 15.0, bottom: 5.0, right: 15.0)
     categoryLabel.edgesToSuperview(insets: insets)
     self.categoryLabel = categoryLabel
   }

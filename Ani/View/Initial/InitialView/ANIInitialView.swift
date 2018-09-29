@@ -87,7 +87,7 @@ class ANIInitialView: UIView {
     base.addSubview(buttonStackView)
     buttonStackView.topToBottom(of: subTitleLabel, offset: 15.0)
     buttonStackView.leftToSuperview(offset: 40.0)
-    buttonStackView.rightToSuperview(offset: 40.0)
+    buttonStackView.rightToSuperview(offset: -40.0)
     self.buttonStackView = buttonStackView
     
     //loginButton

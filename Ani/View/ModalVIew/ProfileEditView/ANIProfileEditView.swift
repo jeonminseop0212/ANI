@@ -121,7 +121,7 @@ class ANIProfileEditView: UIView {
     contentView.addSubview(nameTitleLabel)
     nameTitleLabel.topToBottom(of: familyView, offset: 10.0)
     nameTitleLabel.leftToSuperview(offset: 10.0)
-    nameTitleLabel.rightToSuperview(offset: 10.0)
+    nameTitleLabel.rightToSuperview(offset: -10.0)
     self.familyTitleLabel = familyTitleLabel
     
     //nameBG
@@ -132,7 +132,7 @@ class ANIProfileEditView: UIView {
     contentView.addSubview(nameBG)
     nameBG.topToBottom(of: nameTitleLabel, offset: 10.0)
     nameBG.leftToSuperview(offset: 10.0)
-    nameBG.rightToSuperview(offset: 10.0)
+    nameBG.rightToSuperview(offset: -10.0)
     self.nameBG = nameBG
     
     //nameTextView
@@ -144,7 +144,7 @@ class ANIProfileEditView: UIView {
     nameTextView.placeHolder = "名前を入力してください"
     nameTextView.delegate = self
     nameBG.addSubview(nameTextView)
-    let textViewInsets = UIEdgeInsets(top: 5.0, left: 5.0, bottom: 5.0, right: -5.0)
+    let textViewInsets = UIEdgeInsets(top: 5.0, left: 5.0, bottom: 5.0, right: 5.0)
     nameTextView.edgesToSuperview(insets: textViewInsets)
     self.nameTextView = nameTextView
     setHideButtonOnKeyboard(textView: nameTextView)
@@ -157,7 +157,7 @@ class ANIProfileEditView: UIView {
     contentView.addSubview(kindTitleLable)
     kindTitleLable.topToBottom(of: nameBG, offset: 10.0)
     kindTitleLable.leftToSuperview(offset: 10.0)
-    kindTitleLable.rightToSuperview(offset: 10.0)
+    kindTitleLable.rightToSuperview(offset: -10.0)
     self.kindTitleLable = kindTitleLable
     
     //kindBG
@@ -168,7 +168,7 @@ class ANIProfileEditView: UIView {
     contentView.addSubview(kindBG)
     kindBG.topToBottom(of: kindTitleLable, offset: 10.0)
     kindBG.leftToSuperview(offset: 10.0)
-    kindBG.rightToSuperview(offset: 10.0)
+    kindBG.rightToSuperview(offset: -10.0)
     self.kindBG = kindBG
     
     //kindLabel
@@ -202,7 +202,7 @@ class ANIProfileEditView: UIView {
     contentView.addSubview(introduceTitleLabel)
     introduceTitleLabel.topToBottom(of: kindBG, offset: 10.0)
     introduceTitleLabel.leftToSuperview(offset: 10.0)
-    introduceTitleLabel.rightToSuperview(offset: 10.0)
+    introduceTitleLabel.rightToSuperview(offset: -10.0)
     self.introduceTitleLabel = introduceTitleLabel
     
     //introduceBG
@@ -213,7 +213,7 @@ class ANIProfileEditView: UIView {
     contentView.addSubview(introduceBG)
     introduceBG.topToBottom(of: introduceTitleLabel, offset: 10.0)
     introduceBG.leftToSuperview(offset: 10.0)
-    introduceBG.rightToSuperview(offset: 10.0)
+    introduceBG.rightToSuperview(offset: -10.0)
     introduceBG.bottomToSuperview(offset: -10.0)
     self.introduceBG = introduceBG
     

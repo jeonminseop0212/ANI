@@ -69,7 +69,7 @@ class ANIMyChatViewCell: UITableViewCell {
     base.addSubview(messageBG)
     let width = UIScreen.main.bounds.width * 0.7
     messageBG.topToSuperview(offset: 5.0)
-    messageBG.rightToSuperview(offset: 10.0)
+    messageBG.rightToSuperview(offset: -10.0)
     messageBG.bottomToSuperview(offset: -5.0)
     messageBG.width(min: 0.0, max: width)
     self.messageBG = messageBG
@@ -80,7 +80,7 @@ class ANIMyChatViewCell: UITableViewCell {
     messageLabel.textColor = .white
     messageLabel.numberOfLines = 0
     messageBG.addSubview(messageLabel)
-    let labelInsets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: -10.0)
+    let labelInsets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: 10.0)
     messageLabel.edgesToSuperview(insets: labelInsets)
     self.messageLabel = messageLabel
     

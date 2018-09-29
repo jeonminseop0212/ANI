@@ -94,7 +94,7 @@ class ANIOtherProfileViewController: UIViewController {
     myNavigationBase.addSubview(optionButton)
     optionButton.width(40.0)
     optionButton.height(44.0)
-    optionButton.rightToSuperview(offset: 5.0)
+    optionButton.rightToSuperview(offset: -5.0)
     optionButton.centerYToSuperview()
     self.optionButton = optionButton
     

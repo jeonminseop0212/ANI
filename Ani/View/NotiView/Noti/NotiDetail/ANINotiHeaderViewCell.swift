@@ -56,7 +56,7 @@ class ANINotiHeaderViewCell: UITableViewCell {
     addSubview(headerLabel)
     headerLabelTopConstraint = headerLabel.topToSuperview()
     headerLabel.leftToSuperview(offset: 10.0)
-    headerLabel.rightToSuperview(offset: 10.0)
+    headerLabel.rightToSuperview(offset: -10.0)
     headerLabel.bottomToSuperview(offset: -10)
     self.headerLabel = headerLabel
   }

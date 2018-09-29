@@ -120,7 +120,7 @@ class ANISignUpView: UIView {
     contentView.addSubview(adressTitleLabel)
     adressTitleLabel.topToBottom(of: profileImageView, offset: CONTENT_SPACE)
     adressTitleLabel.leftToSuperview(offset: 10.0)
-    adressTitleLabel.rightToSuperview(offset: 10.0)
+    adressTitleLabel.rightToSuperview(offset: -10.0)
     self.adressTitleLabel = adressTitleLabel
     
     //adressTextFieldBG
@@ -131,7 +131,7 @@ class ANISignUpView: UIView {
     contentView.addSubview(adressTextFieldBG)
     adressTextFieldBG.topToBottom(of: adressTitleLabel, offset: 10.0)
     adressTextFieldBG.leftToSuperview(offset: 10.0)
-    adressTextFieldBG.rightToSuperview(offset: 10.0)
+    adressTextFieldBG.rightToSuperview(offset: -10.0)
     self.adressTextFieldBG = adressTextFieldBG
     
     //adressTextField
@@ -144,7 +144,7 @@ class ANISignUpView: UIView {
     adressTextField.keyboardType = .emailAddress
     adressTextField.delegate = self
     adressTextFieldBG.addSubview(adressTextField)
-    let insets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: -10.0)
+    let insets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: 10.0)
     adressTextField.edgesToSuperview(insets: insets)
     self.adressTextField = adressTextField
     
@@ -156,7 +156,7 @@ class ANISignUpView: UIView {
     contentView.addSubview(passwordTitleLabel)
     passwordTitleLabel.topToBottom(of: adressTextFieldBG, offset: CONTENT_SPACE)
     passwordTitleLabel.leftToSuperview(offset: 10.0)
-    passwordTitleLabel.rightToSuperview(offset: 10.0)
+    passwordTitleLabel.rightToSuperview(offset: -10.0)
     self.passwordTitleLabel = passwordTitleLabel
     
     //passwordTextFieldBG
@@ -167,7 +167,7 @@ class ANISignUpView: UIView {
     contentView.addSubview(passwordTextFieldBG)
     passwordTextFieldBG.topToBottom(of: passwordTitleLabel, offset: 10.0)
     passwordTextFieldBG.leftToSuperview(offset: 10.0)
-    passwordTextFieldBG.rightToSuperview(offset: 10.0)
+    passwordTextFieldBG.rightToSuperview(offset: -10.0)
     self.passwordTextFieldBG = passwordTextFieldBG
     
     //passwordTextField
@@ -191,7 +191,7 @@ class ANISignUpView: UIView {
     contentView.addSubview(passwordCheckTextFieldBG)
     passwordCheckTextFieldBG.topToBottom(of: passwordTextFieldBG, offset: 10.0)
     passwordCheckTextFieldBG.leftToSuperview(offset: 10.0)
-    passwordCheckTextFieldBG.rightToSuperview(offset: 10.0)
+    passwordCheckTextFieldBG.rightToSuperview(offset: -10.0)
     self.passwordCheckTextFieldBG = passwordCheckTextFieldBG
     
     //passwordCheckTextField
@@ -215,7 +215,7 @@ class ANISignUpView: UIView {
     contentView.addSubview(userNameTitleLabel)
     userNameTitleLabel.topToBottom(of: passwordCheckTextFieldBG, offset: CONTENT_SPACE)
     userNameTitleLabel.leftToSuperview(offset: 10.0)
-    userNameTitleLabel.rightToSuperview(offset: 10.0)
+    userNameTitleLabel.rightToSuperview(offset: -10.0)
     self.userNameTitleLabel = userNameTitleLabel
     
     //userNameTextFieldBG
@@ -226,7 +226,7 @@ class ANISignUpView: UIView {
     contentView.addSubview(userNameTextFieldBG)
     userNameTextFieldBG.topToBottom(of: userNameTitleLabel, offset: 10.0)
     userNameTextFieldBG.leftToSuperview(offset: 10.0)
-    userNameTextFieldBG.rightToSuperview(offset: 10.0)
+    userNameTextFieldBG.rightToSuperview(offset: -10.0)
     self.userNameTextFieldBG = userNameTextFieldBG
     
     //userNameTextField

@@ -55,7 +55,7 @@ class ANIUserSearchViewCell: UITableViewCell {
     stackView.distribution = .fill
     stackView.spacing = 10.0
     addSubview(stackView)
-    let insets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: -10.0)
+    let insets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: 10.0)
     stackView.edgesToSuperview(insets: insets)
     self.stackView = stackView
     

@@ -67,7 +67,7 @@ class ANIPopupOptionViewController: UIViewController {
     popupOptionViewTopConstratint = popupOptionView.topToBottom(of: self.view)
     popupOptionViewTopConstraintConstant = popupOptionViewTopConstratint?.constant
     popupOptionView.leftToSuperview(offset: 10.0)
-    popupOptionView.rightToSuperview(offset: 10.0)
+    popupOptionView.rightToSuperview(offset: -10.0)
     self.popupOptionView = popupOptionView
   }
   

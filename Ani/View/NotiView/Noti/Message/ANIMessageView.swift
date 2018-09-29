@@ -51,7 +51,7 @@ class ANIMessageView: UIView {
     reloadView.dropShadow()
     reloadView.centerInSuperview()
     reloadView.leftToSuperview(offset: 50.0)
-    reloadView.rightToSuperview(offset: 50.0)
+    reloadView.rightToSuperview(offset: -50.0)
     self.reloadView = reloadView
     
     //messageTableView

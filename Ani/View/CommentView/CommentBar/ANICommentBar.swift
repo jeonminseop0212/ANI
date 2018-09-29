@@ -60,7 +60,7 @@ class ANICommentBar: UIView {
     commentTextViewBG.layer.borderColor = ANIColor.gray.cgColor
     commentTextViewBG.layer.borderWidth = 1.0
     addSubview(commentTextViewBG)
-    let bgInsets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: -10.0)
+    let bgInsets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: 10.0)
     commentTextViewBG.leftToRight(of: profileImageView, offset: 10.0)
     commentTextViewBG.edgesToSuperview(excluding: .left, insets: bgInsets)
     self.commentTextViewBG = commentTextViewBG
@@ -74,7 +74,7 @@ class ANICommentBar: UIView {
     commentContributionButton.isEnabled = false
     commentContributionButton.alpha = 0.3
     commentTextViewBG.addSubview(commentContributionButton)
-    commentContributionButton.rightToSuperview(offset: 10.0)
+    commentContributionButton.rightToSuperview(offset: -10.0)
     commentContributionButton.centerY(to: profileImageView)
     commentContributionButton.height(to: profileImageView)
     commentContributionButton.width(60.0)
@@ -92,7 +92,7 @@ class ANICommentBar: UIView {
     }
     commentTextView.delegate = self
     commentTextViewBG.addSubview(commentTextView)
-    let insets = UIEdgeInsets(top: 2.5, left: 5.0, bottom: 2.5, right: -5.0)
+    let insets = UIEdgeInsets(top: 2.5, left: 5.0, bottom: 2.5, right: 5.0)
     commentTextView.edgesToSuperview(excluding: .right,insets: insets)
     commentTextView.rightToLeft(of: commentContributionButton, offset: -5.0)
     self.commentTextView = commentTextView

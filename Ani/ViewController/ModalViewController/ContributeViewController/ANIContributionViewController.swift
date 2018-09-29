@@ -113,7 +113,7 @@ class ANIContributionViewController: UIViewController {
     contributionButtonBG.alpha = 0.5
     myNavigationBarBase.addSubview(contributionButtonBG)
     contributionButtonBG.centerYToSuperview()
-    contributionButtonBG.rightToSuperview(offset: 10.0)
+    contributionButtonBG.rightToSuperview(offset: -10.0)
     contributionButtonBG.width(70.0)
     contributionButtonBG.height(UIViewController.NAVIGATION_BAR_HEIGHT - 10.0)
     self.contributionButtonBG = contributionButtonBG

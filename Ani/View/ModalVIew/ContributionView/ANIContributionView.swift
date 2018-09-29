@@ -85,7 +85,7 @@ class ANIContributionView: UIView {
     contentTextView.isScrollEnabled = false
     contentTextView.delegate = self
     contentView.addSubview(contentTextView)
-    let insets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: -10.0, right: -10.0)
+    let insets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: -10.0, right: 10.0)
     contentTextView.edgesToSuperview(excluding: .bottom, insets: insets)
     self.contentTextView = contentTextView
     setHideButtonOnKeyboard(textView: contentTextView)

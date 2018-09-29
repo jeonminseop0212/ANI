@@ -39,7 +39,7 @@ class ANIPopupPickerViewController: UIViewController {
     popupPickerViewTopConstratint = popupPickerView.topToBottom(of: self.view)
     popupPickerViewTopConstraintConstant = popupPickerViewTopConstratint?.constant
     popupPickerView.leftToSuperview(offset: 10.0)
-    popupPickerView.rightToSuperview(offset: 10.0)
+    popupPickerView.rightToSuperview(offset: -10.0)
     popupPickerView.height(POPUP_PICKER_VIEW_HEIGHT)
     self.popupPickerView = popupPickerView
   }

@@ -42,7 +42,7 @@ class ANICommentContentCell: UITableViewCell {
     storyLabel.font = UIFont.systemFont(ofSize: 15.0)
     storyLabel.numberOfLines = 0
     addSubview(storyLabel)
-    let insets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: -10.0)
+    let insets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: 10.0)
     storyLabel.edgesToSuperview(excluding: .bottom, insets: insets)
     self.storyLabel = storyLabel
     

@@ -48,7 +48,7 @@ class ANISupportViewController: UIViewController {
     self.view.addSubview(supportView)
     supportViewCenterYConstraint = supportView.centerYToSuperview()
     supportView.leftToSuperview(offset: 10.0)
-    supportView.rightToSuperview(offset: 10.0)
+    supportView.rightToSuperview(offset: -10.0)
     supportView.height(SUPPORT_VIEW_HEIGHT)
     self.supportView = supportView
   }

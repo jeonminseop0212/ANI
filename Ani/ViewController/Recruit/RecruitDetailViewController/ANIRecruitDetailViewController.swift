@@ -106,7 +106,7 @@ class ANIRecruitDetailViewController: UIViewController {
     myNavigationBar.addSubview(optionButton)
     optionButton.width(40.0)
     optionButton.height(44.0)
-    optionButton.rightToSuperview(offset: 5.0)
+    optionButton.rightToSuperview(offset: -5.0)
     optionButton.bottomToSuperview()
     self.optionButton = optionButton
     
@@ -137,7 +137,7 @@ class ANIRecruitDetailViewController: UIViewController {
     self.view.addSubview(applyButton)
     applyButton.bottomToSuperview(offset: -10.0)
     applyButton.leftToSuperview(offset: 100.0)
-    applyButton.rightToSuperview(offset: 100.0)
+    applyButton.rightToSuperview(offset: -100.0)
     applyButton.height(ANIRecruitDetailViewController.APPLY_BUTTON_HEIGHT)
     self.applyButton = applyButton
     

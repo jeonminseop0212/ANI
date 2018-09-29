@@ -141,7 +141,7 @@ class ANIRecruitContributionViewController: UIViewController {
     self.view.addSubview(contributeButton)
     contributeButton.bottomToSuperview(offset: -10.0)
     contributeButton.leftToSuperview(offset: 100.0)
-    contributeButton.rightToSuperview(offset: 100.0)
+    contributeButton.rightToSuperview(offset: -100.0)
     contributeButton.height(ANIRecruitContributionViewController.CONTRIBUTE_BUTTON_HEIGHT)
     self.contributeButton = contributeButton
     

@@ -120,7 +120,7 @@ class ANIRecruitViewCell: UITableViewCell {
     tapArea.addSubview(basicInfoStackView)
     basicInfoStackView.topToBottom(of: recruitImageView, offset: 10.0)
     basicInfoStackView.leftToSuperview(offset: 10.0)
-    basicInfoStackView.rightToSuperview(offset: 10.0)
+    basicInfoStackView.rightToSuperview(offset: -10.0)
     self.basicInfoStackView = basicInfoStackView
     
     //recruitStateLabel
@@ -183,7 +183,7 @@ class ANIRecruitViewCell: UITableViewCell {
     tapArea.addSubview(titleLabel)
     titleLabel.topToBottom(of: basicInfoStackView, offset: 10.0)
     titleLabel.leftToSuperview(offset: 10.0)
-    titleLabel.rightToSuperview(offset: 10.0)
+    titleLabel.rightToSuperview(offset: -10.0)
     self.titleLabel = titleLabel
     
     //subTitleLabel
@@ -194,7 +194,7 @@ class ANIRecruitViewCell: UITableViewCell {
     tapArea.addSubview(subTitleLabel)
     subTitleLabel.topToBottom(of: titleLabel, offset: 10.0)
     subTitleLabel.leftToSuperview(offset: 10.0)
-    subTitleLabel.rightToSuperview(offset: 10.0)
+    subTitleLabel.rightToSuperview(offset: -10.0)
     subTitleLabel.bottomToSuperview()
     self.subTitleLabel = subTitleLabel
     
@@ -220,7 +220,7 @@ class ANIRecruitViewCell: UITableViewCell {
     clipButton.addTarget(self, action: #selector(clip), for: .touchUpInside)
     addSubview(clipButton)
     clipButton.centerY(to: profileImageView)
-    clipButton.rightToSuperview(offset: 10.0)
+    clipButton.rightToSuperview(offset: -10.0)
     clipButton.width(20.0)
     clipButton.height(20.0)
     self.clipButton = clipButton
