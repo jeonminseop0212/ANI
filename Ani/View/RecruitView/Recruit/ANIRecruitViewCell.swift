@@ -659,11 +659,10 @@ class ANIRecruitViewCell: UITableViewCell {
   @objc private func clip() {
     guard let recruit = self.recruit,
           let recuritId = recruit.id,
-          let currentUserId = ANISessionManager.shared.currentUserUid,
           let clipButton = self.clipButton,
           let indexPath = self.indexPath else { return }
     
-    if !ANISessionManager.shared.isAnonymous {
+    if !ANISessionManager.shared.isAnonymous, let currentUserId = ANISessionManager.shared.currentUserUid {
       let database = Firestore.firestore()
 
       if clipButton.tintColor == ANIColor.gray {
