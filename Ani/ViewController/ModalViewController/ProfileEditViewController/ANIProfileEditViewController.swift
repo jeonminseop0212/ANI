@@ -181,29 +181,29 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
   }
   
   @objc private func keyboardWillChangeFrame(_ notification: Notification) {
-    guard let keyboardFrame = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
-          let duration = notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as? TimeInterval,
-          let curve = notification.userInfo?[UIKeyboardAnimationCurveUserInfoKey] as? UInt,
+    guard let keyboardFrame = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
+          let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval,
+          let curve = notification.userInfo?[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt,
           let profileEditViewBottomConstraint = self.profileEditViewBottomConstraint else { return }
     
     let h = keyboardFrame.height
     
     profileEditViewBottomConstraint.constant = -h
     
-    UIView.animate(withDuration: duration, delay: 0, options: UIViewAnimationOptions(rawValue: curve), animations: {
+    UIView.animate(withDuration: duration, delay: 0, options: UIView.AnimationOptions(rawValue: curve), animations: {
       self.view.layoutIfNeeded()
     })
   }
   
   @objc private func keyboardWillHide(_ notification: Notification) {
-    guard let duration = notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as? TimeInterval,
-          let curve = notification.userInfo?[UIKeyboardAnimationCurveUserInfoKey] as? UInt,
+    guard let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval,
+          let curve = notification.userInfo?[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt,
           let profileEditViewOriginalBottomConstraintConstant = self.profileEditViewOriginalBottomConstraintConstant,
           let profileEditViewBottomConstraint = self.profileEditViewBottomConstraint else { return }
     
     profileEditViewBottomConstraint.constant = profileEditViewOriginalBottomConstraintConstant
     
-    UIView.animate(withDuration: duration, delay: 0, options: UIViewAnimationOptions(rawValue: curve), animations: {
+    UIView.animate(withDuration: duration, delay: 0, options: UIView.AnimationOptions(rawValue: curve), animations: {
       self.view.layoutIfNeeded()
     })
   }
@@ -302,7 +302,7 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
 
       for (index, familyImage) in familyImages.enumerated() {
         if let familyImage = familyImage {
-          if let familyImageData = UIImageJPEGRepresentation(familyImage, 0.5) {
+          if let familyImageData = familyImage.jpegData(compressionQuality: 0.5) {
             let uuid = NSUUID().uuidString
             let storageRef = Storage.storage().reference()
             storageRef.child(KEY_FAMILY_IMAGES).child(uuid).putData(familyImageData, metadata: nil) { (metaData, error) in
@@ -369,7 +369,7 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
           let kind = updateUser.kind,
           let introduce = updateUser.introduce else { return }
     
-    if let profileImage = self.profileImage, let profileImageData = UIImageJPEGRepresentation(profileImage, 0.5) {
+    if let profileImage = self.profileImage, let profileImageData = profileImage.jpegData(compressionQuality: 0.5) {
       let storageRef = Storage.storage().reference()
       storageRef.child(KEY_PROFILE_IMAGES).child("\(currentUserUid).jpeg").putData(profileImageData, metadata: nil) { (metaData, error) in
         if error != nil {

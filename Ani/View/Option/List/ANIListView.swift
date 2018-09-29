@@ -90,7 +90,7 @@ class ANIListView: UIView {
     listTableView.separatorStyle = .none
     listTableView.backgroundColor = ANIColor.bg
     listTableView.alpha = 0.0
-    listTableView.rowHeight = UITableViewAutomaticDimension
+    listTableView.rowHeight = UITableView.automaticDimension
     addSubview(listTableView)
     listTableView.edgesToSuperview()
     self.listTableView = listTableView
@@ -349,7 +349,7 @@ extension ANIListView: UITableViewDelegate {
     if let height = self.cellHeight[indexPath] {
       return height
     } else {
-      return UITableViewAutomaticDimension
+      return UITableView.automaticDimension
     }
   }
 }

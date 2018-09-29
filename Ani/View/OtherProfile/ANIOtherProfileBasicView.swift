@@ -109,7 +109,7 @@ class ANIOtherProfileBasicView: UIView {
     let qnaCellid = NSStringFromClass(ANIQnaViewCell.self)
     basicTableView.register(ANIQnaViewCell.self, forCellReuseIdentifier: qnaCellid)
     basicTableView.alpha = 0.0
-    basicTableView.rowHeight = UITableViewAutomaticDimension
+    basicTableView.rowHeight = UITableView.automaticDimension
     let refreshControl = UIRefreshControl()
     refreshControl.addTarget(self, action: #selector(reloadData(sender:)), for: .valueChanged)
     basicTableView.addSubview(refreshControl)
@@ -425,22 +425,22 @@ extension ANIOtherProfileBasicView: UITableViewDelegate {
       if let height = self.recruitCellHeight[indexPath] {
         return height
       } else {
-        return UITableViewAutomaticDimension
+        return UITableView.automaticDimension
       }
     case .story:
       if let height = self.storyCellHeight[indexPath] {
         return height
       } else {
-        return UITableViewAutomaticDimension
+        return UITableView.automaticDimension
       }
     case .qna:
       if let height = self.qnaCellHeight[indexPath] {
         return height
       } else {
-        return UITableViewAutomaticDimension
+        return UITableView.automaticDimension
       }
     default:
-      return UITableViewAutomaticDimension
+      return UITableView.automaticDimension
     }
   }
 }

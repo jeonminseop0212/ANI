@@ -102,7 +102,7 @@ class ANIProfileBasicView: UIView {
     basicTableView.separatorStyle = .none
     basicTableView.dataSource = self
     basicTableView.delegate = self
-    basicTableView.rowHeight = UITableViewAutomaticDimension
+    basicTableView.rowHeight = UITableView.automaticDimension
     let topCellId = NSStringFromClass(ANIProfileTopCell.self)
     basicTableView.register(ANIProfileTopCell.self, forCellReuseIdentifier: topCellId)
     let profileCellId = NSStringFromClass(ANIProfileCell.self)
@@ -410,22 +410,22 @@ extension ANIProfileBasicView: UITableViewDelegate {
       if let height = self.recruitCellHeight[indexPath] {
         return height
       } else {
-        return UITableViewAutomaticDimension
+        return UITableView.automaticDimension
       }
     case .story:
       if let height = self.storyCellHeight[indexPath] {
         return height
       } else {
-        return UITableViewAutomaticDimension
+        return UITableView.automaticDimension
       }
     case .qna:
       if let height = self.qnaCellHeight[indexPath] {
         return height
       } else {
-        return UITableViewAutomaticDimension
+        return UITableView.automaticDimension
       }
     default:
-      return UITableViewAutomaticDimension
+      return UITableView.automaticDimension
     }
   }
 }

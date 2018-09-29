@@ -32,23 +32,23 @@ class ANINotificationManager: NSObject {
   
   //MARK: Keyboard
   static func receive(keyboardDidChangeFrame observer:Any, selector:Selector) {
-    let name = NSNotification.Name.UIKeyboardDidChangeFrame
+    let name = UIResponder.keyboardDidChangeFrameNotification
     self.receive(notificationName: name, observer: observer, selector: selector)
   }
   static func receive(keyboardDidHide observer:Any, selector:Selector) {
-    let name = NSNotification.Name.UIKeyboardDidHide
+    let name = UIResponder.keyboardDidHideNotification
     self.receive(notificationName: name, observer: observer, selector: selector)
   }
   static func receive(keyboardWillChangeFrame observer:Any, selector:Selector) {
-    let name = NSNotification.Name.UIKeyboardWillChangeFrame
+    let name = UIResponder.keyboardWillChangeFrameNotification
     self.receive(notificationName: name, observer: observer, selector: selector)
   }
   static func receive(keyboardWillHide observer:Any, selector:Selector) {
-    let name = NSNotification.Name.UIKeyboardWillHide
+    let name = UIResponder.keyboardWillHideNotification
     self.receive(notificationName: name, observer: observer, selector: selector)
   }
   static func receive(keyboardWillShow observer:Any, selector:Selector) {
-    let name = NSNotification.Name.UIKeyboardWillShow
+    let name = UIResponder.keyboardWillShowNotification
     self.receive(notificationName: name, observer: observer, selector: selector)
   }
   
@@ -76,7 +76,7 @@ class ANINotificationManager: NSObject {
   
   //MARK: text view text did change
   static func receive(textViewTextDidChange observer:Any, selector:Selector) {
-    let name = NSNotification.Name.UITextViewTextDidChange
+    let name = UITextView.textDidChangeNotification
     self.receive(notificationName: name, observer: observer, selector: selector)
   }
   
@@ -112,13 +112,13 @@ class ANINotificationManager: NSObject {
   
   //MARK: will resignActive
   static func receive(applicationWillResignActive observer:Any, selector:Selector) {
-    let name = NSNotification.Name.UIApplicationWillResignActive
+    let name = UIApplication.willResignActiveNotification
     self.receive(notificationName: name, observer: observer, selector: selector)
   }
   
   //MARK: enter background
   static func receive(applicationWillEnterForeground observer:Any, selector:Selector) {
-    let name = NSNotification.Name.UIApplicationWillEnterForeground
+    let name = UIApplication.willEnterForegroundNotification
     self.receive(notificationName: name, observer: observer, selector: selector)
   }
   

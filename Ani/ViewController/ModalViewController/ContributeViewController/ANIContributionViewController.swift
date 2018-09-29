@@ -171,7 +171,7 @@ class ANIContributionViewController: UIViewController {
     
     DispatchQueue.global().async {
       for (index, contentImage) in self.contentImages.enumerated() {
-        if let contentImage = contentImage, let contentImageData = UIImageJPEGRepresentation(contentImage, 0.5) {
+        if let contentImage = contentImage, let contentImageData = contentImage.jpegData(compressionQuality: 0.5) {
           let uuid = UUID().uuidString
           storageRef.child(KEY_STORY_IMAGES).child(uuid).putData(contentImageData, metadata: nil) { (metaData, error) in
             if error != nil {
@@ -224,7 +224,7 @@ class ANIContributionViewController: UIViewController {
         }
       } else {
         for (index, contentImage) in self.contentImages.enumerated() {
-          if let contentImage = contentImage, let contentImageData = UIImageJPEGRepresentation(contentImage, 0.5) {
+          if let contentImage = contentImage, let contentImageData = contentImage.jpegData(compressionQuality: 0.5) {
             let uuid = UUID().uuidString
             storageRef.child(KEY_QNA_IMAGES).child(uuid).putData(contentImageData, metadata: nil) { (metaData, error) in
               if error != nil {
@@ -347,29 +347,29 @@ class ANIContributionViewController: UIViewController {
   }
   
   @objc private func keyboardWillChangeFrame(_ notification: Notification) {
-    guard let keyboardFrame = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
-          let duration = notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as? TimeInterval,
-          let curve = notification.userInfo?[UIKeyboardAnimationCurveUserInfoKey] as? UInt,
+    guard let keyboardFrame = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
+          let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval,
+          let curve = notification.userInfo?[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt,
           let contributionViewBottomConstraint = self.contributionViewBottomConstraint else { return }
     
     let h = keyboardFrame.height
     
     contributionViewBottomConstraint.constant = -h
     
-    UIView.animate(withDuration: duration, delay: 0, options: UIViewAnimationOptions(rawValue: curve), animations: {
+    UIView.animate(withDuration: duration, delay: 0, options: UIView.AnimationOptions(rawValue: curve), animations: {
       self.view.layoutIfNeeded()
     })
   }
   
   @objc private func keyboardWillHide(_ notification: Notification) {
-    guard let duration = notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as? TimeInterval,
-          let curve = notification.userInfo?[UIKeyboardAnimationCurveUserInfoKey] as? UInt,
+    guard let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval,
+          let curve = notification.userInfo?[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt,
           let contributionViewOriginalBottomConstraintConstant = self.contributionViewOriginalBottomConstraintConstant,
           let contributionViewBottomConstraint = self.contributionViewBottomConstraint else { return }
     
     contributionViewBottomConstraint.constant = contributionViewOriginalBottomConstraintConstant
     
-    UIView.animate(withDuration: duration, delay: 0, options: UIViewAnimationOptions(rawValue: curve), animations: {
+    UIView.animate(withDuration: duration, delay: 0, options: UIView.AnimationOptions(rawValue: curve), animations: {
       self.view.layoutIfNeeded()
     })
   }

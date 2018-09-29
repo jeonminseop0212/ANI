@@ -50,7 +50,7 @@ public class ANIPlaceHolderTextView: UITextView {
       self.addSubview(placeHolderLabel)
     }
     
-    self.sendSubview(toBack: placeHolderLabel)
+    self.sendSubviewToBack(placeHolderLabel)
     
     if(self.text.utf16.count == 0 && self.placeHolder.length > 0){
       self.viewWithTag(1)?.alpha = 1

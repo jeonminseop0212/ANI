@@ -40,7 +40,7 @@ class ANIProfileCell: UITableViewCell {
   
   var delegate: ANIProfileCellDelegate?
     
-  override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+  override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     setup()
     setupNotifications()
@@ -176,7 +176,7 @@ class ANIProfileCell: UITableViewCell {
     introductionLabel.numberOfLines = 0
     introductionLabel.textColor = ANIColor.dark
     introduceBG.addSubview(introductionLabel)
-    let insets = UIEdgeInsetsMake(10.0, 10.0, -10.0, -10.0)
+    let insets = UIEdgeInsets.init(top: 10.0, left: 10.0, bottom: -10.0, right: -10.0)
     introductionLabel.edges(to: introduceBG, insets: insets)
     self.introductionLabel = introductionLabel
   }

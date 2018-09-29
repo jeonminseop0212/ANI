@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		23BE6C66072673B423ABA35D /* Pods_Ani.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FD08576705673419CEA26417 /* Pods_Ani.framework */; };
-		8751932F6CAEF562E234E91C /* Pods_AniTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA314F74AF3E318A20DDD5DB /* Pods_AniTests.framework */; };
 		BFFABBAF01DF20A602B9BB7F /* Pods_AniUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C5DC98FBA0B2CCFDA47C5CD8 /* Pods_AniUITests.framework */; };
 		CD033E4120D8D25E002FB770 /* ANISupportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD033E4020D8D25E002FB770 /* ANISupportViewController.swift */; };
 		CD033E4420D8D28D002FB770 /* ANISupportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD033E4320D8D28D002FB770 /* ANISupportView.swift */; };
@@ -41,6 +40,7 @@
 		CD6762E020FD75AC0098E033 /* PickUpItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6762DF20FD75AC0098E033 /* PickUpItem.swift */; };
 		CD6B675120A8844B009BF63D /* ANIRecruitContributionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6B675020A8844B009BF63D /* ANIRecruitContributionView.swift */; };
 		CD6B675420A90F8A009BF63D /* ANIPlaceholderTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6B675320A90F8A009BF63D /* ANIPlaceholderTextView.swift */; };
+		CD85F558215F547300AB9A0C /* AniTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD85F557215F547300AB9A0C /* AniTests.swift */; };
 		CD8FE7D4215A690A00D3281A /* GoogleService-Info-release.plist in Resources */ = {isa = PBXBuildFile; fileRef = CD8FE7D3215A690900D3281A /* GoogleService-Info-release.plist */; };
 		CD92792220C0DCB400B1F006 /* ANIKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD92792120C0DCB400B1F006 /* ANIKey.swift */; };
 		CD9E52B120921EB400715F50 /* UIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD9E52B020921EB400715F50 /* UIViewController.swift */; };
@@ -146,7 +146,6 @@
 		F5B1EF9320725964000CFB0B /* ANIRecruitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B1EF9220725964000CFB0B /* ANIRecruitViewController.swift */; };
 		F5B1EF9820725964000CFB0B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F5B1EF9720725964000CFB0B /* Assets.xcassets */; };
 		F5B1EF9B20725964000CFB0B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F5B1EF9920725964000CFB0B /* LaunchScreen.storyboard */; };
-		F5B1EFA620725964000CFB0B /* AniTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B1EFA520725964000CFB0B /* AniTests.swift */; };
 		F5B1EFB120725964000CFB0B /* AniUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B1EFB020725964000CFB0B /* AniUITests.swift */; };
 		F5B1EFC220725BDC000CFB0B /* ANITabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B1EFC120725BDC000CFB0B /* ANITabBarController.swift */; };
 		F5B1EFC520726658000CFB0B /* TinyConstraints.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5B1EFC420726658000CFB0B /* TinyConstraints.framework */; };
@@ -166,7 +165,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		F5B1EFA220725964000CFB0B /* PBXContainerItemProxy */ = {
+		CD85F55A215F547300AB9A0C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F5B1EF8520725963000CFB0B /* Project object */;
 			proxyType = 1;
@@ -220,6 +219,9 @@
 		CD6762DF20FD75AC0098E033 /* PickUpItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickUpItem.swift; sourceTree = "<group>"; };
 		CD6B675020A8844B009BF63D /* ANIRecruitContributionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitContributionView.swift; sourceTree = "<group>"; };
 		CD6B675320A90F8A009BF63D /* ANIPlaceholderTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIPlaceholderTextView.swift; sourceTree = "<group>"; };
+		CD85F555215F547200AB9A0C /* AniTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AniTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CD85F557215F547300AB9A0C /* AniTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AniTests.swift; sourceTree = "<group>"; };
+		CD85F559215F547300AB9A0C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CD8FE7D3215A690900D3281A /* GoogleService-Info-release.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info-release.plist"; sourceTree = "<group>"; };
 		CD92792120C0DCB400B1F006 /* ANIKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIKey.swift; sourceTree = "<group>"; };
 		CD9E52B020921EB400715F50 /* UIViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewController.swift; sourceTree = "<group>"; };
@@ -329,9 +331,6 @@
 		F5B1EF9720725964000CFB0B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F5B1EF9A20725964000CFB0B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		F5B1EF9C20725964000CFB0B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		F5B1EFA120725964000CFB0B /* AniTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AniTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		F5B1EFA520725964000CFB0B /* AniTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AniTests.swift; sourceTree = "<group>"; };
-		F5B1EFA720725964000CFB0B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F5B1EFAC20725964000CFB0B /* AniUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AniUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5B1EFB020725964000CFB0B /* AniUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AniUITests.swift; sourceTree = "<group>"; };
 		F5B1EFB220725964000CFB0B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -355,6 +354,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		CD85F552215F547200AB9A0C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F5B1EF8A20725963000CFB0B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -366,14 +372,6 @@
 				CDA97B5420B2497200F46DA4 /* WCLShineButton.framework in Frameworks */,
 				F5B1EFC520726658000CFB0B /* TinyConstraints.framework in Frameworks */,
 				23BE6C66072673B423ABA35D /* Pods_Ani.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		F5B1EF9E20725964000CFB0B /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				8751932F6CAEF562E234E91C /* Pods_AniTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -517,6 +515,15 @@
 				CD6B675320A90F8A009BF63D /* ANIPlaceholderTextView.swift */,
 			);
 			path = PlaceholderTextView;
+			sourceTree = "<group>";
+		};
+		CD85F556215F547200AB9A0C /* AniTests */ = {
+			isa = PBXGroup;
+			children = (
+				CD85F557215F547300AB9A0C /* AniTests.swift */,
+				CD85F559215F547300AB9A0C /* Info.plist */,
+			);
+			path = AniTests;
 			sourceTree = "<group>";
 		};
 		CDA32A1420A9347A008A2AC1 /* ScrollView */ = {
@@ -1181,8 +1188,8 @@
 			isa = PBXGroup;
 			children = (
 				F5B1EF8F20725963000CFB0B /* Ani */,
-				F5B1EFA420725964000CFB0B /* AniTests */,
 				F5B1EFAF20725964000CFB0B /* AniUITests */,
+				CD85F556215F547200AB9A0C /* AniTests */,
 				F5B1EF8E20725963000CFB0B /* Products */,
 				F5B1EFC320726657000CFB0B /* Frameworks */,
 				45824576DBA272D1C4D63B2A /* Pods */,
@@ -1193,8 +1200,8 @@
 			isa = PBXGroup;
 			children = (
 				F5B1EF8D20725963000CFB0B /* d_Ani.app */,
-				F5B1EFA120725964000CFB0B /* AniTests.xctest */,
 				F5B1EFAC20725964000CFB0B /* AniUITests.xctest */,
+				CD85F555215F547200AB9A0C /* AniTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1213,15 +1220,6 @@
 				CD8FE7D3215A690900D3281A /* GoogleService-Info-release.plist */,
 			);
 			path = Ani;
-			sourceTree = "<group>";
-		};
-		F5B1EFA420725964000CFB0B /* AniTests */ = {
-			isa = PBXGroup;
-			children = (
-				F5B1EFA520725964000CFB0B /* AniTests.swift */,
-				F5B1EFA720725964000CFB0B /* Info.plist */,
-			);
-			path = AniTests;
 			sourceTree = "<group>";
 		};
 		F5B1EFAF20725964000CFB0B /* AniUITests */ = {
@@ -1406,6 +1404,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		CD85F554215F547200AB9A0C /* AniTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CD85F55C215F547300AB9A0C /* Build configuration list for PBXNativeTarget "AniTests" */;
+			buildPhases = (
+				CD85F551215F547200AB9A0C /* Sources */,
+				CD85F552215F547200AB9A0C /* Frameworks */,
+				CD85F553215F547200AB9A0C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CD85F55B215F547300AB9A0C /* PBXTargetDependency */,
+			);
+			name = AniTests;
+			productName = AniTests;
+			productReference = CD85F555215F547200AB9A0C /* AniTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		F5B1EF8C20725963000CFB0B /* Ani */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = F5B1EFB520725964000CFB0B /* Build configuration list for PBXNativeTarget "Ani" */;
@@ -1426,25 +1442,6 @@
 			productName = Ani;
 			productReference = F5B1EF8D20725963000CFB0B /* d_Ani.app */;
 			productType = "com.apple.product-type.application";
-		};
-		F5B1EFA020725964000CFB0B /* AniTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = F5B1EFB820725964000CFB0B /* Build configuration list for PBXNativeTarget "AniTests" */;
-			buildPhases = (
-				C08E1861744C02BF273FFC88 /* [CP] Check Pods Manifest.lock */,
-				F5B1EF9D20725964000CFB0B /* Sources */,
-				F5B1EF9E20725964000CFB0B /* Frameworks */,
-				F5B1EF9F20725964000CFB0B /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				F5B1EFA320725964000CFB0B /* PBXTargetDependency */,
-			);
-			name = AniTests;
-			productName = AniTests;
-			productReference = F5B1EFA120725964000CFB0B /* AniTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		F5B1EFAB20725964000CFB0B /* AniUITests */ = {
 			isa = PBXNativeTarget;
@@ -1471,21 +1468,23 @@
 		F5B1EF8520725963000CFB0B /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 0920;
-				LastUpgradeCheck = 0920;
+				LastSwiftUpdateCheck = 1000;
+				LastUpgradeCheck = 1000;
 				ORGANIZATIONNAME = JeonMinseop;
 				TargetAttributes = {
-					F5B1EF8C20725963000CFB0B = {
-						CreatedOnToolsVersion = 9.2;
-						ProvisioningStyle = Automatic;
-					};
-					F5B1EFA020725964000CFB0B = {
-						CreatedOnToolsVersion = 9.2;
+					CD85F554215F547200AB9A0C = {
+						CreatedOnToolsVersion = 10.0;
 						ProvisioningStyle = Automatic;
 						TestTargetID = F5B1EF8C20725963000CFB0B;
 					};
+					F5B1EF8C20725963000CFB0B = {
+						CreatedOnToolsVersion = 9.2;
+						LastSwiftMigration = 1000;
+						ProvisioningStyle = Automatic;
+					};
 					F5B1EFAB20725964000CFB0B = {
 						CreatedOnToolsVersion = 9.2;
+						LastSwiftMigration = 1000;
 						ProvisioningStyle = Automatic;
 						TestTargetID = F5B1EF8C20725963000CFB0B;
 					};
@@ -1505,13 +1504,20 @@
 			projectRoot = "";
 			targets = (
 				F5B1EF8C20725963000CFB0B /* Ani */,
-				F5B1EFA020725964000CFB0B /* AniTests */,
+				CD85F554215F547200AB9A0C /* AniTests */,
 				F5B1EFAB20725964000CFB0B /* AniUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		CD85F553215F547200AB9A0C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F5B1EF8B20725963000CFB0B /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1520,13 +1526,6 @@
 				F5B1EF9820725964000CFB0B /* Assets.xcassets in Resources */,
 				CD8FE7D4215A690A00D3281A /* GoogleService-Info-release.plist in Resources */,
 				CD0FAD0520BF7B9E00D8CD27 /* GoogleService-Info.plist in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		F5B1EF9F20725964000CFB0B /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1570,24 +1569,6 @@
 			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
 				"$(DERIVED_FILE_DIR)/Pods-AniUITests-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		C08E1861744C02BF273FFC88 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-AniTests-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1669,6 +1650,14 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		CD85F551215F547200AB9A0C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CD85F558215F547300AB9A0C /* AniTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F5B1EF8920725963000CFB0B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1817,14 +1806,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		F5B1EF9D20725964000CFB0B /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				F5B1EFA620725964000CFB0B /* AniTests.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		F5B1EFA820725964000CFB0B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1836,10 +1817,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		F5B1EFA320725964000CFB0B /* PBXTargetDependency */ = {
+		CD85F55B215F547300AB9A0C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = F5B1EF8C20725963000CFB0B /* Ani */;
-			targetProxy = F5B1EFA220725964000CFB0B /* PBXContainerItemProxy */;
+			targetProxy = CD85F55A215F547300AB9A0C /* PBXContainerItemProxy */;
 		};
 		F5B1EFAE20725964000CFB0B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1861,6 +1842,45 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		CD85F55D215F547300AB9A0C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 7WMX7DJ97Q;
+				INFOPLIST_FILE = AniTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.gmail-jeonminsopdev.AniTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/d_Ani.app/d_Ani";
+			};
+			name = Debug;
+		};
+		CD85F55E215F547300AB9A0C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 7WMX7DJ97Q;
+				INFOPLIST_FILE = AniTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.gmail-jeonminsopdev.AniTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/d_Ani.app/d_Ani";
+			};
+			name = Release;
+		};
 		F5B1EFB320725964000CFB0B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1876,6 +1896,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -1883,6 +1904,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -1934,6 +1956,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -1941,6 +1964,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -1985,7 +2009,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.gmail-jeonminsopdev.Ani.dev";
 				PRODUCT_NAME = "d_$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -2005,44 +2029,8 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.gmail-jeonminsopdev.Ani";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
-		F5B1EFB920725964000CFB0B /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 9F7E1F101C01F36DEDE88686 /* Pods-AniTests.debug.xcconfig */;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = BY8G5B9E3U;
-				INFOPLIST_FILE = AniTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.gmail-jeonminsopdev.AniTests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Ani.app/Ani";
-			};
-			name = Debug;
-		};
-		F5B1EFBA20725964000CFB0B /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 17FAD9EDAE08B9FA7A60EDB8 /* Pods-AniTests.release.xcconfig */;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = BY8G5B9E3U;
-				INFOPLIST_FILE = AniTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.gmail-jeonminsopdev.AniTests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Ani.app/Ani";
 			};
 			name = Release;
 		};
@@ -2057,7 +2045,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.gmail-jeonminsopdev.AniUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = Ani;
 			};
@@ -2074,7 +2062,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.gmail-jeonminsopdev.AniUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = Ani;
 			};
@@ -2083,6 +2071,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		CD85F55C215F547300AB9A0C /* Build configuration list for PBXNativeTarget "AniTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CD85F55D215F547300AB9A0C /* Debug */,
+				CD85F55E215F547300AB9A0C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		F5B1EF8820725963000CFB0B /* Build configuration list for PBXProject "Ani" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -2097,15 +2094,6 @@
 			buildConfigurations = (
 				F5B1EFB620725964000CFB0B /* Debug */,
 				F5B1EFB720725964000CFB0B /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		F5B1EFB820725964000CFB0B /* Build configuration list for PBXNativeTarget "AniTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				F5B1EFB920725964000CFB0B /* Debug */,
-				F5B1EFBA20725964000CFB0B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

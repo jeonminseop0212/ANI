@@ -112,7 +112,7 @@ class ANISearchView: UIView {
     tableView.dataSource = self
     tableView.delegate = self
     tableView.alpha = 0.0
-    tableView.rowHeight = UITableViewAutomaticDimension
+    tableView.rowHeight = UITableView.automaticDimension
     addSubview(tableView)
     tableView.edgesToSuperview()
     self.tableView = tableView
@@ -318,19 +318,19 @@ extension ANISearchView: UITableViewDelegate {
       if let height = self.userCellHeight[indexPath] {
         return height
       } else {
-        return UITableViewAutomaticDimension
+        return UITableView.automaticDimension
       }
     case .story:
       if let height = self.storyCellHeight[indexPath] {
         return height
       } else {
-        return UITableViewAutomaticDimension
+        return UITableView.automaticDimension
       }
     case .qna:
       if let height = self.qnaCellHeight[indexPath] {
         return height
       } else {
-        return UITableViewAutomaticDimension
+        return UITableView.automaticDimension
       }
     }
   }

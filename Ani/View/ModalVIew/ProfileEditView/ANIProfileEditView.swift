@@ -282,7 +282,7 @@ class ANIProfileEditView: UIView {
   }
   
   @objc func keyboardWillChangeFrame(_ notification: Notification) {
-    guard let keyboardFrame = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
+    guard let keyboardFrame = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
           let scrollView = self.scrollView,
           let selectedTextViewMaxY = self.selectedTextViewMaxY else { return }
 

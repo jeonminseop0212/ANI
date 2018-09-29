@@ -79,7 +79,7 @@ class ANINotiView: UIView {
     notiTableView.backgroundColor = ANIColor.bg
     notiTableView.separatorStyle = .none
     notiTableView.alpha = 0.0
-    notiTableView.rowHeight = UITableViewAutomaticDimension
+    notiTableView.rowHeight = UITableView.automaticDimension
     notiTableView.alwaysBounceVertical = true
     notiTableView.dataSource = self
     notiTableView.delegate = self
@@ -211,7 +211,7 @@ extension ANINotiView: UITableViewDelegate {
     if let height = self.cellHeight[indexPath] {
       return height
     } else {
-      return UITableViewAutomaticDimension
+      return UITableView.automaticDimension
     }
   }
 }

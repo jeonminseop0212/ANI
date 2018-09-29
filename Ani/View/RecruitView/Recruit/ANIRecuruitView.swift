@@ -125,7 +125,7 @@ class ANIRecuruitView: UIView {
     let refreshControl = UIRefreshControl()
     refreshControl.addTarget(self, action: #selector(loadRecruit(sender:)), for: .valueChanged)
     tableView.alpha = 0.0
-    tableView.rowHeight = UITableViewAutomaticDimension
+    tableView.rowHeight = UITableView.automaticDimension
     tableView.addSubview(refreshControl)
     addSubview(tableView)
     tableView.edgesToSuperview()
@@ -292,7 +292,7 @@ extension ANIRecuruitView: UITableViewDelegate {
     if let height = self.cellHeight[indexPath] {
       return height
     } else {
-      return UITableViewAutomaticDimension
+      return UITableView.automaticDimension
     }
   }
 }

@@ -64,11 +64,11 @@ class PermissionView: UIView {
   func makeSettingButton() -> UIButton {
     let button = UIButton(type: .custom)
     button.setTitle("Gallery.Permission.Button".g_localize(fallback: "設定画面").uppercased(),
-                    for: UIControlState())
+                    for: UIControl.State())
     //ANIColor.green
     button.backgroundColor = UIColor(red: 103/255, green: 219/255, blue: 64/255, alpha: 1)
     button.titleLabel?.font = Config.Font.Main.medium.withSize(16)
-    button.setTitleColor(Config.Permission.Button.textColor, for: UIControlState())
+    button.setTitleColor(Config.Permission.Button.textColor, for: UIControl.State())
     button.setTitleColor(Config.Permission.Button.highlightedTextColor, for: .highlighted)
     button.layer.cornerRadius = 22
     button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 50, bottom: 0, right: 50)
@@ -78,7 +78,7 @@ class PermissionView: UIView {
   
   func makeCloseButton() -> UIButton {
     let button = UIButton(type: .custom)
-    button.setImage(GalleryBundle.image("dismissButton")?.withRenderingMode(.alwaysTemplate), for: UIControlState())
+    button.setImage(GalleryBundle.image("dismissButton")?.withRenderingMode(.alwaysTemplate), for: UIControl.State())
     //ANIColor.dark
     button.tintColor = UIColor(red: 48/255, green: 48/255, blue: 48/255, alpha: 1)
     
