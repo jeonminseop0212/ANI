@@ -1,4 +1,4 @@
 framework module InstantSearchClient {
-    header "InstantSearchClient-Swift.h"
-    requires objc
+  header "InstantSearchClient-Swift.h"
+  requires objc
 }
