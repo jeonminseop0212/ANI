@@ -101,7 +101,7 @@ class ANIStoryViewCell: UITableViewCell {
     tapArea.addSubview(storyLabel)
     storyLabel.topToBottom(of: storyImagesView, offset: 5.0)
     storyLabel.leftToSuperview(offset: 10.0)
-    storyLabel.rightToSuperview(offset: 10.0)
+    storyLabel.rightToSuperview(offset: -10.0)
     storyLabel.bottomToSuperview()
     self.storyLabel = storyLabel
     
@@ -127,7 +127,7 @@ class ANIStoryViewCell: UITableViewCell {
     optionButton.tintColor = ANIColor.darkGray
     addSubview(optionButton)
     optionButton.centerY(to: profileImageView)
-    optionButton.rightToSuperview(offset: 10.0)
+    optionButton.rightToSuperview(offset: -10.0)
     optionButton.width(25.0)
     optionButton.height(25.0)
     self.optionButton = optionButton

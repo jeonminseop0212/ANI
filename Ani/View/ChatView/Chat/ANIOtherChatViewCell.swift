@@ -105,7 +105,7 @@ class ANIOtherChatViewCell: UITableViewCell {
     messageLabel.textColor = ANIColor.dark
     messageLabel.numberOfLines = 0
     messageBG.addSubview(messageLabel)
-    let labelInsets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: -10.0)
+    let labelInsets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: 10.0)
     messageLabel.edgesToSuperview(insets: labelInsets)
     self.messageLabel = messageLabel
     

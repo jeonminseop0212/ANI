@@ -127,7 +127,7 @@ class ANINotiDetailView: UIView {
     addSubview(alertLabel)
     alertLabel.centerYToSuperview()
     alertLabel.leftToSuperview(offset: 10.0)
-    alertLabel.rightToSuperview(offset: 10.0)
+    alertLabel.rightToSuperview(offset: -10.0)
     self.alertLabel = alertLabel
     
     //activityIndicatorView

@@ -30,7 +30,7 @@ class ANIOptionViewCell: UITableViewCell {
     titleLabel.font = UIFont.systemFont(ofSize: 16.0)
     titleLabel.textColor = ANIColor.dark
     addSubview(titleLabel)
-    let insets = UIEdgeInsets(top: 15, left: 10, bottom: 15, right: -10)
+    let insets = UIEdgeInsets(top: 15, left: 10, bottom: 15, right: 10)
     titleLabel.edgesToSuperview(insets: insets)
     self.titleLabel = titleLabel
   }

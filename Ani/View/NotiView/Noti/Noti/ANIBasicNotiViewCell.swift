@@ -65,7 +65,7 @@ class ANIBasicNotiViewCell: UITableViewCell {
     addSubview(stackView)
     stackView.topToSuperview(offset: 10.0)
     stackView.leftToSuperview(offset: 10.0)
-    stackView.rightToSuperview(offset: 10.0)
+    stackView.rightToSuperview(offset: -10.0)
     self.stackView = stackView
     
     //profileImageView

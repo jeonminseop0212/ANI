@@ -117,7 +117,7 @@ class ANISupportViewCell: UITableViewCell {
     addSubview(messageLabel)
     messageLabel.topToSuperview(offset: 10.0)
     messageLabel.leftToSuperview(offset: 10.0)
-    messageLabel.rightToSuperview(offset: 10.0)
+    messageLabel.rightToSuperview(offset: -10.0)
     self.messageLabel = messageLabel
     
     //recruitBase
@@ -131,7 +131,7 @@ class ANISupportViewCell: UITableViewCell {
     addSubview(recruitBase)
     recruitBase.topToBottom(of: messageLabel, offset: 10.0)
     recruitBase.leftToSuperview(offset: 10.0)
-    recruitBase.rightToSuperview(offset: 10.0)
+    recruitBase.rightToSuperview(offset: -10.0)
     self.recruitBase = recruitBase
     
     //recruitImageView
@@ -155,7 +155,7 @@ class ANISupportViewCell: UITableViewCell {
     recruitBase.addSubview(basicInfoStackView)
     basicInfoStackView.topToBottom(of: recruitImageView, offset: 10.0)
     basicInfoStackView.leftToSuperview(offset: 10.0)
-    basicInfoStackView.rightToSuperview(offset: 10.0)
+    basicInfoStackView.rightToSuperview(offset: -10.0)
     self.basicInfoStackView = basicInfoStackView
     
     //recruitStateLabel
@@ -218,7 +218,7 @@ class ANISupportViewCell: UITableViewCell {
     recruitBase.addSubview(titleLabel)
     titleLabel.topToBottom(of: basicInfoStackView, offset: 10.0)
     titleLabel.leftToSuperview(offset: 10.0)
-    titleLabel.rightToSuperview(offset: 10.0)
+    titleLabel.rightToSuperview(offset: -10.0)
     self.titleLabel = titleLabel
     
     //subTitleLabel
@@ -229,7 +229,7 @@ class ANISupportViewCell: UITableViewCell {
     recruitBase.addSubview(subTitleLabel)
     subTitleLabel.topToBottom(of: titleLabel, offset: 10.0)
     subTitleLabel.leftToSuperview(offset: 10.0)
-    subTitleLabel.rightToSuperview(offset: 10.0)
+    subTitleLabel.rightToSuperview(offset: -10.0)
     subTitleLabel.bottomToSuperview(offset: -10)
     self.subTitleLabel = subTitleLabel
     
@@ -255,7 +255,7 @@ class ANISupportViewCell: UITableViewCell {
     optionButton.tintColor = ANIColor.darkGray
     addSubview(optionButton)
     optionButton.centerY(to: profileImageView)
-    optionButton.rightToSuperview(offset: 10.0)
+    optionButton.rightToSuperview(offset: -10.0)
     optionButton.width(25.0)
     optionButton.height(25.0)
     self.optionButton = optionButton

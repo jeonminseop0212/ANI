@@ -130,7 +130,7 @@ class ANIRecruitDetailView: UIView {
     contentView.addSubview(titleLabel)
     titleLabel.topToSuperview(offset: 10.0)
     titleLabel.leftToSuperview(offset: 10.0)
-    titleLabel.rightToSuperview(offset: 10.0)
+    titleLabel.rightToSuperview(offset: -10.0)
     self.titleLabel = titleLabel
     
     //profileImageView
@@ -157,7 +157,7 @@ class ANIRecruitDetailView: UIView {
     contentView.addSubview(userNameLabel)
     userNameLabel.centerY(to: profileImageView)
     userNameLabel.leftToRight(of: profileImageView, offset: 10.0)
-    userNameLabel.rightToSuperview(offset: 10.0)
+    userNameLabel.rightToSuperview(offset: -10.0)
     self.userNameLabel = userNameLabel
     
     //basicInfoTitleLabel
@@ -168,7 +168,7 @@ class ANIRecruitDetailView: UIView {
     contentView.addSubview(basicInfoTitleLabel)
     basicInfoTitleLabel.topToBottom(of: profileImageView, offset: CONTENT_SPACE)
     basicInfoTitleLabel.leftToSuperview(offset: 10.0)
-    basicInfoTitleLabel.rightToSuperview(offset: 10.0)
+    basicInfoTitleLabel.rightToSuperview(offset: -10.0)
     self.basicInfoTitleLabel = basicInfoTitleLabel
     
     //basicInfoBG
@@ -179,7 +179,7 @@ class ANIRecruitDetailView: UIView {
     contentView.addSubview(basicInfoBG)
     basicInfoBG.topToBottom(of: basicInfoTitleLabel, offset: 10.0)
     basicInfoBG.leftToSuperview(offset: 10.0)
-    basicInfoBG.rightToSuperview(offset: 10.0)
+    basicInfoBG.rightToSuperview(offset: -10.0)
     self.basicInfoBG = basicInfoBG
     
     //basicInfoLine
@@ -211,7 +211,7 @@ class ANIRecruitDetailView: UIView {
     basicInfoBG.addSubview(basicInfoAgeLabel)
     basicInfoAgeLabel.topToSuperview(offset: 10.0)
     basicInfoAgeLabel.leftToRight(of: basicInfoLine, offset: 10.0)
-    basicInfoAgeLabel.rightToSuperview(offset: 10.0)
+    basicInfoAgeLabel.rightToSuperview(offset: -10.0)
     self.basicInfoAgeLabel = basicInfoAgeLabel
     
     //basicInfoSexLabel
@@ -233,7 +233,7 @@ class ANIRecruitDetailView: UIView {
     basicInfoBG.addSubview(basicInfoHomeLabel)
     basicInfoHomeLabel.topToBottom(of: basicInfoAgeLabel, offset: 10.0)
     basicInfoHomeLabel.leftToRight(of: basicInfoLine, offset: 10.0)
-    basicInfoHomeLabel.rightToSuperview(offset: 10.0)
+    basicInfoHomeLabel.rightToSuperview(offset: -10.0)
     self.basicInfoHomeLabel = basicInfoHomeLabel
     
     //basicInfoVaccineLabel
@@ -256,7 +256,7 @@ class ANIRecruitDetailView: UIView {
     basicInfoBG.addSubview(basicInfoCastrationLabel)
     basicInfoCastrationLabel.topToBottom(of: basicInfoHomeLabel, offset: 10.0)
     basicInfoCastrationLabel.leftToRight(of: basicInfoLine, offset: 10.0)
-    basicInfoCastrationLabel.rightToSuperview(offset: 10.0)
+    basicInfoCastrationLabel.rightToSuperview(offset: -10.0)
     self.basicInfoCastrationLabel = basicInfoCastrationLabel
     
     //reasonTitleLabel
@@ -267,7 +267,7 @@ class ANIRecruitDetailView: UIView {
     contentView.addSubview(reasonTitleLabel)
     reasonTitleLabel.topToBottom(of: basicInfoBG, offset: CONTENT_SPACE)
     reasonTitleLabel.leftToSuperview(offset: 10.0)
-    reasonTitleLabel.rightToSuperview(offset: 10.0)
+    reasonTitleLabel.rightToSuperview(offset: -10.0)
     self.reasonTitleLabel = reasonTitleLabel
     
     //reasonBG
@@ -278,7 +278,7 @@ class ANIRecruitDetailView: UIView {
     contentView.addSubview(reasonBG)
     reasonBG.topToBottom(of: reasonTitleLabel, offset: 10.0)
     reasonBG.leftToSuperview(offset: 10.0)
-    reasonBG.rightToSuperview(offset: 10.0)
+    reasonBG.rightToSuperview(offset: -10.0)
     self.reasonBG = reasonBG
     
     //reasonLabel
@@ -287,7 +287,7 @@ class ANIRecruitDetailView: UIView {
     reasonLabel.textColor = ANIColor.dark
     reasonLabel.numberOfLines = 0
     reasonBG.addSubview(reasonLabel)
-    let insets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: -10.0)
+    let insets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: 10.0)
     reasonLabel.edgesToSuperview(insets: insets)
     self.reasonLabel = reasonLabel
     
@@ -299,7 +299,7 @@ class ANIRecruitDetailView: UIView {
     contentView.addSubview(introduceTitleLabel)
     introduceTitleLabel.topToBottom(of: reasonBG, offset: CONTENT_SPACE)
     introduceTitleLabel.leftToSuperview(offset: 10.0)
-    introduceTitleLabel.rightToSuperview(offset: 10.0)
+    introduceTitleLabel.rightToSuperview(offset: -10.0)
     self.introduceTitleLabel = introduceTitleLabel
     
     //introduceBG
@@ -310,7 +310,7 @@ class ANIRecruitDetailView: UIView {
     contentView.addSubview(introduceBG)
     introduceBG.topToBottom(of: introduceTitleLabel, offset: 10.0)
     introduceBG.leftToSuperview(offset: 10.0)
-    introduceBG.rightToSuperview(offset: 10.0)
+    introduceBG.rightToSuperview(offset: -10.0)
     self.introduceBG = introduceBG
     
     //introduceLabel
@@ -341,7 +341,7 @@ class ANIRecruitDetailView: UIView {
     contentView.addSubview(passingTitleLabel)
     passingTitleLabel.topToBottom(of: introduceImagesView, offset: CONTENT_SPACE)
     passingTitleLabel.leftToSuperview(offset: 10.0)
-    passingTitleLabel.rightToSuperview(offset: 10.0)
+    passingTitleLabel.rightToSuperview(offset: -10.0)
     self.passingTitleLabel = passingTitleLabel
     
     //passingBG
@@ -352,7 +352,7 @@ class ANIRecruitDetailView: UIView {
     contentView.addSubview(passingBG)
     passingBG.topToBottom(of: passingTitleLabel, offset: 10.0)
     passingBG.leftToSuperview(offset: 10.0)
-    passingBG.rightToSuperview(offset: 10.0)
+    passingBG.rightToSuperview(offset: -10.0)
     passingBGBottomConstratins = passingBG.bottomToSuperview(offset: -10.0 - 10.0 - ANIRecruitDetailViewController.APPLY_BUTTON_HEIGHT)
     self.passingBG = passingBG
     

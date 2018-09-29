@@ -92,7 +92,7 @@ class ANIMessageViewCell: UITableViewCell {
     addSubview(messageLabel)
     messageLabel.topToBottom(of: userNameLabel, offset: 10.0)
     messageLabel.left(to: userNameLabel)
-    messageLabel.rightToSuperview(offset: 10.0)
+    messageLabel.rightToSuperview(offset: -10.0)
     self.messageLabel = messageLabel
     
     //bottomSpace

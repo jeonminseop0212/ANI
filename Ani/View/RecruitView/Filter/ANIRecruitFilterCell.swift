@@ -52,7 +52,7 @@ class ANIRecruitFilterCell: UICollectionViewCell {
     selectButton.width(10.0)
     selectButton.height(10.0)
     selectButton.leftToRight(of: filterLabel, offset: 5.0)
-    selectButton.rightToSuperview(offset: 15.0)
+    selectButton.rightToSuperview(offset: -15.0)
     selectButton.centerY(to: filterLabel)
     self.selectButton = selectButton
   }

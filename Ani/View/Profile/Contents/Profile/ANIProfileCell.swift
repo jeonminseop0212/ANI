@@ -61,7 +61,7 @@ class ANIProfileCell: UITableViewCell {
     profileEditButton.delegate = self
     addSubview(profileEditButton)
     profileEditButton.topToSuperview(offset: 10.0)
-    profileEditButton.rightToSuperview(offset: 10.0)
+    profileEditButton.rightToSuperview(offset: -10.0)
     profileEditButton.width(60.0)
     profileEditButton.height(PROFILE_EDIT_BUTTON_HEIGHT)
     self.profileEditButton = profileEditButton
@@ -166,7 +166,7 @@ class ANIProfileCell: UITableViewCell {
     addSubview(introduceBG)
     introduceBG.topToBottom(of: groupLabel, offset: 10.0)
     introduceBG.leftToSuperview(offset: 10.0)
-    introduceBG.rightToSuperview(offset: 10.0)
+    introduceBG.rightToSuperview(offset: -10.0)
     introduceBG.bottomToSuperview(offset: -10.0)
     self.introduceBG = introduceBG
 
@@ -176,8 +176,8 @@ class ANIProfileCell: UITableViewCell {
     introductionLabel.numberOfLines = 0
     introductionLabel.textColor = ANIColor.dark
     introduceBG.addSubview(introductionLabel)
-    let insets = UIEdgeInsets.init(top: 10.0, left: 10.0, bottom: -10.0, right: -10.0)
-    introductionLabel.edges(to: introduceBG, insets: insets)
+    let insets = UIEdgeInsets.init(top: 10.0, left: 10.0, bottom: 10.0, right: 10.0)
+    introductionLabel.edgesToSuperview(insets: insets)
     self.introductionLabel = introductionLabel
   }
   

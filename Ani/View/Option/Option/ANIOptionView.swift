@@ -95,7 +95,7 @@ extension ANIOptionView: UITableViewDelegate {
     titleLabel.textColor = ANIColor.dark
     titleLabel.font = UIFont.boldSystemFont(ofSize: 15.0)
     headerView.addSubview(titleLabel)
-    let insets = UIEdgeInsets(top: 8, left: 10, bottom: 8, right: -10)
+    let insets = UIEdgeInsets(top: 8, left: 10, bottom: 8, right: 10)
     titleLabel.edgesToSuperview(insets: insets)
     
     switch section {

@@ -59,7 +59,7 @@ class ANIChatBar: UIView {
     chatTextViewBG.layer.borderColor = ANIColor.gray.cgColor
     chatTextViewBG.layer.borderWidth = 1.0
     addSubview(chatTextViewBG)
-    let bgInsets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: -10.0)
+    let bgInsets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: 10.0)
     chatTextViewBG.leftToRight(of: profileImageView, offset: 10.0)
     chatTextViewBG.edgesToSuperview(excluding: .left, insets: bgInsets)
     self.chatTextViewBG = chatTextViewBG
@@ -73,7 +73,7 @@ class ANIChatBar: UIView {
     postMessageButton.isEnabled = false
     postMessageButton.alpha = 0.3
     chatTextViewBG.addSubview(postMessageButton)
-    postMessageButton.rightToSuperview(offset: 10.0)
+    postMessageButton.rightToSuperview(offset: -10.0)
     postMessageButton.centerY(to: profileImageView)
     postMessageButton.height(to: profileImageView)
     postMessageButton.width(60.0)
@@ -91,7 +91,7 @@ class ANIChatBar: UIView {
     }
     chatTextView.delegate = self
     chatTextViewBG.addSubview(chatTextView)
-    let insets = UIEdgeInsets(top: 2.5, left: 5.0, bottom: 2.5, right: -5.0)
+    let insets = UIEdgeInsets(top: 2.5, left: 5.0, bottom: 2.5, right: 5.0)
     chatTextView.edgesToSuperview(excluding: .right,insets: insets)
     chatTextView.rightToLeft(of: postMessageButton, offset: -5.0)
     self.chatTextView = chatTextView

@@ -99,7 +99,7 @@ class ANIFollowNotiViewCell: UITableViewCell {
     addSubview(followButton)
     followButton.centerY(to: profileImageView)
     followButton.leftToRight(of: stackView, offset: 10.0)
-    followButton.rightToSuperview(offset: 10.0)
+    followButton.rightToSuperview(offset: -10.0)
     followButton.width(85.0)
     followButton.height(30.0)
     self.followButton = followButton

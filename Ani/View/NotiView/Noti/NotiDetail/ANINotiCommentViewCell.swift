@@ -64,7 +64,7 @@ class ANINotiCommentViewCell: UITableViewCell {
     commentLabel.font = UIFont.systemFont(ofSize: 15.0)
     commentLabel.numberOfLines = 0
     base.addSubview(commentLabel)
-    let insets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: -10.0)
+    let insets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: 10.0)
     commentLabel.edgesToSuperview(excluding: .bottom, insets: insets)
     self.commentLabel = commentLabel
     
@@ -138,7 +138,7 @@ class ANINotiCommentViewCell: UITableViewCell {
     userNameLabel.numberOfLines = 0
     base.addSubview(userNameLabel)
     userNameLabel.leftToRight(of: profileImageView, offset: 10.0)
-    userNameLabel.rightToSuperview(offset: 10.0)
+    userNameLabel.rightToSuperview(offset: -10.0)
 //    userNameLabel.rightToLeft(of: loveButton, offset: -10.0)
     userNameLabel.centerY(to: profileImageView)
     self.userNameLabel = userNameLabel

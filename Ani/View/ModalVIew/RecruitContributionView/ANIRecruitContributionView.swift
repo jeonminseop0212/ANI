@@ -201,7 +201,7 @@ class ANIRecruitContributionView: UIView {
     contentView.addSubview(titleBG)
     titleBG.topToSuperview(offset: 10.0)
     titleBG.leftToSuperview(offset: 5.0)
-    titleBG.rightToSuperview(offset: 5.0)
+    titleBG.rightToSuperview(offset: -5.0)
     self.titleBG = titleBG
     
     //titleTextView
@@ -225,7 +225,7 @@ class ANIRecruitContributionView: UIView {
     contentView.addSubview(basicInfoTitleLabel)
     basicInfoTitleLabel.topToBottom(of: titleBG, offset: CONTENT_SPACE)
     basicInfoTitleLabel.leftToSuperview(offset: 10.0)
-    basicInfoTitleLabel.rightToSuperview(offset: 10.0)
+    basicInfoTitleLabel.rightToSuperview(offset: -10.0)
     self.basicInfoTitleLabel = basicInfoTitleLabel
     
     //basicInfoBG
@@ -236,7 +236,7 @@ class ANIRecruitContributionView: UIView {
     contentView.addSubview(basicInfoBG)
     basicInfoBG.topToBottom(of: basicInfoTitleLabel, offset: 10.0)
     basicInfoBG.leftToSuperview(offset: 10.0)
-    basicInfoBG.rightToSuperview(offset: 10.0)
+    basicInfoBG.rightToSuperview(offset: -10.0)
     self.basicInfoBG = basicInfoBG
     
     //basicInfoLine
@@ -284,7 +284,7 @@ class ANIRecruitContributionView: UIView {
     basicInfoBG.addSubview(basicInfoAgeSelectButton)
     basicInfoAgeSelectButton.width(10.0)
     basicInfoAgeSelectButton.height(10.0)
-    basicInfoAgeSelectButton.rightToSuperview(offset: 10.0)
+    basicInfoAgeSelectButton.rightToSuperview(offset: -10.0)
     self.basicInfoAgeSelectButton = basicInfoAgeSelectButton
     
     //basicInfoAgeLabel
@@ -338,7 +338,7 @@ class ANIRecruitContributionView: UIView {
     basicInfoBG.addSubview(basicInfoHomeSelectButton)
     basicInfoHomeSelectButton.width(10.0)
     basicInfoHomeSelectButton.height(10.0)
-    basicInfoHomeSelectButton.rightToSuperview(offset: 10.0)
+    basicInfoHomeSelectButton.rightToSuperview(offset: -10.0)
     self.basicInfoHomeSelectButton = basicInfoHomeSelectButton
     
     //basicInfoHomeLabel
@@ -393,7 +393,7 @@ class ANIRecruitContributionView: UIView {
     basicInfoBG.addSubview(basicInfoCastrationSelectButton)
     basicInfoCastrationSelectButton.width(10.0)
     basicInfoCastrationSelectButton.height(10.0)
-    basicInfoCastrationSelectButton.rightToSuperview(offset: 10.0)
+    basicInfoCastrationSelectButton.rightToSuperview(offset: -10.0)
     self.basicInfoCastrationSelectButton = basicInfoCastrationSelectButton
     
     //basicInfoCastrationLabel
@@ -421,7 +421,7 @@ class ANIRecruitContributionView: UIView {
     contentView.addSubview(reasonTitleLabel)
     reasonTitleLabel.topToBottom(of: basicInfoBG, offset: CONTENT_SPACE)
     reasonTitleLabel.leftToSuperview(offset: 10.0)
-    reasonTitleLabel.rightToSuperview(offset: 10.0)
+    reasonTitleLabel.rightToSuperview(offset: -10.0)
     self.reasonTitleLabel = reasonTitleLabel
     
     //reasonBG
@@ -432,7 +432,7 @@ class ANIRecruitContributionView: UIView {
     contentView.addSubview(reasonBG)
     reasonBG.topToBottom(of: reasonTitleLabel, offset: 10.0)
     reasonBG.leftToSuperview(offset: 10.0)
-    reasonBG.rightToSuperview(offset: 10.0)
+    reasonBG.rightToSuperview(offset: -10.0)
     self.reasonBG = reasonBG
     
     //reasonTextView
@@ -444,7 +444,7 @@ class ANIRecruitContributionView: UIView {
     reasonTextView.placeHolder = "理由を入力いてください"
     reasonTextView.delegate = self
     reasonBG.addSubview(reasonTextView)
-    let insets = UIEdgeInsets(top: 5.0, left: 5.0, bottom: 5.0, right: -5.0)
+    let insets = UIEdgeInsets(top: 5.0, left: 5.0, bottom: 5.0, right: 5.0)
     reasonTextView.edgesToSuperview(insets: insets)
     self.reasonTextView = reasonTextView
     setHideButtonOnKeyboard(textView: reasonTextView)
@@ -457,7 +457,7 @@ class ANIRecruitContributionView: UIView {
     contentView.addSubview(introduceTitleLabel)
     introduceTitleLabel.topToBottom(of: reasonBG, offset: CONTENT_SPACE)
     introduceTitleLabel.leftToSuperview(offset: 10.0)
-    introduceTitleLabel.rightToSuperview(offset: 10.0)
+    introduceTitleLabel.rightToSuperview(offset: -10.0)
     self.introduceTitleLabel = introduceTitleLabel
     
     //introduceBG
@@ -468,7 +468,7 @@ class ANIRecruitContributionView: UIView {
     contentView.addSubview(introduceBG)
     introduceBG.topToBottom(of: introduceTitleLabel, offset: 10.0)
     introduceBG.leftToSuperview(offset: 10.0)
-    introduceBG.rightToSuperview(offset: 10.0)
+    introduceBG.rightToSuperview(offset: -10.0)
     self.introduceBG = introduceBG
     
     //introduceTextView
@@ -511,7 +511,7 @@ class ANIRecruitContributionView: UIView {
     passingSubTitleLabel.textColor = ANIColor.subTitle
     contentView.addSubview(passingSubTitleLabel)
     passingSubTitleLabel.leftToRight(of: passingTitleLabel, offset: 5.0)
-    passingSubTitleLabel.rightToSuperview(offset: 10.0)
+    passingSubTitleLabel.rightToSuperview(offset: -10.0)
     passingSubTitleLabel.bottom(to: passingTitleLabel, offset: -2.0)
     self.passingSubTitleLabel = passingSubTitleLabel
     
@@ -523,7 +523,7 @@ class ANIRecruitContributionView: UIView {
     contentView.addSubview(passingBG)
     passingBG.topToBottom(of: passingTitleLabel, offset: 10.0)
     passingBG.leftToSuperview(offset: 10.0)
-    passingBG.rightToSuperview(offset: 10.0)
+    passingBG.rightToSuperview(offset: -10.0)
     passingBG.bottomToSuperview(offset: -10.0 - 10.0 - ANIRecruitContributionViewController.CONTRIBUTE_BUTTON_HEIGHT)
     self.passingBG = passingBG
     

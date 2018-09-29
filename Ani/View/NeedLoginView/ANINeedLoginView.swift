@@ -55,7 +55,7 @@ class ANINeedLoginView: UIView {
     self.addSubview(loginButton)
     loginButton.topToBottom(of: messageLabel, offset: 30.0)
     loginButton.leftToSuperview(offset: 100.0)
-    loginButton.rightToSuperview(offset: 100.0)
+    loginButton.rightToSuperview(offset: -100.0)
     loginButton.height(LOGIN_BUTTON_HEIGHT)
     self.loginButton = loginButton
     

@@ -79,7 +79,7 @@ class ANIOtherProfileCell: UITableViewCell {
     followButton.base?.layer.borderColor = ANIColor.green.cgColor
     addSubview(followButton)
     followButton.topToSuperview(offset: 10.0)
-    followButton.rightToSuperview(offset: 10.0)
+    followButton.rightToSuperview(offset: -10.0)
     followButton.width(FOLLOW_BUTTON_WIDTH)
     followButton.height(FOLLOW_BUTTON_HEIGHT)
     self.followButton = followButton
@@ -184,7 +184,7 @@ class ANIOtherProfileCell: UITableViewCell {
     addSubview(introduceBG)
     introduceBG.topToBottom(of: groupLabel, offset: 10.0)
     introduceBG.leftToSuperview(offset: 10.0)
-    introduceBG.rightToSuperview(offset: 10.0)
+    introduceBG.rightToSuperview(offset: -10.0)
     introduceBG.bottomToSuperview(offset: -10.0)
     self.introduceBG = introduceBG
     
@@ -194,8 +194,8 @@ class ANIOtherProfileCell: UITableViewCell {
     introductionLabel.numberOfLines = 0
     introductionLabel.textColor = ANIColor.dark
     introduceBG.addSubview(introductionLabel)
-    let insets = UIEdgeInsets.init(top: 10.0, left: 10.0, bottom: -10.0, right: -10.0)
-    introductionLabel.edges(to: introduceBG, insets: insets)
+    let insets = UIEdgeInsets.init(top: 10.0, left: 10.0, bottom: 10.0, right: 10.0)
+    introductionLabel.edgesToSuperview(insets: insets)
     self.introductionLabel = introductionLabel
   }
   

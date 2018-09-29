@@ -22,7 +22,7 @@ protocol ANIQnaViewCellDelegate {
 
 class ANIQnaViewCell: UITableViewCell {
   private weak var tapArea: UIView?
-  private weak var subTitleLabel: UILabel?
+  private weak var questionLabel: UILabel?
   
   private var qnaImagesViewHeightConstraint: Constraint?
   private var qnaImagesViewHeight: CGFloat = 0.0
@@ -89,17 +89,17 @@ class ANIQnaViewCell: UITableViewCell {
     tapArea.edgesToSuperview(excluding: .bottom)
     self.tapArea = tapArea
     
-    //subTitleLabel
-    let subTitleLabel = UILabel()
-    subTitleLabel.font = UIFont.systemFont(ofSize: 14.0)
-    subTitleLabel.textColor = ANIColor.subTitle
-    subTitleLabel.numberOfLines = 0
-    tapArea.addSubview(subTitleLabel)
-    subTitleLabel.topToSuperview(offset: 10.0)
-    subTitleLabel.leftToSuperview(offset: 10.0)
-    subTitleLabel.rightToSuperview(offset: 10.0)
-    subTitleLabel.bottomToSuperview()
-    self.subTitleLabel = subTitleLabel
+    //questionLabel
+    let questionLabel = UILabel()
+    questionLabel.font = UIFont.systemFont(ofSize: 14.0)
+    questionLabel.textColor = ANIColor.subTitle
+    questionLabel.numberOfLines = 0
+    tapArea.addSubview(questionLabel)
+    questionLabel.topToSuperview(offset: 10.0)
+    questionLabel.leftToSuperview(offset: 10.0)
+    questionLabel.rightToSuperview(offset: -10.0)
+    questionLabel.bottomToSuperview()
+    self.questionLabel = questionLabel
     
     //qnaImagesView
     let qnaImagesView = ANIQnaImagesView()
@@ -143,7 +143,7 @@ class ANIQnaViewCell: UITableViewCell {
     optionButton.tintColor = ANIColor.darkGray
     addSubview(optionButton)
     optionButton.centerY(to: profileImageView)
-    optionButton.rightToSuperview(offset: 10.0)
+    optionButton.rightToSuperview(offset: -10.0)
     optionButton.width(25.0)
     optionButton.height(25.0)
     self.optionButton = optionButton
@@ -222,14 +222,14 @@ class ANIQnaViewCell: UITableViewCell {
   }
   
   private func reloadLayout() {
-    guard let subTitleLabel = self.subTitleLabel,
+    guard let questionLabel = self.questionLabel,
           let qnaImagesView = self.qnaImagesView,
           let loveButtonBG = self.loveButtonBG,
           let loveButton = self.loveButton,
           let qna = self.qna,
           let qnaImagesViewHeightConstraint = self.qnaImagesViewHeightConstraint else { return }
     
-    subTitleLabel.text = qna.qna
+    questionLabel.text = qna.qna
 
     if let qnaImageUrls = qna.qnaImageUrls {
       qnaImagesViewHeightConstraint.constant = qnaImagesViewHeight

@@ -73,7 +73,7 @@ class ANILoginView: UIView {
     contentView.addSubview(titleLabel)
     titleLabel.topToSuperview(offset: 50.0)
     titleLabel.leftToSuperview(offset: 10.0)
-    titleLabel.rightToSuperview(offset: 10.0)
+    titleLabel.rightToSuperview(offset: -10.0)
     self.titleLabel = titleLabel
     
     //emailTextFieldBG
@@ -84,7 +84,7 @@ class ANILoginView: UIView {
     contentView.addSubview(emailTextFieldBG)
     emailTextFieldBG.topToBottom(of: titleLabel, offset: 30.0)
     emailTextFieldBG.leftToSuperview(offset: 10.0)
-    emailTextFieldBG.rightToSuperview(offset: 10.0)
+    emailTextFieldBG.rightToSuperview(offset: -10.0)
     self.emailTextFieldBG = emailTextFieldBG
     
     //emailImageView
@@ -107,7 +107,7 @@ class ANILoginView: UIView {
     emailTextField.keyboardType = .emailAddress
     emailTextField.delegate = self
     emailTextFieldBG.addSubview(emailTextField)
-    let insets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: -10.0)
+    let insets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: 10.0)
     emailTextField.edgesToSuperview(excluding: .left, insets: insets)
     emailTextField.leftToRight(of: emailImageView, offset: 10.0)
     self.emailTextField = emailTextField
@@ -120,7 +120,7 @@ class ANILoginView: UIView {
     contentView.addSubview(passwordTextFieldBG)
     passwordTextFieldBG.topToBottom(of: emailTextFieldBG, offset: 20.0)
     passwordTextFieldBG.leftToSuperview(offset: 10.0)
-    passwordTextFieldBG.rightToSuperview(offset: 10.0)
+    passwordTextFieldBG.rightToSuperview(offset: -10.0)
     self.passwordTextFieldBG = passwordTextFieldBG
 
     //passwordImageView
