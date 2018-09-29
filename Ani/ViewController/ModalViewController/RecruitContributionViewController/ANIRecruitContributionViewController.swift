@@ -196,29 +196,29 @@ class ANIRecruitContributionViewController: UIViewController {
   }
   
   @objc private func keyboardWillChangeFrame(_ notification: Notification) {
-    guard let keyboardFrame = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
-          let duration = notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as? TimeInterval,
-          let curve = notification.userInfo?[UIKeyboardAnimationCurveUserInfoKey] as? UInt,
+    guard let keyboardFrame = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
+          let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval,
+          let curve = notification.userInfo?[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt,
           let recruitContributeViewBottomConstraint = self.recruitContributionViewBottomConstraint else { return }
     
     let h = keyboardFrame.height
     
     recruitContributeViewBottomConstraint.constant = -h  + 10.0 + ANIRecruitContributionViewController.CONTRIBUTE_BUTTON_HEIGHT
 
-    UIView.animate(withDuration: duration, delay: 0, options: UIViewAnimationOptions(rawValue: curve), animations: {
+    UIView.animate(withDuration: duration, delay: 0, options: UIView.AnimationOptions(rawValue: curve), animations: {
       self.view.layoutIfNeeded()
     })
   }
   
   @objc private func keyboardWillHide(_ notification: Notification) {
-    guard let duration = notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as? TimeInterval,
-          let curve = notification.userInfo?[UIKeyboardAnimationCurveUserInfoKey] as? UInt,
+    guard let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval,
+          let curve = notification.userInfo?[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt,
       let recruitContributionViewOriginalBottomConstraintConstant = self.recruitContributionViewOriginalBottomConstraintConstant,
       let recruitContributionViewBottomConstraint = self.recruitContributionViewBottomConstraint else { return }
     
     recruitContributionViewBottomConstraint.constant = recruitContributionViewOriginalBottomConstraintConstant
     
-    UIView.animate(withDuration: duration, delay: 0, options: UIViewAnimationOptions(rawValue: curve), animations: {
+    UIView.animate(withDuration: duration, delay: 0, options: UIView.AnimationOptions(rawValue: curve), animations: {
       self.view.layoutIfNeeded()
     })
   }
@@ -540,7 +540,7 @@ extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
         var recruit = FirebaseRecruit(id: id, headerImageUrl: nil, title: recruitInfo.title, kind: recruitInfo.kind, age: recruitInfo.age, sex: recruitInfo.sex, home: recruitInfo.home, vaccine: recruitInfo.vaccine, castration: recruitInfo.castration, reason: recruitInfo.reason, introduce: recruitInfo.introduce, introduceImageUrls: nil, passing: recruitInfo.passing, recruitState: 0, userId: userId, date: date, isLoved: nil, isCliped: nil, isSupported: nil)
         
         DispatchQueue.global().async {
-          if let recruitHeaderImageData = UIImageJPEGRepresentation(recruitInfo.headerImage, 0.5) {
+          if let recruitHeaderImageData = recruitInfo.headerImage.jpegData(compressionQuality: 0.5) {
             let uuid = NSUUID().uuidString
             storageRef.child(KEY_RECRUIT_HEADER_IMAGES).child(uuid).putData(recruitHeaderImageData, metadata: nil) { (metaData, error) in
               if error != nil {
@@ -562,7 +562,7 @@ extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
         DispatchQueue.global().async {
         var introduceImageUrls = [Int: String]()
           for (index, introduceImage) in recruitInfo.introduceImages.enumerated() {
-            if let introduceImage = introduceImage, let introduceImageData = UIImageJPEGRepresentation(introduceImage, 0.5) {
+            if let introduceImage = introduceImage, let introduceImageData = introduceImage.jpegData(compressionQuality: 0.5) {
               let uuid = NSUUID().uuidString
               storageRef.child(KEY_RECRUIT_INTRODUCE_IMAGES).child(uuid).putData(introduceImageData, metadata: nil) { (metaData, error) in
                 if error != nil {

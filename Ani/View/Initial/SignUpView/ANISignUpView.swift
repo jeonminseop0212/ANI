@@ -334,7 +334,7 @@ class ANISignUpView: UIView {
   private func uploadUserData() {
     guard let currentUser = Auth.auth().currentUser,
           let profileImage = self.profileImage,
-          let profileImageData = UIImageJPEGRepresentation(profileImage, 0.5),
+          let profileImageData = profileImage.jpegData(compressionQuality: 0.5),
           let userNameTextField = self.userNameTextField,
           let userName = userNameTextField.text else { return }
 
@@ -416,7 +416,7 @@ class ANISignUpView: UIView {
   }
   
   @objc func keyboardWillChangeFrame(_ notification: Notification) {
-    guard let keyboardFrame = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
+    guard let keyboardFrame = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
           let scrollView = self.scrollView,
           let selectedTextFieldMaxY = self.selectedTextFieldMaxY else { return }
     

@@ -105,7 +105,7 @@ class ANITabBarController: UITabBarController {
     
     if let items = tabBar.items {
       for item in items {
-        item.imageInsets = UIEdgeInsetsMake(4.0, 0.0, -4.0, 0.0)
+        item.imageInsets = UIEdgeInsets.init(top: 4.0, left: 0.0, bottom: -4.0, right: 0.0)
       }
     }
   }

@@ -118,29 +118,29 @@ class ANISignUpViewController: UIViewController {
   }
   
   @objc private func keyboardWillChangeFrame(_ notification: Notification) {
-    guard let keyboardFrame = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
-          let duration = notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as? TimeInterval,
-          let curve = notification.userInfo?[UIKeyboardAnimationCurveUserInfoKey] as? UInt,
+    guard let keyboardFrame = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
+          let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval,
+          let curve = notification.userInfo?[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt,
           let signUpViewBottomConstraint = self.signUpViewBottomConstraint else { return }
     
     let h = keyboardFrame.height
     
     signUpViewBottomConstraint.constant = -h
     
-    UIView.animate(withDuration: duration, delay: 0, options: UIViewAnimationOptions(rawValue: curve), animations: {
+    UIView.animate(withDuration: duration, delay: 0, options: UIView.AnimationOptions(rawValue: curve), animations: {
       self.view.layoutIfNeeded()
     })
   }
   
   @objc private func keyboardWillHide(_ notification: Notification) {
-    guard let duration = notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as? TimeInterval,
-          let curve = notification.userInfo?[UIKeyboardAnimationCurveUserInfoKey] as? UInt,
+    guard let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval,
+          let curve = notification.userInfo?[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt,
           let signUpViewOriginalBottomConstraintConstant = self.signUpViewOriginalBottomConstraintConstant,
           let signUpViewBottomConstraint = self.signUpViewBottomConstraint else { return }
     
     signUpViewBottomConstraint.constant = signUpViewOriginalBottomConstraintConstant
     
-    UIView.animate(withDuration: duration, delay: 0, options: UIViewAnimationOptions(rawValue: curve), animations: {
+    UIView.animate(withDuration: duration, delay: 0, options: UIView.AnimationOptions(rawValue: curve), animations: {
       self.view.layoutIfNeeded()
     })
   }

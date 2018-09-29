@@ -84,7 +84,7 @@ class ANIStoryView: UIView {
     tableView.dataSource = self
     tableView.delegate = self
     tableView.alpha = 0.0
-    tableView.rowHeight = UITableViewAutomaticDimension
+    tableView.rowHeight = UITableView.automaticDimension
     let refreshControl = UIRefreshControl()
     refreshControl.addTarget(self, action: #selector(loadStory(sender:)), for: .valueChanged)
     tableView.addSubview(refreshControl)
@@ -248,7 +248,7 @@ extension ANIStoryView: UITableViewDelegate {
     if let height = self.cellHeight[indexPath] {
       return height
     } else {
-      return UITableViewAutomaticDimension
+      return UITableView.automaticDimension
     }
   }
 }

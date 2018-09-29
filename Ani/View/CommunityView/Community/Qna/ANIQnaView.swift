@@ -80,7 +80,7 @@ class ANIQnaView: UIView {
     tableView.delegate = self
     tableView.separatorStyle = .none
     tableView.alpha = 0.0
-    tableView.rowHeight = UITableViewAutomaticDimension
+    tableView.rowHeight = UITableView.automaticDimension
     let refreshControl = UIRefreshControl()
     refreshControl.addTarget(self, action: #selector(loadQna(sender:)), for: .valueChanged)
     tableView.addSubview(refreshControl)
@@ -208,7 +208,7 @@ extension ANIQnaView: UITableViewDelegate {
     if let height = self.cellHeight[indexPath] {
       return height
     } else {
-      return UITableViewAutomaticDimension
+      return UITableView.automaticDimension
     }
   }
 }

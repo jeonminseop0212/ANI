@@ -28,7 +28,7 @@ class GridView: UIView {
       let track = asset?.tracks(withMediaType: .video).first
       guard let trackUnrap = track else { return }
       let size = __CGSizeApplyAffineTransform(trackUnrap.naturalSize, trackUnrap.preferredTransform)
-      let videoSize = CGSize(width: fabs(size.width), height: fabs(size.height))
+      let videoSize = CGSize(width: abs(size.width), height: abs(size.height))
       
       setVideoPlayer(size: videoSize)
     }
@@ -240,11 +240,11 @@ class GridView: UIView {
   
   private func makeDoneButton() -> UIButton {
     let button = UIButton(type: .system)
-    button.setTitleColor(UIColor(red: 103/255, green: 219/255, blue: 64/255, alpha: 1), for: UIControlState())
+    button.setTitleColor(UIColor(red: 103/255, green: 219/255, blue: 64/255, alpha: 1), for: UIControl.State())
     button.isEnabled = false
     button.setTitleColor(UIColor.lightGray, for: .disabled)
     button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 17)
-    button.setTitle("Gallery.Done".g_localize(fallback: "選択"), for: UIControlState())
+    button.setTitle("Gallery.Done".g_localize(fallback: "選択"), for: UIControl.State())
     
     return button
   }
@@ -404,7 +404,7 @@ class GridView: UIView {
   }
   
   private func makeLoadingIndicator() -> UIActivityIndicatorView {
-    let view = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
+    let view = UIActivityIndicatorView(style: .whiteLarge)
     view.color = .gray
     view.hidesWhenStopped = true
     
@@ -557,7 +557,7 @@ public class PanGestureHelper: NSObject, UIGestureRecognizerDelegate {
           !dropDownController.expanding else { return }
     
     let preViewHeight = v.topView.frame.height + v.previewScollView.frame.height
-    if sender.state == UIGestureRecognizerState.began {
+    if sender.state == UIGestureRecognizer.State.began {
       let view    = sender.view
       let loc     = sender.location(in: view)
       let subview = view?.hitTest(loc, with: nil)
@@ -582,7 +582,7 @@ public class PanGestureHelper: NSObject, UIGestureRecognizerDelegate {
         (dragDirection == .down && dragStartPos.y > bottomY) {
         dragDirection = .stop
       }
-    } else if sender.state == UIGestureRecognizerState.changed {
+    } else if sender.state == UIGestureRecognizer.State.changed {
       let currentPos = sender.location(in: v)
       if dragDirection == .up && currentPos.y < bottomY - dragDiff {
         v.topViewTopConstraint?.constant =
@@ -601,7 +601,7 @@ public class PanGestureHelper: NSObject, UIGestureRecognizerDelegate {
       }
     } else {
       imaginaryCollectionViewOffsetStartPosY = 0.0
-      if sender.state == UIGestureRecognizerState.ended && dragDirection == .stop {
+      if sender.state == UIGestureRecognizer.State.ended && dragDirection == .stop {
         return
       }
       let currentPos = sender.location(in: v)
