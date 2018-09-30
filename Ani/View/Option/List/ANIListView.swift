@@ -521,7 +521,10 @@ extension ANIListView {
                 return
               }
               
-              guard let recruitSnapshot = recruitSnapshot, let data = recruitSnapshot.data() else { return }
+              guard let recruitSnapshot = recruitSnapshot, let data = recruitSnapshot.data() else {
+                group.leave()
+                return
+              }
               
               do {
                 let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: data)
@@ -531,9 +534,7 @@ extension ANIListView {
               } catch let error {
                 DLog(error)
                 
-                activityIndicatorView.stopAnimating()
-                
-                self.isLoading = false
+                group.leave()
               }
             })
           }
@@ -616,7 +617,10 @@ extension ANIListView {
                 return
               }
               
-              guard let recruitSnapshot = recruitSnapshot, let data = recruitSnapshot.data() else { return }
+              guard let recruitSnapshot = recruitSnapshot, let data = recruitSnapshot.data() else {
+                group.leave()
+                return
+              }
               
               do {
                 let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: data)
@@ -697,7 +701,6 @@ extension ANIListView {
               
               guard let storySnapshot = storySnapshot, let data = storySnapshot.data() else {
                 group.leave()
-                
                 return
               }
               
@@ -792,7 +795,10 @@ extension ANIListView {
                 return
               }
               
-              guard let storySnapshot = storySnapshot, let data = storySnapshot.data() else { return }
+              guard let storySnapshot = storySnapshot, let data = storySnapshot.data() else {
+                group.leave()
+                return
+              }
               
               do {
                 let story = try FirestoreDecoder().decode(FirebaseStory.self, from: data)
@@ -966,7 +972,10 @@ extension ANIListView {
                 return
               }
               
-              guard let qnaSnapshot = qnaSnapshot, let data = qnaSnapshot.data() else { return }
+              guard let qnaSnapshot = qnaSnapshot, let data = qnaSnapshot.data() else {
+                group.leave()
+                return
+              }
               
               do {
                 let qna = try FirestoreDecoder().decode(FirebaseQna.self, from: data)
@@ -1047,7 +1056,6 @@ extension ANIListView {
               
               guard let recruitSnapshot = recruitSnapshot, let data = recruitSnapshot.data() else {
                 group.leave()
-                
                 return
               }
               
@@ -1142,7 +1150,10 @@ extension ANIListView {
                 return
               }
               
-              guard let recruitSnapshot = recruitSnapshot, let data = recruitSnapshot.data() else { return }
+              guard let recruitSnapshot = recruitSnapshot, let data = recruitSnapshot.data() else {
+                group.leave()
+                return
+              }
               
               do {
                 let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: data)

@@ -34,6 +34,12 @@ class ANIFollowUserView: UIView {
   
   private var followingUsers = [FirebaseUser]()
   private var followers = [FirebaseUser]()
+  
+  private var isLastPage: Bool = false
+  private var lastContent: QueryDocumentSnapshot?
+  private var isLoading: Bool = false
+  
+  private var cellHeight = [IndexPath: CGFloat]()
 
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -54,7 +60,9 @@ class ANIFollowUserView: UIView {
     followUserTableView.register(ANIFollowUserViewCell.self, forCellReuseIdentifier: id)
     followUserTableView.separatorStyle = .none
     followUserTableView.alpha = 0.0
+    followUserTableView.rowHeight = UITableView.automaticDimension
     followUserTableView.dataSource = self
+    followUserTableView.delegate = self
     let refreshControl = UIRefreshControl()
     refreshControl.addTarget(self, action: #selector(reloadData(sender:)), for: .valueChanged)
     followUserTableView.addSubview(refreshControl)
@@ -113,11 +121,42 @@ extension ANIFollowUserView: UITableViewDataSource {
   }
 }
 
+//MARK: UITableViewDelegate
+extension ANIFollowUserView: UITableViewDelegate {
+  func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    guard let followUserViewMode = self.followUserViewMode else { return }
+
+    switch followUserViewMode {
+    case .following:
+      let element = self.followingUsers.count - 4
+      if !isLoading, indexPath.row >= element {
+        loadMoreFollowingUser()
+      }
+    case .follower:
+      let element = self.followers.count - 4
+      if !isLoading, indexPath.row >= element {
+        loadMoreFollower()
+      }
+    }
+    
+    self.cellHeight[indexPath] = cell.frame.size.height
+  }
+  
+  func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+    if let height = self.cellHeight[indexPath] {
+      return height
+    } else {
+      return UITableView.automaticDimension
+    }
+  }
+}
+
 //MARK: data
 extension ANIFollowUserView {
   private func loadFollowingUser(sender: UIRefreshControl?) {
     guard let userId = self.userId,
-          let activityIndicatorView = self.activityIndicatorView else { return }
+          let activityIndicatorView = self.activityIndicatorView,
+          let followUserTableView = self.followUserTableView else { return }
     
     if !self.followingUsers.isEmpty {
       self.followingUsers.removeAll()
@@ -129,67 +168,183 @@ extension ANIFollowUserView {
     
     let database = Firestore.firestore()
     
-    database.collection(KEY_USERS).document(userId).collection(KEY_FOLLOWING_USER_IDS).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments { (snapshot, error) in
-      if let error = error {
-        DLog("Error get document: \(error)")
+    DispatchQueue.global().async {
+      self.isLoading = true
+      self.isLastPage = false
+      
+      database.collection(KEY_USERS).document(userId).collection(KEY_FOLLOWING_USER_IDS).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments { (snapshot, error) in
+        if let error = error {
+          DLog("Error get document: \(error)")
+          self.isLoading = false
+          
+          return
+        }
         
-        return
-      }
-      
-      guard let snapshot = snapshot else { return }
-      
-      for document in snapshot.documents {
-        database.collection(KEY_USERS).document(document.documentID).getDocument(completion: { (userSnapshot, userError) in
-          if let error = error {
-            DLog("Error get user document: \(error)")
-            
-            return
-          }
+        guard let snapshot = snapshot,
+              let lastContent = snapshot.documents.last else {
+                self.isLoading = false
+                activityIndicatorView.stopAnimating()
+                return }
+        
+        self.lastContent = lastContent
+        
+        let group = DispatchGroup()
+        var followingUserTemp = [FirebaseUser?]()
+        
+        for (index, document) in snapshot.documents.enumerated() {
+          group.enter()
+          followingUserTemp.append(nil)
           
-          guard let userSnapshot = userSnapshot, let data = userSnapshot.data() else { return }
-          
-          do {
-            let user = try FirestoreDecoder().decode(FirebaseUser.self, from: data)
-            self.followingUsers.append(user)
-
-            DispatchQueue.main.async {
-              if let sender = sender {
-                sender.endRefreshing()
+          DispatchQueue(label: "followingUser").async {
+            database.collection(KEY_USERS).document(document.documentID).getDocument(completion: { (userSnapshot, userError) in
+              if let error = error {
+                DLog("Error get user document: \(error)")
+                self.isLoading = false
+                
+                return
               }
               
-              guard let followUserTableView = self.followUserTableView else { return }
-
-              followUserTableView.reloadData()
-              activityIndicatorView.stopAnimating()
-
-              UIView.animate(withDuration: 0.2, animations: {
-                followUserTableView.alpha = 1.0
-              })
-            }
-          } catch let error {
-            DLog(error)
-            activityIndicatorView.stopAnimating()
-            
+              guard let userSnapshot = userSnapshot, let data = userSnapshot.data() else {
+                group.leave()
+                return
+              }
+              
+              do {
+                let user = try FirestoreDecoder().decode(FirebaseUser.self, from: data)
+                followingUserTemp[index] = user
+                
+                group.leave()
+              } catch let error {
+                DLog(error)
+                
+                group.leave()
+              }
+            })
+          }
+        }
+        
+        group.notify(queue: DispatchQueue(label: "followingUser")) {
+          DispatchQueue.main.async {
             if let sender = sender {
               sender.endRefreshing()
             }
+            
+            for followingUser in followingUserTemp {
+              if let followingUser = followingUser {
+                self.followingUsers.append(followingUser)
+              }
+            }
+            followUserTableView.reloadData()
+            
+            
+            activityIndicatorView.stopAnimating()
+            
+            UIView.animate(withDuration: 0.2, animations: {
+              followUserTableView.alpha = 1.0
+            })
+            
+            self.isLoading = false
           }
-        })
-      }
-      
-      if snapshot.documents.isEmpty {
-        if let sender = sender {
-          sender.endRefreshing()
         }
         
-        activityIndicatorView.stopAnimating()
+        if snapshot.documents.isEmpty {
+          activityIndicatorView.stopAnimating()
+          
+          self.isLoading = false
+        }
       }
+    }
+  }
+  
+  private func loadMoreFollowingUser() {
+    guard let followUserTableView = self.followUserTableView,
+          let lastContent = self.lastContent,
+          let userId = self.userId,
+          !isLoading,
+          !isLastPage else { return }
+    
+    let database = Firestore.firestore()
+    
+    DispatchQueue.global().async {
+      self.isLoading = true
+      
+      database.collection(KEY_USERS).document(userId).collection(KEY_FOLLOWING_USER_IDS).order(by: KEY_DATE, descending: true).start(afterDocument: lastContent).limit(to: 20).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          DLog("Error get document: \(error)")
+          self.isLoading = false
+          
+          return
+        }
+        
+        guard let snapshot = snapshot else { return }
+        guard let lastContent = snapshot.documents.last else {
+          self.isLastPage = true
+          self.isLoading = false
+          return
+        }
+        
+        self.lastContent = lastContent
+        
+        let group = DispatchGroup()
+        var followingUserTemp = [FirebaseUser?]()
+        
+        for (index, document) in snapshot.documents.enumerated() {
+          
+          group.enter()
+          followingUserTemp.append(nil)
+          
+          DispatchQueue(label: "followingUser").async {
+            database.collection(KEY_USERS).document(document.documentID).getDocument(completion: { (userSnapshot, userError) in
+              if let userError = userError {
+                DLog("Error get document: \(userError)")
+                self.isLoading = false
+                
+                return
+              }
+              
+              guard let userSnapshot = userSnapshot, let data = userSnapshot.data() else {
+                group.leave()
+                return
+              }
+              
+              do {
+                let user = try FirestoreDecoder().decode(FirebaseUser.self, from: data)
+                followingUserTemp[index] = user
+                
+                group.leave()
+              } catch let error {
+                DLog(error)
+                
+                group.leave()
+              }
+            })
+          }
+        }
+        
+        group.notify(queue: DispatchQueue(label: "followingUser")) {
+          DispatchQueue.main.async {
+            for followingUser in followingUserTemp {
+              if let followingUser = followingUser {
+                self.followingUsers.append(followingUser)
+              }
+            }
+            followUserTableView.reloadData()
+            
+            self.isLoading = false
+          }
+        }
+        
+        if snapshot.documents.isEmpty {
+          self.isLoading = false
+        }
+      })
     }
   }
   
   private func loadFollower(sender: UIRefreshControl?) {
     guard let userId = self.userId,
-          let activityIndicatorView = self.activityIndicatorView else { return }
+          let activityIndicatorView = self.activityIndicatorView,
+          let followUserTableView = self.followUserTableView else { return }
     
     if !self.followers.isEmpty {
       self.followers.removeAll()
@@ -201,84 +356,182 @@ extension ANIFollowUserView {
     
     let database = Firestore.firestore()
     
-    database.collection(KEY_USERS).document(userId).collection(KEY_FOLLOWER_IDS).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments { (snapshot, error) in
-      if let error = error {
-        DLog("Error get document: \(error)")
-        
-        return
-      }
+    DispatchQueue.global().async {
+      self.isLoading = true
+      self.isLastPage = false
       
-      guard let snapshot = snapshot else { return }
-      
-      let group = DispatchGroup()
-      var followUserTemp = [FirebaseUser?]()
-      
-      for (index, document) in snapshot.documents.enumerated() {
-        
-        group.enter()
-        followUserTemp.append(nil)
-        
-        DispatchQueue(label: "follow").async {
-
-          database.collection(KEY_USERS).document(document.documentID).getDocument(completion: { (userSnapshot, userError) in
-            if let error = error {
-              DLog("Error get user document: \(error)")
-              
-              return
-            }
-            
-            guard let userSnapshot = userSnapshot, let data = userSnapshot.data() else {
-              group.leave()
-
-              return
-            }
-            
-            do {
-              let user = try FirestoreDecoder().decode(FirebaseUser.self, from: data)
-              followUserTemp[index] = user
-              
-              group.leave()
-            } catch let error {
-              DLog(error)
-              
-              group.leave()
-            }
-          })
+      database.collection(KEY_USERS).document(userId).collection(KEY_FOLLOWER_IDS).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments { (snapshot, error) in
+        if let error = error {
+          DLog("Error get document: \(error)")
+          self.isLoading = false
+          
+          return
         }
-      }
-      
-      group.notify(queue: DispatchQueue(label: "follow")) {
-        DispatchQueue.main.async {
-          DispatchQueue.main.async {
-            if let sender = sender {
-              sender.endRefreshing()
-            }
-
-            guard let followUserTableView = self.followUserTableView else { return }
-            
-            for user in followUserTemp {
-              if let user = user {
-                self.followers.append(user)
+        
+        guard let snapshot = snapshot,
+              let lastContent = snapshot.documents.last else {
+                self.isLoading = false
+                activityIndicatorView.stopAnimating()
+                return }
+        
+        self.lastContent = lastContent
+        
+        let group = DispatchGroup()
+        var followUserTemp = [FirebaseUser?]()
+        
+        for (index, document) in snapshot.documents.enumerated() {
+          
+          group.enter()
+          followUserTemp.append(nil)
+          
+          DispatchQueue(label: "follower").async {
+            database.collection(KEY_USERS).document(document.documentID).getDocument(completion: { (userSnapshot, userError) in
+              if let error = error {
+                DLog("Error get user document: \(error)")
+                self.isLoading = false
+                
+                return
               }
-            }
-            
-            followUserTableView.reloadData()
-            activityIndicatorView.stopAnimating()
-
-            UIView.animate(withDuration: 0.2, animations: {
-              followUserTableView.alpha = 1.0
+              
+              guard let userSnapshot = userSnapshot, let data = userSnapshot.data() else {
+                group.leave()
+                return
+              }
+              
+              do {
+                let user = try FirestoreDecoder().decode(FirebaseUser.self, from: data)
+                followUserTemp[index] = user
+                
+                group.leave()
+              } catch let error {
+                DLog(error)
+                
+                group.leave()
+              }
             })
           }
         }
-      }
-      
-      if snapshot.documents.isEmpty {
-        if let sender = sender {
-          sender.endRefreshing()
+        
+        group.notify(queue: DispatchQueue(label: "follower")) {
+          DispatchQueue.main.async {
+            DispatchQueue.main.async {
+              if let sender = sender {
+                sender.endRefreshing()
+              }
+              
+              for user in followUserTemp {
+                if let user = user {
+                  self.followers.append(user)
+                }
+              }
+              
+              followUserTableView.reloadData()
+              activityIndicatorView.stopAnimating()
+
+              UIView.animate(withDuration: 0.2, animations: {
+                followUserTableView.alpha = 1.0
+              })
+              
+              self.isLoading = false
+            }
+          }
         }
         
-        activityIndicatorView.stopAnimating()
+        if snapshot.documents.isEmpty {
+          if let sender = sender {
+            sender.endRefreshing()
+          }
+          
+          activityIndicatorView.stopAnimating()
+          
+          self.isLoading = false
+        }
       }
+    }
+  }
+  
+  private func loadMoreFollower() {
+    guard let followUserTableView = self.followUserTableView,
+          let lastContent = self.lastContent,
+          let userId = self.userId,
+          !isLoading,
+          !isLastPage else { return }
+    
+    let database = Firestore.firestore()
+    
+    DispatchQueue.global().async {
+      self.isLoading = true
+      
+      database.collection(KEY_USERS).document(userId).collection(KEY_FOLLOWER_IDS).order(by: KEY_DATE, descending: true).start(afterDocument: lastContent).limit(to: 20).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          DLog("Error get document: \(error)")
+          self.isLoading = false
+          
+          return
+        }
+        
+        guard let snapshot = snapshot else { return }
+        guard let lastContent = snapshot.documents.last else {
+          self.isLastPage = true
+          self.isLoading = false
+          return
+        }
+        
+        self.lastContent = lastContent
+        
+        let group = DispatchGroup()
+        var followerTemp = [FirebaseUser?]()
+        
+        for (index, document) in snapshot.documents.enumerated() {
+          
+          group.enter()
+          followerTemp.append(nil)
+          
+          DispatchQueue(label: "follower").async {
+            database.collection(KEY_USERS).document(document.documentID).getDocument(completion: { (userSnapshot, userError) in
+              if let userError = userError {
+                DLog("Error get document: \(userError)")
+                self.isLoading = false
+                
+                return
+              }
+              
+              guard let userSnapshot = userSnapshot, let data = userSnapshot.data() else {
+                group.leave()
+                return
+              }
+              
+              do {
+                let user = try FirestoreDecoder().decode(FirebaseUser.self, from: data)
+                followerTemp[index] = user
+                
+                group.leave()
+              } catch let error {
+                DLog(error)
+                
+                group.leave()
+              }
+            })
+          }
+        }
+        
+        group.notify(queue: DispatchQueue(label: "follower")) {
+          DispatchQueue.main.async {
+            for follower in followerTemp {
+              if let follower = follower {
+                self.followers.append(follower)
+              }
+            }
+            followUserTableView.reloadData()
+            
+            self.isLoading = false
+          }
+        }
+        
+        if snapshot.documents.isEmpty {
+          self.isLoading = false
+        }
+      })
     }
   }
 }

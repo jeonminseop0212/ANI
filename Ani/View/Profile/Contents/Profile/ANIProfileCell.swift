@@ -36,14 +36,14 @@ class ANIProfileCell: UITableViewCell {
     }
   }
   
-  var followListener: ListenerRegistration?
+  private var followingUserListener: ListenerRegistration?
+  private var followerListener: ListenerRegistration?
   
   var delegate: ANIProfileCellDelegate?
     
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     setup()
-    setupNotifications()
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -207,12 +207,17 @@ class ANIProfileCell: UITableViewCell {
   private func observeFollow() {
     guard let currentUserId = ANISessionManager.shared.currentUserUid else { return }
 
-    followListener?.remove()
+    if let followingUserListener = self.followingUserListener {
+      followingUserListener.remove()
+    }
+    if let followerListener = self.followerListener {
+      followerListener.remove()
+    }
     
     let database = Firestore.firestore()
     
     DispatchQueue.global().async {
-      self.followListener = database.collection(KEY_USERS).document(currentUserId).collection(KEY_FOLLOWING_USER_IDS).addSnapshotListener({ (snapshot, error) in
+      self.followingUserListener = database.collection(KEY_USERS).document(currentUserId).collection(KEY_FOLLOWING_USER_IDS).addSnapshotListener({ (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
           
@@ -224,7 +229,7 @@ class ANIProfileCell: UITableViewCell {
         followingCountLabel.text = "\(snapshot.documents.count)"
       })
       
-      database.collection(KEY_USERS).document(currentUserId).collection(KEY_FOLLOWER_IDS).addSnapshotListener({ (snapshot, error) in
+     self.followerListener = database.collection(KEY_USERS).document(currentUserId).collection(KEY_FOLLOWER_IDS).addSnapshotListener({ (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
           
@@ -236,10 +241,6 @@ class ANIProfileCell: UITableViewCell {
         followerCountLabel.text = "\(snapshot.documents.count)"
       })
     }
-  }
-  
-  private func setupNotifications() {
-    ANINotificationManager.receive(login: self, selector: #selector(reloadLayout))
   }
   
   //MARK: action
