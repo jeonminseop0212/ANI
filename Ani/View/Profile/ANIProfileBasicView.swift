@@ -63,12 +63,23 @@ class ANIProfileBasicView: UIView {
       if !recruitUsers.isEmpty {
         recruitUsers.removeAll()
       }
+      if !recruits.isEmpty {
+        recruits.removeAll()
+      }
       if !storyUsers.isEmpty {
         storyUsers.removeAll()
+      }
+      if !stories.isEmpty {
+        stories.removeAll()
       }
       if !qnaUsers.isEmpty {
         qnaUsers.removeAll()
       }
+      if !qnas.isEmpty {
+        qnas.removeAll()
+      }
+      
+      loadData()
       
       basicTableView.reloadData()
     }
@@ -83,6 +94,10 @@ class ANIProfileBasicView: UIView {
   private var recruitCellHeight = [IndexPath: CGFloat]()
   private var storyCellHeight = [IndexPath: CGFloat]()
   private var qnaCellHeight = [IndexPath: CGFloat]()
+  
+  private var recruitListener: ListenerRegistration?
+  private var storyListener: ListenerRegistration?
+  private var qnaListener: ListenerRegistration?
   
   var delegate: ANIProfileBasicViewDelegate?
   
@@ -893,10 +908,14 @@ extension ANIProfileBasicView {
   private func observeRecruit() {
     guard let currentUserId = ANISessionManager.shared.currentUserUid else { return }
     
+    if let recruitListener = self.recruitListener {
+      recruitListener.remove()
+    }
+    
     let database = Firestore.firestore()
     
     DispatchQueue.global().async {
-      database.collection(KEY_RECRUITS).whereField(KEY_USER_ID, isEqualTo: currentUserId).addSnapshotListener({ (snapshot, error) in
+      self.recruitListener = database.collection(KEY_RECRUITS).whereField(KEY_USER_ID, isEqualTo: currentUserId).addSnapshotListener({ (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
           
@@ -969,10 +988,14 @@ extension ANIProfileBasicView {
   private func observeStory() {
     guard let currentUserId = ANISessionManager.shared.currentUserUid else { return }
     
+    if let storyListener = self.storyListener {
+      storyListener.remove()
+    }
+    
     let database = Firestore.firestore()
     
     DispatchQueue.global().async {
-      database.collection(KEY_STORIES).whereField(KEY_USER_ID, isEqualTo: currentUserId).addSnapshotListener({ (snapshot, error) in
+      self.storyListener = database.collection(KEY_STORIES).whereField(KEY_USER_ID, isEqualTo: currentUserId).addSnapshotListener({ (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
           
@@ -1025,10 +1048,14 @@ extension ANIProfileBasicView {
   private func observeQna() {
     guard let currentUserId = ANISessionManager.shared.currentUserUid else { return }
     
+    if let qnaListener = self.qnaListener {
+      qnaListener.remove()
+    }
+    
     let database = Firestore.firestore()
 
     DispatchQueue.global().async {
-      database.collection(KEY_QNAS).whereField(KEY_USER_ID, isEqualTo: currentUserId).addSnapshotListener({ (snapshot, error) in
+      self.qnaListener = database.collection(KEY_QNAS).whereField(KEY_USER_ID, isEqualTo: currentUserId).addSnapshotListener({ (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
           

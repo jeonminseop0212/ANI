@@ -49,10 +49,6 @@ class ANIProfileViewController: UIViewController {
     setupNotification()
     showNeedLoginView()
   }
-
-  override func viewWillDisappear(_ animated: Bool) {
-    removeNotifications()
-  }
   
   private func setup() {
     //basic
@@ -183,10 +179,7 @@ class ANIProfileViewController: UIViewController {
   private func setupNotification() {
     ANINotificationManager.receive(imageCellTapped: self, selector: #selector(presentImageBrowser(_:)))
     ANINotificationManager.receive(profileEditButtonTapped: self, selector: #selector(openProfileEdit))
-  }
-  
-  private func removeNotifications() {
-    ANINotificationManager.remove(self)
+    ANINotificationManager.receive(login: self, selector: #selector(reloadNavigationTitle))
   }
   
   @objc private func presentImageBrowser(_ notification: NSNotification) {
@@ -207,6 +200,13 @@ class ANIProfileViewController: UIViewController {
     profileEditViewController.delegate = self
     profileEditViewController.currentUser = currentUser
     self.present(profileEditViewController, animated: true, completion: nil)
+  }
+  
+  @objc private func reloadNavigationTitle() {
+    guard let navigationTitleLabel = self.navigationTitleLabel,
+          let currentUser = self.currentUser else { return }
+    
+    navigationTitleLabel.text = currentUser.userName
   }
   
   //MARK: action
