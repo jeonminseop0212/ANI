@@ -17,5 +17,9 @@ class ANISessionManager: NSObject {
   
   var isAnonymous: Bool = false
   
+  #if DEBUG
   let client = Client(appID: "RBJYX5VF88", apiKey: "ebf262fa4367637cd49431402d70455c")
+  #else
+  let client = Client(appID: "NF5ORAYV5G", apiKey: "e34e8cb3865dd2fe25a02fbf5b916755")
+  #endif
 }

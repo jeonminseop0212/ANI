@@ -32,7 +32,7 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "F5B1EFA020725964000CFB0B"
+               BlueprintIdentifier = "CD85F554215F547200AB9A0C"
                BuildableName = "AniTests.xctest"
                BlueprintName = "AniTests"
                ReferencedContainer = "container:Ani.xcodeproj">
@@ -62,7 +62,7 @@
       </AdditionalOptions>
    </TestAction>
    <LaunchAction
-      buildConfiguration = "Debug"
+      buildConfiguration = "Release"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
