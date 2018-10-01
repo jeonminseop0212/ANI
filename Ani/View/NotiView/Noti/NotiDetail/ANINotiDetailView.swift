@@ -106,8 +106,10 @@ class ANINotiDetailView: UIView {
     tableView.register(ANISupportViewCell.self, forCellReuseIdentifier: supportCellId)
     let qnaCellId = NSStringFromClass(ANIQnaViewCell.self)
     tableView.register(ANIQnaViewCell.self, forCellReuseIdentifier: qnaCellId)
-    let headerCellId = NSStringFromClass(ANINotiHeaderViewCell.self)
-    tableView.register(ANINotiHeaderViewCell.self, forCellReuseIdentifier: headerCellId)
+    let headerBasicCellId = NSStringFromClass(ANINotiHeaderBasicViewCell.self)
+    tableView.register(ANINotiHeaderBasicViewCell.self, forCellReuseIdentifier: headerBasicCellId)
+    let headerQnaCellId = NSStringFromClass(ANINotiHeaderQnaViewCell.self)
+    tableView.register(ANINotiHeaderQnaViewCell.self, forCellReuseIdentifier: headerQnaCellId)
     let commentCellId = NSStringFromClass(ANINotiCommentViewCell.self)
     tableView.register(ANINotiCommentViewCell.self, forCellReuseIdentifier: commentCellId)
     let userCellId = NSStringFromClass(ANIUserSearchViewCell.self)
@@ -205,10 +207,9 @@ extension ANINotiDetailView: UITableViewDataSource {
         
         return cell
       } else if indexPath.row == 1 {
-        let headerCellId = NSStringFromClass(ANINotiHeaderViewCell.self)
-        let cell = tableView.dequeueReusableCell(withIdentifier: headerCellId, for: indexPath) as! ANINotiHeaderViewCell
+        let headerBasicCellId = NSStringFromClass(ANINotiHeaderBasicViewCell.self)
+        let cell = tableView.dequeueReusableCell(withIdentifier: headerBasicCellId, for: indexPath) as! ANINotiHeaderBasicViewCell
         
-        cell.contributionKind = contributionKind
         cell.headerText = "いいねユーザー"
         
         return cell
@@ -237,10 +238,8 @@ extension ANINotiDetailView: UITableViewDataSource {
           
           return cell
         } else if indexPath.row == 1 {
-          let headerCellId = NSStringFromClass(ANINotiHeaderViewCell.self)
-          let cell = tableView.dequeueReusableCell(withIdentifier: headerCellId, for: indexPath) as! ANINotiHeaderViewCell
-          
-          cell.contributionKind = contributionKind
+          let headerBasicCellId = NSStringFromClass(ANINotiHeaderBasicViewCell.self)
+          let cell = tableView.dequeueReusableCell(withIdentifier: headerBasicCellId, for: indexPath) as! ANINotiHeaderBasicViewCell
           
           if noti.commentId != nil {
             cell.headerText = "新しいコメント"
@@ -280,10 +279,8 @@ extension ANINotiDetailView: UITableViewDataSource {
           
           return cell
         } else if indexPath.row == 1 {
-          let headerCellId = NSStringFromClass(ANINotiHeaderViewCell.self)
-          let cell = tableView.dequeueReusableCell(withIdentifier: headerCellId, for: indexPath) as! ANINotiHeaderViewCell
-          
-          cell.contributionKind = contributionKind
+          let headerBasicCellId = NSStringFromClass(ANINotiHeaderBasicViewCell.self)
+          let cell = tableView.dequeueReusableCell(withIdentifier: headerBasicCellId, for: indexPath) as! ANINotiHeaderBasicViewCell
           
           if noti.commentId != nil {
             cell.headerText = "新しいコメント"
@@ -324,11 +321,9 @@ extension ANINotiDetailView: UITableViewDataSource {
         
         return cell
       } else if indexPath.row == 1 {
-        let headerCellId = NSStringFromClass(ANINotiHeaderViewCell.self)
-        let cell = tableView.dequeueReusableCell(withIdentifier: headerCellId, for: indexPath) as! ANINotiHeaderViewCell
+        let headerQnaCellId = NSStringFromClass(ANINotiHeaderQnaViewCell.self)
+        let cell = tableView.dequeueReusableCell(withIdentifier: headerQnaCellId, for: indexPath) as! ANINotiHeaderQnaViewCell
         
-        cell.contributionKind = contributionKind
-
         if noti.commentId != nil {
           cell.headerText = "新しいコメント"
         } else {
