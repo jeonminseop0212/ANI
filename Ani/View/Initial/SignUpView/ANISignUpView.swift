@@ -449,6 +449,7 @@ extension ANISignUpView: ANIButtonViewDelegate {
       if adress.count > 0 && password.count > 0 && passwordCheck.count > 0 && userName.count > 0 {
         if password == passwordCheck {
           signUp(adress: adress, password: password)
+          self.endEditing(true)
         } else {
           self.delegate?.reject(notiText: "パスワードが異なります！")
         }
