@@ -382,16 +382,31 @@ class ANIStoryViewCell: UITableViewCell {
     let database = Firestore.firestore()
     
     DispatchQueue.global().async {
-      do {
-        let noti = "\(currentUserName)さんが「\(story.story)」ストーリーを「いいね」しました。"
-        let date = ANIFunction.shared.getToday()
-        let notification = FirebaseNotification(userId: currentUserId, noti: noti, contributionKind: KEY_CONTRIBUTION_KIND_STROY, notiKind: KEY_NOTI_KIND_LOVE, notiId: storyId, commentId: nil, updateDate: date)
-        let data = try FirestoreEncoder().encode(notification)
+      database.collection(KEY_STORIES).document(storyId).collection(KEY_LOVE_IDS).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          DLog("Error get document: \(error)")
           
-        database.collection(KEY_USERS).document(userId).collection(KEY_NOTIFICATIONS).document(storyId).setData(data)
-      } catch let error {
-        DLog(error)
-      }
+          return
+        }
+        
+        var noti = ""
+        
+        if let snapshot = snapshot, snapshot.documents.count > 1 {
+          noti = "\(currentUserName)さん、他\(snapshot.documents.count - 1)人が「\(story.story)」ストーリーを「いいね」しました。"
+        } else {
+          noti = "\(currentUserName)さんが「\(story.story)」ストーリーを「いいね」しました。"
+        }
+        
+        do {
+          let date = ANIFunction.shared.getToday()
+          let notification = FirebaseNotification(userId: currentUserId, noti: noti, contributionKind: KEY_CONTRIBUTION_KIND_STROY, notiKind: KEY_NOTI_KIND_LOVE, notiId: storyId, commentId: nil, updateDate: date)
+          let data = try FirestoreEncoder().encode(notification)
+          
+          database.collection(KEY_USERS).document(userId).collection(KEY_NOTIFICATIONS).document(storyId).setData(data)
+        } catch let error {
+          DLog(error)
+        }
+      })
     }
   }
   
