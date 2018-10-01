@@ -50,6 +50,8 @@ class ANINotiDetailView: UIView {
       switch contributionKind {
       case .recruit:
         loadRecruit(notiId: noti.notiId)
+        
+        loadLoveUserId()
       case .story:
         loadStory(notiId: noti.notiId)
         
@@ -643,7 +645,10 @@ extension ANINotiDetailView {
     let database = Firestore.firestore()
     
     var collection: String = ""
-    if contributionKind == .story {
+    if contributionKind == .recruit {
+      collection = KEY_RECRUITS
+    }
+    else if contributionKind == .story {
       collection = KEY_STORIES
     } else if contributionKind == .qna {
       collection = KEY_QNAS
