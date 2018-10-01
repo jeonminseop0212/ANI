@@ -390,17 +390,32 @@ class ANIQnaViewCell: UITableViewCell {
     let database = Firestore.firestore()
     
     DispatchQueue.global().async {
-      do {
-        let noti = "\(currentUserName)さんが「\(qna.qna)」質問を「いいね」しました。"
-        let date = ANIFunction.shared.getToday()
-        let notification = FirebaseNotification(userId: currentUserId, noti: noti, contributionKind: KEY_CONTRIBUTION_KIND_QNA, notiKind: KEY_NOTI_KIND_LOVE, notiId: qnaId, commentId: nil, updateDate: date)
-        if let data = try FirebaseEncoder().encode(notification) as? [String: AnyObject] {
+      database.collection(KEY_QNAS).document(qnaId).collection(KEY_LOVE_IDS).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          DLog("Error get document: \(error)")
           
-          database.collection(KEY_USERS).document(userId).collection(KEY_NOTIFICATIONS).document(qnaId).setData(data)
+          return
         }
-      } catch let error {
-        DLog(error)
-      }
+        
+        var noti = ""
+        
+        if let snapshot = snapshot, snapshot.documents.count > 1 {
+          noti = "\(currentUserName)さん、他\(snapshot.documents.count - 1)人が「\(qna.qna)」質問を「いいね」しました。"
+        } else {
+          noti = "\(currentUserName)さんが「\(qna.qna)」質問を「いいね」しました。"
+        }
+        
+        do {
+          let date = ANIFunction.shared.getToday()
+          let notification = FirebaseNotification(userId: currentUserId, noti: noti, contributionKind: KEY_CONTRIBUTION_KIND_QNA, notiKind: KEY_NOTI_KIND_LOVE, notiId: qnaId, commentId: nil, updateDate: date)
+          if let data = try FirebaseEncoder().encode(notification) as? [String: AnyObject] {
+            
+            database.collection(KEY_USERS).document(userId).collection(KEY_NOTIFICATIONS).document(qnaId).setData(data)
+          }
+        } catch let error {
+          DLog(error)
+        }
+      })
     }
   }
   

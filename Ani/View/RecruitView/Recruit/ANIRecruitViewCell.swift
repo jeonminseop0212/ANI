@@ -595,16 +595,31 @@ class ANIRecruitViewCell: UITableViewCell {
     let database = Firestore.firestore()
     
     DispatchQueue.global().async {
-      do {
-        let noti = "\(currentUserName)さんが「\(recruit.title)」募集を「いいね」しました。"
-        let date = ANIFunction.shared.getToday()
-        let notification = FirebaseNotification(userId: currentUserId, noti: noti, contributionKind: KEY_CONTRIBUTION_KIND_RECRUIT, notiKind: KEY_NOTI_KIND_LOVE, notiId: recuritId, commentId: nil, updateDate: date)
-        let data = try FirestoreEncoder().encode(notification)
-
-        database.collection(KEY_USERS).document(userId).collection(KEY_NOTIFICATIONS).document(recuritId).setData(data)
-      } catch let error {
-        DLog(error)
-      }
+      database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_LOVE_IDS).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          DLog("Error get document: \(error)")
+          
+          return
+        }
+        
+        var noti = ""
+        
+        if let snapshot = snapshot, snapshot.documents.count > 1 {
+          noti = "\(currentUserName)さん、他\(snapshot.documents.count - 1)人が「\(recruit.title)」募集を「いいね」しました。"
+        } else {
+          noti = "\(currentUserName)さんが「\(recruit.title)」募集を「いいね」しました。"
+        }
+        
+        do {
+          let date = ANIFunction.shared.getToday()
+          let notification = FirebaseNotification(userId: currentUserId, noti: noti, contributionKind: KEY_CONTRIBUTION_KIND_RECRUIT, notiKind: KEY_NOTI_KIND_LOVE, notiId: recuritId, commentId: nil, updateDate: date)
+          let data = try FirestoreEncoder().encode(notification)
+          
+          database.collection(KEY_USERS).document(userId).collection(KEY_NOTIFICATIONS).document(recuritId).setData(data)
+        } catch let error {
+          DLog(error)
+        }
+      })
     }
   }
   
