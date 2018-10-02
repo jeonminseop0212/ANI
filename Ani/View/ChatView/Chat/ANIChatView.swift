@@ -9,22 +9,27 @@
 import UIKit
 import FirebaseFirestore
 import CodableFirebase
+import NVActivityIndicatorView
 
 class ANIChatView: UIView {
   
   private weak var chatTableView: UITableView?
     
-  var chatGroupId: String? {
+  var chatGroupId: String?
+  
+  var user: FirebaseUser? 
+  
+  var chatGroup: FirebaseChatGroup? {
     didSet {
       loadMessage()
     }
   }
   
-  var user: FirebaseUser?
-  
   private var messages = [FirebaseChatMessage]()
   
   private var beforeDate: String = ""
+  
+  private weak var activityIndicatorView: NVActivityIndicatorView?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -47,9 +52,18 @@ class ANIChatView: UIView {
     let otherChatId = NSStringFromClass(ANIOtherChatViewCell.self)
     chatTableView.register(ANIOtherChatViewCell.self, forCellReuseIdentifier: otherChatId)
     chatTableView.dataSource = self
+    chatTableView.alpha = 0.0
     addSubview(chatTableView)
     chatTableView.edgesToSuperview()
     self.chatTableView = chatTableView
+    
+    //activityIndicatorView
+    let activityIndicatorView = NVActivityIndicatorView(frame: .zero, type: .lineScale, color: ANIColor.green, padding: 0)
+    addSubview(activityIndicatorView)
+    activityIndicatorView.width(40.0)
+    activityIndicatorView.height(40.0)
+    activityIndicatorView.centerInSuperview()
+    self.activityIndicatorView = activityIndicatorView
   }
   
   func scrollToBottom() {
@@ -64,6 +78,25 @@ class ANIChatView: UIView {
     let resetDate = String(date.prefix(10))
     
     return resetDate
+  }
+  
+  private func updateCheckChatGroupDate() {
+    guard let currentUserUid = ANISessionManager.shared.currentUserUid,
+          let chatGroupId = self.chatGroupId,
+          let chatGroup = self.chatGroup else { return }
+    
+    let database = Firestore.firestore()
+    
+    let date = ANIFunction.shared.getToday()
+    
+    var checkChatGroupDateTemp = [String: String]()
+    
+    if let checkChatGroupDate = chatGroup.checkChatGroupDate {
+      checkChatGroupDateTemp = checkChatGroupDate
+    }
+    
+    checkChatGroupDateTemp[currentUserUid] = date
+    database.collection(KEY_CHAT_GROUPS).document(chatGroupId).updateData(["checkChatGroupDate": checkChatGroupDateTemp])
   }
 }
 
@@ -119,18 +152,24 @@ extension ANIChatView: UITableViewDataSource {
 //MAKR: data
 extension ANIChatView {
   private func loadMessage() {
-    guard let chatGroupId = self.chatGroupId else { return }
+    guard let chatGroupId = self.chatGroupId,
+          let activityIndicatorView = self.activityIndicatorView,
+          let chatTableView = self.chatTableView else { return }
     
     let database = Firestore.firestore()
     
-    DispatchQueue.global().async {
-      database.collection(KEY_CHAT_GROUPS).document(chatGroupId).collection(KEY_CHAT_MESSAGES).order(by: KEY_DATE).addSnapshotListener({ (snapshot, error) in
+    activityIndicatorView.startAnimating()
+    
+    DispatchQueue.global().asyncAfter(deadline: .now() + 0.5) {
+      database.collection(KEY_CHAT_GROUPS).document(chatGroupId).collection(KEY_CHAT_MESSAGES).order(by: KEY_DATE).limit(to: 20).addSnapshotListener({ (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
           
           return
         }
         guard let snapshot = snapshot else { return }
+        
+        var updated: Bool = false
         
         snapshot.documentChanges.forEach({ (diff) in
           if diff.type == .added {
@@ -140,16 +179,31 @@ extension ANIChatView {
               self.messages.append(message)
               
               DispatchQueue.main.async {
-                guard let chatTableView = self.chatTableView else { return }
-                
-                chatTableView.reloadData()
+                chatTableView.reloadData() {
+                  if !updated {
+                    self.updateCheckChatGroupDate()
+                    updated = true
+                  }
+                }
                 self.scrollToBottom()
+                
+                UIView.animate(withDuration: 0.2, animations: {
+                  chatTableView.alpha = 1.0
+                })
+                
+                activityIndicatorView.stopAnimating()
               }
             } catch let error {
               DLog(error)
+              
+              activityIndicatorView.stopAnimating()
             }
           }
         })
+        
+        if snapshot.documents.isEmpty {
+          activityIndicatorView.stopAnimating()
+        }
       })
     }
   }

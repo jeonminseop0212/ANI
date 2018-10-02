@@ -33,6 +33,7 @@
 		CD4F0EF720F481030093C543 /* ANINotiCommentViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD4F0EF620F481030093C543 /* ANINotiCommentViewCell.swift */; };
 		CD50A46720EC6A2500CFF16F /* UIIMage.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD50A46620EC6A2500CFF16F /* UIIMage.swift */; };
 		CD516FBE2161ED82002FF41C /* ANINotiHeaderQnaViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD516FBD2161ED82002FF41C /* ANINotiHeaderQnaViewCell.swift */; };
+		CD516FC021631D56002FF41C /* UITableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD516FBF21631D56002FF41C /* UITableView.swift */; };
 		CD529783213E17F7001609DB /* ANIPopupOptionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD529782213E17F7001609DB /* ANIPopupOptionViewCell.swift */; };
 		CD5297852140CD30001609DB /* ANINotiHeaderBasicViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD5297842140CD30001609DB /* ANINotiHeaderBasicViewCell.swift */; };
 		CD6229DC20B64A6400E36875 /* ANISignUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6229DB20B64A6400E36875 /* ANISignUpViewController.swift */; };
@@ -213,6 +214,7 @@
 		CD50A46620EC6A2500CFF16F /* UIIMage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIIMage.swift; sourceTree = "<group>"; };
 		CD50A46820EC89BD00CFF16F /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		CD516FBD2161ED82002FF41C /* ANINotiHeaderQnaViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotiHeaderQnaViewCell.swift; sourceTree = "<group>"; };
+		CD516FBF21631D56002FF41C /* UITableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITableView.swift; sourceTree = "<group>"; };
 		CD529782213E17F7001609DB /* ANIPopupOptionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIPopupOptionViewCell.swift; sourceTree = "<group>"; };
 		CD5297842140CD30001609DB /* ANINotiHeaderBasicViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotiHeaderBasicViewCell.swift; sourceTree = "<group>"; };
 		CD6229DB20B64A6400E36875 /* ANISignUpViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANISignUpViewController.swift; sourceTree = "<group>"; };
@@ -1002,6 +1004,7 @@
 				CD9E52B020921EB400715F50 /* UIViewController.swift */,
 				CDA32A2E20ABD941008A2AC1 /* String.swift */,
 				CD50A46620EC6A2500CFF16F /* UIIMage.swift */,
+				CD516FBF21631D56002FF41C /* UITableView.swift */,
 			);
 			path = Extensioin;
 			sourceTree = "<group>";
@@ -1214,9 +1217,9 @@
 			children = (
 				F5B1EFBE20725B6C000CFB0B /* Supporting */,
 				F5E9E222207696060021D4CC /* Model */,
+				F5B1EFC020725B86000CFB0B /* TabbarController */,
 				F5E9E2302079AF8C0021D4CC /* ViewController */,
 				F5E9E2342079B1660021D4CC /* View */,
-				F5B1EFC020725B86000CFB0B /* TabbarController */,
 				F51D220E20767E49009D1B26 /* Utility */,
 				F5B1EF9C20725964000CFB0B /* Info.plist */,
 				CD0FAD0420BF7B9D00D8CD27 /* GoogleService-Info.plist */,
@@ -1727,6 +1730,7 @@
 				CDAFD75D20DC9EE800AEDD83 /* ANIOptionViewCell.swift in Sources */,
 				CDE2F3BA20E35268005E1DE1 /* ANIChatViewController.swift in Sources */,
 				CDDE4B6C20E31247005762A1 /* ANIFollowUserView.swift in Sources */,
+				CD516FC021631D56002FF41C /* UITableView.swift in Sources */,
 				F566348320752656006CB81B /* ANIRecruitFiltersView.swift in Sources */,
 				CDAFD75720DC9B4D00AEDD83 /* ANIOptionViewController.swift in Sources */,
 				CD6229DC20B64A6400E36875 /* ANISignUpViewController.swift in Sources */,

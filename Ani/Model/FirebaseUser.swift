@@ -15,4 +15,5 @@ struct FirebaseUser: Codable {
   var introduce: String?
   var profileImageUrl: String?
   var familyImageUrls: [String]?
+  var checkNotiDate: String?
 }

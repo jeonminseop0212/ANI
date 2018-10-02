@@ -13,4 +13,5 @@ struct FirebaseChatGroup: Codable {
   let memberIds: [String: Bool]?
   let updateDate: String
   let lastMessage: String
+  var checkChatGroupDate: [String: String]?
 }

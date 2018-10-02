@@ -34,6 +34,7 @@ let KEY_FOLLOWING_USER_IDS = "followingUserIds"
 let KEY_FOLLOWER_IDS = "followerIds"
 let KEY_CHAT_GROUP_IDS = "chatGroupIds"
 let KEY_USER_ID = "userId"
+let KEY_CHECK_NOTI_DATE = "checkNotiDate"
 
 //recruit
 let KEY_RECRUIT_HEADER_IMAGES = "recruit_header_images"

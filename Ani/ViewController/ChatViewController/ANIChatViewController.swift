@@ -29,6 +29,14 @@ class ANIChatViewController: UIViewController {
     }
   }
   
+  var chatGroup: FirebaseChatGroup? {
+    didSet {
+      guard let chatView = self.chatView else { return }
+      
+      chatView.chatGroup = chatGroup
+    }
+  }
+  
   private var chatGroupId: String? {
     didSet {
       guard let chatView = self.chatView,
@@ -166,6 +174,13 @@ class ANIChatViewController: UIViewController {
         for document in snapshot.documents {
           self.chatGroupId = document.documentID
           self.isHaveGroup = true
+          
+          do {
+            let chatGroup = try FirestoreDecoder().decode(FirebaseChatGroup.self, from: document.data())
+            self.chatGroup = chatGroup
+          } catch let error {
+            DLog(error)
+          }
         }
         
         if snapshot.documents.isEmpty {
@@ -178,7 +193,7 @@ class ANIChatViewController: UIViewController {
   private func createGroup() {
     let id = NSUUID().uuidString
     let date = ANIFunction.shared.getToday()
-    let group = FirebaseChatGroup(groupId:id, memberIds: nil, updateDate: date, lastMessage: "")
+    let group = FirebaseChatGroup(groupId:id, memberIds: nil, updateDate: date, lastMessage: "", checkChatGroupDate: nil)
     
     let database = Firestore.firestore()
 

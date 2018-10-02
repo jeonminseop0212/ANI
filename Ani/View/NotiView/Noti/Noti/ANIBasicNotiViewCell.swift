@@ -17,6 +17,7 @@ protocol ANIBasicNotiViewCellDelegate {
 
 class ANIBasicNotiViewCell: UITableViewCell {
   
+  private weak var base: UIView?
   private weak var stackView: UIStackView?
   private let PROFILE_IMAGE_VIEW_HEIGHT: CGFloat = 50.0
   private weak var profileImageView: UIImageView?
@@ -57,12 +58,19 @@ class ANIBasicNotiViewCell: UITableViewCell {
     self.selectionStyle = .none
     backgroundColor = .white
     
+    //base
+    let base = UIView()
+    base.backgroundColor = .white
+    addSubview(base)
+    base.edgesToSuperview()
+    self.base = base
+    
     //stackView
     let stackView = UIStackView()
     stackView.alignment = .top
     stackView.axis = .horizontal
     stackView.spacing = 10.0
-    addSubview(stackView)
+    base.addSubview(stackView)
     stackView.topToSuperview(offset: 10.0)
     stackView.leftToSuperview(offset: 10.0)
     stackView.rightToSuperview(offset: -10.0)
@@ -92,7 +100,7 @@ class ANIBasicNotiViewCell: UITableViewCell {
     //bottomSpace
     let spaceView = UIView()
     spaceView.backgroundColor = ANIColor.bg
-    addSubview(spaceView)
+    base.addSubview(spaceView)
     spaceView.topToBottom(of: stackView, offset: 10.0)
     spaceView.leftToSuperview()
     spaceView.rightToSuperview()
@@ -103,9 +111,19 @@ class ANIBasicNotiViewCell: UITableViewCell {
   
   private func reloadLayout() {
     guard let notiLabel = self.notiLabel,
-          let noti = self.noti else { return }
+          let noti = self.noti,
+          let base = self.base else { return }
     
     notiLabel.text = noti.noti
+    
+    if !checkRead(noti: noti) {
+      base.backgroundColor = ANIColor.green.withAlphaComponent(0.1)
+      UIView.animate(withDuration: 0.2, delay: 1, options: .curveEaseOut, animations: {
+        base.backgroundColor = .white
+      }, completion: nil)
+    } else {
+      base.backgroundColor = .white
+    }
   }
   
   private func reloadUserLayout() {
@@ -115,6 +133,19 @@ class ANIBasicNotiViewCell: UITableViewCell {
       profileImageView.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
     } else {
       profileImageView.image = UIImage()
+    }
+  }
+  
+  private func checkRead(noti: FirebaseNotification) -> Bool {
+    guard let checkNotiDate = ANISessionManager.shared.checkNotiDate else { return false }
+    
+    let checkDate = ANIFunction.shared.dateFromString(string: checkNotiDate)
+    let notiUpdateDate = ANIFunction.shared.dateFromString(string: noti.updateDate)
+    
+    if checkDate > notiUpdateDate {
+      return true
+    } else {
+      return false
     }
   }
   

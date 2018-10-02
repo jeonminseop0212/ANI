@@ -12,7 +12,17 @@ import InstantSearchClient
 class ANISessionManager: NSObject {
   static let shared = ANISessionManager()
   
-  var currentUser: FirebaseUser?
+  var currentUser: FirebaseUser? {
+    didSet {
+      guard let currentUser = self.currentUser,
+            let checkNotiDate = currentUser.checkNotiDate else { return }
+      
+      self.checkNotiDate = checkNotiDate
+    }
+  }
+  
+  var checkNotiDate: String?
+  
   var currentUserUid: String?
   
   var isAnonymous: Bool = false

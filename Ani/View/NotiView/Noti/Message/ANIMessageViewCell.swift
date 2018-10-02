@@ -12,6 +12,8 @@ import CodableFirebase
 
 class ANIMessageViewCell: UITableViewCell {
   
+  private weak var base: UIView?
+
   private let PROFILE_IMAGE_VIEW_HEIGHT: CGFloat = 50.0
   private weak var profileImageView: UIImageView?
   private weak var userNameLabel: UILabel?
@@ -48,6 +50,13 @@ class ANIMessageViewCell: UITableViewCell {
     let tapGesture = UITapGestureRecognizer(target: self, action: #selector(cellTapped))
     self.addGestureRecognizer(tapGesture)
     
+    //base
+    let base = UIView()
+    base.backgroundColor = .white
+    addSubview(base)
+    base.edgesToSuperview()
+    self.base = base
+    
     //profileImageView
     let profileImageView = UIImageView()
     profileImageView.backgroundColor = ANIColor.bg
@@ -56,7 +65,7 @@ class ANIMessageViewCell: UITableViewCell {
     profileImageView.isUserInteractionEnabled = true
     let profileImageTapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped))
     profileImageView.addGestureRecognizer(profileImageTapGesture)
-    addSubview(profileImageView)
+    base.addSubview(profileImageView)
     profileImageView.topToSuperview(offset: 10.0)
     profileImageView.leftToSuperview(offset: 10.0)
     profileImageView.width(PROFILE_IMAGE_VIEW_HEIGHT)
@@ -67,7 +76,7 @@ class ANIMessageViewCell: UITableViewCell {
     let userNameLabel = UILabel()
     userNameLabel.textColor = ANIColor.dark
     userNameLabel.font = UIFont.systemFont(ofSize: 16.0)
-    addSubview(userNameLabel)
+    base.addSubview(userNameLabel)
     userNameLabel.topToSuperview(offset: 13.0)
     userNameLabel.leftToRight(of: profileImageView, offset: 10.0)
     userNameLabel.height(18.0)
@@ -77,7 +86,7 @@ class ANIMessageViewCell: UITableViewCell {
     let updateDateLabel = UILabel()
     updateDateLabel.textColor = ANIColor.darkGray
     updateDateLabel.font = UIFont.systemFont(ofSize: 11.0)
-    addSubview(updateDateLabel)
+    base.addSubview(updateDateLabel)
     updateDateLabel.centerY(to: userNameLabel)
     updateDateLabel.leftToRight(of: userNameLabel, offset: 10.0)
     updateDateLabel.rightToSuperview()
@@ -89,7 +98,7 @@ class ANIMessageViewCell: UITableViewCell {
     messageLabel.numberOfLines = 1
     messageLabel.font = UIFont.systemFont(ofSize: 14.0)
     messageLabel.textColor = ANIColor.subTitle
-    addSubview(messageLabel)
+    base.addSubview(messageLabel)
     messageLabel.topToBottom(of: userNameLabel, offset: 10.0)
     messageLabel.left(to: userNameLabel)
     messageLabel.rightToSuperview(offset: -10.0)
@@ -98,7 +107,7 @@ class ANIMessageViewCell: UITableViewCell {
     //bottomSpace
     let spaceView = UIView()
     spaceView.backgroundColor = ANIColor.bg
-    addSubview(spaceView)
+    base.addSubview(spaceView)
     spaceView.topToBottom(of: profileImageView, offset: 10)
     spaceView.leftToSuperview()
     spaceView.rightToSuperview()
@@ -109,10 +118,17 @@ class ANIMessageViewCell: UITableViewCell {
   private func reloadLayout() {
     guard let updateDateLabel = self.updateDateLabel,
           let messageLabel = self.messageLabel,
-          let chatGroup = self.chatGroup else { return }
+          let chatGroup = self.chatGroup,
+          let base = self.base else { return }
     
     updateDateLabel.text = String(chatGroup.updateDate.prefix(10))
     messageLabel.text = chatGroup.lastMessage
+    
+    if !checkRead(chatGroup: chatGroup) {
+      base.backgroundColor = ANIColor.green.withAlphaComponent(0.1)
+    } else {
+      base.backgroundColor = .white
+    }
   }
   
   private func reloadUserLayout() {
@@ -129,6 +145,21 @@ class ANIMessageViewCell: UITableViewCell {
       userNameLabel.text = userName
     } else {
       userNameLabel.text = ""
+    }
+  }
+  
+  private func checkRead(chatGroup: FirebaseChatGroup) -> Bool {
+    guard let currentUserUid = ANISessionManager.shared.currentUserUid,
+          let checkChatGroupDate = chatGroup.checkChatGroupDate,
+          let myCehckDate = checkChatGroupDate[currentUserUid] else { return false }
+    
+    let checkDate = ANIFunction.shared.dateFromString(string: myCehckDate)
+    let chatGroupUpdateDate = ANIFunction.shared.dateFromString(string: chatGroup.updateDate)
+    
+    if checkDate > chatGroupUpdateDate {
+      return true
+    } else {
+      return false
     }
   }
   
