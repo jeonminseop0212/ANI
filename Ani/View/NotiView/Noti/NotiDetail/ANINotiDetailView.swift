@@ -51,14 +51,14 @@ class ANINotiDetailView: UIView {
       case .recruit:
         loadRecruit(notiId: noti.notiId)
         
-        loadLoveUserId()
+        loadLoveUser()
       case .story:
         loadStory(notiId: noti.notiId)
         
         if notiKind == .comment, let commentId = noti.commentId {
             loadComment(commentId: commentId, contributionKind: .story)
         } else if notiKind == .love {
-          loadLoveUserId()
+          loadLoveUser()
         }
       case .qna:
         loadQna(notiId: noti.notiId)
@@ -66,7 +66,7 @@ class ANINotiDetailView: UIView {
         if notiKind == .comment, let commentId = noti.commentId {
           loadComment(commentId: commentId, contributionKind: .qna)
         } else if notiKind == .love {
-          loadLoveUserId()
+          loadLoveUser()
         }
       }
     }
@@ -76,8 +76,14 @@ class ANINotiDetailView: UIView {
   private var story: FirebaseStory?
   private var qna: FirebaseQna?
   private var comment: FirebaseComment?
-  private var loveUsers: [FirebaseUser]?
+  private var loveUsers = [FirebaseUser]()
   private var user: FirebaseUser?
+  
+  private var isLastPage: Bool = false
+  private var lastUserId: QueryDocumentSnapshot?
+  private var isLoading: Bool = false
+  
+  private var cellHeight = [IndexPath: CGFloat]()
   
   private weak var activityIndicatorView: NVActivityIndicatorView?
   
@@ -115,6 +121,7 @@ class ANINotiDetailView: UIView {
     let userCellId = NSStringFromClass(ANIUserSearchViewCell.self)
     tableView.register(ANIUserSearchViewCell.self, forCellReuseIdentifier: userCellId)
     tableView.alpha = 0.0
+    tableView.rowHeight = UITableView.automaticDimension
     tableView.dataSource = self
     tableView.delegate = self
     addSubview(tableView)
@@ -154,6 +161,8 @@ class ANINotiDetailView: UIView {
     UIView.animate(withDuration: 0.2, animations: {
       tableView.alpha = 1.0
     })
+    
+    self.isLoading = false
   }
 }
 
@@ -165,14 +174,14 @@ extension ANINotiDetailView: UITableViewDataSource {
 
     switch contributionKind {
     case .recruit:
-      if let loveUsers = self.loveUsers {
+      if notiKind == .love {
         return 2 + loveUsers.count
       }
       return 1
     case .story:
       if notiKind == .comment {
         return 3
-      } else if notiKind == .love, let loveUsers = self.loveUsers {
+      } else if notiKind == .love {
         return 2 + loveUsers.count
       } else {
         return 1
@@ -180,7 +189,7 @@ extension ANINotiDetailView: UITableViewDataSource {
     case .qna:
       if notiKind == .comment {
         return 3
-      } else if notiKind == .love, let loveUsers = self.loveUsers {
+      } else if notiKind == .love {
         return 2 + loveUsers.count
       } else {
         return 1
@@ -217,7 +226,7 @@ extension ANINotiDetailView: UITableViewDataSource {
         let userCellId = NSStringFromClass(ANIUserSearchViewCell.self)
         let cell = tableView.dequeueReusableCell(withIdentifier: userCellId, for: indexPath) as! ANIUserSearchViewCell
         
-        if let loveUsers = loveUsers {
+        if !loveUsers.isEmpty {
           cell.user = loveUsers[indexPath.row - 2]
         }
         
@@ -259,7 +268,7 @@ extension ANINotiDetailView: UITableViewDataSource {
           let userCellId = NSStringFromClass(ANIUserSearchViewCell.self)
           let cell = tableView.dequeueReusableCell(withIdentifier: userCellId, for: indexPath) as! ANIUserSearchViewCell
           
-          if let loveUsers = loveUsers {
+          if !loveUsers.isEmpty {
             cell.user = loveUsers[indexPath.row - 2]
           }
           
@@ -300,7 +309,7 @@ extension ANINotiDetailView: UITableViewDataSource {
           let userCellId = NSStringFromClass(ANIUserSearchViewCell.self)
           let cell = tableView.dequeueReusableCell(withIdentifier: userCellId, for: indexPath) as! ANIUserSearchViewCell
           
-          if let loveUsers = loveUsers {
+          if !loveUsers.isEmpty {
             cell.user = loveUsers[indexPath.row - 2]
           }
           
@@ -342,7 +351,7 @@ extension ANINotiDetailView: UITableViewDataSource {
         let userCellId = NSStringFromClass(ANIUserSearchViewCell.self)
         let cell = tableView.dequeueReusableCell(withIdentifier: userCellId, for: indexPath) as! ANIUserSearchViewCell
         
-        if let loveUsers = loveUsers {
+        if !loveUsers.isEmpty {
           cell.user = loveUsers[indexPath.row - 2]
         }
         
@@ -354,20 +363,22 @@ extension ANINotiDetailView: UITableViewDataSource {
 
 //MARK: UITableViewDelegate
 extension ANINotiDetailView: UITableViewDelegate {
-  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    if indexPath.row == 1  {
-      guard let contributionKind = self.contributionKind,
-            let currentUser = ANISessionManager.shared.currentUser else { return }
-      
-      if contributionKind == .story {
-        guard let story = self.story else { return }
-        
-        self.delegate?.storyViewCellDidSelect(selectedStory: story, user: currentUser)
-      } else if contributionKind == .qna {
-        guard let qna = self.qna else { return }
-
-        self.delegate?.qnaViewCellDidSelect(selectedQna: qna, user: currentUser)
+  func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    if let notiKind = self.notiKind, notiKind == .love {
+      let element = loveUsers.count - 2
+      if !isLoading, indexPath.row >= element {
+        loadMoreUser()
       }
+    }
+
+    self.cellHeight[indexPath] = cell.frame.size.height
+  }
+  
+  func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+    if let height = self.cellHeight[indexPath] {
+      return height
+    } else {
+      return UITableView.automaticDimension
     }
   }
 }
@@ -473,7 +484,8 @@ extension ANINotiDetailView: ANIQnaViewCellDelegate {
 //MARK: data
 extension ANINotiDetailView {
   private func loadRecruit(notiId: String) {
-    guard let activityIndicatorView = self.activityIndicatorView else { return }
+    guard let activityIndicatorView = self.activityIndicatorView,
+          let notiKind = self.notiKind else { return }
     
     let database = Firestore.firestore()
     
@@ -492,8 +504,10 @@ extension ANINotiDetailView {
             let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: data)
             self.recruit = recruit
             
-            DispatchQueue.main.async {
-              self.loadDone()
+            if notiKind != .love {
+              DispatchQueue.main.async {
+                self.loadDone()
+              }
             }
           } catch let error {
             DLog(error)
@@ -558,7 +572,8 @@ extension ANINotiDetailView {
   }
   
   private func loadQna(notiId: String) {
-    guard let activityIndicatorView = self.activityIndicatorView else { return }
+    guard let activityIndicatorView = self.activityIndicatorView,
+          let notiKind = self.notiKind else { return }
 
     let database = Firestore.firestore()
     
@@ -576,6 +591,12 @@ extension ANINotiDetailView {
           do {
             let qna = try FirestoreDecoder().decode(FirebaseQna.self, from: data)
             self.qna = qna
+            
+            if notiKind != .love {
+              DispatchQueue.main.async {
+                self.loadDone()
+              }
+            }
           } catch let error {
             DLog(error)
             
@@ -633,11 +654,14 @@ extension ANINotiDetailView {
     }
   }
   
-  private func loadLoveUserId() {
+  private func loadLoveUser() {
     guard let noti = self.noti,
-          let contributionKind = self.contributionKind else { return }
+          let contributionKind = self.contributionKind,
+          let activityIndicatorView = self.activityIndicatorView else { return }
     
     let database = Firestore.firestore()
+    
+    activityIndicatorView.startAnimating()
     
     var collection: String = ""
     if contributionKind == .recruit {
@@ -649,61 +673,171 @@ extension ANINotiDetailView {
       collection = KEY_QNAS
     }
     
-    var loveUserId = [String]()
     DispatchQueue.global().async {
+      self.isLoading = true
+      self.isLastPage = false
       
-      database.collection(collection).document(noti.notiId).collection(KEY_LOVE_IDS).limit(to: 20).getDocuments(completion: { (snapshot, error) in
+      database.collection(collection).document(noti.notiId).collection(KEY_LOVE_IDS).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
+          self.isLoading = false
           
           return
         }
         
-        guard let snapshot = snapshot else { return }
+        guard let snapshot = snapshot,
+              let lastUserId = snapshot.documents.last else {
+                self.isLoading = false
+                activityIndicatorView.stopAnimating()
+                return }
         
-        for document in snapshot.documents {
-          for key in document.data().keys {
-            loveUserId.append(key)
-            
-            if loveUserId.count == snapshot.documents.count {
-              self.loadLoveUser(userIds: loveUserId)
-            }
+        self.lastUserId = lastUserId
+        
+        let group = DispatchGroup()
+        var loveUserTemp = [FirebaseUser?]()
+        
+        for (index, document) in snapshot.documents.enumerated() {
+          group.enter()
+          loveUserTemp.append(nil)
+          
+          DispatchQueue(label: "loveUser").async {
+            database.collection(KEY_USERS).document(document.documentID).getDocument(completion: { (userSnapshot, userError) in
+              if let userError = userError {
+                DLog("Error get document: \(userError)")
+                self.isLoading = false
+                
+                return
+              }
+              
+              guard let userSnapshot = userSnapshot, let data = userSnapshot.data() else {
+                group.leave()
+                return
+              }
+              
+              do {
+                let user = try FirestoreDecoder().decode(FirebaseUser.self, from: data)
+                loveUserTemp[index] = user
+                
+                group.leave()
+              } catch let error {
+                DLog(error)
+                
+                group.leave()
+              }
+            })
           }
+        }
+        
+        group.notify(queue: DispatchQueue(label: "loveUser")) {
+          DispatchQueue.main.async {
+            for loveUser in loveUserTemp {
+              if let loveUser = loveUser {
+                self.loveUsers.append(loveUser)
+              }
+            }
+            
+            self.loadDone()
+          }
+        }
+        
+        if snapshot.documents.isEmpty {
+          activityIndicatorView.stopAnimating()
+
+          self.isLoading = false
         }
       })
     }
   }
   
-  private func loadLoveUser(userIds: [String]) {
-    guard let activityIndicatorView = self.activityIndicatorView else { return }
+  private func loadMoreUser() {
+    guard let noti = self.noti,
+          let contributionKind = self.contributionKind,
+          let lastUserId = self.lastUserId,
+          !isLoading,
+          !isLastPage else { return }
 
     let database = Firestore.firestore()
 
-    for userId in userIds {
-      DispatchQueue.global().async {
-        database.collection(KEY_USERS).document(userId).getDocument(completion: { (snapshot, error) in
-          guard let snapshot = snapshot, let data = snapshot.data() else { return }
+    var collection: String = ""
+    if contributionKind == .recruit {
+      collection = KEY_RECRUITS
+    }
+    else if contributionKind == .story {
+      collection = KEY_STORIES
+    } else if contributionKind == .qna {
+      collection = KEY_QNAS
+    }
+
+    DispatchQueue.global().async {
+      self.isLoading = true
+
+      database.collection(collection).document(noti.notiId).collection(KEY_LOVE_IDS).order(by: KEY_DATE, descending: true).start(afterDocument: lastUserId).limit(to: 20).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          DLog("Error get document: \(error)")
+          self.isLoading = false
+
+          return
+        }
+
+        guard let snapshot = snapshot,
+              let lastUserId = snapshot.documents.last else {
+                self.isLastPage = true
+                self.isLoading = false
+                return }
+
+        self.lastUserId = lastUserId
+        
+        let group = DispatchGroup()
+        var loveUserTemp = [FirebaseUser?]()
+        
+        for (index, document) in snapshot.documents.enumerated() {
+          group.enter()
+          loveUserTemp.append(nil)
           
-          do {
-            let user = try FirestoreDecoder().decode(FirebaseUser.self, from: data)
-            if self.loveUsers != nil {
-              self.loveUsers?.append(user)
-            } else {
-              self.loveUsers = [user]
-            }
-            
-            if self.loveUsers?.count == userIds.count {
-              DispatchQueue.main.async {
-                self.loadDone()
+          DispatchQueue(label: "loveUser").async {
+            database.collection(KEY_USERS).document(document.documentID).getDocument(completion: { (userSnapshot, userError) in
+              if let userError = userError {
+                DLog("Error get document: \(userError)")
+                self.isLoading = false
+                
+                return
+              }
+              
+              guard let userSnapshot = userSnapshot, let data = userSnapshot.data() else {
+                group.leave()
+                return
+              }
+              
+              do {
+                let user = try FirestoreDecoder().decode(FirebaseUser.self, from: data)
+                loveUserTemp[index] = user
+                
+                group.leave()
+              } catch let error {
+                DLog(error)
+                
+                group.leave()
+              }
+            })
+          }
+        }
+        
+        group.notify(queue: DispatchQueue(label: "loveUser")) {
+          DispatchQueue.main.async {
+            for loveUser in loveUserTemp {
+              if let loveUser = loveUser {
+                self.loveUsers.append(loveUser)
               }
             }
-          } catch let error {
-            DLog(error)
             
-            activityIndicatorView.stopAnimating()
+            self.loadDone()
           }
-        })
-      }
+        }
+
+        if snapshot.documents.isEmpty {
+          self.isLoading = false
+        }
+      })
     }
   }
 }

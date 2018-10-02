@@ -508,7 +508,6 @@ extension ANIListView {
         var loveRecruitsTemp = [FirebaseRecruit?]()
         
         for (index, document) in snapshot.documents.enumerated() {
-          
           group.enter()
           loveRecruitsTemp.append(nil)
           
