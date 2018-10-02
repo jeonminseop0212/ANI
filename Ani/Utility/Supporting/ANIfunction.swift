@@ -18,4 +18,14 @@ class ANIFunction: NSObject {
     formatter.dateFormat = format
     return formatter.string(from: now as Date)
   }
+  
+  func dateFromString(string: String, format: String = "yyyy/MM/dd HH:mm:ss") -> Date {
+    let formatter: DateFormatter = DateFormatter()
+    formatter.dateFormat = format
+    if let date = formatter.date(from: string) {
+      return date
+    } else {
+      return Date()
+    }
+  }
 }

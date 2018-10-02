@@ -138,6 +138,15 @@ class ANINotiView: UIView {
     
     self.isLoading = false
   }
+  
+  private func updateCheckNotiDate() {
+    guard let currentUserUid = ANISessionManager.shared.currentUserUid else { return }
+    
+    let database = Firestore.firestore()
+    
+    let date = ANIFunction.shared.getToday()
+    database.collection(KEY_USERS).document(currentUserUid).updateData([KEY_CHECK_NOTI_DATE: date])
+  }
 }
 
 //MARK: UITableViewDataSource
@@ -256,6 +265,8 @@ extension ANINotiView {
         
         self.lastNoti = lastNoti
         
+        var updated: Bool = false
+        
         for document in snapshot.documents {
           do {
             let notification = try FirestoreDecoder().decode(FirebaseNotification.self, from: document.data())
@@ -268,7 +279,12 @@ extension ANINotiView {
               
               activityIndicatorView.stopAnimating()
               
-              notiTableView.reloadData()
+              notiTableView.reloadData() {
+                if !updated {
+                  self.updateCheckNotiDate()
+                  updated = true
+                }
+              }
               
               UIView.animate(withDuration: 0.2, animations: {
                 notiTableView.alpha = 1.0

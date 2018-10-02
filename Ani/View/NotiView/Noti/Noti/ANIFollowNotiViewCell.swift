@@ -16,6 +16,7 @@ protocol ANIFollowNotiViewCellDelegate {
 
 class ANIFollowNotiViewCell: UITableViewCell {
   
+  private weak var base: UIView?
   private weak var stackView: UIStackView?
   private let PROFILE_IMAGE_VIEW_HEIGHT: CGFloat = 50.0
   private weak var profileImageView: UIImageView?
@@ -59,12 +60,19 @@ class ANIFollowNotiViewCell: UITableViewCell {
     let tapGesture = UITapGestureRecognizer(target: self, action: #selector(cellTapped))
     self.addGestureRecognizer(tapGesture)
     
+    //base
+    let base = UIView()
+    base.backgroundColor = .white
+    addSubview(base)
+    base.edgesToSuperview()
+    self.base = base
+    
     //stackView
     let stackView = UIStackView()
     stackView.alignment = .top
     stackView.axis = .horizontal
     stackView.spacing = 10.0
-    addSubview(stackView)
+    base.addSubview(stackView)
     stackView.topToSuperview(offset: 10.0)
     stackView.leftToSuperview(offset: 10.0)
     self.stackView = stackView
@@ -96,7 +104,7 @@ class ANIFollowNotiViewCell: UITableViewCell {
     followButton.base?.layer.borderColor = ANIColor.green.cgColor
     followButton.alpha = 0.0
     followButton.delegate = self
-    addSubview(followButton)
+    base.addSubview(followButton)
     followButton.centerY(to: profileImageView)
     followButton.leftToRight(of: stackView, offset: 10.0)
     followButton.rightToSuperview(offset: -10.0)
@@ -117,7 +125,7 @@ class ANIFollowNotiViewCell: UITableViewCell {
     //bottomSpace
     let spaceView = UIView()
     spaceView.backgroundColor = ANIColor.bg
-    addSubview(spaceView)
+    base.addSubview(spaceView)
     spaceView.topToBottom(of: stackView, offset: 10)
     spaceView.leftToSuperview()
     spaceView.rightToSuperview()
@@ -127,9 +135,19 @@ class ANIFollowNotiViewCell: UITableViewCell {
   
   private func reloadLayout() {
     guard let notiLabel = self.notiLabel,
-          let noti = self.noti else { return }
+          let noti = self.noti,
+          let base = self.base else { return }
     
     notiLabel.text = noti.noti
+    
+    if !checkRead(noti: noti) {
+      base.backgroundColor = ANIColor.green.withAlphaComponent(0.1)
+      UIView.animate(withDuration: 0.2, delay: 1, options: .curveEaseOut, animations: {
+        base.backgroundColor = .white
+      }, completion: nil)
+    } else {
+      base.backgroundColor = .white
+    }
   }
   
   private func reloadUserLayout() {
@@ -217,6 +235,19 @@ class ANIFollowNotiViewCell: UITableViewCell {
       } catch let error {
         DLog(error)
       }
+    }
+  }
+  
+  private func checkRead(noti: FirebaseNotification) -> Bool {
+    guard let checkNotiDate = ANISessionManager.shared.checkNotiDate else { return false }
+    
+    let checkDate = ANIFunction.shared.dateFromString(string: checkNotiDate)
+    let notiUpdateDate = ANIFunction.shared.dateFromString(string: noti.updateDate)
+    
+    if checkDate > notiUpdateDate {
+      return true
+    } else {
+      return false
     }
   }
 }
