@@ -70,6 +70,7 @@ class ANISearchView: UIView {
   private var page: UInt = 0
   private let query = Query()
   private var isLoading: Bool = false
+  private let COUNT_LAST_CELL: Int = 4
   
   private var userCellHeight = [IndexPath: CGFloat]()
   private var storyCellHeight = [IndexPath: CGFloat]()
@@ -289,21 +290,21 @@ extension ANISearchView: UITableViewDelegate {
   func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
     switch selectedCategory {
     case .user:
-      let element = self.searchUsers.count - 4
+      let element = self.searchUsers.count - COUNT_LAST_CELL
       if !isLoading, indexPath.row >= element {
         loadMoreSearch()
       }
       
       self.userCellHeight[indexPath] = cell.frame.size.height
     case .story:
-      let element = self.searchStories.count - 4
+      let element = self.searchStories.count - COUNT_LAST_CELL
       if !isLoading, indexPath.row >= element {
         loadMoreSearch()
       }
       
       self.storyCellHeight[indexPath] = cell.frame.size.height
     case .qna:
-      let element = self.searchQnas.count - 4
+      let element = self.searchQnas.count - COUNT_LAST_CELL
       if !isLoading, indexPath.row >= element {
         loadMoreSearch()
       }

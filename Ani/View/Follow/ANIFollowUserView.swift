@@ -38,6 +38,7 @@ class ANIFollowUserView: UIView {
   private var isLastPage: Bool = false
   private var lastContent: QueryDocumentSnapshot?
   private var isLoading: Bool = false
+  private let COUNT_LAST_CELL: Int = 4
   
   private var cellHeight = [IndexPath: CGFloat]()
 
@@ -128,12 +129,12 @@ extension ANIFollowUserView: UITableViewDelegate {
 
     switch followUserViewMode {
     case .following:
-      let element = self.followingUsers.count - 4
+      let element = self.followingUsers.count - COUNT_LAST_CELL
       if !isLoading, indexPath.row >= element {
         loadMoreFollowingUser()
       }
     case .follower:
-      let element = self.followers.count - 4
+      let element = self.followers.count - COUNT_LAST_CELL
       if !isLoading, indexPath.row >= element {
         loadMoreFollower()
       }

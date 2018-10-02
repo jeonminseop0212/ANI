@@ -91,6 +91,8 @@ class ANIProfileBasicView: UIView {
   private var isLastRecruitPage: Bool = false
   private var isLastStoryPage: Bool = false
   private var isLastQnaPage: Bool = false
+  private let COUNT_LAST_CELL: Int = 4
+
   private var recruitCellHeight = [IndexPath: CGFloat]()
   private var storyCellHeight = [IndexPath: CGFloat]()
   private var qnaCellHeight = [IndexPath: CGFloat]()
@@ -396,21 +398,21 @@ extension ANIProfileBasicView: UITableViewDelegate {
   
   func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
     if contentType == .recruit {
-      let element = self.recruits.count - 4
+      let element = self.recruits.count - COUNT_LAST_CELL
       if !isLoading, indexPath.row >= element {
         loadMoreRecruit()
       }
       
       self.recruitCellHeight[indexPath] = cell.frame.size.height
     } else if contentType == .story {
-      let element = self.stories.count - 4
+      let element = self.stories.count - COUNT_LAST_CELL
       if !isLoading, indexPath.row >= element {
         loadMoreStory()
       }
       
       self.storyCellHeight[indexPath] = cell.frame.size.height
     } else if contentType == .qna {
-      let element = self.qnas.count - 4
+      let element = self.qnas.count - COUNT_LAST_CELL
       if !isLoading, indexPath.row >= element {
         loadMoreQna()
       }

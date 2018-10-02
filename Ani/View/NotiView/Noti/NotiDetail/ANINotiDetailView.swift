@@ -82,6 +82,8 @@ class ANINotiDetailView: UIView {
   private var isLastPage: Bool = false
   private var lastUserId: QueryDocumentSnapshot?
   private var isLoading: Bool = false
+  private let COUNT_LAST_CELL: Int = 4
+  private let COUNT_NOTI_AND_HEADER_CELL: Int = 2
   
   private var cellHeight = [IndexPath: CGFloat]()
   
@@ -365,7 +367,7 @@ extension ANINotiDetailView: UITableViewDataSource {
 extension ANINotiDetailView: UITableViewDelegate {
   func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
     if let notiKind = self.notiKind, notiKind == .love {
-      let element = loveUsers.count - 2
+      let element = loveUsers.count + COUNT_NOTI_AND_HEADER_CELL - COUNT_LAST_CELL
       if !isLoading, indexPath.row >= element {
         loadMoreUser()
       }

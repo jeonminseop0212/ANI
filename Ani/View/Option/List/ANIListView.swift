@@ -57,6 +57,7 @@ class ANIListView: UIView {
   private var isLastPage: Bool = false
   private var lastContent: QueryDocumentSnapshot?
   private var isLoading: Bool = false
+  private let COUNT_LAST_CELL: Int = 4
 
   private var cellHeight = [IndexPath: CGFloat]()
   
@@ -321,22 +322,22 @@ extension ANIListView: UITableViewDelegate {
     
     switch list {
     case .loveRecruit:
-      let element = self.loveRecruits.count - 4
+      let element = self.loveRecruits.count - COUNT_LAST_CELL
       if !isLoading, indexPath.row >= element {
         loadMoreLoveRecruit()
       }
     case .loveStroy:
-      let element = self.loveStories.count - 4
+      let element = self.loveStories.count - COUNT_LAST_CELL
       if !isLoading, indexPath.row >= element {
         loadMoreLoveStory()
       }
     case .loveQuestion:
-      let element = self.loveQnas.count - 4
+      let element = self.loveQnas.count - COUNT_LAST_CELL
       if !isLoading, indexPath.row >= element {
         loadMoreLoveQna()
       }
     case .clipRecruit:
-      let element = self.clipRecruits.count - 4
+      let element = self.clipRecruits.count - COUNT_LAST_CELL
       if !isLoading, indexPath.row >= element {
         loadMoreClipRecruit()
       }

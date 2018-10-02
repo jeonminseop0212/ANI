@@ -36,6 +36,7 @@ class ANIRecuruitView: UIView {
   private var isLastRecruitPage: Bool = false
   private var lastRecruit: QueryDocumentSnapshot?
   private var isLoading: Bool = false
+  private let COUNT_LAST_CELL: Int = 4
   
   var pickMode: FilterPickMode?
   var pickItem: String? {
@@ -280,7 +281,7 @@ extension ANIRecuruitView: UITableViewDelegate {
   }
   
   func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-    let element = self.recruits.count - 4
+    let element = self.recruits.count - COUNT_LAST_CELL
     if !isLoading, indexPath.row >= element {
       loadMoreRecruit()
     }
