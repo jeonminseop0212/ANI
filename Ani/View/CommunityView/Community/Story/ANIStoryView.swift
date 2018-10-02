@@ -31,6 +31,7 @@ class ANIStoryView: UIView {
   private var isLastStoryPage: Bool = false
   private var lastStory: QueryDocumentSnapshot?
   private var isLoading: Bool = false
+  private let COUNT_LAST_CELL: Int = 4
   
   private weak var activityIndicatorView: NVActivityIndicatorView?
   
@@ -236,7 +237,8 @@ extension ANIStoryView: UITableViewDelegate {
   }
   
   func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-    let element = self.stories.count - 4
+    let element = self.stories.count - COUNT_LAST_CELL
+
     if !isLoading, indexPath.row >= element {
       loadMoreStory()
     }

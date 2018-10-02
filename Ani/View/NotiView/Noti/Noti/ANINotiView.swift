@@ -29,6 +29,7 @@ class ANINotiView: UIView {
   private var isLastNotiPage: Bool = false
   private var lastNoti: QueryDocumentSnapshot?
   private var isLoading: Bool = false
+  private let COUNT_LAST_CELL: Int = 4
   
   var isCellSelected: Bool = false
   
@@ -199,7 +200,7 @@ extension ANINotiView: UITableViewDelegate {
   }
   
   func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-    let element = self.notifications.count - 4
+    let element = self.notifications.count - COUNT_LAST_CELL
     if !isLoading, indexPath.row >= element {
       loadMoreNoti()
     }

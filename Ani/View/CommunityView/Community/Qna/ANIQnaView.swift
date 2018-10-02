@@ -33,6 +33,7 @@ class ANIQnaView: UIView {
   private var lastQna: QueryDocumentSnapshot?
   private var isLastQnaPage: Bool = false
   private var isLoading: Bool = false
+  private let COUNT_LAST_CELL: Int = 4
   
   var delegate: ANIQnaViewDelegate?
   
@@ -196,7 +197,7 @@ extension ANIQnaView: UITableViewDelegate {
   }
   
   func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-    let element = self.qnas.count - 4
+    let element = self.qnas.count - COUNT_LAST_CELL
     if !isLoading, indexPath.row >= element {
       loadMoreQna()
     }
