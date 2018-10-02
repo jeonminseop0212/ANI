@@ -213,7 +213,7 @@ class ANIStoryViewCell: UITableViewCell {
     line.leftToSuperview()
     line.rightToSuperview()
     line.height(0.5)
-    line.bottomToSuperview()
+    line.bottomToSuperview(priority: .defaultHigh)
     self.line = line
   }
   
