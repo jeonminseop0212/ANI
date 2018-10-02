@@ -635,9 +635,10 @@ class ANIRecruitViewCell: UITableViewCell {
     
     if loveButton.isSelected == true {
       DispatchQueue.global().async {
-        database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_LOVE_IDS).document(currentUserId).setData([currentUserId: true])
-        
         let date = ANIFunction.shared.getToday()
+ 
+        database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_LOVE_IDS).document(currentUserId).setData([currentUserId: true, KEY_DATE: date])
+        
         database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_RECRUIT_IDS).document(recuritId).setData([KEY_DATE: date])
 
         self.updateNoti()
