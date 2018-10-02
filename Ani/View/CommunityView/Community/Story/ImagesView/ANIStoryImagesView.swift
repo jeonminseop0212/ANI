@@ -22,7 +22,7 @@ class ANIStoryImagesView: UIView {
         subview.removeFromSuperview()
       }
       setup()
-//      setupPageControlHeight(imageUrls: imageUrls)
+      setupPageControlHeight(imageUrls: imageUrls)
     }
   }
   
