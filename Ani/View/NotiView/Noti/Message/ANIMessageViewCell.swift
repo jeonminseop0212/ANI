@@ -156,7 +156,7 @@ class ANIMessageViewCell: UITableViewCell {
     let checkDate = ANIFunction.shared.dateFromString(string: myCehckDate)
     let chatGroupUpdateDate = ANIFunction.shared.dateFromString(string: chatGroup.updateDate)
     
-    if checkDate > chatGroupUpdateDate {
+    if checkDate >= chatGroupUpdateDate {
       return true
     } else {
       return false

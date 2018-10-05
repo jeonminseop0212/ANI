@@ -26,6 +26,8 @@ class ANIChatBar: UIView {
   
   var isHaveGroup: Bool = false
   
+  var messages = [FirebaseChatMessage]()
+  
   override init(frame: CGRect) {
     super.init(frame: frame)
     
@@ -151,7 +153,17 @@ class ANIChatBar: UIView {
           let chatGroupId = self.chatGroupId else { return }
 
     let date = ANIFunction.shared.getToday()
-    let message = FirebaseChatMessage(userId: currentuserUid, message: text, date: date)
+    
+    var isDiffrentBeforeDate = false
+    if !messages.isEmpty {
+      if let beforeDate = messages[messages.count - 1].date, String(beforeDate.prefix(10)) != String(date.prefix(10)) {
+        isDiffrentBeforeDate = true
+      }
+    } else {
+      isDiffrentBeforeDate = true
+    }
+    
+    let message = FirebaseChatMessage(userId: currentuserUid, message: text, date: date, isDiffrentBeforeDate: isDiffrentBeforeDate)
     
     checkMember()
 

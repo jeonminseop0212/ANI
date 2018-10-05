@@ -11,6 +11,10 @@ import FirebaseFirestore
 import CodableFirebase
 import NVActivityIndicatorView
 
+protocol ANIChatViewDelegate {
+  func loadedMessage(messages: [FirebaseChatMessage])
+}
+
 class ANIChatView: UIView {
   
   private weak var chatTableView: UITableView?
@@ -21,13 +25,31 @@ class ANIChatView: UIView {
   
   var chatGroup: FirebaseChatGroup? {
     didSet {
-      loadMessage()
+      loadFirstMessage() {
+        self.loadMessage()
+      }
     }
   }
   
-  private var messages = [FirebaseChatMessage]()
+  private var messages = [FirebaseChatMessage]() {
+    didSet {
+      self.delegate?.loadedMessage(messages: messages)
+    }
+  }
+  
+  var delegate: ANIChatViewDelegate?
   
   private var beforeDate: String = ""
+  
+  private var isFirstLoad: Bool = true
+  private var isLastPage: Bool = false
+  private var lastMessage: QueryDocumentSnapshot?
+  private var isLoading: Bool = false
+  private let COUNT_FIRST_CELL: Int = 4
+  private var firstMessageDocumentId: String?
+  private var isLoadFirstMessage: Bool = false
+  
+  private var cellHeight = [IndexPath: CGFloat]()
   
   private weak var activityIndicatorView: NVActivityIndicatorView?
   
@@ -51,8 +73,12 @@ class ANIChatView: UIView {
     chatTableView.register(ANIMyChatViewCell.self, forCellReuseIdentifier: myChatId)
     let otherChatId = NSStringFromClass(ANIOtherChatViewCell.self)
     chatTableView.register(ANIOtherChatViewCell.self, forCellReuseIdentifier: otherChatId)
+    let activityIndicatorId = NSStringFromClass(ANIChatActivityIndicatorViewCell.self)
+    chatTableView.register(ANIChatActivityIndicatorViewCell.self, forCellReuseIdentifier: activityIndicatorId)
     chatTableView.dataSource = self
+    chatTableView.delegate = self
     chatTableView.alpha = 0.0
+    chatTableView.rowHeight = UITableView.automaticDimension
     addSubview(chatTableView)
     chatTableView.edgesToSuperview()
     self.chatTableView = chatTableView
@@ -70,7 +96,11 @@ class ANIChatView: UIView {
     guard let chatTableView = self.chatTableView else { return }
     
     if !messages.isEmpty {
-      chatTableView.scrollToRow(at: [0, messages.count - 1], at: .bottom, animated: false)
+      if isLoadFirstMessage {
+        chatTableView.scrollToRow(at: [0, messages.count - 1], at: .bottom, animated: false)
+      } else {
+        chatTableView.scrollToRow(at: [0, messages.count], at: .bottom, animated: false)
+      }
     }
   }
   
@@ -98,59 +128,182 @@ class ANIChatView: UIView {
     checkChatGroupDateTemp[currentUserUid] = date
     database.collection(KEY_CHAT_GROUPS).document(chatGroupId).updateData(["checkChatGroupDate": checkChatGroupDateTemp])
   }
+  
+  func updateTableWithNewRowCount(newMessage: [FirebaseChatMessage]) {
+    guard let chatTableView = self.chatTableView else { return }
+    
+    UIView.setAnimationsEnabled(false)
+    CATransaction.begin()
+
+    CATransaction.setCompletionBlock { () -> Void in
+      UIView.setAnimationsEnabled(true)
+    }
+    
+    chatTableView.reloadData()
+    chatTableView.beginUpdates()
+    chatTableView.endUpdates()
+    
+    var indexPath = IndexPath(row: 0, section: 0)
+    if isLoadFirstMessage {
+      indexPath.row = newMessage.count
+    } else {
+      indexPath.row = newMessage.count + 1
+    }
+  
+    chatTableView.scrollToRow(at: indexPath, at: .top, animated: false)
+    
+    var contentOffset = chatTableView.contentOffset
+    contentOffset.y = contentOffset.y - 30
+
+    chatTableView.setContentOffset(contentOffset, animated: false)
+    
+    CATransaction.commit()
+    
+    self.isLoading = false
+  }
 }
 
 //MARK: UITableViewDataSource
 extension ANIChatView: UITableViewDataSource {
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return messages.count
+    if isLoadFirstMessage {
+      return messages.count
+    } else {
+      return messages.count + 1
+    }
   }
   
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     guard let currentUserUid = ANISessionManager.shared.currentUserUid else { return UITableViewCell() }
     
-    if messages[indexPath.row].userId == currentUserUid {
-      let myChatId = NSStringFromClass(ANIMyChatViewCell.self)
-      let cell = tableView.dequeueReusableCell(withIdentifier: myChatId, for: indexPath) as! ANIMyChatViewCell
-      
-      cell.message = messages[indexPath.row]
-      if let date = messages[indexPath.row].date {
-        if indexPath.row == 0 {
-          cell.chagedDate = getDate(date: date)
-        } else {
-          if let beforeDate = messages[indexPath.row - 1].date, getDate(date: beforeDate) != getDate(date: date) {
+    if isLoadFirstMessage {
+      if messages[indexPath.row].userId == currentUserUid {
+        let myChatId = NSStringFromClass(ANIMyChatViewCell.self)
+        let cell = tableView.dequeueReusableCell(withIdentifier: myChatId, for: indexPath) as! ANIMyChatViewCell
+  
+        cell.message = messages[indexPath.row]
+        if let date = messages[indexPath.row].date {
+          if messages[indexPath.row].isDiffrentBeforeDate {
             cell.chagedDate = getDate(date: date)
           } else {
             cell.chagedDate = nil
           }
         }
-      }
-      
-      return cell
-    } else {
-      let otherChatId = NSStringFromClass(ANIOtherChatViewCell.self)
-      let cell = tableView.dequeueReusableCell(withIdentifier: otherChatId, for: indexPath) as! ANIOtherChatViewCell
-      
-      cell.message = messages[indexPath.row]
-      cell.user = self.user
-      if let date = messages[indexPath.row].date {
-        if indexPath.row == 0 {
-          cell.chagedDate = getDate(date: date)
-        } else {
-          if let beforeDate = messages[indexPath.row - 1].date, getDate(date: beforeDate) != getDate(date: date) {
-            cell.chagedDate = date
+  
+        return cell
+      } else {
+        let otherChatId = NSStringFromClass(ANIOtherChatViewCell.self)
+        let cell = tableView.dequeueReusableCell(withIdentifier: otherChatId, for: indexPath) as! ANIOtherChatViewCell
+  
+        cell.message = messages[indexPath.row]
+        cell.user = self.user
+        if let date = messages[indexPath.row].date {
+          if messages[indexPath.row].isDiffrentBeforeDate {
+            cell.chagedDate = getDate(date: date)
           } else {
             cell.chagedDate = nil
           }
         }
+        return cell
       }
-      return cell
+    } else {
+      if indexPath.row == 0 {
+        let activityIndicatorId = NSStringFromClass(ANIChatActivityIndicatorViewCell.self)
+        let cell = tableView.dequeueReusableCell(withIdentifier: activityIndicatorId, for: indexPath) as! ANIChatActivityIndicatorViewCell
+        
+        return cell
+      } else {
+        if messages[indexPath.row - 1].userId == currentUserUid {
+          let myChatId = NSStringFromClass(ANIMyChatViewCell.self)
+          let cell = tableView.dequeueReusableCell(withIdentifier: myChatId, for: indexPath) as! ANIMyChatViewCell
+
+          cell.message = messages[indexPath.row - 1]
+          if let date = messages[indexPath.row - 1].date {
+            if messages[indexPath.row - 1].isDiffrentBeforeDate {
+              cell.chagedDate = getDate(date: date)
+            } else {
+              cell.chagedDate = nil
+            }
+          }
+
+          return cell
+        } else {
+          let otherChatId = NSStringFromClass(ANIOtherChatViewCell.self)
+          let cell = tableView.dequeueReusableCell(withIdentifier: otherChatId, for: indexPath) as! ANIOtherChatViewCell
+
+          cell.message = messages[indexPath.row - 1]
+          cell.user = self.user
+          if let date = messages[indexPath.row - 1].date {
+            if messages[indexPath.row - 1].isDiffrentBeforeDate {
+              cell.chagedDate = getDate(date: date)
+            } else {
+              cell.chagedDate = nil
+            }
+          }
+          return cell
+        }
+      }
+    }
+  }
+}
+
+//MARK: UITableViewDelegate
+extension ANIChatView: UITableViewDelegate {
+  func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    self.cellHeight[indexPath] = cell.frame.size.height
+  }
+  
+  func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+    if let height = self.cellHeight[indexPath] {
+      return height
+    } else {
+      return UITableView.automaticDimension
+    }
+  }
+  
+  func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+    if scrollView.contentOffset.y == 0 {
+      loadMoreMessage()
     }
   }
 }
 
 //MAKR: data
 extension ANIChatView {
+  private func loadFirstMessage(completion:(()->())? = nil) {
+    guard let chatGroupId = self.chatGroupId,
+          let activityIndicatorView = self.activityIndicatorView else { return }
+    
+    let database = Firestore.firestore()
+    
+    activityIndicatorView.startAnimating()
+    
+    DispatchQueue.global().async {
+      database.collection(KEY_CHAT_GROUPS).document(chatGroupId).collection(KEY_CHAT_MESSAGES).order(by: KEY_DATE).limit(to: 1).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          DLog("Error get document: \(error)")
+          self.isLoading = false
+          completion?()
+          
+          return
+        }
+        
+        guard let snapshot = snapshot else { return }
+        
+        for document in snapshot.documents {
+          self.firstMessageDocumentId = document.documentID
+          
+          completion?()
+        }
+        
+        if snapshot.documents.isEmpty {
+          self.isLoadFirstMessage = true
+          
+          completion?()
+        }
+      })
+    }
+  }
   private func loadMessage() {
     guard let chatGroupId = self.chatGroupId,
           let activityIndicatorView = self.activityIndicatorView,
@@ -158,17 +311,26 @@ extension ANIChatView {
     
     let database = Firestore.firestore()
     
-    activityIndicatorView.startAnimating()
-    
-    DispatchQueue.global().asyncAfter(deadline: .now() + 0.5) {
-      database.collection(KEY_CHAT_GROUPS).document(chatGroupId).collection(KEY_CHAT_MESSAGES).order(by: KEY_DATE).limit(to: 20).addSnapshotListener({ (snapshot, error) in
+    DispatchQueue.global().async {
+      self.isLoading = true
+      self.isLastPage = false
+      
+      database.collection(KEY_CHAT_GROUPS).document(chatGroupId).collection(KEY_CHAT_MESSAGES).order(by: KEY_DATE, descending: true).limit(to: 20).addSnapshotListener({ (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
+          self.isLoading = false
           
           return
         }
-        guard let snapshot = snapshot else { return }
         
+        guard let snapshot = snapshot,
+              let lastMessage = snapshot.documents.last else {
+                self.isLoading = false
+                activityIndicatorView.stopAnimating()
+                return }
+        
+        self.lastMessage = lastMessage
+                
         var updated: Bool = false
         
         snapshot.documentChanges.forEach({ (diff) in
@@ -176,13 +338,24 @@ extension ANIChatView {
             do {
               let message = try FirestoreDecoder().decode(FirebaseChatMessage.self, from: diff.document.data())
               
-              self.messages.append(message)
+              if self.isFirstLoad {
+                if let firstMessageDocumentId = self.firstMessageDocumentId {
+                  if firstMessageDocumentId == diff.document.documentID {
+                    self.isLoadFirstMessage = true
+                  }
+                }
+                
+                self.messages.insert(message, at: 0)
+              } else {
+                self.messages.append(message)
+              }
               
               DispatchQueue.main.async {
-                chatTableView.reloadData() {
-                  if !updated {
-                    self.updateCheckChatGroupDate()
-                    updated = true
+                if !updated {
+                  chatTableView.reloadData() {
+                      self.updateCheckChatGroupDate()
+                      updated = true
+                      self.isFirstLoad = false
                   }
                 }
                 self.scrollToBottom()
@@ -192,19 +365,87 @@ extension ANIChatView {
                 })
                 
                 activityIndicatorView.stopAnimating()
+                
+                self.isLoading = false
               }
             } catch let error {
               DLog(error)
               
               activityIndicatorView.stopAnimating()
+              
+              self.isLoading = false
             }
           }
         })
         
         if snapshot.documents.isEmpty {
           activityIndicatorView.stopAnimating()
+          
+          self.isLoading = false
         }
       })
+    }
+  }
+  
+  private func loadMoreMessage() {
+    guard let chatGroupId = self.chatGroupId,
+          let lastMessage = self.lastMessage,
+          !isLoading,
+          !isLastPage else { return }
+    
+    let database = Firestore.firestore()
+    
+    DispatchQueue.global().async {
+      self.isLoading = true
+      
+      database.collection(KEY_CHAT_GROUPS).document(chatGroupId).collection(KEY_CHAT_MESSAGES).order(by: KEY_DATE, descending: true).start(afterDocument: lastMessage).limit(to: 20).getDocuments { (snapshot, error) in
+        if let error = error {
+          DLog("Error get document: \(error)")
+          self.isLoading = false
+          
+          return
+        }
+        
+        guard let snapshot = snapshot else { return }
+        
+        guard let lastMessage = snapshot.documents.last else {
+          self.isLastPage = true
+          self.isLoading = false
+          return }
+        
+        self.lastMessage = lastMessage
+        
+        var newMessage = [FirebaseChatMessage]()
+        
+        for (index, document) in snapshot.documents.enumerated() {
+          do {
+            if let firstMessageDocumentId = self.firstMessageDocumentId {
+              if firstMessageDocumentId == document.documentID {
+                self.isLoadFirstMessage = true
+              }
+            }
+            
+            let message = try FirestoreDecoder().decode(FirebaseChatMessage.self, from: document.data())
+            
+            self.messages.insert(message, at: 0)
+            newMessage.insert(message, at: 0)
+            
+            DispatchQueue.main.async {
+              if index + 1 == snapshot.documents.count {
+                self.updateTableWithNewRowCount(newMessage: newMessage)
+              }
+            }
+          } catch let error {
+            DLog(error)
+            
+            self.isLoading = false
+          }
+        }
+        
+        if snapshot.documents.isEmpty {          
+          self.isLoading = false
+        }
+      }
     }
   }
 }

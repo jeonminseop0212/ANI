@@ -13,7 +13,10 @@ import CodableFirebase
 class ANIOtherChatViewCell: UITableViewCell {
   
   private weak var stackView: UIStackView?
+  private weak var dateLabelBG: UIView?
   private weak var dateLabel: UILabel?
+  private weak var leftLine: UIView?
+  private weak var rightLine: UIView?
   private weak var base: UIView?
   private let PROFILE_IMAGE_VIEW_HEIGHT: CGFloat = 35.0
   private weak var profileImageView: UIImageView?
@@ -34,6 +37,8 @@ class ANIOtherChatViewCell: UITableViewCell {
       reloadLayout()
     }
   }
+
+  static let shared = ANIMyChatViewCell()
   
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -56,15 +61,42 @@ class ANIOtherChatViewCell: UITableViewCell {
     stackView.edgesToSuperview()
     self.stackView = stackView
     
+    //dateLabelBG
+    let dateLabelBG = UIView()
+    stackView.addArrangedSubview(dateLabelBG)
+    dateLabelBG.height(30)
+    self.dateLabelBG = dateLabelBG
+    
     //dateLabel
     let dateLabel = UILabel()
     dateLabel.backgroundColor = .white
-    dateLabel.textColor = ANIColor.darkGray
-    dateLabel.font = UIFont.systemFont(ofSize: 15)
+    dateLabel.textColor = ANIColor.moreDarkGray
+    dateLabel.font = UIFont.systemFont(ofSize: 13)
     dateLabel.textAlignment = .center
-    dateLabel.isHidden = true
-    stackView.addArrangedSubview(dateLabel)
+    dateLabelBG.addSubview(dateLabel)
+    dateLabel.centerXToSuperview()
+    dateLabel.bottomToSuperview()
     self.dateLabel = dateLabel
+    
+    //leftLine
+    let leftLine = UIView()
+    leftLine.backgroundColor = ANIColor.darkGray
+    dateLabelBG.addSubview(leftLine)
+    leftLine.leftToSuperview(offset: 10)
+    leftLine.rightToLeft(of: dateLabel, offset: -10)
+    leftLine.centerY(to: dateLabel)
+    leftLine.height(0.5)
+    self.leftLine = leftLine
+    
+    //rightLine
+    let rightLine = UIView()
+    rightLine.backgroundColor = ANIColor.darkGray
+    dateLabelBG.addSubview(rightLine)
+    rightLine.leftToRight(of: dateLabel, offset: 10)
+    rightLine.rightToSuperview(offset: -10)
+    rightLine.centerY(to: dateLabel)
+    rightLine.height(0.5)
+    self.rightLine = rightLine
     
     //base
     let base = UIView()
@@ -96,7 +128,7 @@ class ANIOtherChatViewCell: UITableViewCell {
     messageBG.top(to: profileImageView)
     messageBG.leftToRight(of: profileImageView, offset: 10.0)
     messageBG.width(min: 0.0, max: width)
-    messageBG.bottomToSuperview(offset: -5.0)
+    messageBG.bottomToSuperview(offset: -5.0, priority: .defaultHigh)
     self.messageBG = messageBG
     
     //messageLabel
@@ -109,11 +141,10 @@ class ANIOtherChatViewCell: UITableViewCell {
     messageLabel.edgesToSuperview(insets: labelInsets)
     self.messageLabel = messageLabel
     
-    
     //timeLabel
     let timeLabel = UILabel()
     timeLabel.textColor = ANIColor.darkGray
-    timeLabel.font = UIFont.systemFont(ofSize: 13)
+    timeLabel.font = UIFont.systemFont(ofSize: 11)
     base.addSubview(timeLabel)
     timeLabel.leftToRight(of: messageBG, offset: 4.0)
     timeLabel.bottom(to: messageBG)
@@ -121,18 +152,20 @@ class ANIOtherChatViewCell: UITableViewCell {
   }
   
   private func reloadLayout() {
-    guard let dateLabel = self.dateLabel,
+    guard let dateLabelBG = self.dateLabelBG,
+          let dateLabel = self.dateLabel,
           let messageLabel = self.messageLabel,
           let message = self.message,
           let text = message.message,
           let timeLabel = self.timeLabel,
           let date = message.date else { return }
     
+    dateLabelBG.isHidden = true
     if let chagedDate = self.chagedDate {
-      dateLabel.isHidden = false
+      dateLabelBG.isHidden = false
       dateLabel.text = chagedDate
     } else {
-      dateLabel.isHidden = true
+      dateLabelBG.isHidden = true
     }
     
     messageLabel.text = text

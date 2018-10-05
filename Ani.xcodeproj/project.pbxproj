@@ -34,6 +34,7 @@
 		CD50A46720EC6A2500CFF16F /* UIIMage.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD50A46620EC6A2500CFF16F /* UIIMage.swift */; };
 		CD516FBE2161ED82002FF41C /* ANINotiHeaderQnaViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD516FBD2161ED82002FF41C /* ANINotiHeaderQnaViewCell.swift */; };
 		CD516FC021631D56002FF41C /* UITableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD516FBF21631D56002FF41C /* UITableView.swift */; };
+		CD516FFE21659885002FF41C /* ANIChatActivityIndicatorViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD516FFD21659885002FF41C /* ANIChatActivityIndicatorViewCell.swift */; };
 		CD529783213E17F7001609DB /* ANIPopupOptionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD529782213E17F7001609DB /* ANIPopupOptionViewCell.swift */; };
 		CD5297852140CD30001609DB /* ANINotiHeaderBasicViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD5297842140CD30001609DB /* ANINotiHeaderBasicViewCell.swift */; };
 		CD6229DC20B64A6400E36875 /* ANISignUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6229DB20B64A6400E36875 /* ANISignUpViewController.swift */; };
@@ -215,6 +216,7 @@
 		CD50A46820EC89BD00CFF16F /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		CD516FBD2161ED82002FF41C /* ANINotiHeaderQnaViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotiHeaderQnaViewCell.swift; sourceTree = "<group>"; };
 		CD516FBF21631D56002FF41C /* UITableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITableView.swift; sourceTree = "<group>"; };
+		CD516FFD21659885002FF41C /* ANIChatActivityIndicatorViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIChatActivityIndicatorViewCell.swift; sourceTree = "<group>"; };
 		CD529782213E17F7001609DB /* ANIPopupOptionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIPopupOptionViewCell.swift; sourceTree = "<group>"; };
 		CD5297842140CD30001609DB /* ANINotiHeaderBasicViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotiHeaderBasicViewCell.swift; sourceTree = "<group>"; };
 		CD6229DB20B64A6400E36875 /* ANISignUpViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANISignUpViewController.swift; sourceTree = "<group>"; };
@@ -960,6 +962,7 @@
 				CDE2F3BC20E35B33005E1DE1 /* ANIChatView.swift */,
 				CDE2F3BE20E35CBF005E1DE1 /* ANIMyChatViewCell.swift */,
 				CDE2F3C020E35CCE005E1DE1 /* ANIOtherChatViewCell.swift */,
+				CD516FFD21659885002FF41C /* ANIChatActivityIndicatorViewCell.swift */,
 			);
 			path = Chat;
 			sourceTree = "<group>";
@@ -1682,6 +1685,7 @@
 				F53E87B72084608000B19A2F /* ANIUserSearchViewCell.swift in Sources */,
 				CDE2F40F20E464D5005E1DE1 /* FirebaseChatGroup.swift in Sources */,
 				CD9E963320F2EF8600AD4F64 /* FirebaseNotification.swift in Sources */,
+				CD516FFE21659885002FF41C /* ANIChatActivityIndicatorViewCell.swift in Sources */,
 				CD6B675420A90F8A009BF63D /* ANIPlaceholderTextView.swift in Sources */,
 				CD3DBF97215A31F50010A219 /* Macros.swift in Sources */,
 				CDA32A2720AA6652008A2AC1 /* ANIPopupPickerView.swift in Sources */,
