@@ -85,6 +85,8 @@ class ANINotiView: UIView {
     notiTableView.dataSource = self
     notiTableView.delegate = self
     let refreshControl = UIRefreshControl()
+    refreshControl.backgroundColor = .clear
+    refreshControl.tintColor = ANIColor.moreDarkGray
     refreshControl.addTarget(self, action: #selector(loadNoti(sender:)), for: .valueChanged)
     notiTableView.addSubview(refreshControl)
     addSubview(notiTableView)

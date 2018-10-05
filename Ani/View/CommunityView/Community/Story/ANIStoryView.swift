@@ -87,6 +87,8 @@ class ANIStoryView: UIView {
     tableView.alpha = 0.0
     tableView.rowHeight = UITableView.automaticDimension
     let refreshControl = UIRefreshControl()
+    refreshControl.backgroundColor = .clear
+    refreshControl.tintColor = ANIColor.moreDarkGray
     refreshControl.addTarget(self, action: #selector(loadStory(sender:)), for: .valueChanged)
     tableView.addSubview(refreshControl)
     addSubview(tableView)
