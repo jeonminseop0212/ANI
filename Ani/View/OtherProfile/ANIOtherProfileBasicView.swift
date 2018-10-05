@@ -113,6 +113,8 @@ class ANIOtherProfileBasicView: UIView {
     basicTableView.alpha = 0.0
     basicTableView.rowHeight = UITableView.automaticDimension
     let refreshControl = UIRefreshControl()
+    refreshControl.backgroundColor = .clear
+    refreshControl.tintColor = ANIColor.moreDarkGray
     refreshControl.addTarget(self, action: #selector(reloadData(sender:)), for: .valueChanged)
     basicTableView.addSubview(refreshControl)
     addSubview(basicTableView)

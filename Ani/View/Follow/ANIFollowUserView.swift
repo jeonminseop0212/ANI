@@ -65,6 +65,8 @@ class ANIFollowUserView: UIView {
     followUserTableView.dataSource = self
     followUserTableView.delegate = self
     let refreshControl = UIRefreshControl()
+    refreshControl.backgroundColor = .clear
+    refreshControl.tintColor = ANIColor.moreDarkGray
     refreshControl.addTarget(self, action: #selector(reloadData(sender:)), for: .valueChanged)
     followUserTableView.addSubview(refreshControl)
     addSubview(followUserTableView)
@@ -113,9 +115,13 @@ extension ANIFollowUserView: UITableViewDataSource {
     
     switch followUserViewMode {
     case .following:
-      cell.user = followingUsers[indexPath.row]
+      if !followingUsers.isEmpty {
+        cell.user = followingUsers[indexPath.row]
+      }
     case .follower:
-      cell.user = followers[indexPath.row]
+      if !followers.isEmpty {
+        cell.user = followers[indexPath.row]
+      }
     }
     
     return cell

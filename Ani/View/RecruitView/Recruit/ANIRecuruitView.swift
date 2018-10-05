@@ -124,6 +124,8 @@ class ANIRecuruitView: UIView {
     tableView.dataSource = self
     tableView.delegate = self
     let refreshControl = UIRefreshControl()
+    refreshControl.backgroundColor = .clear
+    refreshControl.tintColor = ANIColor.moreDarkGray
     refreshControl.addTarget(self, action: #selector(loadRecruit(sender:)), for: .valueChanged)
     tableView.alpha = 0.0
     tableView.rowHeight = UITableView.automaticDimension
