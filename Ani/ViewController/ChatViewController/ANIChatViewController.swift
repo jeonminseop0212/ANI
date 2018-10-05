@@ -146,6 +146,7 @@ class ANIChatViewController: UIViewController {
       chatView.user = user
       chatView.chatGroupId = chatGroupId
     }
+    chatView.delegate = self
     self.view.addSubview(chatView)
     chatView.topToBottom(of: myNavigationBar)
     chatView.leftToSuperview()
@@ -193,16 +194,23 @@ class ANIChatViewController: UIViewController {
   private func createGroup() {
     let id = NSUUID().uuidString
     let date = ANIFunction.shared.getToday()
-    let group = FirebaseChatGroup(groupId:id, memberIds: nil, updateDate: date, lastMessage: "", checkChatGroupDate: nil)
+    let chatGroup = FirebaseChatGroup(groupId:id, memberIds: nil, updateDate: date, lastMessage: "", checkChatGroupDate: nil)
     
     let database = Firestore.firestore()
 
     DispatchQueue.global().async {
       do {
-        let data = try FirestoreEncoder().encode(group)
-        database.collection(KEY_CHAT_GROUPS).document(id).setData(data)
-
-        self.chatGroupId = id
+        let data = try FirestoreEncoder().encode(chatGroup)
+        database.collection(KEY_CHAT_GROUPS).document(id).setData(data, completion: { (error) in
+          if let error = error {
+            DLog("Error get document: \(error)")
+            
+            return
+          }
+          
+          self.chatGroupId = id
+          self.chatGroup = chatGroup
+        })
       } catch let error {
         DLog(error)
       }
@@ -322,5 +330,14 @@ class ANIChatViewController: UIViewController {
 extension ANIChatViewController: UIGestureRecognizerDelegate {
   func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
     return true
+  }
+}
+
+//MARK: ANIChatViewDelegate
+extension ANIChatViewController: ANIChatViewDelegate {
+  func loadedMessage(messages: [FirebaseChatMessage]) {
+    guard let chatBar = self.chatBar else { return }
+    
+    chatBar.messages = messages
   }
 }

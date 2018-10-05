@@ -315,6 +315,8 @@ extension ANINotiView {
           }
           
           self.showReloadView(sender: sender)
+          
+          self.isLoading = false
         }
       }
     }
@@ -362,8 +364,13 @@ extension ANINotiView {
             }
           } catch let error {
             DLog(error)
+            
             self.isLoading = false
           }
+        }
+        
+        if snapshot.documents.isEmpty {          
+          self.isLoading = false
         }
       }
     }
