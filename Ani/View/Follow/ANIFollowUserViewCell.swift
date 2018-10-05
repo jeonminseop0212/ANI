@@ -39,6 +39,9 @@ class ANIFollowUserViewCell: UITableViewCell {
   
   private func setup() {
     self.selectionStyle = .none
+    self.isUserInteractionEnabled = true
+    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped))
+    self.addGestureRecognizer(tapGesture)
     
     //stackView
     let stackView = UIStackView()
@@ -56,9 +59,6 @@ class ANIFollowUserViewCell: UITableViewCell {
     profileImageView.layer.cornerRadius = PROFILE_IMAGE_VIEW_HEIGHT / 2
     profileImageView.layer.masksToBounds = true
     profileImageView.backgroundColor = ANIColor.bg
-    profileImageView.isUserInteractionEnabled = true
-    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped))
-    profileImageView.addGestureRecognizer(tapGesture)
     stackView.addArrangedSubview(profileImageView)
     profileImageView.width(PROFILE_IMAGE_VIEW_HEIGHT)
     profileImageView.height(PROFILE_IMAGE_VIEW_HEIGHT)
