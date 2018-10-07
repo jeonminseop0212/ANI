@@ -460,7 +460,7 @@ extension ANINotiDetailView: ANISupportViewCellDelegate {
     self.delegate?.supportCellRecruitTapped(recruit: recruit, user: user)
   }
   
-  func loadedRecruit(recruit: FirebaseRecruit) {
+  func loadedRecruit(recruitId: String, recruit: FirebaseRecruit?) {
   }
 }
 

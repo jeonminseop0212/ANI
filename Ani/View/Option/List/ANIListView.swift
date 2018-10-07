@@ -49,7 +49,7 @@ class ANIListView: UIView {
   private var loveRecruits = [FirebaseRecruit]()
   private var loveStories = [FirebaseStory]()
   private var loveQnas = [FirebaseQna]()
-  private var supportRecruits = [FirebaseRecruit]()
+  private var supportRecruits = [String: FirebaseRecruit?]()
   private var clipRecruits = [FirebaseRecruit]()
   
   private var users = [FirebaseUser]()
@@ -188,19 +188,21 @@ extension ANIListView: UITableViewDataSource {
       return cell
     case .loveStroy:
       if !loveStories.isEmpty {
-        if loveStories[indexPath.row].recruitId != nil {
+        if let recruitId = loveStories[indexPath.row].recruitId {
           let supportCellId = NSStringFromClass(ANISupportViewCell.self)
           let cell = tableView.dequeueReusableCell(withIdentifier: supportCellId, for: indexPath) as! ANISupportViewCell
           
-          if let recruitId = loveStories[indexPath.row].recruitId, supportRecruits.count != 0 {
-            for supportRecruit in supportRecruits {
-              if let supportRecruitId = supportRecruit.id, supportRecruitId == recruitId {
-                cell.recruit = supportRecruit
-                break
-              }
+          if let supportRecruit = supportRecruits[recruitId] {
+            if let supportRecruit = supportRecruit {
+              cell.recruit = supportRecruit
+              cell.isDeleteRecruit = false
+            } else {
+              cell.recruit = nil
+              cell.isDeleteRecruit = true
             }
           } else {
             cell.recruit = nil
+            cell.isDeleteRecruit = nil
           }
 
           if users.contains(where: { $0.uid == loveStories[indexPath.row].userId }) {
@@ -451,8 +453,8 @@ extension ANIListView: ANISupportViewCellDelegate {
     self.delegate?.supportCellRecruitTapped(recruit: recruit, user: user)
   }
   
-  func loadedRecruit(recruit: FirebaseRecruit) {
-    self.supportRecruits.append(recruit)
+  func loadedRecruit(recruitId: String, recruit: FirebaseRecruit?) {
+    self.supportRecruits[recruitId] = recruit
   }
 }
 
