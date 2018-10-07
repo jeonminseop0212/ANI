@@ -15,7 +15,7 @@ protocol ANISupportViewCellDelegate {
   func supportCellTapped(story: FirebaseStory, user: FirebaseUser)
   func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser)
   func reject()
-  func loadedRecruit(recruit: FirebaseRecruit)
+  func loadedRecruit(recruitId: String, recruit: FirebaseRecruit?)
   func popupOptionView(isMe: Bool, contentType: ContentType, id: String)
   func loadedStoryIsLoved(indexPath: Int, isLoved: Bool)
   func loadedStoryUser(user: FirebaseUser)
@@ -34,6 +34,10 @@ class ANISupportViewCell: UITableViewCell {
   private weak var sexLabel: UILabel?
   private weak var titleLabel: UILabel?
   private weak var subTitleLabel: UILabel?
+  
+  private weak var deleteRecruitBase: UIView?
+  private weak var deleteRecruitImageView: UIImageView?
+  private weak var deleteRecruitAlertLabel: UILabel?
   
   private let PROFILE_IMAGE_VIEW_HEIGHT: CGFloat = 32.0
   private weak var profileImageView: UIImageView?
@@ -55,7 +59,7 @@ class ANISupportViewCell: UITableViewCell {
       if user == nil {
         loadUser()
       }
-      if recruit == nil {
+      if recruit == nil, isDeleteRecruit == nil {
         loadRecruit()
       }
       if story.isLoved == nil {
@@ -73,6 +77,25 @@ class ANISupportViewCell: UITableViewCell {
       
       loadRecruitUser()
       reloadRecruitLayout(recruit: recruit)
+    }
+  }
+  
+  var isDeleteRecruit: Bool? {
+    didSet {
+      guard let isDeleteRecruit = self.isDeleteRecruit,
+            let deleteRecruitBase = self.deleteRecruitBase,
+            let deleteRecruitImageView = self.deleteRecruitImageView,
+            let deleteRecruitAlertLabel = self.deleteRecruitAlertLabel else { return }
+
+      if isDeleteRecruit {
+        deleteRecruitBase.isHidden = false
+        deleteRecruitImageView.isHidden = false
+        deleteRecruitAlertLabel.isHidden = false
+      } else {
+        deleteRecruitBase.isHidden = true
+        deleteRecruitImageView.isHidden = true
+        deleteRecruitAlertLabel.isHidden = true
+      }
     }
   }
   
@@ -232,6 +255,40 @@ class ANISupportViewCell: UITableViewCell {
     subTitleLabel.rightToSuperview(offset: -10.0)
     subTitleLabel.bottomToSuperview(offset: -10)
     self.subTitleLabel = subTitleLabel
+    
+    //deleteRecruitBase
+    let deleteRecruitBase = UIView()
+    deleteRecruitBase.backgroundColor = .white
+    deleteRecruitBase.layer.cornerRadius = 10.0
+    deleteRecruitBase.layer.masksToBounds = true
+    addSubview(deleteRecruitBase)
+    deleteRecruitBase.edges(to: recruitBase)
+    self.deleteRecruitBase = deleteRecruitBase
+    
+    //deleteRecruitImageView
+    let deleteRecruitImageView = UIImageView()
+    deleteRecruitImageView.image = UIImage(named: "notSee")
+    deleteRecruitImageView.contentMode = .center
+    deleteRecruitImageView.isHidden = true
+    deleteRecruitBase.addSubview(deleteRecruitImageView)
+    deleteRecruitImageView.widthToSuperview(multiplier: 0.2)
+    deleteRecruitImageView.heightToWidth(of: deleteRecruitImageView)
+    deleteRecruitImageView.centerXToSuperview()
+    deleteRecruitImageView.centerYToSuperview(offset: -20.0)
+    self.deleteRecruitImageView = deleteRecruitImageView
+    
+    //deleteRecruitAlertLabel
+    let deleteRecruitAlertLabel = UILabel()
+    deleteRecruitAlertLabel.text = "募集が削除されました。"
+    deleteRecruitAlertLabel.textColor = ANIColor.dark
+    deleteRecruitAlertLabel.textAlignment = .center
+    deleteRecruitAlertLabel.font = UIFont.boldSystemFont(ofSize: 17.0)
+    deleteRecruitAlertLabel.isHidden = true
+    deleteRecruitBase.addSubview(deleteRecruitAlertLabel)
+    deleteRecruitAlertLabel.topToBottom(of: deleteRecruitImageView, offset: 30)
+    deleteRecruitAlertLabel.leftToSuperview(offset: 10)
+    deleteRecruitAlertLabel.rightToSuperview(offset: -10)
+    self.deleteRecruitAlertLabel = deleteRecruitAlertLabel
     
     //profileImageView
     let profileImageView = UIImageView()
@@ -699,14 +756,20 @@ extension ANISupportViewCell {
           return
         }
         
-        guard let snapshot = snapshot, let data = snapshot.data() else { return }
+        guard let snapshot = snapshot, let data = snapshot.data() else {
+          self.delegate?.loadedRecruit(recruitId: recruitId ,recruit: nil)
+          self.isDeleteRecruit = true
+          return }
         
         do {
           let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: data)
           self.recruit = recruit
-          self.delegate?.loadedRecruit(recruit: recruit)
+          self.delegate?.loadedRecruit(recruitId: recruitId ,recruit: recruit)
+          self.isDeleteRecruit = false
         } catch let error {
           DLog(error)
+          
+          self.isDeleteRecruit = false
         }
       })
     }

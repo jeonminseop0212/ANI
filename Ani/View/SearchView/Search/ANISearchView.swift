@@ -35,8 +35,8 @@ class ANISearchView: UIView {
   private var storyUsers = [FirebaseUser]()
   private var searchQnas = [FirebaseQna]()
   private var qnaUsers = [FirebaseUser]()
-  private var supportRecruits = [FirebaseRecruit]()
-  
+  private var supportRecruits = [String: FirebaseRecruit?]()
+
   var selectedCategory: SearchCategory = .user {
     didSet {
       if searchText != "" {
@@ -188,20 +188,23 @@ extension ANISearchView: UITableViewDataSource {
       return cell
     case .story:
       if !searchStories.isEmpty {
-        if searchStories[indexPath.row].recruitId != nil {
+        if let recruitId = searchStories[indexPath.row].recruitId {
           let supportCellId = NSStringFromClass(ANISupportViewCell.self)
           let cell = tableView.dequeueReusableCell(withIdentifier: supportCellId, for: indexPath) as! ANISupportViewCell
           
-          if let recruitId = searchStories[indexPath.row].recruitId, supportRecruits.count != 0 {
-            for supportRecruit in supportRecruits {
-              if let supportRecruitId = supportRecruit.id, supportRecruitId == recruitId {
-                cell.recruit = supportRecruit
-                break
-              }
+          if let supportRecruit = supportRecruits[recruitId] {
+            if let supportRecruit = supportRecruit {
+              cell.recruit = supportRecruit
+              cell.isDeleteRecruit = false
+            } else {
+              cell.recruit = nil
+              cell.isDeleteRecruit = true
             }
           } else {
             cell.recruit = nil
+            cell.isDeleteRecruit = nil
           }
+          
           if storyUsers.contains(where: { $0.uid == searchStories[indexPath.row].userId }) {
             for user in storyUsers {
               if searchStories[indexPath.row].userId == user.uid {
@@ -375,8 +378,8 @@ extension ANISearchView: ANISupportViewCellDelegate {
     self.delegate?.supportCellRecruitTapped(recruit: recruit, user: user)
   }
   
-  func loadedRecruit(recruit: FirebaseRecruit) {
-    self.supportRecruits.append(recruit)
+  func loadedRecruit(recruitId: String, recruit: FirebaseRecruit?) {
+    self.supportRecruits[recruitId] = recruit
   }
 }
 
