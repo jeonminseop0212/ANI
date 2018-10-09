@@ -150,7 +150,9 @@ class ANIChatBar: UIView {
     guard let chatTextView = self.chatTextView,
           let text = chatTextView.text,
           let currentuserUid = ANISessionManager.shared.currentUserUid,
-          let chatGroupId = self.chatGroupId else { return }
+          let chatGroupId = self.chatGroupId,
+          let user = self.user,
+          let userId = user.uid else { return }
 
     let date = ANIFunction.shared.getToday()
     
@@ -177,6 +179,8 @@ class ANIChatBar: UIView {
 
         let value: [String: String] = [KEY_CHAT_UPDATE_DATE: date, KEY_CHAT_LAST_MESSAGE: text]
         database.collection(KEY_CHAT_GROUPS).document(chatGroupId).updateData(value)
+        
+        database.collection(KEY_USERS).document(userId).updateData([KEY_IS_HAVE_UNREAD_MESSAGE: true])
       }
     } catch let error {
       DLog(error)
