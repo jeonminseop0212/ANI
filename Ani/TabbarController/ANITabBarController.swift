@@ -21,6 +21,7 @@ class ANITabBarController: UITabBarController {
   private var showingTabTag: Int = 0
   
   private var oldIsHaveUnreadNoti: Bool = false
+  private var oldIsHaveUnreadMessage: Bool = false
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -172,6 +173,14 @@ extension ANITabBarController {
                 }
                 
                 self.oldIsHaveUnreadNoti = isHaveUnreadNoti
+              }
+              
+              if let isHaveUnreadMessage = user.isHaveUnreadMessage {
+                if self.oldIsHaveUnreadMessage != isHaveUnreadMessage {
+                  ANISessionManager.shared.isHaveUnreadMessage = isHaveUnreadMessage
+                }
+                
+                self.oldIsHaveUnreadMessage = isHaveUnreadMessage
               }
             }
           } catch let error {

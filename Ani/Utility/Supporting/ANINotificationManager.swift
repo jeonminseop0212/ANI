@@ -110,7 +110,7 @@ class ANINotificationManager: NSObject {
   static func postLogin() { self.post(name: N_LOGIN, object: nil, userInfo:nil) }
   static func receive(login observer:Any, selector:Selector) { receive(name: N_LOGIN, observer: observer, selector: selector) }
   
-  //MARK: will resignActive
+  //MARK: will resign active
   static func receive(applicationWillResignActive observer:Any, selector:Selector) {
     let name = UIApplication.willResignActiveNotification
     self.receive(notificationName: name, observer: observer, selector: selector)
@@ -142,8 +142,13 @@ class ANINotificationManager: NSObject {
   static func postDeleteRecruit(id: String) { self.post(name: N_DELETE_RECRUIT, object: id, userInfo:nil) }
   static func receive(deleteRecruit observer:Any, selector:Selector) { receive(name: N_DELETE_RECRUIT, observer: observer, selector: selector) }
   
-  //MARK: change isHaveUnreadNoti
+  //MARK: change isHave unread noti
   private static let N_CHANGE_IS_HAVE_UNREAD_NOTI = "N_CHANGE_IS_HAVE_UNREAD_NOTI"
   static func postChangeIsHaveUnreadNoti() { self.post(name: N_CHANGE_IS_HAVE_UNREAD_NOTI, object: nil, userInfo:nil) }
   static func receive(changeIsHaveUnreadNoti observer:Any, selector:Selector) { receive(name: N_CHANGE_IS_HAVE_UNREAD_NOTI, observer: observer, selector: selector) }
+  
+  //MARK: change isHave unread message
+  private static let N_CHANGE_IS_HAVE_UNREAD_MESSAGE = "N_CHANGE_IS_HAVE_UNREAD_MESSAGE"
+  static func postChangeIsHaveUnreadMessage() { self.post(name: N_CHANGE_IS_HAVE_UNREAD_MESSAGE, object: nil, userInfo:nil) }
+  static func receive(changeIsHaveUnreadMessage observer:Any, selector:Selector) { receive(name: N_CHANGE_IS_HAVE_UNREAD_MESSAGE, observer: observer, selector: selector) }
 }

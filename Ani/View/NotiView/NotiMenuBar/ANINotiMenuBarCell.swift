@@ -70,6 +70,8 @@ class ANINotiMenuBarCell: UICollectionViewCell {
   private func setupNotification() {
     if menuKind == .noti {
       ANINotificationManager.receive(changeIsHaveUnreadNoti: self, selector: #selector(updateNotiBadge))
+    } else if menuKind == .message {
+      ANINotificationManager.receive(changeIsHaveUnreadMessage: self, selector: #selector(updateMessageBadge))
     }
   }
   
@@ -77,6 +79,16 @@ class ANINotiMenuBarCell: UICollectionViewCell {
     guard let badge = self.badge else { return }
     
     if ANISessionManager.shared.isHaveUnreadNoti {
+      badge.alpha = 1.0
+    } else {
+      badge.alpha = 0.0
+    }
+  }
+  
+  @objc private func updateMessageBadge() {
+    guard let badge = self.badge else { return }
+    
+    if ANISessionManager.shared.isHaveUnreadMessage {
       badge.alpha = 1.0
     } else {
       badge.alpha = 0.0

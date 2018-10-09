@@ -310,7 +310,8 @@ extension ANIChatView {
   private func loadMessage() {
     guard let chatGroupId = self.chatGroupId,
           let activityIndicatorView = self.activityIndicatorView,
-          let chatTableView = self.chatTableView else { return }
+          let chatTableView = self.chatTableView,
+          let currentUserUid = ANISessionManager.shared.currentUserUid else { return }
     
     let database = Firestore.firestore()
     
@@ -356,9 +357,11 @@ extension ANIChatView {
               DispatchQueue.main.async {
                 if !updated {
                   chatTableView.reloadData() {
-                      self.updateCheckChatGroupDate()
-                      updated = true
-                      self.isFirstLoad = false
+                    self.updateCheckChatGroupDate()
+                    database.collection(KEY_USERS).document(currentUserUid).updateData([KEY_IS_HAVE_UNREAD_MESSAGE: false])
+
+                    updated = true
+                    self.isFirstLoad = false
                   }
                 }
                 self.scrollToBottom()
