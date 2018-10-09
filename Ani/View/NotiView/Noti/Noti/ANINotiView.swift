@@ -147,7 +147,7 @@ class ANINotiView: UIView {
     let database = Firestore.firestore()
     
     let date = ANIFunction.shared.getToday()
-    database.collection(KEY_USERS).document(currentUserUid).updateData([KEY_CHECK_NOTI_DATE: date])
+    database.collection(KEY_USERS).document(currentUserUid).updateData([KEY_CHECK_NOTI_DATE: date, KEY_IS_HAVE_UNREAD_NOTI: false])
   }
 }
 

@@ -13,7 +13,14 @@ import CodableFirebase
 
 class ANITabBarController: UITabBarController {
   
+  private let BADGE_WIDHT: CGFloat = 5.0
+  private weak var badge: UIView?
+  
+  private let NUMBER_OF_NOTI_TAB: Int = 2
+
   private var showingTabTag: Int = 0
+  
+  private var oldIsHaveUnreadNoti: Bool = false
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -26,6 +33,7 @@ class ANITabBarController: UITabBarController {
     tabBar.clipsToBounds = true
     
     setTabBar()
+    setupBadge()
   }
   
   override func viewDidAppear(_ animated: Bool) {
@@ -35,39 +43,7 @@ class ANITabBarController: UITabBarController {
     let dic = [KEY_FIRST_LAUNCH: true]
     userDefault.register(defaults: dic)
     
-    ANISessionManager.shared.currentUserUid = Auth.auth().currentUser?.uid
-    if let currentUserUid = ANISessionManager.shared.currentUserUid {
-      let database = Firestore.firestore()
-      DispatchQueue.global().async {
-        database.collection(KEY_USERS).document(currentUserUid).addSnapshotListener({ (snapshot, error) in
-          guard let snapshot = snapshot, let value = snapshot.data() else { return }
-          
-          do {
-            let user = try FirestoreDecoder().decode(FirebaseUser.self, from: value)
-            
-            DispatchQueue.main.async {
-              ANISessionManager.shared.currentUser = user
-              ANISessionManager.shared.isAnonymous = false
-            }
-          } catch let error {
-            DLog(error)
-          }
-        })
-      }
-    } else {
-      do {
-        try Auth.auth().signOut()
-      } catch let signOutError as NSError {
-        DLog("signOutError \(signOutError)")
-      }
-      
-      ANISessionManager.shared.isAnonymous = true
-      
-      if userDefault.bool(forKey: KEY_FIRST_LAUNCH) {
-        userDefault.set(false, forKey: KEY_FIRST_LAUNCH)
-        showInitialView()
-      }
-    }
+    loadUser()
   }
   
   private func setTabBar() {
@@ -110,6 +86,28 @@ class ANITabBarController: UITabBarController {
     }
   }
   
+  private func setupBadge() {
+    if self.tabBar.subviews.count > NUMBER_OF_NOTI_TAB {
+      let tabBarButton = self.tabBar.subviews[NUMBER_OF_NOTI_TAB]
+      for subView in tabBarButton.subviews {
+        guard let icon = subView as? UIImageView else { continue }
+
+        let badge = UIView()
+        badge.backgroundColor = ANIColor.red
+        badge.layer.cornerRadius = BADGE_WIDHT / 2
+        badge.layer.masksToBounds = true
+        icon.addSubview(badge)
+        badge.centerX(to: icon, icon.rightAnchor)
+        badge.centerY(to: icon, icon.topAnchor, offset: 2)
+        badge.width(BADGE_WIDHT)
+        badge.height(BADGE_WIDHT)
+        self.badge = badge
+        
+        break
+      }
+    }
+  }
+  
   private func showInitialView() {
     let initialViewController = ANIInitialViewController()
     let initialNV = UINavigationController(rootViewController: initialViewController)
@@ -145,6 +143,55 @@ class ANITabBarController: UITabBarController {
       showingTabTag = 4
     default:
       DLog("default tab")
+    }
+  }
+}
+
+//MARK: data
+extension ANITabBarController {
+  private func loadUser() {
+    let userDefault = UserDefaults.standard
+
+    ANISessionManager.shared.currentUserUid = Auth.auth().currentUser?.uid
+    if let currentUserUid = ANISessionManager.shared.currentUserUid {
+      let database = Firestore.firestore()
+      DispatchQueue.global().async {
+        database.collection(KEY_USERS).document(currentUserUid).addSnapshotListener({ (snapshot, error) in
+          guard let snapshot = snapshot, let value = snapshot.data() else { return }
+          
+          do {
+            let user = try FirestoreDecoder().decode(FirebaseUser.self, from: value)
+            
+            DispatchQueue.main.async {
+              ANISessionManager.shared.currentUser = user
+              ANISessionManager.shared.isAnonymous = false
+              
+              if let isHaveUnreadNoti = user.isHaveUnreadNoti {
+                if self.oldIsHaveUnreadNoti != isHaveUnreadNoti {
+                  ANISessionManager.shared.isHaveUnreadNoti = isHaveUnreadNoti
+                }
+                
+                self.oldIsHaveUnreadNoti = isHaveUnreadNoti
+              }
+            }
+          } catch let error {
+            DLog(error)
+          }
+        })
+      }
+    } else {
+      do {
+        try Auth.auth().signOut()
+      } catch let signOutError as NSError {
+        DLog("signOutError \(signOutError)")
+      }
+      
+      ANISessionManager.shared.isAnonymous = true
+      
+      if userDefault.bool(forKey: KEY_FIRST_LAUNCH) {
+        userDefault.set(false, forKey: KEY_FIRST_LAUNCH)
+        showInitialView()
+      }
     }
   }
 }

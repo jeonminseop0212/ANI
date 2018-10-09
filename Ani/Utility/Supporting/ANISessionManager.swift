@@ -21,6 +21,12 @@ class ANISessionManager: NSObject {
     }
   }
   
+  var isHaveUnreadNoti: Bool = false {
+    didSet {
+      ANINotificationManager.postChangeIsHaveUnreadNoti()
+    }
+  }
+  
   var checkNotiDate: String?
   
   var currentUserUid: String?
