@@ -35,6 +35,7 @@ let KEY_FOLLOWER_IDS = "followerIds"
 let KEY_CHAT_GROUP_IDS = "chatGroupIds"
 let KEY_USER_ID = "userId"
 let KEY_CHECK_NOTI_DATE = "checkNotiDate"
+let KEY_IS_HAVE_UNREAD_NOTI = "isHaveUnreadNoti"
 
 //recruit
 let KEY_RECRUIT_HEADER_IMAGES = "recruit_header_images"
@@ -63,6 +64,7 @@ let KEY_CHAT_GROUPS = "chatGroups"
 let KEY_CHAT_MEMBER_IDS = "memberIds"
 let KEY_CHAT_UPDATE_DATE = "updateDate"
 let KEY_CHAT_LAST_MESSAGE = "lastMessage"
+let KEY_CHECK_CHAT_GROUP_DATE = "checkChatGroupDate"
 
 //chat message
 let KEY_CHAT_MESSAGES = "chatChatMessages"

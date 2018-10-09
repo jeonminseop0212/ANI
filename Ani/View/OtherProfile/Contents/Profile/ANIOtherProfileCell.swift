@@ -287,6 +287,7 @@ class ANIOtherProfileCell: UITableViewCell {
         let data = try FirestoreEncoder().encode(notification)
         
         database.collection(KEY_USERS).document(userId).collection(KEY_NOTIFICATIONS).document(currentUserId).setData(data)
+        database.collection(KEY_USERS).document(userId).updateData([KEY_IS_HAVE_UNREAD_NOTI: true])
       } catch let error {
         DLog(error)
       }

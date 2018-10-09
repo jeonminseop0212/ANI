@@ -141,4 +141,9 @@ class ANINotificationManager: NSObject {
   private static let N_DELETE_RECRUIT = "N_DELETE_RECRUIT"
   static func postDeleteRecruit(id: String) { self.post(name: N_DELETE_RECRUIT, object: id, userInfo:nil) }
   static func receive(deleteRecruit observer:Any, selector:Selector) { receive(name: N_DELETE_RECRUIT, observer: observer, selector: selector) }
+  
+  //MARK: change isHaveUnreadNoti
+  private static let N_CHANGE_IS_HAVE_UNREAD_NOTI = "N_CHANGE_IS_HAVE_UNREAD_NOTI"
+  static func postChangeIsHaveUnreadNoti() { self.post(name: N_CHANGE_IS_HAVE_UNREAD_NOTI, object: nil, userInfo:nil) }
+  static func receive(changeIsHaveUnreadNoti observer:Any, selector:Selector) { receive(name: N_CHANGE_IS_HAVE_UNREAD_NOTI, observer: observer, selector: selector) }
 }

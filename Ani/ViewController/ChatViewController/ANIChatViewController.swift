@@ -72,6 +72,13 @@ class ANIChatViewController: UIViewController {
     removeNotifications()
     removeGroup()
   }
+  
+  override func viewDidDisappear(_ animated: Bool) {
+    guard let chatView = self.chatView,
+          let chatGropListener = chatView.chatGropListener else { return }
+    
+    chatGropListener.remove()
+  }
     
   private func setup() {
     //basic

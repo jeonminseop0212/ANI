@@ -21,7 +21,9 @@ class ANIChatView: UIView {
     
   var chatGroupId: String?
   
-  var user: FirebaseUser? 
+  var user: FirebaseUser?
+  
+  var chatGropListener: ListenerRegistration?
   
   var chatGroup: FirebaseChatGroup? {
     didSet {
@@ -126,7 +128,7 @@ class ANIChatView: UIView {
     }
     
     checkChatGroupDateTemp[currentUserUid] = date
-    database.collection(KEY_CHAT_GROUPS).document(chatGroupId).updateData(["checkChatGroupDate": checkChatGroupDateTemp])
+    database.collection(KEY_CHAT_GROUPS).document(chatGroupId).updateData([KEY_CHECK_CHAT_GROUP_DATE: checkChatGroupDateTemp])
   }
   
   func updateTableWithNewRowCount(newMessage: [FirebaseChatMessage]) {
@@ -304,6 +306,7 @@ extension ANIChatView {
       })
     }
   }
+  
   private func loadMessage() {
     guard let chatGroupId = self.chatGroupId,
           let activityIndicatorView = self.activityIndicatorView,
@@ -315,7 +318,7 @@ extension ANIChatView {
       self.isLoading = true
       self.isLastPage = false
       
-      database.collection(KEY_CHAT_GROUPS).document(chatGroupId).collection(KEY_CHAT_MESSAGES).order(by: KEY_DATE, descending: true).limit(to: 20).addSnapshotListener({ (snapshot, error) in
+      self.chatGropListener = database.collection(KEY_CHAT_GROUPS).document(chatGroupId).collection(KEY_CHAT_MESSAGES).order(by: KEY_DATE, descending: true).limit(to: 20).addSnapshotListener({ (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
           self.isLoading = false

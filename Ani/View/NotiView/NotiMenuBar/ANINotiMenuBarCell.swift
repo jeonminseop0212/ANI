@@ -8,9 +8,19 @@
 
 import UIKit
 import TinyConstraints
+import FirebaseFirestore
 
 class ANINotiMenuBarCell: UICollectionViewCell {
+  
+  private let BADGE_WIDHT: CGFloat = 5.0
+  private weak var badge: UIView?
+  
   var menuLabel: UILabel?
+  var menuKind: MenuKind = .noti {
+    didSet {
+      setupNotification()
+    }
+  }
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -19,16 +29,6 @@ class ANINotiMenuBarCell: UICollectionViewCell {
   
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
-  }
-  
-  private func setup() {
-    let menuLabel = UILabel()
-    menuLabel.textAlignment = .center
-    menuLabel.font = UIFont.boldSystemFont(ofSize: 17)
-    menuLabel.textColor = ANIColor.gray
-    addSubview(menuLabel)
-    menuLabel.edgesToSuperview()
-    self.menuLabel = menuLabel
   }
   
   override var isHighlighted: Bool {
@@ -40,6 +40,46 @@ class ANINotiMenuBarCell: UICollectionViewCell {
   override var isSelected: Bool {
     didSet {
       menuLabel?.textColor = isSelected ? ANIColor.dark : ANIColor.gray
+    }
+  }
+  
+  private func setup() {
+    //menuLabel
+    let menuLabel = UILabel()
+    menuLabel.textAlignment = .center
+    menuLabel.font = UIFont.boldSystemFont(ofSize: 17)
+    menuLabel.textColor = ANIColor.gray
+    addSubview(menuLabel)
+    menuLabel.centerInSuperview()
+    self.menuLabel = menuLabel
+    
+    //badge
+    let badge = UIView()
+    badge.backgroundColor = ANIColor.red
+    badge.layer.cornerRadius = BADGE_WIDHT / 2
+    badge.layer.masksToBounds = true
+    badge.alpha = 0.0
+    addSubview(badge)
+    badge.top(to: menuLabel, offset: -1.0)
+    badge.right(to: menuLabel, offset: 6.0)
+    badge.width(BADGE_WIDHT)
+    badge.height(BADGE_WIDHT)
+    self.badge = badge
+  }
+  
+  private func setupNotification() {
+    if menuKind == .noti {
+      ANINotificationManager.receive(changeIsHaveUnreadNoti: self, selector: #selector(updateNotiBadge))
+    }
+  }
+  
+  @objc private func updateNotiBadge() {
+    guard let badge = self.badge else { return }
+    
+    if ANISessionManager.shared.isHaveUnreadNoti {
+      badge.alpha = 1.0
+    } else {
+      badge.alpha = 0.0
     }
   }
 }

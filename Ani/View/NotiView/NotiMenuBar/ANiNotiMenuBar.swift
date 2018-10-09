@@ -9,6 +9,11 @@
 import UIKit
 import TinyConstraints
 
+enum MenuKind {
+  case noti;
+  case message;
+}
+
 class ANiNotiMenuBar: UIView {
   weak var menuCollectionView: UICollectionView?
   private let menus = ["通知", "メッセージ"]
@@ -56,13 +61,20 @@ class ANiNotiMenuBar: UIView {
 
 extension ANiNotiMenuBar: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-    return 2
+    return menus.count
   }
   
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     let id = NSStringFromClass(ANINotiMenuBarCell.self)
     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! ANINotiMenuBarCell
+
+    if indexPath.row == 0 {
+      cell.menuKind = .noti
+    } else if indexPath.row == 1 {
+      cell.menuKind = .message
+    }
     cell.menuLabel?.text = menus[indexPath.item]
+    
     return cell
   }
   
