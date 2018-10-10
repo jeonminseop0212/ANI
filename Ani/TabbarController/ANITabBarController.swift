@@ -35,6 +35,10 @@ class ANITabBarController: UITabBarController {
     
     setTabBar()
     setupBadge()
+    
+    loadUser()
+    observeChatGroup()
+    setupNotification()
   }
   
   override func viewDidAppear(_ animated: Bool) {
@@ -43,8 +47,6 @@ class ANITabBarController: UITabBarController {
     let userDefault = UserDefaults.standard
     let dic = [KEY_FIRST_LAUNCH: true]
     userDefault.register(defaults: dic)
-    
-    loadUser()
   }
   
   private func setTabBar() {
@@ -97,6 +99,7 @@ class ANITabBarController: UITabBarController {
         badge.backgroundColor = ANIColor.red
         badge.layer.cornerRadius = BADGE_WIDHT / 2
         badge.layer.masksToBounds = true
+        badge.alpha = 0.0
         icon.addSubview(badge)
         badge.centerX(to: icon, icon.rightAnchor)
         badge.centerY(to: icon, icon.topAnchor, offset: 2)
@@ -146,6 +149,21 @@ class ANITabBarController: UITabBarController {
       DLog("default tab")
     }
   }
+  
+  private func setupNotification() {
+    ANINotificationManager.receive(changeIsHaveUnreadNoti: self, selector: #selector(updateBadge))
+    ANINotificationManager.receive(changeIsHaveUnreadMessage: self, selector: #selector(updateBadge))
+  }
+  
+  @objc private func updateBadge() {
+    guard let badge = self.badge else { return }
+    
+    if ANISessionManager.shared.isHaveUnreadNoti || ANISessionManager.shared.isHaveUnreadMessage {
+      badge.alpha = 1.0
+    } else {
+      badge.alpha = 0.0
+    }
+  }
 }
 
 //MARK: data
@@ -174,14 +192,6 @@ extension ANITabBarController {
                 
                 self.oldIsHaveUnreadNoti = isHaveUnreadNoti
               }
-              
-              if let isHaveUnreadMessage = user.isHaveUnreadMessage {
-                if self.oldIsHaveUnreadMessage != isHaveUnreadMessage {
-                  ANISessionManager.shared.isHaveUnreadMessage = isHaveUnreadMessage
-                }
-                
-                self.oldIsHaveUnreadMessage = isHaveUnreadMessage
-              }
             }
           } catch let error {
             DLog(error)
@@ -201,6 +211,45 @@ extension ANITabBarController {
         userDefault.set(false, forKey: KEY_FIRST_LAUNCH)
         showInitialView()
       }
+    }
+  }
+  
+  private func observeChatGroup() {
+    guard let crrentUserUid = ANISessionManager.shared.currentUserUid else { return }
+    
+    let database = Firestore.firestore()
+    
+    DispatchQueue.global().async {
+      database.collection(KEY_CHAT_GROUPS).whereField(KEY_CHAT_MEMBER_IDS + "." + crrentUserUid, isEqualTo: true).whereField(KEY_IS_HAVE_UNREAD_MESSAGE + "." + crrentUserUid, isEqualTo: true).addSnapshotListener({ (snapshot, error) in
+        if let error = error {
+          DLog("Error get document: \(error)")
+          
+          return
+        }
+        
+        guard let snapshot = snapshot else { return }
+
+        snapshot.documentChanges.forEach({ (diff) in
+          if diff.type == .added {
+            if self.oldIsHaveUnreadMessage != true {
+              ANISessionManager.shared.isHaveUnreadMessage = true
+            }
+            self.oldIsHaveUnreadMessage = ANISessionManager.shared.isHaveUnreadMessage
+          } else if diff.type == .modified {
+            if self.oldIsHaveUnreadMessage != true {
+              ANISessionManager.shared.isHaveUnreadMessage = true
+            }
+            self.oldIsHaveUnreadMessage = ANISessionManager.shared.isHaveUnreadMessage
+          }
+        })
+        
+        if snapshot.documents.isEmpty {
+          if self.oldIsHaveUnreadMessage != false {
+            ANISessionManager.shared.isHaveUnreadMessage = false
+          }
+          self.oldIsHaveUnreadMessage = ANISessionManager.shared.isHaveUnreadMessage
+        }
+      })
     }
   }
 }

@@ -346,7 +346,7 @@ class ANISignUpView: UIView {
       }
       
       if let profileImageUrl = metaData?.downloadURL() {
-        let user = FirebaseUser(uid: currentUser.uid, userName: userName, kind: "個人", introduce: "", profileImageUrl: profileImageUrl.absoluteString, familyImageUrls: nil, checkNotiDate: nil, isHaveUnreadNoti: false, isHaveUnreadMessage: false)
+        let user = FirebaseUser(uid: currentUser.uid, userName: userName, kind: "個人", introduce: "", profileImageUrl: profileImageUrl.absoluteString, familyImageUrls: nil, checkNotiDate: nil, isHaveUnreadNoti: false)
         self.uploadUserIntoDatabase(uid: currentUser.uid, user: user)
       }
     }

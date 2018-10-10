@@ -177,10 +177,8 @@ class ANIChatBar: UIView {
       DispatchQueue.global().async {
         database.collection(KEY_CHAT_GROUPS).document(chatGroupId).collection(KEY_CHAT_MESSAGES).addDocument(data: message)
 
-        let value: [String: String] = [KEY_CHAT_UPDATE_DATE: date, KEY_CHAT_LAST_MESSAGE: text]
+        let value: [String: Any] = [KEY_CHAT_UPDATE_DATE: date, KEY_CHAT_LAST_MESSAGE: text, KEY_IS_HAVE_UNREAD_MESSAGE + "." + userId: true]
         database.collection(KEY_CHAT_GROUPS).document(chatGroupId).updateData(value)
-        
-        database.collection(KEY_USERS).document(userId).updateData([KEY_IS_HAVE_UNREAD_MESSAGE: true])
       }
     } catch let error {
       DLog(error)
