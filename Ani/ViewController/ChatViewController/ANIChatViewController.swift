@@ -201,7 +201,7 @@ class ANIChatViewController: UIViewController {
   private func createGroup() {
     let id = NSUUID().uuidString
     let date = ANIFunction.shared.getToday()
-    let chatGroup = FirebaseChatGroup(groupId:id, memberIds: nil, updateDate: date, lastMessage: "", checkChatGroupDate: nil)
+    let chatGroup = FirebaseChatGroup(groupId:id, memberIds: nil, updateDate: date, lastMessage: "", checkChatGroupDate: nil, isHaveUnreadMessage: nil)
     
     let database = Firestore.firestore()
 

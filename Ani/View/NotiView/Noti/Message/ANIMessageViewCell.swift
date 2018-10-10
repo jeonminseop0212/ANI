@@ -119,15 +119,18 @@ class ANIMessageViewCell: UITableViewCell {
     guard let updateDateLabel = self.updateDateLabel,
           let messageLabel = self.messageLabel,
           let chatGroup = self.chatGroup,
-          let base = self.base else { return }
+          let base = self.base,
+          let currentUserId = ANISessionManager.shared.currentUserUid else { return }
     
     updateDateLabel.text = String(chatGroup.updateDate.prefix(10))
     messageLabel.text = chatGroup.lastMessage
     
-    if !checkRead(chatGroup: chatGroup) {
-      base.backgroundColor = ANIColor.green.withAlphaComponent(0.1)
-    } else {
-      base.backgroundColor = .white
+    if let isHaveUnreadMessage = chatGroup.isHaveUnreadMessage, let currentUserIsHaveUnreadMessage = isHaveUnreadMessage[currentUserId] {
+      if currentUserIsHaveUnreadMessage {
+        base.backgroundColor = ANIColor.green.withAlphaComponent(0.1)
+      } else {
+        base.backgroundColor = .white
+      }
     }
   }
   
@@ -148,20 +151,6 @@ class ANIMessageViewCell: UITableViewCell {
     }
   }
   
-  private func checkRead(chatGroup: FirebaseChatGroup) -> Bool {
-    guard let currentUserUid = ANISessionManager.shared.currentUserUid,
-          let checkChatGroupDate = chatGroup.checkChatGroupDate,
-          let myCehckDate = checkChatGroupDate[currentUserUid] else { return false }
-    
-    let checkDate = ANIFunction.shared.dateFromString(string: myCehckDate)
-    let chatGroupUpdateDate = ANIFunction.shared.dateFromString(string: chatGroup.updateDate)
-    
-    if checkDate >= chatGroupUpdateDate {
-      return true
-    } else {
-      return false
-    }
-  }
   
   @objc private func cellTapped() {
     guard let user = self.user else { return }

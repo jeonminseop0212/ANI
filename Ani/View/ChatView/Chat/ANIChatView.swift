@@ -112,25 +112,6 @@ class ANIChatView: UIView {
     return resetDate
   }
   
-  private func updateCheckChatGroupDate() {
-    guard let currentUserUid = ANISessionManager.shared.currentUserUid,
-          let chatGroupId = self.chatGroupId,
-          let chatGroup = self.chatGroup else { return }
-    
-    let database = Firestore.firestore()
-    
-    let date = ANIFunction.shared.getToday()
-    
-    var checkChatGroupDateTemp = [String: String]()
-    
-    if let checkChatGroupDate = chatGroup.checkChatGroupDate {
-      checkChatGroupDateTemp = checkChatGroupDate
-    }
-    
-    checkChatGroupDateTemp[currentUserUid] = date
-    database.collection(KEY_CHAT_GROUPS).document(chatGroupId).updateData([KEY_CHECK_CHAT_GROUP_DATE: checkChatGroupDateTemp])
-  }
-  
   func updateTableWithNewRowCount(newMessage: [FirebaseChatMessage]) {
     guard let chatTableView = self.chatTableView else { return }
     
@@ -357,8 +338,7 @@ extension ANIChatView {
               DispatchQueue.main.async {
                 if !updated {
                   chatTableView.reloadData() {
-                    self.updateCheckChatGroupDate()
-                    database.collection(KEY_USERS).document(currentUserUid).updateData([KEY_IS_HAVE_UNREAD_MESSAGE: false])
+                    database.collection(KEY_CHAT_GROUPS).document(chatGroupId).updateData([KEY_IS_HAVE_UNREAD_MESSAGE + "." + currentUserUid: false])
 
                     updated = true
                     self.isFirstLoad = false
