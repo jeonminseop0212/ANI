@@ -125,7 +125,7 @@ class ANIRecruitDetailViewController: UIViewController {
     
     //applyButton
     let applyButton = ANIAreaButtonView()
-    applyButton.base?.backgroundColor = ANIColor.green
+    applyButton.base?.backgroundColor = ANIColor.emerald
     applyButton.baseCornerRadius = ANIRecruitDetailViewController.APPLY_BUTTON_HEIGHT / 2
     applyButton.dropShadow(opacity: 0.2)
     applyButton.delegate = self
@@ -225,7 +225,7 @@ class ANIRecruitDetailViewController: UIViewController {
 
           DispatchQueue.main.async {
             UIView.animate(withDuration: 0.15) {
-              clipButton.tintColor = ANIColor.green
+              clipButton.tintColor = ANIColor.emerald
               self.isClipped = true
             }
           }
@@ -269,7 +269,7 @@ class ANIRecruitDetailViewController: UIViewController {
           if document.documentID == currentUserId {
             self.isClipped = true
             UIView.animate(withDuration: 0.15) {
-              self.clipButton?.tintColor = ANIColor.green
+              self.clipButton?.tintColor = ANIColor.emerald
             }
           }
         }

@@ -59,7 +59,7 @@ class ANIMessageViewCell: UITableViewCell {
     
     //profileImageView
     let profileImageView = UIImageView()
-    profileImageView.backgroundColor = ANIColor.bg
+    profileImageView.backgroundColor = ANIColor.gray
     profileImageView.layer.cornerRadius = PROFILE_IMAGE_VIEW_HEIGHT / 2
     profileImageView.layer.masksToBounds = true
     profileImageView.isUserInteractionEnabled = true
@@ -127,7 +127,7 @@ class ANIMessageViewCell: UITableViewCell {
     
     if let isHaveUnreadMessage = chatGroup.isHaveUnreadMessage, let currentUserIsHaveUnreadMessage = isHaveUnreadMessage[currentUserId] {
       if currentUserIsHaveUnreadMessage {
-        base.backgroundColor = ANIColor.green.withAlphaComponent(0.1)
+        base.backgroundColor = ANIColor.emerald.withAlphaComponent(0.1)
       } else {
         base.backgroundColor = .white
       }

@@ -265,6 +265,14 @@ extension ANIProfileBasicView: UITableViewDataSource {
       cell.selectedIndex = contentType.rawValue
       cell.user = currentUser
       
+      if let bottomSpace = cell.bottomSpace {
+        if contentType == .recruit {
+          bottomSpace.isHidden = false
+        } else {
+          bottomSpace.isHidden = true
+        }
+      }
+      
       return cell
     } else {
       if contentType == .profile {

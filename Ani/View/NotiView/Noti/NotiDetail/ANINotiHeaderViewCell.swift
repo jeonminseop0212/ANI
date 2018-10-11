@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ANINotiHeaderQnaViewCell: UITableViewCell {
+class ANINotiHeaderViewCell: UITableViewCell {
   
   private weak var headerLabel: UILabel?
   

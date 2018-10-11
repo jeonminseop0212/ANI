@@ -243,7 +243,7 @@ class ANISignUpView: UIView {
     
     //doneButton
     let doneButton = ANIAreaButtonView()
-    doneButton.base?.backgroundColor = ANIColor.green
+    doneButton.base?.backgroundColor = ANIColor.emerald
     doneButton.base?.layer.cornerRadius = DONE_BUTTON_HEIGHT / 2
     doneButton.delegate = self
     doneButton.dropShadow(opacity: 0.1)
@@ -274,7 +274,7 @@ class ANISignUpView: UIView {
     guard let userNameTextField = self.userNameTextField,
           let userName = userNameTextField.text else { return }
     
-    let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.green)
+    let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.emerald)
     NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData, nil)
     
     let database = Firestore.firestore()

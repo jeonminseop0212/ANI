@@ -50,7 +50,7 @@ class ANiNotiMenuBar: UIView {
     
     //horizontalBar
     let horizontalBar = UIView()
-    horizontalBar.backgroundColor = ANIColor.green
+    horizontalBar.backgroundColor = ANIColor.emerald
     addSubview(horizontalBar)
     horizontalBarleftConstraint = horizontalBar.leftToSuperview()
     horizontalBar.widthToSuperview(multiplier: 1/2)

@@ -23,7 +23,6 @@ class ANIStoryViewCell: UITableViewCell {
   private weak var tapArea: UIView?
   private weak var storyImagesView: ANIStoryImagesView?
   private weak var storyLabel: UILabel?
-  private weak var line: UIImageView?
   private let PROFILE_IMAGE_VIEW_HEIGHT: CGFloat = 32.0
   private weak var profileImageView: UIImageView?
   private weak var userNameLabel: UILabel?
@@ -107,7 +106,7 @@ class ANIStoryViewCell: UITableViewCell {
     
     //profileImageView
     let profileImageView = UIImageView()
-    profileImageView.backgroundColor = ANIColor.bg
+    profileImageView.backgroundColor = ANIColor.gray
     profileImageView.isUserInteractionEnabled = true
     let profileIamgetapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped))
     profileImageView.addGestureRecognizer(profileIamgetapGesture)
@@ -179,10 +178,10 @@ class ANIStoryViewCell: UITableViewCell {
 
     //loveButton
     var param = WCLShineParams()
-    param.bigShineColor = ANIColor.red
-    param.smallShineColor = ANIColor.pink
+    param.bigShineColor = ANIColor.pink
+    param.smallShineColor = ANIColor.lightPink
     let loveButton = WCLShineButton(frame: CGRect(x: 0.0, y: 0.0, width: 20.0, height: 20.0), params: param)
-    loveButton.fillColor = ANIColor.red
+    loveButton.fillColor = ANIColor.pink
     loveButton.color = ANIColor.gray
     loveButton.image = .heart
     loveButton.isEnabled = false
@@ -205,16 +204,15 @@ class ANIStoryViewCell: UITableViewCell {
     userNameLabel.centerY(to: profileImageView)
     self.userNameLabel = userNameLabel
     
-    //line
-    let line = UIImageView()
-    line.image = UIImage(named: "line")
-    addSubview(line)
-    line.topToBottom(of: profileImageView, offset: 10.0)
-    line.leftToSuperview()
-    line.rightToSuperview()
-    line.height(0.5)
-    line.bottomToSuperview(priority: .defaultHigh)
-    self.line = line
+    //bottomSpace
+    let spaceView = UIView()
+    spaceView.backgroundColor = ANIColor.bg
+    addSubview(spaceView)
+    spaceView.topToBottom(of: profileImageView, offset: 10)
+    spaceView.leftToSuperview()
+    spaceView.rightToSuperview()
+    spaceView.height(10.0)
+    spaceView.bottomToSuperview(priority: .defaultHigh)
   }
   
   private func reloadLayout() {

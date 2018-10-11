@@ -22,6 +22,8 @@ protocol ANIRecruitViewCellDelegate {
 }
 
 class ANIRecruitViewCell: UITableViewCell {
+  
+  private weak var base: UIView?
   private weak var tapArea: UIView?
   private weak var recruitImageView: UIImageView?
   private weak var basicInfoStackView: UIStackView?
@@ -40,7 +42,6 @@ class ANIRecruitViewCell: UITableViewCell {
   private weak var loveButton: WCLShineButton?
   private weak var loveCountLabel: UILabel?
   private weak var clipButton: UIButton?
-  private weak var line: UIImageView?
   
   var recruit: FirebaseRecruit? {
     didSet {
@@ -88,19 +89,31 @@ class ANIRecruitViewCell: UITableViewCell {
   
   private func setup() {
     self.selectionStyle = .none
-    self.backgroundColor = .white
+    self.backgroundColor = ANIColor.bg
+    
+    //base
+    let base = UIView()
+    base.backgroundColor = .white
+    base.layer.cornerRadius = 10.0
+    base.layer.masksToBounds = true
+    addSubview(base)
+    base.topToSuperview(offset: 0)
+    base.leftToSuperview(offset: 10)
+    base.rightToSuperview(offset: -10)
+    base.bottomToSuperview(offset: -10)
+    self.base = base
     
     //tapArea
     let tapArea = UIView()
     let cellTapGesture = UITapGestureRecognizer(target: self, action: #selector(cellTapped))
     tapArea.addGestureRecognizer(cellTapGesture)
-    addSubview(tapArea)
+    base.addSubview(tapArea)
     tapArea.edgesToSuperview(excluding: .bottom)
     self.tapArea = tapArea
     
     //recruitImageView
     let recruitImageView = UIImageView()
-    recruitImageView.backgroundColor = ANIColor.bg
+    recruitImageView.backgroundColor = ANIColor.gray
     recruitImageView.contentMode = .scaleAspectFill
     recruitImageView.clipsToBounds = true
     tapArea.addSubview(recruitImageView)
@@ -116,7 +129,7 @@ class ANIRecruitViewCell: UITableViewCell {
     basicInfoStackView.axis = .horizontal
     basicInfoStackView.distribution = .fillEqually
     basicInfoStackView.alignment = .center
-    basicInfoStackView.spacing = 8.0
+    basicInfoStackView.spacing = 5.0
     tapArea.addSubview(basicInfoStackView)
     basicInfoStackView.topToBottom(of: recruitImageView, offset: 10.0)
     basicInfoStackView.leftToSuperview(offset: 10.0)
@@ -130,9 +143,9 @@ class ANIRecruitViewCell: UITableViewCell {
     recruitStateLabel.font = UIFont.boldSystemFont(ofSize: 13.0)
     recruitStateLabel.layer.cornerRadius = 5.0
     recruitStateLabel.layer.masksToBounds = true
-    recruitStateLabel.backgroundColor = ANIColor.green
+    recruitStateLabel.backgroundColor = ANIColor.emerald
     basicInfoStackView.addArrangedSubview(recruitStateLabel)
-    recruitStateLabel.height(24.0)
+    recruitStateLabel.height(26.0)
     self.recruitStateLabel = recruitStateLabel
     
     //homeLabel
@@ -140,12 +153,13 @@ class ANIRecruitViewCell: UITableViewCell {
     homeLabel.textColor = ANIColor.darkGray
     homeLabel.textAlignment = .center
     homeLabel.font = UIFont.boldSystemFont(ofSize: 13.0)
+    homeLabel.adjustsFontSizeToFitWidth = true
     homeLabel.layer.cornerRadius = 5.0
     homeLabel.layer.masksToBounds = true
     homeLabel.layer.borderColor = ANIColor.darkGray.cgColor
     homeLabel.layer.borderWidth = 1.2
     basicInfoStackView.addArrangedSubview(homeLabel)
-    homeLabel.height(24.0)
+    homeLabel.height(26.0)
     self.homeLabel = homeLabel
     
     //ageLabel
@@ -153,12 +167,13 @@ class ANIRecruitViewCell: UITableViewCell {
     ageLabel.textColor = ANIColor.darkGray
     ageLabel.textAlignment = .center
     ageLabel.font = UIFont.boldSystemFont(ofSize: 13.0)
+    ageLabel.adjustsFontSizeToFitWidth = true
     ageLabel.layer.cornerRadius = 5.0
     ageLabel.layer.masksToBounds = true
     ageLabel.layer.borderColor = ANIColor.darkGray.cgColor
     ageLabel.layer.borderWidth = 1.2
     basicInfoStackView.addArrangedSubview(ageLabel)
-    ageLabel.height(24.0)
+    ageLabel.height(26.0)
     self.ageLabel = ageLabel
     
     //sexLabel
@@ -166,12 +181,13 @@ class ANIRecruitViewCell: UITableViewCell {
     sexLabel.textColor = ANIColor.darkGray
     sexLabel.textAlignment = .center
     sexLabel.font = UIFont.boldSystemFont(ofSize: 13.0)
+    sexLabel.adjustsFontSizeToFitWidth = true
     sexLabel.layer.cornerRadius = 5.0
     sexLabel.layer.masksToBounds = true
     sexLabel.layer.borderColor = ANIColor.darkGray.cgColor
     sexLabel.layer.borderWidth = 1.2
     basicInfoStackView.addArrangedSubview(sexLabel)
-    sexLabel.height(24.0)
+    sexLabel.height(26.0)
     self.sexLabel = sexLabel
     
     //titleLabel
@@ -203,10 +219,11 @@ class ANIRecruitViewCell: UITableViewCell {
     profileImageView.isUserInteractionEnabled = true
     let profileImageTapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped))
     profileImageView.addGestureRecognizer(profileImageTapGesture)
-    profileImageView.backgroundColor = ANIColor.bg
-    addSubview(profileImageView)
+    profileImageView.backgroundColor = ANIColor.gray
+    base.addSubview(profileImageView)
     profileImageView.topToBottom(of: tapArea, offset: 10.0)
     profileImageView.leftToSuperview(offset: 10.0)
+    profileImageView.bottomToSuperview(offset: -10.0)
     profileImageView.width(PROFILE_IMAGE_HEIGHT)
     profileImageView.height(PROFILE_IMAGE_HEIGHT)
     profileImageView.layer.cornerRadius = PROFILE_IMAGE_HEIGHT / 2
@@ -218,7 +235,7 @@ class ANIRecruitViewCell: UITableViewCell {
     clipButton.setImage(UIImage(named: "clip")?.withRenderingMode(.alwaysTemplate), for: .normal)
     clipButton.tintColor = ANIColor.gray
     clipButton.addTarget(self, action: #selector(clip), for: .touchUpInside)
-    addSubview(clipButton)
+    base.addSubview(clipButton)
     clipButton.centerY(to: profileImageView)
     clipButton.rightToSuperview(offset: -10.0)
     clipButton.width(20.0)
@@ -229,7 +246,7 @@ class ANIRecruitViewCell: UITableViewCell {
     let loveCountLabel = UILabel()
     loveCountLabel.font = UIFont.boldSystemFont(ofSize: 14.0)
     loveCountLabel.textColor = ANIColor.dark
-    addSubview(loveCountLabel)
+    base.addSubview(loveCountLabel)
     loveCountLabel.centerY(to: profileImageView)
     loveCountLabel.rightToLeft(of: clipButton, offset: -10.0)
     loveCountLabel.width(25.0)
@@ -241,7 +258,7 @@ class ANIRecruitViewCell: UITableViewCell {
     loveButtonBG.isUserInteractionEnabled = false
     let tapGesture = UITapGestureRecognizer(target: self, action: #selector(loveButtonBGTapped))
     loveButtonBG.addGestureRecognizer(tapGesture)
-    addSubview(loveButtonBG)
+    base.addSubview(loveButtonBG)
     loveButtonBG.centerY(to: profileImageView)
     loveButtonBG.rightToLeft(of: loveCountLabel, offset: -10.0)
     loveButtonBG.width(20.0)
@@ -250,15 +267,15 @@ class ANIRecruitViewCell: UITableViewCell {
     
     //loveButton
     var param = WCLShineParams()
-    param.bigShineColor = ANIColor.red
-    param.smallShineColor = ANIColor.pink
+    param.bigShineColor = ANIColor.pink
+    param.smallShineColor = ANIColor.lightPink
     let loveButton = WCLShineButton(frame: CGRect(x: 0.0, y: 0.0, width: 20.0, height: 20.0), params: param)
-    loveButton.fillColor = ANIColor.red
+    loveButton.fillColor = ANIColor.pink
     loveButton.color = ANIColor.gray
     loveButton.image = .heart
     loveButton.isEnabled = false
     loveButton.addTarget(self, action: #selector(love), for: .valueChanged)
-    addSubview(loveButton)
+    base.addSubview(loveButton)
     loveButton.centerY(to: profileImageView)
     loveButton.rightToLeft(of: loveCountLabel, offset: -10.0)
     loveButton.width(20.0)
@@ -269,7 +286,7 @@ class ANIRecruitViewCell: UITableViewCell {
     let supportCountLabel = UILabel()
     supportCountLabel.font = UIFont.boldSystemFont(ofSize: 14.0)
     supportCountLabel.textColor = ANIColor.dark
-    addSubview(supportCountLabel)
+    base.addSubview(supportCountLabel)
     supportCountLabel.centerY(to: profileImageView)
     supportCountLabel.rightToLeft(of: loveButton, offset: -10.0)
     supportCountLabel.width(25.0)
@@ -281,7 +298,7 @@ class ANIRecruitViewCell: UITableViewCell {
     supportButton.setImage(UIImage(named: "support")?.withRenderingMode(.alwaysTemplate), for: .normal)
     supportButton.tintColor = ANIColor.gray
     supportButton.addTarget(self, action: #selector(support), for: .touchUpInside)
-    addSubview(supportButton)
+    base.addSubview(supportButton)
     supportButton.centerY(to: profileImageView)
     supportButton.rightToLeft(of: supportCountLabel, offset: -10.0)
     supportButton.width(20.0)
@@ -293,22 +310,11 @@ class ANIRecruitViewCell: UITableViewCell {
     userNameLabel.font = UIFont.systemFont(ofSize: 13.0)
     userNameLabel.textColor = ANIColor.subTitle
     userNameLabel.numberOfLines = 2
-    addSubview(userNameLabel)
+    base.addSubview(userNameLabel)
     userNameLabel.leftToRight(of: profileImageView, offset: 10.0)
     userNameLabel.rightToLeft(of: supportButton, offset: -10.0)
     userNameLabel.centerY(to: profileImageView)
     self.userNameLabel = userNameLabel
-    
-    //line
-    let line = UIImageView()
-    line.image = UIImage(named: "line")
-    addSubview(line)
-    line.topToBottom(of: profileImageView, offset: 10.0)
-    line.leftToSuperview()
-    line.rightToSuperview()
-    line.height(0.5)
-    line.bottomToSuperview()
-    self.line = line
   }
   
   private func reloadLayout() {
@@ -329,7 +335,7 @@ class ANIRecruitViewCell: UITableViewCell {
     recruitImageView.sd_setImage(with: URL(string: headerImageUrl), completed: nil)
     if recruit.recruitState == 0 {
       recruitStateLabel.text = "募集中"
-      recruitStateLabel.backgroundColor  = ANIColor.green
+      recruitStateLabel.backgroundColor  = ANIColor.emerald
     } else if recruit.recruitState == 1 {
       recruitStateLabel.text = "家族決定"
       recruitStateLabel.backgroundColor  = ANIColor.pink

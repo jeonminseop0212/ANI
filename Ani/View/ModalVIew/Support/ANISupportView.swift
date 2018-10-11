@@ -58,7 +58,7 @@ class ANISupportView: UIView {
     
     //supportButton
     let supportButton = ANIAreaButtonView()
-    supportButton.base?.backgroundColor = ANIColor.green
+    supportButton.base?.backgroundColor = ANIColor.emerald
     supportButton.baseCornerRadius = SUPPORT_BUTTON_HEIGHT / 2
     supportButton.dropShadow(opacity: 0.1)
     supportButton.delegate = self

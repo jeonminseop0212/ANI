@@ -48,7 +48,7 @@ class ANINeedLoginView: UIView {
     
     //loginButton
     let loginButton = ANIAreaButtonView()
-    loginButton.base?.backgroundColor = ANIColor.green
+    loginButton.base?.backgroundColor = ANIColor.emerald
     loginButton.baseCornerRadius = LOGIN_BUTTON_HEIGHT / 2
     loginButton.dropShadow(opacity: 0.1)
     loginButton.delegate = self

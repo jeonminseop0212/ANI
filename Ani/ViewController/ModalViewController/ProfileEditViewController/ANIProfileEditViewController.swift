@@ -122,7 +122,7 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
     let editButtonBG = UIView()
     editButtonBG.layer.cornerRadius = (UIViewController.NAVIGATION_BAR_HEIGHT - 10.0) / 2
     editButtonBG.layer.masksToBounds = true
-    editButtonBG.backgroundColor = ANIColor.green
+    editButtonBG.backgroundColor = ANIColor.emerald
     editButtonBG.alpha = 1.0
     myNavigationBase.addSubview(editButtonBG)
     editButtonBG.centerYToSuperview()
@@ -342,7 +342,7 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
     guard let currentUser = ANISessionManager.shared.currentUser,
           let currentUserUid = ANISessionManager.shared.currentUserUid else { return }
     
-    let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.green)
+    let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.emerald)
     NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData, nil)
 
     if familyImagesChange {
@@ -423,7 +423,7 @@ extension ANIProfileEditViewController: ANIProfileEditViewDelegate {
       Config.Camera.imageLimit = 10
       Gallery.Config.Font.Main.regular = UIFont.boldSystemFont(ofSize: 17)
       Gallery.Config.Grid.ArrowButton.tintColor = ANIColor.dark
-      Gallery.Config.Grid.FrameView.borderColor = ANIColor.green
+      Gallery.Config.Grid.FrameView.borderColor = ANIColor.emerald
       Gallery.Config.Grid.previewRatio = 1.0
       
       let galleryNV = UINavigationController(rootViewController: galleryUnrap)
@@ -446,7 +446,7 @@ extension ANIProfileEditViewController: ANIProfileEditViewDelegate {
       }
       Gallery.Config.Font.Main.regular = UIFont.boldSystemFont(ofSize: 17)
       Gallery.Config.Grid.ArrowButton.tintColor = ANIColor.dark
-      Gallery.Config.Grid.FrameView.borderColor = ANIColor.green
+      Gallery.Config.Grid.FrameView.borderColor = ANIColor.emerald
       Gallery.Config.Grid.previewRatio = 1.0
       
       let galleryNV = UINavigationController(rootViewController: galleryUnrap)

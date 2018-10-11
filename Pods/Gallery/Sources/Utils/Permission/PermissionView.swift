@@ -65,8 +65,8 @@ class PermissionView: UIView {
     let button = UIButton(type: .custom)
     button.setTitle("Gallery.Permission.Button".g_localize(fallback: "設定画面").uppercased(),
                     for: UIControl.State())
-    //ANIColor.green
-    button.backgroundColor = UIColor(red: 103/255, green: 219/255, blue: 64/255, alpha: 1)
+    //ANIColor.emerald
+    button.backgroundColor = UIColor(red: 33/255, green: 183/255, blue: 169/255, alpha: 1)
     button.titleLabel?.font = Config.Font.Main.medium.withSize(16)
     button.setTitleColor(Config.Permission.Button.textColor, for: UIControl.State())
     button.setTitleColor(Config.Permission.Button.highlightedTextColor, for: .highlighted)

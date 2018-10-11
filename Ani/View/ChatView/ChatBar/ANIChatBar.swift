@@ -43,7 +43,7 @@ class ANIChatBar: UIView {
   private func setup() {
     //profileImageView
     let profileImageView = UIImageView()
-    profileImageView.backgroundColor = ANIColor.bg
+    profileImageView.backgroundColor = ANIColor.gray
     profileImageView.layer.cornerRadius = 40.0 / 2
     profileImageView.layer.masksToBounds = true
     profileImageView.contentMode = .scaleAspectFill
@@ -69,7 +69,7 @@ class ANIChatBar: UIView {
     //postMessageButton
     let postMessageButton = UIButton()
     postMessageButton.setTitle("送信する", for: .normal)
-    postMessageButton.setTitleColor(ANIColor.green, for: .normal)
+    postMessageButton.setTitleColor(ANIColor.emerald, for: .normal)
     postMessageButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 15.0)
     postMessageButton.addTarget(self, action: #selector(postMessage), for: .touchUpInside)
     postMessageButton.isEnabled = false

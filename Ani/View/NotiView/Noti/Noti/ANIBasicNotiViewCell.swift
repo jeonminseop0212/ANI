@@ -78,7 +78,7 @@ class ANIBasicNotiViewCell: UITableViewCell {
     
     //profileImageView
     let profileImageView = UIImageView()
-    profileImageView.backgroundColor = ANIColor.bg
+    profileImageView.backgroundColor = ANIColor.gray
     profileImageView.layer.cornerRadius = PROFILE_IMAGE_VIEW_HEIGHT / 2
     profileImageView.layer.masksToBounds = true
     profileImageView.isUserInteractionEnabled = true
@@ -117,7 +117,7 @@ class ANIBasicNotiViewCell: UITableViewCell {
     notiLabel.text = noti.noti
     
     if !checkRead(noti: noti) {
-      base.backgroundColor = ANIColor.green.withAlphaComponent(0.1)
+      base.backgroundColor = ANIColor.emerald.withAlphaComponent(0.1)
       UIView.animate(withDuration: 0.2, delay: 1, options: .curveEaseOut, animations: {
         base.backgroundColor = .white
       }, completion: nil)

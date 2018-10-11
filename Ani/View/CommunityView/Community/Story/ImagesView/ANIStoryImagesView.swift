@@ -45,7 +45,7 @@ class ANIStoryImagesView: UIView {
     imagesCollectionView.dataSource = self
     imagesCollectionView.isPagingEnabled = true
     imagesCollectionView.showsHorizontalScrollIndicator = false
-    imagesCollectionView.backgroundColor = .white
+    imagesCollectionView.backgroundColor = ANIColor.gray
     let id = NSStringFromClass(ANIStoryImagesCell.self)
     imagesCollectionView.register(ANIStoryImagesCell.self, forCellWithReuseIdentifier: id)
     addSubview(imagesCollectionView)
@@ -56,7 +56,7 @@ class ANIStoryImagesView: UIView {
     //pageControl
     let pageControl = UIPageControl()
     pageControl.pageIndicatorTintColor = ANIColor.gray
-    pageControl.currentPageIndicatorTintColor = ANIColor.green
+    pageControl.currentPageIndicatorTintColor = ANIColor.emerald
     pageControl.currentPage = 0
     pageControl.isUserInteractionEnabled = false
     addSubview(pageControl)

@@ -25,10 +25,12 @@ class ANIRecuruitView: UIView {
   private weak var recruitTableView: UITableView? {
     didSet {
       guard let recruitTableView = self.recruitTableView else { return }
-      let topInset = UIViewController.NAVIGATION_BAR_HEIGHT + ANIRecruitViewController.FILTERS_VIEW_HEIGHT
+      let topInset = UIViewController.NAVIGATION_BAR_HEIGHT + ANIRecruitViewController.FILTERS_VIEW_HEIGHT + TABLE_VIEW_TOP_MARGIN
       recruitTableView.setContentOffset(CGPoint(x: 0, y: -topInset), animated: false)
     }
   }
+  
+  private let TABLE_VIEW_TOP_MARGIN: CGFloat = 10.0
   
   private var recruits = [FirebaseRecruit]()
   private var users = [FirebaseUser]()
@@ -115,7 +117,7 @@ class ANIRecuruitView: UIView {
     //recruitTableView
     let tableView = UITableView()
     tableView.separatorStyle = .none
-    let topInset = UIViewController.NAVIGATION_BAR_HEIGHT + ANIRecruitViewController.FILTERS_VIEW_HEIGHT
+    let topInset = UIViewController.NAVIGATION_BAR_HEIGHT + ANIRecruitViewController.FILTERS_VIEW_HEIGHT + TABLE_VIEW_TOP_MARGIN
     tableView.contentInset = UIEdgeInsets(top: topInset, left: 0, bottom: 0, right: 0)
     tableView.scrollIndicatorInsets  = UIEdgeInsets(top: topInset, left: 0, bottom: 0, right: 0)
     tableView.backgroundColor = ANIColor.bg
@@ -135,7 +137,7 @@ class ANIRecuruitView: UIView {
     self.recruitTableView = tableView
     
     //activityIndicatorView
-    let activityIndicatorView = NVActivityIndicatorView(frame: .zero, type: .lineScale, color: ANIColor.green, padding: 0)
+    let activityIndicatorView = NVActivityIndicatorView(frame: .zero, type: .lineScale, color: ANIColor.emerald, padding: 0)
     addSubview(activityIndicatorView)
     activityIndicatorView.width(40.0)
     activityIndicatorView.height(40.0)

@@ -63,7 +63,7 @@ class ANIUserSearchViewCell: UITableViewCell {
     let profileImageView = UIImageView()
     profileImageView.layer.cornerRadius = PROFILE_IMAGE_VIEW_HEIGHT / 2
     profileImageView.layer.masksToBounds = true
-    profileImageView.backgroundColor = ANIColor.bg
+    profileImageView.backgroundColor = ANIColor.gray
     stackView.addArrangedSubview(profileImageView)
     profileImageView.width(PROFILE_IMAGE_VIEW_HEIGHT)
     profileImageView.height(PROFILE_IMAGE_VIEW_HEIGHT)
@@ -79,9 +79,9 @@ class ANIUserSearchViewCell: UITableViewCell {
     //followButton
     let followButton = ANIAreaButtonView()
     followButton.baseCornerRadius = 10.0
-    followButton.base?.backgroundColor = ANIColor.green
+    followButton.base?.backgroundColor = ANIColor.emerald
     followButton.base?.layer.borderWidth = 1.8
-    followButton.base?.layer.borderColor = ANIColor.green.cgColor
+    followButton.base?.layer.borderColor = ANIColor.emerald.cgColor
     followButton.alpha = 0.0
     followButton.delegate = self
     stackView.addArrangedSubview(followButton)
@@ -153,18 +153,18 @@ class ANIUserSearchViewCell: UITableViewCell {
             if document.documentID == userId {
               followButton.base?.backgroundColor = .clear
               followLabel.text = "フォロー中"
-              followLabel.textColor = ANIColor.green
+              followLabel.textColor = ANIColor.emerald
               
               break
             } else {
-              followButton.base?.backgroundColor = ANIColor.green
+              followButton.base?.backgroundColor = ANIColor.emerald
               followLabel.text = "フォロー"
               followLabel.textColor = .white
             }
           }
           
           if snapshot.documents.isEmpty {
-            followButton.base?.backgroundColor = ANIColor.green
+            followButton.base?.backgroundColor = ANIColor.emerald
             followLabel.text = "フォロー"
             followLabel.textColor = .white
           }
@@ -177,7 +177,7 @@ class ANIUserSearchViewCell: UITableViewCell {
         })
       }
     } else {
-      followButton.base?.backgroundColor = ANIColor.green
+      followButton.base?.backgroundColor = ANIColor.emerald
       followLabel.text = "フォロー"
       followLabel.textColor = .white
       
@@ -233,7 +233,7 @@ extension ANIUserSearchViewCell: ANIButtonViewDelegate {
       if let currentUserUid = ANISessionManager.shared.currentUserUid, !ANISessionManager.shared.isAnonymous {
         let database = Firestore.firestore()
         
-        if followButton.base?.backgroundColor == ANIColor.green {
+        if followButton.base?.backgroundColor == ANIColor.emerald {
           DispatchQueue.global().async {
             let date = ANIFunction.shared.getToday()
             database.collection(KEY_USERS).document(currentUserUid).collection(KEY_FOLLOWING_USER_IDS).document(userId).setData([KEY_DATE: date])
@@ -244,14 +244,14 @@ extension ANIUserSearchViewCell: ANIButtonViewDelegate {
           
           followButton.base?.backgroundColor = .clear
           followLabel.text = "フォロー中"
-          followLabel.textColor = ANIColor.green
+          followLabel.textColor = ANIColor.emerald
         } else {
           DispatchQueue.global().async {
             database.collection(KEY_USERS).document(currentUserUid).collection(KEY_FOLLOWING_USER_IDS).document(userId).delete()
             database.collection(KEY_USERS).document(userId).collection(KEY_FOLLOWER_IDS).document(currentUserUid).delete()
           }
           
-          followButton.base?.backgroundColor = ANIColor.green
+          followButton.base?.backgroundColor = ANIColor.emerald
           followLabel.text = "フォロー"
           followLabel.textColor = .white
         }

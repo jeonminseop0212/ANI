@@ -12,9 +12,13 @@ class ANIProfileTopCell: UITableViewCell {
   
   private weak var familyView: ANIFamilyView?
   private let FAMILY_VIEW_HEIGHT: CGFloat = 95.0
+  
+  private weak var stackView: UIStackView?
 
   private weak var menuBar: ANIProfileMenuBar?
   private let MENU_BAR_HEIGHT: CGFloat = 60.0
+  
+  weak var bottomSpace: UIView?
   
   var user: FirebaseUser? {
     didSet {
@@ -57,17 +61,28 @@ class ANIProfileTopCell: UITableViewCell {
     familyView.widthToSuperview()
     familyView.height(FAMILY_VIEW_HEIGHT)
     self.familyView = familyView
+    
+    //stackView
+    let stackView = UIStackView()
+    stackView.axis = .vertical
+    stackView.distribution = .equalSpacing
+    addSubview(stackView)
+    stackView.topToBottom(of: familyView, offset: 10.0)
+    stackView.edgesToSuperview(excluding: .top)
+    self.stackView = stackView
 
     //menuBar
     let menuBar = ANIProfileMenuBar()
-    addSubview(menuBar)
-    menuBar.topToBottom(of: familyView, offset: 10.0)
-    menuBar.leftToSuperview()
-    menuBar.rightToSuperview()
-    menuBar.widthToSuperview()
+    stackView.addArrangedSubview(menuBar)
     menuBar.height(MENU_BAR_HEIGHT)
-    menuBar.bottomToSuperview()
     self.menuBar = menuBar
+    
+    //bottomSpace
+    let bottomSpace = UIView()
+    bottomSpace.backgroundColor = ANIColor.bg
+    bottomSpace.height(10.0)
+    stackView.addArrangedSubview(bottomSpace)
+    self.bottomSpace = bottomSpace
   }
   
   private func reloadLayout() {

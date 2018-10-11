@@ -40,7 +40,7 @@ class ANIImageFilterCell: UICollectionViewCell {
   private func setup() {    
     //filterImageView
     let filterImageView = UIImageView()
-    filterImageView.backgroundColor = ANIColor.bg
+    filterImageView.backgroundColor = ANIColor.gray
     filterImageView.dropShadow(opacity: 0.2)
     addSubview(filterImageView)
     filterImageView.width(ANIImageFilterCell.FILTER_IMAGE_VIEW_WIDTH)

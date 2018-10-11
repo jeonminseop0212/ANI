@@ -61,7 +61,7 @@ class ANIInitialView: UIView {
     subTitleLabel.font = UIFont.systemFont(ofSize: 20.0)
     subTitleLabel.numberOfLines = 2
     subTitleLabel.textAlignment = .center
-    subTitleLabel.text = "猫たちがもっと幸せに暮らせる\n環境になるように..."
+    subTitleLabel.text = "猫と猫好きが\n幸せになるコミュニティー"
     base.addSubview(subTitleLabel)
     subTitleLabel.centerXToSuperview()
     subTitleLabel.centerYToSuperview(offset: -15.0)
@@ -93,7 +93,7 @@ class ANIInitialView: UIView {
     //loginButton
     let loginButton = ANIAreaButtonView()
     loginButton.base?.layer.cornerRadius = LOGIN_BUTTON_HEIGHT / 2
-    loginButton.base?.backgroundColor = ANIColor.green
+    loginButton.base?.backgroundColor = ANIColor.emerald
     loginButton.delegate = self
     buttonStackView.addArrangedSubview(loginButton)
     loginButton.height(LOGIN_BUTTON_HEIGHT)
@@ -113,7 +113,7 @@ class ANIInitialView: UIView {
     let signUpButton = ANIAreaButtonView()
     signUpButton.base?.layer.cornerRadius = LOGIN_BUTTON_HEIGHT / 2
     signUpButton.base?.backgroundColor = .white
-    signUpButton.base?.layer.borderColor = ANIColor.green.cgColor
+    signUpButton.base?.layer.borderColor = ANIColor.emerald.cgColor
     signUpButton.base?.layer.borderWidth = 2.0
     signUpButton.delegate = self
     buttonStackView.addArrangedSubview(signUpButton)
@@ -122,7 +122,7 @@ class ANIInitialView: UIView {
     
     //signUpButtonLabel
     let signUpButtonLabel = UILabel()
-    signUpButtonLabel.textColor = ANIColor.green
+    signUpButtonLabel.textColor = ANIColor.emerald
     signUpButtonLabel.textAlignment = .center
     signUpButtonLabel.text = "登録"
     signUpButtonLabel.font = UIFont.boldSystemFont(ofSize: 20.0)

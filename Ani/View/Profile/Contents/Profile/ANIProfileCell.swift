@@ -56,7 +56,7 @@ class ANIProfileCell: UITableViewCell {
     
     //profileEditButton
     let profileEditButton = ANIAreaButtonView()
-    profileEditButton.base?.backgroundColor = ANIColor.green
+    profileEditButton.base?.backgroundColor = ANIColor.emerald
     profileEditButton.baseCornerRadius = PROFILE_EDIT_BUTTON_HEIGHT / 2
     profileEditButton.delegate = self
     addSubview(profileEditButton)

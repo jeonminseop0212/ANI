@@ -80,7 +80,7 @@ class ANILoginViewController: UIViewController {
     
     //rejectView
     let rejectView = UIView()
-    rejectView.backgroundColor = ANIColor.green
+    rejectView.backgroundColor = ANIColor.emerald
     self.view.addSubview(rejectView)
     rejectViewBottomConstraint = rejectView.bottomToTop(of: self.view)
     rejectViewBottomConstraintOriginalConstant = rejectViewBottomConstraint?.constant
@@ -91,7 +91,7 @@ class ANILoginViewController: UIViewController {
     
     //rejectBaseView
     let rejectBaseView = UIView()
-    rejectBaseView.backgroundColor = ANIColor.green
+    rejectBaseView.backgroundColor = ANIColor.emerald
     rejectView.addSubview(rejectBaseView)
     rejectBaseView.edgesToSuperview(excluding: .top)
     rejectBaseView.height(UIViewController.NAVIGATION_BAR_HEIGHT)
