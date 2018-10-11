@@ -108,7 +108,7 @@ class ANIOtherChatViewCell: UITableViewCell {
     profileImageView.layer.cornerRadius = PROFILE_IMAGE_VIEW_HEIGHT / 2
     profileImageView.layer.masksToBounds = true
     profileImageView.isUserInteractionEnabled = true
-    profileImageView.backgroundColor = ANIColor.bg
+    profileImageView.backgroundColor = ANIColor.gray
     let tapGesture = UITapGestureRecognizer(target: self, action: #selector(profileTapped))
     profileImageView.addGestureRecognizer(tapGesture)
     base.addSubview(profileImageView)

@@ -25,8 +25,6 @@ class ANINotiCommentViewCell: UITableViewCell {
 //  private weak var commentButton: UIButton?
 //  private weak var commentCountLabel: UILabel?
   
-  private weak var bottomLine: UIImageView?
-  
   var comment: FirebaseComment? {
     didSet {
       reloadLayout()
@@ -70,7 +68,7 @@ class ANINotiCommentViewCell: UITableViewCell {
     
     //profileImageView
     let profileImageView = UIImageView()
-    profileImageView.backgroundColor = ANIColor.bg
+    profileImageView.backgroundColor = ANIColor.gray
     profileImageView.layer.cornerRadius = PROFILE_IMAGE_VIEW_HEIGHT / 2
     profileImageView.layer.masksToBounds = true
     profileImageView.isUserInteractionEnabled = true
@@ -81,6 +79,7 @@ class ANINotiCommentViewCell: UITableViewCell {
     profileImageView.height(PROFILE_IMAGE_VIEW_HEIGHT)
     profileImageView.topToBottom(of: commentLabel, offset: 10.0)
     profileImageView.leftToSuperview(offset: 10.0)
+    profileImageView.bottomToSuperview(offset: -10.0)
     self.profileImageView = profileImageView
     
 //    //commentCountLabel
@@ -117,10 +116,10 @@ class ANINotiCommentViewCell: UITableViewCell {
 //
 //    //loveButton
 //    var param = WCLShineParams()
-//    param.bigShineColor = ANIColor.red
-//    param.smallShineColor = ANIColor.pink
+//    param.bigShineColor = ANIColor.pink
+//    param.smallShineColor = ANIColor.lightPink
 //    let loveButton = WCLShineButton(frame: CGRect(x: 0.0, y: 0.0, width: 15.0, height: 15.0), params: param)
-//    loveButton.fillColor = ANIColor.red
+//    loveButton.fillColor = ANIColor.pink
 //    loveButton.color = ANIColor.gray
 //    loveButton.image = .heart
 //    loveButton.addTarget(self, action: #selector(love), for: .valueChanged)
@@ -142,15 +141,6 @@ class ANINotiCommentViewCell: UITableViewCell {
 //    userNameLabel.rightToLeft(of: loveButton, offset: -10.0)
     userNameLabel.centerY(to: profileImageView)
     self.userNameLabel = userNameLabel
-    
-    //bottomLine
-    let bottomLine = UIImageView()
-    bottomLine.image = UIImage(named: "line")
-    base.addSubview(bottomLine)
-    bottomLine.height(0.5)
-    bottomLine.topToBottom(of: profileImageView, offset: 10.0)
-    bottomLine.edgesToSuperview(excluding: .top)
-    self.bottomLine = bottomLine
   }
   
   private func reloadLayout() {

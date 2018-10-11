@@ -76,7 +76,7 @@ class ANIImageFilterViewController: UIViewController {
     let doneButton = UIButton()
     doneButton.setTitle("完了", for: .normal)
     doneButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 17)
-    doneButton.setTitleColor(ANIColor.green, for: .normal)
+    doneButton.setTitleColor(ANIColor.emerald, for: .normal)
     doneButton.addTarget(self, action: #selector(done), for: .touchUpInside)
     myNavigationBar.addSubview(doneButton)
     doneButton.width(60.0)

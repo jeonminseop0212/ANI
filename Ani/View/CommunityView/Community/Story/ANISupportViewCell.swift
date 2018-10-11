@@ -25,6 +25,7 @@ class ANISupportViewCell: UITableViewCell {
   
   private weak var messageLabel: UILabel?
   
+  private let RECRUIT_BASE_BORDER_WIDHT: CGFloat = 0.8
   private weak var recruitBase: UIView?
   private weak var recruitImageView: UIImageView?
   private weak var basicInfoStackView: UIStackView?
@@ -48,7 +49,6 @@ class ANISupportViewCell: UITableViewCell {
   private weak var commentButton: UIButton?
   private weak var commentCountLabel: UILabel?
   private weak var optionButton: UIButton?
-  private weak var line: UIImageView?
   
   var delegate: ANISupportViewCellDelegate?
   
@@ -126,40 +126,27 @@ class ANISupportViewCell: UITableViewCell {
   
   private func setup() {
     self.selectionStyle = .none
-    self.backgroundColor = ANIColor.bg
-    
-    //messageLabel
-    let messageLabel = UILabel()
-    messageLabel.font = UIFont.systemFont(ofSize: 16.0)
-    messageLabel.textAlignment = .left
-    messageLabel.textColor = ANIColor.subTitle
-    messageLabel.numberOfLines = 0
-    messageLabel.isUserInteractionEnabled = true
-    let labelTapGesture = UITapGestureRecognizer(target: self, action: #selector(cellTapped))
-    messageLabel.addGestureRecognizer(labelTapGesture)
-    addSubview(messageLabel)
-    messageLabel.topToSuperview(offset: 10.0)
-    messageLabel.leftToSuperview(offset: 10.0)
-    messageLabel.rightToSuperview(offset: -10.0)
-    self.messageLabel = messageLabel
+    self.backgroundColor = .white
     
     //recruitBase
     let recruitBase = UIView()
     recruitBase.backgroundColor = .white
     recruitBase.layer.cornerRadius = 10.0
     recruitBase.layer.masksToBounds = true
+    recruitBase.layer.borderColor = ANIColor.gray.cgColor
+    recruitBase.layer.borderWidth = RECRUIT_BASE_BORDER_WIDHT
     recruitBase.isUserInteractionEnabled = true
     let recruitTapGesture = UITapGestureRecognizer(target: self, action: #selector(recruitTapped))
     recruitBase.addGestureRecognizer(recruitTapGesture)
     addSubview(recruitBase)
-    recruitBase.topToBottom(of: messageLabel, offset: 10.0)
+    recruitBase.topToSuperview(offset: 10.0)
     recruitBase.leftToSuperview(offset: 10.0)
     recruitBase.rightToSuperview(offset: -10.0)
     self.recruitBase = recruitBase
     
     //recruitImageView
     let recruitImageView = UIImageView()
-    recruitImageView.backgroundColor = .white
+    recruitImageView.backgroundColor = ANIColor.gray
     recruitImageView.contentMode = .redraw
     recruitBase.addSubview(recruitImageView)
     let recruitImageViewHeight: CGFloat = (UIScreen.main.bounds.width - 20) * UIViewController.HEADER_IMAGE_VIEW_RATIO
@@ -174,7 +161,7 @@ class ANISupportViewCell: UITableViewCell {
     basicInfoStackView.axis = .horizontal
     basicInfoStackView.distribution = .fillEqually
     basicInfoStackView.alignment = .center
-    basicInfoStackView.spacing = 8.0
+    basicInfoStackView.spacing = 5.0
     recruitBase.addSubview(basicInfoStackView)
     basicInfoStackView.topToBottom(of: recruitImageView, offset: 10.0)
     basicInfoStackView.leftToSuperview(offset: 10.0)
@@ -188,9 +175,9 @@ class ANISupportViewCell: UITableViewCell {
     recruitStateLabel.font = UIFont.boldSystemFont(ofSize: 13.0)
     recruitStateLabel.layer.cornerRadius = 5.0
     recruitStateLabel.layer.masksToBounds = true
-    recruitStateLabel.backgroundColor = ANIColor.green
+    recruitStateLabel.backgroundColor = ANIColor.emerald
     basicInfoStackView.addArrangedSubview(recruitStateLabel)
-    recruitStateLabel.height(24.0)
+    recruitStateLabel.height(26.0)
     self.recruitStateLabel = recruitStateLabel
     
     //homeLabel
@@ -198,12 +185,13 @@ class ANISupportViewCell: UITableViewCell {
     homeLabel.textColor = ANIColor.darkGray
     homeLabel.textAlignment = .center
     homeLabel.font = UIFont.boldSystemFont(ofSize: 13.0)
+    homeLabel.adjustsFontSizeToFitWidth = true
     homeLabel.layer.cornerRadius = 5.0
     homeLabel.layer.masksToBounds = true
     homeLabel.layer.borderColor = ANIColor.darkGray.cgColor
     homeLabel.layer.borderWidth = 1.2
     basicInfoStackView.addArrangedSubview(homeLabel)
-    homeLabel.height(24.0)
+    homeLabel.height(26.0)
     self.homeLabel = homeLabel
     
     //ageLabel
@@ -211,12 +199,13 @@ class ANISupportViewCell: UITableViewCell {
     ageLabel.textColor = ANIColor.darkGray
     ageLabel.textAlignment = .center
     ageLabel.font = UIFont.boldSystemFont(ofSize: 13.0)
+    ageLabel.adjustsFontSizeToFitWidth = true
     ageLabel.layer.cornerRadius = 5.0
     ageLabel.layer.masksToBounds = true
     ageLabel.layer.borderColor = ANIColor.darkGray.cgColor
     ageLabel.layer.borderWidth = 1.2
     basicInfoStackView.addArrangedSubview(ageLabel)
-    ageLabel.height(24.0)
+    ageLabel.height(26.0)
     self.ageLabel = ageLabel
     
     //sexLabel
@@ -224,12 +213,13 @@ class ANISupportViewCell: UITableViewCell {
     sexLabel.textColor = ANIColor.darkGray
     sexLabel.textAlignment = .center
     sexLabel.font = UIFont.boldSystemFont(ofSize: 13.0)
+    sexLabel.adjustsFontSizeToFitWidth = true
     sexLabel.layer.cornerRadius = 5.0
     sexLabel.layer.masksToBounds = true
     sexLabel.layer.borderColor = ANIColor.darkGray.cgColor
     sexLabel.layer.borderWidth = 1.2
     basicInfoStackView.addArrangedSubview(sexLabel)
-    sexLabel.height(24.0)
+    sexLabel.height(26.0)
     self.sexLabel = sexLabel
     
     //titleLabel
@@ -256,11 +246,28 @@ class ANISupportViewCell: UITableViewCell {
     subTitleLabel.bottomToSuperview(offset: -10)
     self.subTitleLabel = subTitleLabel
     
+    //messageLabel
+    let messageLabel = UILabel()
+    messageLabel.font = UIFont.systemFont(ofSize: 16.0)
+    messageLabel.textAlignment = .left
+    messageLabel.textColor = ANIColor.subTitle
+    messageLabel.numberOfLines = 0
+    messageLabel.isUserInteractionEnabled = true
+    let labelTapGesture = UITapGestureRecognizer(target: self, action: #selector(cellTapped))
+    messageLabel.addGestureRecognizer(labelTapGesture)
+    addSubview(messageLabel)
+    messageLabel.topToBottom(of: recruitBase, offset: 10.0)
+    messageLabel.leftToSuperview(offset: 10.0)
+    messageLabel.rightToSuperview(offset: -10.0)
+    self.messageLabel = messageLabel
+    
     //deleteRecruitBase
     let deleteRecruitBase = UIView()
     deleteRecruitBase.backgroundColor = .white
     deleteRecruitBase.layer.cornerRadius = 10.0
     deleteRecruitBase.layer.masksToBounds = true
+    deleteRecruitBase.layer.borderColor = ANIColor.gray.cgColor
+    deleteRecruitBase.layer.borderWidth = RECRUIT_BASE_BORDER_WIDHT
     addSubview(deleteRecruitBase)
     deleteRecruitBase.edges(to: recruitBase)
     self.deleteRecruitBase = deleteRecruitBase
@@ -292,12 +299,12 @@ class ANISupportViewCell: UITableViewCell {
     
     //profileImageView
     let profileImageView = UIImageView()
-    profileImageView.backgroundColor = ANIColor.bg
+    profileImageView.backgroundColor = ANIColor.gray
     profileImageView.isUserInteractionEnabled = true
     let tapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped))
     profileImageView.addGestureRecognizer(tapGesture)
     addSubview(profileImageView)
-    profileImageView.topToBottom(of: recruitBase, offset: 10.0)
+    profileImageView.topToBottom(of: messageLabel, offset: 10.0)
     profileImageView.leftToSuperview(offset: 10.0)
     profileImageView.width(PROFILE_IMAGE_VIEW_HEIGHT)
     profileImageView.height(PROFILE_IMAGE_VIEW_HEIGHT)
@@ -364,10 +371,10 @@ class ANISupportViewCell: UITableViewCell {
     
     //loveButton
     var param = WCLShineParams()
-    param.bigShineColor = ANIColor.red
-    param.smallShineColor = ANIColor.pink
+    param.bigShineColor = ANIColor.pink
+    param.smallShineColor = ANIColor.lightPink
     let loveButton = WCLShineButton(frame: CGRect(x: 0.0, y: 0.0, width: 20.0, height: 20.0), params: param)
-    loveButton.fillColor = ANIColor.red
+    loveButton.fillColor = ANIColor.pink
     loveButton.color = ANIColor.gray
     loveButton.image = .heart
     loveButton.isEnabled = false
@@ -390,16 +397,15 @@ class ANISupportViewCell: UITableViewCell {
     userNameLabel.centerY(to: profileImageView)
     self.userNameLabel = userNameLabel
     
-    //line
-    let line = UIImageView()
-    line.image = UIImage(named: "line")
-    addSubview(line)
-    line.topToBottom(of: profileImageView, offset: 10.0)
-    line.leftToSuperview()
-    line.rightToSuperview()
-    line.height(0.5)
-    line.bottomToSuperview()
-    self.line = line
+    //bottomSpace
+    let spaceView = UIView()
+    spaceView.backgroundColor = ANIColor.bg
+    addSubview(spaceView)
+    spaceView.topToBottom(of: profileImageView, offset: 10)
+    spaceView.leftToSuperview()
+    spaceView.rightToSuperview()
+    spaceView.height(10.0)
+    spaceView.bottomToSuperview()
   }
   
   private func reloadLayout() {
@@ -460,7 +466,7 @@ class ANISupportViewCell: UITableViewCell {
     recruitImageView.sd_setImage(with: URL(string: headerImageUrl), completed: nil)
     if recruit.recruitState == 0 {
       recruitStateLabel.text = "募集中"
-      recruitStateLabel.backgroundColor  = ANIColor.green
+      recruitStateLabel.backgroundColor  = ANIColor.emerald
     } else if recruit.recruitState == 1 {
       recruitStateLabel.text = "家族決定"
       recruitStateLabel.backgroundColor  = ANIColor.pink

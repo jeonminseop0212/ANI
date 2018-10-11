@@ -42,7 +42,7 @@ class ANICommentBar: UIView {
   private func setup() {
     //profileImageView
     let profileImageView = UIImageView()
-    profileImageView.backgroundColor = ANIColor.bg
+    profileImageView.backgroundColor = ANIColor.gray
     profileImageView.layer.cornerRadius = 40.0 / 2
     profileImageView.layer.masksToBounds = true
     profileImageView.contentMode = .scaleAspectFill
@@ -68,7 +68,7 @@ class ANICommentBar: UIView {
     //commentContributionButton
     let commentContributionButton = UIButton()
     commentContributionButton.setTitle("投稿する", for: .normal)
-    commentContributionButton.setTitleColor(ANIColor.green, for: .normal)
+    commentContributionButton.setTitleColor(ANIColor.emerald, for: .normal)
     commentContributionButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 15.0)
     commentContributionButton.addTarget(self, action: #selector(contribute), for: .touchUpInside)
     commentContributionButton.isEnabled = false

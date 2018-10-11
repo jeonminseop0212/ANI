@@ -109,7 +109,7 @@ class ANIContributionViewController: UIViewController {
     let contributionButtonBG = UIView()
     contributionButtonBG.layer.cornerRadius = (UIViewController.NAVIGATION_BAR_HEIGHT - 10.0) / 2
     contributionButtonBG.layer.masksToBounds = true
-    contributionButtonBG.backgroundColor = ANIColor.green
+    contributionButtonBG.backgroundColor = ANIColor.emerald
     contributionButtonBG.alpha = 0.5
     myNavigationBarBase.addSubview(contributionButtonBG)
     contributionButtonBG.centerYToSuperview()
@@ -152,7 +152,7 @@ class ANIContributionViewController: UIViewController {
     Gallery.Config.tabsToShow = [.imageTab, .cameraTab]
     Gallery.Config.Font.Main.regular = UIFont.boldSystemFont(ofSize: 17)
     Gallery.Config.Grid.ArrowButton.tintColor = ANIColor.dark
-    Gallery.Config.Grid.FrameView.borderColor = ANIColor.green
+    Gallery.Config.Grid.FrameView.borderColor = ANIColor.emerald
     Gallery.Config.Grid.previewRatio = 1.0
   }
   

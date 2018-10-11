@@ -84,7 +84,7 @@ class ANIImageFilterPreviewView: UIView {
     flowLayout.minimumInteritemSpacing = 0
     flowLayout.scrollDirection = .horizontal
     let previewCollectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
-    previewCollectionView.backgroundColor = .white
+    previewCollectionView.backgroundColor = ANIColor.gray
     previewCollectionView.dataSource = self
     previewCollectionView.delegate = self
     previewCollectionView.isPagingEnabled = true
@@ -99,7 +99,7 @@ class ANIImageFilterPreviewView: UIView {
     //pageCotrol
     let pageControl = UIPageControl()
     pageControl.pageIndicatorTintColor = ANIColor.gray
-    pageControl.currentPageIndicatorTintColor = ANIColor.green
+    pageControl.currentPageIndicatorTintColor = ANIColor.emerald
     pageControl.currentPage = 0
     pageControl.alpha = 0.0
     pageControl.isUserInteractionEnabled = false

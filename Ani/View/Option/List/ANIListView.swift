@@ -97,7 +97,7 @@ class ANIListView: UIView {
     self.listTableView = listTableView
     
     //activityIndicatorView
-    let activityIndicatorView = NVActivityIndicatorView(frame: .zero, type: .lineScale, color: ANIColor.green, padding: 0)
+    let activityIndicatorView = NVActivityIndicatorView(frame: .zero, type: .lineScale, color: ANIColor.emerald, padding: 0)
     addSubview(activityIndicatorView)
     activityIndicatorView.width(40.0)
     activityIndicatorView.height(40.0)

@@ -149,7 +149,7 @@ class ANILoginView: UIView {
     
     //loginButton
     let logButton = ANIAreaButtonView()
-    logButton.base?.backgroundColor = ANIColor.green
+    logButton.base?.backgroundColor = ANIColor.emerald
     logButton.base?.layer.cornerRadius = LOGIN_BUTTON_HEIGHT / 2
     logButton.delegate = self
     logButton.dropShadow(opacity: 0.1)
@@ -200,7 +200,7 @@ extension ANILoginView: ANIButtonViewDelegate {
             let passwordTextField = self.passwordTextField,
             let password = passwordTextField.text else { return }
       
-      let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.green)
+      let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.emerald)
       NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData, nil)
       
       self.endEditing(true)

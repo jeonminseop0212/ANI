@@ -72,11 +72,11 @@ class ANIOtherProfileCell: UITableViewCell {
     
     //followButton
     let followButton = ANIAreaButtonView()
-    followButton.base?.backgroundColor = ANIColor.green
+    followButton.base?.backgroundColor = ANIColor.emerald
     followButton.baseCornerRadius = FOLLOW_BUTTON_HEIGHT / 2
     followButton.delegate = self
     followButton.base?.layer.borderWidth = 1.8
-    followButton.base?.layer.borderColor = ANIColor.green.cgColor
+    followButton.base?.layer.borderColor = ANIColor.emerald.cgColor
     addSubview(followButton)
     followButton.topToSuperview(offset: 10.0)
     followButton.rightToSuperview(offset: -10.0)
@@ -229,9 +229,9 @@ class ANIOtherProfileCell: UITableViewCell {
     if isFollowed {
       followButton.base?.backgroundColor = .clear
       followLabel.text = "フォロー中"
-      followLabel.textColor = ANIColor.green
+      followLabel.textColor = ANIColor.emerald
     } else {
-      followButton.base?.backgroundColor = ANIColor.green
+      followButton.base?.backgroundColor = ANIColor.emerald
       followLabel.text = "フォロー"
       followLabel.textColor = .white
     }
@@ -316,7 +316,7 @@ extension ANIOtherProfileCell: ANIButtonViewDelegate {
       let database = Firestore.firestore()
       
       if let currentUserUid = ANISessionManager.shared.currentUserUid, !ANISessionManager.shared.isAnonymous {
-        if followButton.base?.backgroundColor == ANIColor.green {
+        if followButton.base?.backgroundColor == ANIColor.emerald {
           DispatchQueue.global().async {
             let date = ANIFunction.shared.getToday()
             database.collection(KEY_USERS).document(currentUserUid).collection(KEY_FOLLOWING_USER_IDS).document(userId).setData([KEY_DATE: date])
@@ -327,14 +327,14 @@ extension ANIOtherProfileCell: ANIButtonViewDelegate {
           
           followButton.base?.backgroundColor = .clear
           followLabel.text = "フォロー中"
-          followLabel.textColor = ANIColor.green
+          followLabel.textColor = ANIColor.emerald
         } else {
           DispatchQueue.global().async {
             database.collection(KEY_USERS).document(currentUserUid).collection(KEY_FOLLOWING_USER_IDS).document(userId).delete()
             database.collection(KEY_USERS).document(userId).collection(KEY_FOLLOWER_IDS).document(currentUserUid).delete()
           }
           
-          followButton.base?.backgroundColor = ANIColor.green
+          followButton.base?.backgroundColor = ANIColor.emerald
           followLabel.text = "フォロー"
           followLabel.textColor = .white
         }

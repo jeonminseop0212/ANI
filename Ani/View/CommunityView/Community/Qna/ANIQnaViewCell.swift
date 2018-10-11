@@ -113,7 +113,7 @@ class ANIQnaViewCell: UITableViewCell {
     
     //profileImageView
     let profileImageView = UIImageView()
-    profileImageView.backgroundColor = ANIColor.bg
+    profileImageView.backgroundColor = ANIColor.gray
     profileImageView.isUserInteractionEnabled = true
     let tapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped))
     profileImageView.addGestureRecognizer(tapGesture)
@@ -195,10 +195,10 @@ class ANIQnaViewCell: UITableViewCell {
 
     //loveButton
     var param = WCLShineParams()
-    param.bigShineColor = ANIColor.red
-    param.smallShineColor = ANIColor.pink
+    param.bigShineColor = ANIColor.pink
+    param.smallShineColor = ANIColor.lightPink
     let loveButton = WCLShineButton(frame: CGRect(x: 0.0, y: 0.0, width: 20.0, height: 20.0), params: param)
-    loveButton.fillColor = ANIColor.red
+    loveButton.fillColor = ANIColor.pink
     loveButton.color = ANIColor.gray
     loveButton.image = .heart
     loveButton.addTarget(self, action: #selector(love), for: .valueChanged)

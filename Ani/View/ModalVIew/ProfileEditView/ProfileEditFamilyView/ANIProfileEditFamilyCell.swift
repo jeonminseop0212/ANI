@@ -46,7 +46,7 @@ class ANIProfileEditFamilyCell: UICollectionViewCell {
     
     //imageView
     let imageView = UIImageView()
-    imageView.backgroundColor = ANIColor.bg
+    imageView.backgroundColor = ANIColor.gray
     imageView.contentMode = .scaleAspectFit
     imageViewBG.addSubview(imageView)
     imageView.layer.cornerRadius = FAMILY_IMAGE_VIEW_BG_HEIGHT / 2

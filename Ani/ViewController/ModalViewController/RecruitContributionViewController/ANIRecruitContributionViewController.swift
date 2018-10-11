@@ -131,7 +131,7 @@ class ANIRecruitContributionViewController: UIViewController {
     
     //contributeButton
     let contributeButton = ANIAreaButtonView()
-    contributeButton.base?.backgroundColor = ANIColor.green
+    contributeButton.base?.backgroundColor = ANIColor.emerald
     contributeButton.baseCornerRadius = ANIRecruitContributionViewController.CONTRIBUTE_BUTTON_HEIGHT / 2
     contributeButton.dropShadow(opacity: 0.2)
     contributeButton.delegate = self
@@ -161,7 +161,7 @@ class ANIRecruitContributionViewController: UIViewController {
     
     //rejectView
     let rejectView = UIView()
-    rejectView.backgroundColor = ANIColor.green
+    rejectView.backgroundColor = ANIColor.emerald
     self.view.addSubview(rejectView)
     rejectViewBottomConstraint = rejectView.bottomToTop(of: self.view)
     rejectViewBottomConstraintOriginalConstant = rejectViewBottomConstraint?.constant
@@ -172,7 +172,7 @@ class ANIRecruitContributionViewController: UIViewController {
     
     //rejectBaseView
     let rejectBaseView = UIView()
-    rejectBaseView.backgroundColor = ANIColor.green
+    rejectBaseView.backgroundColor = ANIColor.emerald
     rejectView.addSubview(rejectBaseView)
     rejectBaseView.edgesToSuperview(excluding: .top)
     rejectBaseView.height(UIViewController.NAVIGATION_BAR_HEIGHT)
@@ -233,7 +233,7 @@ class ANIRecruitContributionViewController: UIViewController {
       Gallery.Config.Camera.oneImageMode = true
       Gallery.Config.Font.Main.regular = UIFont.boldSystemFont(ofSize: 17)
       Gallery.Config.Grid.ArrowButton.tintColor = ANIColor.dark
-      Gallery.Config.Grid.FrameView.borderColor = ANIColor.green
+      Gallery.Config.Grid.FrameView.borderColor = ANIColor.emerald
       if Gallery.Config.Camera.oneImageMode {
         Gallery.Config.Grid.previewRatio = UIViewController.HEADER_IMAGE_VIEW_RATIO
         Gallery.Config.tabsToShow = [.imageTab, .cameraTab]
@@ -255,7 +255,7 @@ class ANIRecruitContributionViewController: UIViewController {
       Gallery.Config.Camera.oneImageMode = false
       Gallery.Config.Font.Main.regular = UIFont.boldSystemFont(ofSize: 17)
       Gallery.Config.Grid.ArrowButton.tintColor = ANIColor.dark
-      Gallery.Config.Grid.FrameView.borderColor = ANIColor.green
+      Gallery.Config.Grid.FrameView.borderColor = ANIColor.emerald
       Gallery.Config.Grid.previewRatio = 1.0
       Config.tabsToShow = [.imageTab, .cameraTab]
       let galleryNV = UINavigationController(rootViewController: galleryUnrap)
@@ -519,7 +519,7 @@ extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
       if recruitInfo.headerImage != UIImage(named: "headerDefault") && recruitInfo.title.count > 0 && recruitInfo.kind.count > 0 && recruitInfo.age.count > 0 && recruitInfo.age.count > 0 && recruitInfo.sex.count > 0 && recruitInfo.home.count > 0 && recruitInfo.vaccine.count > 0 && recruitInfo.castration.count > 0 && recruitInfo.reason.count > 0 && recruitInfo.introduce.count > 0 && recruitInfo.passing.count > 0 && !recruitInfo.introduceImages.isEmpty {
         
         if recruitContributionMode == .edit {
-          let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.green)
+          let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.emerald)
           NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData, nil)
         }
         

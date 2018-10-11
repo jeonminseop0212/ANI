@@ -84,7 +84,7 @@ class ANISignUpViewController: UIViewController {
     
     //rejectView
     let rejectView = UIView()
-    rejectView.backgroundColor = ANIColor.green
+    rejectView.backgroundColor = ANIColor.emerald
     self.view.addSubview(rejectView)
     rejectViewBottomConstraint = rejectView.bottomToTop(of: self.view)
     rejectViewBottomConstraintOriginalConstant = rejectViewBottomConstraint?.constant
@@ -95,7 +95,7 @@ class ANISignUpViewController: UIViewController {
     
     //rejectBaseView
     let rejectBaseView = UIView()
-    rejectBaseView.backgroundColor = ANIColor.green
+    rejectBaseView.backgroundColor = ANIColor.emerald
     rejectView.addSubview(rejectBaseView)
     rejectBaseView.edgesToSuperview(excluding: .top)
     rejectBaseView.height(UIViewController.NAVIGATION_BAR_HEIGHT)
@@ -193,7 +193,7 @@ extension ANISignUpViewController: ANISignUpViewDelegate {
       Gallery.Config.tabsToShow = [.imageTab, .cameraTab]
       Gallery.Config.Font.Main.regular = UIFont.boldSystemFont(ofSize: 17)
       Gallery.Config.Grid.ArrowButton.tintColor = ANIColor.dark
-      Gallery.Config.Grid.FrameView.borderColor = ANIColor.green
+      Gallery.Config.Grid.FrameView.borderColor = ANIColor.emerald
       Gallery.Config.Grid.previewRatio = 1.0
       
       let galleryNV = UINavigationController(rootViewController: galleryUnrap)

@@ -61,7 +61,7 @@ class ANICommentCell: UITableViewCell {
     
     //profileImageView
     let profileImageView = UIImageView()
-    profileImageView.backgroundColor = ANIColor.bg
+    profileImageView.backgroundColor = ANIColor.gray
     profileImageView.layer.cornerRadius = PROFILE_IMAGE_VIEW_HEIGHT / 2
     profileImageView.layer.masksToBounds = true
     profileImageView.isUserInteractionEnabled = true
@@ -108,10 +108,10 @@ class ANICommentCell: UITableViewCell {
 //
 //    //loveButton
 //    var param = WCLShineParams()
-//    param.bigShineColor = ANIColor.red
-//    param.smallShineColor = ANIColor.pink
+//    param.bigShineColor = ANIColor.pink
+//    param.smallShineColor = ANIColor.lightPink
 //    let loveButton = WCLShineButton(frame: CGRect(x: 0.0, y: 0.0, width: 15.0, height: 15.0), params: param)
-//    loveButton.fillColor = ANIColor.red
+//    loveButton.fillColor = ANIColor.pink
 //    loveButton.color = ANIColor.gray
 //    loveButton.image = .heart
 //    loveButton.addTarget(self, action: #selector(love), for: .valueChanged)
