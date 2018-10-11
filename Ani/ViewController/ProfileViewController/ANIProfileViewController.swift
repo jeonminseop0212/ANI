@@ -184,6 +184,7 @@ class ANIProfileViewController: UIViewController {
   
   @objc private func presentImageBrowser(_ notification: NSNotification) {
     guard let item = notification.object as? (Int, [String]) else { return }
+    
     let selectedIndex = item.0
     let imageUrls = item.1
     let imageBrowserViewController = ANIImageBrowserViewController()
@@ -315,6 +316,16 @@ extension ANIProfileViewController: ANIProfileBasicViewDelegate {
     popupOptionViewController.isMe = isMe
     popupOptionViewController.delegate = self
     self.tabBarController?.present(popupOptionViewController, animated: false, completion: nil)
+  }
+  
+  func presentImageBrowser(index: Int, imageUrls: [String]) {
+    let imageBrowserViewController = ANIImageBrowserViewController()
+    imageBrowserViewController.selectedIndex = index
+    imageBrowserViewController.imageUrls = imageUrls
+    imageBrowserViewController.modalPresentationStyle = .overCurrentContext
+    imageBrowserViewController.delegate = self
+    //overCurrentContextだとtabBarが消えないのでtabBarからpresentする
+    self.tabBarController?.present(imageBrowserViewController, animated: false, completion: nil)
   }
 }
 
