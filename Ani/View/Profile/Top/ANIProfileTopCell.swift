@@ -8,6 +8,11 @@
 
 import UIKit
 
+protocol ANIProfileTopCellDelegate {
+  func presentImageBrowser(index: Int, imageUrls: [String])
+  func didSelecteMenuItem(selectedIndex: Int)
+}
+
 class ANIProfileTopCell: UITableViewCell {
   
   private weak var familyView: ANIFamilyView?
@@ -29,16 +34,13 @@ class ANIProfileTopCell: UITableViewCell {
     }
   }
   
-  var delegate: ANIProfileMenuBarDelegate? {
-    get { return self.menuBar?.delegate }
-    set(v) { self.menuBar?.delegate = v }
-  }
-  
   var selectedIndex: Int? {
     didSet {
       reloadLayout()
     }
   }
+  
+  var delegate: ANIProfileTopCellDelegate?
   
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -54,6 +56,7 @@ class ANIProfileTopCell: UITableViewCell {
     
     //familyView
     let familyView = ANIFamilyView()
+    familyView.delegate = self
     addSubview(familyView)
     familyView.topToSuperview()
     familyView.leftToSuperview()
@@ -73,6 +76,7 @@ class ANIProfileTopCell: UITableViewCell {
 
     //menuBar
     let menuBar = ANIProfileMenuBar()
+    menuBar.delegate = self
     stackView.addArrangedSubview(menuBar)
     menuBar.height(MENU_BAR_HEIGHT)
     self.menuBar = menuBar
@@ -90,5 +94,19 @@ class ANIProfileTopCell: UITableViewCell {
           let selectedIndex = self.selectedIndex else { return }
     let indexPath = IndexPath(item: selectedIndex, section: 0)
     menuBar.menuCollectionView?.selectItem(at: indexPath, animated: false, scrollPosition: .left)
+  }
+}
+
+//MARK: ANIProfileMenuBarDelegate
+extension ANIProfileTopCell: ANIProfileMenuBarDelegate {
+  func didSelecteMenuItem(selectedIndex: Int) {
+    self.delegate?.didSelecteMenuItem(selectedIndex: selectedIndex)
+  }
+}
+
+//MARK: ANIFamilyViewDelegate
+extension ANIProfileTopCell: ANIFamilyViewDelegate {
+  func presentImageBrowser(index: Int, imageUrls: [String]) {
+    self.delegate?.presentImageBrowser(index: index, imageUrls: imageUrls)
   }
 }

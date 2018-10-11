@@ -20,6 +20,7 @@ protocol ANIProfileBasicViewDelegate {
   func supportButtonTapped(supportRecruit: FirebaseRecruit, user: FirebaseUser)
   func reject()
   func popupOptionView(isMe: Bool, contentType: ContentType, id: String)
+  func presentImageBrowser(index: Int, imageUrls: [String])
 }
 
 enum ContentType: Int {
@@ -458,8 +459,8 @@ extension ANIProfileBasicView: UITableViewDelegate {
   }
 }
 
-//MARK: ANIProfileMenuBarDelegate
-extension ANIProfileBasicView: ANIProfileMenuBarDelegate {
+//MARK: ANIProfileTopCellDelegate
+extension ANIProfileBasicView: ANIProfileTopCellDelegate {
   func didSelecteMenuItem(selectedIndex: Int) {
     guard let basicTableView = self.basicTableView else { return }
     
@@ -480,6 +481,10 @@ extension ANIProfileBasicView: ANIProfileMenuBarDelegate {
     }
 
     basicTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
+  }
+  
+  func presentImageBrowser(index: Int, imageUrls: [String]) {
+    self.delegate?.presentImageBrowser(index: index, imageUrls: imageUrls)
   }
 }
 
