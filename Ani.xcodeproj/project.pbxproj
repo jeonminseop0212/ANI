@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		23BE6C66072673B423ABA35D /* Pods_Ani.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FD08576705673419CEA26417 /* Pods_Ani.framework */; };
 		BFFABBAF01DF20A602B9BB7F /* Pods_AniUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C5DC98FBA0B2CCFDA47C5CD8 /* Pods_AniUITests.framework */; };
+		C5B62B81AC482FE993A03ABF /* Pods_AniTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA314F74AF3E318A20DDD5DB /* Pods_AniTests.framework */; };
 		CD033E4120D8D25E002FB770 /* ANISupportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD033E4020D8D25E002FB770 /* ANISupportViewController.swift */; };
 		CD033E4420D8D28D002FB770 /* ANISupportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD033E4320D8D28D002FB770 /* ANISupportView.swift */; };
 		CD033E4620DA14B3002FB770 /* ANISupportViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD033E4520DA14B3002FB770 /* ANISupportViewCell.swift */; };
@@ -21,7 +22,6 @@
 		CD0BFF1420C7619600D5959B /* FirebaseStory.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0BFF1320C7619600D5959B /* FirebaseStory.swift */; };
 		CD0BFF1620C7807F00D5959B /* FirebaseComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0BFF1520C7807F00D5959B /* FirebaseComment.swift */; };
 		CD0BFF1820C7AD9C00D5959B /* FirebaseQna.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0BFF1720C7AD9C00D5959B /* FirebaseQna.swift */; };
-		CD0FAD0520BF7B9E00D8CD27 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = CD0FAD0420BF7B9D00D8CD27 /* GoogleService-Info.plist */; };
 		CD0FAD0A20BF8DFD00D8CD27 /* FirebaseUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0FAD0920BF8DFD00D8CD27 /* FirebaseUser.swift */; };
 		CD0FAD0E20BFC02E00D8CD27 /* ANISessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0FAD0D20BFC02E00D8CD27 /* ANISessionManager.swift */; };
 		CD2C414520A556AE00581267 /* ANIRecruitContributionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2C414420A556AE00581267 /* ANIRecruitContributionViewController.swift */; };
@@ -40,6 +40,7 @@
 		CD6229DE20B64B9900E36875 /* ANISignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6229DD20B64B9900E36875 /* ANISignUpView.swift */; };
 		CD6762DE20F8285E0098E033 /* InstantSearchClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD6762DD20F8285E0098E033 /* InstantSearchClient.framework */; };
 		CD6762E020FD75AC0098E033 /* PickUpItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6762DF20FD75AC0098E033 /* PickUpItem.swift */; };
+		CD6B3B7D21706CBC00B5E268 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = CD6B3B7C21706CBC00B5E268 /* GoogleService-Info.plist */; };
 		CD6B675120A8844B009BF63D /* ANIRecruitContributionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6B675020A8844B009BF63D /* ANIRecruitContributionView.swift */; };
 		CD6B675420A90F8A009BF63D /* ANIPlaceholderTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6B675320A90F8A009BF63D /* ANIPlaceholderTextView.swift */; };
 		CD85F558215F547300AB9A0C /* AniTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD85F557215F547300AB9A0C /* AniTests.swift */; };
@@ -201,7 +202,6 @@
 		CD0BFF1320C7619600D5959B /* FirebaseStory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseStory.swift; sourceTree = "<group>"; };
 		CD0BFF1520C7807F00D5959B /* FirebaseComment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseComment.swift; sourceTree = "<group>"; };
 		CD0BFF1720C7AD9C00D5959B /* FirebaseQna.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseQna.swift; sourceTree = "<group>"; };
-		CD0FAD0420BF7B9D00D8CD27 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		CD0FAD0920BF8DFD00D8CD27 /* FirebaseUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseUser.swift; sourceTree = "<group>"; };
 		CD0FAD0D20BFC02E00D8CD27 /* ANISessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANISessionManager.swift; sourceTree = "<group>"; };
 		CD2C414420A556AE00581267 /* ANIRecruitContributionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitContributionViewController.swift; sourceTree = "<group>"; };
@@ -221,6 +221,7 @@
 		CD6229DD20B64B9900E36875 /* ANISignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANISignUpView.swift; sourceTree = "<group>"; };
 		CD6762DD20F8285E0098E033 /* InstantSearchClient.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = InstantSearchClient.framework; path = Carthage/Build/iOS/InstantSearchClient.framework; sourceTree = "<group>"; };
 		CD6762DF20FD75AC0098E033 /* PickUpItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickUpItem.swift; sourceTree = "<group>"; };
+		CD6B3B7C21706CBC00B5E268 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		CD6B675020A8844B009BF63D /* ANIRecruitContributionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitContributionView.swift; sourceTree = "<group>"; };
 		CD6B675320A90F8A009BF63D /* ANIPlaceholderTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIPlaceholderTextView.swift; sourceTree = "<group>"; };
 		CD85F555215F547200AB9A0C /* AniTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AniTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -362,6 +363,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C5B62B81AC482FE993A03ABF /* Pods_AniTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1222,7 +1224,7 @@
 				F5E9E2342079B1660021D4CC /* View */,
 				F51D220E20767E49009D1B26 /* Utility */,
 				F5B1EF9C20725964000CFB0B /* Info.plist */,
-				CD0FAD0420BF7B9D00D8CD27 /* GoogleService-Info.plist */,
+				CD6B3B7C21706CBC00B5E268 /* GoogleService-Info.plist */,
 				CD8FE7D3215A690900D3281A /* GoogleService-Info-release.plist */,
 			);
 			path = Ani;
@@ -1414,6 +1416,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = CD85F55C215F547300AB9A0C /* Build configuration list for PBXNativeTarget "AniTests" */;
 			buildPhases = (
+				78C67DAF09396DA89D1A6BC1 /* [CP] Check Pods Manifest.lock */,
 				CD85F551215F547200AB9A0C /* Sources */,
 				CD85F552215F547200AB9A0C /* Frameworks */,
 				CD85F553215F547200AB9A0C /* Resources */,
@@ -1529,9 +1532,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				F5B1EF9B20725964000CFB0B /* LaunchScreen.storyboard in Resources */,
+				CD6B3B7D21706CBC00B5E268 /* GoogleService-Info.plist in Resources */,
 				F5B1EF9820725964000CFB0B /* Assets.xcassets in Resources */,
 				CD8FE7D4215A690A00D3281A /* GoogleService-Info-release.plist in Resources */,
-				CD0FAD0520BF7B9E00D8CD27 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1557,6 +1560,24 @@
 			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
 				"$(DERIVED_FILE_DIR)/Pods-Ani-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		78C67DAF09396DA89D1A6BC1 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-AniTests-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1852,6 +1873,7 @@
 /* Begin XCBuildConfiguration section */
 		CD85F55D215F547300AB9A0C /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9F7E1F101C01F36DEDE88686 /* Pods-AniTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -1872,6 +1894,7 @@
 		};
 		CD85F55E215F547300AB9A0C /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 17FAD9EDAE08B9FA7A60EDB8 /* Pods-AniTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_OBJC_WEAK = YES;
