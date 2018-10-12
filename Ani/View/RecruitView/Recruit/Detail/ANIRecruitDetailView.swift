@@ -101,6 +101,13 @@ class ANIRecruitDetailView: UIView {
     headerImageView.height(headerImageViewHeight)
     self.headerImageView = headerImageView
     
+    //gradiationLayer
+    let gradiationLayer = CAGradientLayer()
+    let margin: CGFloat = 20.0
+    gradiationLayer.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIViewController.STATUS_BAR_HEIGHT + UIViewController.NAVIGATION_BAR_HEIGHT + margin)
+    gradiationLayer.colors = [ANIColor.dark.withAlphaComponent(0.15).cgColor, ANIColor.dark.withAlphaComponent(0).cgColor]
+    headerImageView.layer.addSublayer(gradiationLayer)
+    
     //scrollView
     let scrollView = UIScrollView()
     scrollView.delegate = self
