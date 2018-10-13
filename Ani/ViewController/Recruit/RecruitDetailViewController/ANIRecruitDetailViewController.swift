@@ -211,10 +211,9 @@ class ANIRecruitDetailViewController: UIViewController {
   private func clip() {
     guard let recruit = self.recruit,
           let recuritId = recruit.id,
-          let currentUserId = ANISessionManager.shared.currentUserUid,
           let clipButton = self.clipButton else { return }
 
-    if !ANISessionManager.shared.isAnonymous {
+    if !ANISessionManager.shared.isAnonymous, let currentUserId = ANISessionManager.shared.currentUserUid {
       let database = Firestore.firestore()
 
       if !isClipped {
@@ -243,6 +242,18 @@ class ANIRecruitDetailViewController: UIViewController {
           }
         }
       }
+    } else {
+      self.reject()
+    }
+  }
+  
+  private func apply() {
+    if !ANISessionManager.shared.isAnonymous {
+      let chatViewController = ANIChatViewController()
+      let navigationContoller = UINavigationController(rootViewController: chatViewController)
+      chatViewController.user = user
+      chatViewController.isPush = false
+      self.present(navigationContoller, animated: true, completion: nil)
     } else {
       self.reject()
     }
@@ -306,10 +317,6 @@ class ANIRecruitDetailViewController: UIViewController {
   @objc private func back() {
     isBack = true
     self.navigationController?.popViewController(animated: true)
-  }
-  
-  @objc private func apply() {
-    DLog("apply")
   }
   
   @objc private func rejectViewTapped() {
@@ -391,12 +398,8 @@ extension ANIRecruitDetailViewController: ANIButtonViewDelegate {
     if view === self.clipButton {
       clip()
     }
-    if view === self.applyButton {      
-      let chatViewController = ANIChatViewController()
-      let navigationContoller = UINavigationController(rootViewController: chatViewController)
-      chatViewController.user = user
-      chatViewController.isPush = false
-      self.present(navigationContoller, animated: true, completion: nil)
+    if view === self.applyButton {
+      apply()
     }
   }
 }
