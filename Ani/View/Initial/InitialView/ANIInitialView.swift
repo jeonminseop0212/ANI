@@ -16,9 +16,8 @@ protocol ANIInitialViewDelegate {
 
 class ANIInitialView: UIView {
   
-  private weak var headerImageView: UIImageView?
-  
-  private weak var base: UIView?
+  private weak var initialImageView: UIImageView?
+
   private weak var titleLabel: UILabel?
   private weak var subTitleLabel: UILabel?
   
@@ -28,9 +27,8 @@ class ANIInitialView: UIView {
   private weak var loginButtonLabel: UILabel?
   private weak var signUpButton: ANIAreaButtonView?
   private weak var signUpButtonLabel: UILabel?
-  private weak var anonymousLabel: UILabel?
   
-  private weak var fotterImageView: UIImageView?
+  private weak var anonymousLabel: UILabel?
   
   var delegate: ANIInitialViewDelegate?
   
@@ -45,37 +43,26 @@ class ANIInitialView: UIView {
   }
   
   private func setup() {
-    //base
-    let base = UIView()
-    base.backgroundColor = .white
-    addSubview(base)
-    base.leftToSuperview()
-    base.rightToSuperview()
-    base.height(300.0)
-    base.centerInSuperview()
-    self.base = base
+    //initialImageView
+    let initialImageView = UIImageView()
+    initialImageView.contentMode = .scaleAspectFill
+    initialImageView.image = UIImage(named: "initial")
+    addSubview(initialImageView)
+    initialImageView.edgesToSuperview()
+    self.initialImageView = initialImageView
     
-    //subTitleLabel
-    let subTitleLabel = UILabel()
-    subTitleLabel.textColor = ANIColor.subTitle
-    subTitleLabel.font = UIFont.systemFont(ofSize: 20.0)
-    subTitleLabel.numberOfLines = 2
-    subTitleLabel.textAlignment = .center
-    subTitleLabel.text = "猫と猫好きが\n幸せになるコミュニティー"
-    base.addSubview(subTitleLabel)
-    subTitleLabel.centerXToSuperview()
-    subTitleLabel.centerYToSuperview(offset: -15.0)
-    self.subTitleLabel = subTitleLabel
-    
-    //titleLabel
-    let titleLabel = UILabel()
-    titleLabel.textColor = ANIColor.dark
-    titleLabel.font = UIFont.boldSystemFont(ofSize: 60.0)
-    titleLabel.text = "ANI"
-    base.addSubview(titleLabel)
-    titleLabel.bottomToTop(of: subTitleLabel, offset: -15.0)
-    titleLabel.centerXToSuperview()
-    self.titleLabel = titleLabel
+    //anonymousLabel
+    let anonymousLabel = UILabel()
+    anonymousLabel.font = UIFont.systemFont(ofSize: 13.0)
+    anonymousLabel.textColor = ANIColor.darkGray
+    anonymousLabel.text = "ログインしないで始める"
+    anonymousLabel.isUserInteractionEnabled = true
+    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(startAnonymous))
+    anonymousLabel.addGestureRecognizer(tapGesture)
+    addSubview(anonymousLabel)
+    anonymousLabel.bottomToSuperview(offset: -24.0)
+    anonymousLabel.centerXToSuperview()
+    self.anonymousLabel = anonymousLabel
     
     //buttonStackView
     let buttonStackView = UIStackView()
@@ -84,8 +71,8 @@ class ANIInitialView: UIView {
     buttonStackView.alignment = .center
     buttonStackView.distribution = .fillEqually
     buttonStackView.spacing = 10.0
-    base.addSubview(buttonStackView)
-    buttonStackView.topToBottom(of: subTitleLabel, offset: 15.0)
+    addSubview(buttonStackView)
+    buttonStackView.bottomToTop(of: anonymousLabel, offset: -12.0)
     buttonStackView.leftToSuperview(offset: 40.0)
     buttonStackView.rightToSuperview(offset: -40.0)
     self.buttonStackView = buttonStackView
@@ -104,7 +91,7 @@ class ANIInitialView: UIView {
     loginButtonLabel.textColor = .white
     loginButtonLabel.textAlignment = .center
     loginButtonLabel.text = "ログイン"
-    loginButtonLabel.font = UIFont.boldSystemFont(ofSize: 20.0)
+    loginButtonLabel.font = UIFont.boldSystemFont(ofSize: 18.0)
     loginButton.addContent(loginButtonLabel)
     loginButtonLabel.edgesToSuperview()
     self.loginButtonLabel = loginButtonLabel
@@ -112,7 +99,7 @@ class ANIInitialView: UIView {
     //signUpButton
     let signUpButton = ANIAreaButtonView()
     signUpButton.base?.layer.cornerRadius = LOGIN_BUTTON_HEIGHT / 2
-    signUpButton.base?.backgroundColor = .white
+    signUpButton.base?.backgroundColor = .clear
     signUpButton.base?.layer.borderColor = ANIColor.emerald.cgColor
     signUpButton.base?.layer.borderWidth = 2.0
     signUpButton.delegate = self
@@ -125,41 +112,32 @@ class ANIInitialView: UIView {
     signUpButtonLabel.textColor = ANIColor.emerald
     signUpButtonLabel.textAlignment = .center
     signUpButtonLabel.text = "登録"
-    signUpButtonLabel.font = UIFont.boldSystemFont(ofSize: 20.0)
+    signUpButtonLabel.font = UIFont.boldSystemFont(ofSize: 18.0)
     signUpButton.addContent(signUpButtonLabel)
     signUpButtonLabel.edgesToSuperview()
     self.signUpButtonLabel = signUpButtonLabel
+
+    //subTitleLabel
+    let subTitleLabel = UILabel()
+    subTitleLabel.textColor = ANIColor.subTitle
+    subTitleLabel.font = UIFont.systemFont(ofSize: 18.0)
+    subTitleLabel.numberOfLines = 2
+    subTitleLabel.textAlignment = .center
+    subTitleLabel.text = "猫と猫好き、猫好きと猫好きが\nつながるコミュニティー"
+    addSubview(subTitleLabel)
+    subTitleLabel.centerXToSuperview()
+    subTitleLabel.bottomToTop(of: buttonStackView, offset: -24.0)
+    self.subTitleLabel = subTitleLabel
     
-    //anonymousLabel
-    let anonymousLabel = UILabel()
-    anonymousLabel.font = UIFont.systemFont(ofSize: 13.0)
-    anonymousLabel.textColor = ANIColor.darkGray
-    anonymousLabel.text = "ログインしないで始める"
-    anonymousLabel.isUserInteractionEnabled = true
-    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(startAnonymous))
-    anonymousLabel.addGestureRecognizer(tapGesture)
-    base.addSubview(anonymousLabel)
-    anonymousLabel.topToBottom(of: buttonStackView, offset: 15.0)
-    anonymousLabel.centerXToSuperview()
-    self.anonymousLabel = anonymousLabel
-    
-    //headerImageView
-    let headerImageView = UIImageView()
-    headerImageView.image = UIImage(named: "headerImage")
-    headerImageView.alpha = 0.25
-    addSubview(headerImageView)
-    headerImageView.edgesToSuperview(excluding: .bottom)
-    headerImageView.bottomToTop(of: base)
-    self.headerImageView = headerImageView
-    
-    //fotterImageView
-    let fotterImageView = UIImageView()
-    fotterImageView.image = UIImage(named: "footerImage")
-    fotterImageView.alpha = 0.25
-    addSubview(fotterImageView)
-    fotterImageView.edgesToSuperview(excluding: .top)
-    fotterImageView.topToBottom(of: base)
-    self.fotterImageView = fotterImageView
+    //titleLabel
+    let titleLabel = UILabel()
+    titleLabel.textColor = ANIColor.dark
+    titleLabel.font = UIFont.boldSystemFont(ofSize: 55.0)
+    titleLabel.text = "MYAU"
+    addSubview(titleLabel)
+    titleLabel.bottomToTop(of: subTitleLabel, offset: -20.0)
+    titleLabel.centerXToSuperview()
+    self.titleLabel = titleLabel
   }
   
   @objc private func startAnonymous() {
