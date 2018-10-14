@@ -116,7 +116,7 @@ class ANISignUpView: UIView {
     let adressTitleLabel = UILabel()
     adressTitleLabel.font = UIFont.boldSystemFont(ofSize: 20.0)
     adressTitleLabel.textColor = ANIColor.dark
-    adressTitleLabel.text = "IDを決めましょ！"
+    adressTitleLabel.text = "IDを決めましょう！"
     contentView.addSubview(adressTitleLabel)
     adressTitleLabel.topToBottom(of: profileImageView, offset: CONTENT_SPACE)
     adressTitleLabel.leftToSuperview(offset: 10.0)
@@ -211,7 +211,7 @@ class ANISignUpView: UIView {
     let userNameTitleLabel = UILabel()
     userNameTitleLabel.font = UIFont.boldSystemFont(ofSize: 20.0)
     userNameTitleLabel.textColor = ANIColor.dark
-    userNameTitleLabel.text = "ユーザーネームを決めましょ！"
+    userNameTitleLabel.text = "ユーザーネームを決めましょう！"
     contentView.addSubview(userNameTitleLabel)
     userNameTitleLabel.topToBottom(of: passwordCheckTextFieldBG, offset: CONTENT_SPACE)
     userNameTitleLabel.leftToSuperview(offset: 10.0)
