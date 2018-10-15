@@ -71,14 +71,15 @@ extension ANIFamilyView: UICollectionViewDataSource {
     
     if indexPath.item == 0 {
       if let user = self.user, let profileImageUrl = user.profileImageUrl {
-        cell.familySmallImageVIew?.alpha = 0.0
+        cell.familySmallImageViewBG?.alpha = 0.0
+        cell.familyBigImageView?.alpha = 1.0
         cell.familyBigImageView?.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
       }
     } else {
       if let user = self.user, let familyImageUrls = user.familyImageUrls {
-        cell.familySmallImageVIew?.alpha = 1.0
-        cell.familySmallImageVIew?.sd_setImage(with: URL(string: familyImageUrls[indexPath.item - 1]), completed: nil)
-        cell.familyBigImageView?.image = UIImage(named: "familyBG")
+        cell.familyBigImageView?.alpha = 0.0
+        cell.familySmallImageViewBG?.alpha = 1.0
+        cell.familySmallImageView?.sd_setImage(with: URL(string: familyImageUrls[indexPath.item - 1]), completed: nil)
       }
     }
     
