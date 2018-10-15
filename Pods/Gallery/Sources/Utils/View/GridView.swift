@@ -239,8 +239,9 @@ class GridView: UIView {
   }
   
   private func makeDoneButton() -> UIButton {
+    //ANIColor.emerald
     let button = UIButton(type: .system)
-    button.setTitleColor(UIColor(red: 103/255, green: 219/255, blue: 64/255, alpha: 1), for: UIControl.State())
+    button.setTitleColor(UIColor(red: 33/255, green: 183/255, blue: 169/255, alpha: 1), for: UIControl.State())
     button.isEnabled = false
     button.setTitleColor(UIColor.lightGray, for: .disabled)
     button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 17)
