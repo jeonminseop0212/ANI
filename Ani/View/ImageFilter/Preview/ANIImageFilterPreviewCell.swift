@@ -27,7 +27,7 @@ class ANIImageFilterPreviewCell: UICollectionViewCell {
     
     //imageView
     let imageView = UIImageView()
-    imageView.backgroundColor = ANIColor.gray
+    imageView.backgroundColor = .white
     imageView.contentMode = .scaleAspectFit
     addSubview(imageView)
     imageView.edgesToSuperview()
