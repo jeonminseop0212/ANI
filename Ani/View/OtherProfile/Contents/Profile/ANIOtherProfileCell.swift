@@ -238,7 +238,9 @@ class ANIOtherProfileCell: UITableViewCell {
   }
   
   func observeUserFollow() {
-    guard let userId = self.userId else { return }
+    guard let userId = self.userId,
+          let followingCountLabel = self.followingCountLabel,
+          let followerCountLabel = self.followerCountLabel else { return }
     
     let database = Firestore.firestore()
     
@@ -249,8 +251,8 @@ class ANIOtherProfileCell: UITableViewCell {
           
           return
         }
-        
-        guard let snapshot = snapshot, let followingCountLabel = self.followingCountLabel else { return }
+
+        guard let snapshot = snapshot else { return }
 
         followingCountLabel.text = "\(snapshot.documents.count)"
       })
@@ -261,9 +263,9 @@ class ANIOtherProfileCell: UITableViewCell {
           
           return
         }
-        
-        guard let snapshot = snapshot, let followerCountLabel = self.followerCountLabel else { return }
-        
+
+        guard let snapshot = snapshot else { return }
+
         followerCountLabel.text = "\(snapshot.documents.count)"
       })
     }

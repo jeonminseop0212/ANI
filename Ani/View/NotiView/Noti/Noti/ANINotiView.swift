@@ -105,6 +105,7 @@ class ANINotiView: UIView {
   private func setupNotifications() {
     ANINotificationManager.receive(notiTabTapped: self, selector: #selector(scrollToTop))
     ANINotificationManager.receive(login: self, selector: #selector(reloadNotifications))
+    ANINotificationManager.receive(logout: self, selector: #selector(hideTableView))
   }
   
   @objc private func scrollToTop() {
@@ -117,6 +118,12 @@ class ANINotiView: UIView {
   
   @objc private func reloadNotifications() {
     loadNoti(sender: nil)
+  }
+  
+  @objc private func hideTableView() {
+    guard let notiTableView = self.notiTableView else { return }
+    
+    notiTableView.alpha = 0.0
   }
   
   private func showReloadView(sender: UIRefreshControl?) {
