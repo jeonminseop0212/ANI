@@ -284,7 +284,7 @@ extension ANIQnaView {
         
         for document in snapshot.documents {
           do {
-            let qna = try FirestoreDecoder().decode(FirebaseQna.self.self, from: document.data())
+            let qna = try FirestoreDecoder().decode(FirebaseQna.self, from: document.data())
             self.qnas.append(qna)
             
             DispatchQueue.main.async {

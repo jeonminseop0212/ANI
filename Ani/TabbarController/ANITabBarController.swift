@@ -23,6 +23,9 @@ class ANITabBarController: UITabBarController {
   private var oldIsHaveUnreadNoti: Bool = false
   private var oldIsHaveUnreadMessage: Bool = false
   
+  private var userListener: ListenerRegistration?
+  private var chatGroupListener: ListenerRegistration?
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     //tabBar上の線を消す
@@ -153,6 +156,8 @@ class ANITabBarController: UITabBarController {
   private func setupNotification() {
     ANINotificationManager.receive(changeIsHaveUnreadNoti: self, selector: #selector(updateBadge))
     ANINotificationManager.receive(changeIsHaveUnreadMessage: self, selector: #selector(updateBadge))
+    ANINotificationManager.receive(login: self, selector: #selector(relogin))
+    ANINotificationManager.receive(logout: self, selector: #selector(logout))
   }
   
   @objc private func updateBadge() {
@@ -164,26 +169,51 @@ class ANITabBarController: UITabBarController {
       badge.alpha = 0.0
     }
   }
+  
+  @objc private func relogin() {
+    loadUser(relogin: true)
+    observeChatGroup()
+  }
+  
+  @objc private func logout() {
+    guard let userListener = self.userListener,
+          let chatGroupListener = self.chatGroupListener else { return }
+    
+    userListener.remove()
+    chatGroupListener.remove()
+    
+    ANISessionManager.shared.isHaveUnreadNoti = false
+    ANISessionManager.shared.isHaveUnreadMessage = false
+    
+    oldIsHaveUnreadNoti = false
+    oldIsHaveUnreadMessage = false
+  }
 }
 
 //MARK: data
 extension ANITabBarController {
-  private func loadUser() {
+  private func loadUser(relogin: Bool = false) {
     let userDefault = UserDefaults.standard
+    
+    if let userListener = self.userListener {
+      userListener.remove()
+    }
 
     ANISessionManager.shared.currentUserUid = Auth.auth().currentUser?.uid
     if let currentUserUid = ANISessionManager.shared.currentUserUid {
       let database = Firestore.firestore()
       DispatchQueue.global().async {
-        database.collection(KEY_USERS).document(currentUserUid).addSnapshotListener({ (snapshot, error) in
+        self.userListener = database.collection(KEY_USERS).document(currentUserUid).addSnapshotListener({ (snapshot, error) in
           guard let snapshot = snapshot, let value = snapshot.data() else { return }
           
           do {
             let user = try FirestoreDecoder().decode(FirebaseUser.self, from: value)
             
             DispatchQueue.main.async {
-              ANISessionManager.shared.currentUser = user
-              ANISessionManager.shared.isAnonymous = false
+              if !relogin {
+                ANISessionManager.shared.currentUser = user
+                ANISessionManager.shared.isAnonymous = false
+              }
               
               if let isHaveUnreadNoti = user.isHaveUnreadNoti {
                 if self.oldIsHaveUnreadNoti != isHaveUnreadNoti {
@@ -219,8 +249,12 @@ extension ANITabBarController {
     
     let database = Firestore.firestore()
     
+    if let chatGroupListener = self.chatGroupListener {
+      chatGroupListener.remove()
+    }
+    
     DispatchQueue.global().async {
-      database.collection(KEY_CHAT_GROUPS).whereField(KEY_CHAT_MEMBER_IDS + "." + crrentUserUid, isEqualTo: true).whereField(KEY_IS_HAVE_UNREAD_MESSAGE + "." + crrentUserUid, isEqualTo: true).addSnapshotListener({ (snapshot, error) in
+      self.chatGroupListener = database.collection(KEY_CHAT_GROUPS).whereField(KEY_CHAT_MEMBER_IDS + "." + crrentUserUid, isEqualTo: true).whereField(KEY_IS_HAVE_UNREAD_MESSAGE + "." + crrentUserUid, isEqualTo: true).addSnapshotListener({ (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
           

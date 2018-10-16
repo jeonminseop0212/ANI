@@ -19,6 +19,8 @@ class ANIMessageView: UIView {
   
   private var chatGroups = [FirebaseChatGroup]()
   
+  private var chatGroupListener: ListenerRegistration?
+  
   private weak var activityIndicatorView: NVActivityIndicatorView?
   
   var isCellSelected: Bool = false
@@ -81,6 +83,7 @@ class ANIMessageView: UIView {
   private func setupNotifications() {
     ANINotificationManager.receive(notiTabTapped: self, selector: #selector(scrollToTop))
     ANINotificationManager.receive(login: self, selector: #selector(reloadChatGroups))
+    ANINotificationManager.receive(logout: self, selector: #selector(hideTableView))
   }
   
   @objc private func scrollToTop() {
@@ -93,6 +96,12 @@ class ANIMessageView: UIView {
   
   @objc private func reloadChatGroups() {
     loadChatGroup()
+  }
+  
+  @objc private func hideTableView() {
+    guard let messageTableView = self.messageTableView else { return }
+    
+    messageTableView.alpha = 0.0
   }
 }
 
@@ -126,8 +135,12 @@ extension ANIMessageView {
     
     activityIndicatorView.startAnimating()
     
+    if let chatGroupListener = self.chatGroupListener {
+      chatGroupListener.remove()
+    }
+    
     DispatchQueue.global().async {
-      database.collection(KEY_CHAT_GROUPS).whereField(KEY_CHAT_MEMBER_IDS + "." + crrentUserUid, isEqualTo: true).addSnapshotListener({ (snapshot, error) in
+      self.chatGroupListener = database.collection(KEY_CHAT_GROUPS).whereField(KEY_CHAT_MEMBER_IDS + "." + crrentUserUid, isEqualTo: true).addSnapshotListener({ (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
           

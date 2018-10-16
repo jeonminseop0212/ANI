@@ -18,6 +18,8 @@ class ANINotiMenuBarCell: UICollectionViewCell {
   var menuLabel: UILabel?
   var menuKind: MenuKind = .noti {
     didSet {
+      updateNotiBadge()
+      updateMessageBadge()
       setupNotification()
     }
   }
