@@ -330,7 +330,7 @@
 		F57F7D8B20844C41008A2645 /* ANISearchCategoriesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANISearchCategoriesView.swift; sourceTree = "<group>"; };
 		F57F7D8D20844C4E008A2645 /* ANISearchCategoryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANISearchCategoryCell.swift; sourceTree = "<group>"; };
 		F57F7D9020844DC2008A2645 /* ANISearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANISearchView.swift; sourceTree = "<group>"; };
-		F5B1EF8D20725963000CFB0B /* d_Ani.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = d_Ani.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F5B1EF8D20725963000CFB0B /* d_MYAU.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = d_MYAU.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5B1EF9020725964000CFB0B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F5B1EF9220725964000CFB0B /* ANIRecruitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitViewController.swift; sourceTree = "<group>"; };
 		F5B1EF9720725964000CFB0B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -1207,7 +1207,7 @@
 		F5B1EF8E20725963000CFB0B /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				F5B1EF8D20725963000CFB0B /* d_Ani.app */,
+				F5B1EF8D20725963000CFB0B /* d_MYAU.app */,
 				F5B1EFAC20725964000CFB0B /* AniUITests.xctest */,
 				CD85F555215F547200AB9A0C /* AniTests.xctest */,
 			);
@@ -1449,7 +1449,7 @@
 			);
 			name = Ani;
 			productName = Ani;
-			productReference = F5B1EF8D20725963000CFB0B /* d_Ani.app */;
+			productReference = F5B1EF8D20725963000CFB0B /* d_MYAU.app */;
 			productType = "com.apple.product-type.application";
 		};
 		F5B1EFAB20725964000CFB0B /* AniUITests */ = {
@@ -1613,7 +1613,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [ \"${CONFIGURATION}\" == \"Release\" ]; then\ncp \"${PROJECT_DIR}/${PROJECT_NAME}/GoogleService-Info-release.plist\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/GoogleService-Info.plist\"\necho \"Production GoogleService-Info copied.\"\nelse\ncp \"${PROJECT_DIR}/${PROJECT_NAME}/GoogleService-Info.plist\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/GoogleService-Info.plist\"\necho \"Development GoogleService-Info copied.\"\nfi";
+			shellScript = "if [ \"${CONFIGURATION}\" == \"Release\" ]; then\ncp \"${PROJECT_DIR}/${PROJECT_NAME}/GoogleService-Info-release.plist\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/GoogleService-Info.plist\"\necho \"Production GoogleService-Info copied.\"\nelse\ncp \"${PROJECT_DIR}/${PROJECT_NAME}/GoogleService-Info.plist\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/GoogleService-Info.plist\"\necho \"Development GoogleService-Info copied.\"\nfi\n";
 		};
 		D8894B36BCEAEA49086B4D2B /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1672,7 +1672,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "/usr/local/bin/carthage copy-frameworks";
+			shellScript = "/usr/local/bin/carthage copy-frameworks\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -2039,7 +2039,7 @@
 				INFOPLIST_FILE = Ani/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.gmail-jeonminsopdev.Ani.dev";
-				PRODUCT_NAME = "d_$(TARGET_NAME)";
+				PRODUCT_NAME = d_MYAU;
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -2059,7 +2059,7 @@
 				INFOPLIST_FILE = Ani/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.gmail-jeonminsopdev.Ani";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = MYAU;
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
