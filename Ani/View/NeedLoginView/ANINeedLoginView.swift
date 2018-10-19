@@ -17,6 +17,7 @@ class ANINeedLoginView: UIView {
   private weak var messageLabel: UILabel?
   
   private let LOGIN_BUTTON_HEIGHT: CGFloat = 45.0
+  private let LOGIN_BUTTON_WIDTH: CGFloat = 160.0
   private weak var loginButton: ANIAreaButtonView?
   private weak var loginButtonLabel: UILabel?
   
@@ -54,9 +55,9 @@ class ANINeedLoginView: UIView {
     loginButton.delegate = self
     self.addSubview(loginButton)
     loginButton.topToBottom(of: messageLabel, offset: 30.0)
-    loginButton.leftToSuperview(offset: 100.0)
-    loginButton.rightToSuperview(offset: -100.0)
+    loginButton.centerXToSuperview()
     loginButton.height(LOGIN_BUTTON_HEIGHT)
+    loginButton.width(LOGIN_BUTTON_WIDTH)
     self.loginButton = loginButton
     
     //loginButtonLabel
