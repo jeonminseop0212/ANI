@@ -75,7 +75,7 @@ class ANINotiViewController: UIViewController {
     //needLoginView
     let needLoginView = ANINeedLoginView()
     needLoginView.isHidden = true
-    needLoginView.setupMessage(text: "通知とメッセージを利用するには\nログインが必要です。")
+    needLoginView.setupMessage(text: "通知とメッセージを利用するには\nログインが必要です")
     needLoginView.delegate = self
     self.view.addSubview(needLoginView)
     needLoginView.edgesToSuperview()

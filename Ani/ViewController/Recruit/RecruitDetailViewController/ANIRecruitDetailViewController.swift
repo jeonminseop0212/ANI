@@ -22,6 +22,7 @@ class ANIRecruitDetailViewController: UIViewController {
   private weak var recruitDetailView: ANIRecruitDetailView?
   
   static let APPLY_BUTTON_HEIGHT: CGFloat = 45.0
+  private let APPLY_BUTTON_WIDTH: CGFloat = 160.0
   private weak var applyButton: ANIAreaButtonView?
   private weak var applyButtonLabel: UILabel?
   
@@ -136,8 +137,8 @@ class ANIRecruitDetailViewController: UIViewController {
     }
     self.view.addSubview(applyButton)
     applyButton.bottomToSuperview(offset: -10.0)
-    applyButton.leftToSuperview(offset: 100.0)
-    applyButton.rightToSuperview(offset: -100.0)
+    applyButton.centerXToSuperview()
+    applyButton.width(APPLY_BUTTON_WIDTH)
     applyButton.height(ANIRecruitDetailViewController.APPLY_BUTTON_HEIGHT)
     self.applyButton = applyButton
     

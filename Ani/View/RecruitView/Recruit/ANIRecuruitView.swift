@@ -102,6 +102,9 @@ class ANIRecuruitView: UIView {
   }
   
   private func setup() {
+    //basic
+    self.backgroundColor = ANIColor.bg
+    
     //reloadView
     let reloadView = ANIReloadView()
     reloadView.alpha = 0.0

@@ -158,7 +158,7 @@ class ANIProfileViewController: UIViewController {
     //needLoginView
     let needLoginView = ANINeedLoginView()
     needLoginView.isHidden = true
-    needLoginView.setupMessage(text: "プロフィールを利用するには\nログインが必要です。")
+    needLoginView.setupMessage(text: "プロフィールを利用するには\nログインが必要です")
     needLoginView.delegate = self
     self.view.addSubview(needLoginView)
     needLoginView.edgesToSuperview()
