@@ -132,10 +132,10 @@ class ANILoginViewController: UIViewController {
   @objc private func keyboardWillHide(_ notification: Notification) {
     guard let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval,
           let curve = notification.userInfo?[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt,
-          let signUpViewOriginalBottomConstraintConstant = self.loginViewOriginalBottomConstraintConstant,
+          let loginViewOriginalBottomConstraintConstant = self.loginViewOriginalBottomConstraintConstant,
           let loginViewBottomConstraint = self.loginViewBottomConstraint else { return }
     
-    loginViewBottomConstraint.constant = signUpViewOriginalBottomConstraintConstant
+    loginViewBottomConstraint.constant = loginViewOriginalBottomConstraintConstant
     
     UIView.animate(withDuration: duration, delay: 0, options: UIView.AnimationOptions(rawValue: curve), animations: {
       self.view.layoutIfNeeded()
