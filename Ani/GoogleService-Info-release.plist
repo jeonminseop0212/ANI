@@ -7,9 +7,9 @@
 	<key>AD_UNIT_ID_FOR_INTERSTITIAL_TEST</key>
 	<string>ca-app-pub-3940256099942544/4411468910</string>
 	<key>CLIENT_ID</key>
-	<string>504196481868-fc8aebks5fnuq16vgk1h5oj8p598cl08.apps.googleusercontent.com</string>
+	<string>504196481868-jn48am95m7l79njke5asvhtqf8ouj6ru.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.504196481868-fc8aebks5fnuq16vgk1h5oj8p598cl08</string>
+	<string>com.googleusercontent.apps.504196481868-jn48am95m7l79njke5asvhtqf8ouj6ru</string>
 	<key>API_KEY</key>
 	<string>AIzaSyByK7zLxjtkuzT1j8MWHD4PjFky5SzVcZA</string>
 	<key>GCM_SENDER_ID</key>
@@ -17,7 +17,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.gmail-jeonminsopdev.Ani</string>
+	<string>com.gmail-jeonminsopdev.MYAU</string>
 	<key>PROJECT_ID</key>
 	<string>ani-release</string>
 	<key>STORAGE_BUCKET</key>
@@ -33,7 +33,7 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:504196481868:ios:9d983b895bdba4a6</string>
+	<string>1:504196481868:ios:8bcb8fd080c44877</string>
 	<key>DATABASE_URL</key>
 	<string>https://ani-release.firebaseio.com</string>
 </dict>

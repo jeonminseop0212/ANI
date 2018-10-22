@@ -123,7 +123,7 @@ class ANIInitialView: UIView {
     subTitleLabel.font = UIFont.systemFont(ofSize: 18.0)
     subTitleLabel.numberOfLines = 2
     subTitleLabel.textAlignment = .center
-    subTitleLabel.text = "猫と猫好き、猫好きと猫好きが\nつながるコミュニティー"
+    subTitleLabel.text = "猫と猫好き、猫好きと猫好きが\nつながるコミュニティ"
     addSubview(subTitleLabel)
     subTitleLabel.centerXToSuperview()
     subTitleLabel.bottomToTop(of: buttonStackView, offset: -24.0)
