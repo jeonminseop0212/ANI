@@ -360,7 +360,7 @@ class ANIRecruitDetailView: UIView {
     passingBG.topToBottom(of: passingTitleLabel, offset: 10.0)
     passingBG.leftToSuperview(offset: 10.0)
     passingBG.rightToSuperview(offset: -10.0)
-    passingBGBottomConstratins = passingBG.bottomToSuperview(offset: -10.0 - 10.0 - ANIRecruitDetailViewController.APPLY_BUTTON_HEIGHT)
+    passingBGBottomConstratins = passingBG.bottomToSuperview(offset: -15.0 - 10.0 - ANIRecruitDetailViewController.APPLY_BUTTON_HEIGHT)
     self.passingBG = passingBG
     
     //passingLabel
@@ -409,7 +409,7 @@ class ANIRecruitDetailView: UIView {
     passingLabel.text = recruit.passing
     
     if let currentUserId = ANISessionManager.shared.currentUserUid, currentUserId == recruit.userId || recruit.recruitState != 0 {
-      passingBGBottomConstratins.constant = -10
+      passingBGBottomConstratins.constant = -15
     }
   }
   
