@@ -8,6 +8,8 @@
 
 import UIKit
 import Firebase
+import FirebaseMessaging
+import UserNotifications
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -27,6 +29,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     if let path = Bundle.main.path(forResource: firebasePlistName, ofType: "plist"), let firbaseOptions = FirebaseOptions(contentsOfFile: path) {
       FirebaseApp.configure(options: firbaseOptions)
     }
+    
+    //notification
+    application.registerForRemoteNotifications()
+    Messaging.messaging().delegate = self
+    UNUserNotificationCenter.current().delegate = self
     
     window = UIWindow(frame: UIScreen.main.bounds)
     window?.rootViewController = ANITabBarController()
@@ -61,10 +68,66 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
 
   func applicationDidBecomeActive(_ application: UIApplication) {
-    // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+    UIApplication.shared.applicationIconBadgeNumber = 0
   }
 
   func applicationWillTerminate(_ application: UIApplication) {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+  }
+}
+
+//MARK: UNUserNotificationCenterDelegate
+extension AppDelegate: UNUserNotificationCenterDelegate {
+  
+  //通知を受け取った時に呼ばれるメソッド
+  func userNotificationCenter(_ center: UNUserNotificationCenter,
+                              willPresent notification: UNNotification,
+                              withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+    
+//    let userInfo = notification.request.content.userInfo
+//
+//    if let messageID = userInfo["gcm.message_id"] {
+//      DLog("Message ID: \(messageID)")
+//    }
+
+    completionHandler([.alert, .badge, .sound])
+  }
+
+  func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+
+    Messaging.messaging().appDidReceiveMessage(userInfo)
+    
+    let state = application.applicationState
+    
+    if state == .background {
+      UIApplication.shared.applicationIconBadgeNumber = UIApplication.shared.applicationIconBadgeNumber + 1
+    }
+    
+    completionHandler(.newData)
+  }
+  
+  //通知を開いた時に呼ばれるメソッド
+  func userNotificationCenter(_ center: UNUserNotificationCenter,
+                              didReceive response: UNNotificationResponse,
+                              withCompletionHandler completionHandler: @escaping () -> Void) {
+    
+//    let userInfo = response.notification.request.content.userInfo
+//
+//    if let messageID = userInfo["gcm.message_id"] {
+//      DLog("Message ID: \(messageID)")
+//    }
+    
+    completionHandler()
+  }
+}
+
+// MARK: - MessagingDelegate
+extension AppDelegate: MessagingDelegate {
+  func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String) {
+    UserDefaults.standard.set(fcmToken, forKey: KEY_FCM_TOKEN)
+    UserDefaults.standard.synchronize()
+  }
+  
+  func messaging(_ messaging: Messaging, didReceive remoteMessage: MessagingRemoteMessage) {
   }
 }

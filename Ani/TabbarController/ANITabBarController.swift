@@ -10,6 +10,7 @@ import UIKit
 import FirebaseAuth
 import FirebaseFirestore
 import CodableFirebase
+import UserNotifications
 
 class ANITabBarController: UITabBarController {
   
@@ -39,17 +40,14 @@ class ANITabBarController: UITabBarController {
     setTabBar()
     setupBadge()
     
+    let userDefaults = UserDefaults.standard
+    if userDefaults.object(forKey: KEY_FIRST_LAUNCH) == nil {
+      userDefaults.set(true, forKey: KEY_FIRST_LAUNCH)
+    }
+    
     loadUser()
     observeChatGroup()
     setupNotification()
-  }
-  
-  override func viewDidAppear(_ animated: Bool) {
-    super.viewDidAppear(true)
-    
-    let userDefault = UserDefaults.standard
-    let dic = [KEY_FIRST_LAUNCH: true]
-    userDefault.register(defaults: dic)
   }
   
   private func setTabBar() {
@@ -115,12 +113,6 @@ class ANITabBarController: UITabBarController {
     }
   }
   
-  private func showInitialView() {
-    let initialViewController = ANIInitialViewController()
-    let initialNV = UINavigationController(rootViewController: initialViewController)
-    self.present(initialNV, animated: true, completion: nil)
-  }
-  
   override func tabBar(_ tabBar: UITabBar, didSelect item: UITabBarItem) {
     switch item.tag {
     case 0:
@@ -173,6 +165,12 @@ class ANITabBarController: UITabBarController {
   @objc private func relogin() {
     loadUser(relogin: true)
     observeChatGroup()
+    
+    //notification
+    let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
+    UNUserNotificationCenter.current().requestAuthorization(options: authOptions) { _, _ in
+      DLog("push permission finished")
+    }
   }
   
   @objc private func logout() {
@@ -193,10 +191,18 @@ class ANITabBarController: UITabBarController {
 //MARK: data
 extension ANITabBarController {
   private func loadUser(relogin: Bool = false) {
-    let userDefault = UserDefaults.standard
+    let userDefaults = UserDefaults.standard
     
     if let userListener = self.userListener {
       userListener.remove()
+    }
+    
+    if userDefaults.bool(forKey: KEY_FIRST_LAUNCH) {
+      do {
+        try Auth.auth().signOut()
+      } catch let signOutError as NSError {
+        DLog("signOutError \(signOutError)")
+      }
     }
 
     ANISessionManager.shared.currentUserUid = Auth.auth().currentUser?.uid
@@ -236,11 +242,7 @@ extension ANITabBarController {
       }
       
       ANISessionManager.shared.isAnonymous = true
-      
-      if userDefault.bool(forKey: KEY_FIRST_LAUNCH) {
-        userDefault.set(false, forKey: KEY_FIRST_LAUNCH)
-        showInitialView()
-      }
+      ANISessionManager.shared.currentUser = nil
     }
   }
   
