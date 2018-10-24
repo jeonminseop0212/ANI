@@ -341,39 +341,41 @@ class ANIQnaViewCell: UITableViewCell {
   private func isLoved() {
     guard let qna = self.qna,
           let qnaId = qna.id,
-          let currentUserId = ANISessionManager.shared.currentUserUid else { return }
+          let loveButton = self.loveButton else { return }
     
-    let database = Firestore.firestore()
-    DispatchQueue.global().async {
-      database.collection(KEY_QNAS).document(qnaId).collection(KEY_LOVE_IDS).getDocuments(completion: { (snapshot, error) in
-        if let error = error {
-          DLog("Error get document: \(error)")
+    if let currentUserId = ANISessionManager.shared.currentUserUid {
+      let database = Firestore.firestore()
+      DispatchQueue.global().async {
+        database.collection(KEY_QNAS).document(qnaId).collection(KEY_LOVE_IDS).getDocuments(completion: { (snapshot, error) in
+          if let error = error {
+            DLog("Error get document: \(error)")
+            
+            return
+          }
           
-          return
-        }
-        
-        guard let snapshot = snapshot else { return }
-        
-        var isLoved = false
-        
-        DispatchQueue.main.async {
-          for document in snapshot.documents {
-            if document.documentID == currentUserId {
-              guard let loveButton = self.loveButton else { return }
-              
-              loveButton.isSelected = true
-              isLoved = true
-              break
-            } else {
-              isLoved = false
+          guard let snapshot = snapshot else { return }
+          
+          var isLoved = false
+          
+          DispatchQueue.main.async {
+            for document in snapshot.documents {
+              if document.documentID == currentUserId {
+                loveButton.isSelected = true
+                isLoved = true
+                break
+              } else {
+                isLoved = false
+              }
+            }
+            
+            if let indexPath = self.indexPath {
+              self.delegate?.loadedQnaIsLoved(indexPath: indexPath, isLoved: isLoved)
             }
           }
-          
-          if let indexPath = self.indexPath {
-            self.delegate?.loadedQnaIsLoved(indexPath: indexPath, isLoved: isLoved)
-          }
-        }
-      })
+        })
+      }
+    } else {
+      loveButton.isSelected = false
     }
   }
   

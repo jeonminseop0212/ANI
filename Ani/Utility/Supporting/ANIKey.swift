@@ -11,6 +11,7 @@ import Foundation
 let KEY_FIRST_LAUNCH = "firstLaunch"
 let KEY_ID = "id"
 let KEY_DATE = "date"
+let KEY_FCM_TOKEN = "fcmToken"
 
 //user
 let KEY_UID = "uid"

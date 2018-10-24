@@ -106,14 +106,22 @@ class ANIStoryView: UIView {
   
   //MARK: Notifications
   private func setupNotifications() {
-    ANINotificationManager.receive(logout: self, selector: #selector(reloadStory))
-    ANINotificationManager.receive(login: self, selector: #selector(reloadStory))
+    ANINotificationManager.receive(logout: self, selector: #selector(reloadStoryLayout))
+    ANINotificationManager.receive(login: self, selector: #selector(reloadStoryLayout))
     ANINotificationManager.receive(communityTabTapped: self, selector: #selector(scrollToTop))
     ANINotificationManager.receive(deleteStory: self, selector: #selector(deleteStory))
   }
   
-  @objc private func reloadStory() {
-    loadStory(sender: nil)
+  @objc private func reloadStoryLayout() {
+    guard let storyTableView = self.storyTableView else { return }
+    
+    for (index, story) in stories.enumerated() {
+      var storyTemp = story
+      storyTemp.isLoved = nil
+      self.stories[index] = storyTemp
+    }
+    
+    storyTableView.reloadData()
   }
   
   @objc private func scrollToTop() {

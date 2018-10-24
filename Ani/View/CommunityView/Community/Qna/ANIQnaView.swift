@@ -102,14 +102,22 @@ class ANIQnaView: UIView {
   
   //MARK: Notifications
   private func setupNotifications() {
-    ANINotificationManager.receive(logout: self, selector: #selector(reloadQna))
-    ANINotificationManager.receive(login: self, selector: #selector(reloadQna))
+    ANINotificationManager.receive(logout: self, selector: #selector(reloadQnaLayout))
+    ANINotificationManager.receive(login: self, selector: #selector(reloadQnaLayout))
     ANINotificationManager.receive(communityTabTapped: self, selector: #selector(scrollToTop))
     ANINotificationManager.receive(deleteQna: self, selector: #selector(deleteQna))
   }
   
-  @objc private func reloadQna() {
-    loadQna(sender: nil)
+  @objc private func reloadQnaLayout() {
+    guard let qnaTableView = self.qnaTableView else { return }
+    
+    for (index, qna) in qnas.enumerated() {
+      var qnaTemp = qna
+      qnaTemp.isLoved = nil
+      self.qnas[index] = qnaTemp
+    }
+    
+    qnaTableView.reloadData()
   }
   
   @objc private func scrollToTop() {

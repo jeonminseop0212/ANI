@@ -28,6 +28,10 @@
 	<string>投稿のためにカメラへのアクセスを許可してください</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>投稿のために写真へのアクセスを許可してください</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

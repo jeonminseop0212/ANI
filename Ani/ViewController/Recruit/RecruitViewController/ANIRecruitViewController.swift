@@ -42,6 +42,7 @@ class ANIRecruitViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     setup()
+    ifNeedsShowInitialView()
   }
   
   override func viewWillAppear(_ animated: Bool) {
@@ -133,6 +134,18 @@ class ANIRecruitViewController: UIViewController {
     rejectTapView.size(to: rejectView)
     rejectTapView.topToSuperview()
     self.rejectTapView = rejectTapView
+  }
+  
+  private func ifNeedsShowInitialView() {
+    let userDefaults = UserDefaults.standard
+
+    if userDefaults.bool(forKey: KEY_FIRST_LAUNCH) {
+      let initialViewController = ANIInitialViewController()
+      let initialNV = UINavigationController(rootViewController: initialViewController)
+      self.present(initialNV, animated: true, completion: nil)
+      
+      userDefaults.set(false, forKey: KEY_FIRST_LAUNCH)
+    }
   }
   
   //MARK: Notifications

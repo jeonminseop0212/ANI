@@ -206,6 +206,7 @@
 		CD0FAD0D20BFC02E00D8CD27 /* ANISessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANISessionManager.swift; sourceTree = "<group>"; };
 		CD127399217D587600539D54 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "Ani/GoogleService-Info.plist"; sourceTree = SOURCE_ROOT; };
 		CD12739B217D58CD00539D54 /* GoogleService-Info-release.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info-release.plist"; sourceTree = "<group>"; };
+		CD12739D217D74A500539D54 /* d_MYAU.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = d_MYAU.entitlements; sourceTree = "<group>"; };
 		CD2C414420A556AE00581267 /* ANIRecruitContributionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitContributionViewController.swift; sourceTree = "<group>"; };
 		CD2C414720A5A23C00581267 /* ANIImageFilterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIImageFilterViewController.swift; sourceTree = "<group>"; };
 		CD334E8121421C7F001C6289 /* ANIReloadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIReloadView.swift; sourceTree = "<group>"; };
@@ -219,6 +220,7 @@
 		CD516FBF21631D56002FF41C /* UITableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITableView.swift; sourceTree = "<group>"; };
 		CD516FFD21659885002FF41C /* ANIChatActivityIndicatorViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIChatActivityIndicatorViewCell.swift; sourceTree = "<group>"; };
 		CD529782213E17F7001609DB /* ANIPopupOptionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIPopupOptionViewCell.swift; sourceTree = "<group>"; };
+		CD5CA18E21801A1200F15F39 /* MYAU.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MYAU.entitlements; sourceTree = "<group>"; };
 		CD6229DB20B64A6400E36875 /* ANISignUpViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANISignUpViewController.swift; sourceTree = "<group>"; };
 		CD6229DD20B64B9900E36875 /* ANISignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANISignUpView.swift; sourceTree = "<group>"; };
 		CD6762DD20F8285E0098E033 /* InstantSearchClient.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = InstantSearchClient.framework; path = Carthage/Build/iOS/InstantSearchClient.framework; sourceTree = "<group>"; };
@@ -1223,6 +1225,8 @@
 				F5E9E2302079AF8C0021D4CC /* ViewController */,
 				F5E9E2342079B1660021D4CC /* View */,
 				F51D220E20767E49009D1B26 /* Utility */,
+				CD12739D217D74A500539D54 /* d_MYAU.entitlements */,
+				CD5CA18E21801A1200F15F39 /* MYAU.entitlements */,
 				F5B1EF9C20725964000CFB0B /* Info.plist */,
 				CD127399217D587600539D54 /* GoogleService-Info.plist */,
 				CD12739B217D58CD00539D54 /* GoogleService-Info-release.plist */,
@@ -1490,6 +1494,14 @@
 						CreatedOnToolsVersion = 9.2;
 						LastSwiftMigration = 1000;
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+							com.apple.Push = {
+								enabled = 1;
+							};
+						};
 					};
 					F5B1EFAB20725964000CFB0B = {
 						CreatedOnToolsVersion = 9.2;
@@ -2030,6 +2042,7 @@
 			baseConfigurationReference = F1F77997FC894BF232AA6788 /* Pods-Ani.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Ani/d_MYAU.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = BY8G5B9E3U;
@@ -2052,6 +2065,7 @@
 			baseConfigurationReference = F8BF8D21240D7035E50361DD /* Pods-Ani.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Ani/MYAU.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = BY8G5B9E3U;

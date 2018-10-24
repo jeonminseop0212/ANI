@@ -225,33 +225,41 @@ extension ANILoginView: ANIButtonViewDelegate {
           let database = Firestore.firestore()
           
           ANISessionManager.shared.currentUserUid = Auth.auth().currentUser?.uid
-          if let currentUserUid = ANISessionManager.shared.currentUserUid {
-            DispatchQueue.global().async {
-              database.collection(KEY_USERS).document(currentUserUid).addSnapshotListener({ (snapshot, error) in
-                if let error = error {
-                  DLog("Error adding document: \(error)")
-
-                  return
-                }
+          if let currentUserUid = ANISessionManager.shared.currentUserUid, let fcmToken = UserDefaults.standard.string(forKey: KEY_FCM_TOKEN) {
+            database.collection(KEY_USERS).document(currentUserUid).updateData([KEY_FCM_TOKEN: fcmToken], completion: { (error) in
+              if let error = error {
+                DLog("fcm token update error: \(error)")
                 
-                guard let snapshot = snapshot, let value = snapshot.data() else { return }
-                                
-                do {
-                  let user = try FirestoreDecoder().decode(FirebaseUser.self, from: value)
-                  
-                  DispatchQueue.main.async {
-                    ANISessionManager.shared.currentUser = user
-                    ANISessionManager.shared.isAnonymous = false
-                    self.delegate?.loginSuccess()
+                return
+              }
+              
+              DispatchQueue.global().async {
+                database.collection(KEY_USERS).document(currentUserUid).addSnapshotListener({ (snapshot, error) in
+                  if let error = error {
+                    DLog("Error adding document: \(error)")
                     
+                    return
+                  }
+                  
+                  guard let snapshot = snapshot, let value = snapshot.data() else { return }
+                  
+                  do {
+                    let user = try FirestoreDecoder().decode(FirebaseUser.self, from: value)
+                    
+                    DispatchQueue.main.async {
+                      ANISessionManager.shared.currentUser = user
+                      ANISessionManager.shared.isAnonymous = false
+                      self.delegate?.loginSuccess()
+                      
+                      NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+                    }
+                  } catch let error {
+                    DLog(error)
                     NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
                   }
-                } catch let error {
-                  DLog(error)
-                  NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
-                }
-              })
-            }
+                })
+              }
+            })
           }
           
           self.endEditing(true)

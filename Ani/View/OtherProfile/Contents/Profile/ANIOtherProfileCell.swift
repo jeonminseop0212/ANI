@@ -285,7 +285,7 @@ class ANIOtherProfileCell: UITableViewCell {
       do {
         let noti = "\(currentUserName)さんがあなたをフォローしました。"
         let date = ANIFunction.shared.getToday()
-        let notification = FirebaseNotification(userId: currentUserId, noti: noti, contributionKind: KEY_CONTRIBUTION_KIND_USER, notiKind: KEY_NOTI_KIND_FOLLOW, notiId: userId, commentId: nil, updateDate: date)
+        let notification = FirebaseNotification(userId: currentUserId, noti: noti, contributionKind: KEY_CONTRIBUTION_KIND_USER, notiKind: KEY_NOTI_KIND_FOLLOW, notiId: currentUserId, commentId: nil, updateDate: date)
         let data = try FirestoreEncoder().encode(notification)
         
         database.collection(KEY_USERS).document(userId).collection(KEY_NOTIFICATIONS).document(currentUserId).setData(data)
