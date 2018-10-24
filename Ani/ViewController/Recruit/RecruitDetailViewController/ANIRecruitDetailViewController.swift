@@ -136,7 +136,7 @@ class ANIRecruitDetailViewController: UIViewController {
       applyButton.isHidden = true
     }
     self.view.addSubview(applyButton)
-    applyButton.bottomToSuperview(offset: -10.0)
+    applyButton.bottomToSuperview(offset: -15.0)
     applyButton.centerXToSuperview()
     applyButton.width(APPLY_BUTTON_WIDTH)
     applyButton.height(ANIRecruitDetailViewController.APPLY_BUTTON_HEIGHT)
