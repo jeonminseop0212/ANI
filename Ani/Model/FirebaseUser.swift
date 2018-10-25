@@ -17,5 +17,6 @@ struct FirebaseUser: Codable {
   var familyImageUrls: [String]?
   var checkNotiDate: String?
   var isHaveUnreadNoti: Bool?
+  var unreadNotiCount: Int?
   var fcmToken: String?
 }

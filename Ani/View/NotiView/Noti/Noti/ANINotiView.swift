@@ -149,12 +149,16 @@ class ANINotiView: UIView {
   }
   
   private func updateCheckNotiDate() {
-    guard let currentUserUid = ANISessionManager.shared.currentUserUid else { return }
+    guard let currentUserUid = ANISessionManager.shared.currentUserUid,
+          let currentUser = ANISessionManager.shared.currentUser,
+          let unreadNotiCount = currentUser.unreadNotiCount else { return }
     
     let database = Firestore.firestore()
     
+    UIApplication.shared.applicationIconBadgeNumber = UIApplication.shared.applicationIconBadgeNumber - unreadNotiCount
+    
     let date = ANIFunction.shared.getToday()
-    database.collection(KEY_USERS).document(currentUserUid).updateData([KEY_CHECK_NOTI_DATE: date, KEY_IS_HAVE_UNREAD_NOTI: false])
+    database.collection(KEY_USERS).document(currentUserUid).updateData([KEY_CHECK_NOTI_DATE: date, KEY_IS_HAVE_UNREAD_NOTI: false, KEY_UNREAD_NOTI_COUNT: 0])
   }
 }
 

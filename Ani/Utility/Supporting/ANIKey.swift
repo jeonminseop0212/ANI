@@ -37,6 +37,7 @@ let KEY_CHAT_GROUP_IDS = "chatGroupIds"
 let KEY_USER_ID = "userId"
 let KEY_CHECK_NOTI_DATE = "checkNotiDate"
 let KEY_IS_HAVE_UNREAD_NOTI = "isHaveUnreadNoti"
+let KEY_UNREAD_NOTI_COUNT = "unreadNotiCount"
 let KEY_IS_HAVE_UNREAD_MESSAGE = "isHaveUnreadMessage"
 
 //recruit
