@@ -70,8 +70,18 @@ extension ANiNotiMenuBar: UICollectionViewDataSource, UICollectionViewDelegate, 
 
     if indexPath.row == 0 {
       cell.menuKind = .noti
+      if ANISessionManager.shared.isHaveUnreadNoti {
+        cell.badge?.alpha = 1.0
+      } else {
+        cell.badge?.alpha = 0.0
+      }
     } else if indexPath.row == 1 {
       cell.menuKind = .message
+      if ANISessionManager.shared.isHaveUnreadMessage {
+        cell.badge?.alpha = 1.0
+      } else {
+        cell.badge?.alpha = 0.0
+      }
     }
     cell.menuLabel?.text = menus[indexPath.item]
     

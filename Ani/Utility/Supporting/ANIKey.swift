@@ -39,6 +39,7 @@ let KEY_CHECK_NOTI_DATE = "checkNotiDate"
 let KEY_IS_HAVE_UNREAD_NOTI = "isHaveUnreadNoti"
 let KEY_UNREAD_NOTI_COUNT = "unreadNotiCount"
 let KEY_IS_HAVE_UNREAD_MESSAGE = "isHaveUnreadMessage"
+let KEY_UNREAD_MESSAGE_COUNT = "unreadMessageCount"
 
 //recruit
 let KEY_RECRUIT_HEADER_IMAGES = "recruit_header_images"
@@ -68,9 +69,10 @@ let KEY_CHAT_MEMBER_IDS = "memberIds"
 let KEY_CHAT_UPDATE_DATE = "updateDate"
 let KEY_CHAT_LAST_MESSAGE = "lastMessage"
 let KEY_CHECK_CHAT_GROUP_DATE = "checkChatGroupDate"
+let KEY_UNREAD_MESSAGE_COUNT_FOR_BADGE = "unreadMessageCountForBadge"
 
 //chat message
-let KEY_CHAT_MESSAGES = "chatChatMessages"
+let KEY_CHAT_MESSAGES = "chatMessages"
 
 //noti
 let KEY_NOTIFICATIONS = "notifications"

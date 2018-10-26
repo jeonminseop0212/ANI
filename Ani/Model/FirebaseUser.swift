@@ -18,5 +18,6 @@ struct FirebaseUser: Codable {
   var checkNotiDate: String?
   var isHaveUnreadNoti: Bool?
   var unreadNotiCount: Int?
+  var unreadMessageCount: Int?
   var fcmToken: String?
 }

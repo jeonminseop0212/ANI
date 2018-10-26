@@ -75,9 +75,12 @@ class ANIChatViewController: UIViewController {
   
   override func viewDidDisappear(_ animated: Bool) {
     guard let chatView = self.chatView,
-          let chatGropListener = chatView.chatGropListener else { return }
+          let chatViewChatGroupListener = chatView.chatGroupListener,
+          let chatBar = self.chatBar,
+          let chatBarChatGroupListener = chatBar.chatGroupListener else { return }
     
-    chatGropListener.remove()
+    chatViewChatGroupListener.remove()
+    chatBarChatGroupListener.remove()
   }
     
   private func setup() {
@@ -201,7 +204,11 @@ class ANIChatViewController: UIViewController {
   private func createGroup() {
     let id = NSUUID().uuidString
     let date = ANIFunction.shared.getToday()
-    let chatGroup = FirebaseChatGroup(groupId:id, memberIds: nil, updateDate: date, lastMessage: "", checkChatGroupDate: nil, isHaveUnreadMessage: nil)
+    var unreadMessageCountForBadge = [String: Int]()
+    if let currentUserUid = ANISessionManager.shared.currentUserUid, let user = self.user, let userId = user.uid {
+      unreadMessageCountForBadge = [currentUserUid: 0, userId: 0]
+    }
+    let chatGroup = FirebaseChatGroup(groupId:id, memberIds: nil, updateDate: date, lastMessage: "", checkChatGroupDate: nil, isHaveUnreadMessage: nil, unreadMessageCountForBadge: unreadMessageCountForBadge)
     
     let database = Firestore.firestore()
 

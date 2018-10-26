@@ -68,7 +68,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
 
   func applicationDidBecomeActive(_ application: UIApplication) {
-    UIApplication.shared.applicationIconBadgeNumber = 0
+//    UIApplication.shared.applicationIconBadgeNumber = 0
   }
 
   func applicationWillTerminate(_ application: UIApplication) {
@@ -96,12 +96,6 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
   func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
 
     Messaging.messaging().appDidReceiveMessage(userInfo)
-    
-    let state = application.applicationState
-    
-    if state == .background {
-      UIApplication.shared.applicationIconBadgeNumber = UIApplication.shared.applicationIconBadgeNumber + 1
-    }
     
     completionHandler(.newData)
   }

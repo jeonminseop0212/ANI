@@ -162,7 +162,7 @@ class ANICommentBar: UIView {
         }
         
         let date = ANIFunction.shared.getToday()
-        let notification = FirebaseNotification(userId: currentUserId, noti: noti, contributionKind: contributionKind, notiKind: KEY_NOTI_KIND_COMMENT, notiId: notiId, commentId: commentId, updateDate: date)
+        let notification = FirebaseNotification(userId: currentUserId, userName: currentUserName, noti: noti, contributionKind: contributionKind, notiKind: KEY_NOTI_KIND_COMMENT, notiId: notiId, commentId: commentId, updateDate: date)
         let id = NSUUID().uuidString
         let data = try FirestoreEncoder().encode(notification)
         

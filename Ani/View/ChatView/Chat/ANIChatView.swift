@@ -23,7 +23,7 @@ class ANIChatView: UIView {
   
   var user: FirebaseUser?
   
-  var chatGropListener: ListenerRegistration?
+  var chatGroupListener: ListenerRegistration?
   
   var chatGroup: FirebaseChatGroup? {
     didSet {
@@ -160,7 +160,7 @@ extension ANIChatView: UITableViewDataSource {
     guard let currentUserUid = ANISessionManager.shared.currentUserUid else { return UITableViewCell() }
     
     if isLoadFirstMessage {
-      if messages[indexPath.row].userId == currentUserUid {
+      if messages[indexPath.row].sendUserId == currentUserUid {
         let myChatId = NSStringFromClass(ANIMyChatViewCell.self)
         let cell = tableView.dequeueReusableCell(withIdentifier: myChatId, for: indexPath) as! ANIMyChatViewCell
   
@@ -196,7 +196,7 @@ extension ANIChatView: UITableViewDataSource {
         
         return cell
       } else {
-        if messages[indexPath.row - 1].userId == currentUserUid {
+        if messages[indexPath.row - 1].sendUserId == currentUserUid {
           let myChatId = NSStringFromClass(ANIMyChatViewCell.self)
           let cell = tableView.dequeueReusableCell(withIdentifier: myChatId, for: indexPath) as! ANIMyChatViewCell
 
@@ -292,7 +292,11 @@ extension ANIChatView {
     guard let chatGroupId = self.chatGroupId,
           let activityIndicatorView = self.activityIndicatorView,
           let chatTableView = self.chatTableView,
-          let currentUserUid = ANISessionManager.shared.currentUserUid else { return }
+          let currentUser = ANISessionManager.shared.currentUser,
+          let unreadMessageCount = currentUser.unreadMessageCount,
+          let currentUserUid = ANISessionManager.shared.currentUserUid,
+          let chatGroup = self.chatGroup,
+          let unreadMessageCountForBadge = chatGroup.unreadMessageCountForBadge else { return }
     
     let database = Firestore.firestore()
     
@@ -300,7 +304,7 @@ extension ANIChatView {
       self.isLoading = true
       self.isLastPage = false
       
-      self.chatGropListener = database.collection(KEY_CHAT_GROUPS).document(chatGroupId).collection(KEY_CHAT_MESSAGES).order(by: KEY_DATE, descending: true).limit(to: 20).addSnapshotListener({ (snapshot, error) in
+      self.chatGroupListener = database.collection(KEY_CHAT_GROUPS).document(chatGroupId).collection(KEY_CHAT_MESSAGES).order(by: KEY_DATE, descending: true).limit(to: 20).addSnapshotListener({ (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
           self.isLoading = false
@@ -338,8 +342,13 @@ extension ANIChatView {
               DispatchQueue.main.async {
                 if !updated {
                   chatTableView.reloadData() {
-                    database.collection(KEY_CHAT_GROUPS).document(chatGroupId).updateData([KEY_IS_HAVE_UNREAD_MESSAGE + "." + currentUserUid: false])
-
+                    if let unreadMessageCountForBadge = unreadMessageCountForBadge[currentUserUid] {
+                      UIApplication.shared.applicationIconBadgeNumber = UIApplication.shared.applicationIconBadgeNumber - unreadMessageCountForBadge
+                      database.collection(KEY_USERS).document(currentUserUid).updateData([KEY_UNREAD_MESSAGE_COUNT: unreadMessageCount - unreadMessageCountForBadge])
+                      
+                      database.collection(KEY_CHAT_GROUPS).document(chatGroupId).updateData([KEY_IS_HAVE_UNREAD_MESSAGE + "." + currentUserUid: false, KEY_UNREAD_MESSAGE_COUNT_FOR_BADGE + "." + currentUserUid: 0])
+                    }
+                    
                     updated = true
                     self.isFirstLoad = false
                   }

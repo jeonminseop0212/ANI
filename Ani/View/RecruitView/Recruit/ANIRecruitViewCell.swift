@@ -625,7 +625,7 @@ class ANIRecruitViewCell: UITableViewCell {
         
         do {
           let date = ANIFunction.shared.getToday()
-          let notification = FirebaseNotification(userId: currentUserId, noti: noti, contributionKind: KEY_CONTRIBUTION_KIND_RECRUIT, notiKind: KEY_NOTI_KIND_LOVE, notiId: recuritId, commentId: nil, updateDate: date)
+          let notification = FirebaseNotification(userId: currentUserId, userName: currentUserName, noti: noti, contributionKind: KEY_CONTRIBUTION_KIND_RECRUIT, notiKind: KEY_NOTI_KIND_LOVE, notiId: recuritId, commentId: nil, updateDate: date)
           let data = try FirestoreEncoder().encode(notification)
           
           database.collection(KEY_USERS).document(userId).collection(KEY_NOTIFICATIONS).document(recuritId).setData(data)
