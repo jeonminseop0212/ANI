@@ -13,13 +13,11 @@ import FirebaseFirestore
 class ANINotiMenuBarCell: UICollectionViewCell {
   
   private let BADGE_WIDHT: CGFloat = 5.0
-  private weak var badge: UIView?
+  weak var badge: UIView?
   
   var menuLabel: UILabel?
   var menuKind: MenuKind = .noti {
     didSet {
-      updateNotiBadge()
-      updateMessageBadge()
       setupNotification()
     }
   }

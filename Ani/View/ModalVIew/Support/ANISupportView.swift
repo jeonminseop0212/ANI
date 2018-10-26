@@ -117,7 +117,7 @@ class ANISupportView: UIView {
           noti = "\(currentUserName)さんが「\(recruit.title)」募集を「応援」しました。"
         }
         let date = ANIFunction.shared.getToday()
-        let notification = FirebaseNotification(userId: currentUserId, noti: noti, contributionKind: KEY_CONTRIBUTION_KIND_STROY, notiKind: KEY_NOTI_KIND_SUPPORT, notiId: storyId, commentId: nil, updateDate: date)
+        let notification = FirebaseNotification(userId: currentUserId, userName: currentUserName, noti: noti, contributionKind: KEY_CONTRIBUTION_KIND_STROY, notiKind: KEY_NOTI_KIND_SUPPORT, notiId: storyId, commentId: nil, updateDate: date)
         
         let data = try FirestoreEncoder().encode(notification)
         let id = NSUUID().uuidString
