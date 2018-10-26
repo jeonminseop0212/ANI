@@ -112,7 +112,7 @@ class ANIChatView: UIView {
     return resetDate
   }
   
-  func updateTableWithNewRowCount(newMessage: [FirebaseChatMessage]) {
+  private func updateTableWithNewRowCount(newMessage: [FirebaseChatMessage]) {
     guard let chatTableView = self.chatTableView else { return }
     
     UIView.setAnimationsEnabled(false)
@@ -318,13 +318,14 @@ extension ANIChatView {
                 activityIndicatorView.stopAnimating()
                 return }
         
+        var newMassageCount = 0
+
         self.lastMessage = lastMessage
-                
-        var updated: Bool = false
-        
         snapshot.documentChanges.forEach({ (diff) in
           if diff.type == .added {
             do {
+              newMassageCount = newMassageCount + 1
+              
               let message = try FirestoreDecoder().decode(FirebaseChatMessage.self, from: diff.document.data())
               
               if self.isFirstLoad {
@@ -339,8 +340,8 @@ extension ANIChatView {
                 self.messages.append(message)
               }
               
-              DispatchQueue.main.async {
-                if !updated {
+              if snapshot.documentChanges.count == newMassageCount {
+                DispatchQueue.main.async {
                   chatTableView.reloadData() {
                     if let unreadMessageCountForBadge = unreadMessageCountForBadge[currentUserUid] {
                       UIApplication.shared.applicationIconBadgeNumber = UIApplication.shared.applicationIconBadgeNumber - unreadMessageCountForBadge
@@ -348,20 +349,19 @@ extension ANIChatView {
                       
                       database.collection(KEY_CHAT_GROUPS).document(chatGroupId).updateData([KEY_IS_HAVE_UNREAD_MESSAGE + "." + currentUserUid: false, KEY_UNREAD_MESSAGE_COUNT_FOR_BADGE + "." + currentUserUid: 0])
                     }
-                    
-                    updated = true
-                    self.isFirstLoad = false
                   }
+                  self.isFirstLoad = false
+
+                  self.scrollToBottom()
+                  
+                  UIView.animate(withDuration: 0.2, animations: {
+                    chatTableView.alpha = 1.0
+                  })
+                  
+                  activityIndicatorView.stopAnimating()
+                  
+                  self.isLoading = false
                 }
-                self.scrollToBottom()
-                
-                UIView.animate(withDuration: 0.2, animations: {
-                  chatTableView.alpha = 1.0
-                })
-                
-                activityIndicatorView.stopAnimating()
-                
-                self.isLoading = false
               }
             } catch let error {
               DLog(error)
