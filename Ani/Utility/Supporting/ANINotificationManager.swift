@@ -151,4 +151,9 @@ class ANINotificationManager: NSObject {
   private static let N_CHANGE_IS_HAVE_UNREAD_MESSAGE = "N_CHANGE_IS_HAVE_UNREAD_MESSAGE"
   static func postChangeIsHaveUnreadMessage() { self.post(name: N_CHANGE_IS_HAVE_UNREAD_MESSAGE, object: nil, userInfo:nil) }
   static func receive(changeIsHaveUnreadMessage observer:Any, selector:Selector) { receive(name: N_CHANGE_IS_HAVE_UNREAD_MESSAGE, observer: observer, selector: selector) }
+  
+  //MARK: tap noti notification
+  private static let N_TAP_NOTI_NOTIFICATION = "N_TAP_NOTI_NOTIFICATION"
+  static func postTapNotiNotification() { self.post(name: N_TAP_NOTI_NOTIFICATION, object: nil, userInfo:nil) }
+  static func receive(tapNotiNotification observer:Any, selector:Selector) { receive(name: N_TAP_NOTI_NOTIFICATION, observer: observer, selector: selector) }
 }
