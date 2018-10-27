@@ -148,7 +148,9 @@ class ANINotiViewController: UIViewController {
     guard let menuBar = self.menuBar else { return }
     
     scrollToMenuIndex(menuIndex: 0)
-    menuBar.menuCollectionView?.selectItem(at: IndexPath(item: 0, section: 0), animated: true, scrollPosition: .left)    
+    menuBar.menuCollectionView?.selectItem(at: IndexPath(item: 0, section: 0), animated: true, scrollPosition: .left)
+    
+    ANINotificationManager.postTapNotiNotification()
   }
   
   private func tapMessageNotification() {
