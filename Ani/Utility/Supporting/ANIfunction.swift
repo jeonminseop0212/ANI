@@ -11,7 +11,7 @@ import UIKit
 class ANIFunction: NSObject {
   static let shared = ANIFunction()
 
-  func getToday(format:String = "yyyy/MM/dd HH:mm:ss") -> String {
+  func getToday(format:String = "yyyy/MM/dd HH:mm:ss.SSS") -> String {
     
     let now = Date()
     let formatter = DateFormatter()

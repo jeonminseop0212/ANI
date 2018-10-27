@@ -9,10 +9,10 @@
 import UIKit
 
 struct FirebaseChatMessage: Codable {
-  let sendUserId: String?
-  let sendUserName: String?
-  let receiveUserId: String?
-  let message: String?
-  let date: String?
+  let sendUserId: String
+  let sendUserName: String
+  let receiveUserId: String
+  let message: String
+  let date: String
   let isDiffrentBeforeDate: Bool
 }

@@ -29,6 +29,8 @@ class ANIChatBar: UIView {
   
   var messages = [FirebaseChatMessage]()
   
+  var userListener: ListenerRegistration?
+  
   override init(frame: CGRect) {
     super.init(frame: frame)
     
@@ -156,6 +158,7 @@ class ANIChatBar: UIView {
           let chatGroupId = self.chatGroupId,
           let user = self.user,
           let userId = user.uid,
+          let unreadMessageCount = user.unreadMessageCount,
           let chatGroup = self.chatGroup,
           let unreadMessageCountForBadge = chatGroup.unreadMessageCountForBadge else { return }
 
@@ -163,7 +166,8 @@ class ANIChatBar: UIView {
     
     var isDiffrentBeforeDate = false
     if !messages.isEmpty {
-      if let beforeDate = messages[messages.count - 1].date, String(beforeDate.prefix(10)) != String(date.prefix(10)) {
+      let beforeDate = messages[messages.count - 1].date
+      if String(beforeDate.prefix(10)) != String(date.prefix(10)) {
         isDiffrentBeforeDate = true
       }
     } else {
@@ -180,15 +184,17 @@ class ANIChatBar: UIView {
       let message = try FirestoreEncoder().encode(message)
       
       DispatchQueue.global().async {
-        database.collection(KEY_CHAT_GROUPS).document(chatGroupId).collection(KEY_CHAT_MESSAGES).addDocument(data: message)
-        
-        var unreadMessageCount = 0
+        var userUnreadMessageCount = 0
         if let unreadMessageCountForBadge = unreadMessageCountForBadge[userId] {
-          unreadMessageCount = unreadMessageCountForBadge + 1
+          userUnreadMessageCount = unreadMessageCountForBadge + 1
         }
 
-        let value: [String: Any] = [KEY_CHAT_UPDATE_DATE: date, KEY_CHAT_LAST_MESSAGE: text, KEY_IS_HAVE_UNREAD_MESSAGE + "." + userId: true, KEY_UNREAD_MESSAGE_COUNT_FOR_BADGE + "." + userId: unreadMessageCount]
+        let value: [String: Any] = [KEY_CHAT_UPDATE_DATE: date, KEY_CHAT_LAST_MESSAGE: text, KEY_IS_HAVE_UNREAD_MESSAGE + "." + userId: true, KEY_UNREAD_MESSAGE_COUNT_FOR_BADGE + "." + userId: userUnreadMessageCount]
         database.collection(KEY_CHAT_GROUPS).document(chatGroupId).updateData(value)
+        
+        database.collection(KEY_USERS).document(userId).updateData([KEY_UNREAD_MESSAGE_COUNT: unreadMessageCount + 1])
+        
+        database.collection(KEY_CHAT_GROUPS).document(chatGroupId).collection(KEY_CHAT_MESSAGES).addDocument(data: message)
       }
     } catch let error {
       DLog(error)
@@ -203,5 +209,28 @@ class ANIChatBar: UIView {
 extension ANIChatBar: GrowingTextViewDelegate {
   func textViewDidChange(_ textView: UITextView) {
     updateCommentContributionButton(text: textView.text)
+  }
+}
+
+//data
+extension ANIChatBar {
+  func observeUser() {
+    guard let user = self.user,
+          let userId = user.uid else { return }
+    
+    let database = Firestore.firestore()
+    DispatchQueue.global().async {
+      self.userListener = database.collection(KEY_USERS).document(userId).addSnapshotListener { (snapshot, error) in
+        guard let snapshot = snapshot, let data = snapshot.data() else { return }
+        
+        do {
+          let user = try FirestoreDecoder().decode(FirebaseUser.self, from: data)
+          
+          self.user = user
+        } catch let error {
+          DLog(error)
+        }
+      }
+    }
   }
 }

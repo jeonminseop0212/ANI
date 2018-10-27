@@ -52,6 +52,7 @@ class ANIChatViewController: UIViewController {
       ANISessionManager.shared.onlineChatGroupId = chatGroupId
       
       observeChatGroup()
+      chatBar.observeUser()
     }
   }
   
@@ -84,10 +85,13 @@ class ANIChatViewController: UIViewController {
   override func viewDidDisappear(_ animated: Bool) {
     guard let chatView = self.chatView,
           let chatViewChatGroupListener = chatView.chatGroupListener,
-          let chatBarChatGroupListener = self.chatGroupListener else { return }
+          let chatBarChatGroupListener = self.chatGroupListener,
+          let chatBar = self.chatBar,
+          let userListener = chatBar.userListener else { return }
     
     chatViewChatGroupListener.remove()
     chatBarChatGroupListener.remove()
+    userListener.remove()
     
     ANISessionManager.shared.onlineChatGroupId = nil
   }
