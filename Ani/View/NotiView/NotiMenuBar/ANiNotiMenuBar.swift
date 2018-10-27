@@ -18,7 +18,7 @@ class ANiNotiMenuBar: UIView {
   weak var menuCollectionView: UICollectionView?
   private let menus = ["通知", "メッセージ"]
   var horizontalBarleftConstraint:Constraint?
-  var aniNotiViewController: ANINotiViewController?
+  var notiViewController: ANINotiViewController?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -98,8 +98,8 @@ extension ANiNotiMenuBar: UICollectionViewDataSource, UICollectionViewDelegate, 
   }
   
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-    guard let aniNotiViewController = self.aniNotiViewController else { return }
-    aniNotiViewController.scrollToMenuIndex(menuIndex: indexPath.item)
+    guard let notiViewController = self.notiViewController else { return }
+    notiViewController.scrollToMenuIndex(menuIndex: indexPath.item)
   }
 }
 

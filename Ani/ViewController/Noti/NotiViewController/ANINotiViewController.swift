@@ -8,6 +8,13 @@
 
 import UIKit
 import TinyConstraints
+import FirebaseFirestore
+import CodableFirebase
+
+enum PushNotificationKind: String {
+  case noti;
+  case message;
+}
 
 class ANINotiViewController: UIViewController {
   
@@ -16,9 +23,37 @@ class ANINotiViewController: UIViewController {
   
   private weak var needLoginView: ANINeedLoginView?
   
+  var pushNotificationKind: PushNotificationKind? {
+    didSet {
+      guard let pushNotificationKind = self.pushNotificationKind else { return }
+      
+      if pushNotificationKind == .noti {
+        self.tapNotiNotification()
+      } else if pushNotificationKind == .message {
+        self.tapMessageNotification()
+      }
+    }
+  }
+  
+  var sendPushNotificationUserId: String? {
+    didSet {
+      guard let sendPushNotificationUserId = self.sendPushNotificationUserId else { return }
+      
+      pushChatTapPushNotification(sendUserId: sendPushNotificationUserId)
+    }
+  }
+  
   override func viewDidLoad() {
     super.viewDidLoad()
-    setup()
+    setup() {
+      guard let pushNotificationKind = self.pushNotificationKind else { return }
+      
+      if pushNotificationKind == .noti {
+        self.tapNotiNotification()
+      } else if pushNotificationKind == .message {
+        self.tapMessageNotification()
+      }
+    }
   }
   
   override func viewWillAppear(_ animated: Bool) {
@@ -32,7 +67,7 @@ class ANINotiViewController: UIViewController {
     removeNotifications()
   }
   
-  private func setup() {
+  private func setup(completion:(()->())? = nil) {
     //basic
     ANIOrientation.lockOrientation(.portrait)
     navigationController?.setNavigationBarHidden(true, animated: false)
@@ -63,7 +98,7 @@ class ANINotiViewController: UIViewController {
     
     //menuBar
     let menuBar = ANiNotiMenuBar()
-    menuBar.aniNotiViewController = self
+    menuBar.notiViewController = self
     self.view.addSubview(menuBar)
     let menuBarHeight = UIViewController.STATUS_BAR_HEIGHT + UIViewController.NAVIGATION_BAR_HEIGHT
     menuBar.topToSuperview()
@@ -80,6 +115,8 @@ class ANINotiViewController: UIViewController {
     self.view.addSubview(needLoginView)
     needLoginView.edgesToSuperview()
     self.needLoginView = needLoginView
+    
+    completion?()
   }
   
   private func setupNotifications() {
@@ -104,6 +141,48 @@ class ANINotiViewController: UIViewController {
       needLoginView.isHidden = false
     } else {
       needLoginView.isHidden = true
+    }
+  }
+  
+  private func tapNotiNotification() {
+    guard let menuBar = self.menuBar else { return }
+    
+    scrollToMenuIndex(menuIndex: 0)
+    menuBar.menuCollectionView?.selectItem(at: IndexPath(item: 0, section: 0), animated: true, scrollPosition: .left)    
+  }
+  
+  private func tapMessageNotification() {
+    guard let menuBar = self.menuBar else { return }
+    
+    scrollToMenuIndex(menuIndex: 1)
+    menuBar.menuCollectionView?.selectItem(at: IndexPath(item: 1, section: 0), animated: true, scrollPosition: .left)
+  }
+  
+  private func pushChatTapPushNotification(sendUserId: String) {
+    let database = Firestore.firestore()
+    
+    DispatchQueue.global().async {
+      database.collection(KEY_USERS).document(sendUserId).getDocument(completion: { (snapshot, error) in
+        if let error = error {
+          DLog("Error get document: \(error)")
+          return
+        }
+
+        guard let snapshot = snapshot,
+              let data = snapshot.data() else { return }
+        
+        do {
+          let sendUser = try FirestoreDecoder().decode(FirebaseUser.self, from: data)
+          
+          let chatViewController = ANIChatViewController()
+          chatViewController.user = sendUser
+          chatViewController.isPush = true
+          chatViewController.hidesBottomBarWhenPushed = true
+          self.navigationController?.pushViewController(chatViewController, animated: true)
+        } catch let error {
+          DLog(error)
+        }
+      })
     }
   }
   

@@ -16,6 +16,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   var window: UIWindow?
   var orientationLock = UIInterfaceOrientationMask.all
+  private weak var tabBarController: ANITabBarController?
+  private let NOTI_VIEW_CONTROLLER_INDEX: Int = 2
 
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
     
@@ -35,8 +37,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     Messaging.messaging().delegate = self
     UNUserNotificationCenter.current().delegate = self
     
+    let tabBarController = ANITabBarController()
+    self.tabBarController = tabBarController
+    
     window = UIWindow(frame: UIScreen.main.bounds)
-    window?.rootViewController = ANITabBarController()
+    window?.rootViewController = tabBarController
     window?.makeKeyAndVisible()
     
     //navigation bar
@@ -78,19 +83,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 //MARK: UNUserNotificationCenterDelegate
 extension AppDelegate: UNUserNotificationCenterDelegate {
-  
-  //通知を受け取った時に呼ばれるメソッド
   func userNotificationCenter(_ center: UNUserNotificationCenter,
                               willPresent notification: UNNotification,
                               withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
     
-//    let userInfo = notification.request.content.userInfo
-//
-//    if let messageID = userInfo["gcm.message_id"] {
-//      DLog("Message ID: \(messageID)")
-//    }
-
-    completionHandler([.alert, .badge, .sound])
+    completionHandler([.badge])
   }
 
   func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
@@ -100,16 +97,26 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     completionHandler(.newData)
   }
   
-  //通知を開いた時に呼ばれるメソッド
   func userNotificationCenter(_ center: UNUserNotificationCenter,
                               didReceive response: UNNotificationResponse,
                               withCompletionHandler completionHandler: @escaping () -> Void) {
+    guard let tabBarController = self.tabBarController,
+          let viewControllers = tabBarController.viewControllers,
+          let notiNavigationController = viewControllers[NOTI_VIEW_CONTROLLER_INDEX] as? UINavigationController,
+          let notiViewController = notiNavigationController.viewControllers.first as? ANINotiViewController else { return }
     
-//    let userInfo = response.notification.request.content.userInfo
-//
-//    if let messageID = userInfo["gcm.message_id"] {
-//      DLog("Message ID: \(messageID)")
-//    }
+    
+    let userInfo = response.notification.request.content.userInfo
+    if let notificationKind = userInfo[AnyHashable("notificationKind")] as? String {
+      tabBarController.selectedIndex = NOTI_VIEW_CONTROLLER_INDEX
+
+      if notificationKind == PushNotificationKind.noti.rawValue {
+        notiViewController.pushNotificationKind = .noti
+      } else if notificationKind == PushNotificationKind.message.rawValue, let sendUserId = userInfo[AnyHashable("sendUserId")] as? String {
+        notiViewController.pushNotificationKind = .message
+        notiViewController.sendPushNotificationUserId = sendUserId
+      }
+    }
     
     completionHandler()
   }
