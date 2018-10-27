@@ -22,6 +22,9 @@ class ANIChatView: UIView {
   var chatGroupId: String? {
     didSet {
       observeChatGroup()
+      loadFirstMessage() {
+        self.loadMessage()
+      }
     }
   }
   
@@ -29,13 +32,7 @@ class ANIChatView: UIView {
   
   var chatGroupListener: ListenerRegistration?
   
-  var chatGroup: FirebaseChatGroup? {
-    didSet {
-      loadFirstMessage() {
-        self.loadMessage()
-      }
-    }
-  }
+  var chatGroup: FirebaseChatGroup?
   
   private var messages = [FirebaseChatMessage]() {
     didSet {
@@ -152,24 +149,23 @@ class ANIChatView: UIView {
   private func reloadTableView(completion:(()->())? = nil) {
     guard let chatTableView = self.chatTableView,
           let currentUserUid = ANISessionManager.shared.currentUserUid,
+          let currentUser = ANISessionManager.shared.currentUser,
+          let unreadNotiCount = currentUser.unreadNotiCount,
+          let unreadMessageCount = currentUser.unreadMessageCount,
           let chatGroup = self.chatGroup,
           let chatGroupId = self.chatGroupId,
           let unreadMessageCountForBadge = chatGroup.unreadMessageCountForBadge,
+          let currentUserUnreadMessageCountForBadge = unreadMessageCountForBadge[currentUserUid],
           let activityIndicatorView = self.activityIndicatorView else { return }
     
     let database = Firestore.firestore()
     
     DispatchQueue.main.async {
       chatTableView.reloadData() {
-        if let unreadMessageCountForBadge = unreadMessageCountForBadge[currentUserUid],
-          let currentUser = ANISessionManager.shared.currentUser,
-          let unreadNotiCount = currentUser.unreadNotiCount,
-          let unreadMessageCount = currentUser.unreadMessageCount {
-          UIApplication.shared.applicationIconBadgeNumber = unreadNotiCount + unreadMessageCount - unreadMessageCountForBadge
-          database.collection(KEY_USERS).document(currentUserUid).updateData([KEY_UNREAD_MESSAGE_COUNT: unreadMessageCount - unreadMessageCountForBadge])
-          
-          database.collection(KEY_CHAT_GROUPS).document(chatGroupId).updateData([KEY_IS_HAVE_UNREAD_MESSAGE + "." + currentUserUid: false, KEY_UNREAD_MESSAGE_COUNT_FOR_BADGE + "." + currentUserUid: 0])
-        }
+        UIApplication.shared.applicationIconBadgeNumber = unreadNotiCount + unreadMessageCount - currentUserUnreadMessageCountForBadge
+        database.collection(KEY_USERS).document(currentUserUid).updateData([KEY_UNREAD_MESSAGE_COUNT: unreadMessageCount - currentUserUnreadMessageCountForBadge])
+        
+        database.collection(KEY_CHAT_GROUPS).document(chatGroupId).updateData([KEY_IS_HAVE_UNREAD_MESSAGE + "." + currentUserUid: false, KEY_UNREAD_MESSAGE_COUNT_FOR_BADGE + "." + currentUserUid: 0])
       }
       
       self.scrollToBottom()

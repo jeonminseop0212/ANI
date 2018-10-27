@@ -31,9 +31,11 @@ class ANIChatViewController: UIViewController {
   
   var chatGroup: FirebaseChatGroup? {
     didSet {
-      guard let chatView = self.chatView else { return }
+      guard let chatView = self.chatView,
+            let chatBar = self.chatBar else { return }
       
       chatView.chatGroup = chatGroup
+      chatBar.chatGroup = chatGroup
     }
   }
   
@@ -46,6 +48,10 @@ class ANIChatViewController: UIViewController {
       chatView.user = user
       chatBar.chatGroupId = chatGroupId
       chatBar.user = user
+      
+      ANISessionManager.shared.onlineChatGroupId = chatGroupId
+      
+      observeChatGroup()
     }
   }
   
@@ -58,6 +64,8 @@ class ANIChatViewController: UIViewController {
   }
   
   var isPush: Bool = false
+  
+  private var chatGroupListener: ListenerRegistration?
   
   override func viewDidLoad() {
     setup()
@@ -76,11 +84,12 @@ class ANIChatViewController: UIViewController {
   override func viewDidDisappear(_ animated: Bool) {
     guard let chatView = self.chatView,
           let chatViewChatGroupListener = chatView.chatGroupListener,
-          let chatBar = self.chatBar,
-          let chatBarChatGroupListener = chatBar.chatGroupListener else { return }
+          let chatBarChatGroupListener = self.chatGroupListener else { return }
     
     chatViewChatGroupListener.remove()
     chatBarChatGroupListener.remove()
+    
+    ANISessionManager.shared.onlineChatGroupId = nil
   }
     
   private func setup() {
@@ -353,5 +362,33 @@ extension ANIChatViewController: ANIChatViewDelegate {
     guard let chatBar = self.chatBar else { return }
     
     chatBar.messages = messages
+  }
+}
+
+//data
+extension ANIChatViewController {
+  private func observeChatGroup() {
+    guard let chatGroupId = self.chatGroupId else { return }
+    
+    let database = Firestore.firestore()
+    
+    chatGroupListener = database.collection(KEY_CHAT_GROUPS).document(chatGroupId).addSnapshotListener({ (snapshot, error) in
+      if let error = error {
+        DLog("Error get document: \(error)")
+        return
+      }
+      
+      guard let snapshot = snapshot, let value = snapshot.data() else { return }
+      
+      do {
+        let chatGroup = try FirestoreDecoder().decode(FirebaseChatGroup.self, from: value)
+        
+        DispatchQueue.main.async {
+          self.chatGroup = chatGroup
+        }
+      } catch let error {
+        DLog(error)
+      }
+    })
   }
 }
