@@ -202,12 +202,10 @@ extension ANIChatView: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: myChatId, for: indexPath) as! ANIMyChatViewCell
   
         cell.message = messages[indexPath.row]
-        if let date = messages[indexPath.row].date {
-          if messages[indexPath.row].isDiffrentBeforeDate {
-            cell.chagedDate = getDate(date: date)
-          } else {
-            cell.chagedDate = nil
-          }
+        if messages[indexPath.row].isDiffrentBeforeDate {
+          cell.chagedDate = getDate(date: messages[indexPath.row].date)
+        } else {
+          cell.chagedDate = nil
         }
   
         return cell
@@ -217,13 +215,12 @@ extension ANIChatView: UITableViewDataSource {
   
         cell.message = messages[indexPath.row]
         cell.user = self.user
-        if let date = messages[indexPath.row].date {
-          if messages[indexPath.row].isDiffrentBeforeDate {
-            cell.chagedDate = getDate(date: date)
-          } else {
-            cell.chagedDate = nil
-          }
+        if messages[indexPath.row].isDiffrentBeforeDate {
+          cell.chagedDate = getDate(date: messages[indexPath.row].date)
+        } else {
+          cell.chagedDate = nil
         }
+        
         return cell
       }
     } else {
@@ -238,12 +235,10 @@ extension ANIChatView: UITableViewDataSource {
           let cell = tableView.dequeueReusableCell(withIdentifier: myChatId, for: indexPath) as! ANIMyChatViewCell
 
           cell.message = messages[indexPath.row - 1]
-          if let date = messages[indexPath.row - 1].date {
-            if messages[indexPath.row - 1].isDiffrentBeforeDate {
-              cell.chagedDate = getDate(date: date)
-            } else {
-              cell.chagedDate = nil
-            }
+          if messages[indexPath.row - 1].isDiffrentBeforeDate {
+            cell.chagedDate = getDate(date: messages[indexPath.row - 1].date)
+          } else {
+            cell.chagedDate = nil
           }
 
           return cell
@@ -253,13 +248,12 @@ extension ANIChatView: UITableViewDataSource {
 
           cell.message = messages[indexPath.row - 1]
           cell.user = self.user
-          if let date = messages[indexPath.row - 1].date {
-            if messages[indexPath.row - 1].isDiffrentBeforeDate {
-              cell.chagedDate = getDate(date: date)
-            } else {
-              cell.chagedDate = nil
-            }
+          if messages[indexPath.row - 1].isDiffrentBeforeDate {
+            cell.chagedDate = getDate(date: messages[indexPath.row - 1].date)
+          } else {
+            cell.chagedDate = nil
           }
+          
           return cell
         }
       }

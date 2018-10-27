@@ -210,10 +210,10 @@ extension ANITabBarController {
       let database = Firestore.firestore()
       DispatchQueue.global().async {
         self.userListener = database.collection(KEY_USERS).document(currentUserUid).addSnapshotListener({ (snapshot, error) in
-          guard let snapshot = snapshot, let value = snapshot.data() else { return }
+          guard let snapshot = snapshot, let data = snapshot.data() else { return }
           
           do {
-            let user = try FirestoreDecoder().decode(FirebaseUser.self, from: value)
+            let user = try FirestoreDecoder().decode(FirebaseUser.self, from: data)
             
             DispatchQueue.main.async {
               if !relogin {

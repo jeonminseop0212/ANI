@@ -131,9 +131,7 @@ class ANIMyChatViewCell: UITableViewCell {
           let dateLabel = self.dateLabel,
           let messageLabel = self.messageLabel,
           let message = self.message,
-          let text = message.message,
-          let timeLabel = self.timeLabel,
-          let date = message.date else { return }
+          let timeLabel = self.timeLabel  else { return }
     
     dateLabelBG.isHidden = true
     if let chagedDate = self.chagedDate {
@@ -143,9 +141,9 @@ class ANIMyChatViewCell: UITableViewCell {
       dateLabelBG.isHidden = true
     }
     
-    messageLabel.text = text
+    messageLabel.text = message.message
     
-    let suffixString = String(date.suffix(8))
-    timeLabel.text = String(suffixString.prefix(5))
+    let suffixString = String(message.date.prefix(16))
+    timeLabel.text = String(suffixString.suffix(5))
   }
 }
