@@ -116,8 +116,23 @@ extension ANIMessageView: UITableViewDataSource {
     let cell = tableView.dequeueReusableCell(withIdentifier: id, for: indexPath) as! ANIMessageViewCell
     
     cell.chatGroup = chatGroups[indexPath.row]
+    cell.delegate = self
     
     return cell
+  }
+}
+
+//MARK: ANIMessageViewCellDelegate
+extension ANIMessageView: ANIMessageViewCellDelegate {
+  func loadedUser() {
+    guard let activityIndicatorView = self.activityIndicatorView,
+          let messageTableView = self.messageTableView else { return }
+    
+    activityIndicatorView.stopAnimating()
+    
+    UIView.animate(withDuration: 0.2, animations: {
+      messageTableView.alpha = 1.0
+    })
   }
 }
 
@@ -159,13 +174,7 @@ extension ANIMessageView {
               self.chatGroups = chatGroupsTemp
 
               DispatchQueue.main.async {
-                activityIndicatorView.stopAnimating()
-    
                 messageTableView.reloadData()
-    
-                UIView.animate(withDuration: 0.2, animations: {
-                  messageTableView.alpha = 1.0
-                })
               }
             } catch let error {
               DLog(error)

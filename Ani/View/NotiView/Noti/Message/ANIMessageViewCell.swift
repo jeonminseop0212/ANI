@@ -10,6 +10,10 @@ import UIKit
 import FirebaseFirestore
 import CodableFirebase
 
+protocol ANIMessageViewCellDelegate {
+  func loadedUser()
+}
+
 class ANIMessageViewCell: UITableViewCell {
   
   private weak var base: UIView?
@@ -28,10 +32,13 @@ class ANIMessageViewCell: UITableViewCell {
   
   private var user: FirebaseUser? {
     didSet {
+      self.delegate?.loadedUser()
       reloadUserLayout()
       reloadLayout()
     }
   }
+  
+  var delegate: ANIMessageViewCellDelegate?
   
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)

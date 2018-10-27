@@ -19,7 +19,11 @@ class ANIChatView: UIView {
   
   private weak var chatTableView: UITableView?
     
-  var chatGroupId: String?
+  var chatGroupId: String? {
+    didSet {
+      observeChatGroup()
+    }
+  }
   
   var user: FirebaseUser?
   
@@ -143,6 +147,43 @@ class ANIChatView: UIView {
     CATransaction.commit()
     
     self.isLoading = false
+  }
+  
+  private func reloadTableView(completion:(()->())? = nil) {
+    guard let chatTableView = self.chatTableView,
+          let currentUserUid = ANISessionManager.shared.currentUserUid,
+          let chatGroup = self.chatGroup,
+          let chatGroupId = self.chatGroupId,
+          let unreadMessageCountForBadge = chatGroup.unreadMessageCountForBadge,
+          let activityIndicatorView = self.activityIndicatorView else { return }
+    
+    let database = Firestore.firestore()
+    
+    DispatchQueue.main.async {
+      chatTableView.reloadData() {
+        if let unreadMessageCountForBadge = unreadMessageCountForBadge[currentUserUid],
+          let currentUser = ANISessionManager.shared.currentUser,
+          let unreadNotiCount = currentUser.unreadNotiCount,
+          let unreadMessageCount = currentUser.unreadMessageCount {
+          UIApplication.shared.applicationIconBadgeNumber = unreadNotiCount + unreadMessageCount - unreadMessageCountForBadge
+          database.collection(KEY_USERS).document(currentUserUid).updateData([KEY_UNREAD_MESSAGE_COUNT: unreadMessageCount - unreadMessageCountForBadge])
+          
+          database.collection(KEY_CHAT_GROUPS).document(chatGroupId).updateData([KEY_IS_HAVE_UNREAD_MESSAGE + "." + currentUserUid: false, KEY_UNREAD_MESSAGE_COUNT_FOR_BADGE + "." + currentUserUid: 0])
+        }
+      }
+      
+      self.scrollToBottom()
+      
+      UIView.animate(withDuration: 0.2, animations: {
+        chatTableView.alpha = 1.0
+      })
+      
+      activityIndicatorView.stopAnimating()
+      
+      self.isLoading = false
+      
+      completion?()
+    }
   }
 }
 
@@ -290,21 +331,15 @@ extension ANIChatView {
   
   private func loadMessage() {
     guard let chatGroupId = self.chatGroupId,
-          let activityIndicatorView = self.activityIndicatorView,
-          let chatTableView = self.chatTableView,
-          let currentUser = ANISessionManager.shared.currentUser,
-          let unreadMessageCount = currentUser.unreadMessageCount,
-          let currentUserUid = ANISessionManager.shared.currentUserUid,
-          let chatGroup = self.chatGroup,
-          let unreadMessageCountForBadge = chatGroup.unreadMessageCountForBadge else { return }
-    
+          let activityIndicatorView = self.activityIndicatorView else { return }
+
     let database = Firestore.firestore()
     
     DispatchQueue.global().async {
       self.isLoading = true
       self.isLastPage = false
-      
-      self.chatGroupListener = database.collection(KEY_CHAT_GROUPS).document(chatGroupId).collection(KEY_CHAT_MESSAGES).order(by: KEY_DATE, descending: true).limit(to: 20).addSnapshotListener({ (snapshot, error) in
+
+      database.collection(KEY_CHAT_GROUPS).document(chatGroupId).collection(KEY_CHAT_MESSAGES).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments { (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
           self.isLoading = false
@@ -317,68 +352,40 @@ extension ANIChatView {
                 self.isLoading = false
                 activityIndicatorView.stopAnimating()
                 return }
-        
-        var newMassageCount = 0
 
         self.lastMessage = lastMessage
-        snapshot.documentChanges.forEach({ (diff) in
-          if diff.type == .added {
-            do {
-              newMassageCount = newMassageCount + 1
-              
-              let message = try FirestoreDecoder().decode(FirebaseChatMessage.self, from: diff.document.data())
-              
-              if self.isFirstLoad {
-                if let firstMessageDocumentId = self.firstMessageDocumentId {
-                  if firstMessageDocumentId == diff.document.documentID {
-                    self.isLoadFirstMessage = true
-                  }
-                }
-                
-                self.messages.insert(message, at: 0)
-              } else {
-                self.messages.append(message)
-              }
-              
-              if snapshot.documentChanges.count == newMassageCount {
-                DispatchQueue.main.async {
-                  chatTableView.reloadData() {
-                    if let unreadMessageCountForBadge = unreadMessageCountForBadge[currentUserUid] {
-                      UIApplication.shared.applicationIconBadgeNumber = UIApplication.shared.applicationIconBadgeNumber - unreadMessageCountForBadge
-                      database.collection(KEY_USERS).document(currentUserUid).updateData([KEY_UNREAD_MESSAGE_COUNT: unreadMessageCount - unreadMessageCountForBadge])
-                      
-                      database.collection(KEY_CHAT_GROUPS).document(chatGroupId).updateData([KEY_IS_HAVE_UNREAD_MESSAGE + "." + currentUserUid: false, KEY_UNREAD_MESSAGE_COUNT_FOR_BADGE + "." + currentUserUid: 0])
-                    }
-                  }
-                  self.isFirstLoad = false
-
-                  self.scrollToBottom()
-                  
-                  UIView.animate(withDuration: 0.2, animations: {
-                    chatTableView.alpha = 1.0
-                  })
-                  
-                  activityIndicatorView.stopAnimating()
-                  
-                  self.isLoading = false
-                }
-              }
-            } catch let error {
-              DLog(error)
-              
-              activityIndicatorView.stopAnimating()
-              
-              self.isLoading = false
-            }
-          }
-        })
         
+        for (index, document) in snapshot.documents.enumerated() {
+          do {
+            let message = try FirestoreDecoder().decode(FirebaseChatMessage.self, from: document.data())
+            if let firstMessageDocumentId = self.firstMessageDocumentId {
+              if firstMessageDocumentId == document.documentID {
+                self.isLoadFirstMessage = true
+              }
+            }
+
+            self.messages.insert(message, at: 0)
+
+            if index + 1 == snapshot.documents.count {
+              self.reloadTableView() {
+                self.isFirstLoad = false
+              }
+            }
+          } catch let error {
+            DLog(error)
+
+            activityIndicatorView.stopAnimating()
+
+            self.isLoading = false
+          }
+        }
+
         if snapshot.documents.isEmpty {
           activityIndicatorView.stopAnimating()
           
           self.isLoading = false
         }
-      })
+      }
     }
   }
   
@@ -441,6 +448,43 @@ extension ANIChatView {
           self.isLoading = false
         }
       }
+    }
+  }
+  
+  private func observeChatGroup() {
+    guard let chatGroupId = self.chatGroupId else { return }
+    
+    let database = Firestore.firestore()
+    
+    if let chatGroupListener = self.chatGroupListener {
+      chatGroupListener.remove()
+    }
+
+    DispatchQueue.global().async {
+      self.chatGroupListener = database.collection(KEY_CHAT_GROUPS).document(chatGroupId).collection(KEY_CHAT_MESSAGES).addSnapshotListener({ (snapshot, error) in
+        if let error = error {
+          DLog("Error get document: \(error)")
+          self.isLoading = false
+
+          return
+        }
+
+        guard let snapshot = snapshot,
+              !self.isFirstLoad else { return }
+
+        snapshot.documentChanges.forEach({ (diff) in
+          if diff.type == .added {
+            do {
+              let message = try FirestoreDecoder().decode(FirebaseChatMessage.self, from: diff.document.data())
+
+              self.messages.append(message)
+              self.reloadTableView()
+            } catch let error {
+              DLog(error)
+            }
+          }
+        })
+      })
     }
   }
 }
