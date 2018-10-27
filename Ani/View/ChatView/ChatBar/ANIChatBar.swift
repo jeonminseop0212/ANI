@@ -20,21 +20,14 @@ class ANIChatBar: UIView {
   
   private weak var postMessageButton: UIButton?
   
-  var chatGroupId: String? {
-    didSet {
-      observeChatGroup()
-    }
-  }
-  
-  private var chatGroup: FirebaseChatGroup?
+  var chatGroupId: String?
+  var chatGroup: FirebaseChatGroup?
   
   var user: FirebaseUser?
   
   var isHaveGroup: Bool = false
   
   var messages = [FirebaseChatMessage]()
-  
-  var chatGroupListener: ListenerRegistration?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -210,33 +203,5 @@ class ANIChatBar: UIView {
 extension ANIChatBar: GrowingTextViewDelegate {
   func textViewDidChange(_ textView: UITextView) {
     updateCommentContributionButton(text: textView.text)
-  }
-}
-
-//MARK: data
-extension ANIChatBar {
-  private func observeChatGroup() {
-    guard let chatGroupId = self.chatGroupId else { return }
-    
-    let database = Firestore.firestore()
-    
-    chatGroupListener = database.collection(KEY_CHAT_GROUPS).document(chatGroupId).addSnapshotListener({ (snapshot, error) in
-      if let error = error {
-        DLog("Error get document: \(error)")
-        return
-      }
-      
-      guard let snapshot = snapshot, let value = snapshot.data() else { return }
-      
-      do {
-        let chatGroup = try FirestoreDecoder().decode(FirebaseChatGroup.self, from: value)
-        
-        DispatchQueue.main.async {
-          self.chatGroup = chatGroup
-        }
-      } catch let error {
-        DLog(error)
-      }
-    })
   }
 }

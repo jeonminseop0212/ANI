@@ -33,6 +33,8 @@ class ANISessionManager: NSObject {
     }
   }
   
+  var onlineChatGroupId: String?
+  
   var checkNotiDate: String?
   
   var currentUserUid: String?

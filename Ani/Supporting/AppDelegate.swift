@@ -73,7 +73,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
 
   func applicationDidBecomeActive(_ application: UIApplication) {
-//    UIApplication.shared.applicationIconBadgeNumber = 0
   }
 
   func applicationWillTerminate(_ application: UIApplication) {
@@ -86,6 +85,16 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
   func userNotificationCenter(_ center: UNUserNotificationCenter,
                               willPresent notification: UNNotification,
                               withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+    
+    let userInfo = notification.request.content.userInfo
+    
+    if let notificationKind = userInfo[AnyHashable("notificationKind")] as? String,
+      notificationKind == PushNotificationKind.message.rawValue,
+      let chatGroupId = userInfo[AnyHashable("chatGroupId")] as? String,
+      ANISessionManager.shared.onlineChatGroupId == chatGroupId {
+      completionHandler([])
+      return
+    }
     
     completionHandler([.badge])
   }
