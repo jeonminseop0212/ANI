@@ -131,6 +131,7 @@ class ANIContributionView: UIView {
   
   private func setHideButtonOnKeyboard(textView: UITextView){
     let tools = UIToolbar()
+    tools.tintColor = ANIColor.emerald
     tools.frame = CGRect(x: 0, y: 0, width: frame.width, height: KEYBOARD_HIDE_TOOL_BAR_HEIGHT)
     let spacer = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
     let closeButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(keyboardHideButtonTapped))

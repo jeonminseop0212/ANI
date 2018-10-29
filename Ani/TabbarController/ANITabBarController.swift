@@ -29,6 +29,9 @@ class ANITabBarController: UITabBarController {
   
   override func viewDidLoad() {
     super.viewDidLoad()
+    
+    ANIOrientation.lockOrientation(.portrait)
+    
     //tabBar上の線を消す
     let tabBarAppearane = UITabBar.appearance()
     tabBarAppearane.backgroundImage = UIImage()

@@ -70,6 +70,7 @@ let KEY_CHAT_UPDATE_DATE = "updateDate"
 let KEY_CHAT_LAST_MESSAGE = "lastMessage"
 let KEY_CHECK_CHAT_GROUP_DATE = "checkChatGroupDate"
 let KEY_UNREAD_MESSAGE_COUNT_FOR_BADGE = "unreadMessageCountForBadge"
+let KEY_OPINION_BOX_CHAT_GROUP = "opinionBoxChatGroup"
 
 //chat message
 let KEY_CHAT_MESSAGES = "chatMessages"

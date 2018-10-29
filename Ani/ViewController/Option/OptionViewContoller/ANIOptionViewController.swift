@@ -8,6 +8,8 @@
 
 import UIKit
 import FirebaseAuth
+import FirebaseFirestore
+import CodableFirebase
 
 class ANIOptionViewController: UIViewController {
   
@@ -112,5 +114,40 @@ extension ANIOptionViewController: ANIOptionViewDelegate {
     alertController.addAction(cancelAction)
     
     self.present(alertController, animated: true, completion: nil)
+  }
+  
+  func opinionBoxTapped() {
+    let opinionBoxViewController = ANIOpinionBoxViewController()
+    self.navigationController?.pushViewController(opinionBoxViewController, animated: true)
+  }
+  
+  func contactTapped() {
+    let adminUserId = ANISessionManager.shared.adminUserId
+    
+    let database = Firestore.firestore()
+    
+    DispatchQueue.global().async {
+      database.collection(KEY_USERS).document(adminUserId).getDocument(completion: { (snapshot, error) in
+        if let error = error {
+          DLog("Error get document: \(error)")
+          return
+        }
+        
+        guard let snapshot = snapshot,
+          let data = snapshot.data() else { return }
+        
+        do {
+          let adminUser = try FirestoreDecoder().decode(FirebaseUser.self, from: data)
+          
+          let chatViewController = ANIChatViewController()
+          chatViewController.user = adminUser
+          chatViewController.isPush = true
+          chatViewController.hidesBottomBarWhenPushed = true
+          self.navigationController?.pushViewController(chatViewController, animated: true)
+        } catch let error {
+          DLog(error)
+        }
+      })
+    }
   }
 }
