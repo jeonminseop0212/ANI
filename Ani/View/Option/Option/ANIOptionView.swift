@@ -11,6 +11,8 @@ import UIKit
 protocol ANIOptionViewDelegate {
   func listTapped(list: List)
   func logoutTapped()
+  func opinionBoxTapped()
+  func contactTapped()
 }
 
 enum List: String {
@@ -26,6 +28,7 @@ class ANIOptionView: UIView {
   
   private var list = [List.loveRecruit, List.loveStroy, List.loveQuestion, List.clipRecruit]
   private var account = ["ログアウト"]
+  private var etc = ["意見箱", "お問合せ"]
   
   var delegate: ANIOptionViewDelegate?
   
@@ -54,7 +57,7 @@ class ANIOptionView: UIView {
 //MARK: UITableViewDataSource
 extension ANIOptionView: UITableViewDataSource {
   func numberOfSections(in tableView: UITableView) -> Int {
-    return 2
+    return 3
   }
   
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -63,6 +66,8 @@ extension ANIOptionView: UITableViewDataSource {
       return list.count
     case 1:
       return account.count
+    case 2:
+      return etc.count
     default:
       return 0
     }
@@ -77,6 +82,8 @@ extension ANIOptionView: UITableViewDataSource {
       cell.titleLabel?.text = list[indexPath.row].rawValue
     case 1:
       cell.titleLabel?.text = account[indexPath.row]
+    case 2:
+      cell.titleLabel?.text = etc[indexPath.row]
     default:
       cell.titleLabel?.text = ""
     }
@@ -103,6 +110,8 @@ extension ANIOptionView: UITableViewDelegate {
       titleLabel.text = "リスト"
     case 1:
       titleLabel.text = "アカウント"
+    case 2:
+      titleLabel.text = "その他"
     default:
       titleLabel.text = ""
     }
@@ -117,6 +126,12 @@ extension ANIOptionView: UITableViewDelegate {
     case 1:
       if account[indexPath.row] == "ログアウト" {
         self.delegate?.logoutTapped()
+      }
+    case 2:
+      if etc[indexPath.row] == "意見箱" {
+        self.delegate?.opinionBoxTapped()
+      } else if etc[indexPath.row] == "お問合せ" {
+        self.delegate?.contactTapped()
       }
     default:
       DLog("default")

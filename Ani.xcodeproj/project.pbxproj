@@ -32,6 +32,8 @@
 		CD33BEDE20F31F9A00D2A367 /* ANINotiDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD33BEDD20F31F9A00D2A367 /* ANINotiDetailViewController.swift */; };
 		CD33BEE120F3212400D2A367 /* ANINotiDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD33BEE020F3212400D2A367 /* ANINotiDetailView.swift */; };
 		CD3DBF97215A31F50010A219 /* Macros.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD3DBF96215A31F50010A219 /* Macros.swift */; };
+		CD47936B2186A5F7002643E2 /* ANIOpinionBoxViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD47936A2186A5F7002643E2 /* ANIOpinionBoxViewController.swift */; };
+		CD47936E2186A6E8002643E2 /* ANIOpinionBoxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD47936D2186A6E8002643E2 /* ANIOpinionBoxView.swift */; };
 		CD4F0EF720F481030093C543 /* ANINotiCommentViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD4F0EF620F481030093C543 /* ANINotiCommentViewCell.swift */; };
 		CD50A46720EC6A2500CFF16F /* UIIMage.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD50A46620EC6A2500CFF16F /* UIIMage.swift */; };
 		CD516FBE2161ED82002FF41C /* ANINotiHeaderViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD516FBD2161ED82002FF41C /* ANINotiHeaderViewCell.swift */; };
@@ -213,6 +215,8 @@
 		CD33BEDD20F31F9A00D2A367 /* ANINotiDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotiDetailViewController.swift; sourceTree = "<group>"; };
 		CD33BEE020F3212400D2A367 /* ANINotiDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotiDetailView.swift; sourceTree = "<group>"; };
 		CD3DBF96215A31F50010A219 /* Macros.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Macros.swift; sourceTree = "<group>"; };
+		CD47936A2186A5F7002643E2 /* ANIOpinionBoxViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIOpinionBoxViewController.swift; sourceTree = "<group>"; };
+		CD47936D2186A6E8002643E2 /* ANIOpinionBoxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIOpinionBoxView.swift; sourceTree = "<group>"; };
 		CD4F0EF620F481030093C543 /* ANINotiCommentViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotiCommentViewCell.swift; sourceTree = "<group>"; };
 		CD50A46620EC6A2500CFF16F /* UIIMage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIIMage.swift; sourceTree = "<group>"; };
 		CD50A46820EC89BD00CFF16F /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
@@ -491,6 +495,22 @@
 				CD4F0EF620F481030093C543 /* ANINotiCommentViewCell.swift */,
 			);
 			path = NotiDetail;
+			sourceTree = "<group>";
+		};
+		CD4793692186A5D2002643E2 /* opinionBoxViewController */ = {
+			isa = PBXGroup;
+			children = (
+				CD47936A2186A5F7002643E2 /* ANIOpinionBoxViewController.swift */,
+			);
+			path = opinionBoxViewController;
+			sourceTree = "<group>";
+		};
+		CD47936C2186A6C3002643E2 /* opinionBoxView */ = {
+			isa = PBXGroup;
+			children = (
+				CD47936D2186A6E8002643E2 /* ANIOpinionBoxView.swift */,
+			);
+			path = opinionBoxView;
 			sourceTree = "<group>";
 		};
 		CD66F49020C4C0CD00FF563C /* Supporting */ = {
@@ -1340,6 +1360,7 @@
 				CDDE4B6420E20D19005762A1 /* Follow */,
 				CDA97B5620B25F2000F46DA4 /* CommentViewController */,
 				CDE2F3B820E3524F005E1DE1 /* ChatViewController */,
+				CD4793692186A5D2002643E2 /* opinionBoxViewController */,
 				CDA32A2120AA6041008A2AC1 /* ModalViewController */,
 			);
 			path = ViewController;
@@ -1368,6 +1389,7 @@
 				CDDE4B6A20E3122B005762A1 /* Follow */,
 				CDA97B5B20B263BE00F46DA4 /* CommentView */,
 				CDE2F3BB20E35B20005E1DE1 /* ChatView */,
+				CD47936C2186A6C3002643E2 /* opinionBoxView */,
 				CDA32A2420AA661A008A2AC1 /* ModalVIew */,
 				CDAFD76020DE1D2100AEDD83 /* RejectView */,
 				CDDE4B5720DF7636005762A1 /* NeedLoginView */,
@@ -1773,6 +1795,7 @@
 				CDA32A7B20AE7007008A2AC1 /* ANIQnaImagesCell.swift in Sources */,
 				CD334E8221421C7F001C6289 /* ANIReloadView.swift in Sources */,
 				F5DF8365207A27DC00EA7FBE /* ANIStoryViewCell.swift in Sources */,
+				CD47936B2186A5F7002643E2 /* ANIOpinionBoxViewController.swift in Sources */,
 				F5E9E22F2079AEC30021D4CC /* ANIOrientation.swift in Sources */,
 				CDDD04B320B50FEA0094DBFA /* ANIInitialViewController.swift in Sources */,
 				F5E9E2372079B1900021D4CC /* ANICommunityMenuBar.swift in Sources */,
@@ -1797,6 +1820,7 @@
 				F530AB1C207A45D900114E6B /* ANIStoryImagesCell.swift in Sources */,
 				CD6762E020FD75AC0098E033 /* PickUpItem.swift in Sources */,
 				CD50A46720EC6A2500CFF16F /* UIIMage.swift in Sources */,
+				CD47936E2186A6E8002643E2 /* ANIOpinionBoxView.swift in Sources */,
 				CDE2F41520E47070005E1DE1 /* ANIChatBar.swift in Sources */,
 				CD6229DE20B64B9900E36875 /* ANISignUpView.swift in Sources */,
 				CDF7F16E208F2BEF00254A0F /* UIView.swift in Sources */,

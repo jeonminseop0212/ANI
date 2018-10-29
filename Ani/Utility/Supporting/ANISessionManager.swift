@@ -46,4 +46,10 @@ class ANISessionManager: NSObject {
   #else
   let client = Client(appID: "NF5ORAYV5G", apiKey: "e34e8cb3865dd2fe25a02fbf5b916755")
   #endif
+  
+  #if DEBUG
+  let adminUserId = "BHvoCcfLeKdjFXcpUPxXIBft44w2"
+  #else
+  let adminUserId = "GIXHwMHxr6NInoLAXYc8hjfQOeF3"
+  #endif
 }

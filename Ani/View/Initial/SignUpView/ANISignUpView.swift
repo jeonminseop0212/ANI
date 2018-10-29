@@ -139,7 +139,7 @@ class ANISignUpView: UIView {
     adressTextField.font = UIFont.systemFont(ofSize: 18.0)
     adressTextField.textColor = ANIColor.dark
     adressTextField.backgroundColor = .clear
-    adressTextField.placeholder = "ex)ANI-ani@ani.com"
+    adressTextField.placeholder = "ex)MYAU@myau.com"
     adressTextField.returnKeyType = .done
     adressTextField.keyboardType = .emailAddress
     adressTextField.delegate = self
@@ -234,7 +234,7 @@ class ANISignUpView: UIView {
     userNameTextField.font = UIFont.systemFont(ofSize: 18.0)
     userNameTextField.textColor = ANIColor.dark
     userNameTextField.backgroundColor = .clear
-    userNameTextField.placeholder = "ex)ANI-ani"
+    userNameTextField.placeholder = "ex)MYAU-myau"
     userNameTextField.returnKeyType = .done
     userNameTextField.delegate = self
     userNameTextFieldBG.addSubview(userNameTextField)

@@ -158,7 +158,6 @@ class ANIMessageViewCell: UITableViewCell {
     }
   }
   
-  
   @objc private func cellTapped() {
     guard let user = self.user else { return }
     
@@ -182,7 +181,6 @@ extension ANIMessageViewCell {
     
     for memberId in memberIds.keys {
       if currentUserUid != memberId {
-        
         let database = Firestore.firestore()
         DispatchQueue.global().async {          
           database.collection(KEY_USERS).document(memberId).getDocument(completion: { (snapshot, error) in

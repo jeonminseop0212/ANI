@@ -10,9 +10,9 @@ import UIKit
 
 public class ANIPlaceHolderTextView: UITextView {
   
-  lazy var placeHolderLabel:UILabel = UILabel()
-  var placeHolderColor:UIColor = .lightGray
-  var placeHolder:NSString = ""
+  lazy var placeHolderLabel: UILabel = UILabel()
+  var placeHolderColor: UIColor = .lightGray
+  var placeHolder: NSString = ""
   
   public override init(frame: CGRect, textContainer: NSTextContainer?) {
     super.init(frame: frame, textContainer: textContainer)
@@ -52,20 +52,24 @@ public class ANIPlaceHolderTextView: UITextView {
     
     self.sendSubviewToBack(placeHolderLabel)
     
-    if(self.text.utf16.count == 0 && self.placeHolder.length > 0){
+    if self.text.utf16.count == 0 && self.placeHolder.length > 0 {
       self.viewWithTag(1)?.alpha = 1
     }
   }
   
   @objc public func textChanged(notification:NSNotification?) -> (Void) {
-    if(self.placeHolder.length == 0){
+    if self.placeHolder.length == 0 {
       return
     }
     
-    if(self.text.utf16.count == 0) {
+    if self.text.utf16.count == 0 {
       self.viewWithTag(1)?.alpha = 1
-    }else{
+    } else {
       self.viewWithTag(1)?.alpha = 0
     }
+  }
+  
+  func showPlaceHolder() {
+    self.viewWithTag(1)?.alpha = 1
   }
 }
