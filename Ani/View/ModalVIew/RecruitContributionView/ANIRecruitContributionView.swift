@@ -531,7 +531,7 @@ class ANIRecruitContributionView: UIView {
     passingBG.topToBottom(of: passingTitleLabel, offset: 10.0)
     passingBG.leftToSuperview(offset: 10.0)
     passingBG.rightToSuperview(offset: -10.0)
-    passingBG.bottomToSuperview(offset: -10.0 - 10.0 - ANIRecruitContributionViewController.CONTRIBUTE_BUTTON_HEIGHT)
+    passingBG.bottomToSuperview(offset: -15.0 - 10.0 - ANIRecruitContributionViewController.CONTRIBUTE_BUTTON_HEIGHT)
     self.passingBG = passingBG
     
     //passingTextView
@@ -728,7 +728,7 @@ class ANIRecruitContributionView: UIView {
     let selectedTextViewVisiableMaxY = selectedTextViewMaxY - scrollView.contentOffset.y
     
     if selectedTextViewVisiableMaxY > keyboardFrame.origin.y {
-      let margin: CGFloat = 10.0
+      let margin: CGFloat = 15.0
       let blindHeight = selectedTextViewVisiableMaxY - keyboardFrame.origin.y + margin
       scrollView.contentOffset.y = scrollView.contentOffset.y + blindHeight
     }
