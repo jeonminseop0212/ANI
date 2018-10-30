@@ -347,6 +347,12 @@ extension ANIStoryView {
         
         guard let snapshot = snapshot,
               let lastStory = snapshot.documents.last else {
+                if !self.stories.isEmpty {
+                  self.stories.removeAll()
+                }
+                
+                self.isLoading = false
+
                 self.showReloadView(sender: sender)
                 return }
         
@@ -387,14 +393,6 @@ extension ANIStoryView {
             
             self.isLoading = false
           }
-        }
-        
-        if snapshot.documents.isEmpty {
-          if !self.stories.isEmpty {
-            self.stories.removeAll()
-          }
-          
-          self.showReloadView(sender: sender)
         }
       })
     }

@@ -278,6 +278,12 @@ extension ANINotiView {
         
         guard let snapshot = snapshot,
               let lastNoti = snapshot.documents.last else {
+                if !self.notifications.isEmpty {
+                  self.notifications.removeAll()
+                }
+                
+                self.isLoading = false
+                
                 self.showReloadView(sender: sender)
                 return }
         
@@ -325,16 +331,6 @@ extension ANINotiView {
             
             self.isLoading = false
           }
-        }
-        
-        if snapshot.documents.isEmpty {
-          if !self.notifications.isEmpty {
-            self.notifications.removeAll()
-          }
-          
-          self.showReloadView(sender: sender)
-          
-          self.isLoading = false
         }
       }
     }
@@ -385,10 +381,6 @@ extension ANINotiView {
             
             self.isLoading = false
           }
-        }
-        
-        if snapshot.documents.isEmpty {          
-          self.isLoading = false
         }
       }
     }

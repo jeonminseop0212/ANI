@@ -376,6 +376,10 @@ extension ANIChatViewController {
     
     let database = Firestore.firestore()
     
+    if chatGroupListener != nil {
+      chatGroupListener?.remove()
+    }
+    
     chatGroupListener = database.collection(KEY_CHAT_GROUPS).document(chatGroupId).addSnapshotListener({ (snapshot, error) in
       if let error = error {
         DLog("Error get document: \(error)")

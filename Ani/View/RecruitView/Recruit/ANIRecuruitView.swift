@@ -387,6 +387,12 @@ extension ANIRecuruitView {
         
         guard let snapshot = snapshot,
               let lastRecruit = snapshot.documents.last else {
+                if !self.recruits.isEmpty {
+                  self.recruits.removeAll()
+                }
+                
+                self.isLoading = false
+                
                 self.showReloadView(sender: sender)
                 return }
         
@@ -427,14 +433,6 @@ extension ANIRecuruitView {
             
             self.isLoading = false
           }
-        }
-        
-        if snapshot.documents.isEmpty {
-          if !self.recruits.isEmpty {
-            self.recruits.removeAll()
-          }
-          
-          self.showReloadView(sender: sender)
         }
       })
     }

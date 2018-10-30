@@ -642,7 +642,13 @@ extension ANIOtherProfileBasicView {
         }
         
         guard let snapshot = snapshot,
-              let lastRecruit = snapshot.documents.last else { return }
+              let lastRecruit = snapshot.documents.last else {
+                if let sender = sender {
+                  sender.endRefreshing()
+                }
+                
+                self.isLoading = false
+                return }
         
         self.lastRecruit = lastRecruit
         
@@ -671,14 +677,6 @@ extension ANIOtherProfileBasicView {
             
             self.isLoading = false
           }
-        }
-        
-        if snapshot.documents.isEmpty {
-          if let sender = sender {
-            sender.endRefreshing()
-          }
-          
-          self.isLoading = false
         }
       })
     }
@@ -764,7 +762,13 @@ extension ANIOtherProfileBasicView {
         }
         
         guard let snapshot = snapshot,
-              let lastStory = snapshot.documents.last else { return }
+              let lastStory = snapshot.documents.last else {
+                if let sender = sender {
+                  sender.endRefreshing()
+                }
+                
+                self.isLoading = false
+                return }
         
         self.lastStory = lastStory
         
@@ -793,14 +797,6 @@ extension ANIOtherProfileBasicView {
             
             self.isLoading = false
           }
-        }
-        
-        if snapshot.documents.isEmpty {
-          if let sender = sender {
-            sender.endRefreshing()
-          }
-          
-          self.isLoading = false
         }
       })
     }
@@ -883,7 +879,13 @@ extension ANIOtherProfileBasicView {
         }
         
         guard let snapshot = snapshot,
-              let lastQna = snapshot.documents.last else { return }
+              let lastQna = snapshot.documents.last else {
+                if let sender = sender {
+                  sender.endRefreshing()
+                }
+                
+                self.isLoading = false
+                return }
         
         self.lastQna = lastQna
         
@@ -912,14 +914,6 @@ extension ANIOtherProfileBasicView {
             
             self.isLoading = false
           }
-        }
-        
-        if snapshot.documents.isEmpty {
-          if let sender = sender {
-            sender.endRefreshing()
-          }
-          
-          self.isLoading = false
         }
       })
     }

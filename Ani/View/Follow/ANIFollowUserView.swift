@@ -253,12 +253,6 @@ extension ANIFollowUserView {
             self.isLoading = false
           }
         }
-        
-        if snapshot.documents.isEmpty {
-          activityIndicatorView.stopAnimating()
-          
-          self.isLoading = false
-        }
       }
     }
   }
@@ -340,10 +334,6 @@ extension ANIFollowUserView {
             self.isLoading = false
           }
         }
-        
-        if snapshot.documents.isEmpty {
-          self.isLoading = false
-        }
       })
     }
   }
@@ -379,6 +369,10 @@ extension ANIFollowUserView {
               let lastContent = snapshot.documents.last else {
                 self.isLoading = false
                 activityIndicatorView.stopAnimating()
+                
+                if let sender = sender {
+                  sender.endRefreshing()
+                }
                 return }
         
         self.lastContent = lastContent
@@ -442,16 +436,6 @@ extension ANIFollowUserView {
               self.isLoading = false
             }
           }
-        }
-        
-        if snapshot.documents.isEmpty {
-          if let sender = sender {
-            sender.endRefreshing()
-          }
-          
-          activityIndicatorView.stopAnimating()
-          
-          self.isLoading = false
         }
       }
     }
@@ -533,10 +517,6 @@ extension ANIFollowUserView {
             
             self.isLoading = false
           }
-        }
-        
-        if snapshot.documents.isEmpty {
-          self.isLoading = false
         }
       })
     }

@@ -563,12 +563,6 @@ extension ANIListView {
             self.isLoading = false
           }
         }
-        
-        if snapshot.documents.isEmpty {
-          activityIndicatorView.stopAnimating()
-          
-          self.isLoading = false
-        }
       })
     }
   }
@@ -649,10 +643,6 @@ extension ANIListView {
             
             self.isLoading = false
           }
-        }
-        
-        if snapshot.documents.isEmpty {
-          self.isLoading = false
         }
       })
     }
@@ -741,12 +731,6 @@ extension ANIListView {
             self.isLoading = false
           }
         }
-        
-        if snapshot.documents.isEmpty {          
-          activityIndicatorView.stopAnimating()
-          
-          self.isLoading = false
-        }
       })
     }
   }
@@ -827,10 +811,6 @@ extension ANIListView {
             
             self.isLoading = false
           }
-        }
-        
-        if snapshot.documents.isEmpty {
-          self.isLoading = false
         }
       })
     }
@@ -918,12 +898,6 @@ extension ANIListView {
             self.isLoading = false
           }
         }
-        
-        if snapshot.documents.isEmpty {
-          activityIndicatorView.stopAnimating()
-          
-          self.isLoading = false
-        }
       })
     }
   }
@@ -1004,10 +978,6 @@ extension ANIListView {
             
             self.isLoading = false
           }
-        }
-        
-        if snapshot.documents.isEmpty {
-          self.isLoading = false
         }
       })
     }
@@ -1096,12 +1066,6 @@ extension ANIListView {
             self.isLoading = false
           }
         }
-        
-        if snapshot.documents.isEmpty {
-          activityIndicatorView.stopAnimating()
-          
-          self.isLoading = false
-        }
       })
     }
   }
@@ -1182,10 +1146,6 @@ extension ANIListView {
             
             self.isLoading = false
           }
-        }
-        
-        if snapshot.documents.isEmpty {
-          self.isLoading = false
         }
       })
     }
