@@ -341,6 +341,9 @@ extension ANIChatView {
               let lastMessage = snapshot.documents.last else {
                 self.isLoading = false
                 activityIndicatorView.stopAnimating()
+                
+                self.isFirstLoad = false
+                self.isLoading = false
                 return }
 
         self.lastMessage = lastMessage
@@ -368,12 +371,6 @@ extension ANIChatView {
 
             self.isLoading = false
           }
-        }
-
-        if snapshot.documents.isEmpty {
-          activityIndicatorView.stopAnimating()
-          
-          self.isLoading = false
         }
       }
     }
@@ -433,10 +430,6 @@ extension ANIChatView {
             self.isLoading = false
           }
         }
-        
-        if snapshot.documents.isEmpty {          
-          self.isLoading = false
-        }
       }
     }
   }
@@ -454,7 +447,6 @@ extension ANIChatView {
       self.chatGroupListener = database.collection(KEY_CHAT_GROUPS).document(chatGroupId).collection(KEY_CHAT_MESSAGES).addSnapshotListener({ (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
-          self.isLoading = false
 
           return
         }

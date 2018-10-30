@@ -616,7 +616,11 @@ extension ANIProfileBasicView {
         }
         
         guard let snapshot = snapshot,
-              let lastRecruit = snapshot.documents.last else { return }
+              let lastRecruit = snapshot.documents.last else {
+                self.isLoading = false
+                
+                completion?()
+                return }
         
         self.lastRecruit = lastRecruit
         
@@ -641,12 +645,6 @@ extension ANIProfileBasicView {
             
             self.isLoading = false
           }
-        }
-        
-        if snapshot.documents.isEmpty {
-          self.isLoading = false
-          
-          completion?()
         }
       })
     }
@@ -730,7 +728,9 @@ extension ANIProfileBasicView {
         }
         
         guard let snapshot = snapshot,
-              let lastStory = snapshot.documents.last else { return }
+              let lastStory = snapshot.documents.last else {
+                self.isLoading = false
+                return }
         
         self.lastStory = lastStory
         
@@ -755,10 +755,6 @@ extension ANIProfileBasicView {
             
             self.isLoading = false
           }
-        }
-        
-        if snapshot.documents.isEmpty {
-          self.isLoading = false
         }
       })
     }
@@ -839,7 +835,9 @@ extension ANIProfileBasicView {
         }
         
         guard let snapshot = snapshot,
-              let lastQna = snapshot.documents.last else { return }
+              let lastQna = snapshot.documents.last else {
+                self.isLoading = false
+                return }
         
         self.lastQna = lastQna
         
@@ -864,10 +862,6 @@ extension ANIProfileBasicView {
 
             self.isLoading = false
           }
-        }
-        
-        if snapshot.documents.isEmpty {
-          self.isLoading = false
         }
       })
     }

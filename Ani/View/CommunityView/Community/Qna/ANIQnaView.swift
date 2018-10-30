@@ -285,6 +285,12 @@ extension ANIQnaView {
         
         guard let snapshot = snapshot,
               let lastQna = snapshot.documents.last else {
+                if !self.qnas.isEmpty {
+                  self.qnas.removeAll()
+                }
+                
+                self.isLoading = false
+                
                 self.showReloadView(sender: sender)
                 return }
         
@@ -325,14 +331,6 @@ extension ANIQnaView {
             
             self.isLoading = false
           }
-        }
-        
-        if snapshot.documents.isEmpty {
-          if !self.qnas.isEmpty {
-            self.qnas.removeAll()
-          }
-          
-          self.showReloadView(sender: sender)
         }
       })
     }
