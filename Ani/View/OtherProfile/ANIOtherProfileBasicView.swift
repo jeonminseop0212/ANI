@@ -57,9 +57,9 @@ class ANIOtherProfileBasicView: UIView {
   private var user: FirebaseUser? {
     didSet {
       checkFollowed()
-      loadRecruit(sender: nil)
-      loadStory(sender: nil)
-      loadQna(sender: nil)
+      loadRecruit()
+      loadStory()
+      loadQna()
     }
   }
   
@@ -192,9 +192,6 @@ class ANIOtherProfileBasicView: UIView {
   
   @objc private func reloadData(sender: UIRefreshControl?) {
     loadUser(sender: sender)
-    loadRecruit(sender: sender)
-    loadStory(sender: sender)
-    loadQna(sender: sender)
   }
   
   private func unobserveBeforeMenu() {
@@ -594,6 +591,9 @@ extension ANIOtherProfileBasicView {
       database.collection(KEY_USERS).document(userId).getDocument(completion: { (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
+          if let sender = sender {
+            sender.endRefreshing()
+          }
           
           return
         }
@@ -604,19 +604,29 @@ extension ANIOtherProfileBasicView {
           let user = try FirebaseDecoder().decode(FirebaseUser.self, from: data)
           self.user = user
           
-          self.delegate?.loadedUser(user: user)
-          
-          guard let basicTableView = self.basicTableView else { return }
-          
-          basicTableView.reloadData()
+          DispatchQueue.main.async {
+            self.delegate?.loadedUser(user: user)
+            
+            guard let basicTableView = self.basicTableView else { return }
+            
+            basicTableView.reloadData()
+            
+            if let sender = sender {
+              sender.endRefreshing()
+            }
+          }
         } catch let error {
           DLog(error)
+          
+          if let sender = sender {
+            sender.endRefreshing()
+          }
         }
       })
     }
   }
   
-  private func loadRecruit(sender: UIRefreshControl?) {
+  private func loadRecruit() {
     guard let user = self.user,
           let uid = user.uid else { return }
     
@@ -643,10 +653,6 @@ extension ANIOtherProfileBasicView {
         
         guard let snapshot = snapshot,
               let lastRecruit = snapshot.documents.last else {
-                if let sender = sender {
-                  sender.endRefreshing()
-                }
-                
                 self.isLoading = false
                 return }
         
@@ -658,10 +664,6 @@ extension ANIOtherProfileBasicView {
             self.recruits.append(recruit)
             
             DispatchQueue.main.async {
-              if let sender = sender {
-                sender.endRefreshing()
-              }
-              
               guard let basicTableView = self.basicTableView else { return }
               
               basicTableView.reloadData()
@@ -670,10 +672,6 @@ extension ANIOtherProfileBasicView {
             }
           } catch let error {
             DLog(error)
-            
-            if let sender = sender {
-              sender.endRefreshing()
-            }
             
             self.isLoading = false
           }
@@ -733,7 +731,7 @@ extension ANIOtherProfileBasicView {
     }
   }
   
-  private func loadStory(sender: UIRefreshControl?) {
+  private func loadStory() {
     guard let user = self.user,
           let uid = user.uid else { return }
     
@@ -763,10 +761,6 @@ extension ANIOtherProfileBasicView {
         
         guard let snapshot = snapshot,
               let lastStory = snapshot.documents.last else {
-                if let sender = sender {
-                  sender.endRefreshing()
-                }
-                
                 self.isLoading = false
                 return }
         
@@ -778,10 +772,6 @@ extension ANIOtherProfileBasicView {
             self.stories.append(story)
             
             DispatchQueue.main.async {
-              if let sender = sender {
-                sender.endRefreshing()
-              }
-              
               guard let basicTableView = self.basicTableView else { return }
               
               basicTableView.reloadData()
@@ -790,10 +780,6 @@ extension ANIOtherProfileBasicView {
             }
           } catch let error {
             DLog(error)
-            
-            if let sender = sender {
-              sender.endRefreshing()
-            }
             
             self.isLoading = false
           }
@@ -853,7 +839,7 @@ extension ANIOtherProfileBasicView {
     }
   }
   
-  private func loadQna(sender: UIRefreshControl?) {
+  private func loadQna() {
     guard let user = self.user,
           let uid = user.uid else { return }
     
@@ -880,9 +866,6 @@ extension ANIOtherProfileBasicView {
         
         guard let snapshot = snapshot,
               let lastQna = snapshot.documents.last else {
-                if let sender = sender {
-                  sender.endRefreshing()
-                }
                 
                 self.isLoading = false
                 return }
@@ -895,9 +878,6 @@ extension ANIOtherProfileBasicView {
             self.qnas.append(qna)
             
             DispatchQueue.main.async {
-              if let sender = sender {
-                sender.endRefreshing()
-              }
               
               guard let basicTableView = self.basicTableView else { return }
               
@@ -907,10 +887,6 @@ extension ANIOtherProfileBasicView {
             }
           } catch let error {
             DLog(error)
-            
-            if let sender = sender {
-              sender.endRefreshing()
-            }
             
             self.isLoading = false
           }

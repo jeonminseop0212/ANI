@@ -155,7 +155,7 @@ class ANIProfileBasicView: UIView {
     basicTableView.scrollToRow(at: [0, 0], at: .top, animated: true)
   }
   
-  func loadData() {
+  private func loadData() {
     loadRecruit() {
       self.observeRecruit()
     }
@@ -611,6 +611,7 @@ extension ANIProfileBasicView {
         if let error = error {
           DLog("Error get document: \(error)")
           self.isLoading = false
+          completion?()
           
           return
         }
@@ -644,6 +645,7 @@ extension ANIProfileBasicView {
             DLog(error)
             
             self.isLoading = false
+            completion?()
           }
         }
       })
@@ -723,6 +725,7 @@ extension ANIProfileBasicView {
         if let error = error {
           DLog("Error get document: \(error)")
           self.isLoading = false
+          completion?()
           
           return
         }
@@ -730,6 +733,7 @@ extension ANIProfileBasicView {
         guard let snapshot = snapshot,
               let lastStory = snapshot.documents.last else {
                 self.isLoading = false
+                completion?()
                 return }
         
         self.lastStory = lastStory
@@ -754,6 +758,7 @@ extension ANIProfileBasicView {
             DLog(error)
             
             self.isLoading = false
+            completion?()
           }
         }
       })
@@ -830,6 +835,7 @@ extension ANIProfileBasicView {
         if let error = error {
           DLog("Error get document: \(error)")
           self.isLoading = false
+          completion?()
           
           return
         }
@@ -837,6 +843,7 @@ extension ANIProfileBasicView {
         guard let snapshot = snapshot,
               let lastQna = snapshot.documents.last else {
                 self.isLoading = false
+                completion?()
                 return }
         
         self.lastQna = lastQna
@@ -861,6 +868,7 @@ extension ANIProfileBasicView {
             DLog(error)
 
             self.isLoading = false
+            completion?()
           }
         }
       })
@@ -934,8 +942,7 @@ extension ANIProfileBasicView {
           return
         }
         
-        guard let snapshot = snapshot,
-              snapshot.documentChanges.count == 1 else { return }
+        guard let snapshot = snapshot else { return }
 
         snapshot.documentChanges.forEach({ (diff) in
           if diff.type == .added {
@@ -1014,8 +1021,7 @@ extension ANIProfileBasicView {
           return
         }
         
-        guard let snapshot = snapshot,
-              snapshot.documentChanges.count == 1 else { return }
+        guard let snapshot = snapshot else { return }
         
         snapshot.documentChanges.forEach({ (diff) in
           if diff.type == .added {
@@ -1074,8 +1080,7 @@ extension ANIProfileBasicView {
           return
         }
         
-        guard let snapshot = snapshot,
-              snapshot.documentChanges.count == 1 else { return }
+        guard let snapshot = snapshot else { return }
         
         snapshot.documentChanges.forEach({ (diff) in
           if diff.type == .added {
