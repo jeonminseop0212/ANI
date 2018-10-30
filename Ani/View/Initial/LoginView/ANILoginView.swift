@@ -212,57 +212,63 @@ extension ANILoginView: ANIButtonViewDelegate {
           NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
 
           DLog("nsError \(nsError)")
-          if nsError.code == 17008 {
+          if nsError.code == 17008 || nsError.code == 17011 {
             self.delegate?.reject(notiText: "存在しないメールアドレスです！")
           } else if nsError.code == 17009 {
             self.delegate?.reject(notiText: "パスワードが違います！")
-          } else if nsError.code == 17011 || nsError.code == 17008 {
-            self.delegate?.reject(notiText: "存在しないメールアドレスです！")
           } else {
             self.delegate?.reject(notiText: "ログインに失敗しました！")
           }
         } else {
-          let database = Firestore.firestore()
-          
-          ANISessionManager.shared.currentUserUid = Auth.auth().currentUser?.uid
-          if let currentUserUid = ANISessionManager.shared.currentUserUid, let fcmToken = UserDefaults.standard.string(forKey: KEY_FCM_TOKEN) {
-            database.collection(KEY_USERS).document(currentUserUid).updateData([KEY_FCM_TOKEN: fcmToken], completion: { (error) in
-              if let error = error {
-                DLog("fcm token update error: \(error)")
-                
-                return
-              }
+          if let currentUser = Auth.auth().currentUser {
+            if currentUser.isEmailVerified {
+              let database = Firestore.firestore()
               
-              DispatchQueue.global().async {
-                database.collection(KEY_USERS).document(currentUserUid).addSnapshotListener({ (snapshot, error) in
+              ANISessionManager.shared.currentUserUid = Auth.auth().currentUser?.uid
+              if let currentUserUid = ANISessionManager.shared.currentUserUid, let fcmToken = UserDefaults.standard.string(forKey: KEY_FCM_TOKEN) {
+                database.collection(KEY_USERS).document(currentUserUid).updateData([KEY_FCM_TOKEN: fcmToken], completion: { (error) in
                   if let error = error {
-                    DLog("Error adding document: \(error)")
+                    DLog("fcm token update error: \(error)")
                     
                     return
                   }
                   
-                  guard let snapshot = snapshot, let value = snapshot.data() else { return }
-                  
-                  do {
-                    let user = try FirestoreDecoder().decode(FirebaseUser.self, from: value)
-                    
-                    DispatchQueue.main.async {
-                      ANISessionManager.shared.currentUser = user
-                      ANISessionManager.shared.isAnonymous = false
-                      self.delegate?.loginSuccess()
+                  DispatchQueue.global().async {
+                    database.collection(KEY_USERS).document(currentUserUid).addSnapshotListener({ (snapshot, error) in
+                      if let error = error {
+                        DLog("Error adding document: \(error)")
+                        
+                        return
+                      }
                       
-                      NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
-                    }
-                  } catch let error {
-                    DLog(error)
-                    NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+                      guard let snapshot = snapshot, let value = snapshot.data() else { return }
+                      
+                      do {
+                        let user = try FirestoreDecoder().decode(FirebaseUser.self, from: value)
+                        
+                        DispatchQueue.main.async {
+                          ANISessionManager.shared.currentUser = user
+                          ANISessionManager.shared.isAnonymous = false
+                          self.delegate?.loginSuccess()
+                          
+                          NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+                        }
+                      } catch let error {
+                        DLog(error)
+                        NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+                      }
+                    })
                   }
                 })
               }
-            })
+            } else {
+              NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+              
+              self.delegate?.reject(notiText: "アドレスの認証メールを確認してください！")
+            }
+            
+            self.endEditing(true)
           }
-          
-          self.endEditing(true)
         }
       }
     }

@@ -16,7 +16,7 @@ import NVActivityIndicatorView
 protocol ANISignUpViewDelegate {
   func prifileImagePickButtonTapped()
   func reject(notiText: String)
-  func signUpSuccess()
+  func signUpSuccess(adress: String, password: String)
 }
 
 class ANISignUpView: UIView {
@@ -60,6 +60,9 @@ class ANISignUpView: UIView {
       profileImageView.image = profileImage
     }
   }
+  
+  private var adress: String = ""
+  private var password: String = ""
   
   var delegate: ANISignUpViewDelegate?
   
@@ -316,20 +319,22 @@ class ANISignUpView: UIView {
           self.delegate?.reject(notiText: "登録に失敗しました！")
         }
       } else {
-        self.login(adress: adress, password: password)
+        Auth.auth().languageCode = "ja"
+        Auth.auth().currentUser?.sendEmailVerification(completion: { (error) in
+          if let error = error {
+            DLog("send email verification error \(error)")
+            self.delegate?.reject(notiText: "認証メールの送信に失敗しました")
+            return
+          }
+          
+          self.adress = adress
+          self.password = password
+          self.uploadUserData()
+        })
       }
     }
   }
   
-  private func login(adress: String, password: String) {
-    Auth.auth().signIn(withEmail: adress, password: password) { (successUser, error) in
-      if let errorUnrap = error {
-        DLog("loginError \(errorUnrap.localizedDescription)")
-      } else {
-        self.uploadUserData()
-      }
-    }
-  }
   
   private func uploadUserData() {
     guard let currentUser = Auth.auth().currentUser,
@@ -342,6 +347,7 @@ class ANISignUpView: UIView {
     storageRef.child(KEY_PROFILE_IMAGES).child("\(currentUser.uid).jpeg").putData(profileImageData, metadata: nil) { (metaData, error) in
       if error != nil {
         DLog("storageError")
+        NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
         return
       }
       
@@ -367,29 +373,9 @@ class ANISignUpView: UIView {
         
         self.pushDataAlgolia(data: userData as [String: AnyObject])
         
-        ANISessionManager.shared.currentUserUid = Auth.auth().currentUser?.uid
-        if let currentUserUid = ANISessionManager.shared.currentUserUid {
-          DispatchQueue.global().async {
-            database.collection(KEY_USERS).document(currentUserUid).addSnapshotListener({ (snapshot, error) in
-              guard let snapshot = snapshot, let value = snapshot.data() else { return }
-              
-              do {
-                let user = try FirestoreDecoder().decode(FirebaseUser.self, from: value)
-                
-                DispatchQueue.main.async {
-                  ANISessionManager.shared.currentUser = user
-                  ANISessionManager.shared.isAnonymous = false
-                  self.delegate?.signUpSuccess()
-                  
-                  NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
-                }
-              } catch let error {
-                DLog(error)
-                NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
-              }
-            })
-          }
-        }
+        self.delegate?.signUpSuccess(adress: self.adress, password: self.password)
+        
+        NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
       }
       
       self.endEditing(true)

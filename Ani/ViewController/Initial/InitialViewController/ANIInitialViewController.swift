@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import FirebaseAuth
 
 class ANIInitialViewController: UIViewController {
   
@@ -55,7 +56,19 @@ extension ANIInitialViewController: ANIInitialViewDelegate {
   
   func startAnonymous() {
     self.dismiss(animated: true, completion: nil)
-    ANISessionManager.shared.isAnonymous = true
+    
+    do {
+      try Auth.auth().signOut()
+      
+      ANISessionManager.shared.currentUser = nil
+      ANISessionManager.shared.currentUserUid = nil
+      ANISessionManager.shared.isAnonymous = true
+      
+      ANINotificationManager.postLogout()
+      
+    } catch let signOutError as NSError {
+      DLog("signOutError \(signOutError)")
+    }
   }
 }
 

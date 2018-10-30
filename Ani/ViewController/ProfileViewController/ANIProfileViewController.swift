@@ -175,11 +175,16 @@ class ANIProfileViewController: UIViewController {
     }
   }
   
+  @objc private func updateLayoutLogin() {
+    reloadNavigationTitle()
+    showNeedLoginView()
+  }
+  
   //MAKR: notification
   private func setupNotification() {
     ANINotificationManager.receive(imageCellTapped: self, selector: #selector(presentImageBrowser(_:)))
     ANINotificationManager.receive(profileEditButtonTapped: self, selector: #selector(openProfileEdit))
-    ANINotificationManager.receive(login: self, selector: #selector(reloadNavigationTitle))
+    ANINotificationManager.receive(login: self, selector: #selector(updateLayoutLogin))
   }
   
   @objc private func presentImageBrowser(_ notification: NSNotification) {
@@ -203,7 +208,7 @@ class ANIProfileViewController: UIViewController {
     self.present(profileEditViewController, animated: true, completion: nil)
   }
   
-  @objc private func reloadNavigationTitle() {
+  private func reloadNavigationTitle() {
     guard let navigationTitleLabel = self.navigationTitleLabel,
           let currentUser = self.currentUser else { return }
     

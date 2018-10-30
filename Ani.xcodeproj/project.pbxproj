@@ -34,6 +34,8 @@
 		CD3DBF97215A31F50010A219 /* Macros.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD3DBF96215A31F50010A219 /* Macros.swift */; };
 		CD47936B2186A5F7002643E2 /* ANIOpinionBoxViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD47936A2186A5F7002643E2 /* ANIOpinionBoxViewController.swift */; };
 		CD47936E2186A6E8002643E2 /* ANIOpinionBoxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD47936D2186A6E8002643E2 /* ANIOpinionBoxView.swift */; };
+		CD4793722187F1E6002643E2 /* ANIAutoLoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD4793712187F1E6002643E2 /* ANIAutoLoginViewController.swift */; };
+		CD4793742187F256002643E2 /* ANIAutoLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD4793732187F256002643E2 /* ANIAutoLoginView.swift */; };
 		CD4F0EF720F481030093C543 /* ANINotiCommentViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD4F0EF620F481030093C543 /* ANINotiCommentViewCell.swift */; };
 		CD50A46720EC6A2500CFF16F /* UIIMage.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD50A46620EC6A2500CFF16F /* UIIMage.swift */; };
 		CD516FBE2161ED82002FF41C /* ANINotiHeaderViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD516FBD2161ED82002FF41C /* ANINotiHeaderViewCell.swift */; };
@@ -217,6 +219,8 @@
 		CD3DBF96215A31F50010A219 /* Macros.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Macros.swift; sourceTree = "<group>"; };
 		CD47936A2186A5F7002643E2 /* ANIOpinionBoxViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIOpinionBoxViewController.swift; sourceTree = "<group>"; };
 		CD47936D2186A6E8002643E2 /* ANIOpinionBoxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIOpinionBoxView.swift; sourceTree = "<group>"; };
+		CD4793712187F1E6002643E2 /* ANIAutoLoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIAutoLoginViewController.swift; sourceTree = "<group>"; };
+		CD4793732187F256002643E2 /* ANIAutoLoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIAutoLoginView.swift; sourceTree = "<group>"; };
 		CD4F0EF620F481030093C543 /* ANINotiCommentViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotiCommentViewCell.swift; sourceTree = "<group>"; };
 		CD50A46620EC6A2500CFF16F /* UIIMage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIIMage.swift; sourceTree = "<group>"; };
 		CD50A46820EC89BD00CFF16F /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
@@ -511,6 +515,22 @@
 				CD47936D2186A6E8002643E2 /* ANIOpinionBoxView.swift */,
 			);
 			path = opinionBoxView;
+			sourceTree = "<group>";
+		};
+		CD47936F2187F148002643E2 /* autoLoginView */ = {
+			isa = PBXGroup;
+			children = (
+				CD4793732187F256002643E2 /* ANIAutoLoginView.swift */,
+			);
+			path = autoLoginView;
+			sourceTree = "<group>";
+		};
+		CD4793702187F161002643E2 /* AutoLoginViewController */ = {
+			isa = PBXGroup;
+			children = (
+				CD4793712187F1E6002643E2 /* ANIAutoLoginViewController.swift */,
+			);
+			path = AutoLoginViewController;
 			sourceTree = "<group>";
 		};
 		CD66F49020C4C0CD00FF563C /* Supporting */ = {
@@ -838,6 +858,7 @@
 				CDDD04B120B50FCE0094DBFA /* InitialViewController */,
 				CDDD04B820B538400094DBFA /* LoginViewController */,
 				CDDD04BB20B539EE0094DBFA /* SignUpViewController */,
+				CD4793702187F161002643E2 /* AutoLoginViewController */,
 			);
 			path = Initial;
 			sourceTree = "<group>";
@@ -881,6 +902,7 @@
 				CDDD04BE20B53A7C0094DBFA /* InitialView */,
 				CDDD04C220B53C1A0094DBFA /* LoginView */,
 				CDDD04C320B53C760094DBFA /* SignUpView */,
+				CD47936F2187F148002643E2 /* autoLoginView */,
 			);
 			path = Initial;
 			sourceTree = "<group>";
@@ -1793,6 +1815,7 @@
 				CDF7F174208F658E00254A0F /* ANIImageButtonView.swift in Sources */,
 				CD08A72E20915BD700F0B72D /* ANIRecruitDetailView.swift in Sources */,
 				CDA32A7B20AE7007008A2AC1 /* ANIQnaImagesCell.swift in Sources */,
+				CD4793722187F1E6002643E2 /* ANIAutoLoginViewController.swift in Sources */,
 				CD334E8221421C7F001C6289 /* ANIReloadView.swift in Sources */,
 				F5DF8365207A27DC00EA7FBE /* ANIStoryViewCell.swift in Sources */,
 				CD47936B2186A5F7002643E2 /* ANIOpinionBoxViewController.swift in Sources */,
@@ -1810,6 +1833,7 @@
 				F5E9E23D2079C10C0021D4CC /* ANIStoryView.swift in Sources */,
 				CDA32A2D20ABCE5F008A2AC1 /* RecruitInfo.swift in Sources */,
 				CD529783213E17F7001609DB /* ANIPopupOptionViewCell.swift in Sources */,
+				CD4793742187F256002643E2 /* ANIAutoLoginView.swift in Sources */,
 				F53E87C82085F5FA00B19A2F /* ANIProfileMenuBarCell.swift in Sources */,
 				F57F7D572081FEBF008A2645 /* ANINotiMessageCell.swift in Sources */,
 				CDA97ACC20B000FF00F46DA4 /* ANIProfileEditFamilyView.swift in Sources */,
