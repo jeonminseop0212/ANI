@@ -122,6 +122,7 @@ class ANINotiViewController: UIViewController {
   private func setupNotifications() {
     ANINotificationManager.receive(messageCellTapped: self, selector: #selector(pushChat))
     ANINotificationManager.receive(profileImageViewTapped: self, selector: #selector(pushOtherProfile))
+    ANINotificationManager.receive(login: self, selector: #selector(showNeedLoginView))
   }
   
   private func removeNotifications() {
@@ -134,7 +135,7 @@ class ANINotiViewController: UIViewController {
     containerCollectionView.scrollToItem(at: indexPath, at: .left, animated: true)
   }
   
-  private func showNeedLoginView() {
+  @objc private func showNeedLoginView() {
     guard let needLoginView = self.needLoginView else { return }
     
     if ANISessionManager.shared.isAnonymous == true {

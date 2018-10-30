@@ -166,7 +166,7 @@ class ANITabBarController: UITabBarController {
   }
   
   @objc private func relogin() {
-    loadUser(relogin: true)
+    loadUser()
     observeChatGroup()
     
     //notification
@@ -193,7 +193,7 @@ class ANITabBarController: UITabBarController {
 
 //MARK: data
 extension ANITabBarController {
-  private func loadUser(relogin: Bool = false) {
+  private func loadUser() {
     let userDefaults = UserDefaults.standard
     
     if let userListener = self.userListener {
@@ -203,8 +203,31 @@ extension ANITabBarController {
     if userDefaults.bool(forKey: KEY_FIRST_LAUNCH) {
       do {
         try Auth.auth().signOut()
+        
+        ANISessionManager.shared.currentUser = nil
+        ANISessionManager.shared.currentUserUid = nil
+        ANISessionManager.shared.isAnonymous = true
+        
+        ANINotificationManager.postLogout()
       } catch let signOutError as NSError {
         DLog("signOutError \(signOutError)")
+      }
+    }
+    
+    if let currentUser = Auth.auth().currentUser {
+      if !currentUser.isEmailVerified {
+        do {
+          try Auth.auth().signOut()
+          
+          ANISessionManager.shared.currentUser = nil
+          ANISessionManager.shared.currentUserUid = nil
+          ANISessionManager.shared.isAnonymous = true
+          
+          ANINotificationManager.postLogout()
+          
+        } catch let signOutError as NSError {
+          DLog("signOutError \(signOutError)")
+        }
       }
     }
 
@@ -219,10 +242,8 @@ extension ANITabBarController {
             let user = try FirestoreDecoder().decode(FirebaseUser.self, from: data)
             
             DispatchQueue.main.async {
-              if !relogin {
-                ANISessionManager.shared.currentUser = user
-                ANISessionManager.shared.isAnonymous = false
-              }
+              ANISessionManager.shared.currentUser = user
+              ANISessionManager.shared.isAnonymous = false
               
               if let isHaveUnreadNoti = user.isHaveUnreadNoti {
                 if self.oldIsHaveUnreadNoti != isHaveUnreadNoti {
@@ -240,12 +261,16 @@ extension ANITabBarController {
     } else {
       do {
         try Auth.auth().signOut()
+        
+        ANISessionManager.shared.currentUser = nil
+        ANISessionManager.shared.currentUserUid = nil
+        ANISessionManager.shared.isAnonymous = true
+        
+        ANINotificationManager.postLogout()
+        
       } catch let signOutError as NSError {
         DLog("signOutError \(signOutError)")
       }
-      
-      ANISessionManager.shared.isAnonymous = true
-      ANISessionManager.shared.currentUser = nil
     }
   }
   

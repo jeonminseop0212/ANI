@@ -172,10 +172,11 @@ class ANISignUpViewController: UIViewController {
 
 //MARK: ANISignUpViewDelegate
 extension ANISignUpViewController: ANISignUpViewDelegate {
-  func signUpSuccess() {
-    self.navigationController?.dismiss(animated: true, completion: {
-      ANINotificationManager.postLogin()
-    })
+  func signUpSuccess(adress: String, password: String) {
+    let autoLoginViewController = ANIAutoLoginViewController()
+    autoLoginViewController.adress = adress
+    autoLoginViewController.password = password
+    self.navigationController?.pushViewController(autoLoginViewController, animated: true)
   }
   
   func donButtonTapped() {
