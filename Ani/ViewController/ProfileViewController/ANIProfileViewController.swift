@@ -138,7 +138,6 @@ class ANIProfileViewController: UIViewController {
     //profileBasicView
     let profileBasicView = ANIProfileBasicView()
     profileBasicView.currentUser = currentUser
-    profileBasicView.loadData()
     profileBasicView.delegate = self
     self.view.addSubview(profileBasicView)
     profileBasicView.topToBottom(of: myNavigationBar)
