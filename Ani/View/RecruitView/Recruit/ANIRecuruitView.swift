@@ -412,8 +412,10 @@ extension ANIRecuruitView {
               
               recruitTableView.reloadData()
               
-              UIView.animate(withDuration: 0.2, animations: {
+              UIView.animate(withDuration: 0.4, animations: {
                 recruitTableView.alpha = 1.0
+              }, completion: { (complete) in
+                ANINotificationManager.postLoadedRecruit()
               })
               
               self.isLoading = false

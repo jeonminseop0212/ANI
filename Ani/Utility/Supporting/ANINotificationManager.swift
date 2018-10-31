@@ -156,4 +156,9 @@ class ANINotificationManager: NSObject {
   private static let N_TAP_NOTI_NOTIFICATION = "N_TAP_NOTI_NOTIFICATION"
   static func postTapNotiNotification() { self.post(name: N_TAP_NOTI_NOTIFICATION, object: nil, userInfo:nil) }
   static func receive(tapNotiNotification observer:Any, selector:Selector) { receive(name: N_TAP_NOTI_NOTIFICATION, observer: observer, selector: selector) }
+  
+  //MARK: loaded recruit
+  private static let N_LOADED_RECRUIT = "N_LOADED_RECRUIT"
+  static func postLoadedRecruit() { self.post(name: N_LOADED_RECRUIT, object: nil, userInfo:nil) }
+  static func receive(loadedRecruit observer:Any, selector:Selector) { receive(name: N_LOADED_RECRUIT, observer: observer, selector: selector) }
 }

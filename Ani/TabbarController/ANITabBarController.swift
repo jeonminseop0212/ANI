@@ -14,6 +14,8 @@ import UserNotifications
 
 class ANITabBarController: UITabBarController {
   
+  private weak var splashView: ANISplashView?
+  
   private let BADGE_WIDHT: CGFloat = 5.0
   private weak var badge: UIView?
   
@@ -30,7 +32,24 @@ class ANITabBarController: UITabBarController {
   override func viewDidLoad() {
     super.viewDidLoad()
     
+    setup()
+    setupTabBar()
+    setupBadge()
+    
+    loadUser()
+    observeChatGroup()
+    setupNotification()
+  }
+  
+  private func setup() {
+    //basic
     ANIOrientation.lockOrientation(.portrait)
+    
+    //splashView
+    let splashView = ANISplashView()
+    self.view.addSubview(splashView)
+    splashView.edgesToSuperview()
+    self.splashView = splashView
     
     //tabBar上の線を消す
     let tabBarAppearane = UITabBar.appearance()
@@ -40,20 +59,14 @@ class ANITabBarController: UITabBarController {
     tabBar.layer.borderWidth = 0.0
     tabBar.clipsToBounds = true
     
-    setTabBar()
-    setupBadge()
-    
+    //update first launch
     let userDefaults = UserDefaults.standard
     if userDefaults.object(forKey: KEY_FIRST_LAUNCH) == nil {
       userDefaults.set(true, forKey: KEY_FIRST_LAUNCH)
     }
-    
-    loadUser()
-    observeChatGroup()
-    setupNotification()
   }
   
-  private func setTabBar() {
+  private func setupTabBar() {
     let recruitVC = ANIRecruitViewController()
     recruitVC.tabBarItem.image = UIImage(named: "home")?.withRenderingMode(.alwaysOriginal)
     recruitVC.tabBarItem.selectedImage = UIImage(named: "homeSelected")?.withRenderingMode(.alwaysOriginal)
@@ -153,6 +166,7 @@ class ANITabBarController: UITabBarController {
     ANINotificationManager.receive(changeIsHaveUnreadMessage: self, selector: #selector(updateBadge))
     ANINotificationManager.receive(login: self, selector: #selector(relogin))
     ANINotificationManager.receive(logout: self, selector: #selector(logout))
+    ANINotificationManager.receive(loadedRecruit: self, selector: #selector(hideSplash))
   }
   
   @objc private func updateBadge() {
@@ -188,6 +202,14 @@ class ANITabBarController: UITabBarController {
     
     oldIsHaveUnreadNoti = false
     oldIsHaveUnreadMessage = false
+  }
+  
+  @objc private func hideSplash() {
+    guard let splashView = splashView else { return }
+    
+    UIView.animate(withDuration: 0.2) {
+      splashView.alpha = 0.0
+    }
   }
 }
 
