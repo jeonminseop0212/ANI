@@ -50,6 +50,10 @@ class ANIProfileViewController: UIViewController {
     showNeedLoginView()
   }
   
+  override func viewWillDisappear(_ animated: Bool) {
+    removeNotifications()
+  }
+  
   private func setup() {
     //basic
     self.view.backgroundColor = .white
@@ -184,6 +188,10 @@ class ANIProfileViewController: UIViewController {
     ANINotificationManager.receive(imageCellTapped: self, selector: #selector(presentImageBrowser(_:)))
     ANINotificationManager.receive(profileEditButtonTapped: self, selector: #selector(openProfileEdit))
     ANINotificationManager.receive(login: self, selector: #selector(updateLayoutLogin))
+  }
+  
+  private func removeNotifications() {
+    ANINotificationManager.remove(self)
   }
   
   @objc private func presentImageBrowser(_ notification: NSNotification) {

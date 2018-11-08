@@ -9,6 +9,8 @@
 import UIKit
 import TinyConstraints
 import FirebaseAuth
+import FirebaseFirestore
+import CodableFirebase
 
 class ANIAutoLoginViewController: UIViewController {
   
@@ -27,6 +29,7 @@ class ANIAutoLoginViewController: UIViewController {
   
   var adress: String?
   var password: String?
+  var userId: String?
   
   override func viewDidLoad() {
     setup()
@@ -139,7 +142,8 @@ class ANIAutoLoginViewController: UIViewController {
 extension ANIAutoLoginViewController: ANIAutoLoginViewDelegate {
   func tappeLoginButton() {
     guard let adress = self.adress,
-          let password = self.password else { return }
+          let password = self.password,
+          let userId = self.userId else { return }
     
     Auth.auth().signIn(withEmail: adress, password: password) { (successUser, error) in
       if let errorUnrap = error {
@@ -147,12 +151,35 @@ extension ANIAutoLoginViewController: ANIAutoLoginViewDelegate {
       } else {
         if let currentUser = Auth.auth().currentUser {
           if currentUser.isEmailVerified {
-            self.navigationController?.dismiss(animated: true, completion: {
-              ANISessionManager.shared.currentUserUid = currentUser.uid
-              ANISessionManager.shared.isAnonymous = false
-              
-              ANINotificationManager.postLogin()
-            })
+            let database = Firestore.firestore()
+            
+            DispatchQueue.global().async {
+              database.collection(KEY_USERS).document(userId).addSnapshotListener({ (snapshot, error) in
+                if let error = error {
+                  DLog("Error adding document: \(error)")
+                  
+                  return
+                }
+                
+                guard let snapshot = snapshot, let value = snapshot.data() else { return }
+                
+                do {
+                  let user = try FirestoreDecoder().decode(FirebaseUser.self, from: value)
+                  
+                  DispatchQueue.main.async {                    
+                    self.navigationController?.dismiss(animated: true, completion: {
+                      ANISessionManager.shared.currentUser = user
+                      ANISessionManager.shared.currentUserUid = currentUser.uid
+                      ANISessionManager.shared.isAnonymous = false
+                      
+                      ANINotificationManager.postLogin()
+                    })
+                  }
+                } catch let error {
+                  DLog(error)
+                }
+              })
+            }
           } else {
             self.reject(notiText: "アドレスの認証メールを確認してください！")
           }

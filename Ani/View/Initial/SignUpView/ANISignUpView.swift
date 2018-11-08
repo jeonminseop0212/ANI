@@ -16,7 +16,7 @@ import NVActivityIndicatorView
 protocol ANISignUpViewDelegate {
   func prifileImagePickButtonTapped()
   func reject(notiText: String)
-  func signUpSuccess(adress: String, password: String)
+  func signUpSuccess(adress: String, password: String, userId: String)
 }
 
 class ANISignUpView: UIView {
@@ -373,7 +373,7 @@ class ANISignUpView: UIView {
         
         self.pushDataAlgolia(data: userData as [String: AnyObject])
         
-        self.delegate?.signUpSuccess(adress: self.adress, password: self.password)
+        self.delegate?.signUpSuccess(adress: self.adress, password: self.password, userId: uid)
         
         NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
       }

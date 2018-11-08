@@ -172,10 +172,11 @@ class ANISignUpViewController: UIViewController {
 
 //MARK: ANISignUpViewDelegate
 extension ANISignUpViewController: ANISignUpViewDelegate {
-  func signUpSuccess(adress: String, password: String) {
+  func signUpSuccess(adress: String, password: String, userId: String) {
     let autoLoginViewController = ANIAutoLoginViewController()
     autoLoginViewController.adress = adress
     autoLoginViewController.password = password
+    autoLoginViewController.userId = userId
     self.navigationController?.pushViewController(autoLoginViewController, animated: true)
   }
   
