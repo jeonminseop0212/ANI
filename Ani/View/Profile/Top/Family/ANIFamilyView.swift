@@ -99,13 +99,14 @@ extension ANIFamilyView: UICollectionViewDelegateFlowLayout {
 extension ANIFamilyView: UICollectionViewDelegate {
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
     guard let user = self.user,
-          let profileImageUrl = user.profileImageUrl,
-          let familyImageUrls = user.familyImageUrls else { return }
+          let profileImageUrl = user.profileImageUrl else { return }
     
     var imageUrls = [String]()
     imageUrls.append(profileImageUrl)
-    for familyImageUrl in familyImageUrls {
-      imageUrls.append(familyImageUrl)
+    if let familyImageUrls = user.familyImageUrls {
+      for familyImageUrl in familyImageUrls {
+        imageUrls.append(familyImageUrl)
+      }
     }
     
     self.delegate?.presentImageBrowser(index: indexPath.item, imageUrls: imageUrls)
