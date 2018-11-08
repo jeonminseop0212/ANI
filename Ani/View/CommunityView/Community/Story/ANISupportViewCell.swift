@@ -25,7 +25,7 @@ class ANISupportViewCell: UITableViewCell {
   
   private weak var messageLabel: UILabel?
   
-  private let RECRUIT_BASE_BORDER_WIDHT: CGFloat = 0.8
+  private let RECRUIT_BASE_BORDER_WIDHT: CGFloat = 1.2
   private weak var recruitBase: UIView?
   private weak var recruitImageView: UIImageView?
   private weak var basicInfoStackView: UIStackView?
@@ -286,7 +286,7 @@ class ANISupportViewCell: UITableViewCell {
     
     //deleteRecruitAlertLabel
     let deleteRecruitAlertLabel = UILabel()
-    deleteRecruitAlertLabel.text = "募集が削除されました。"
+    deleteRecruitAlertLabel.text = "削除された募集です。"
     deleteRecruitAlertLabel.textColor = ANIColor.dark
     deleteRecruitAlertLabel.textAlignment = .center
     deleteRecruitAlertLabel.font = UIFont.boldSystemFont(ofSize: 17.0)
