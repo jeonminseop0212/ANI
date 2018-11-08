@@ -35,11 +35,10 @@ class ANISplashView: UIView {
     //logoImageView
     let logoImageView = UIImageView()
     logoImageView.image = UIImage(named: "MYAULogo")
-    logoImageView.contentMode = .scaleAspectFill
+    logoImageView.contentMode = .scaleAspectFit
     backGroundImageView.addSubview(logoImageView)
     logoImageView.centerInSuperview()
-    logoImageView.height(83.0)
-    logoImageView.width(118.0)
+    logoImageView.width(100.0)
     self.logoImageView = logoImageView
   }
 }
