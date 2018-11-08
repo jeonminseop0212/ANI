@@ -21,11 +21,10 @@
                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="splashBG" translatesAutoresizingMaskIntoConstraints="NO" id="YEg-0U-BAj">
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                             </imageView>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="MYAULogo" translatesAutoresizingMaskIntoConstraints="NO" id="flB-Nw-364">
-                                <rect key="frame" x="128.5" y="292" width="118" height="83"/>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="MYAULogo" translatesAutoresizingMaskIntoConstraints="NO" id="flB-Nw-364">
+                                <rect key="frame" x="137.5" y="292" width="100" height="83"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="118" id="P4V-OV-38F"/>
-                                    <constraint firstAttribute="height" constant="83" id="e9S-mD-xld"/>
+                                    <constraint firstAttribute="width" constant="100" id="P4V-OV-38F"/>
                                 </constraints>
                             </imageView>
                         </subviews>
