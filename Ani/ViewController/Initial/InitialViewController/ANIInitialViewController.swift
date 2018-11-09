@@ -8,6 +8,7 @@
 
 import UIKit
 import FirebaseAuth
+import SafariServices
 
 class ANIInitialViewController: UIViewController {
   
@@ -69,6 +70,15 @@ extension ANIInitialViewController: ANIInitialViewDelegate {
     } catch let signOutError as NSError {
       DLog("signOutError \(signOutError)")
     }
+  }
+  
+  func showPrivacyPolicy() {
+    let urlString = "https://myau5.webnode.jp/プライバシーポリシー/"
+    guard let privacyPolicyUrl = urlString.addingPercentEncoding(withAllowedCharacters: NSCharacterSet.urlQueryAllowed),
+          let url = URL(string: privacyPolicyUrl) else { return }
+    
+    let safariVC = SFSafariViewController(url: url)
+    present(safariVC, animated: true, completion: nil)
   }
 }
 
