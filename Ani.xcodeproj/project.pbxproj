@@ -552,6 +552,7 @@
 				CD0FAD0D20BFC02E00D8CD27 /* ANISessionManager.swift */,
 				CD92792120C0DCB400B1F006 /* ANIKey.swift */,
 				CDDE4B6220E0A985005762A1 /* ANIfunction.swift */,
+				CDD0550F20A6C64300BEF482 /* ANIFilter.swift */,
 				CD3DBF96215A31F50010A219 /* Macros.swift */,
 			);
 			path = Supporting;
@@ -794,7 +795,6 @@
 		CDD0550420A5CF0100BEF482 /* ImageFilter */ = {
 			isa = PBXGroup;
 			children = (
-				CDD0550F20A6C64300BEF482 /* ANIFilter.swift */,
 				CDD0550920A5D27300BEF482 /* Preview */,
 				CDD0550A20A5D28100BEF482 /* Filter */,
 			);
