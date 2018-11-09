@@ -166,7 +166,7 @@ class ANITabBarController: UITabBarController {
     ANINotificationManager.receive(changeIsHaveUnreadMessage: self, selector: #selector(updateBadge))
     ANINotificationManager.receive(login: self, selector: #selector(relogin))
     ANINotificationManager.receive(logout: self, selector: #selector(logout))
-    ANINotificationManager.receive(loadedRecruit: self, selector: #selector(hideSplash))
+    ANINotificationManager.receive(dismissSplash: self, selector: #selector(dismissSplash))
   }
   
   @objc private func updateBadge() {
@@ -204,7 +204,7 @@ class ANITabBarController: UITabBarController {
     oldIsHaveUnreadMessage = false
   }
   
-  @objc private func hideSplash() {
+  @objc private func dismissSplash() {
     guard let splashView = splashView else { return }
     
     UIView.animate(withDuration: 0.2) {

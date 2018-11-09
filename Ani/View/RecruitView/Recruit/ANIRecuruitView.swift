@@ -245,7 +245,7 @@ class ANIRecuruitView: UIView {
     UIView.animate(withDuration: 0.2, animations: {
       reloadView.alpha = 1.0
     }) { (complete) in
-      ANINotificationManager.postLoadedRecruit()
+      ANINotificationManager.postDismissSplash()
     }
     
     self.isLoading = false
@@ -417,7 +417,7 @@ extension ANIRecuruitView {
               UIView.animate(withDuration: 0.4, animations: {
                 recruitTableView.alpha = 1.0
               }, completion: { (complete) in
-                ANINotificationManager.postLoadedRecruit()
+                ANINotificationManager.postDismissSplash()
               })
               
               self.isLoading = false
