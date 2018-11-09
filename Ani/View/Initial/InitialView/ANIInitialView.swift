@@ -12,6 +12,7 @@ protocol ANIInitialViewDelegate {
   func loginButtonTapped()
   func signUpButtonTapped()
   func startAnonymous()
+  func showPrivacyPolicy()
 }
 
 class ANIInitialView: UIView {
@@ -28,7 +29,11 @@ class ANIInitialView: UIView {
   private weak var signUpButton: ANIAreaButtonView?
   private weak var signUpButtonLabel: UILabel?
   
+  private weak var bottomStackView: UIStackView?
   private weak var anonymousLabel: UILabel?
+  private let dotViewHeight: CGFloat = 2.0
+  private weak var dotView: UIView?
+  private weak var privacyPolicyLabel: UILabel?
   
   var delegate: ANIInitialViewDelegate?
   
@@ -51,22 +56,51 @@ class ANIInitialView: UIView {
     initialImageView.edgesToSuperview()
     self.initialImageView = initialImageView
     
+    //bottomStackView
+    let bottomStackView = UIStackView()
+    bottomStackView.axis = .horizontal
+    bottomStackView.alignment = .center
+    bottomStackView.distribution = .equalSpacing
+    bottomStackView.spacing = 5.0
+    addSubview(bottomStackView)
+    bottomStackView.bottomToSuperview(offset: -24.0)
+    bottomStackView.centerXToSuperview()
+    self.bottomStackView = bottomStackView
+    
     //anonymousLabel
     let anonymousLabel = UILabel()
     anonymousLabel.font = UIFont.systemFont(ofSize: 13.0)
     anonymousLabel.textColor = ANIColor.darkGray
     anonymousLabel.text = "ログインしないで始める"
     anonymousLabel.isUserInteractionEnabled = true
-    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(startAnonymous))
-    anonymousLabel.addGestureRecognizer(tapGesture)
-    addSubview(anonymousLabel)
-    anonymousLabel.bottomToSuperview(offset: -24.0)
-    anonymousLabel.centerXToSuperview()
+    let anonymousTapGesture = UITapGestureRecognizer(target: self, action: #selector(startAnonymous))
+    anonymousLabel.addGestureRecognizer(anonymousTapGesture)
+    bottomStackView.addArrangedSubview(anonymousLabel)
     self.anonymousLabel = anonymousLabel
+    
+    //dotView
+    let dotView = UIView()
+    dotView.backgroundColor = ANIColor.darkGray
+    dotView.layer.cornerRadius = dotViewHeight / 2
+    dotView.layer.masksToBounds = true
+    bottomStackView.addArrangedSubview(dotView)
+    dotView.width(dotViewHeight)
+    dotView.height(dotViewHeight)
+    self.dotView = dotView
+    
+    //privacyPolicyLabel
+    let privacyPolicyLabel = UILabel()
+    privacyPolicyLabel.font = UIFont.systemFont(ofSize: 13.0)
+    privacyPolicyLabel.textColor = ANIColor.darkGray
+    privacyPolicyLabel.text = "プライバシーポリシー"
+    privacyPolicyLabel.isUserInteractionEnabled = true
+    let privacyPolicyTapGesture = UITapGestureRecognizer(target: self, action: #selector(showPrivacyPolicy))
+    privacyPolicyLabel.addGestureRecognizer(privacyPolicyTapGesture)
+    bottomStackView.addArrangedSubview(privacyPolicyLabel)
+    self.privacyPolicyLabel = privacyPolicyLabel
     
     //buttonStackView
     let buttonStackView = UIStackView()
-    buttonStackView.backgroundColor = .red
     buttonStackView.axis = .horizontal
     buttonStackView.alignment = .center
     buttonStackView.distribution = .fillEqually
@@ -142,6 +176,10 @@ class ANIInitialView: UIView {
   
   @objc private func startAnonymous() {
     self.delegate?.startAnonymous()
+  }
+  
+  @objc private func showPrivacyPolicy() {
+    self.delegate?.showPrivacyPolicy()
   }
 }
 
