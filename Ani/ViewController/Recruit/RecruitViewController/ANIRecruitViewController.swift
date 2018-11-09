@@ -9,58 +9,59 @@
 import UIKit
 import TinyConstraints
 
+enum FilterPickMode: Int {
+  case home;
+  case kind;
+  case age;
+  case sex;
+}
+
 class ANIRecruitViewController: UIViewController {
   
   private weak var myNavigationBar: UIView?
   private weak var myNavigationBarTopConstroint: Constraint?
+  private weak var navigaitonTitleLabel: UILabel?
 
-  private weak var categoriesView: ANIRecruitCategoriesView?
-  static let CATEGORIES_VIEW_HEIGHT: CGFloat = 47.0
+  private weak var filtersView: ANIRecruitFiltersView?
+  static let FILTERS_VIEW_HEIGHT: CGFloat = 47.0
   
   private weak var recruitView: ANIRecuruitView?
   
-  private weak var searchBar: UISearchBar?
+  private let pickUpItem = PickUpItem()
+  private var pickMode: FilterPickMode?
   
   private let CONTRIBUTION_BUTTON_HEIGHT:CGFloat = 55.0
   private weak var contributionButon: ANIImageButtonView?
   
-  private var recruits = [Recruit]() {
-    didSet {
-      guard let recruitView = self.recruitView else { return }
-      recruitView.recruits = recruits
-    }
-  }
-  
-  private var me: User?
+  private var rejectViewBottomConstraint: Constraint?
+  private var rejectViewBottomConstraintOriginalConstant: CGFloat?
+  private weak var rejectView: ANIRejectView?
+  private var isRejectAnimating: Bool = false
+  private var rejectTapView: UIView?
   
   override func viewDidLoad() {
     super.viewDidLoad()
     setup()
-    setupMe()
-    setupTestData()
-    setupNotifications()
+    ifNeedsShowInitialView()
   }
   
   override func viewWillAppear(_ animated: Bool) {
     UIApplication.shared.statusBarStyle = .default
-    UIApplication.shared.statusBar?.isHidden = false
+    UIApplication.shared.isStatusBarHidden = false
+    setupNotifications()
+  }
+  
+  override func viewWillDisappear(_ animated: Bool) {
+    removeNotifications()
   }
   
   private func setup() {
     //basic
-    Orientation.lockOrientation(.portrait)
+    ANIOrientation.lockOrientation(.portrait)
     self.view.backgroundColor = .white
     self.navigationController?.setNavigationBarHidden(true, animated: false)
     self.navigationController?.navigationBar.isTranslucent = false
-    
-    //navigation bar right item
-    let filterImage = UIImage(named: "filter")?.withRenderingMode(.alwaysOriginal)
-    let filterButton = UIButton(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
-    filterButton.setImage(filterImage, for: .normal)
-    filterButton.addTarget(self, action: #selector(filter), for: .touchUpInside)
-    let rightBarButton = UIBarButtonItem()
-    rightBarButton.customView = filterButton
-    navigationItem.rightBarButtonItem = rightBarButton
+    self.navigationController?.interactivePopGestureRecognizer?.delegate = self
     
     //rcruitView
     let recruitView = ANIRecuruitView()
@@ -80,28 +81,24 @@ class ANIRecruitViewController: UIViewController {
     myNavigationBar.height(UIViewController.NAVIGATION_BAR_HEIGHT)
     self.myNavigationBar = myNavigationBar
     
-    //searchBar
-    let searchBar = UISearchBar()
-    searchBar.placeholder = "Search"
-    searchBar.textField?.backgroundColor = ANIColor.lightGray
-    //    searchBar.showsCancelButton = true
-    searchBar.delegate = self
-    searchBar.backgroundImage = UIImage()
-    myNavigationBar.addSubview(searchBar)
-    searchBar.topToSuperview()
-    searchBar.leftToSuperview()
-    searchBar.rightToSuperview()
-    searchBar.bottomToSuperview()
-    self.searchBar = searchBar
+    //navigaitonTitleLabel
+    let navigaitonTitleLabel = UILabel()
+    navigaitonTitleLabel.text = "M Y A U"
+    navigaitonTitleLabel.textColor = ANIColor.dark
+    navigaitonTitleLabel.font = UIFont.boldSystemFont(ofSize: 22)
+    myNavigationBar.addSubview(navigaitonTitleLabel)
+    navigaitonTitleLabel.centerInSuperview()
+    self.navigaitonTitleLabel = navigaitonTitleLabel
     
-    //categoriesView
-    let categoriesView = ANIRecruitCategoriesView()
-    self.view.addSubview(categoriesView)
-    categoriesView.topToBottom(of: myNavigationBar)
-    categoriesView.leftToSuperview()
-    categoriesView.rightToSuperview()
-    categoriesView.height(ANIRecruitViewController.CATEGORIES_VIEW_HEIGHT)
-    self.categoriesView = categoriesView
+    //filtersView
+    let filtersView = ANIRecruitFiltersView()
+    filtersView.delegate = self
+    self.view.addSubview(filtersView)
+    filtersView.topToBottom(of: myNavigationBar)
+    filtersView.leftToSuperview()
+    filtersView.rightToSuperview()
+    filtersView.height(ANIRecruitViewController.FILTERS_VIEW_HEIGHT)
+    self.filtersView = filtersView
     
     //contributionButon
     let contributionButon = ANIImageButtonView()
@@ -112,75 +109,89 @@ class ANIRecruitViewController: UIViewController {
     self.view.addSubview(contributionButon)
     contributionButon.width(CONTRIBUTION_BUTTON_HEIGHT)
     contributionButon.height(CONTRIBUTION_BUTTON_HEIGHT)
-    contributionButon.rightToSuperview(offset: 15.0)
+    contributionButon.rightToSuperview(offset: -15.0)
     contributionButon.bottomToSuperview(offset: -15, usingSafeArea: true)
     self.contributionButon = contributionButon
+    
+    //rejectView
+    let rejectView = ANIRejectView()
+    rejectView.setRejectText("ログインが必要です。")
+    self.view.addSubview(rejectView)
+    rejectViewBottomConstraint = rejectView.bottomToTop(of: self.view)
+    rejectViewBottomConstraintOriginalConstant = rejectViewBottomConstraint?.constant
+    rejectView.leftToSuperview()
+    rejectView.rightToSuperview()
+    self.rejectView = rejectView
+    
+    //rejectTapView
+    let rejectTapView = UIView()
+    rejectTapView.isUserInteractionEnabled = true
+    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(rejectViewTapped))
+    rejectTapView.addGestureRecognizer(tapGesture)
+    rejectTapView.isHidden = true
+    rejectTapView.backgroundColor = .clear
+    self.view.addSubview(rejectTapView)
+    rejectTapView.size(to: rejectView)
+    rejectTapView.topToSuperview()
+    self.rejectTapView = rejectTapView
   }
   
-  private func setupMe() {
-    let familyImages = [UIImage(named: "family1")!, UIImage(named: "family2")!, UIImage(named: "family3")!]
-    let me = User(id: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "meProfileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
-    
-    self.me = me
-  }
-  
-  private func setupTestData() {
-    let familyImages = [UIImage(named: "family1")!, UIImage(named: "family2")!, UIImage(named: "family3")!]
-    let user1 = User(id: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
-    let user2 = User(id: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
-    let user3 = User(id: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "団体", introduce: "団体で猫たちのためにボランティア活動をしています")
-    
-    let image1 = UIImage(named: "storyCat1")!
-    let image2 = UIImage(named: "storyCat2")!
-    let image3 = UIImage(named: "storyCat3")!
-    let image4 = UIImage(named: "storyCat1")!
-    
-    let introduceImages = [image1, image2, image3, image4]
-    let recruitInfo = RecruitInfo(headerImage: UIImage(named: "cat1")!, title: "かわいい猫ちゃんの里親になって >_<", kind: "ミックス", age: "１歳以下", sex: "男の子", home: "東京都", vaccine: "１回", castration: "済み", reason: "親がいない子猫を保護しました。\n家ではすでに猫を飼えないので親になってくれる方を探しています。\nよろしくお願いします。", introduce: "人懐こくて甘えん坊の可愛い子猫です。\n元気よくご飯もいっぱいたべます😍\n遊ぶのが大好きであっちこっち走り回る姿がたまらなく可愛いです。", introduceImages: introduceImages, passing: "ご自宅までお届けします！", isRecruit: true)
-    let recruit1 = Recruit(recruitInfo: recruitInfo, user: user1, supportCount: 10, loveCount: 10)
-    let recruit2 = Recruit(recruitInfo: recruitInfo, user: user2, supportCount: 5, loveCount: 8)
-    let recruit3 = Recruit(recruitInfo: recruitInfo, user: user3, supportCount: 14, loveCount: 20)
+  private func ifNeedsShowInitialView() {
+    let userDefaults = UserDefaults.standard
 
-    self.recruits = [recruit1, recruit2, recruit3, recruit1, recruit2, recruit3]
+    if userDefaults.bool(forKey: KEY_FIRST_LAUNCH) {
+      let initialViewController = ANIInitialViewController()
+      let initialNV = UINavigationController(rootViewController: initialViewController)
+      self.present(initialNV, animated: true, completion: nil)
+      
+      userDefaults.set(false, forKey: KEY_FIRST_LAUNCH)
+    }
   }
   
   //MARK: Notifications
   private func setupNotifications() {
-    ANINotificationManager.receive(viewScrolled: self, selector: #selector(hideKeyboard))
+    ANINotificationManager.receive(profileImageViewTapped: self, selector: #selector(pushOtherProfile))
+    ANINotificationManager.receive(pickerViewDidSelect: self, selector: #selector(updateFilter))
+  }
+  
+  private func removeNotifications() {
+    ANINotificationManager.remove(self)
+  }
+  
+  @objc private func pushOtherProfile(_ notification: NSNotification) {
+    guard let userId = notification.object as? String else { return }
+    
+    if let currentUserUid = ANISessionManager.shared.currentUserUid, currentUserUid == userId {
+      let profileViewController = ANIProfileViewController()
+      profileViewController.hidesBottomBarWhenPushed = true
+      self.navigationController?.pushViewController(profileViewController, animated: true)
+      profileViewController.isBackButtonHide = false
+    } else {
+      let otherProfileViewController = ANIOtherProfileViewController()
+      otherProfileViewController.hidesBottomBarWhenPushed = true
+      otherProfileViewController.userId = userId
+      self.navigationController?.pushViewController(otherProfileViewController, animated: true)
+    }
+  }
+  
+  @objc private func updateFilter(_ notification: NSNotification) {
+    guard let pickMode = self.pickMode,
+          let pickItem = notification.object as? String,
+          let filtersView = self.filtersView,
+          let recruitView = self.recruitView else { return }
+    
+    filtersView.pickMode = pickMode
+    filtersView.pickItem = pickItem
+    
+    recruitView.pickMode = pickMode
+    recruitView.pickItem = pickItem
   }
   
   //MARK: Action
-  @objc func filter() {
-    print("filtering")
-  }
-  
-  @objc private func hideKeyboard() {
-    guard let searchBar = self.searchBar,
-      let searchBarTextField = searchBar.textField else { return }
-    if searchBarTextField.isFirstResponder {
-      searchBarTextField.resignFirstResponder()
-      searchBar.setShowsCancelButton(false, animated: true)
-      
-      if let searchCancelButton = searchBar.cancelButton {
-        searchCancelButton.alpha = 0.0
-      }
-    }
-  }
-}
-
-extension ANIRecruitViewController: UISearchBarDelegate {
-  func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-    guard let searchBarTextField = searchBar.textField else { return }
-    if searchBarTextField.isFirstResponder {
-      searchBarTextField.resignFirstResponder()
-    }
-  }
-  
-  func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-    guard let searchBarTextField = searchBar.textField else { return }
-    if searchBarTextField.isFirstResponder {
-      searchBarTextField.resignFirstResponder()
-    }
+  @objc private func rejectViewTapped() {
+    let initialViewController = ANIInitialViewController()
+    let navigationController = UINavigationController(rootViewController: initialViewController)
+    self.present(navigationController, animated: true, completion: nil)
   }
 }
 
@@ -188,27 +199,42 @@ extension ANIRecruitViewController: UISearchBarDelegate {
 extension ANIRecruitViewController:ANIButtonViewDelegate {
   func buttonViewTapped(view: ANIButtonView) {
     if view === self.contributionButon {
-      let recruitContribtionViewController = ANIRecruitContributionViewController()
-      recruitContribtionViewController.delegate = self
-      let recruitContributionNV = UINavigationController(rootViewController: recruitContribtionViewController)
-      self.navigationController?.present(recruitContributionNV, animated: true, completion: nil)
+      if ANISessionManager.shared.isAnonymous == false {
+        let recruitContribtionViewController = ANIRecruitContributionViewController()
+        let recruitContributionNV = UINavigationController(rootViewController: recruitContribtionViewController)
+        self.navigationController?.present(recruitContributionNV, animated: true, completion: nil)
+      } else {
+        reject()
+      }
     }
   }
 }
 
 //ANIRecruitViewDelegate
 extension ANIRecruitViewController: ANIRecruitViewDelegate {
-  func recruitRowTap(tapRowIndex: Int) {
+  func supportButtonTapped(supportRecruit: FirebaseRecruit, user: FirebaseUser) {
+    let supportViewController = ANISupportViewController()
+    supportViewController.modalPresentationStyle = .overCurrentContext
+    supportViewController.recruit = supportRecruit
+    supportViewController.user = user
+    self.tabBarController?.present(supportViewController, animated: false, completion: nil)
+  }
+  
+  func recruitCellTap(selectedRecruit: FirebaseRecruit, user: FirebaseUser) {
     let recruitDetailViewController = ANIRecruitDetailViewController()
     recruitDetailViewController.hidesBottomBarWhenPushed = true
-    recruitDetailViewController.testRecruit = recruits[tapRowIndex]
+    recruitDetailViewController.recruit = selectedRecruit
+    recruitDetailViewController.user = user
     self.navigationController?.pushViewController(recruitDetailViewController, animated: true)
   }
   
   func recruitViewDidScroll(scrollY: CGFloat) {
-    guard let myNavigationBarTopConstroint = self.myNavigationBarTopConstroint else { return }
+    guard let myNavigationBarTopConstroint = self.myNavigationBarTopConstroint,
+          let filtersView = self.filtersView,
+          let filterCollectionView = filtersView.filterCollectionView,
+          let navigaitonTitleLabel = self.navigaitonTitleLabel else { return }
     
-    let topHeight = UIViewController.NAVIGATION_BAR_HEIGHT + ANIRecruitViewController.CATEGORIES_VIEW_HEIGHT
+    let topHeight = UIViewController.NAVIGATION_BAR_HEIGHT + ANIRecruitViewController.FILTERS_VIEW_HEIGHT
     let newScrollY = topHeight + scrollY
     
     //navigation animate
@@ -218,29 +244,91 @@ extension ANIRecruitViewController: ANIRecruitViewDelegate {
         self.view.layoutIfNeeded()
         
         let alpha = 1 - (scrollY / topHeight)
-        searchBar?.alpha = alpha
-        categoriesView?.categoryCollectionView?.alpha = alpha
+        navigaitonTitleLabel.alpha = alpha * alpha
+        filterCollectionView.alpha = alpha * alpha
       } else {
         myNavigationBarTopConstroint.constant = -topHeight
-        searchBar?.alpha = 0.0
-        categoriesView?.categoryCollectionView?.alpha = 0.0
+        navigaitonTitleLabel.alpha = 0.0
+        filterCollectionView.alpha = 0.0
         self.view.layoutIfNeeded()
       }
     } else {
       myNavigationBarTopConstroint.constant = 0.0
       self.view.layoutIfNeeded()
       
-      searchBar?.alpha = 1.0
-      categoriesView?.categoryCollectionView?.alpha = 1.0
+      navigaitonTitleLabel.alpha = 1.0
+      filterCollectionView.alpha = 1.0
+    }
+  }
+  
+  func reject() {
+    guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
+          !isRejectAnimating,
+          let rejectTapView = self.rejectTapView else { return }
+    
+    rejectViewBottomConstraint.constant = UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    rejectTapView.isHidden = false
+    
+    UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut, animations: {
+      self.isRejectAnimating = true
+      self.view.layoutIfNeeded()
+    }) { (complete) in
+      guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
+        let rejectViewBottomConstraintOriginalConstant = self.rejectViewBottomConstraintOriginalConstant else { return }
+      
+      rejectViewBottomConstraint.constant = rejectViewBottomConstraintOriginalConstant
+      UIView.animate(withDuration: 0.3, delay: 1.0, options: .curveEaseInOut, animations: {
+        self.view.layoutIfNeeded()
+      }, completion: { (complete) in
+        self.isRejectAnimating = false
+        rejectTapView.isHidden = true
+      })
     }
   }
 }
 
-extension ANIRecruitViewController: ANIRecruitContributionViewControllerDelegate {
-  func contributionButtonTapped(recruitInfo: RecruitInfo) {
-    guard let me = self.me else { return }
+//MARK: ANIRecruitFiltersViewDelegate
+extension ANIRecruitViewController: ANIRecruitFiltersViewDelegate {
+  func didSelectedItem(index: Int) {
+    let popupPickerViewController = ANIPopupPickerViewController()
+
+    switch index {
+    case FilterPickMode.home.rawValue:
+      var home = pickUpItem.home
+      home.insert("選択しない", at: 0)
+      pickMode = .home
+      
+      popupPickerViewController.pickerItem = home
+    case FilterPickMode.kind.rawValue:
+      var kind = pickUpItem.kind
+      kind.insert("選択しない", at: 0)
+      pickMode = .kind
+      
+      popupPickerViewController.pickerItem = kind
+    case FilterPickMode.age.rawValue:
+      var age = pickUpItem.age
+      age.insert("選択しない", at: 0)
+      pickMode = .age
+      
+      popupPickerViewController.pickerItem = age
+    case FilterPickMode.sex.rawValue:
+      var sex = pickUpItem.sex
+      sex.insert("選択しない", at: 0)
+      pickMode = .sex
+      
+      popupPickerViewController.pickerItem = sex
+    default:
+      DLog("filter default")
+    }
     
-    let recruit = Recruit(recruitInfo: recruitInfo, user: me, supportCount: 10, loveCount: 10)
-    self.recruits.insert(recruit, at: 0)
+    popupPickerViewController.modalPresentationStyle = .overCurrentContext
+    self.tabBarController?.present(popupPickerViewController, animated: false, completion: nil)
+  }
+}
+
+//MARK: UIGestureRecognizerDelegate
+extension ANIRecruitViewController: UIGestureRecognizerDelegate {
+  func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+    return true
   }
 }

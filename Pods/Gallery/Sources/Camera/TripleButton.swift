@@ -2,17 +2,17 @@ import UIKit
 
 class TripleButton: UIButton {
   
-  struct State {
+  struct Status {
     let title: String
     let image: UIImage
   }
   
-  let states: [State]
+  let states: [Status]
   var selectedIndex: Int = 0
   
   // MARK: - Initialization
   
-  init(states: [State]) {
+  init(states: [Status]) {
     self.states = states
     super.init(frame: .zero)
     setup()
@@ -46,7 +46,7 @@ class TripleButton: UIButton {
     
     let state = states[index]
     
-    setTitle(state.title, for: UIControlState())
-    setImage(state.image, for: UIControlState())
+    setTitle(state.title, for: UIControl.State())
+    setImage(state.image, for: UIControl.State())
   }
 }

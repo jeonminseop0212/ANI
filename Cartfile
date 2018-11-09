@@ -1,3 +1,6 @@
 github "roberthein/TinyConstraints"
 github "imwcl/WCLShineButton"
 github "KennethTsang/GrowingTextView" ~> 0.5
+github "ninjaprox/NVActivityIndicatorView"
+github "alickbass/CodableFirebase"
+github "algolia/algoliasearch-client-swift"

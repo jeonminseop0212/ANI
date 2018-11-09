@@ -22,7 +22,7 @@ class ANIImageBrowserViewController: UIViewController {
   
   private weak var containerCollectionView: UICollectionView?
   
-  var images = [UIImage?]()
+  var imageUrls = [String]()
   var selectedIndex = Int()
   
   var delegate: ANIImageBrowserViewControllerDelegate?
@@ -33,6 +33,10 @@ class ANIImageBrowserViewController: UIViewController {
   
   override func viewDidAppear(_ animated: Bool) {
     openAnimation()
+  }
+  
+  override func viewWillDisappear(_ animated: Bool) {
+    UIApplication.shared.statusBar?.alpha = 1.0
   }
   
   private func setup() {
@@ -96,7 +100,7 @@ class ANIImageBrowserViewController: UIViewController {
     
     //navigationTitleLabel
     let navigationTitleLabel = UILabel()
-    navigationTitleLabel.text = "\(selectedIndex + 1)/\(images.count)"
+    navigationTitleLabel.text = "\(selectedIndex + 1)/\(imageUrls.count)"
     navigationTitleLabel.textColor = .white
     navigationTitleLabel.font = UIFont.boldSystemFont(ofSize: 17)
     myNavigationBase.addSubview(navigationTitleLabel)
@@ -148,13 +152,14 @@ class ANIImageBrowserViewController: UIViewController {
 //MARK: UICollectionViewDataSource
 extension ANIImageBrowserViewController: UICollectionViewDataSource {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-    return images.count
+    return imageUrls.count
   }
   
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     let id = NSStringFromClass(ANIImageBrowserCell.self)
     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! ANIImageBrowserCell
-    cell.draggableView?.imageView?.image = images[indexPath.item]
+    cell.draggableView?.imageView?.sd_setImage(with: URL(string: imageUrls[indexPath.item]), completed: nil)
+//    cell.draggableView?.imageView?.image = images[indexPath.item]
     cell.delegate = self
     return cell
   }
@@ -174,7 +179,7 @@ extension ANIImageBrowserViewController: UICollectionViewDelegate {
     guard let navigationTitleLabel = self.navigationTitleLabel else { return }
     
     let indexPath = IndexPath(item: Int(targetContentOffset.pointee.x / view.frame.width), section: 0)
-    navigationTitleLabel.text = "\(indexPath.item + 1)/\(images.count)"
+    navigationTitleLabel.text = "\(indexPath.item + 1)/\(imageUrls.count)"
   }
 }
 

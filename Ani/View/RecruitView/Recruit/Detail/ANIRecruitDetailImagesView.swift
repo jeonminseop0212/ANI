@@ -9,15 +9,21 @@
 import UIKit
 import Photos
 
+protocol ANIRecruitDetailImagesViewDelegate {
+  func imageCellTapped(index: Int, introduceImageUrls: [String])
+}
+
 class ANIRecruitDetailImagesView: UIView {
   
   private weak var imagesViewCollectionView: UICollectionView?
   
-  var introduceImages = [UIImage?]() {
+  var introduceImageUrls = [String]() {
     didSet {
       reloadLayout()
     }
   }
+  
+  var delegate: ANIRecruitDetailImagesViewDelegate?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -54,14 +60,14 @@ class ANIRecruitDetailImagesView: UIView {
 //MARK: UICollectionViewDataSource
 extension ANIRecruitDetailImagesView: UICollectionViewDataSource {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-    return introduceImages.count
+    return introduceImageUrls.count
   }
   
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     let id = NSStringFromClass(ANIRecruitDetailImagesViewCell.self)
     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! ANIRecruitDetailImagesViewCell
     
-    cell.imageView?.image = introduceImages[indexPath.item]
+    cell.imageView?.sd_setImage(with: URL(string: introduceImageUrls[indexPath.item]), completed: nil)
     
     return cell
   }
@@ -77,6 +83,6 @@ extension ANIRecruitDetailImagesView: UICollectionViewDelegateFlowLayout {
 //MARK: UICollectionViewDelegate
 extension ANIRecruitDetailImagesView: UICollectionViewDelegate {
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-    ANINotificationManager.postImageCellTapped(tapCellItem: (indexPath.item, introduceImages))
+    self.delegate?.imageCellTapped(index: indexPath.item, introduceImageUrls: introduceImageUrls)
   }
 }

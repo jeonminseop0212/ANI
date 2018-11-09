@@ -11,13 +11,14 @@ import UIKit
 protocol ANIInitialViewDelegate {
   func loginButtonTapped()
   func signUpButtonTapped()
+  func startAnonymous()
+  func showPrivacyPolicy()
 }
 
 class ANIInitialView: UIView {
   
-  private weak var headerImageView: UIImageView?
-  
-  private weak var base: UIView?
+  private weak var initialImageView: UIImageView?
+
   private weak var titleLabel: UILabel?
   private weak var subTitleLabel: UILabel?
   
@@ -28,7 +29,11 @@ class ANIInitialView: UIView {
   private weak var signUpButton: ANIAreaButtonView?
   private weak var signUpButtonLabel: UILabel?
   
-  private weak var fotterImageView: UIImageView?
+  private weak var bottomStackView: UIStackView?
+  private weak var anonymousLabel: UILabel?
+  private let dotViewHeight: CGFloat = 2.0
+  private weak var dotView: UIView?
+  private weak var privacyPolicyLabel: UILabel?
   
   var delegate: ANIInitialViewDelegate?
   
@@ -43,54 +48,73 @@ class ANIInitialView: UIView {
   }
   
   private func setup() {
-    //base
-    let base = UIView()
-    base.backgroundColor = .white
-    addSubview(base)
-    base.leftToSuperview()
-    base.rightToSuperview()
-    base.height(300.0)
-    base.centerInSuperview()
-    self.base = base
+    //initialImageView
+    let initialImageView = UIImageView()
+    initialImageView.contentMode = .scaleAspectFill
+    initialImageView.image = UIImage(named: "initial")
+    addSubview(initialImageView)
+    initialImageView.edgesToSuperview()
+    self.initialImageView = initialImageView
     
-    //subTitleLabel
-    let subTitleLabel = UILabel()
-    subTitleLabel.textColor = ANIColor.subTitle
-    subTitleLabel.font = UIFont.systemFont(ofSize: 20.0)
-    subTitleLabel.numberOfLines = 2
-    subTitleLabel.textAlignment = .center
-    subTitleLabel.text = "猫たちがもっと幸せに暮らせる\n環境になるように..."
-    base.addSubview(subTitleLabel)
-    subTitleLabel.centerInSuperview()
-    self.subTitleLabel = subTitleLabel
+    //bottomStackView
+    let bottomStackView = UIStackView()
+    bottomStackView.axis = .horizontal
+    bottomStackView.alignment = .center
+    bottomStackView.distribution = .equalSpacing
+    bottomStackView.spacing = 5.0
+    addSubview(bottomStackView)
+    bottomStackView.bottomToSuperview(offset: -24.0)
+    bottomStackView.centerXToSuperview()
+    self.bottomStackView = bottomStackView
     
-    //titleLabel
-    let titleLabel = UILabel()
-    titleLabel.textColor = ANIColor.dark
-    titleLabel.font = UIFont.boldSystemFont(ofSize: 60.0)
-    titleLabel.text = "ANI"
-    base.addSubview(titleLabel)
-    titleLabel.bottomToTop(of: subTitleLabel, offset: -15.0)
-    titleLabel.centerXToSuperview()
-    self.titleLabel = titleLabel
+    //anonymousLabel
+    let anonymousLabel = UILabel()
+    anonymousLabel.font = UIFont.systemFont(ofSize: 13.0)
+    anonymousLabel.textColor = ANIColor.darkGray
+    anonymousLabel.text = "ログインしないで始める"
+    anonymousLabel.isUserInteractionEnabled = true
+    let anonymousTapGesture = UITapGestureRecognizer(target: self, action: #selector(startAnonymous))
+    anonymousLabel.addGestureRecognizer(anonymousTapGesture)
+    bottomStackView.addArrangedSubview(anonymousLabel)
+    self.anonymousLabel = anonymousLabel
+    
+    //dotView
+    let dotView = UIView()
+    dotView.backgroundColor = ANIColor.darkGray
+    dotView.layer.cornerRadius = dotViewHeight / 2
+    dotView.layer.masksToBounds = true
+    bottomStackView.addArrangedSubview(dotView)
+    dotView.width(dotViewHeight)
+    dotView.height(dotViewHeight)
+    self.dotView = dotView
+    
+    //privacyPolicyLabel
+    let privacyPolicyLabel = UILabel()
+    privacyPolicyLabel.font = UIFont.systemFont(ofSize: 13.0)
+    privacyPolicyLabel.textColor = ANIColor.darkGray
+    privacyPolicyLabel.text = "プライバシーポリシー"
+    privacyPolicyLabel.isUserInteractionEnabled = true
+    let privacyPolicyTapGesture = UITapGestureRecognizer(target: self, action: #selector(showPrivacyPolicy))
+    privacyPolicyLabel.addGestureRecognizer(privacyPolicyTapGesture)
+    bottomStackView.addArrangedSubview(privacyPolicyLabel)
+    self.privacyPolicyLabel = privacyPolicyLabel
     
     //buttonStackView
     let buttonStackView = UIStackView()
-    buttonStackView.backgroundColor = .red
     buttonStackView.axis = .horizontal
     buttonStackView.alignment = .center
     buttonStackView.distribution = .fillEqually
-    buttonStackView.spacing = 18.0
-    base.addSubview(buttonStackView)
-    buttonStackView.topToBottom(of: subTitleLabel, offset: 15.0)
+    buttonStackView.spacing = 10.0
+    addSubview(buttonStackView)
+    buttonStackView.bottomToTop(of: anonymousLabel, offset: -12.0)
     buttonStackView.leftToSuperview(offset: 40.0)
-    buttonStackView.rightToSuperview(offset: 40.0)
+    buttonStackView.rightToSuperview(offset: -40.0)
     self.buttonStackView = buttonStackView
     
     //loginButton
     let loginButton = ANIAreaButtonView()
     loginButton.base?.layer.cornerRadius = LOGIN_BUTTON_HEIGHT / 2
-    loginButton.base?.backgroundColor = ANIColor.green
+    loginButton.base?.backgroundColor = ANIColor.emerald
     loginButton.delegate = self
     buttonStackView.addArrangedSubview(loginButton)
     loginButton.height(LOGIN_BUTTON_HEIGHT)
@@ -101,7 +125,7 @@ class ANIInitialView: UIView {
     loginButtonLabel.textColor = .white
     loginButtonLabel.textAlignment = .center
     loginButtonLabel.text = "ログイン"
-    loginButtonLabel.font = UIFont.boldSystemFont(ofSize: 20.0)
+    loginButtonLabel.font = UIFont.boldSystemFont(ofSize: 18.0)
     loginButton.addContent(loginButtonLabel)
     loginButtonLabel.edgesToSuperview()
     self.loginButtonLabel = loginButtonLabel
@@ -109,8 +133,8 @@ class ANIInitialView: UIView {
     //signUpButton
     let signUpButton = ANIAreaButtonView()
     signUpButton.base?.layer.cornerRadius = LOGIN_BUTTON_HEIGHT / 2
-    signUpButton.base?.backgroundColor = .white
-    signUpButton.base?.layer.borderColor = ANIColor.green.cgColor
+    signUpButton.base?.backgroundColor = .clear
+    signUpButton.base?.layer.borderColor = ANIColor.emerald.cgColor
     signUpButton.base?.layer.borderWidth = 2.0
     signUpButton.delegate = self
     buttonStackView.addArrangedSubview(signUpButton)
@@ -119,31 +143,43 @@ class ANIInitialView: UIView {
     
     //signUpButtonLabel
     let signUpButtonLabel = UILabel()
-    signUpButtonLabel.textColor = ANIColor.green
+    signUpButtonLabel.textColor = ANIColor.emerald
     signUpButtonLabel.textAlignment = .center
     signUpButtonLabel.text = "登録"
-    signUpButtonLabel.font = UIFont.boldSystemFont(ofSize: 20.0)
+    signUpButtonLabel.font = UIFont.boldSystemFont(ofSize: 18.0)
     signUpButton.addContent(signUpButtonLabel)
     signUpButtonLabel.edgesToSuperview()
     self.signUpButtonLabel = signUpButtonLabel
+
+    //subTitleLabel
+    let subTitleLabel = UILabel()
+    subTitleLabel.textColor = ANIColor.subTitle
+    subTitleLabel.font = UIFont.systemFont(ofSize: 18.0)
+    subTitleLabel.numberOfLines = 2
+    subTitleLabel.textAlignment = .center
+    subTitleLabel.text = "猫と猫好き、猫好きと猫好きが\nつながるコミュニティ"
+    addSubview(subTitleLabel)
+    subTitleLabel.centerXToSuperview()
+    subTitleLabel.bottomToTop(of: buttonStackView, offset: -24.0)
+    self.subTitleLabel = subTitleLabel
     
-    //headerImageView
-    let headerImageView = UIImageView()
-    headerImageView.image = UIImage(named: "headerImage")
-    headerImageView.alpha = 0.25
-    addSubview(headerImageView)
-    headerImageView.edgesToSuperview(excluding: .bottom)
-    headerImageView.bottomToTop(of: base)
-    self.headerImageView = headerImageView
-    
-    //fotterImageView
-    let fotterImageView = UIImageView()
-    fotterImageView.image = UIImage(named: "footerImage")
-    fotterImageView.alpha = 0.25
-    addSubview(fotterImageView)
-    fotterImageView.edgesToSuperview(excluding: .top)
-    fotterImageView.topToBottom(of: base)
-    self.fotterImageView = fotterImageView
+    //titleLabel
+    let titleLabel = UILabel()
+    titleLabel.textColor = ANIColor.dark
+    titleLabel.font = UIFont.boldSystemFont(ofSize: 55.0)
+    titleLabel.text = "MYAU"
+    addSubview(titleLabel)
+    titleLabel.bottomToTop(of: subTitleLabel, offset: -20.0)
+    titleLabel.centerXToSuperview()
+    self.titleLabel = titleLabel
+  }
+  
+  @objc private func startAnonymous() {
+    self.delegate?.startAnonymous()
+  }
+  
+  @objc private func showPrivacyPolicy() {
+    self.delegate?.showPrivacyPolicy()
   }
 }
 

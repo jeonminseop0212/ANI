@@ -8,7 +8,7 @@
 
 import UIKit
 
-protocol ANIProfileMenuBarDelegate:NSObjectProtocol {
+protocol ANIProfileMenuBarDelegate {
   func didSelecteMenuItem(selectedIndex: Int)
 }
 
@@ -17,7 +17,7 @@ class ANIProfileMenuBar: UIView {
   var delegate: ANIProfileMenuBarDelegate?
 
   weak var menuCollectionView: UICollectionView?
-  private let menus = ["profile", "recruit", "story", "qna"]
+  private let menus = ["プロフィール", "募集", "ストーリー", "Q&A"]
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -45,7 +45,8 @@ class ANIProfileMenuBar: UIView {
   }
 }
 
-extension ANIProfileMenuBar: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+//MAKR: UICollectionViewDataSource
+extension ANIProfileMenuBar: UICollectionViewDataSource {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
     return 4
   }
@@ -57,15 +58,21 @@ extension ANIProfileMenuBar: UICollectionViewDataSource, UICollectionViewDelegat
     return cell
   }
   
+  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+    return 0
+  }
+}
+
+//MARK: UICollectionViewDelegateFlowLayout
+extension ANIProfileMenuBar: UICollectionViewDelegateFlowLayout {
   func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
     let size = CGSize(width: collectionView.frame.width / 4, height: collectionView.frame.height)
     return size
   }
-  
-  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-    return 0
-  }
-  
+}
+
+//MARK: UICollectionViewDelegate
+extension ANIProfileMenuBar: UICollectionViewDelegate {
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
     self.delegate?.didSelecteMenuItem(selectedIndex: indexPath.item)
   }

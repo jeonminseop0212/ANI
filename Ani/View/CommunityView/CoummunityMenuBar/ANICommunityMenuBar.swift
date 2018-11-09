@@ -14,8 +14,8 @@ protocol ANICommunityMenuBarDelegate {
 }
 
 class ANICommunityMenuBar: UIView {
-  var menuCollectionView: UICollectionView?
-  private let menus = ["STORY", "Q&A"]
+  weak var menuCollectionView: UICollectionView?
+  private let menus = ["ストーリー", "Q&A"]
   var horizontalBarleftConstraint:Constraint?
   
   var delegate: ANICommunityMenuBarDelegate?
@@ -23,7 +23,6 @@ class ANICommunityMenuBar: UIView {
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()
-    setupHorizontalBar()
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -31,6 +30,7 @@ class ANICommunityMenuBar: UIView {
   }
   
   private func setup() {
+    //menuCollectionView
     self.backgroundColor = .white    
     let flowlayout = UICollectionViewFlowLayout()
     let collectionView = UICollectionView(frame: self.frame, collectionViewLayout: flowlayout)
@@ -47,20 +47,20 @@ class ANICommunityMenuBar: UIView {
     collectionView.rightToSuperview()
     collectionView.height(UIViewController.NAVIGATION_BAR_HEIGHT)
     self.menuCollectionView = collectionView
-  }
-  
-  private func setupHorizontalBar() {
+    
+    //horizontalBar
     let horizontalBar = UIView()
-    horizontalBar.backgroundColor = ANIColor.green
+    horizontalBar.backgroundColor = ANIColor.emerald
     addSubview(horizontalBar)
     horizontalBarleftConstraint = horizontalBar.leftToSuperview()
     horizontalBar.widthToSuperview(multiplier: 1/2)
-    horizontalBar.height(3.0)
+    horizontalBar.height(2.0)
     horizontalBar.bottomToSuperview()
   }
 }
 
-extension ANICommunityMenuBar: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+//MARK: UICollectionViewDataSource
+extension ANICommunityMenuBar: UICollectionViewDataSource {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
     return 2
   }
@@ -72,15 +72,21 @@ extension ANICommunityMenuBar: UICollectionViewDataSource, UICollectionViewDeleg
     return cell
   }
   
+  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+    return 0
+  }
+}
+
+//MAKR: UICollectionViewDelegateFlowLayout
+extension ANICommunityMenuBar: UICollectionViewDelegateFlowLayout {
   func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
     let size = CGSize(width: collectionView.frame.width / 2, height: collectionView.frame.height)
     return size
   }
-  
-  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-    return 0
-  }
-  
+}
+
+//MARK: UICollectionViewDelegate
+extension ANICommunityMenuBar: UICollectionViewDelegate {
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
     self.delegate?.didSelectCell(index: indexPath)
   }

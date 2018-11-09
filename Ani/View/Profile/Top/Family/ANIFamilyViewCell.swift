@@ -10,10 +10,11 @@ import UIKit
 
 class ANIFamilyViewCell: UICollectionViewCell {
   
-  private let FAMILY_IMAGE_VIEW_BG_HEIGHT: CGFloat = 80.0
-  private weak var familyImageViewBG: UIView?
-  
-  weak var familyImageView: UIImageView?
+  private let FAMILY_BIG_IMAGE_VIEW_HEIGHT: CGFloat = 80.0
+  weak var familyBigImageView: UIImageView?
+  private let FAMILY_SMALL_IMAGE_VIEW_HEIGHT: CGFloat = 69.0
+  weak var familySmallImageViewBG: UIImageView?
+  weak var familySmallImageView: UIImageView?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -25,18 +26,35 @@ class ANIFamilyViewCell: UICollectionViewCell {
   }
   
   private func setup() {
-    let imageViewBG = UIView()
-    addSubview(imageViewBG)
-    imageViewBG.width(FAMILY_IMAGE_VIEW_BG_HEIGHT)
-    imageViewBG.height(FAMILY_IMAGE_VIEW_BG_HEIGHT)
-    imageViewBG.centerInSuperview()
-    self.familyImageViewBG = imageViewBG
+    //familyBigImageView
+    let familyBigImageView = UIImageView()
+    familyBigImageView.contentMode = .scaleAspectFill
+    familyBigImageView.backgroundColor = ANIColor.gray
+    familyBigImageView.layer.cornerRadius = FAMILY_BIG_IMAGE_VIEW_HEIGHT / 2
+    familyBigImageView.layer.masksToBounds = true
+    addSubview(familyBigImageView)
+    familyBigImageView.width(FAMILY_BIG_IMAGE_VIEW_HEIGHT)
+    familyBigImageView.height(FAMILY_BIG_IMAGE_VIEW_HEIGHT)
+    familyBigImageView.centerInSuperview()
+    self.familyBigImageView = familyBigImageView
     
-    let imageView = UIImageView()
-    imageViewBG.addSubview(imageView)
-    imageView.layer.cornerRadius = FAMILY_IMAGE_VIEW_BG_HEIGHT / 2
-    imageView.layer.masksToBounds = true
-    imageView.edgesToSuperview()
-    self.familyImageView = imageView
+    //familySmallImageViewBG
+    let familySmallImageViewBG = UIImageView()
+    familySmallImageViewBG.image = UIImage(named: "familyBG")
+    addSubview(familySmallImageViewBG)
+    familySmallImageViewBG.edges(to: familyBigImageView)
+    self.familySmallImageViewBG = familySmallImageViewBG
+    
+    //familySmallImageView
+    let familySmallImageView = UIImageView()
+    familySmallImageView.contentMode = .scaleAspectFill
+    familySmallImageView.backgroundColor = ANIColor.gray
+    familySmallImageView.layer.cornerRadius = FAMILY_SMALL_IMAGE_VIEW_HEIGHT / 2
+    familySmallImageView.layer.masksToBounds = true
+    familySmallImageViewBG.addSubview(familySmallImageView)
+    familySmallImageView.width(FAMILY_SMALL_IMAGE_VIEW_HEIGHT)
+    familySmallImageView.height(FAMILY_SMALL_IMAGE_VIEW_HEIGHT)
+    familySmallImageView.centerInSuperview()
+    self.familySmallImageView = familySmallImageView
   }
 }

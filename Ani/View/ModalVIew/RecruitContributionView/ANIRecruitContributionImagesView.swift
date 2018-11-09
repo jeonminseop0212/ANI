@@ -57,6 +57,7 @@ class ANIRecruitContributionImagesView: UIView {
   }
 }
 
+//MARK: UICollectionViewDataSource
 extension ANIRecruitContributionImagesView: UICollectionViewDataSource {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
     return introduceImages.count + 1
@@ -106,6 +107,7 @@ extension ANIRecruitContributionImagesView: UICollectionViewDelegateFlowLayout {
   }
 }
 
+//MARK: ANIRecruitContributionImagesCellDelegate
 extension ANIRecruitContributionImagesView: ANIRecruitContributionImagesCellDelegate {
   func deleteButtonTapped(index: Int) {
     self.delegate?.imageDelete(index: index)

@@ -54,13 +54,13 @@ class ImagesController: UIViewController {
     
     view.addSubview(gridView)
     
-    addChildViewController(dropdownController)
+    addChild(dropdownController)
     gridView.insertSubview(dropdownController.view, belowSubview: gridView.topView)
-    dropdownController.didMove(toParentViewController: self)
+    dropdownController.didMove(toParent: self)
     
     gridView.bottomView.addSubview(stackView)
-    
     gridView.g_pinEdges()
+    gridView.dropDownController = dropdownController
     
     dropdownController.view.g_pin(on: .left)
     dropdownController.view.g_pin(on: .right)

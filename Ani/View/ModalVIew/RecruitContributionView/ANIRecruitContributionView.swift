@@ -8,6 +8,7 @@
 
 import UIKit
 import TinyConstraints
+import NVActivityIndicatorView
 
 protocol ANIRecruitContributionViewDelegate {
   func recruitContributeViewDidScroll(offset: CGFloat)
@@ -19,6 +20,7 @@ protocol ANIRecruitContributionViewDelegate {
   func vaccineSelectButtonTapped()
   func castrationSelectButtonTapped()
   func imagesPickCellTapped()
+  func doneEditLayout()
 }
 
 class ANIRecruitContributionView: UIView {
@@ -65,6 +67,8 @@ class ANIRecruitContributionView: UIView {
   private weak var passingBG: UIView?
   private weak var passingTextView: ANIPlaceHolderTextView?
   
+  private weak var activityIndicatorView: NVActivityIndicatorView?
+  
   private let KEYBOARD_HIDE_TOOL_BAR_HEIGHT: CGFloat = 40.0
   
   var headerMinHeight: CGFloat?
@@ -84,12 +88,64 @@ class ANIRecruitContributionView: UIView {
   var pickMode: BasicInfoPickMode?
   private var selectedTextViewMaxY: CGFloat?
   
+  var recruit: FirebaseRecruit? {
+    didSet {
+      guard let recruit = self.recruit,
+            let headerImageUrl = recruit.headerImageUrl,
+            let introduceImageUrls = recruit.introduceImageUrls,
+            let scrollView = self.scrollView,
+            let headerImageView = self.headerImageView,
+            let headerImagePickupButton = self.headerImagePickupButton,
+            let activityIndicatorView = self.activityIndicatorView else { return }
+
+      activityIndicatorView.startAnimating()
+      
+      scrollView.alpha = 0.0
+      headerImageView.alpha = 0.0
+      headerImagePickupButton.alpha = 0.0
+      
+      let setUIImageGroup = DispatchGroup()
+      let queue1 = DispatchQueue(label: "header")
+      let queue2 = DispatchQueue(label: "introduce")
+      
+      queue1.async(group: setUIImageGroup) {
+        setUIImageGroup.enter()
+        self.setUIImageHeaderUrl(url: headerImageUrl) {
+          setUIImageGroup.leave()
+        }
+      }
+      queue2.async(group: setUIImageGroup) {
+        setUIImageGroup.enter()
+        self.setUIImagesFromUrls(urls: introduceImageUrls) {
+          setUIImageGroup.leave()
+        }
+      }
+      
+      setUIImageGroup.notify(queue: DispatchQueue.main) {
+        self.setNeedsUpdateConstraints()
+        activityIndicatorView.stopAnimating()
+        self.delegate?.doneEditLayout()
+        
+        UIView.animate(withDuration: 0.2, animations: {
+          scrollView.alpha = 1.0
+          headerImageView.alpha = 1.0
+          headerImagePickupButton.alpha = 1.0
+        })
+      }
+    }
+  }
+  
   var delegate: ANIRecruitContributionViewDelegate?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()
     setNotification()
+  }
+  
+  override func updateConstraints() {
+    reloadLayout()
+    super.updateConstraints()
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -101,6 +157,7 @@ class ANIRecruitContributionView: UIView {
     
     //headerImageView
     let headerImageView = UIImageView()
+    headerImageView.backgroundColor = ANIColor.bg
     addSubview(headerImageView)
     let headerImageViewHeight: CGFloat = UIScreen.main.bounds.width * UIViewController.HEADER_IMAGE_VIEW_RATIO
     headerImageViewTopConstraint = headerImageView.topToSuperview()
@@ -109,6 +166,13 @@ class ANIRecruitContributionView: UIView {
     headerImageView.height(headerImageViewHeight)
     self.headerImageView = headerImageView
     headerImage = UIImage(named: "headerDefault")
+    
+    //gradiationLayer
+    let gradiationLayer = CAGradientLayer()
+    let margin: CGFloat = 20.0
+    gradiationLayer.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIViewController.STATUS_BAR_HEIGHT + UIViewController.NAVIGATION_BAR_HEIGHT + margin)
+    gradiationLayer.colors = [ANIColor.dark.withAlphaComponent(0.15).cgColor, ANIColor.dark.withAlphaComponent(0).cgColor]
+    headerImageView.layer.addSublayer(gradiationLayer)
     
     //scrollView
     let scrollView = ANIScrollView()
@@ -144,7 +208,7 @@ class ANIRecruitContributionView: UIView {
     contentView.addSubview(titleBG)
     titleBG.topToSuperview(offset: 10.0)
     titleBG.leftToSuperview(offset: 5.0)
-    titleBG.rightToSuperview(offset: 5.0)
+    titleBG.rightToSuperview(offset: -5.0)
     self.titleBG = titleBG
     
     //titleTextView
@@ -168,7 +232,7 @@ class ANIRecruitContributionView: UIView {
     contentView.addSubview(basicInfoTitleLabel)
     basicInfoTitleLabel.topToBottom(of: titleBG, offset: CONTENT_SPACE)
     basicInfoTitleLabel.leftToSuperview(offset: 10.0)
-    basicInfoTitleLabel.rightToSuperview(offset: 10.0)
+    basicInfoTitleLabel.rightToSuperview(offset: -10.0)
     self.basicInfoTitleLabel = basicInfoTitleLabel
     
     //basicInfoBG
@@ -179,11 +243,12 @@ class ANIRecruitContributionView: UIView {
     contentView.addSubview(basicInfoBG)
     basicInfoBG.topToBottom(of: basicInfoTitleLabel, offset: 10.0)
     basicInfoBG.leftToSuperview(offset: 10.0)
-    basicInfoBG.rightToSuperview(offset: 10.0)
+    basicInfoBG.rightToSuperview(offset: -10.0)
     self.basicInfoBG = basicInfoBG
     
     //basicInfoLine
     let basicInfoLine = UIImageView()
+    basicInfoLine.backgroundColor = ANIColor.bg
     basicInfoLine.image = UIImage(named: "basicInfoLine")
     basicInfoBG.addSubview(basicInfoLine)
     basicInfoLine.topToSuperview(offset: 10.0)
@@ -197,8 +262,8 @@ class ANIRecruitContributionView: UIView {
     basicInfoKindSelectButton.delegate = self
     basicInfoKindSelectButton.image = UIImage(named: "basicInfoSelectButton")
     basicInfoBG.addSubview(basicInfoKindSelectButton)
-    basicInfoKindSelectButton.width(12.0)
-    basicInfoKindSelectButton.height(12.0)
+    basicInfoKindSelectButton.width(10.0)
+    basicInfoKindSelectButton.height(10.0)
     basicInfoKindSelectButton.rightToLeft(of: basicInfoLine, offset: -10.0)
     self.basicInfoKindSelectButton = basicInfoKindSelectButton
     
@@ -224,9 +289,9 @@ class ANIRecruitContributionView: UIView {
     basicInfoAgeSelectButton.delegate = self
     basicInfoAgeSelectButton.image = UIImage(named: "basicInfoSelectButton")
     basicInfoBG.addSubview(basicInfoAgeSelectButton)
-    basicInfoAgeSelectButton.width(12.0)
-    basicInfoAgeSelectButton.height(12.0)
-    basicInfoAgeSelectButton.rightToSuperview(offset: 10.0)
+    basicInfoAgeSelectButton.width(10.0)
+    basicInfoAgeSelectButton.height(10.0)
+    basicInfoAgeSelectButton.rightToSuperview(offset: -10.0)
     self.basicInfoAgeSelectButton = basicInfoAgeSelectButton
     
     //basicInfoAgeLabel
@@ -251,8 +316,8 @@ class ANIRecruitContributionView: UIView {
     basicInfoSexSelectButton.delegate = self
     basicInfoSexSelectButton.image = UIImage(named: "basicInfoSelectButton")
     basicInfoBG.addSubview(basicInfoSexSelectButton)
-    basicInfoSexSelectButton.width(12.0)
-    basicInfoSexSelectButton.height(12.0)
+    basicInfoSexSelectButton.width(10.0)
+    basicInfoSexSelectButton.height(10.0)
     basicInfoSexSelectButton.rightToLeft(of: basicInfoLine, offset: -10.0)
     self.basicInfoSexSelectButton = basicInfoSexSelectButton
     
@@ -278,9 +343,9 @@ class ANIRecruitContributionView: UIView {
     basicInfoHomeSelectButton.delegate = self
     basicInfoHomeSelectButton.image = UIImage(named: "basicInfoSelectButton")
     basicInfoBG.addSubview(basicInfoHomeSelectButton)
-    basicInfoHomeSelectButton.width(12.0)
-    basicInfoHomeSelectButton.height(12.0)
-    basicInfoHomeSelectButton.rightToSuperview(offset: 10.0)
+    basicInfoHomeSelectButton.width(10.0)
+    basicInfoHomeSelectButton.height(10.0)
+    basicInfoHomeSelectButton.rightToSuperview(offset: -10.0)
     self.basicInfoHomeSelectButton = basicInfoHomeSelectButton
     
     //basicInfoHomeLabel
@@ -305,8 +370,8 @@ class ANIRecruitContributionView: UIView {
     basicInfoVaccineSelectButton.delegate = self
     basicInfoVaccineSelectButton.image = UIImage(named: "basicInfoSelectButton")
     basicInfoBG.addSubview(basicInfoVaccineSelectButton)
-    basicInfoVaccineSelectButton.width(12.0)
-    basicInfoVaccineSelectButton.height(12.0)
+    basicInfoVaccineSelectButton.width(10.0)
+    basicInfoVaccineSelectButton.height(10.0)
     basicInfoVaccineSelectButton.rightToLeft(of: basicInfoLine, offset: -10.0)
     self.basicInfoVaccineSelectButton = basicInfoVaccineSelectButton
     
@@ -333,9 +398,9 @@ class ANIRecruitContributionView: UIView {
     basicInfoCastrationSelectButton.delegate = self
     basicInfoCastrationSelectButton.image = UIImage(named: "basicInfoSelectButton")
     basicInfoBG.addSubview(basicInfoCastrationSelectButton)
-    basicInfoCastrationSelectButton.width(12.0)
-    basicInfoCastrationSelectButton.height(12.0)
-    basicInfoCastrationSelectButton.rightToSuperview(offset: 10.0)
+    basicInfoCastrationSelectButton.width(10.0)
+    basicInfoCastrationSelectButton.height(10.0)
+    basicInfoCastrationSelectButton.rightToSuperview(offset: -10.0)
     self.basicInfoCastrationSelectButton = basicInfoCastrationSelectButton
     
     //basicInfoCastrationLabel
@@ -363,7 +428,7 @@ class ANIRecruitContributionView: UIView {
     contentView.addSubview(reasonTitleLabel)
     reasonTitleLabel.topToBottom(of: basicInfoBG, offset: CONTENT_SPACE)
     reasonTitleLabel.leftToSuperview(offset: 10.0)
-    reasonTitleLabel.rightToSuperview(offset: 10.0)
+    reasonTitleLabel.rightToSuperview(offset: -10.0)
     self.reasonTitleLabel = reasonTitleLabel
     
     //reasonBG
@@ -374,7 +439,7 @@ class ANIRecruitContributionView: UIView {
     contentView.addSubview(reasonBG)
     reasonBG.topToBottom(of: reasonTitleLabel, offset: 10.0)
     reasonBG.leftToSuperview(offset: 10.0)
-    reasonBG.rightToSuperview(offset: 10.0)
+    reasonBG.rightToSuperview(offset: -10.0)
     self.reasonBG = reasonBG
     
     //reasonTextView
@@ -386,7 +451,7 @@ class ANIRecruitContributionView: UIView {
     reasonTextView.placeHolder = "理由を入力いてください"
     reasonTextView.delegate = self
     reasonBG.addSubview(reasonTextView)
-    let insets = UIEdgeInsets(top: 5.0, left: 5.0, bottom: 5.0, right: -5.0)
+    let insets = UIEdgeInsets(top: 5.0, left: 5.0, bottom: 5.0, right: 5.0)
     reasonTextView.edgesToSuperview(insets: insets)
     self.reasonTextView = reasonTextView
     setHideButtonOnKeyboard(textView: reasonTextView)
@@ -399,7 +464,7 @@ class ANIRecruitContributionView: UIView {
     contentView.addSubview(introduceTitleLabel)
     introduceTitleLabel.topToBottom(of: reasonBG, offset: CONTENT_SPACE)
     introduceTitleLabel.leftToSuperview(offset: 10.0)
-    introduceTitleLabel.rightToSuperview(offset: 10.0)
+    introduceTitleLabel.rightToSuperview(offset: -10.0)
     self.introduceTitleLabel = introduceTitleLabel
     
     //introduceBG
@@ -410,7 +475,7 @@ class ANIRecruitContributionView: UIView {
     contentView.addSubview(introduceBG)
     introduceBG.topToBottom(of: introduceTitleLabel, offset: 10.0)
     introduceBG.leftToSuperview(offset: 10.0)
-    introduceBG.rightToSuperview(offset: 10.0)
+    introduceBG.rightToSuperview(offset: -10.0)
     self.introduceBG = introduceBG
     
     //introduceTextView
@@ -453,7 +518,7 @@ class ANIRecruitContributionView: UIView {
     passingSubTitleLabel.textColor = ANIColor.subTitle
     contentView.addSubview(passingSubTitleLabel)
     passingSubTitleLabel.leftToRight(of: passingTitleLabel, offset: 5.0)
-    passingSubTitleLabel.rightToSuperview(offset: 10.0)
+    passingSubTitleLabel.rightToSuperview(offset: -10.0)
     passingSubTitleLabel.bottom(to: passingTitleLabel, offset: -2.0)
     self.passingSubTitleLabel = passingSubTitleLabel
     
@@ -465,8 +530,8 @@ class ANIRecruitContributionView: UIView {
     contentView.addSubview(passingBG)
     passingBG.topToBottom(of: passingTitleLabel, offset: 10.0)
     passingBG.leftToSuperview(offset: 10.0)
-    passingBG.rightToSuperview(offset: 10.0)
-    passingBG.bottomToSuperview(offset: -10.0 - 10.0 - ANIRecruitContributionViewController.CONTRIBUTE_BUTTON_HEIGHT)
+    passingBG.rightToSuperview(offset: -10.0)
+    passingBG.bottomToSuperview(offset: -15.0 - 10.0 - ANIRecruitContributionViewController.CONTRIBUTE_BUTTON_HEIGHT)
     self.passingBG = passingBG
     
     //passingTextView
@@ -475,14 +540,79 @@ class ANIRecruitContributionView: UIView {
     passingTextView.textColor = ANIColor.dark
     passingTextView.backgroundColor = .clear
     passingTextView.isScrollEnabled = false
-    passingTextView.placeHolder = "引渡し方法を入力いてください"
+    passingTextView.placeHolder = "引渡し方法を入力してください"
     passingTextView.delegate = self
     passingBG.addSubview(passingTextView)
     passingTextView.edgesToSuperview(insets: insets)
     self.passingTextView = passingTextView
     setHideButtonOnKeyboard(textView: passingTextView)
+    
+    //activityIndicatorView
+    let activityIndicatorView = NVActivityIndicatorView(frame: .zero, type: .lineScale, color: ANIColor.emerald, padding: 0)
+    addSubview(activityIndicatorView)
+    activityIndicatorView.width(40.0)
+    activityIndicatorView.height(40.0)
+    activityIndicatorView.centerInSuperview()
+    self.activityIndicatorView = activityIndicatorView
   }
   
+  private func reloadLayout() {
+    guard let recruit = self.recruit,
+          let titleTextView = self.titleTextView,
+          let basicInfoKindLabel = self.basicInfoKindLabel,
+          let basicInfoAgeLabel = self.basicInfoAgeLabel,
+          let basicInfoSexLabel = self.basicInfoSexLabel,
+          let basicInfoHomeLabel = self.basicInfoHomeLabel,
+          let basicInfoVaccineLabel = self.basicInfoVaccineLabel,
+          let basicInfoCastrationLabel = self.basicInfoCastrationLabel,
+          let reasonTextView = self.reasonTextView,
+          let introduceTextView = self.introduceTextView,
+          let passingTextView = self.passingTextView else { return }
+    
+    titleTextView.text = recruit.title
+    basicInfoKindLabel.text = "種類：" + recruit.kind
+    basicInfoAgeLabel.text = "年齢：" + recruit.age
+    basicInfoSexLabel.text = "性別：" + recruit.sex
+    basicInfoHomeLabel.text = "お家：" + recruit.home
+    basicInfoVaccineLabel.text = "ワクチン：" + recruit.vaccine
+    basicInfoCastrationLabel.text = "去勢：" + recruit.vaccine
+    reasonTextView.text = recruit.reason
+    introduceTextView.text = recruit.introduce
+    passingTextView.text = recruit.passing
+  }
+  
+  private func setUIImageHeaderUrl(url: String, completion:(()->())? = nil) {
+    if let url = URL(string: url) {
+      let data = try? Data(contentsOf: url)
+      
+      if let imageData = data, let image = UIImage(data: imageData) {
+        DispatchQueue.main.async {
+          self.headerImage = image
+        }
+        completion?()
+      }
+    }
+  }
+  
+  private func setUIImagesFromUrls(urls: [String], completion:(()->())? = nil) {
+    var images = [UIImage?]()
+    for introduceImageUrl in urls {
+      if let url = URL(string: introduceImageUrl) {
+        let data = try? Data(contentsOf: url)
+        
+        if let imageData = data, let image = UIImage(data: imageData) {
+          images.append(image)
+          
+          if images.count == urls.count {
+            DispatchQueue.main.async {
+              self.introduceImages = images
+            }
+            completion?()
+          }
+        }
+      }
+    }
+  }
   
   private func setNotification() {
     ANINotificationManager.receive(pickerViewDidSelect: self, selector: #selector(updateBasicInfo))
@@ -491,6 +621,7 @@ class ANIRecruitContributionView: UIView {
   
   private func setHideButtonOnKeyboard(textView: UITextView){
     let tools = UIToolbar()
+    tools.tintColor = ANIColor.emerald
     tools.frame = CGRect(x: 0, y: 0, width: frame.width, height: KEYBOARD_HIDE_TOOL_BAR_HEIGHT)
     let spacer = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
     let closeButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(keyboardHideButtonTapped))
@@ -500,28 +631,28 @@ class ANIRecruitContributionView: UIView {
   
   func getRecruitInfo() -> RecruitInfo? {
     guard let headerImage = self.headerImage,
-    let titleTextView = self.titleTextView,
-    let basicInfoKindLabel = self.basicInfoKindLabel,
-    let kindText = basicInfoKindLabel.text,
-    let basicInfoAgeLabel = self.basicInfoAgeLabel,
-    let ageText = basicInfoAgeLabel.text,
-    let basicInfoSexLabel = self.basicInfoSexLabel,
-    let sexText = basicInfoSexLabel.text,
-    let basicInfoHomeLabel = self.basicInfoHomeLabel,
-    let homeText = basicInfoHomeLabel.text,
-    let basicInfoVaccineLabel = self.basicInfoVaccineLabel,
-    let vaccineText = basicInfoVaccineLabel.text,
-    let basicInfoCastrationLabel = self.basicInfoCastrationLabel,
-    let castrationText = basicInfoCastrationLabel.text,
-    let resonTextView = self.reasonTextView,
-    let introduceTextView = self.introduceTextView,
-    let passingTextView = self.passingTextView else { return nil }
+          let titleTextView = self.titleTextView,
+          let basicInfoKindLabel = self.basicInfoKindLabel,
+          let kindText = basicInfoKindLabel.text,
+          let basicInfoAgeLabel = self.basicInfoAgeLabel,
+          let ageText = basicInfoAgeLabel.text,
+          let basicInfoSexLabel = self.basicInfoSexLabel,
+          let sexText = basicInfoSexLabel.text,
+          let basicInfoHomeLabel = self.basicInfoHomeLabel,
+          let homeText = basicInfoHomeLabel.text,
+          let basicInfoVaccineLabel = self.basicInfoVaccineLabel,
+          let vaccineText = basicInfoVaccineLabel.text,
+          let basicInfoCastrationLabel = self.basicInfoCastrationLabel,
+          let castrationText = basicInfoCastrationLabel.text,
+          let resonTextView = self.reasonTextView,
+          let introduceTextView = self.introduceTextView,
+          let passingTextView = self.passingTextView else { return nil }
     
     let kind = kindText.substring(3...) == "選択" ? "" : kindText.substring(3...)
     let age = ageText.substring(3...) == "選択" ? "" : ageText.substring(3...)
     let sex = sexText.substring(3...) == "選択" ? "" : sexText.substring(3...)
     let home = homeText.substring(3...) == "選択" ? "" : homeText.substring(3...)
-    let vaccine = vaccineText.substring(5...) == "選択" ? "" : vaccineText.substring(3...)
+    let vaccine = vaccineText.substring(5...) == "選択" ? "" : vaccineText.substring(5...)
     let castration = castrationText.substring(3...) == "選択" ? "" : castrationText.substring(3...)
     
     let recruitInfo = RecruitInfo(headerImage: headerImage, title: titleTextView.text, kind: kind, age: age, sex: sex, home: home, vaccine: vaccine, castration: castration, reason: resonTextView.text, introduce: introduceTextView.text, introduceImages: introduceImages, passing: passingTextView.text, isRecruit: true)
@@ -562,20 +693,24 @@ class ANIRecruitContributionView: UIView {
           let basicInfoHomeLabel = self.basicInfoHomeLabel,
           let basicInfoVaccineLabel = self.basicInfoVaccineLabel,
           let basicInfoCastrationLabel = self.basicInfoCastrationLabel,
-          let pickItem = notification.object as? String else { return }
+          var pickItem = notification.object as? String else { return }
 
+    if pickItem == "" {
+      pickItem = "わからない"
+    }
+    
     switch pickMode {
-    case BasicInfoPickMode.kind:
+    case .kind:
       basicInfoKindLabel.text = "種類：\(pickItem)"
-    case BasicInfoPickMode.age:
+    case .age:
       basicInfoAgeLabel.text = "年齢：\(pickItem)"
-    case BasicInfoPickMode.sex:
+    case .sex:
       basicInfoSexLabel.text = "性別：\(pickItem)"
-    case BasicInfoPickMode.home:
+    case .home:
       basicInfoHomeLabel.text = "お家：\(pickItem)"
-    case BasicInfoPickMode.vaccine:
+    case .vaccine:
       basicInfoVaccineLabel.text = "ワクチン：\(pickItem)"
-    case BasicInfoPickMode.castration:
+    case .castration:
       basicInfoCastrationLabel.text = "去勢：\(pickItem)"
     }
   }
@@ -586,14 +721,14 @@ class ANIRecruitContributionView: UIView {
   }
   
   @objc func keyboardWillChangeFrame(_ notification: Notification) {
-    guard let keyboardFrame = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
-        let scrollView = self.scrollView,
-        let selectedTextViewMaxY = self.selectedTextViewMaxY else { return }
+    guard let keyboardFrame = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
+          let scrollView = self.scrollView,
+          let selectedTextViewMaxY = self.selectedTextViewMaxY else { return }
 
     let selectedTextViewVisiableMaxY = selectedTextViewMaxY - scrollView.contentOffset.y
     
     if selectedTextViewVisiableMaxY > keyboardFrame.origin.y {
-      let margin: CGFloat = 10.0
+      let margin: CGFloat = 15.0
       let blindHeight = selectedTextViewVisiableMaxY - keyboardFrame.origin.y + margin
       scrollView.contentOffset.y = scrollView.contentOffset.y + blindHeight
     }
@@ -604,8 +739,8 @@ class ANIRecruitContributionView: UIView {
 extension ANIRecruitContributionView: UIScrollViewDelegate {
   func scrollViewDidScroll(_ scrollView: UIScrollView) {
     guard let imageView = self.headerImageView,
-      let imageViewTopConstraint = self.headerImageViewTopConstraint,
-      let headerMinHeight = self.headerMinHeight else { return }
+          let imageViewTopConstraint = self.headerImageViewTopConstraint,
+          let headerMinHeight = self.headerMinHeight else { return }
     
     let headerImageViewHeight: CGFloat = UIScreen.main.bounds.width * UIViewController.HEADER_IMAGE_VIEW_RATIO
 

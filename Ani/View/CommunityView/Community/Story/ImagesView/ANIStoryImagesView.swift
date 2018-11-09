@@ -16,13 +16,13 @@ class ANIStoryImagesView: UIView {
   private var pageControlHeightConstraint: Constraint?
   weak var pageControl: UIPageControl?
   
-  var images = [UIImage?]() {
+  var imageUrls = [String]() {
     didSet {
       for subview in self.subviews{
         subview.removeFromSuperview()
       }
       setup()
-      setupPageControlHeight(images: images)
+      setupPageControlHeight(imageUrls: imageUrls)
     }
   }
   
@@ -38,28 +38,25 @@ class ANIStoryImagesView: UIView {
     //iamgesCollectionView
     let flowLayot = UICollectionViewFlowLayout()
     flowLayot.scrollDirection = .horizontal
-    flowLayot.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
     flowLayot.minimumLineSpacing = 0
     flowLayot.minimumInteritemSpacing = 0
-    let imagesCollectionView = UICollectionView(frame: self.frame, collectionViewLayout: flowLayot)
+    let imagesCollectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayot)
     imagesCollectionView.delegate = self
     imagesCollectionView.dataSource = self
     imagesCollectionView.isPagingEnabled = true
     imagesCollectionView.showsHorizontalScrollIndicator = false
-    imagesCollectionView.backgroundColor = .white
+    imagesCollectionView.backgroundColor = ANIColor.gray
     let id = NSStringFromClass(ANIStoryImagesCell.self)
     imagesCollectionView.register(ANIStoryImagesCell.self, forCellWithReuseIdentifier: id)
     addSubview(imagesCollectionView)
-    imagesCollectionView.topToSuperview()
-    imagesCollectionView.leftToSuperview()
-    imagesCollectionView.rightToSuperview()
     imagesCollectionView.height(UIScreen.main.bounds.width)
+    imagesCollectionView.edgesToSuperview(excluding: .bottom)
     self.imagesCollectionView = imagesCollectionView
     
     //pageControl
     let pageControl = UIPageControl()
     pageControl.pageIndicatorTintColor = ANIColor.gray
-    pageControl.currentPageIndicatorTintColor = ANIColor.green
+    pageControl.currentPageIndicatorTintColor = ANIColor.emerald
     pageControl.currentPage = 0
     pageControl.isUserInteractionEnabled = false
     addSubview(pageControl)
@@ -71,11 +68,11 @@ class ANIStoryImagesView: UIView {
     self.pageControl = pageControl
   }
   
-  private func setupPageControlHeight(images: [UIImage?]) {
+  private func setupPageControlHeight(imageUrls: [String]) {
     guard let pageControlHeightConstraint = self.pageControlHeightConstraint,
           let pageControl = self.pageControl else { return }
     
-    if images.count < 2 {
+    if imageUrls.count < 2 {
       pageControlHeightConstraint.constant = 0
       pageControl.alpha = 0.0
     } else {
@@ -87,13 +84,13 @@ class ANIStoryImagesView: UIView {
 
 extension ANIStoryImagesView: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-    return images.count
+    return imageUrls.count
   }
   
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     let id = NSStringFromClass(ANIStoryImagesCell.self)
     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! ANIStoryImagesCell
-    cell.imageView?.image = images[indexPath.item]
+    cell.imageView?.sd_setImage(with: URL(string: imageUrls[indexPath.item]), completed: nil)
     return cell
   }
   

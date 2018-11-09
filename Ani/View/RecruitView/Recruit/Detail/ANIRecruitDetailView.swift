@@ -11,6 +11,7 @@ import TinyConstraints
 
 protocol ANIRecruitDetailViewDelegate {
   func recruitDetailViewDidScroll(offset: CGFloat)
+  func imageCellTapped(index: Int, introduceImageUrls: [String])
 }
 
 class ANIRecruitDetailView: UIView {
@@ -51,25 +52,32 @@ class ANIRecruitDetailView: UIView {
   private let INTRODUCE_IMAGES_VIEW_RATIO: CGFloat = 0.5
   private weak var introduceImagesView: ANIRecruitDetailImagesView?
   
+  private var passingBGBottomConstratins: Constraint?
   private weak var passingTitleLabel: UILabel?
   private weak var passingBG: UIView?
   private weak var passingLabel: UILabel?
   
-  private var introduceImages = [UIImage?]() {
+  private var introduceImageUrls = [String]() {
     didSet {
       guard let introduceImagesView = self.introduceImagesView else { return }
-      introduceImagesView.introduceImages = introduceImages
+      introduceImagesView.introduceImageUrls = introduceImageUrls
     }
   }
   
   var delegate: ANIRecruitDetailViewDelegate?
   
-  var testRecruit: Recruit? {
+  var recruit: FirebaseRecruit? {
     didSet {
       reloadLayout()
     }
   }
   
+  var user: FirebaseUser? {
+    didSet {
+      reloadUserLayout()
+    }
+  }
+
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()
@@ -84,6 +92,7 @@ class ANIRecruitDetailView: UIView {
     
     //headerImageView
     let headerImageView = UIImageView()
+    headerImageView.backgroundColor = ANIColor.bg
     addSubview(headerImageView)
     headerImageViewTopConstraint = headerImageView.topToSuperview()
     let headerImageViewHeight: CGFloat = UIScreen.main.bounds.width * UIViewController.HEADER_IMAGE_VIEW_RATIO
@@ -91,6 +100,13 @@ class ANIRecruitDetailView: UIView {
     headerImageView.rightToSuperview()
     headerImageView.height(headerImageViewHeight)
     self.headerImageView = headerImageView
+    
+    //gradiationLayer
+    let gradiationLayer = CAGradientLayer()
+    let margin: CGFloat = 20.0
+    gradiationLayer.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIViewController.STATUS_BAR_HEIGHT + UIViewController.NAVIGATION_BAR_HEIGHT + margin)
+    gradiationLayer.colors = [ANIColor.dark.withAlphaComponent(0.15).cgColor, ANIColor.dark.withAlphaComponent(0).cgColor]
+    headerImageView.layer.addSublayer(gradiationLayer)
     
     //scrollView
     let scrollView = UIScrollView()
@@ -121,11 +137,18 @@ class ANIRecruitDetailView: UIView {
     contentView.addSubview(titleLabel)
     titleLabel.topToSuperview(offset: 10.0)
     titleLabel.leftToSuperview(offset: 10.0)
-    titleLabel.rightToSuperview(offset: 10.0)
+    titleLabel.rightToSuperview(offset: -10.0)
     self.titleLabel = titleLabel
     
     //profileImageView
     let profileImageView = UIImageView()
+    profileImageView.backgroundColor = ANIColor.bg
+    profileImageView.layer.cornerRadius = PROFILE_IMAGE_HEIGHT / 2
+    profileImageView.layer.masksToBounds = true
+    profileImageView.isUserInteractionEnabled = true
+    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped))
+    profileImageView.addGestureRecognizer(tapGesture)
+    addSubview(profileImageView)
     contentView.addSubview(profileImageView)
     profileImageView.width(PROFILE_IMAGE_HEIGHT)
     profileImageView.height(PROFILE_IMAGE_HEIGHT)
@@ -141,7 +164,7 @@ class ANIRecruitDetailView: UIView {
     contentView.addSubview(userNameLabel)
     userNameLabel.centerY(to: profileImageView)
     userNameLabel.leftToRight(of: profileImageView, offset: 10.0)
-    userNameLabel.rightToSuperview(offset: 10.0)
+    userNameLabel.rightToSuperview(offset: -10.0)
     self.userNameLabel = userNameLabel
     
     //basicInfoTitleLabel
@@ -152,7 +175,7 @@ class ANIRecruitDetailView: UIView {
     contentView.addSubview(basicInfoTitleLabel)
     basicInfoTitleLabel.topToBottom(of: profileImageView, offset: CONTENT_SPACE)
     basicInfoTitleLabel.leftToSuperview(offset: 10.0)
-    basicInfoTitleLabel.rightToSuperview(offset: 10.0)
+    basicInfoTitleLabel.rightToSuperview(offset: -10.0)
     self.basicInfoTitleLabel = basicInfoTitleLabel
     
     //basicInfoBG
@@ -163,7 +186,7 @@ class ANIRecruitDetailView: UIView {
     contentView.addSubview(basicInfoBG)
     basicInfoBG.topToBottom(of: basicInfoTitleLabel, offset: 10.0)
     basicInfoBG.leftToSuperview(offset: 10.0)
-    basicInfoBG.rightToSuperview(offset: 10.0)
+    basicInfoBG.rightToSuperview(offset: -10.0)
     self.basicInfoBG = basicInfoBG
     
     //basicInfoLine
@@ -184,7 +207,7 @@ class ANIRecruitDetailView: UIView {
     basicInfoBG.addSubview(basicInfoKindLabel)
     basicInfoKindLabel.topToSuperview(offset: 10.0)
     basicInfoKindLabel.leftToSuperview(offset: 10.0)
-    basicInfoKindLabel.rightToLeft(of: basicInfoLine, offset: 10.0)
+    basicInfoKindLabel.rightToLeft(of: basicInfoLine, offset: -10.0)
     self.basicInfoKindLabel = basicInfoKindLabel
     
     //basicInfoAgeLabel
@@ -195,7 +218,7 @@ class ANIRecruitDetailView: UIView {
     basicInfoBG.addSubview(basicInfoAgeLabel)
     basicInfoAgeLabel.topToSuperview(offset: 10.0)
     basicInfoAgeLabel.leftToRight(of: basicInfoLine, offset: 10.0)
-    basicInfoAgeLabel.rightToSuperview(offset: 10.0)
+    basicInfoAgeLabel.rightToSuperview(offset: -10.0)
     self.basicInfoAgeLabel = basicInfoAgeLabel
     
     //basicInfoSexLabel
@@ -206,7 +229,7 @@ class ANIRecruitDetailView: UIView {
     basicInfoBG.addSubview(basicInfoSexLabel)
     basicInfoSexLabel.topToBottom(of: basicInfoKindLabel, offset: 10.0)
     basicInfoSexLabel.leftToSuperview(offset: 10.0)
-    basicInfoSexLabel.rightToLeft(of: basicInfoLine, offset: 10.0)
+    basicInfoSexLabel.rightToLeft(of: basicInfoLine, offset: -10.0)
     self.basicInfoSexLabel = basicInfoSexLabel
 
     //basicInfoHomeLabel
@@ -217,7 +240,7 @@ class ANIRecruitDetailView: UIView {
     basicInfoBG.addSubview(basicInfoHomeLabel)
     basicInfoHomeLabel.topToBottom(of: basicInfoAgeLabel, offset: 10.0)
     basicInfoHomeLabel.leftToRight(of: basicInfoLine, offset: 10.0)
-    basicInfoHomeLabel.rightToSuperview(offset: 10.0)
+    basicInfoHomeLabel.rightToSuperview(offset: -10.0)
     self.basicInfoHomeLabel = basicInfoHomeLabel
     
     //basicInfoVaccineLabel
@@ -228,7 +251,7 @@ class ANIRecruitDetailView: UIView {
     basicInfoBG.addSubview(basicInfoVaccineLabel)
     basicInfoVaccineLabel.topToBottom(of: basicInfoSexLabel, offset: 10.0)
     basicInfoVaccineLabel.leftToSuperview(offset: 10.0)
-    basicInfoVaccineLabel.rightToLeft(of: basicInfoLine, offset: 10.0)
+    basicInfoVaccineLabel.rightToLeft(of: basicInfoLine, offset: -10.0)
     basicInfoVaccineLabel.bottomToSuperview(offset: -10)
     self.basicInfoVaccineLabel = basicInfoVaccineLabel
     
@@ -240,7 +263,7 @@ class ANIRecruitDetailView: UIView {
     basicInfoBG.addSubview(basicInfoCastrationLabel)
     basicInfoCastrationLabel.topToBottom(of: basicInfoHomeLabel, offset: 10.0)
     basicInfoCastrationLabel.leftToRight(of: basicInfoLine, offset: 10.0)
-    basicInfoCastrationLabel.rightToSuperview(offset: 10.0)
+    basicInfoCastrationLabel.rightToSuperview(offset: -10.0)
     self.basicInfoCastrationLabel = basicInfoCastrationLabel
     
     //reasonTitleLabel
@@ -251,7 +274,7 @@ class ANIRecruitDetailView: UIView {
     contentView.addSubview(reasonTitleLabel)
     reasonTitleLabel.topToBottom(of: basicInfoBG, offset: CONTENT_SPACE)
     reasonTitleLabel.leftToSuperview(offset: 10.0)
-    reasonTitleLabel.rightToSuperview(offset: 10.0)
+    reasonTitleLabel.rightToSuperview(offset: -10.0)
     self.reasonTitleLabel = reasonTitleLabel
     
     //reasonBG
@@ -262,7 +285,7 @@ class ANIRecruitDetailView: UIView {
     contentView.addSubview(reasonBG)
     reasonBG.topToBottom(of: reasonTitleLabel, offset: 10.0)
     reasonBG.leftToSuperview(offset: 10.0)
-    reasonBG.rightToSuperview(offset: 10.0)
+    reasonBG.rightToSuperview(offset: -10.0)
     self.reasonBG = reasonBG
     
     //reasonLabel
@@ -271,7 +294,7 @@ class ANIRecruitDetailView: UIView {
     reasonLabel.textColor = ANIColor.dark
     reasonLabel.numberOfLines = 0
     reasonBG.addSubview(reasonLabel)
-    let insets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: -10.0)
+    let insets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: 10.0)
     reasonLabel.edgesToSuperview(insets: insets)
     self.reasonLabel = reasonLabel
     
@@ -283,7 +306,7 @@ class ANIRecruitDetailView: UIView {
     contentView.addSubview(introduceTitleLabel)
     introduceTitleLabel.topToBottom(of: reasonBG, offset: CONTENT_SPACE)
     introduceTitleLabel.leftToSuperview(offset: 10.0)
-    introduceTitleLabel.rightToSuperview(offset: 10.0)
+    introduceTitleLabel.rightToSuperview(offset: -10.0)
     self.introduceTitleLabel = introduceTitleLabel
     
     //introduceBG
@@ -294,7 +317,7 @@ class ANIRecruitDetailView: UIView {
     contentView.addSubview(introduceBG)
     introduceBG.topToBottom(of: introduceTitleLabel, offset: 10.0)
     introduceBG.leftToSuperview(offset: 10.0)
-    introduceBG.rightToSuperview(offset: 10.0)
+    introduceBG.rightToSuperview(offset: -10.0)
     self.introduceBG = introduceBG
     
     //introduceLabel
@@ -308,7 +331,8 @@ class ANIRecruitDetailView: UIView {
     
     //introduceImagesView
     let introduceImagesView = ANIRecruitDetailImagesView()
-    introduceImagesView.introduceImages = introduceImages
+    introduceImagesView.delegate = self
+    introduceImagesView.introduceImageUrls = introduceImageUrls
     contentView.addSubview(introduceImagesView)
     introduceImagesView.topToBottom(of: introduceBG, offset: 10.0)
     introduceImagesView.leftToSuperview()
@@ -324,7 +348,7 @@ class ANIRecruitDetailView: UIView {
     contentView.addSubview(passingTitleLabel)
     passingTitleLabel.topToBottom(of: introduceImagesView, offset: CONTENT_SPACE)
     passingTitleLabel.leftToSuperview(offset: 10.0)
-    passingTitleLabel.rightToSuperview(offset: 10.0)
+    passingTitleLabel.rightToSuperview(offset: -10.0)
     self.passingTitleLabel = passingTitleLabel
     
     //passingBG
@@ -335,8 +359,8 @@ class ANIRecruitDetailView: UIView {
     contentView.addSubview(passingBG)
     passingBG.topToBottom(of: passingTitleLabel, offset: 10.0)
     passingBG.leftToSuperview(offset: 10.0)
-    passingBG.rightToSuperview(offset: 10.0)
-    passingBG.bottomToSuperview(offset: -10.0 - 10.0 - ANIRecruitDetailViewController.APPLY_BUTTON_HEIGHT)
+    passingBG.rightToSuperview(offset: -10.0)
+    passingBGBottomConstratins = passingBG.bottomToSuperview(offset: -15.0 - 10.0 - ANIRecruitDetailViewController.APPLY_BUTTON_HEIGHT)
     self.passingBG = passingBG
     
     //passingLabel
@@ -350,10 +374,8 @@ class ANIRecruitDetailView: UIView {
   }
   
   private func reloadLayout() {
-    guard let testRecruit = self.testRecruit,
-          let headerImageView = self.headerImageView,
+    guard let headerImageView = self.headerImageView,
           let titleLabel = self.titleLabel,
-          let profileImageView = self.profileImageView,
           let basicInfoKindLabel = self.basicInfoKindLabel,
           let basicInfoAgeLabel = self.basicInfoAgeLabel,
           let basicInfoSexLabel = self.basicInfoSexLabel,
@@ -362,29 +384,52 @@ class ANIRecruitDetailView: UIView {
           let basicInfoCastrationLabel = self.basicInfoCastrationLabel,
           let reasonLabel = self.reasonLabel,
           let introduceLabel = self.introduceLabel,
-          let passingLabel = self.passingLabel else { return }
+          let passingBGBottomConstratins = self.passingBGBottomConstratins,
+          let passingLabel = self.passingLabel,
+          let recruit = self.recruit,
+          let headerImageUrl = recruit.headerImageUrl,
+          let introduceImageUrls = recruit.introduceImageUrls else { return }
     
-    headerImageView.image = testRecruit.recruitInfo.headerImage
+    headerImageView.sd_setImage(with: URL(string: headerImageUrl), completed: nil)
     
-    titleLabel.text = testRecruit.recruitInfo.title
+    titleLabel.text = recruit.title
     
-    profileImageView.image = testRecruit.user.profileImage
+    basicInfoKindLabel.text = "種類：\(recruit.kind)"
+    basicInfoAgeLabel.text = "年齢：\(recruit.age)"
+    basicInfoSexLabel.text = "性別：\(recruit.sex)"
+    basicInfoHomeLabel.text = "お家：\(recruit.home)"
+    basicInfoVaccineLabel.text = "ワクチン：\(recruit.vaccine)"
+    basicInfoCastrationLabel.text = "去勢生：\(recruit.castration)"
     
-    userNameLabel?.text = testRecruit.user.name
+    reasonLabel.text = recruit.reason
     
-    basicInfoKindLabel.text = "種類：\(testRecruit.recruitInfo.kind)"
-    basicInfoAgeLabel.text = "年齢：\(testRecruit.recruitInfo.age)"
-    basicInfoSexLabel.text = "性別：\(testRecruit.recruitInfo.sex)"
-    basicInfoHomeLabel.text = "お家：\(testRecruit.recruitInfo.home)"
-    basicInfoVaccineLabel.text = "ワクチン：\(testRecruit.recruitInfo.vaccine)"
-    basicInfoCastrationLabel.text = "去勢生：\(testRecruit.recruitInfo.castration)"
+    introduceLabel.text = recruit.introduce
+    self.introduceImageUrls = introduceImageUrls
     
-    reasonLabel.text = testRecruit.recruitInfo.reason
+    passingLabel.text = recruit.passing
     
-    introduceLabel.text = testRecruit.recruitInfo.introduce
-    introduceImages = testRecruit.recruitInfo.introduceImages
+    if let currentUserId = ANISessionManager.shared.currentUserUid, currentUserId == recruit.userId || recruit.recruitState != 0 {
+      passingBGBottomConstratins.constant = -15
+    }
+  }
+  
+  private func reloadUserLayout() {
+    guard let profileImageView = self.profileImageView,
+          let userNameLabel = self.userNameLabel,
+          let user = self.user,
+          let userName = user.userName,
+          let profileImageUrl = user.profileImageUrl else { return }
     
-    passingLabel.text = testRecruit.recruitInfo.passing
+    profileImageView.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
+
+    userNameLabel.text = userName
+  }
+  
+  //MARK: action
+  @objc private func profileImageViewTapped() {
+    guard let recruit = self.recruit else { return }
+    
+    ANINotificationManager.postProfileImageViewTapped(userId: recruit.userId)
   }
 }
 
@@ -392,8 +437,7 @@ extension ANIRecruitDetailView: UIScrollViewDelegate {
   func scrollViewDidScroll(_ scrollView: UIScrollView) {
     guard let imageView = self.headerImageView,
           let imageViewTopConstraint = self.headerImageViewTopConstraint,
-          let headerMinHeight = self.headerMinHeight
-          else { return }
+          let headerMinHeight = self.headerMinHeight else { return }
     
     let headerImageViewHeight: CGFloat = UIScreen.main.bounds.width * UIViewController.HEADER_IMAGE_VIEW_RATIO
 
@@ -420,6 +464,12 @@ extension ANIRecruitDetailView: UIScrollViewDelegate {
     //navigation bar animation
     let offset = newScrollY / (headerImageViewHeight - headerMinHeight)
     self.delegate?.recruitDetailViewDidScroll(offset: offset)
+  }
+}
+
+extension ANIRecruitDetailView: ANIRecruitDetailImagesViewDelegate {
+  func imageCellTapped(index: Int, introduceImageUrls: [String]) {
+    self.delegate?.imageCellTapped(index: index, introduceImageUrls: introduceImageUrls)
   }
 }
 

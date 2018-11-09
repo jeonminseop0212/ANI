@@ -39,7 +39,7 @@ class ANIPopupPickerViewController: UIViewController {
     popupPickerViewTopConstratint = popupPickerView.topToBottom(of: self.view)
     popupPickerViewTopConstraintConstant = popupPickerViewTopConstratint?.constant
     popupPickerView.leftToSuperview(offset: 10.0)
-    popupPickerView.rightToSuperview(offset: 10.0)
+    popupPickerView.rightToSuperview(offset: -10.0)
     popupPickerView.height(POPUP_PICKER_VIEW_HEIGHT)
     self.popupPickerView = popupPickerView
   }
@@ -60,7 +60,7 @@ class ANIPopupPickerViewController: UIViewController {
   
   @objc private func pickerViewDismiss() {
     guard let popupPickerViewTopConstratint = self.popupPickerViewTopConstratint,
-      let popupPickerViewTopConstraintConstant = self.popupPickerViewTopConstraintConstant else { return }
+          let popupPickerViewTopConstraintConstant = self.popupPickerViewTopConstraintConstant else { return }
 
     popupPickerViewTopConstratint.constant = popupPickerViewTopConstraintConstant
     
@@ -73,8 +73,9 @@ class ANIPopupPickerViewController: UIViewController {
   }
 }
 
+//ANIPopupPickerViewDelegate
 extension ANIPopupPickerViewController: ANIPopupPickerViewDelegate {
-  func cancelButtonTapped() {
+  func okeyButtonTapped() {
     pickerViewDismiss()
   }
 }

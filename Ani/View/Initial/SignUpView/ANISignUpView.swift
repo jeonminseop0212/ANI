@@ -7,11 +7,16 @@
 //
 
 import UIKit
+import FirebaseAuth
+import FirebaseStorage
+import FirebaseFirestore
+import CodableFirebase
+import NVActivityIndicatorView
 
 protocol ANISignUpViewDelegate {
-  func donButtonTapped()
   func prifileImagePickButtonTapped()
   func reject(notiText: String)
+  func signUpSuccess(adress: String, password: String, userId: String)
 }
 
 class ANISignUpView: UIView {
@@ -26,9 +31,9 @@ class ANISignUpView: UIView {
   private let PROFILE_IMAGE_PICK_BUTTON_HEIGHT: CGFloat = 30.0
   private weak var profileImagePickButton: ANIImageButtonView?
   
-  private weak var idTitleLabel: UILabel?
-  private weak var idTextFieldBG: UIView?
-  private weak var idTextField: UITextField?
+  private weak var adressTitleLabel: UILabel?
+  private weak var adressTextFieldBG: UIView?
+  private weak var adressTextField: UITextField?
   
   private weak var passwordTitleLabel: UILabel?
   private weak var passwordTextFieldBG: UIView?
@@ -55,6 +60,9 @@ class ANISignUpView: UIView {
       profileImageView.image = profileImage
     }
   }
+  
+  private var adress: String = ""
+  private var password: String = ""
   
   var delegate: ANISignUpViewDelegate?
   
@@ -107,40 +115,41 @@ class ANISignUpView: UIView {
     profileImagePickButton.right(to: profileImageView)
     self.profileImagePickButton = profileImagePickButton
     
-    //idTitleLabel
-    let idTitleLabel = UILabel()
-    idTitleLabel.font = UIFont.boldSystemFont(ofSize: 20.0)
-    idTitleLabel.textColor = ANIColor.dark
-    idTitleLabel.text = "IDを決めましょ！"
-    contentView.addSubview(idTitleLabel)
-    idTitleLabel.topToBottom(of: profileImageView, offset: CONTENT_SPACE)
-    idTitleLabel.leftToSuperview(offset: 10.0)
-    idTitleLabel.rightToSuperview(offset: 10.0)
-    self.idTitleLabel = idTitleLabel
+    //adressTitleLabel
+    let adressTitleLabel = UILabel()
+    adressTitleLabel.font = UIFont.boldSystemFont(ofSize: 20.0)
+    adressTitleLabel.textColor = ANIColor.dark
+    adressTitleLabel.text = "IDを決めましょう！"
+    contentView.addSubview(adressTitleLabel)
+    adressTitleLabel.topToBottom(of: profileImageView, offset: CONTENT_SPACE)
+    adressTitleLabel.leftToSuperview(offset: 10.0)
+    adressTitleLabel.rightToSuperview(offset: -10.0)
+    self.adressTitleLabel = adressTitleLabel
     
-    //idTextFieldBG
-    let idTextFieldBG = UIView()
-    idTextFieldBG.backgroundColor = ANIColor.lightGray
-    idTextFieldBG.layer.cornerRadius = 10.0
-    idTextFieldBG.layer.masksToBounds = true
-    contentView.addSubview(idTextFieldBG)
-    idTextFieldBG.topToBottom(of: idTitleLabel, offset: 10.0)
-    idTextFieldBG.leftToSuperview(offset: 10.0)
-    idTextFieldBG.rightToSuperview(offset: 10.0)
-    self.idTextFieldBG = idTextFieldBG
+    //adressTextFieldBG
+    let adressTextFieldBG = UIView()
+    adressTextFieldBG.backgroundColor = ANIColor.lightGray
+    adressTextFieldBG.layer.cornerRadius = 10.0
+    adressTextFieldBG.layer.masksToBounds = true
+    contentView.addSubview(adressTextFieldBG)
+    adressTextFieldBG.topToBottom(of: adressTitleLabel, offset: 10.0)
+    adressTextFieldBG.leftToSuperview(offset: 10.0)
+    adressTextFieldBG.rightToSuperview(offset: -10.0)
+    self.adressTextFieldBG = adressTextFieldBG
     
-    //idTextField
-    let idTextField = UITextField()
-    idTextField.font = UIFont.systemFont(ofSize: 18.0)
-    idTextField.textColor = ANIColor.dark
-    idTextField.backgroundColor = .clear
-    idTextField.placeholder = "ex)ANI-ani"
-    idTextField.returnKeyType = .done
-    idTextField.delegate = self
-    idTextFieldBG.addSubview(idTextField)
-    let insets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: -10.0)
-    idTextField.edgesToSuperview(insets: insets)
-    self.idTextField = idTextField
+    //adressTextField
+    let adressTextField = UITextField()
+    adressTextField.font = UIFont.systemFont(ofSize: 18.0)
+    adressTextField.textColor = ANIColor.dark
+    adressTextField.backgroundColor = .clear
+    adressTextField.placeholder = "ex)MYAU@myau.com"
+    adressTextField.returnKeyType = .done
+    adressTextField.keyboardType = .emailAddress
+    adressTextField.delegate = self
+    adressTextFieldBG.addSubview(adressTextField)
+    let insets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: 10.0)
+    adressTextField.edgesToSuperview(insets: insets)
+    self.adressTextField = adressTextField
     
     //passwordTitleLabel
     let passwordTitleLabel = UILabel()
@@ -148,9 +157,9 @@ class ANISignUpView: UIView {
     passwordTitleLabel.textColor = ANIColor.dark
     passwordTitleLabel.text = "パスワードを決めましょう🔑"
     contentView.addSubview(passwordTitleLabel)
-    passwordTitleLabel.topToBottom(of: idTextFieldBG, offset: CONTENT_SPACE)
+    passwordTitleLabel.topToBottom(of: adressTextFieldBG, offset: CONTENT_SPACE)
     passwordTitleLabel.leftToSuperview(offset: 10.0)
-    passwordTitleLabel.rightToSuperview(offset: 10.0)
+    passwordTitleLabel.rightToSuperview(offset: -10.0)
     self.passwordTitleLabel = passwordTitleLabel
     
     //passwordTextFieldBG
@@ -161,7 +170,7 @@ class ANISignUpView: UIView {
     contentView.addSubview(passwordTextFieldBG)
     passwordTextFieldBG.topToBottom(of: passwordTitleLabel, offset: 10.0)
     passwordTextFieldBG.leftToSuperview(offset: 10.0)
-    passwordTextFieldBG.rightToSuperview(offset: 10.0)
+    passwordTextFieldBG.rightToSuperview(offset: -10.0)
     self.passwordTextFieldBG = passwordTextFieldBG
     
     //passwordTextField
@@ -185,7 +194,7 @@ class ANISignUpView: UIView {
     contentView.addSubview(passwordCheckTextFieldBG)
     passwordCheckTextFieldBG.topToBottom(of: passwordTextFieldBG, offset: 10.0)
     passwordCheckTextFieldBG.leftToSuperview(offset: 10.0)
-    passwordCheckTextFieldBG.rightToSuperview(offset: 10.0)
+    passwordCheckTextFieldBG.rightToSuperview(offset: -10.0)
     self.passwordCheckTextFieldBG = passwordCheckTextFieldBG
     
     //passwordCheckTextField
@@ -205,11 +214,11 @@ class ANISignUpView: UIView {
     let userNameTitleLabel = UILabel()
     userNameTitleLabel.font = UIFont.boldSystemFont(ofSize: 20.0)
     userNameTitleLabel.textColor = ANIColor.dark
-    userNameTitleLabel.text = "ユーザーネームを決めましょ！"
+    userNameTitleLabel.text = "ユーザーネームを決めましょう！"
     contentView.addSubview(userNameTitleLabel)
     userNameTitleLabel.topToBottom(of: passwordCheckTextFieldBG, offset: CONTENT_SPACE)
     userNameTitleLabel.leftToSuperview(offset: 10.0)
-    userNameTitleLabel.rightToSuperview(offset: 10.0)
+    userNameTitleLabel.rightToSuperview(offset: -10.0)
     self.userNameTitleLabel = userNameTitleLabel
     
     //userNameTextFieldBG
@@ -220,7 +229,7 @@ class ANISignUpView: UIView {
     contentView.addSubview(userNameTextFieldBG)
     userNameTextFieldBG.topToBottom(of: userNameTitleLabel, offset: 10.0)
     userNameTextFieldBG.leftToSuperview(offset: 10.0)
-    userNameTextFieldBG.rightToSuperview(offset: 10.0)
+    userNameTextFieldBG.rightToSuperview(offset: -10.0)
     self.userNameTextFieldBG = userNameTextFieldBG
     
     //userNameTextField
@@ -228,7 +237,7 @@ class ANISignUpView: UIView {
     userNameTextField.font = UIFont.systemFont(ofSize: 18.0)
     userNameTextField.textColor = ANIColor.dark
     userNameTextField.backgroundColor = .clear
-    userNameTextField.placeholder = "ex)ANI-ani"
+    userNameTextField.placeholder = "ex)MYAU-myau"
     userNameTextField.returnKeyType = .done
     userNameTextField.delegate = self
     userNameTextFieldBG.addSubview(userNameTextField)
@@ -237,7 +246,7 @@ class ANISignUpView: UIView {
     
     //doneButton
     let doneButton = ANIAreaButtonView()
-    doneButton.base?.backgroundColor = ANIColor.green
+    doneButton.base?.backgroundColor = ANIColor.emerald
     doneButton.base?.layer.cornerRadius = DONE_BUTTON_HEIGHT / 2
     doneButton.delegate = self
     doneButton.dropShadow(opacity: 0.1)
@@ -264,8 +273,137 @@ class ANISignUpView: UIView {
     ANINotificationManager.receive(keyboardWillChangeFrame: self, selector: #selector(keyboardWillChangeFrame))
   }
   
+  private func signUp(adress: String, password: String) {
+    guard let userNameTextField = self.userNameTextField,
+          let userName = userNameTextField.text else { return }
+    
+    let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.emerald)
+    NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData, nil)
+    
+    let database = Firestore.firestore()
+    DispatchQueue.global().async {
+      database.collection(KEY_USERS).whereField(KEY_USER_NAME, isEqualTo: userName).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          DLog("Error get document: \(error)")
+          
+          return
+        }
+        
+        guard let snapshot = snapshot else { return }
+        
+        if snapshot.documents.isEmpty {
+          self.createAccount(adress: adress, password: password)
+        } else {
+          NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+
+          self.delegate?.reject(notiText: "すでに存在するユーザーネームです！")
+        }
+      })
+    }
+  }
+  
+  private func createAccount(adress: String, password: String) {
+    Auth.auth().createUser(withEmail: adress, password: password) { (successUser, error) in
+      if let errorUnrap = error {
+        let nsError = errorUnrap as NSError
+        
+        NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+
+        if nsError.code == 17007 {
+          self.delegate?.reject(notiText: "すでに存在するメールアドレスです！")
+        } else if nsError.code == 17008 {
+          self.delegate?.reject(notiText: "メールアドレスの書式が正しくありません！")
+        } else if nsError.code == 17026 {
+          self.delegate?.reject(notiText: "パスワードが短いです！")
+        } else {
+          self.delegate?.reject(notiText: "登録に失敗しました！")
+        }
+      } else {
+        Auth.auth().languageCode = "ja"
+        Auth.auth().currentUser?.sendEmailVerification(completion: { (error) in
+          if let error = error {
+            DLog("send email verification error \(error)")
+            self.delegate?.reject(notiText: "認証メールの送信に失敗しました")
+            return
+          }
+          
+          self.adress = adress
+          self.password = password
+          self.uploadUserData()
+        })
+      }
+    }
+  }
+  
+  
+  private func uploadUserData() {
+    guard let currentUser = Auth.auth().currentUser,
+          let profileImage = self.profileImage,
+          let profileImageData = profileImage.jpegData(compressionQuality: 0.5),
+          let userNameTextField = self.userNameTextField,
+          let userName = userNameTextField.text else { return }
+
+    let storageRef = Storage.storage().reference()
+    storageRef.child(KEY_PROFILE_IMAGES).child("\(currentUser.uid).jpeg").putData(profileImageData, metadata: nil) { (metaData, error) in
+      if error != nil {
+        DLog("storageError")
+        NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+        return
+      }
+      
+      if let profileImageUrl = metaData?.downloadURL() {
+        let fcmToken = UserDefaults.standard.string(forKey: KEY_FCM_TOKEN)
+        let user = FirebaseUser(uid: currentUser.uid, userName: userName, kind: "個人", introduce: "", profileImageUrl: profileImageUrl.absoluteString, familyImageUrls: nil, checkNotiDate: nil, isHaveUnreadNoti: false, unreadNotiCount: 0, unreadMessageCount: 0, fcmToken: fcmToken)
+        self.uploadUserIntoDatabase(uid: currentUser.uid, user: user)
+      }
+    }
+  }
+  
+  private func uploadUserIntoDatabase(uid: String, user: FirebaseUser) {
+    let database = Firestore.firestore()
+    
+    do {
+      let userData = try FirestoreEncoder().encode(user)
+      
+      database.collection(KEY_USERS).document(uid).setData(userData) { error in
+        if let error = error {
+          DLog("Error set document: \(error)")
+          return
+        }
+        
+        self.pushDataAlgolia(data: userData as [String: AnyObject])
+        
+        self.delegate?.signUpSuccess(adress: self.adress, password: self.password, userId: uid)
+        
+        NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+      }
+      
+      self.endEditing(true)
+    } catch let error {
+      DLog(error)
+      NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+    }
+  }
+  
+  private func pushDataAlgolia(data: [String: AnyObject]) {
+    let index = ANISessionManager.shared.client.index(withName: KEY_USERS_INDEX)
+    
+    var newData = data
+    if let objectId = data[KEY_UID] {
+      newData.updateValue(objectId, forKey: KEY_OBJECT_ID)
+    }
+    
+    DispatchQueue.global().async {
+      index.addObject(newData, completionHandler: { (content, error) -> Void in
+        if error == nil {
+          DLog("Object IDs: \(content!)")
+        }
+      })
+    }
+  }
+  
   @objc func keyboardWillChangeFrame(_ notification: Notification) {
-    guard let keyboardFrame = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
+    guard let keyboardFrame = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
           let scrollView = self.scrollView,
           let selectedTextFieldMaxY = self.selectedTextFieldMaxY else { return }
     
@@ -286,9 +424,8 @@ extension ANISignUpView: ANIButtonViewDelegate {
       self.delegate?.prifileImagePickButtonTapped()
     }
     if view == doneButton {
-      guard let profileImage = self.profileImage,
-            let idTextField = self.idTextField,
-            let id = idTextField.text,
+      guard let adressTextField = self.adressTextField,
+            let adress = adressTextField.text,
             let passwordTextField = self.passwordTextField,
             let password = passwordTextField.text,
             let passwordCheckTextField = self.passwordCheckTextField,
@@ -296,18 +433,15 @@ extension ANISignUpView: ANIButtonViewDelegate {
             let userNameTextField = self.userNameTextField,
             let userName = userNameTextField.text else { return }
       
-      if id.count > 0 && password.count > 0 && passwordCheck.count > 0 && userName.count > 0 {
+      if adress.count > 0 && password.count > 0 && passwordCheck.count > 0 && userName.count > 0 {
         if password == passwordCheck {
-          let user = User(id: id, password: password, profileImage: profileImage, name: userName, familyImages: nil, kind: nil, introduce: nil)
-          
-          //TODO: user create server
-          
-          self.delegate?.donButtonTapped()
+          signUp(adress: adress, password: password)
+          self.endEditing(true)
         } else {
           self.delegate?.reject(notiText: "パスワードが異なります！")
         }
       } else {
-        self.delegate?.reject(notiText: "入力してない項目があります！")
+        self.delegate?.reject(notiText: "入力していない項目があります！")
       }
     }
   }

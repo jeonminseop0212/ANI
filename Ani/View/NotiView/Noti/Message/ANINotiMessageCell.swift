@@ -12,6 +12,14 @@ class ANINotiMessageCell: UICollectionViewCell {
   
   private weak var messageView: ANIMessageView?
   
+  var isCellSelected: Bool = false {
+    didSet {
+      guard let messageView = self.messageView else { return }
+      
+      messageView.isCellSelected = isCellSelected
+    }
+  }
+  
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()

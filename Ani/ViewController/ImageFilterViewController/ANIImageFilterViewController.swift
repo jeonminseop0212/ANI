@@ -35,7 +35,11 @@ class ANIImageFilterViewController: UIViewController {
   private func setup() {
     //basic
     self.view.backgroundColor = .white
-    
+    self.navigationController?.setNavigationBarHidden(true, animated: false)
+    self.navigationController?.navigationBar.isTranslucent = false
+    self.navigationController?.interactivePopGestureRecognizer?.delegate = self
+    UIApplication.shared.isStatusBarHidden = true
+
     //myNavigationBar
     let myNavigationBar = UIView()
     myNavigationBar.backgroundColor = .white
@@ -72,7 +76,7 @@ class ANIImageFilterViewController: UIViewController {
     let doneButton = UIButton()
     doneButton.setTitle("完了", for: .normal)
     doneButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 17)
-    doneButton.setTitleColor(ANIColor.green, for: .normal)
+    doneButton.setTitleColor(ANIColor.emerald, for: .normal)
     doneButton.addTarget(self, action: #selector(done), for: .touchUpInside)
     myNavigationBar.addSubview(doneButton)
     doneButton.width(60.0)
@@ -123,6 +127,7 @@ class ANIImageFilterViewController: UIViewController {
   }
 }
 
+//MAKR: ANIImageFilterViewDelegate
 extension ANIImageFilterViewController: ANIImageFilterViewDelegate {
   func selectedFilter(filter: ANIFilter, selectedFilterIndex: Int) {
     guard let previewView = self.previewView else { return }
@@ -131,9 +136,17 @@ extension ANIImageFilterViewController: ANIImageFilterViewDelegate {
   }
 }
 
+//MARK: ANIImageFilterPreviewViewDelegate
 extension ANIImageFilterViewController: ANIImageFilterPreviewViewDelegate {
   func selectedPreviewItem(selectedFilterIndex: Int) {
     guard let filterView = self.filterView else { return }
     filterView.selectedItemFilterIndex = selectedFilterIndex
+  }
+}
+
+//MARK: UIGestureRecognizerDelegate
+extension ANIImageFilterViewController: UIGestureRecognizerDelegate {
+  func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+    return true
   }
 }

@@ -20,6 +20,7 @@ class ANICommentViewController: UIViewController {
   private weak var myNavigationBase: UIView?
   private weak var backButton: UIButton?
   private let NAVIGATION_PROFILE_IMAGE_VIEW_HEIGHT: CGFloat = 30.0
+  private weak var navigationProfileImageShadowView: UIView?
   private weak var navigationProfileImageView: UIImageView?
   
   private weak var commentView: ANICommentView?
@@ -27,41 +28,37 @@ class ANICommentViewController: UIViewController {
   private var commentBarBottomConstraint: Constraint?
   private var commentBarOriginalBottomConstraintConstant: CGFloat?
   private weak var commentBar: ANICommentBar?
+  private weak var anonymousCommentTapView: UIView?
+  
+  private var rejectViewBottomConstraint: Constraint?
+  private var rejectViewBottomConstraintOriginalConstant: CGFloat?
+  private weak var rejectView: ANIRejectView?
+  private var isRejectAnimating: Bool = false
+  private var rejectTapView: UIView?
     
   var commentMode: CommentMode?
   
-  var story: Story? {
-    didSet {
-      guard let commentView = self.commentView,
-            let story = self.story else { return }
-      
-      commentView.story = story
-    }
-  }
-  var qna: Qna? {
-    didSet {
-      guard let commentView = self.commentView,
-            let qna = self.qna else { return }
-      
-      commentView.qna = qna
-    }
-  }
+  var story: FirebaseStory?
+  var qna: FirebaseQna?
+  var user: FirebaseUser?
   
-  var me: User?
-    
   override func viewDidLoad() {
     setup()
     passingData()
     setupNavigationProfileImage()
+  }
+  
+  override func viewWillAppear(_ animated: Bool) {
     setupNotification()
+  }
+  
+  override func viewWillDisappear(_ animated: Bool) {
+    removeNotifications()
   }
   
   private func setup() {
     //basic
     self.view.backgroundColor = .white
-    self.navigationController?.navigationBar.tintColor = .white
-    self.navigationController?.setNavigationBarHidden(true, animated: false)
-    self.navigationController?.navigationBar.isTranslucent = false
     
     //myNavigationBar
     let myNavigationBar = UIView()
@@ -93,26 +90,49 @@ class ANICommentViewController: UIViewController {
     backButton.centerYToSuperview()
     self.backButton = backButton
     
+    //navigationProfileImageShadowView
+    let navigationProfileImageShadowView = UIView()
+    navigationProfileImageShadowView.layer.cornerRadius = NAVIGATION_PROFILE_IMAGE_VIEW_HEIGHT / 2
+    navigationProfileImageShadowView.dropShadow(opacity: 0.25, offset: CGSize(width: 0.0, height: 1.0))
+    myNavigationBase.addSubview(navigationProfileImageShadowView)
+    navigationProfileImageShadowView.width(NAVIGATION_PROFILE_IMAGE_VIEW_HEIGHT)
+    navigationProfileImageShadowView.height(NAVIGATION_PROFILE_IMAGE_VIEW_HEIGHT)
+    navigationProfileImageShadowView.centerInSuperview()
+    self.navigationProfileImageShadowView = navigationProfileImageShadowView
+    
     //navigationProfileImageView
     let navigationProfileImageView = UIImageView()
-    navigationProfileImageView.dropShadow(opacity: 0.1, offset: CGSize(width: 0.0, height: 3.0))
+    navigationProfileImageView.contentMode = .scaleAspectFit
     navigationProfileImageView.layer.cornerRadius = NAVIGATION_PROFILE_IMAGE_VIEW_HEIGHT / 2
-    myNavigationBase.addSubview(navigationProfileImageView)
-    navigationProfileImageView.width(NAVIGATION_PROFILE_IMAGE_VIEW_HEIGHT)
-    navigationProfileImageView.height(NAVIGATION_PROFILE_IMAGE_VIEW_HEIGHT)
-    navigationProfileImageView.centerInSuperview()
+    navigationProfileImageView.layer.masksToBounds = true
+    navigationProfileImageShadowView.addSubview(navigationProfileImageView)
+    navigationProfileImageView.edgesToSuperview()
     self.navigationProfileImageView = navigationProfileImageView
     
     //commentBar
     let commentBar = ANICommentBar()
-    commentBar.me = me
-    commentBar.delegate = self
+    if let user = self.user {
+      commentBar.user = user
+    }
     self.view.addSubview(commentBar)
     commentBar.leftToSuperview()
     commentBar.rightToSuperview()
     commentBarBottomConstraint = commentBar.bottomToSuperview(usingSafeArea: true)
     commentBarOriginalBottomConstraintConstant = commentBarBottomConstraint?.constant
     self.commentBar = commentBar
+    
+    //anonymousCommentTapView
+    let anonymousCommentTapView = UIView()
+    if !ANISessionManager.shared.isAnonymous {
+      anonymousCommentTapView.isUserInteractionEnabled = false
+    } else {
+      anonymousCommentTapView.isUserInteractionEnabled = true
+    }
+    let anonymousCommentTapGesture = UITapGestureRecognizer(target: self, action: #selector(reject))
+    anonymousCommentTapView.addGestureRecognizer(anonymousCommentTapGesture)
+    self.view.addSubview(anonymousCommentTapView)
+    anonymousCommentTapView.edges(to: commentBar)
+    self.anonymousCommentTapView = anonymousCommentTapView
     
     //commentView
     let commentView = ANICommentView()
@@ -122,47 +142,73 @@ class ANICommentViewController: UIViewController {
     commentView.rightToSuperview()
     commentView.bottomToTop(of: commentBar)
     self.commentView = commentView
+    
+    //rejectView
+    let rejectView = ANIRejectView()
+    rejectView.setRejectText("ログインが必要です。")
+    self.view.addSubview(rejectView)
+    rejectViewBottomConstraint = rejectView.bottomToTop(of: self.view)
+    rejectViewBottomConstraintOriginalConstant = rejectViewBottomConstraint?.constant
+    rejectView.leftToSuperview()
+    rejectView.rightToSuperview()
+    self.rejectView = rejectView
+    
+    //rejectTapView
+    let rejectTapView = UIView()
+    rejectTapView.isUserInteractionEnabled = true
+    let rejectTapGesture = UITapGestureRecognizer(target: self, action: #selector(rejectViewTapped))
+    rejectTapView.addGestureRecognizer(rejectTapGesture)
+    rejectTapView.isHidden = true
+    rejectTapView.backgroundColor = .clear
+    self.view.addSubview(rejectTapView)
+    rejectTapView.size(to: rejectView)
+    rejectTapView.topToSuperview()
+    self.rejectTapView = rejectTapView
   }
   
   private func passingData() {
     guard let commentView = self.commentView,
+          let commentBar = self.commentBar,
           let commentMode = self.commentMode else { return }
+
+    commentView.commentMode = commentMode
+    commentBar.commentMode = commentMode
     
     switch commentMode {
     case .story:
       commentView.story = story
+      commentBar.story = story
     case .qna:
       commentView.qna = qna
+      commentBar.qna = qna
     }
-    
-    commentView.commentMode = commentMode
   }
   
   private func setupNavigationProfileImage() {
     guard let navigationProfileImageView = self.navigationProfileImageView,
-          let commentMode = self.commentMode else { return }
+          let user = self.user,
+          let profileImageUrl = user.profileImageUrl else { return }
     
-    switch commentMode {
-    case .story:
-      if let story = self.story {
-        navigationProfileImageView.image = story.user.profileImage
-      }
-    case .qna:
-      if let qna = self.qna {
-        navigationProfileImageView.image = qna.user.profileImage
-      }
-    }
+    navigationProfileImageView.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
   }
   
+  //MARK: notification
   private func setupNotification() {
     ANINotificationManager.receive(keyboardWillChangeFrame: self, selector: #selector(keyboardWillChangeFrame))
     ANINotificationManager.receive(keyboardWillHide: self, selector: #selector(keyboardWillHide))
+    ANINotificationManager.receive(profileImageViewTapped: self, selector: #selector(pushOtherProfile))
+    ANINotificationManager.receive(login: self, selector: #selector(setAnonymousCommentTapViewUserInteractionEnabled))
+    ANINotificationManager.receive(logout: self, selector: #selector(setAnonymousCommentTapViewUserInteractionEnabled))
+  }
+  
+  private func removeNotifications() {
+    ANINotificationManager.remove(self)
   }
   
   @objc private func keyboardWillChangeFrame(_ notification: Notification) {
-    guard let keyboardFrame = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
-      let duration = notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as? TimeInterval,
-      let curve = notification.userInfo?[UIKeyboardAnimationCurveUserInfoKey] as? UInt,
+    guard let keyboardFrame = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
+      let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval,
+      let curve = notification.userInfo?[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt,
       let commentBarBottomConstraint = self.commentBarBottomConstraint,
       let window = UIApplication.shared.keyWindow else { return }
     
@@ -171,47 +217,86 @@ class ANICommentViewController: UIViewController {
     
     commentBarBottomConstraint.constant = -h + bottomSafeArea
     
-    UIView.animate(withDuration: duration, delay: 0, options: UIViewAnimationOptions(rawValue: curve), animations: {
+    UIView.animate(withDuration: duration, delay: 0, options: UIView.AnimationOptions(rawValue: curve), animations: {
       self.view.layoutIfNeeded()
     })
   }
   
   @objc private func keyboardWillHide(_ notification: Notification) {
-    guard let duration = notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as? TimeInterval,
-      let curve = notification.userInfo?[UIKeyboardAnimationCurveUserInfoKey] as? UInt,
+    guard let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval,
+      let curve = notification.userInfo?[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt,
       let commentBarOriginalBottomConstraintConstant = self.commentBarOriginalBottomConstraintConstant,
       let commentBarBottomConstraint = self.commentBarBottomConstraint else { return }
     
     commentBarBottomConstraint.constant = commentBarOriginalBottomConstraintConstant
     
-    UIView.animate(withDuration: duration, delay: 0, options: UIViewAnimationOptions(rawValue: curve), animations: {
+    UIView.animate(withDuration: duration, delay: 0, options: UIView.AnimationOptions(rawValue: curve), animations: {
       self.view.layoutIfNeeded()
     })
+  }
+  
+  @objc private func pushOtherProfile(_ notification: NSNotification) {
+    guard let userId = notification.object as? String else { return }
+    
+    if let currentUserUid = ANISessionManager.shared.currentUserUid, currentUserUid == userId {
+      let profileViewController = ANIProfileViewController()
+      profileViewController.hidesBottomBarWhenPushed = true
+      self.navigationController?.pushViewController(profileViewController, animated: true)
+      profileViewController.isBackButtonHide = false
+    } else {
+      let otherProfileViewController = ANIOtherProfileViewController()
+      otherProfileViewController.hidesBottomBarWhenPushed = true
+      otherProfileViewController.userId = userId
+      self.navigationController?.pushViewController(otherProfileViewController, animated: true)
+    }
+  }
+  
+  @objc private func setAnonymousCommentTapViewUserInteractionEnabled() {
+    guard let anonymousCommentTapView = self.anonymousCommentTapView,
+          let commentBar = self.commentBar else { return }
+    
+    commentBar.setProfileImage()
+    
+    if !ANISessionManager.shared.isAnonymous {
+      anonymousCommentTapView.isUserInteractionEnabled = false
+    } else {
+      anonymousCommentTapView.isUserInteractionEnabled = true
+    }
+  }
+  
+  @objc private func reject() {
+    guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
+      !isRejectAnimating,
+      let rejectTapView = self.rejectTapView else { return }
+    
+    rejectViewBottomConstraint.constant = UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    rejectTapView.isHidden = false
+    
+    UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut, animations: {
+      self.isRejectAnimating = true
+      self.view.layoutIfNeeded()
+    }) { (complete) in
+      guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
+        let rejectViewBottomConstraintOriginalConstant = self.rejectViewBottomConstraintOriginalConstant else { return }
+      
+      rejectViewBottomConstraint.constant = rejectViewBottomConstraintOriginalConstant
+      UIView.animate(withDuration: 0.3, delay: 1.0, options: .curveEaseInOut, animations: {
+        self.view.layoutIfNeeded()
+      }, completion: { (complete) in
+        self.isRejectAnimating = false
+        rejectTapView.isHidden = true
+      })
+    }
   }
   
   //MARK: Action
   @objc private func back() {
     self.navigationController?.popViewController(animated: true)
   }
-}
-
-extension ANICommentViewController: ANICommentBarDelegate {
-  func commentContributionButtonTapped(comment: String) {
-    //TODO: 本体updateやってないsever作ったらupdate
-    guard let commentMode = self.commentMode,
-          let me = self.me else { return }
-    
-    switch commentMode {
-    case CommentMode.story:
-      if story != nil {
-        let comment = Comment(user: me, comment: comment, loveCount: 0, commentCount: 0)
-        story?.comments?.append(comment)
-      }
-    case CommentMode.qna:
-      if qna != nil {
-        let comment = Comment(user: me, comment: comment, loveCount: 0, commentCount: 0)
-        qna?.comments?.append(comment)
-      }
-    }
+  
+  @objc private func rejectViewTapped() {
+    let initialViewController = ANIInitialViewController()
+    let navigationController = UINavigationController(rootViewController: initialViewController)
+    self.present(navigationController, animated: true, completion: nil)
   }
 }

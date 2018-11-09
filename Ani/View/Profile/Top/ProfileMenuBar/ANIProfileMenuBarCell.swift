@@ -24,7 +24,7 @@ class ANIProfileMenuBarCell: UICollectionViewCell {
   private func setup() {
     let menuLabel = UILabel()
     menuLabel.textAlignment = .center
-    menuLabel.font = UIFont.boldSystemFont(ofSize: 17)
+    menuLabel.font = UIFont.boldSystemFont(ofSize: 13)
     menuLabel.textColor = ANIColor.bg
     addSubview(menuLabel)
     menuLabel.edgesToSuperview()

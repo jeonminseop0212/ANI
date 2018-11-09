@@ -19,20 +19,33 @@ class ANIContributionView: UIView {
   private weak var scrollView: ANIScrollView?
   private weak var contentView: UIView?
   
-  weak var contentTextView: ANIPlaceHolderTextView?
+  private weak var contentTextView: ANIPlaceHolderTextView?
   private let CONTENT_IMAGES_VIEW_RATIO: CGFloat = 0.5
   private weak var contentImagesView: ANIContributionImagesView?
   
   var contentImages = [UIImage?]() {
     didSet {
-      guard let contentImagesView = self.contentImagesView,
-            let contentTextView = self.contentTextView else { return }
+      guard let contentImagesView = self.contentImagesView else { return }
+      
       contentImagesView.contentImages = contentImages
       
-      if contentTextView.text.count > 0 && !contentImages.isEmpty {
+      if isContributable() {
         self.delegate?.contributionButtonOn(on: true)
       } else {
         self.delegate?.contributionButtonOn(on: false)
+      }
+    }
+  }
+  
+  var selectedContributionMode: ContributionMode? {
+    didSet {
+      guard let selectedContributionMode = self.selectedContributionMode,
+            let contentTextView = self.contentTextView else { return }
+      
+      if selectedContributionMode == .story {
+        contentTextView.placeHolder = "どんな話でも大丈夫です*^_^*"
+      } else if selectedContributionMode == .qna {
+        contentTextView.placeHolder = "どんな質問でも大丈夫です*^_^*"
       }
     }
   }
@@ -69,11 +82,10 @@ class ANIContributionView: UIView {
     let contentTextView = ANIPlaceHolderTextView()
     contentTextView.textColor = ANIColor.dark
     contentTextView.font = UIFont.systemFont(ofSize: 17.0)
-    contentTextView.placeHolder = "どんな話でも構いません*^_^*"
     contentTextView.isScrollEnabled = false
     contentTextView.delegate = self
     contentView.addSubview(contentTextView)
-    let insets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: -10.0, right: -10.0)
+    let insets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: -10.0, right: 10.0)
     contentTextView.edgesToSuperview(excluding: .bottom, insets: insets)
     self.contentTextView = contentTextView
     setHideButtonOnKeyboard(textView: contentTextView)
@@ -90,8 +102,36 @@ class ANIContributionView: UIView {
     self.contentImagesView = contentImagesView
   }
   
+  func getContent() -> String {
+    guard let contentTextView = self.contentTextView,
+          let text = contentTextView.text else { return "" }
+    
+    return text
+  }
+  
+  private func isContributable() -> Bool {
+    guard let selectedContributionMode = self.selectedContributionMode,
+          let contentTextView = self.contentTextView else { return false }
+    
+    switch selectedContributionMode {
+    case .story:
+      if contentTextView.text.count > 0 && !contentImages.isEmpty {
+        return true
+      } else {
+        return false
+      }
+    case .qna:
+      if contentTextView.text.count > 0 {
+        return true
+      } else {
+        return false
+      }
+    }
+  }
+  
   private func setHideButtonOnKeyboard(textView: UITextView){
     let tools = UIToolbar()
+    tools.tintColor = ANIColor.emerald
     tools.frame = CGRect(x: 0, y: 0, width: frame.width, height: KEYBOARD_HIDE_TOOL_BAR_HEIGHT)
     let spacer = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
     let closeButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(keyboardHideButtonTapped))
@@ -120,7 +160,7 @@ extension ANIContributionView: ANIContributionImagesViewDelegate {
 
 extension ANIContributionView: UITextViewDelegate {
   func textViewDidChange(_ textView: UITextView) {
-    if textView.text.count > 0 && !contentImages.isEmpty {
+    if isContributable() {
       self.delegate?.contributionButtonOn(on: true)
     } else {
       self.delegate?.contributionButtonOn(on: false)

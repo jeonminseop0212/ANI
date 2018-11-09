@@ -58,7 +58,7 @@ class ANIAreaButtonView: ANIButtonView {
   override func touchUp(_ contain: Bool) {
     super.touchUp(contain)
     if isAnimation {
-      UIView.animate(withDuration: 0.2, delay: 0.2, options: UIViewAnimationOptions.curveEaseInOut, animations: {
+      UIView.animate(withDuration: 0.2, delay: 0.2, options: UIView.AnimationOptions.curveEaseInOut, animations: {
         self.base?.transform = CGAffineTransform.identity
       }, completion: nil)
     }

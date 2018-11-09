@@ -7,15 +7,29 @@
 //
 
 import UIKit
+import FirebaseFirestore
+import CodableFirebase
+import NVActivityIndicatorView
 
 class ANIMessageView: UIView {
   
-  private weak var messageCollectionView: UICollectionView?
-  private var testMessageData = [Message]()
+  private weak var reloadView: ANIReloadView?
+  
+  private weak var messageTableView: UITableView?
+  
+  private var chatGroups = [FirebaseChatGroup]()
+  
+  private var chatGroupListener: ListenerRegistration?
+  
+  private weak var activityIndicatorView: NVActivityIndicatorView?
+  
+  var isCellSelected: Bool = false
+  
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()
-    setupTestData()
+    loadChatGroup()
+    setupNotifications()
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -23,65 +37,214 @@ class ANIMessageView: UIView {
   }
   
   private func setup() {
+    self.backgroundColor = ANIColor.bg
     let window = UIApplication.shared.keyWindow
     var bottomSafeArea: CGFloat = 0.0
     if let windowUnrap = window {
       bottomSafeArea = windowUnrap.safeAreaInsets.bottom
     }
-    let flowLayout = UICollectionViewFlowLayout()
-    flowLayout.minimumLineSpacing = 10.0
-    let messageCollectionView = UICollectionView(frame: self.frame, collectionViewLayout: flowLayout)
+    
+    //reloadView
+    let reloadView = ANIReloadView()
+    reloadView.alpha = 0.0
+    reloadView.messege = "メッセージがありません。"
+    reloadView.delegate = self
+    addSubview(reloadView)
+    reloadView.dropShadow()
+    reloadView.centerInSuperview()
+    reloadView.leftToSuperview(offset: 50.0)
+    reloadView.rightToSuperview(offset: -50.0)
+    self.reloadView = reloadView
+    
+    //messageTableView
+    let messageTableView = UITableView()
+    messageTableView.contentInset = UIEdgeInsets(top: ANICommunityViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: bottomSafeArea, right: 0)
+    messageTableView.scrollIndicatorInsets  = UIEdgeInsets(top: UIViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: bottomSafeArea, right: 0)
     let id = NSStringFromClass(ANIMessageViewCell.self)
-    messageCollectionView.register(ANIMessageViewCell.self, forCellWithReuseIdentifier: id)
-    messageCollectionView.contentInset = UIEdgeInsets(top: UIViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT + bottomSafeArea, right: 0)
-    messageCollectionView.scrollIndicatorInsets  = UIEdgeInsets(top: UIViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT + bottomSafeArea, right: 0)
-    messageCollectionView.backgroundColor = ANIColor.bg
-    messageCollectionView.alwaysBounceVertical = true
-    messageCollectionView.dataSource = self
-    messageCollectionView.delegate = self
-    addSubview(messageCollectionView)
-    messageCollectionView.edgesToSuperview()
-    self.messageCollectionView = messageCollectionView
+    messageTableView.register(ANIMessageViewCell.self, forCellReuseIdentifier: id)
+    messageTableView.backgroundColor = ANIColor.bg
+    messageTableView.separatorStyle = .none
+    messageTableView.alwaysBounceVertical = true
+    messageTableView.dataSource = self
+    messageTableView.alpha = 0.0
+    addSubview(messageTableView)
+    messageTableView.edgesToSuperview()
+    self.messageTableView = messageTableView
+    
+    //activityIndicatorView
+    let activityIndicatorView = NVActivityIndicatorView(frame: .zero, type: .lineScale, color: ANIColor.emerald, padding: 0)
+    addSubview(activityIndicatorView)
+    activityIndicatorView.width(40.0)
+    activityIndicatorView.height(40.0)
+    activityIndicatorView.centerInSuperview()
+    self.activityIndicatorView = activityIndicatorView
   }
   
-  private func setupTestData() {
-    let familyImages = [UIImage(named: "family1")!, UIImage(named: "family2")!, UIImage(named: "family3")!]
-    let user1 = User(id: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
-    let user2 = User(id: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
-    let user3 = User(id: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "団体", introduce: "団体で猫たちのためにボランティア活動をしています")
-    let message1 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user1)
-    let message2 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user2)
-    let message3 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user3)
-    let message4 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user1)
-    let message5 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user2)
-    let message6 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user3)
-    let message7 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user1)
-    let message8 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user2)
-    let message9 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user3)
-    let message10 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user1)
-    let message11 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user2)
-    let message12 = Message(subtitle: "俺とお話でもしようかああああああああああ？？？？？", user: user3)
+  private func setupNotifications() {
+    ANINotificationManager.receive(notiTabTapped: self, selector: #selector(scrollToTop))
+    ANINotificationManager.receive(login: self, selector: #selector(reloadChatGroups))
+    ANINotificationManager.receive(logout: self, selector: #selector(hideTableView))
+  }
+  
+  @objc private func scrollToTop() {
+    guard let messageTableView = messageTableView,
+          !chatGroups.isEmpty,
+          isCellSelected else { return }
     
-    self.testMessageData = [message1, message2, message3, message4, message5, message6, message7, message8, message9, message10, message11, message12]
+    messageTableView.scrollToRow(at: [0, 0], at: .top, animated: true)
+  }
+  
+  @objc private func reloadChatGroups() {
+    loadChatGroup()
+  }
+  
+  @objc private func hideTableView() {
+    guard let messageTableView = self.messageTableView else { return }
+    
+    messageTableView.alpha = 0.0
   }
 }
 
-extension ANIMessageView: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
-  func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-    return testMessageData.count
+//MARK: UITableViewDataSource
+extension ANIMessageView: UITableViewDataSource {
+  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    return chatGroups.count
   }
   
-  func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let id = NSStringFromClass(ANIMessageViewCell.self)
-    let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! ANIMessageViewCell
-    cell.profileImageView?.image = testMessageData[indexPath.item].user.profileImage
-    cell.userNameLabel?.text = testMessageData[indexPath.item].user.name
-    cell.subTitleLabel?.text = testMessageData[indexPath.item].subtitle
+    let cell = tableView.dequeueReusableCell(withIdentifier: id, for: indexPath) as! ANIMessageViewCell
+    
+    cell.chatGroup = chatGroups[indexPath.row]
+    cell.delegate = self
+    
     return cell
   }
-  
-  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-    let size = CGSize(width: collectionView.frame.width, height: 80)
-    return size
+}
+
+//MARK: ANIMessageViewCellDelegate
+extension ANIMessageView: ANIMessageViewCellDelegate {
+  func loadedUser() {
+    guard let activityIndicatorView = self.activityIndicatorView,
+          let messageTableView = self.messageTableView else { return }
+    
+    activityIndicatorView.stopAnimating()
+    
+    UIView.animate(withDuration: 0.2, animations: {
+      messageTableView.alpha = 1.0
+    }) { (complete) in
+      ANINotificationManager.postDismissSplash()
+    }
+  }
+}
+
+//MARK: data
+extension ANIMessageView {
+  private func loadChatGroup() {
+    guard let crrentUserUid = ANISessionManager.shared.currentUserUid,
+          let activityIndicatorView = self.activityIndicatorView,
+          let reloadView = self.reloadView,
+          let messageTableView = self.messageTableView else { return }
+
+    reloadView.alpha = 0.0
+    
+    let database = Firestore.firestore()
+    
+    activityIndicatorView.startAnimating()
+    
+    if let chatGroupListener = self.chatGroupListener {
+      chatGroupListener.remove()
+    }
+    
+    DispatchQueue.global().async {
+      self.chatGroupListener = database.collection(KEY_CHAT_GROUPS).whereField(KEY_CHAT_MEMBER_IDS + "." + crrentUserUid, isEqualTo: true).addSnapshotListener({ (snapshot, error) in
+        if let error = error {
+          DLog("Error get document: \(error)")
+          
+          return
+        }
+        guard let snapshot = snapshot else { return }
+        
+        var chatGroupsTemp = self.chatGroups
+        snapshot.documentChanges.forEach({ (diff) in
+          if diff.type == .added {
+            do {
+              let group = try FirebaseDecoder().decode(FirebaseChatGroup.self, from: diff.document.data())
+              chatGroupsTemp.append(group)
+              chatGroupsTemp.sort(by: {$0.updateDate > $1.updateDate})
+              
+              self.chatGroups = chatGroupsTemp
+
+              DispatchQueue.main.async {
+                messageTableView.reloadData()
+              }
+            } catch let error {
+              DLog(error)
+              
+              activityIndicatorView.stopAnimating()
+              
+              UIView.animate(withDuration: 0.2, animations: {
+                reloadView.alpha = 1.0
+              }, completion: { (complete) in
+                ANINotificationManager.postDismissSplash()
+              })
+            }
+          } else if diff.type == .modified {
+            do {
+              let group = try FirebaseDecoder().decode(FirebaseChatGroup.self, from: diff.document.data())
+              
+              for (index, chatGroupTemp) in chatGroupsTemp.enumerated() {
+                if chatGroupTemp.groupId == group.groupId {
+                  chatGroupsTemp[index] = group
+                  
+                  break
+                }
+              }
+              
+              chatGroupsTemp.sort(by: {$0.updateDate > $1.updateDate})
+              
+              self.chatGroups = chatGroupsTemp
+              
+              DispatchQueue.main.async {                
+                messageTableView.reloadData()
+              }
+            } catch let error {
+              DLog(error)
+            }
+          }
+        })
+        
+        if snapshot.documents.isEmpty {
+          activityIndicatorView.stopAnimating()
+          
+          messageTableView.alpha = 0.0
+          
+          UIView.animate(withDuration: 0.2, animations: {
+            reloadView.alpha = 1.0
+          }, completion: { (complete) in
+            ANINotificationManager.postDismissSplash()
+          })
+        }
+      })
+    }
+  }
+}
+
+//MARK: ANIReloadViewDelegate
+extension ANIMessageView: ANIReloadViewDelegate {
+  func reloadButtonTapped() {
+    guard let activityIndicatorView = self.activityIndicatorView,
+          let reloadView = self.reloadView else { return }
+    
+    reloadView.alpha = 0.0
+    activityIndicatorView.startAnimating()
+    
+    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+      activityIndicatorView.stopAnimating()
+      
+      UIView.animate(withDuration: 0.2, animations: {
+        reloadView.alpha = 1.0
+      })
+    }
   }
 }

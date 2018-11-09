@@ -8,34 +8,50 @@
 
 import UIKit
 import TinyConstraints
+import FirebaseFirestore
+import CodableFirebase
+import FirebaseStorage
+import InstantSearchClient
 
 class ANIProfileViewController: UIViewController {
   
   private weak var myNavigationBar: UIView?
   private weak var myNavigationBase: UIView?
   private weak var navigationTitleLabel: UILabel?
+  private weak var backButton: UIButton?
+  private weak var optionButton: UIButton?
+  private let OPTION_RIGTHT_GRADATION_VIEW_WIDTH: CGFloat = 35.0
+  private weak var optionRightGradationView: UIView?
+  
+  private weak var needLoginView: ANINeedLoginView?
+  
+  var isBackButtonHide: Bool = true
   
   private weak var profileBasicView: ANIProfileBasicView?
   
-  private var recruits = [Recruit]()
-  private var storys = [Story]()
-  private var qnas = [Qna]()
-  private var me: User?
-  private var user: User?
-    
+  private var rejectViewBottomConstraint: Constraint?
+  private var rejectViewBottomConstraintOriginalConstant: CGFloat?
+  private weak var rejectView: ANIRejectView?
+  private var isRejectAnimating: Bool = false
+  
+  private var currentUser: FirebaseUser? { return ANISessionManager.shared.currentUser }
+  
+  private var contentType: ContentType?
+  private var contributionId: String?
+  
   override func viewDidLoad() {
     super.viewDidLoad()
-    setupTestUser()
-    setupTestRecruitData()
-    setupTestStoryData()
-    setupTestQnaData()
-    setupMe()
     setup()
-    setupNotification()
   }
   
   override func viewWillAppear(_ animated: Bool) {
     UIApplication.shared.statusBarStyle = .default
+    setupNotification()
+    showNeedLoginView()
+  }
+  
+  override func viewWillDisappear(_ animated: Bool) {
+    removeNotifications()
   }
   
   private func setup() {
@@ -43,7 +59,8 @@ class ANIProfileViewController: UIViewController {
     self.view.backgroundColor = .white
     self.navigationController?.setNavigationBarHidden(true, animated: false)
     self.navigationController?.navigationBar.isTranslucent = false
-    Orientation.lockOrientation(.portrait)
+    self.navigationController?.interactivePopGestureRecognizer?.delegate = self
+    ANIOrientation.lockOrientation(.portrait)
     
     //myNavigationBar
     let myNavigationBar = UIView()
@@ -62,150 +79,444 @@ class ANIProfileViewController: UIViewController {
     myNavigationBase.height(UIViewController.NAVIGATION_BAR_HEIGHT)
     self.myNavigationBase = myNavigationBase
     
+    //backButton
+    let backButton = UIButton()
+    let backButtonImage = UIImage(named: "backButton")?.withRenderingMode(.alwaysTemplate)
+    backButton.setImage(backButtonImage, for: .normal)
+    backButton.tintColor = ANIColor.dark
+    backButton.addTarget(self, action: #selector(back), for: .touchUpInside)
+    if isBackButtonHide {
+      backButton.alpha = 0.0
+    } else {
+      backButton.alpha = 1.0
+    }
+    myNavigationBase.addSubview(backButton)
+    backButton.width(44.0)
+    backButton.height(44.0)
+    backButton.leftToSuperview()
+    backButton.centerYToSuperview()
+    self.backButton = backButton
+    
+    //optionButton
+    let optionButton = UIButton()
+    let optionButtonImage = UIImage(named: "optionButton")?.withRenderingMode(.alwaysTemplate)
+    optionButton.setImage(optionButtonImage, for: .normal)
+    optionButton.tintColor = ANIColor.dark
+    optionButton.addTarget(self, action: #selector(option), for: .touchUpInside)
+    myNavigationBase.addSubview(optionButton)
+    optionButton.width(40.0)
+    optionButton.height(44.0)
+    optionButton.rightToSuperview(offset: -5.0)
+    optionButton.centerYToSuperview()
+    self.optionButton = optionButton
+    
     //navigationTitleLabel
     let navigationTitleLabel = UILabel()
-    navigationTitleLabel.text = "プロフィール"
+    if let currentUser = self.currentUser {
+      navigationTitleLabel.text = currentUser.userName
+    }
+    navigationTitleLabel.textAlignment = .center
     navigationTitleLabel.textColor = ANIColor.dark
     navigationTitleLabel.font = UIFont.boldSystemFont(ofSize: 17)
     myNavigationBase.addSubview(navigationTitleLabel)
-    navigationTitleLabel.centerInSuperview()
+    navigationTitleLabel.centerYToSuperview()
+    navigationTitleLabel.leftToRight(of: backButton)
+    navigationTitleLabel.rightToLeft(of: optionButton)
     self.navigationTitleLabel = navigationTitleLabel
+    
+    //optionRightGradationView
+    let optionRightGradationView = UIView()
+    let gradiationLayer = CAGradientLayer()
+    gradiationLayer.startPoint = CGPoint(x: 0.8, y: 0.5)
+    gradiationLayer.endPoint = CGPoint(x: 0, y: 0.5)
+    gradiationLayer.frame = CGRect(x: 0, y: 0, width: OPTION_RIGTHT_GRADATION_VIEW_WIDTH, height: UIViewController.NAVIGATION_BAR_HEIGHT)
+    gradiationLayer.colors = [UIColor.white.cgColor, UIColor.white.withAlphaComponent(0).cgColor]
+    optionRightGradationView.layer.addSublayer(gradiationLayer)
+    myNavigationBase.addSubview(optionRightGradationView)
+    optionRightGradationView.rightToLeft(of: optionButton, offset: 0.0)
+    optionRightGradationView.width(OPTION_RIGTHT_GRADATION_VIEW_WIDTH)
+    optionRightGradationView.topToSuperview()
+    optionRightGradationView.bottomToSuperview()
+    self.optionRightGradationView = optionRightGradationView
     
     //profileBasicView
     let profileBasicView = ANIProfileBasicView()
-    profileBasicView.recruits = recruits
-    profileBasicView.storys = storys
-    profileBasicView.qnas = qnas
-    profileBasicView.user = user
+    profileBasicView.currentUser = currentUser
     profileBasicView.delegate = self
     self.view.addSubview(profileBasicView)
     profileBasicView.topToBottom(of: myNavigationBar)
     profileBasicView.edgesToSuperview(excluding: .top)
     self.profileBasicView = profileBasicView
+    
+    //rejectView
+    let rejectView = ANIRejectView()
+    rejectView.setRejectText("ログインが必要です。")
+    self.view.addSubview(rejectView)
+    rejectViewBottomConstraint = rejectView.bottomToTop(of: self.view)
+    rejectViewBottomConstraintOriginalConstant = rejectViewBottomConstraint?.constant
+    rejectView.leftToSuperview()
+    rejectView.rightToSuperview()
+    self.rejectView = rejectView
+    
+    //needLoginView
+    let needLoginView = ANINeedLoginView()
+    needLoginView.isHidden = true
+    needLoginView.setupMessage(text: "プロフィールを利用するには\nログインが必要です")
+    needLoginView.delegate = self
+    self.view.addSubview(needLoginView)
+    needLoginView.edgesToSuperview()
+    self.needLoginView = needLoginView
   }
   
-  private func setupTestUser() {
-    let familyImages = [UIImage(named: "family1")!, UIImage(named: "family2")!, UIImage(named: "family3")!]
-    let user = User(id: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
+  private func showNeedLoginView() {
+    guard let needLoginView = self.needLoginView else { return }
     
-    self.user = user
+    if ANISessionManager.shared.isAnonymous == true {
+      needLoginView.isHidden = false
+    } else {
+      needLoginView.isHidden = true
+    }
   }
   
-  private func setupTestRecruitData() {
-    let familyImages = [UIImage(named: "family1")!, UIImage(named: "family2")!, UIImage(named: "family3")!]
-    let user1 = User(id: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
-    let user2 = User(id: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
-    let user3 = User(id: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "団体", introduce: "団体で猫たちのためにボランティア活動をしています")
-    
-    let image1 = UIImage(named: "storyCat1")!
-    let image2 = UIImage(named: "storyCat2")!
-    let image3 = UIImage(named: "storyCat3")!
-    let image4 = UIImage(named: "storyCat1")!
-    
-    let introduceImages = [image1, image2, image3, image4]
-    let recruitInfo = RecruitInfo(headerImage: UIImage(named: "cat1")!, title: "かわいい猫ちゃんの里親になって >_<", kind: "ミックス", age: "１歳以下", sex: "男の子", home: "東京都", vaccine: "１回", castration: "済み", reason: "親がいない子猫を保護しました。\n家ではすでに猫を飼えないので親になってくれる方を探しています。\nよろしくお願いします。", introduce: "人懐こくて甘えん坊の可愛い子猫です。\n元気よくご飯もいっぱいたべます😍\n遊ぶのが大好きであっちこっち走り回る姿がたまらなく可愛いです。", introduceImages: introduceImages, passing: "ご自宅までお届けします！", isRecruit: true)
-    let recruit1 = Recruit(recruitInfo: recruitInfo, user: user1, supportCount: 10, loveCount: 10)
-    let recruit2 = Recruit(recruitInfo: recruitInfo, user: user2, supportCount: 5, loveCount: 8)
-    let recruit3 = Recruit(recruitInfo: recruitInfo, user: user3, supportCount: 14, loveCount: 20)
-    
-    self.recruits = [recruit1, recruit2, recruit3, recruit1, recruit2, recruit3]
+  @objc private func updateLayoutLogin() {
+    reloadNavigationTitle()
+    showNeedLoginView()
   }
   
-  private func setupTestStoryData() {
-    let cat1 = UIImage(named: "storyCat1")!
-    let cat2 = UIImage(named: "storyCat2")!
-    let cat3 = UIImage(named: "storyCat3")!
-    let cat4 = UIImage(named: "storyCat1")!
-    let familyImages = [UIImage(named: "family1")!, UIImage(named: "family2")!, UIImage(named: "family3")!]
-    let user1 = User(id: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
-    let user2 = User(id: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
-    let user3 = User(id: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "団体", introduce: "団体で猫たちのためにボランティア活動をしています")
-    let comment1 = Comment(user: user1, comment: "可愛い写真ですね", loveCount: 0, commentCount: 0)
-    let comment2 = Comment(user: user2, comment: "いいですねえええええええええコメントだよいいですねえええええええええコメントだよいいですねえええええええええコメントだよいいですねえええええええええコメントだよいいですねえええええええええコメントだよ", loveCount: 0, commentCount: 0)
-    let comment3 = Comment(user: user3, comment: "コメントふふふふ", loveCount: 0, commentCount: 0)
-    let story1 = Story(storyImages: [cat1, cat2, cat3], story: "あれこれ内容を書くところだよおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user1, loveCount: 10, commentCount: 10, comments: [comment1, comment2, comment3])
-    let story2 = Story(storyImages: [cat2, cat1, cat3, cat4], story: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user2, loveCount: 5, commentCount: 8, comments: [comment1, comment2, comment3])
-    let story3 = Story(storyImages: [cat3, cat2, cat1], story: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user3, loveCount: 15, commentCount: 20, comments: [comment1, comment2, comment3])
-    self.storys = [story1, story2, story3, story1, story2, story3]
-  }
-  
-  private func setupTestQnaData() {
-    let cat1 = UIImage(named: "storyCat1")!
-    let cat2 = UIImage(named: "storyCat2")!
-    let cat3 = UIImage(named: "storyCat3")!
-    let cat4 = UIImage(named: "storyCat1")!
-    let familyImages = [UIImage(named: "family1")!, UIImage(named: "family2")!, UIImage(named: "family3")!]
-    let user1 = User(id: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
-    let user2 = User(id: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "profileImage")!,name: "inoue chiaki", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
-    let user3 = User(id: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "profileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "団体", introduce: "団体で猫たちのためにボランティア活動をしています")
-    let comment1 = Comment(user: user1, comment: "可愛い写真ですね", loveCount: 0, commentCount: 0)
-    let comment2 = Comment(user: user2, comment: "いいですねえええええええええコメントだよいいですねえええええええええコメントだよいいですねえええええええええコメントだよいいですねえええええええええコメントだよいいですねえええええええええコメントだよ", loveCount: 0, commentCount: 0)
-    let comment3 = Comment(user: user3, comment: "コメントふふふふ", loveCount: 0, commentCount: 0)
-    let qna1 = Qna(qnaImages: [cat1, cat2, cat3], qna: "あれこれ内容を書くところだよおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user1, loveCount: 10, commentCount: 5, comments: [comment1, comment2, comment3])
-    let qna2 = Qna(qnaImages: [cat2, cat1, cat3, cat4], qna: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user2, loveCount: 5, commentCount: 5, comments: [comment1, comment2, comment3])
-    let qna3 = Qna(qnaImages: [cat3, cat2, cat1], qna: "あれこれ内容を書くところだよおおおおおおおお今は思い出せないから適当なものを描いてる明けだよおおおおおおおお", user: user3, loveCount: 15, commentCount: 10, comments: [comment1, comment2, comment3])
-    
-    self.qnas = [qna1, qna2, qna3, qna1, qna2, qna3]
-  }
-  
-  private func setupMe() {
-    let familyImages = [UIImage(named: "family1")!, UIImage(named: "family2")!, UIImage(named: "family3")!]
-    let me = User(id: "jeonminseop", password: "aaaaa", profileImage: UIImage(named: "meProfileImage")!,name: "jeon minseop", familyImages: familyImages, kind: "個人", introduce: "一人で猫たちのためにボランティア活動をしています")
-    
-    self.me = me
-  }
-  
+  //MAKR: notification
   private func setupNotification() {
     ANINotificationManager.receive(imageCellTapped: self, selector: #selector(presentImageBrowser(_:)))
     ANINotificationManager.receive(profileEditButtonTapped: self, selector: #selector(openProfileEdit))
+    ANINotificationManager.receive(login: self, selector: #selector(updateLayoutLogin))
   }
   
-  //MARK: action
+  private func removeNotifications() {
+    ANINotificationManager.remove(self)
+  }
+  
   @objc private func presentImageBrowser(_ notification: NSNotification) {
-    guard let item = notification.object as? (Int, [UIImage?]) else { return }
+    guard let item = notification.object as? (Int, [String]) else { return }
+    
     let selectedIndex = item.0
-    let images = item.1
+    let imageUrls = item.1
     let imageBrowserViewController = ANIImageBrowserViewController()
     imageBrowserViewController.selectedIndex = selectedIndex
-    imageBrowserViewController.images = images
+    imageBrowserViewController.imageUrls = imageUrls
     imageBrowserViewController.modalPresentationStyle = .overCurrentContext
+    imageBrowserViewController.delegate = self
     //overCurrentContextだとtabBarが消えないのでtabBarからpresentする
     self.tabBarController?.present(imageBrowserViewController, animated: false, completion: nil)
   }
   
   @objc private func openProfileEdit() {
-    guard let profileBasicView = self.profileBasicView else { return }
-    
     let profileEditViewController = ANIProfileEditViewController()
-    profileEditViewController.user = profileBasicView.user
+    profileEditViewController.delegate = self
+    profileEditViewController.currentUser = currentUser
     self.present(profileEditViewController, animated: true, completion: nil)
+  }
+  
+  private func reloadNavigationTitle() {
+    guard let navigationTitleLabel = self.navigationTitleLabel,
+          let currentUser = self.currentUser else { return }
+    
+    navigationTitleLabel.text = currentUser.userName
+  }
+  
+  //MARK: action
+  @objc private func back() {
+    self.navigationController?.popViewController(animated: true)
+  }
+  
+  @objc private func option() {
+    let optionViewController = ANIOptionViewController()
+    optionViewController.hidesBottomBarWhenPushed = true
+    self.navigationController?.pushViewController(optionViewController, animated: true)
   }
 }
 
 //MARK: ANIProfileBasicViewDelegate
 extension ANIProfileViewController: ANIProfileBasicViewDelegate {
-  func recruitViewCellDidSelect(index: Int) {
+  func followingTapped() {
+    guard let currentUser = self.currentUser else { return }
+    
+    let followUserViewController = ANIFollowUserViewContoller()
+    followUserViewController.followUserViewMode = .following
+    followUserViewController.userId = currentUser.uid
+    followUserViewController.hidesBottomBarWhenPushed = true
+    self.navigationController?.pushViewController(followUserViewController, animated: true)
+  }
+  
+  func followerTapped() {
+    guard let currentUser = self.currentUser else { return }
+
+    let followUserViewController = ANIFollowUserViewContoller()
+    followUserViewController.followUserViewMode = .follower
+    followUserViewController.userId = currentUser.uid
+    followUserViewController.hidesBottomBarWhenPushed = true
+    self.navigationController?.pushViewController(followUserViewController, animated: true)
+  }
+  
+  func supportButtonTapped(supportRecruit: FirebaseRecruit, user: FirebaseUser) {
+    let supportViewController = ANISupportViewController()
+    supportViewController.modalPresentationStyle = .overCurrentContext
+    supportViewController.recruit = supportRecruit
+    supportViewController.user = user
+    self.tabBarController?.present(supportViewController, animated: false, completion: nil)
+  }
+  
+  func recruitViewCellDidSelect(selectedRecruit: FirebaseRecruit, user: FirebaseUser) {
     let recruitDetailViewController = ANIRecruitDetailViewController()
     recruitDetailViewController.hidesBottomBarWhenPushed = true
-    recruitDetailViewController.testRecruit = recruits[index]
+    recruitDetailViewController.recruit = selectedRecruit
+    recruitDetailViewController.user = user
     self.navigationController?.pushViewController(recruitDetailViewController, animated: true)
   }
   
-  func storyViewCellDidSelect(index: Int) {
+  func storyViewCellDidSelect(selectedStory: FirebaseStory, user: FirebaseUser) {
     let commentViewController = ANICommentViewController()
     commentViewController.hidesBottomBarWhenPushed = true
     commentViewController.commentMode = CommentMode.story
-    commentViewController.story = storys[index]
-    commentViewController.me = me
+    commentViewController.story = selectedStory
+    commentViewController.user = user
     self.navigationController?.pushViewController(commentViewController, animated: true)
   }
   
-  func qnaViewCellDidSelect(index: Int) {
+  func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser) {
+    let recruitDetailViewController = ANIRecruitDetailViewController()
+    recruitDetailViewController.hidesBottomBarWhenPushed = true
+    recruitDetailViewController.recruit = recruit
+    recruitDetailViewController.user = user
+    self.navigationController?.pushViewController(recruitDetailViewController, animated: true)
+  }
+  
+  func qnaViewCellDidSelect(selectedQna: FirebaseQna, user: FirebaseUser) {
     let commentViewController = ANICommentViewController()
     commentViewController.hidesBottomBarWhenPushed = true
     commentViewController.commentMode = CommentMode.qna
-    commentViewController.qna = qnas[index]
-    commentViewController.me = me
+    commentViewController.qna = selectedQna
+    commentViewController.user = user
     self.navigationController?.pushViewController(commentViewController, animated: true)
+  }
+  
+  func reject() {
+    guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
+          !isRejectAnimating else { return }
+    
+    rejectViewBottomConstraint.constant = UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut, animations: {
+      self.isRejectAnimating = true
+      self.view.layoutIfNeeded()
+    }) { (complete) in
+      guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
+        let rejectViewBottomConstraintOriginalConstant = self.rejectViewBottomConstraintOriginalConstant else { return }
+      
+      rejectViewBottomConstraint.constant = rejectViewBottomConstraintOriginalConstant
+      UIView.animate(withDuration: 0.3, delay: 1.0, options: .curveEaseInOut, animations: {
+        self.view.layoutIfNeeded()
+      }, completion: { (complete) in
+        self.isRejectAnimating = false
+      })
+    }
+  }
+  
+  func popupOptionView(isMe: Bool, contentType: ContentType, id: String) {
+    self.contentType = contentType
+    self.contributionId = id
+    
+    let popupOptionViewController = ANIPopupOptionViewController()
+    popupOptionViewController.modalPresentationStyle = .overCurrentContext
+    popupOptionViewController.isMe = isMe
+    popupOptionViewController.delegate = self
+    self.tabBarController?.present(popupOptionViewController, animated: false, completion: nil)
+  }
+  
+  func presentImageBrowser(index: Int, imageUrls: [String]) {
+    let imageBrowserViewController = ANIImageBrowserViewController()
+    imageBrowserViewController.selectedIndex = index
+    imageBrowserViewController.imageUrls = imageUrls
+    imageBrowserViewController.modalPresentationStyle = .overCurrentContext
+    imageBrowserViewController.delegate = self
+    //overCurrentContextだとtabBarが消えないのでtabBarからpresentする
+    self.tabBarController?.present(imageBrowserViewController, animated: false, completion: nil)
+  }
+}
+
+//MARK: ANIProfileEditViewControllerDelegate
+extension ANIProfileViewController: ANIProfileEditViewControllerDelegate {
+  func didEdit() {
+    guard let profileBasicView = self.profileBasicView,
+          let navigationTitleLabel = self.navigationTitleLabel,
+          let currentUser = self.currentUser else { return }
+    
+    profileBasicView.currentUser = currentUser
+    navigationTitleLabel.text = currentUser.userName
+  }
+}
+
+//MARK: ANINeedLoginViewDelegate
+extension ANIProfileViewController: ANINeedLoginViewDelegate {
+  func loginButtonTapped() {
+    let initialViewController = ANIInitialViewController()
+    let navigationController = UINavigationController(rootViewController: initialViewController)
+    self.present(navigationController, animated: true, completion: nil)
+  }
+}
+
+//MARK: ANIImageBrowserViewControllerDelegate
+extension ANIProfileViewController: ANIImageBrowserViewControllerDelegate {
+  func imageBrowserDidDissmiss() {
+    UIApplication.shared.statusBarStyle = .default
+  }
+}
+
+//MARK: ANIPopupOptionViewControllerDelegate
+extension ANIProfileViewController: ANIPopupOptionViewControllerDelegate {
+  func deleteContribution() {
+    let alertController = UIAlertController(title: nil, message: "投稿を削除しますか？", preferredStyle: .alert)
+    
+    let deleteAction = UIAlertAction(title: "削除", style: .default) { (action) in
+      self.deleteData()
+    }
+    let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
+    
+    alertController.addAction(deleteAction)
+    alertController.addAction(cancelAction)
+    
+    self.present(alertController, animated: true, completion: nil)
+  }
+  
+  func reportContribution() {
+  }
+  
+  func optionTapped(index: Int) {
+  }
+}
+
+//MAKR: data
+extension ANIProfileViewController {
+  private func deleteData() {
+    guard let contentType = self.contentType, let contributionId = self.contributionId else { return }
+    
+    let database = Firestore.firestore()
+    
+    var collection = ""
+    var loveIDsCollection = ""
+    
+    if contentType == .story {
+      collection = KEY_STORIES
+      loveIDsCollection = KEY_LOVE_STORY_IDS
+    } else if contentType == .qna {
+      collection = KEY_QNAS
+      loveIDsCollection = KEY_LOVE_QNA_IDS
+    }
+    
+    DispatchQueue.global().async {
+      database.collection(collection).document(contributionId).getDocument(completion: { (snapshot, error) in
+        if let error = error {
+          DLog("get document error \(error)")
+          
+          return
+        }
+        
+        database.collection(collection).document(contributionId).delete()
+        self.delegateDataAlgolia(contentType: contentType, contributionId: contributionId)
+        
+        DispatchQueue.main.async {
+          guard let profileBasicView = self.profileBasicView else { return }
+          
+          profileBasicView.deleteData(id: contributionId)
+        }
+        
+        guard let snapshot = snapshot, let data = snapshot.data() else { return }
+        
+        do {
+          if contentType == .story {
+            let story = try FirestoreDecoder().decode(FirebaseStory.self, from: data)
+            
+            if let urls = story.storyImageUrls {
+              for url in urls {
+                let storage = Storage.storage()
+                let storageRef = storage.reference(forURL: url)
+                
+                storageRef.delete { error in
+                  if let error = error {
+                    DLog(error)
+                  }
+                }
+              }
+            }
+          } else if contentType == .qna {
+            let qna = try FirestoreDecoder().decode(FirebaseQna.self, from: data)
+            
+            if let urls = qna.qnaImageUrls {
+              for url in urls {
+                let storage = Storage.storage()
+                let storageRef = storage.reference(forURL: url)
+                
+                storageRef.delete { error in
+                  if let error = error {
+                    DLog(error)
+                  }
+                }
+              }
+            }
+          }
+        } catch let error {
+          DLog(error)
+        }
+      })
+    }
+    
+    DispatchQueue.global().async {
+      database.collection(collection).document(contributionId).collection(KEY_LOVE_IDS).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          DLog("Get document error \(error)")
+          
+          return
+        }
+        
+        guard let snapshot = snapshot else { return }
+        
+        for document in snapshot.documents {
+          database.collection(KEY_USERS).document(document.documentID).collection(loveIDsCollection).document(contributionId).delete()
+          database.collection(collection).document(contributionId).collection(KEY_LOVE_IDS).document(document.documentID).delete()
+        }
+      })
+      
+      database.collection(collection).document(contributionId).collection(KEY_COMMENTS).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          DLog("Get document error \(error)")
+          
+          return
+        }
+        
+        guard let snapshot = snapshot else { return }
+        
+        for document in snapshot.documents {
+          database.collection(collection).document(contributionId).collection(KEY_COMMENTS).document(document.documentID).delete()
+        }
+      })
+    }
+  }
+  
+  private func delegateDataAlgolia(contentType: ContentType, contributionId: String) {
+    var index: Index?
+    
+    if contentType == .story {
+      index = ANISessionManager.shared.client.index(withName: KEY_STORIES_INDEX)
+    } else if contentType == .qna {
+      index = ANISessionManager.shared.client.index(withName: KEY_QNAS_INDEX)
+    }
+    
+    DispatchQueue.global().async {
+      index?.deleteObject(withID: contributionId)
+    }
+  }
+}
+
+//MARK: UIGestureRecognizerDelegate
+extension ANIProfileViewController: UIGestureRecognizerDelegate {
+  func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+    return true
   }
 }

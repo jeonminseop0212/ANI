@@ -7,12 +7,24 @@
 //
 
 import UIKit
+import FirebaseStorageUI
+
+protocol ANIFamilyViewDelegate {
+  func presentImageBrowser(index: Int, imageUrls: [String])
+}
 
 class ANIFamilyView: UIView {
   
   private weak var familyCollectionView: UICollectionView?
   
-  var user: User?
+  var user: FirebaseUser? {
+    didSet {
+      guard let familyCollectionView = self.familyCollectionView else { return }
+      familyCollectionView.reloadData()
+    }
+  }
+  
+  var delegate: ANIFamilyViewDelegate?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -43,26 +55,60 @@ class ANIFamilyView: UIView {
   }
 }
 
-extension ANIFamilyView: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+//MARK: UICollectionViewDataSource
+extension ANIFamilyView: UICollectionViewDataSource {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-    guard let user = self.user,
-          let familyImages = user.familyImages else { return 0 }
-    
-    return familyImages.count
+    if let user = self.user, let familyImageUrls = user.familyImageUrls {
+      return 1 + familyImageUrls.count
+    } else {
+      return 1
+    }
   }
   
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-    guard let user = self.user,
-          let familyImages = user.familyImages else { return UICollectionViewCell() }
-    
     let id = NSStringFromClass(ANIFamilyViewCell.self)
     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! ANIFamilyViewCell
-    cell.familyImageView?.image = familyImages[indexPath.item]
+    
+    if indexPath.item == 0 {
+      if let user = self.user, let profileImageUrl = user.profileImageUrl {
+        cell.familySmallImageViewBG?.alpha = 0.0
+        cell.familyBigImageView?.alpha = 1.0
+        cell.familyBigImageView?.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
+      }
+    } else {
+      if let user = self.user, let familyImageUrls = user.familyImageUrls {
+        cell.familyBigImageView?.alpha = 0.0
+        cell.familySmallImageViewBG?.alpha = 1.0
+        cell.familySmallImageView?.sd_setImage(with: URL(string: familyImageUrls[indexPath.item - 1]), completed: nil)
+      }
+    }
+    
     return cell
   }
-  
+}
+
+//MARK: UICollectionViewDelegateFlowLayout
+extension ANIFamilyView: UICollectionViewDelegateFlowLayout {
   func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
     let size = CGSize(width: collectionView.frame.height, height: collectionView.frame.height)
     return size
+  }
+}
+
+//MARK: UICollectionViewDelegate
+extension ANIFamilyView: UICollectionViewDelegate {
+  func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    guard let user = self.user,
+          let profileImageUrl = user.profileImageUrl else { return }
+    
+    var imageUrls = [String]()
+    imageUrls.append(profileImageUrl)
+    if let familyImageUrls = user.familyImageUrls {
+      for familyImageUrl in familyImageUrls {
+        imageUrls.append(familyImageUrl)
+      }
+    }
+    
+    self.delegate?.presentImageBrowser(index: indexPath.item, imageUrls: imageUrls)
   }
 }

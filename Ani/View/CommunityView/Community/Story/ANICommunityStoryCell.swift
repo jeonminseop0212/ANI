@@ -11,11 +11,11 @@ import UIKit
 class ANICommunityStoryCell: UICollectionViewCell {
   private weak var storyView: ANIStoryView?
   
-  var storys: [Story]? {
+  var isCellSelected: Bool = false {
     didSet {
-      guard let storyView = self.storyView,
-            let storys = self.storys else { return }
-      storyView.storys = storys
+      guard let storyView = self.storyView else { return }
+      
+      storyView.isCellSelected = isCellSelected
     }
   }
   

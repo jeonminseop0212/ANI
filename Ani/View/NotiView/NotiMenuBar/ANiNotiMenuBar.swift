@@ -9,16 +9,20 @@
 import UIKit
 import TinyConstraints
 
+enum MenuKind {
+  case noti;
+  case message;
+}
+
 class ANiNotiMenuBar: UIView {
-  var menuCollectionView: UICollectionView?
-  private let menus = ["NOTI", "MESSAGE"]
+  weak var menuCollectionView: UICollectionView?
+  private let menus = ["通知", "メッセージ"]
   var horizontalBarleftConstraint:Constraint?
-  var aniNotiViewController: ANINotiViewController?
+  var notiViewController: ANINotiViewController?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()
-    setupHorizontalBar()
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -26,6 +30,7 @@ class ANiNotiMenuBar: UIView {
   }
   
   private func setup() {
+    //menuCollectionView
     self.backgroundColor = .white
     let flowlayout = UICollectionViewFlowLayout()
     let collectionView = UICollectionView(frame: self.frame, collectionViewLayout: flowlayout)
@@ -42,28 +47,44 @@ class ANiNotiMenuBar: UIView {
     collectionView.rightToSuperview()
     collectionView.height(ANICommunityViewController.NAVIGATION_BAR_HEIGHT)
     self.menuCollectionView = collectionView
-  }
-  
-  private func setupHorizontalBar() {
+    
+    //horizontalBar
     let horizontalBar = UIView()
-    horizontalBar.backgroundColor = ANIColor.green
+    horizontalBar.backgroundColor = ANIColor.emerald
     addSubview(horizontalBar)
     horizontalBarleftConstraint = horizontalBar.leftToSuperview()
     horizontalBar.widthToSuperview(multiplier: 1/2)
-    horizontalBar.height(3.0)
+    horizontalBar.height(2.0)
     horizontalBar.bottomToSuperview()
   }
 }
 
 extension ANiNotiMenuBar: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-    return 2
+    return menus.count
   }
   
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     let id = NSStringFromClass(ANINotiMenuBarCell.self)
     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! ANINotiMenuBarCell
+
+    if indexPath.row == 0 {
+      cell.menuKind = .noti
+      if ANISessionManager.shared.isHaveUnreadNoti {
+        cell.badge?.alpha = 1.0
+      } else {
+        cell.badge?.alpha = 0.0
+      }
+    } else if indexPath.row == 1 {
+      cell.menuKind = .message
+      if ANISessionManager.shared.isHaveUnreadMessage {
+        cell.badge?.alpha = 1.0
+      } else {
+        cell.badge?.alpha = 0.0
+      }
+    }
     cell.menuLabel?.text = menus[indexPath.item]
+    
     return cell
   }
   
@@ -77,8 +98,8 @@ extension ANiNotiMenuBar: UICollectionViewDataSource, UICollectionViewDelegate, 
   }
   
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-    guard let aniNotiViewController = self.aniNotiViewController else { return }
-    aniNotiViewController.scrollToMenuIndex(menuIndex: indexPath.item)
+    guard let notiViewController = self.notiViewController else { return }
+    notiViewController.scrollToMenuIndex(menuIndex: indexPath.item)
   }
 }
 

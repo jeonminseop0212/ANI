@@ -9,6 +9,10 @@
 import UIKit
 import Gallery
 import TinyConstraints
+import FirebaseStorage
+import FirebaseFirestore
+import CodableFirebase
+import NVActivityIndicatorView
 
 enum BasicInfoPickMode {
   case kind
@@ -19,8 +23,13 @@ enum BasicInfoPickMode {
   case castration
 }
 
+enum RecruitContributionMode {
+  case new
+  case edit
+}
+
 protocol ANIRecruitContributionViewControllerDelegate {
-  func contributionButtonTapped(recruitInfo: RecruitInfo)
+  func doneEditingRecruit(recruit: FirebaseRecruit)
 }
 
 class ANIRecruitContributionViewController: UIViewController {
@@ -54,10 +63,19 @@ class ANIRecruitContributionViewController: UIViewController {
     }
   }
   
+  private let pickUpItem = PickUpItem()
+  
   private var isHaderImagePick: Bool = false
   
+  private let IMAGE_SIZE: CGSize = CGSize(width: 500.0, height: 500.0)
+  
+  private var isBack: Bool = false
+  
+  var recruitContributionMode: RecruitContributionMode = .new
+  var recruit: FirebaseRecruit?
+  
   var delegate: ANIRecruitContributionViewControllerDelegate?
-    
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     
@@ -77,6 +95,9 @@ class ANIRecruitContributionViewController: UIViewController {
     
     //recruitContributionView
     let recruitContributionView = ANIRecruitContributionView()
+    if recruitContributionMode == .edit, let recruit = self.recruit {
+      recruitContributionView.recruit = recruit
+    }
     recruitContributionView.headerMinHeight = UIViewController.STATUS_BAR_HEIGHT + UIViewController.NAVIGATION_BAR_HEIGHT
     recruitContributionView.delegate = self
     self.view.addSubview(recruitContributionView)
@@ -110,20 +131,27 @@ class ANIRecruitContributionViewController: UIViewController {
     
     //contributeButton
     let contributeButton = ANIAreaButtonView()
-    contributeButton.base?.backgroundColor = ANIColor.green
+    contributeButton.base?.backgroundColor = ANIColor.emerald
     contributeButton.baseCornerRadius = ANIRecruitContributionViewController.CONTRIBUTE_BUTTON_HEIGHT / 2
     contributeButton.dropShadow(opacity: 0.2)
     contributeButton.delegate = self
+    if recruitContributionMode == .edit {
+      contributeButton.alpha = 0.0
+    }
     self.view.addSubview(contributeButton)
-    contributeButton.bottomToSuperview(offset: -10.0)
+    contributeButton.bottomToSuperview(offset: -15.0)
     contributeButton.leftToSuperview(offset: 100.0)
-    contributeButton.rightToSuperview(offset: 100.0)
+    contributeButton.rightToSuperview(offset: -100.0)
     contributeButton.height(ANIRecruitContributionViewController.CONTRIBUTE_BUTTON_HEIGHT)
     self.contributeButton = contributeButton
     
-    //ontributeButtonLabel
+    //contributeButtonLabel
     let contributeButtonLabel = UILabel()
-    contributeButtonLabel.text = "投稿する"
+    if recruitContributionMode == .new {
+      contributeButtonLabel.text = "投稿する"
+    } else if recruitContributionMode == .edit {
+      contributeButtonLabel.text = "保存する"
+    }
     contributeButtonLabel.textAlignment = .center
     contributeButtonLabel.font = UIFont.boldSystemFont(ofSize: 17.0)
     contributeButtonLabel.textColor = .white
@@ -133,7 +161,7 @@ class ANIRecruitContributionViewController: UIViewController {
     
     //rejectView
     let rejectView = UIView()
-    rejectView.backgroundColor = ANIColor.green
+    rejectView.backgroundColor = ANIColor.emerald
     self.view.addSubview(rejectView)
     rejectViewBottomConstraint = rejectView.bottomToTop(of: self.view)
     rejectViewBottomConstraintOriginalConstant = rejectViewBottomConstraint?.constant
@@ -144,7 +172,7 @@ class ANIRecruitContributionViewController: UIViewController {
     
     //rejectBaseView
     let rejectBaseView = UIView()
-    rejectBaseView.backgroundColor = ANIColor.green
+    rejectBaseView.backgroundColor = ANIColor.emerald
     rejectView.addSubview(rejectBaseView)
     rejectBaseView.edgesToSuperview(excluding: .top)
     rejectBaseView.height(UIViewController.NAVIGATION_BAR_HEIGHT)
@@ -152,7 +180,7 @@ class ANIRecruitContributionViewController: UIViewController {
     
     //rejectLabel
     let rejectLabel = UILabel()
-    rejectLabel.text = "入力してない項目があります！"
+    rejectLabel.text = "入力していない項目があります！"
     rejectLabel.textColor = .white
     rejectLabel.textAlignment = .center
     rejectLabel.font = UIFont.boldSystemFont(ofSize: 16.0)
@@ -168,29 +196,29 @@ class ANIRecruitContributionViewController: UIViewController {
   }
   
   @objc private func keyboardWillChangeFrame(_ notification: Notification) {
-    guard let keyboardFrame = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
-          let duration = notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as? TimeInterval,
-          let curve = notification.userInfo?[UIKeyboardAnimationCurveUserInfoKey] as? UInt,
+    guard let keyboardFrame = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
+          let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval,
+          let curve = notification.userInfo?[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt,
           let recruitContributeViewBottomConstraint = self.recruitContributionViewBottomConstraint else { return }
     
     let h = keyboardFrame.height
     
     recruitContributeViewBottomConstraint.constant = -h  + 10.0 + ANIRecruitContributionViewController.CONTRIBUTE_BUTTON_HEIGHT
 
-    UIView.animate(withDuration: duration, delay: 0, options: UIViewAnimationOptions(rawValue: curve), animations: {
+    UIView.animate(withDuration: duration, delay: 0, options: UIView.AnimationOptions(rawValue: curve), animations: {
       self.view.layoutIfNeeded()
     })
   }
   
   @objc private func keyboardWillHide(_ notification: Notification) {
-    guard let duration = notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as? TimeInterval,
-          let curve = notification.userInfo?[UIKeyboardAnimationCurveUserInfoKey] as? UInt,
+    guard let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval,
+          let curve = notification.userInfo?[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt,
       let recruitContributionViewOriginalBottomConstraintConstant = self.recruitContributionViewOriginalBottomConstraintConstant,
       let recruitContributionViewBottomConstraint = self.recruitContributionViewBottomConstraint else { return }
     
     recruitContributionViewBottomConstraint.constant = recruitContributionViewOriginalBottomConstraintConstant
     
-    UIView.animate(withDuration: duration, delay: 0, options: UIViewAnimationOptions(rawValue: curve), animations: {
+    UIView.animate(withDuration: duration, delay: 0, options: UIView.AnimationOptions(rawValue: curve), animations: {
       self.view.layoutIfNeeded()
     })
   }
@@ -205,10 +233,10 @@ class ANIRecruitContributionViewController: UIViewController {
       Gallery.Config.Camera.oneImageMode = true
       Gallery.Config.Font.Main.regular = UIFont.boldSystemFont(ofSize: 17)
       Gallery.Config.Grid.ArrowButton.tintColor = ANIColor.dark
-      Gallery.Config.Grid.FrameView.borderColor = ANIColor.green
+      Gallery.Config.Grid.FrameView.borderColor = ANIColor.emerald
       if Gallery.Config.Camera.oneImageMode {
         Gallery.Config.Grid.previewRatio = UIViewController.HEADER_IMAGE_VIEW_RATIO
-        Config.tabsToShow = [.imageTab, .cameraTab]
+        Gallery.Config.tabsToShow = [.imageTab, .cameraTab]
       }
       let galleryNV = UINavigationController(rootViewController: galleryUnrap)
       present(galleryNV, animated: animation, completion: nil)
@@ -227,7 +255,7 @@ class ANIRecruitContributionViewController: UIViewController {
       Gallery.Config.Camera.oneImageMode = false
       Gallery.Config.Font.Main.regular = UIFont.boldSystemFont(ofSize: 17)
       Gallery.Config.Grid.ArrowButton.tintColor = ANIColor.dark
-      Gallery.Config.Grid.FrameView.borderColor = ANIColor.green
+      Gallery.Config.Grid.FrameView.borderColor = ANIColor.emerald
       Gallery.Config.Grid.previewRatio = 1.0
       Config.tabsToShow = [.imageTab, .cameraTab]
       let galleryNV = UINavigationController(rootViewController: galleryUnrap)
@@ -237,7 +265,7 @@ class ANIRecruitContributionViewController: UIViewController {
     }
   }
   
-  func getCropImages(images: [UIImage?], items: [Image]) -> [UIImage] {
+  private func getCropImages(images: [UIImage?], items: [Image]) -> [UIImage] {
     var croppedImages = [UIImage]()
     
     for (index, image) in images.enumerated() {
@@ -247,7 +275,7 @@ class ANIRecruitContributionViewController: UIViewController {
       let heightScale = scrollViewWidth / (imageSize?.height)! * items[index].scale
       
       let scale = 1 / min(widthScale, heightScale)
-      let visibleRect = CGRect(x: items[index].offset.x * scale, y: items[index].offset.y * scale, width: scrollViewWidth * scale, height: scrollViewWidth * scale * Config.Grid.previewRatio)
+      let visibleRect = CGRect(x: floor(items[index].offset.x * scale), y: floor(items[index].offset.y * scale), width: scrollViewWidth * scale, height: scrollViewWidth * scale * Config.Grid.previewRatio)
       let ref: CGImage = (image?.cgImage?.cropping(to: visibleRect))!
       let croppedImage:UIImage = UIImage(cgImage: ref)
       
@@ -256,8 +284,64 @@ class ANIRecruitContributionViewController: UIViewController {
     return croppedImages
   }
   
+  private func updateDatabase(recruit: FirebaseRecruit, id: String) {
+    if recruit.headerImageUrl != nil && recruit.introduceImageUrls != nil {
+      do {
+        let database = Firestore.firestore()
+
+        let data = try FirestoreEncoder().encode(recruit) as [String: AnyObject]
+        
+        if recruitContributionMode == .new {
+          database.collection(KEY_RECRUITS).document(id).setData(data)
+        } else if recruitContributionMode == .edit {
+          database.collection(KEY_RECRUITS).document(id).setData(data) { (error) in
+            if let error = error {
+              DLog(error)
+            } else {
+              NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+              
+              self.delegate?.doneEditingRecruit(recruit: recruit)
+              self.dismiss(animated: true, completion: nil)
+            }
+          }
+        }
+      } catch let error {
+        DLog(error)
+      }
+    }
+  }
+  
+  private func deleteStorage() {
+    guard let recruit = self.recruit else { return }
+    
+    if let headerImageUrl = recruit.headerImageUrl {
+      let storage = Storage.storage()
+      let storageRef = storage.reference(forURL: headerImageUrl)
+      
+      storageRef.delete { error in
+        if let error = error {
+          DLog(error)
+        }
+      }
+    }
+    
+    if let introduceImageUrls = recruit.introduceImageUrls {
+      for url in introduceImageUrls {
+        let storage = Storage.storage()
+        let storageRef = storage.reference(forURL: url)
+        
+        storageRef.delete { error in
+          if let error = error {
+            DLog(error)
+          }
+        }
+      }
+    }
+  }
+  
   //MARK: Action
   @objc private func recruitContributeDismiss() {
+    self.isBack = true
     self.navigationController?.dismiss(animated: true, completion: nil)
   }
 }
@@ -301,15 +385,11 @@ extension ANIRecruitContributionViewController: ANIImageFilterViewControllerDele
     
     if isHaderImagePick {
       if let filteredImage = filteredImages[0] {
-        recruitContributionView.headerImage = filteredImage
+        recruitContributionView.headerImage = filteredImage.resize(size: IMAGE_SIZE)
       }
     } else {
-      if recruitContributionView.introduceImages.isEmpty {
-        recruitContributionView.introduceImages = filteredImages
-      } else {
-        for filteredImage in filteredImages {
-          recruitContributionView.introduceImages.append(filteredImage)
-        }
+      for filteredImage in filteredImages {
+        recruitContributionView.introduceImages.append(filteredImage?.resize(size: IMAGE_SIZE))
       }
     }
   }
@@ -319,7 +399,8 @@ extension ANIRecruitContributionViewController: ANIImageFilterViewControllerDele
 extension ANIRecruitContributionViewController: ANIRecruitContributionViewDelegate {
   func recruitContributeViewDidScroll(offset: CGFloat) {
     guard let myNavigationBar = self.myNavigationBar,
-      let dismissButton = self.dismissButton else { return }
+          let dismissButton = self.dismissButton,
+          !isBack else { return }
     
     if offset > 1 {
       let backGroundColorOffset: CGFloat = 1.0
@@ -346,52 +427,66 @@ extension ANIRecruitContributionViewController: ANIRecruitContributionViewDelega
   }
   
   func kindSelectButtonTapped() {
+    var kind = pickUpItem.kind
+    kind.insert("わからない", at: 0)
+    
     let popupPickerViewController = ANIPopupPickerViewController()
-    popupPickerViewController.pickerItem = ["わからない", "ミックス", "ブリティッシュショートヘア", "シャム", "ペルシャ", "ラグドール", "メインクーン", "ベンガル", "スフィンクス", "アビシニアン", "ロシアンブルー", "エキゾチックショートヘア", "アメリカン・ショートヘア", "スコティッシュフォールド", "バーマン", "ノルウェージャンフォレストキャット", "アメリカンカール", "マンチカン"]
+    popupPickerViewController.pickerItem = kind
     popupPickerViewController.modalPresentationStyle = .overCurrentContext
     pickMode = BasicInfoPickMode.kind
     present(popupPickerViewController, animated: false, completion: nil)
   }
   
   func ageSelectButtonTapped() {
+    var age = pickUpItem.age
+    age.insert("わからない", at: 0)
+    
     let popupPickerViewController = ANIPopupPickerViewController()
-    popupPickerViewController.pickerItem = ["わからない", "1歳未満", "１〜２歳", "２〜３歳", "３〜４歳", "４〜５歳", "５〜６歳", "６〜７歳", "７〜８歳", "８〜９歳", "９〜１０歳", "１０歳以上"]
+    popupPickerViewController.pickerItem = age
     pickMode = BasicInfoPickMode.age
     popupPickerViewController.modalPresentationStyle = .overCurrentContext
     present(popupPickerViewController, animated: false, completion: nil)
   }
   
   func sexSelectButtonTapped() {
+    var sex = pickUpItem.sex
+    sex.insert("わからない", at: 0)
+    
     let popupPickerViewController = ANIPopupPickerViewController()
-    popupPickerViewController.pickerItem = ["わからない", "男の子", "女の子"]
+    popupPickerViewController.pickerItem = sex
     pickMode = BasicInfoPickMode.sex
     popupPickerViewController.modalPresentationStyle = .overCurrentContext
     present(popupPickerViewController, animated: false, completion: nil)
   }
   
   func homeSelectButtonTapped() {
+    var home = pickUpItem.home
+    home.insert("わからない", at: 0)
+
     let popupPickerViewController = ANIPopupPickerViewController()
-    popupPickerViewController.pickerItem = ["東京都", "神奈川県", "大阪府", "愛知県", "埼玉県", "千葉県", "兵庫県", "北海道", "福岡県", "静岡県",
-                                            "茨城県", "広島県", "京都府", "宮城県", "新潟県", "長野県", "岐阜県", "栃木県", "群馬県", "岡山県",
-                                            "福島県", "三重県", "熊本県", "鹿児島県", "沖縄県", "滋賀県", "山口県", "愛媛県", "長崎県", "奈良県",
-                                            "青森県", "岩手県", "大分県", "石川県", "山形県", "宮崎県", "富山県", "秋田県", "香川県", "和歌山県",
-                                            "佐賀県", "山梨県", "福井県", "徳島県", "高知県", "島根県", "鳥取県"]
+    popupPickerViewController.pickerItem = home
     pickMode = BasicInfoPickMode.home
     popupPickerViewController.modalPresentationStyle = .overCurrentContext
     present(popupPickerViewController, animated: false, completion: nil)
   }
   
   func vaccineSelectButtonTapped() {
+    var vaccine = pickUpItem.vaccine
+    vaccine.insert("わからない", at: 0)
+    
     let popupPickerViewController = ANIPopupPickerViewController()
-    popupPickerViewController.pickerItem = ["わからない", "０回", "１回", "２回"]
+    popupPickerViewController.pickerItem = vaccine
     pickMode = BasicInfoPickMode.vaccine
     popupPickerViewController.modalPresentationStyle = .overCurrentContext
     present(popupPickerViewController, animated: false, completion: nil)
   }
   
   func castrationSelectButtonTapped() {
+    var castration = pickUpItem.castration
+    castration.insert("わからない", at: 0)
+    
     let popupPickerViewController = ANIPopupPickerViewController()
-    popupPickerViewController.pickerItem = ["わからない", "済み"]
+    popupPickerViewController.pickerItem = castration
     pickMode = BasicInfoPickMode.castration
     popupPickerViewController.modalPresentationStyle = .overCurrentContext
     present(popupPickerViewController, animated: false, completion: nil)
@@ -400,21 +495,107 @@ extension ANIRecruitContributionViewController: ANIRecruitContributionViewDelega
   func imagesPickCellTapped() {
     recruitIntroduceImagesPick(animation: true)
   }
+  
+  func doneEditLayout() {
+    guard let contributeButton = self.contributeButton else { return }
+    
+    UIView.animate(withDuration: 0.2, animations: {
+      contributeButton.alpha = 1.0
+    })
+  }
 }
 
 //MARK: ANIButtonViewDelegate
 extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
   func buttonViewTapped(view: ANIButtonView) {
     if view === self.contributeButton {
-      guard let recruitContributionView = self.recruitContributionView,
+      guard let currentUser = ANISessionManager.shared.currentUser,
+            let userId = currentUser.uid,
+            let recruitContributionView = self.recruitContributionView,
             let recruitInfo = recruitContributionView.getRecruitInfo(),
             let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
             !isRejectAnimating else { return }
       
       if recruitInfo.headerImage != UIImage(named: "headerDefault") && recruitInfo.title.count > 0 && recruitInfo.kind.count > 0 && recruitInfo.age.count > 0 && recruitInfo.age.count > 0 && recruitInfo.sex.count > 0 && recruitInfo.home.count > 0 && recruitInfo.vaccine.count > 0 && recruitInfo.castration.count > 0 && recruitInfo.reason.count > 0 && recruitInfo.introduce.count > 0 && recruitInfo.passing.count > 0 && !recruitInfo.introduceImages.isEmpty {
-        self.delegate?.contributionButtonTapped(recruitInfo: recruitInfo)
         
-        self.dismiss(animated: true, completion: nil)
+        if recruitContributionMode == .edit {
+          let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.emerald)
+          NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData, nil)
+        }
+        
+        let storageRef = Storage.storage().reference()
+        
+        var id = ""
+        var date = ""
+        if recruitContributionMode == .new {
+          id = NSUUID().uuidString
+          date = ANIFunction.shared.getToday()
+        } else if recruitContributionMode == .edit, let recruit = self.recruit, let recruitId = recruit.id {
+          deleteStorage()
+          
+          id = recruitId
+          date = recruit.date
+        }
+        
+        var recruit = FirebaseRecruit(id: id, headerImageUrl: nil, title: recruitInfo.title, kind: recruitInfo.kind, age: recruitInfo.age, sex: recruitInfo.sex, home: recruitInfo.home, vaccine: recruitInfo.vaccine, castration: recruitInfo.castration, reason: recruitInfo.reason, introduce: recruitInfo.introduce, introduceImageUrls: nil, passing: recruitInfo.passing, recruitState: 0, userId: userId, date: date, isLoved: nil, isCliped: nil, isSupported: nil)
+        
+        DispatchQueue.global().async {
+          if let recruitHeaderImageData = recruitInfo.headerImage.jpegData(compressionQuality: 0.5) {
+            let uuid = NSUUID().uuidString
+            storageRef.child(KEY_RECRUIT_HEADER_IMAGES).child(uuid).putData(recruitHeaderImageData, metadata: nil) { (metaData, error) in
+              if error != nil {
+                DLog("storageError")
+                return
+              }
+              
+              if let recruitHeaderImageUrl = metaData?.downloadURL() {
+                recruit.headerImageUrl = recruitHeaderImageUrl.absoluteString
+                
+                DispatchQueue.main.async {
+                  self.updateDatabase(recruit: recruit, id: id)
+                }
+              }
+            }
+          }
+        }
+        
+        DispatchQueue.global().async {
+        var introduceImageUrls = [Int: String]()
+          for (index, introduceImage) in recruitInfo.introduceImages.enumerated() {
+            if let introduceImage = introduceImage, let introduceImageData = introduceImage.jpegData(compressionQuality: 0.5) {
+              let uuid = NSUUID().uuidString
+              storageRef.child(KEY_RECRUIT_INTRODUCE_IMAGES).child(uuid).putData(introduceImageData, metadata: nil) { (metaData, error) in
+                if error != nil {
+                  DLog("storageError")
+                  return
+                }
+                
+                if let introduceImageUrl = metaData?.downloadURL() {
+                  introduceImageUrls[index] = introduceImageUrl.absoluteString
+                  if introduceImageUrls.count == recruitInfo.introduceImages.count {
+                    let sortdUrls = introduceImageUrls.sorted(by: {$0.0 < $1.0})
+                    var urls = [String]()
+                    for url in sortdUrls {
+                      urls.append(url.value)
+                    }
+                    
+                    recruit.introduceImageUrls = urls
+                    
+                    DispatchQueue.main.async {
+                      self.updateDatabase(recruit: recruit, id: id)
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        
+        self.view.endEditing(true)
+        
+        if recruitContributionMode == .new {
+          self.dismiss(animated: true, completion: nil)
+        }
       } else {
         rejectViewBottomConstraint.constant = UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
         UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut, animations: {

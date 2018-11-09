@@ -13,6 +13,7 @@ protocol ANIProfileEditViewDelegate {
   func editButtonEnable(enable: Bool)
   func imagePickerCellTapped()
   func imageEditCellTapped(index: Int)
+  func familyImageDelete(index: Int)
 }
 
 class ANIProfileEditView: UIView {
@@ -37,16 +38,30 @@ class ANIProfileEditView: UIView {
   private weak var introduceBG: UIView?
   private weak var introduceTextView: ANIPlaceHolderTextView?
   
-  var user: User? {
+  var currentUser: FirebaseUser? {
     didSet {
-      guard let familyView = self.familyView else { return }
-      familyView.user = user
+      guard let familyView = self.familyView,
+            let currentUser = self.currentUser else { return }
+      familyView.currentUser = currentUser
       
       reloadLayout()
     }
   }
   
   private var selectedTextViewMaxY: CGFloat?
+  
+  var profileImage = UIImage() {
+    didSet {
+      guard let familyView = self.familyView else { return }
+      familyView.profileImage = profileImage
+    }
+  }
+  var familyImages: [UIImage?]? {
+    didSet {
+      guard let familyView = self.familyView else { return }
+      familyView.familyImages = familyImages
+    }
+  }
   
   var delegate: ANIProfileEditViewDelegate?
   
@@ -106,7 +121,7 @@ class ANIProfileEditView: UIView {
     contentView.addSubview(nameTitleLabel)
     nameTitleLabel.topToBottom(of: familyView, offset: 10.0)
     nameTitleLabel.leftToSuperview(offset: 10.0)
-    nameTitleLabel.rightToSuperview(offset: 10.0)
+    nameTitleLabel.rightToSuperview(offset: -10.0)
     self.familyTitleLabel = familyTitleLabel
     
     //nameBG
@@ -117,7 +132,7 @@ class ANIProfileEditView: UIView {
     contentView.addSubview(nameBG)
     nameBG.topToBottom(of: nameTitleLabel, offset: 10.0)
     nameBG.leftToSuperview(offset: 10.0)
-    nameBG.rightToSuperview(offset: 10.0)
+    nameBG.rightToSuperview(offset: -10.0)
     self.nameBG = nameBG
     
     //nameTextView
@@ -129,7 +144,7 @@ class ANIProfileEditView: UIView {
     nameTextView.placeHolder = "名前を入力してください"
     nameTextView.delegate = self
     nameBG.addSubview(nameTextView)
-    let textViewInsets = UIEdgeInsets(top: 5.0, left: 5.0, bottom: 5.0, right: -5.0)
+    let textViewInsets = UIEdgeInsets(top: 5.0, left: 5.0, bottom: 5.0, right: 5.0)
     nameTextView.edgesToSuperview(insets: textViewInsets)
     self.nameTextView = nameTextView
     setHideButtonOnKeyboard(textView: nameTextView)
@@ -142,7 +157,7 @@ class ANIProfileEditView: UIView {
     contentView.addSubview(kindTitleLable)
     kindTitleLable.topToBottom(of: nameBG, offset: 10.0)
     kindTitleLable.leftToSuperview(offset: 10.0)
-    kindTitleLable.rightToSuperview(offset: 10.0)
+    kindTitleLable.rightToSuperview(offset: -10.0)
     self.kindTitleLable = kindTitleLable
     
     //kindBG
@@ -153,7 +168,7 @@ class ANIProfileEditView: UIView {
     contentView.addSubview(kindBG)
     kindBG.topToBottom(of: kindTitleLable, offset: 10.0)
     kindBG.leftToSuperview(offset: 10.0)
-    kindBG.rightToSuperview(offset: 10.0)
+    kindBG.rightToSuperview(offset: -10.0)
     self.kindBG = kindBG
     
     //kindLabel
@@ -173,8 +188,8 @@ class ANIProfileEditView: UIView {
     kindSelectButton.delegate = self
     kindSelectButton.image = UIImage(named: "basicInfoSelectButton")
     kindBG.addSubview(kindSelectButton)
-    kindSelectButton.width(12.0)
-    kindSelectButton.height(12.0)
+    kindSelectButton.width(10.0)
+    kindSelectButton.height(10.0)
     kindSelectButton.centerY(to: kindLabel)
     kindSelectButton.leftToRight(of: kindLabel, offset: 10.0)
     self.kindSelectButton = kindSelectButton
@@ -187,7 +202,7 @@ class ANIProfileEditView: UIView {
     contentView.addSubview(introduceTitleLabel)
     introduceTitleLabel.topToBottom(of: kindBG, offset: 10.0)
     introduceTitleLabel.leftToSuperview(offset: 10.0)
-    introduceTitleLabel.rightToSuperview(offset: 10.0)
+    introduceTitleLabel.rightToSuperview(offset: -10.0)
     self.introduceTitleLabel = introduceTitleLabel
     
     //introduceBG
@@ -198,7 +213,7 @@ class ANIProfileEditView: UIView {
     contentView.addSubview(introduceBG)
     introduceBG.topToBottom(of: introduceTitleLabel, offset: 10.0)
     introduceBG.leftToSuperview(offset: 10.0)
-    introduceBG.rightToSuperview(offset: 10.0)
+    introduceBG.rightToSuperview(offset: -10.0)
     introduceBG.bottomToSuperview(offset: -10.0)
     self.introduceBG = introduceBG
     
@@ -225,17 +240,16 @@ class ANIProfileEditView: UIView {
     guard let nameTextView = self.nameTextView,
           let kindLabel = self.kindLabel,
           let introduceTextView = self.introduceTextView,
-          let user = self.user else { return }
+          let currentUser = self.currentUser else { return }
     
-    nameTextView.text = user.name
-    
-    kindLabel.text = user.kind
-    
-    introduceTextView.text = user.introduce
+    nameTextView.text = currentUser.userName
+    kindLabel.text = currentUser.kind
+    introduceTextView.text = currentUser.introduce
   }
   
   private func setHideButtonOnKeyboard(textView: UITextView){
     let tools = UIToolbar()
+    tools.tintColor = ANIColor.emerald
     tools.frame = CGRect(x: 0, y: 0, width: frame.width, height: KEYBOARD_HIDE_TOOL_BAR_HEIGHT)
     let spacer = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
     let closeButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(keyboardHideButtonTapped))
@@ -244,18 +258,32 @@ class ANIProfileEditView: UIView {
   }
   
   private func editButtonEnable() {
-    guard let nameTextView = self.nameTextView,
-          let introduceTextView = self.introduceTextView else { return }
+    guard let nameTextView = self.nameTextView else { return }
     
-    if nameTextView.text.count > 0 && introduceTextView.text.count > 0 {
+    if nameTextView.text.count > 0 {
       self.delegate?.editButtonEnable(enable: true)
     } else {
       self.delegate?.editButtonEnable(enable: false)
     }
   }
   
+  func getUpdateUser() -> FirebaseUser? {
+    guard let nameTextView = self.nameTextView,
+          let name = nameTextView.text,
+          let kindLabel = self.kindLabel,
+          let kind = kindLabel.text,
+          let introduceTextView = self.introduceTextView,
+          let introduce = introduceTextView.text else { return nil }
+    
+    var updateUser = FirebaseUser()
+    updateUser.userName = name
+    updateUser.kind = kind
+    updateUser.introduce = introduce
+    return updateUser
+  }
+  
   @objc func keyboardWillChangeFrame(_ notification: Notification) {
-    guard let keyboardFrame = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
+    guard let keyboardFrame = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
           let scrollView = self.scrollView,
           let selectedTextViewMaxY = self.selectedTextViewMaxY else { return }
 
@@ -321,5 +349,9 @@ extension ANIProfileEditView: ANIProfileEditFamilyViewDelegate {
   
   func imageEditButtonTapped(index: Int) {
     self.delegate?.imageEditCellTapped(index: index)
+  }
+  
+  func familyImageDelete(index: Int) {
+    self.delegate?.familyImageDelete(index: index)
   }
 }

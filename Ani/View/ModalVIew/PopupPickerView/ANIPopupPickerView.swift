@@ -9,7 +9,7 @@
 import UIKit
 
 protocol ANIPopupPickerViewDelegate {
-  func cancelButtonTapped()
+  func okeyButtonTapped()
 }
 
 class ANIPopupPickerView: UIView {
@@ -17,14 +17,16 @@ class ANIPopupPickerView: UIView {
   private weak var pickerAreaBG: UIView?
   private weak var pickerView: UIPickerView?
   
-  private let CENCEL_BUTTON_HEIGHT: CGFloat = 50.0
-  private weak var cancelButton: UIButton?
+  private let OKEY_BUTTON_HEIGHT: CGFloat = 50.0
+  private weak var okeyButton: UIButton?
   
   var pickerItem: [String]? {
     didSet {
       setupPickerView()
     }
   }
+  
+  private var pickItem: String = ""
   
   var delegate: ANIPopupPickerViewDelegate?
 
@@ -39,19 +41,19 @@ class ANIPopupPickerView: UIView {
   }
   
   private func setup() {
-    //cancelButton
-    let cancelButton = UIButton()
-    cancelButton.setTitle("キャンセル", for: .normal)
-    cancelButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 17.0)
-    cancelButton.setTitleColor(ANIColor.dark, for: .normal)
-    cancelButton.backgroundColor = .white
-    cancelButton.layer.cornerRadius = 7.0
-    cancelButton.layer.masksToBounds = true
-    cancelButton.addTarget(self, action: #selector(cancel), for: .touchUpInside)
-    addSubview(cancelButton)
-    cancelButton.edgesToSuperview(excluding: .top)
-    cancelButton.height(CENCEL_BUTTON_HEIGHT)
-    self.cancelButton = cancelButton
+    //okeyButton
+    let okeyButton = UIButton()
+    okeyButton.setTitle("OK", for: .normal)
+    okeyButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 17.0)
+    okeyButton.setTitleColor(ANIColor.dark, for: .normal)
+    okeyButton.backgroundColor = .white
+    okeyButton.layer.cornerRadius = 7.0
+    okeyButton.layer.masksToBounds = true
+    okeyButton.addTarget(self, action: #selector(okey), for: .touchUpInside)
+    addSubview(okeyButton)
+    okeyButton.edgesToSuperview(excluding: .top)
+    okeyButton.height(OKEY_BUTTON_HEIGHT)
+    self.okeyButton = okeyButton
     
     //pickerAreaBG
     let pickerAreaBG = UIView()
@@ -60,13 +62,12 @@ class ANIPopupPickerView: UIView {
     pickerAreaBG.layer.masksToBounds = true
     addSubview(pickerAreaBG)
     pickerAreaBG.edgesToSuperview(excluding: .bottom)
-    pickerAreaBG.bottomToTop(of: cancelButton, offset: -10.0)
+    pickerAreaBG.bottomToTop(of: okeyButton, offset: -10.0)
     self.pickerAreaBG = pickerAreaBG
   }
   
   private func setupPickerView() {
-    guard let pickerAreaBG = self.pickerAreaBG,
-          let pickerItem = self.pickerItem else { return }
+    guard let pickerAreaBG = self.pickerAreaBG else { return }
     
     let pickerView = UIPickerView()
     pickerView.dataSource = self
@@ -74,18 +75,16 @@ class ANIPopupPickerView: UIView {
     pickerAreaBG.addSubview(pickerView)
     pickerView.edgesToSuperview()
     self.pickerView = pickerView
-    
-    if !pickerItem.isEmpty {
-      ANINotificationManager.postPickerViewDidSelect(pickItem: pickerItem[0])
-    }
   }
   
   //MARK: action
-  @objc private func cancel() {
-    self.delegate?.cancelButtonTapped()
+  @objc private func okey() {
+    self.delegate?.okeyButtonTapped()
+    ANINotificationManager.postPickerViewDidSelect(pickItem: pickItem)
   }
 }
 
+//MARK: UIPickerViewDataSource
 extension ANIPopupPickerView: UIPickerViewDataSource {
   func numberOfComponents(in pickerView: UIPickerView) -> Int {
     return 1
@@ -108,6 +107,7 @@ extension ANIPopupPickerView: UIPickerViewDataSource {
   }
 }
 
+//MARK: UIPickerViewDelegate
 extension ANIPopupPickerView: UIPickerViewDelegate {
   func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
     guard let pickerItem = self.pickerItem else { return "" }
@@ -118,6 +118,6 @@ extension ANIPopupPickerView: UIPickerViewDelegate {
   func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
     guard let pickerItem = self.pickerItem else { return }
 
-    ANINotificationManager.postPickerViewDidSelect(pickItem: pickerItem[row])
+    pickItem = pickerItem[row]
   }
 }
