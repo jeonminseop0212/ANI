@@ -50,6 +50,6 @@ class ANISessionManager: NSObject {
   #if DEBUG
   let adminUserId = "BHvoCcfLeKdjFXcpUPxXIBft44w2"
   #else
-  let adminUserId = "GIXHwMHxr6NInoLAXYc8hjfQOeF3"
+  let adminUserId = "oJ3eBzIFdISyrFOFPUNjMj61jNp2"
   #endif
 }
