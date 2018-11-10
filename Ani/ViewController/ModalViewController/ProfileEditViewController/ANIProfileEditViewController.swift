@@ -31,6 +31,13 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
   private var profileEditViewBottomConstraint: Constraint?
   private weak var profileEditView: ANIProfileEditView?
   
+  private var rejectViewBottomConstraint: Constraint?
+  private var rejectViewBottomConstraintOriginalConstant: CGFloat?
+  private weak var rejectView: UIView?
+  private weak var rejectBaseView: UIView?
+  private weak var rejectLabel: UILabel?
+  private var isRejectAnimating: Bool = false
+  
   private var gallery: GalleryController?
   
   private var editImageIndex: Int?
@@ -71,6 +78,18 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
   
   override func viewWillAppear(_ animated: Bool) {
     UIApplication.shared.isStatusBarHidden = false
+  }
+  
+  override func viewDidAppear(_ animated: Bool) {
+    guard let rejectView = self.rejectView else { return }
+    
+    rejectView.isHidden = false
+  }
+  
+  override func viewWillDisappear(_ animated: Bool) {
+    guard let rejectView = self.rejectView else { return }
+    
+    rejectView.isHidden = true
   }
   
   private func setup() {
@@ -154,6 +173,36 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
     profileEditViewOriginalBottomConstraintConstant = profileEditViewBottomConstraint?.constant
     profileEditView.topToBottom(of: myNavigationBar)
     self.profileEditView = profileEditView
+    
+    //rejectView
+    let rejectView = UIView()
+    rejectView.backgroundColor = ANIColor.emerald
+    rejectView.isHidden = true
+    self.view.addSubview(rejectView)
+    rejectViewBottomConstraint = rejectView.bottomToTop(of: self.view)
+    rejectViewBottomConstraintOriginalConstant = rejectViewBottomConstraint?.constant
+    rejectView.leftToSuperview()
+    rejectView.rightToSuperview()
+    rejectView.height(UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT)
+    self.rejectView = rejectView
+    
+    //rejectBaseView
+    let rejectBaseView = UIView()
+    rejectBaseView.backgroundColor = ANIColor.emerald
+    rejectView.addSubview(rejectBaseView)
+    rejectBaseView.edgesToSuperview(excluding: .top)
+    rejectBaseView.height(UIViewController.NAVIGATION_BAR_HEIGHT)
+    self.rejectBaseView = rejectBaseView
+    
+    //rejectLabel
+    let rejectLabel = UILabel()
+    rejectLabel.textAlignment = .center
+    rejectLabel.textColor = .white
+    rejectLabel.font = UIFont.boldSystemFont(ofSize: 16.0)
+    rejectLabel.textAlignment = .center
+    rejectBaseView.addSubview(rejectLabel)
+    rejectLabel.edgesToSuperview()
+    self.rejectLabel = rejectLabel
   }
   
   private func setupNotification() {
@@ -178,6 +227,30 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
       croppedImages.append(croppedImage)
     }
     return croppedImages
+  }
+  
+  private func reject(notiText: String) {
+    guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
+          let rejectLabel = self.rejectLabel,
+          !isRejectAnimating else { return }
+    
+    rejectLabel.text = notiText
+    
+    rejectViewBottomConstraint.constant = UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut, animations: {
+      self.isRejectAnimating = true
+      self.view.layoutIfNeeded()
+    }) { (complete) in
+      guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
+        let rejectViewBottomConstraintOriginalConstant = self.rejectViewBottomConstraintOriginalConstant else { return }
+      
+      rejectViewBottomConstraint.constant = rejectViewBottomConstraintOriginalConstant
+      UIView.animate(withDuration: 0.3, delay: 1.0, options: .curveEaseInOut, animations: {
+        self.view.layoutIfNeeded()
+      }, completion: { (complete) in
+        self.isRejectAnimating = false
+      })
+    }
   }
   
   @objc private func keyboardWillChangeFrame(_ notification: Notification) {
@@ -363,28 +436,68 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
   
   private func setNewUserData() {
     guard let currentUserUid = ANISessionManager.shared.currentUserUid,
+          let currentUser = ANISessionManager.shared.currentUser,
+          let currentUserName = currentUser.userName,
           let profileEditView = self.profileEditView,
           let updateUser = profileEditView.getUpdateUser(),
           let userName = updateUser.userName,
           let kind = updateUser.kind,
           let introduce = updateUser.introduce else { return }
     
-    if let profileImage = self.profileImage, let profileImageData = profileImage.jpegData(compressionQuality: 0.5) {
-      let storageRef = Storage.storage().reference()
-      storageRef.child(KEY_PROFILE_IMAGES).child("\(currentUserUid).jpeg").putData(profileImageData, metadata: nil) { (metaData, error) in
-        if error != nil {
-          DLog("storageError")
-          return
+    if currentUserName == userName {
+      if let profileImage = self.profileImage, let profileImageData = profileImage.jpegData(compressionQuality: 0.5) {
+        let storageRef = Storage.storage().reference()
+        storageRef.child(KEY_PROFILE_IMAGES).child("\(currentUserUid).jpeg").putData(profileImageData, metadata: nil) { (metaData, error) in
+          if error != nil {
+            DLog("storageError")
+            return
+          }
+          
+          if let profileImageUrl = metaData?.downloadURL() {
+            let values = [KEY_USER_NAME: userName, KEY_KIND: kind, KEY_INTRODUCE: introduce, KEY_PROFILE_IMAGE_URL: profileImageUrl.absoluteString] as [String : AnyObject]
+            self.updateUserData(uid: currentUserUid, values: values)
+          }
         }
-        
-        if let profileImageUrl = metaData?.downloadURL() {
-          let values = [KEY_USER_NAME: userName, KEY_KIND: kind, KEY_INTRODUCE: introduce, KEY_PROFILE_IMAGE_URL: profileImageUrl.absoluteString] as [String : AnyObject]
-          self.updateUserData(uid: currentUserUid, values: values)
-        }
+      } else {
+        let values = [KEY_USER_NAME: userName, KEY_KIND: kind, KEY_INTRODUCE: introduce] as [String : AnyObject]
+        self.updateUserData(uid: currentUserUid, values: values)
       }
     } else {
-      let values = [KEY_USER_NAME: userName, KEY_KIND: kind, KEY_INTRODUCE: introduce] as [String : AnyObject]
-      self.updateUserData(uid: currentUserUid, values: values)
+      let database = Firestore.firestore()
+      DispatchQueue.global().async {
+        database.collection(KEY_USERS).whereField(KEY_USER_NAME, isEqualTo: userName).getDocuments(completion: { (snapshot, error) in
+          if let error = error {
+            DLog("Error get document: \(error)")
+            
+            return
+          }
+          
+          guard let snapshot = snapshot else { return }
+          
+          if snapshot.documents.isEmpty {
+            if let profileImage = self.profileImage, let profileImageData = profileImage.jpegData(compressionQuality: 0.5) {
+              let storageRef = Storage.storage().reference()
+              storageRef.child(KEY_PROFILE_IMAGES).child("\(currentUserUid).jpeg").putData(profileImageData, metadata: nil) { (metaData, error) in
+                if error != nil {
+                  DLog("storageError")
+                  return
+                }
+                
+                if let profileImageUrl = metaData?.downloadURL() {
+                  let values = [KEY_USER_NAME: userName, KEY_KIND: kind, KEY_INTRODUCE: introduce, KEY_PROFILE_IMAGE_URL: profileImageUrl.absoluteString] as [String : AnyObject]
+                  self.updateUserData(uid: currentUserUid, values: values)
+                }
+              }
+            } else {
+              let values = [KEY_USER_NAME: userName, KEY_KIND: kind, KEY_INTRODUCE: introduce] as [String : AnyObject]
+              self.updateUserData(uid: currentUserUid, values: values)
+            }
+          } else {
+            NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+            self.reject(notiText: "すでに存在するユーザーネームです！")
+          }
+        })
+      }
     }
   }
 }
