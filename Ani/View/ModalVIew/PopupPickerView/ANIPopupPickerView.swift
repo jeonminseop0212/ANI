@@ -22,7 +22,12 @@ class ANIPopupPickerView: UIView {
   
   var pickerItem: [String]? {
     didSet {
+      guard let pickerItem = self.pickerItem else { return }
+      
       setupPickerView()
+      if !pickerItem.isEmpty {
+        pickItem = pickerItem[0]
+      }
     }
   }
   
