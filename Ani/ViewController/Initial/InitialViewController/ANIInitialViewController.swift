@@ -72,6 +72,14 @@ extension ANIInitialViewController: ANIInitialViewDelegate {
     }
   }
   
+  func showTerms() {
+    let urlString = "https://myau5.webnode.jp/%E5%88%A9%E7%94%A8%E8%A6%8F%E7%B4%84/"
+    guard let url = URL(string: urlString) else { return }
+    
+    let safariVC = SFSafariViewController(url: url)
+    present(safariVC, animated: true, completion: nil)
+  }
+  
   func showPrivacyPolicy() {
     let urlString = "https://myau5.webnode.jp/プライバシーポリシー/"
     guard let privacyPolicyUrl = urlString.addingPercentEncoding(withAllowedCharacters: NSCharacterSet.urlQueryAllowed),
