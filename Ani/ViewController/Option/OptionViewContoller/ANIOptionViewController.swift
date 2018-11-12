@@ -116,6 +116,11 @@ extension ANIOptionViewController: ANIOptionViewDelegate {
     self.present(alertController, animated: true, completion: nil)
   }
   
+  func blockUserTapped() {
+    let blockUserViewController = ANIBlockUserViewController()
+    self.navigationController?.pushViewController(blockUserViewController, animated: true)
+  }
+  
   func opinionBoxTapped() {
     let opinionBoxViewController = ANIOpinionBoxViewController()
     self.navigationController?.pushViewController(opinionBoxViewController, animated: true)

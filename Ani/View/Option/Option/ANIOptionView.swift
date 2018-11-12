@@ -11,6 +11,7 @@ import UIKit
 protocol ANIOptionViewDelegate {
   func listTapped(list: List)
   func logoutTapped()
+  func blockUserTapped()
   func opinionBoxTapped()
   func contactTapped()
 }
@@ -27,7 +28,7 @@ class ANIOptionView: UIView {
   private weak var tableView: UITableView?
   
   private var list = [List.loveRecruit, List.loveStroy, List.loveQuestion, List.clipRecruit]
-  private var account = ["ログアウト"]
+  private var account = ["ログアウト", "ブロックユーザー"]
   private var etc = ["意見箱", "お問合せ"]
   
   var delegate: ANIOptionViewDelegate?
@@ -126,6 +127,8 @@ extension ANIOptionView: UITableViewDelegate {
     case 1:
       if account[indexPath.row] == "ログアウト" {
         self.delegate?.logoutTapped()
+      } else if account[indexPath.row] == "ブロックユーザー" {
+        self.delegate?.blockUserTapped()
       }
     case 2:
       if etc[indexPath.row] == "意見箱" {
