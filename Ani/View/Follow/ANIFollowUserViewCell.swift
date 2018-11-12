@@ -23,7 +23,7 @@ class ANIFollowUserViewCell: UITableViewCell {
     didSet {
       reloadLayout()
       checkFollowed()
-      reloadFollowButtoLayout()
+      reloadFollowButtonLayout()
     }
   }
   
@@ -106,7 +106,7 @@ class ANIFollowUserViewCell: UITableViewCell {
     userNameLabel.text = user.userName
   }
   
-  private func reloadFollowButtoLayout() {
+  private func reloadFollowButtonLayout() {
     guard let user = self.user,
           let currentUserUid = ANISessionManager.shared.currentUserUid,
           let followButton = self.followButton else { return }

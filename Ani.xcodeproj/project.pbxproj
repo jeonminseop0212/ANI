@@ -26,6 +26,9 @@
 		CD0FAD0E20BFC02E00D8CD27 /* ANISessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0FAD0D20BFC02E00D8CD27 /* ANISessionManager.swift */; };
 		CD12739A217D587700539D54 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = CD127399217D587600539D54 /* GoogleService-Info.plist */; };
 		CD12739C217D58CD00539D54 /* GoogleService-Info-release.plist in Resources */ = {isa = PBXBuildFile; fileRef = CD12739B217D58CD00539D54 /* GoogleService-Info-release.plist */; };
+		CD1A97BD219945570008EC98 /* ANIBlockUserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD1A97BC219945570008EC98 /* ANIBlockUserViewController.swift */; };
+		CD1A97C0219949770008EC98 /* ANIBlockUserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD1A97BF219949770008EC98 /* ANIBlockUserView.swift */; };
+		CD1A97C221994AC60008EC98 /* ANIBlockUserViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD1A97C121994AC60008EC98 /* ANIBlockUserViewCell.swift */; };
 		CD2C414520A556AE00581267 /* ANIRecruitContributionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2C414420A556AE00581267 /* ANIRecruitContributionViewController.swift */; };
 		CD2C414820A5A23C00581267 /* ANIImageFilterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2C414720A5A23C00581267 /* ANIImageFilterViewController.swift */; };
 		CD334E8221421C7F001C6289 /* ANIReloadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD334E8121421C7F001C6289 /* ANIReloadView.swift */; };
@@ -212,6 +215,9 @@
 		CD127399217D587600539D54 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "Ani/GoogleService-Info.plist"; sourceTree = SOURCE_ROOT; };
 		CD12739B217D58CD00539D54 /* GoogleService-Info-release.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info-release.plist"; sourceTree = "<group>"; };
 		CD12739D217D74A500539D54 /* d_MYAU.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = d_MYAU.entitlements; sourceTree = "<group>"; };
+		CD1A97BC219945570008EC98 /* ANIBlockUserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIBlockUserViewController.swift; sourceTree = "<group>"; };
+		CD1A97BF219949770008EC98 /* ANIBlockUserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIBlockUserView.swift; sourceTree = "<group>"; };
+		CD1A97C121994AC60008EC98 /* ANIBlockUserViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIBlockUserViewCell.swift; sourceTree = "<group>"; };
 		CD2C414420A556AE00581267 /* ANIRecruitContributionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitContributionViewController.swift; sourceTree = "<group>"; };
 		CD2C414720A5A23C00581267 /* ANIImageFilterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIImageFilterViewController.swift; sourceTree = "<group>"; };
 		CD334E8121421C7F001C6289 /* ANIReloadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIReloadView.swift; sourceTree = "<group>"; };
@@ -450,6 +456,23 @@
 				CD08A73020915C2A00F0B72D /* ANIRecruitDetailViewController.swift */,
 			);
 			path = RecruitDetailViewController;
+			sourceTree = "<group>";
+		};
+		CD1A97BB219945370008EC98 /* BlockUserViewController */ = {
+			isa = PBXGroup;
+			children = (
+				CD1A97BC219945570008EC98 /* ANIBlockUserViewController.swift */,
+			);
+			path = BlockUserViewController;
+			sourceTree = "<group>";
+		};
+		CD1A97BE2199495D0008EC98 /* BlockUserView */ = {
+			isa = PBXGroup;
+			children = (
+				CD1A97BF219949770008EC98 /* ANIBlockUserView.swift */,
+				CD1A97C121994AC60008EC98 /* ANIBlockUserViewCell.swift */,
+			);
+			path = BlockUserView;
 			sourceTree = "<group>";
 		};
 		CD2C414320A5566B00581267 /* RecruitContributionViewController */ = {
@@ -738,6 +761,7 @@
 			children = (
 				CDDE4B5E20E07B4D005762A1 /* Option */,
 				CDDE4B6120E07B5C005762A1 /* List */,
+				CD1A97BE2199495D0008EC98 /* BlockUserView */,
 			);
 			path = Option;
 			sourceTree = "<group>";
@@ -946,6 +970,7 @@
 			children = (
 				CDAFD75820DC9B5B00AEDD83 /* OptionViewContoller */,
 				CDDE4B5D20E079BC005762A1 /* ListViewController */,
+				CD1A97BB219945370008EC98 /* BlockUserViewController */,
 			);
 			path = Option;
 			sourceTree = "<group>";
@@ -1815,6 +1840,7 @@
 				F57F7D512081FC71008A2645 /* ANINotiMenuBarCell.swift in Sources */,
 				CDA32A3820AD1ED3008A2AC1 /* ANIContributionView.swift in Sources */,
 				CDD0550E20A6B23B00BEF482 /* ANIImageFilterCell.swift in Sources */,
+				CD1A97BD219945570008EC98 /* ANIBlockUserViewController.swift in Sources */,
 				CDA32A2320AA6041008A2AC1 /* ANIPopupPickerViewController.swift in Sources */,
 				CDAFD75D20DC9EE800AEDD83 /* ANIOptionViewCell.swift in Sources */,
 				CDE2F3BA20E35268005E1DE1 /* ANIChatViewController.swift in Sources */,
@@ -1841,6 +1867,7 @@
 				F5B1EF9320725964000CFB0B /* ANIRecruitViewController.swift in Sources */,
 				F51D221520768B24009D1B26 /* UISearchBar.swift in Sources */,
 				F5E9E2392079B9D20021D4CC /* ANICommunityMenuBarCell.swift in Sources */,
+				CD1A97C0219949770008EC98 /* ANIBlockUserView.swift in Sources */,
 				CD0FAD0E20BFC02E00D8CD27 /* ANISessionManager.swift in Sources */,
 				F5E9E23D2079C10C0021D4CC /* ANIStoryView.swift in Sources */,
 				CDA32A2D20ABCE5F008A2AC1 /* RecruitInfo.swift in Sources */,
@@ -1890,6 +1917,7 @@
 				CDA32A2920ABBA21008A2AC1 /* ANIRecruitContributionImagesView.swift in Sources */,
 				CD08A73120915C2A00F0B72D /* ANIRecruitDetailViewController.swift in Sources */,
 				F53E87C62085F13800B19A2F /* ANIProfileMenuBar.swift in Sources */,
+				CD1A97C221994AC60008EC98 /* ANIBlockUserViewCell.swift in Sources */,
 				CD0BFF1620C7807F00D5959B /* FirebaseComment.swift in Sources */,
 				CDA97AC920AFFFEC00F46DA4 /* ANIProfileEditView.swift in Sources */,
 				F57F7D61208322D3008A2645 /* ANIMessageView.swift in Sources */,
