@@ -165,6 +165,17 @@ class ANIQnaView: UIView {
     
     self.isLoading = false
   }
+  
+  private func isBlockQna(qna: FirebaseQna) -> Bool {
+    if let blockUserIds = ANISessionManager.shared.blockUserIds, blockUserIds.contains(qna.userId) {
+      return true
+    }
+    if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(qna.userId) {
+      return true
+    }
+    
+    return false
+  }
 }
 
 //MARK: UITableViewDataSource
@@ -299,7 +310,9 @@ extension ANIQnaView {
         for document in snapshot.documents {
           do {
             let qna = try FirestoreDecoder().decode(FirebaseQna.self, from: document.data())
-            self.qnas.append(qna)
+            if !self.isBlockQna(qna: qna) {
+              self.qnas.append(qna)
+            }
             
             DispatchQueue.main.async {
               if let sender = sender {
@@ -310,9 +323,13 @@ extension ANIQnaView {
               
               qnaTableView.reloadData()
               
-              UIView.animate(withDuration: 0.2, animations: {
-                qnaTableView.alpha = 1.0
-              })
+              if self.qnas.count > 0 {
+                UIView.animate(withDuration: 0.2, animations: {
+                  qnaTableView.alpha = 1.0
+                })
+              } else {
+                self.showReloadView(sender: sender)
+              }
               
               self.isLoading = false
             }
@@ -367,7 +384,9 @@ extension ANIQnaView {
         for (index, document) in snapshot.documents.enumerated() {
           do {
             let qna = try FirestoreDecoder().decode(FirebaseQna.self, from: document.data())
-            self.qnas.append(qna)
+            if !self.isBlockQna(qna: qna) {
+              self.qnas.append(qna)
+            }
             
             DispatchQueue.main.async {
               if index + 1 == snapshot.documents.count {

@@ -171,6 +171,19 @@ class ANINotiDetailView: UIView {
     
     self.isLoading = false
   }
+  
+  private func isBlockUser(user: FirebaseUser) -> Bool {
+    guard let userId = user.uid else { return false }
+    
+    if let blockUserIds = ANISessionManager.shared.blockUserIds, blockUserIds.contains(userId) {
+      return true
+    }
+    if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(userId) {
+      return true
+    }
+    
+    return false
+  }
 }
 
 //MARK: UITableViewDataSource
@@ -739,7 +752,9 @@ extension ANINotiDetailView {
           DispatchQueue.main.async {
             for loveUser in loveUserTemp {
               if let loveUser = loveUser {
-                self.loveUsers.append(loveUser)
+                if !self.isBlockUser(user: loveUser) {
+                  self.loveUsers.append(loveUser)
+                }
               }
             }
             
@@ -833,7 +848,9 @@ extension ANINotiDetailView {
           DispatchQueue.main.async {
             for loveUser in loveUserTemp {
               if let loveUser = loveUser {
-                self.loveUsers.append(loveUser)
+                if !self.isBlockUser(user: loveUser) {
+                  self.loveUsers.append(loveUser)
+                }
               }
             }
             

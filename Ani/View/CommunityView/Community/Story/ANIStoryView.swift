@@ -167,6 +167,17 @@ class ANIStoryView: UIView {
     
     self.isLoading = false
   }
+  
+  private func isBlockStory(story: FirebaseStory) -> Bool {
+    if let blockUserIds = ANISessionManager.shared.blockUserIds, blockUserIds.contains(story.userId) {
+      return true
+    }
+    if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(story.userId) {
+      return true
+    }
+    
+    return false
+  }
 }
 
 //MARK: UITableViewDataSource
@@ -361,7 +372,9 @@ extension ANIStoryView {
         for document in snapshot.documents {
           do {
             let story = try FirestoreDecoder().decode(FirebaseStory.self, from: document.data())
-            self.stories.append(story)
+            if !self.isBlockStory(story: story) {
+              self.stories.append(story)
+            }
             
             DispatchQueue.main.async {
               if let sender = sender {
@@ -372,9 +385,13 @@ extension ANIStoryView {
               
               storyTableView.reloadData()
               
-              UIView.animate(withDuration: 0.2, animations: {
-                storyTableView.alpha = 1.0
-              })
+              if self.stories.count > 0 {
+                UIView.animate(withDuration: 0.2, animations: {
+                  storyTableView.alpha = 1.0
+                })
+              } else {
+                self.showReloadView(sender: sender)
+              }
               
               self.isLoading = false
             }
@@ -429,7 +446,9 @@ extension ANIStoryView {
         for (index, document) in snapshot.documents.enumerated() {
           do {
             let story = try FirestoreDecoder().decode(FirebaseStory.self, from: document.data())
-            self.stories.append(story)
+            if !self.isBlockStory(story: story) {
+              self.stories.append(story)
+            }
             
             DispatchQueue.main.async {
               if index + 1 == snapshot.documents.count {

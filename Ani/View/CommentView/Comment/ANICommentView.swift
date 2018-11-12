@@ -55,6 +55,17 @@ class ANICommentView: UIView {
     commentTableView.edgesToSuperview()
     self.commentTableView = commentTableView
   }
+  
+  private func isBlockComment(comment: FirebaseComment) -> Bool {
+    if let blockUserIds = ANISessionManager.shared.blockUserIds, blockUserIds.contains(comment.userId) {
+      return true
+    }
+    if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(comment.userId) {
+      return true
+    }
+    
+    return false
+  }
 }
 
 //MARK: UITableViewDataSource
@@ -139,7 +150,10 @@ extension ANICommentView {
               do {
                 let comment = try FirestoreDecoder().decode(FirebaseComment.self, from: diff.document.data())
                 
-                self.comments.append(comment)
+                if !self.isBlockComment(comment: comment) {
+                  self.comments.append(comment)
+                }
+                
                 DispatchQueue.main.async {
                   guard let commentTableView = self.commentTableView else { return }
                   
@@ -171,7 +185,10 @@ extension ANICommentView {
               do {
                 let comment = try FirestoreDecoder().decode(FirebaseComment.self, from: diff.document.data())
                 
-                self.comments.append(comment)
+                if !self.isBlockComment(comment: comment) {
+                  self.comments.append(comment)
+                }
+                
                 DispatchQueue.main.async {
                   guard let commentTableView = self.commentTableView else { return }
                   
