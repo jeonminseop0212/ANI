@@ -103,6 +103,29 @@ class ANIMessageView: UIView {
     
     messageTableView.alpha = 0.0
   }
+  
+  private func isBlockChatGroup(chatGroup: FirebaseChatGroup) -> Bool {
+    guard let memberIds = chatGroup.memberIds,
+          let currentUserUid = ANISessionManager.shared.currentUserUid else { return false }
+    
+    var userId = ""
+    
+    for key in memberIds.keys {
+      if key != currentUserUid {
+        userId = key
+        break
+      }
+    }
+    
+    if let blockUserIds = ANISessionManager.shared.blockUserIds, blockUserIds.contains(userId) {
+      return true
+    }
+    if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(userId) {
+      return true
+    }
+
+    return false
+  }
 }
 
 //MARK: UITableViewDataSource
@@ -170,8 +193,10 @@ extension ANIMessageView {
           if diff.type == .added {
             do {
               let group = try FirebaseDecoder().decode(FirebaseChatGroup.self, from: diff.document.data())
-              chatGroupsTemp.append(group)
-              chatGroupsTemp.sort(by: {$0.updateDate > $1.updateDate})
+              if !self.isBlockChatGroup(chatGroup: group) {
+                chatGroupsTemp.append(group)
+                chatGroupsTemp.sort(by: {$0.updateDate > $1.updateDate})
+              }
               
               self.chatGroups = chatGroupsTemp
 

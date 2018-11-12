@@ -167,6 +167,17 @@ class ANINotiView: UIView {
     let date = ANIFunction.shared.getToday()
     database.collection(KEY_USERS).document(currentUserUid).updateData([KEY_CHECK_NOTI_DATE: date, KEY_IS_HAVE_UNREAD_NOTI: false, KEY_UNREAD_NOTI_COUNT: 0])
   }
+  
+  private func isBlockNotification(notification: FirebaseNotification) -> Bool {
+    if let blockUserIds = ANISessionManager.shared.blockUserIds, blockUserIds.contains(notification.userId) {
+      return true
+    }
+    if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(notification.userId) {
+      return true
+    }
+    
+    return false
+  }
 }
 
 //MARK: UITableViewDataSource
@@ -296,7 +307,9 @@ extension ANINotiView {
         for document in snapshot.documents {
           do {
             let notification = try FirestoreDecoder().decode(FirebaseNotification.self, from: document.data())
-            self.notifications.append(notification)
+            if !self.isBlockNotification(notification: notification) {
+              self.notifications.append(notification)
+            }
             
             DispatchQueue.main.async {
               if let sender = sender {
@@ -312,11 +325,15 @@ extension ANINotiView {
                 }
               }
               
-              UIView.animate(withDuration: 0.2, animations: {
-                notiTableView.alpha = 1.0
-              }, completion: { (complete) in
-                ANINotificationManager.postDismissSplash()
-              })
+              if self.notifications.count > 0 {
+                UIView.animate(withDuration: 0.2, animations: {
+                  notiTableView.alpha = 1.0
+                }, completion: { (complete) in
+                  ANINotificationManager.postDismissSplash()
+                })
+              } else {
+                self.showReloadView(sender: sender)
+              }
               
               self.isLoading = false
             }
@@ -370,8 +387,10 @@ extension ANINotiView {
         
         for (index, document) in snapshot.documents.enumerated() {
           do {
-            let noti = try FirestoreDecoder().decode(FirebaseNotification.self, from: document.data())
-            self.notifications.append(noti)
+            let notification = try FirestoreDecoder().decode(FirebaseNotification.self, from: document.data())
+            if !self.isBlockNotification(notification: notification) {
+              self.notifications.append(notification)
+            }
             
             DispatchQueue.main.async {
               if index + 1 == snapshot.documents.count {

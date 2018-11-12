@@ -171,6 +171,16 @@ class ANIOtherProfileViewController: UIViewController {
     self.rejectTapView = rejectTapView
   }
   
+  private func unfollow(userId: String, currentUserUid: String) {
+    let database = Firestore.firestore()
+    
+    database.collection(KEY_USERS).document(currentUserUid).collection(KEY_FOLLOWER_IDS).document(userId).delete()
+    database.collection(KEY_USERS).document(currentUserUid).collection(KEY_FOLLOWING_USER_IDS).document(userId).delete()
+    
+    database.collection(KEY_USERS).document(userId).collection(KEY_FOLLOWER_IDS).document(currentUserUid).delete()
+    database.collection(KEY_USERS).document(userId).collection(KEY_FOLLOWING_USER_IDS).document(currentUserUid).delete()
+  }
+  
   //MARK: notification
   private func setupNotification() {
     ANINotificationManager.receive(imageCellTapped: self, selector: #selector(presentImageBrowser(_:)))
@@ -390,6 +400,8 @@ extension ANIOtherProfileViewController: ANIPopupOptionViewControllerDelegate {
 
         database.collection(KEY_USERS).document(currentUserUid).collection(KEY_BLOCK_USER_IDS).document(userId).setData([KEY_USER_ID: userId, KEY_DATE: today])
         database.collection(KEY_USERS).document(userId).collection(KEY_BLOCKING_USER_IDS).document(currentUserUid).setData([KEY_USER_ID: currentUserUid, KEY_DATE: today])
+        
+        self.unfollow(userId: userId, currentUserUid: currentUserUid)
         
         self.navigationController?.popViewController(animated: true)
       }

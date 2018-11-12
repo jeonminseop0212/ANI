@@ -161,6 +161,41 @@ class ANISearchView: UIView {
     
     tableView.deleteRows(at: [indexPath], with: .automatic)
   }
+  
+  private func isBlockUser(user: FirebaseUser) -> Bool {
+    guard let userId = user.uid else { return false }
+    
+    if let blockUserIds = ANISessionManager.shared.blockUserIds, blockUserIds.contains(userId) {
+      return true
+    }
+    if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(userId) {
+      return true
+    }
+    
+    return false
+  }
+  
+  private func isBlockStory(story: FirebaseStory) -> Bool {
+    if let blockUserIds = ANISessionManager.shared.blockUserIds, blockUserIds.contains(story.userId) {
+      return true
+    }
+    if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(story.userId) {
+      return true
+    }
+    
+    return false
+  }
+  
+  private func isBlockQna(qna: FirebaseQna) -> Bool {
+    if let blockUserIds = ANISessionManager.shared.blockUserIds, blockUserIds.contains(qna.userId) {
+      return true
+    }
+    if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(qna.userId) {
+      return true
+    }
+    
+    return false
+  }
 }
 
 //MARK: UITableViewDataSource
@@ -467,19 +502,27 @@ extension ANISearchView {
                 
                 if let currenUserUid = ANISessionManager.shared.currentUserUid {
                   if user.uid != currenUserUid {
-                    self.searchUsers.append(user)
+                    if !self.isBlockUser(user: user) {
+                      self.searchUsers.append(user)
+                    }
                   }
                 } else {
-                  self.searchUsers.append(user)
+                  if !self.isBlockUser(user: user) {
+                    self.searchUsers.append(user)
+                  }
                 }
               case .story:
                 let story = try FirebaseDecoder().decode(FirebaseStory.self, from: hitDic)
                 
-                self.searchStories.append(story)
+                if !self.isBlockStory(story: story) {
+                  self.searchStories.append(story)
+                }
               case .qna:
                 let qna = try FirebaseDecoder().decode(FirebaseQna.self, from: hitDic)
                 
-                self.searchQnas.append(qna)
+                if !self.isBlockQna(qna: qna) {
+                  self.searchQnas.append(qna)
+                }
               }
               
               DispatchQueue.main.async {
@@ -550,23 +593,31 @@ extension ANISearchView {
                 if !self.searchUsers.contains(where: { $0.uid == user.uid }) {
                   if let currenUserUid = ANISessionManager.shared.currentUserUid {
                     if user.uid != currenUserUid {
-                      self.searchUsers.append(user)
+                      if !self.isBlockUser(user: user) {
+                        self.searchUsers.append(user)
+                      }
                     }
                   } else {
-                    self.searchUsers.append(user)
+                    if !self.isBlockUser(user: user) {
+                      self.searchUsers.append(user)
+                    }
                   }
                 }
               case .story:
                 let story = try FirebaseDecoder().decode(FirebaseStory.self, from: hitDic)
                 
                 if !self.searchStories.contains(where: { $0.id == story.id }) {
-                  self.searchStories.append(story)
+                  if !self.isBlockStory(story: story) {
+                    self.searchStories.append(story)
+                  }
                 }
               case .qna:
                 let qna = try FirebaseDecoder().decode(FirebaseQna.self, from: hitDic)
                 
                 if !self.searchQnas.contains(where: { $0.id == qna.id }) {
-                  self.searchQnas.append(qna)
+                  if !self.isBlockQna(qna: qna) {
+                    self.searchQnas.append(qna)
+                  }
                 }
               }
               

@@ -155,6 +155,28 @@ class ANIListView: UIView {
     
     return false
   }
+  
+  private func isBlockStory(story: FirebaseStory) -> Bool {
+    if let blockUserIds = ANISessionManager.shared.blockUserIds, blockUserIds.contains(story.userId) {
+      return true
+    }
+    if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(story.userId) {
+      return true
+    }
+    
+    return false
+  }
+  
+  private func isBlockQna(qna: FirebaseQna) -> Bool {
+    if let blockUserIds = ANISessionManager.shared.blockUserIds, blockUserIds.contains(qna.userId) {
+      return true
+    }
+    if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(qna.userId) {
+      return true
+    }
+    
+    return false
+  }
 }
 
 //MARK: UITableViewDataSource
@@ -731,7 +753,9 @@ extension ANIListView {
             
             for loveStory in loveStoriesTemp {
               if let loveStory = loveStory {
-                self.loveStories.append(loveStory)
+                if !self.isBlockStory(story: loveStory) {
+                  self.loveStories.append(loveStory)
+                }
               }
             }
             
@@ -819,7 +843,9 @@ extension ANIListView {
           DispatchQueue.main.async {
             for loveStory in loveStoriesTemp {
               if let loveStory = loveStory {
-                self.loveStories.append(loveStory)
+                if !self.isBlockStory(story: loveStory) {
+                  self.loveStories.append(loveStory)
+                }
               }
             }
             listTableView.reloadData()
@@ -898,7 +924,9 @@ extension ANIListView {
             
             for loveQna in loveQnasTemp {
               if let loveQna = loveQna {
-                self.loveQnas.append(loveQna)
+                if !self.isBlockQna(qna: loveQna) {
+                  self.loveQnas.append(loveQna)
+                }
               }
             }
             
@@ -986,7 +1014,9 @@ extension ANIListView {
           DispatchQueue.main.async {
             for loveQna in loveQnasTemp {
               if let loveQna = loveQna {
-                self.loveQnas.append(loveQna)
+                if !self.isBlockQna(qna: loveQna) {
+                  self.loveQnas.append(loveQna)
+                }
               }
             }
             listTableView.reloadData()
