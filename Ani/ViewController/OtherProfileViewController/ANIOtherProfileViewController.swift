@@ -201,6 +201,7 @@ class ANIOtherProfileViewController: UIViewController {
   
   @objc private func rejectViewTapped() {
     let initialViewController = ANIInitialViewController()
+    initialViewController.myTabBarController = self.tabBarController as? ANITabBarController
     let navigationController = UINavigationController(rootViewController: initialViewController)
     self.present(navigationController, animated: true, completion: nil)
   }
@@ -212,6 +213,7 @@ class ANIOtherProfileViewController: UIViewController {
     let popupOptionViewController = ANIPopupOptionViewController()
     popupOptionViewController.modalPresentationStyle = .overCurrentContext
     popupOptionViewController.isMe = false
+    popupOptionViewController.options = ["ブロック"]
     popupOptionViewController.delegate = self
     self.tabBarController?.present(popupOptionViewController, animated: false, completion: nil)
   }
@@ -374,6 +376,30 @@ extension ANIOtherProfileViewController: ANIPopupOptionViewControllerDelegate {
   }
   
   func optionTapped(index: Int) {
+    if index == 0 {
+      guard let user = self.user,
+            let userId = self.userId,
+            let currentUserUid = ANISessionManager.shared.currentUserUid,
+            let userName = user.userName else { return }
+      
+      let alertController = UIAlertController(title: "\(userName)さんをブロックしますか？", message: "ブロックされた人はあなたのプロフィールや投稿を見られなくなります。ブロックしたことは相手に通知されません。", preferredStyle: .alert)
+      
+      let blockAction = UIAlertAction(title: "ブロック", style: .default) { (action) in
+        let database = Firestore.firestore()
+        let today = ANIFunction.shared.getToday()
+
+        database.collection(KEY_USERS).document(currentUserUid).collection(KEY_BLOCK_USER_IDS).document(userId).setData([KEY_USER_ID: userId, KEY_DATE: today])
+        database.collection(KEY_USERS).document(userId).collection(KEY_BLOCKING_USER_IDS).document(currentUserUid).setData([KEY_USER_ID: currentUserUid, KEY_DATE: today])
+        
+        self.navigationController?.popViewController(animated: true)
+      }
+      let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
+      
+      alertController.addAction(blockAction)
+      alertController.addAction(cancelAction)
+      
+      self.present(alertController, animated: true, completion: nil)
+    }
   }
 }
 

@@ -144,6 +144,17 @@ class ANIListView: UIView {
     
     listTableView.deleteRows(at: [indexPath], with: .automatic)
   }
+  
+  private func isBlockRecruit(recruit: FirebaseRecruit) -> Bool {
+    if let blockUserIds = ANISessionManager.shared.blockUserIds, blockUserIds.contains(recruit.userId) {
+      return true
+    }
+    if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(recruit.userId) {
+      return true
+    }
+    
+    return false
+  }
 }
 
 //MARK: UITableViewDataSource
@@ -548,7 +559,9 @@ extension ANIListView {
             
             for loveRecruit in loveRecruitsTemp {
               if let loveRecruit = loveRecruit {
-                self.loveRecruits.append(loveRecruit)
+                if !self.isBlockRecruit(recruit: loveRecruit) {
+                  self.loveRecruits.append(loveRecruit)
+                }
               }
             }
             
@@ -636,7 +649,9 @@ extension ANIListView {
           DispatchQueue.main.async {
             for loveRecruit in loveRecruitsTemp {
               if let loveRecruit = loveRecruit {
-                self.loveRecruits.append(loveRecruit)
+                if !self.isBlockRecruit(recruit: loveRecruit) {
+                  self.loveRecruits.append(loveRecruit)
+                }
               }
             }
             listTableView.reloadData()
@@ -1051,7 +1066,9 @@ extension ANIListView {
             
             for clipRecruit in clipRecruitsTemp {
               if let clipRecruit = clipRecruit {
-                self.clipRecruits.append(clipRecruit)
+                if !self.isBlockRecruit(recruit: clipRecruit) {
+                  self.clipRecruits.append(clipRecruit)
+                }
               }
             }
             
@@ -1139,7 +1156,9 @@ extension ANIListView {
           DispatchQueue.main.async {
             for clipRecruit in clipRecruitsTemp {
               if let clipRecruit = clipRecruit {
-                self.clipRecruits.append(clipRecruit)
+                if !self.isBlockRecruit(recruit: clipRecruit) {
+                  self.clipRecruits.append(clipRecruit)
+                }
               }
             }
             listTableView.reloadData()

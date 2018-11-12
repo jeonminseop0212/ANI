@@ -40,6 +40,8 @@ let KEY_IS_HAVE_UNREAD_NOTI = "isHaveUnreadNoti"
 let KEY_UNREAD_NOTI_COUNT = "unreadNotiCount"
 let KEY_IS_HAVE_UNREAD_MESSAGE = "isHaveUnreadMessage"
 let KEY_UNREAD_MESSAGE_COUNT = "unreadMessageCount"
+let KEY_BLOCK_USER_IDS = "blockUserIds"
+let KEY_BLOCKING_USER_IDS = "blockingUserIds"
 
 //recruit
 let KEY_RECRUIT_HEADER_IMAGES = "recruit_header_images"

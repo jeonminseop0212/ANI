@@ -161,4 +161,9 @@ class ANINotificationManager: NSObject {
   private static let N_DISMISS_SPLASH = "N_DISMISS_SPLASH"
   static func postDismissSplash() { self.post(name: N_DISMISS_SPLASH, object: nil, userInfo:nil) }
   static func receive(dismissSplash observer:Any, selector:Selector) { receive(name: N_DISMISS_SPLASH, observer: observer, selector: selector) }
+  
+  //MARK: loaded currentUser
+  private static let N_LOADED_CURRENT_USER = "N_LOADED_CURRENT_USER"
+  static func postLoadedCurrentUser() { self.post(name: N_LOADED_CURRENT_USER, object: nil, userInfo:nil) }
+  static func receive(loadedCurrentUser observer:Any, selector:Selector) { receive(name: N_LOADED_CURRENT_USER, observer: observer, selector: selector) }
 }

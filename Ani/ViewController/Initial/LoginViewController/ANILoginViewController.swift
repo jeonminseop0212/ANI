@@ -26,6 +26,8 @@ class ANILoginViewController: UIViewController {
   private weak var rejectLabel: UILabel?
   private var isRejectAnimating: Bool = false
   
+  var myTabBarController: ANITabBarController?
+  
   override func viewDidLoad() {
     setup()
     setupNotification()
@@ -69,6 +71,7 @@ class ANILoginViewController: UIViewController {
     
     //loginView
     let loginView = ANILoginView()
+    loginView.myTabBarController = myTabBarController
     loginView.delegate = self
     self.view.addSubview(loginView)
     loginView.topToBottom(of: myNavigationBar)

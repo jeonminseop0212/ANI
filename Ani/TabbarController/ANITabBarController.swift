@@ -27,7 +27,11 @@ class ANITabBarController: UITabBarController {
   private var oldIsHaveUnreadMessage: Bool = false
   
   private var userListener: ListenerRegistration?
+  private var blockUserListener: ListenerRegistration?
+  private var blockingUserListener: ListenerRegistration?
   private var chatGroupListener: ListenerRegistration?
+  
+  var isLoadedFirstData: Bool = false
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -35,10 +39,14 @@ class ANITabBarController: UITabBarController {
     setup()
     setupTabBar()
     setupBadge()
-    
-    loadUser()
-    observeChatGroup()
     setupNotification()
+  }
+  
+  override func viewDidAppear(_ animated: Bool) {
+    if !isLoadedFirstData {
+      loadUser()
+      observeChatGroup()
+    }
   }
   
   private func setup() {
@@ -192,9 +200,13 @@ class ANITabBarController: UITabBarController {
   
   @objc private func logout() {
     guard let userListener = self.userListener,
+          let blockUserListener = self.blockUserListener,
+          let blockingUserListener = self.blockingUserListener,
           let chatGroupListener = self.chatGroupListener else { return }
     
     userListener.remove()
+    blockUserListener.remove()
+    blockingUserListener.remove()
     chatGroupListener.remove()
     
     ANISessionManager.shared.isHaveUnreadNoti = false
@@ -215,11 +227,17 @@ class ANITabBarController: UITabBarController {
 
 //MARK: data
 extension ANITabBarController {
-  private func loadUser() {
+  func loadUser(completion:(()->())? = nil) {
     let userDefaults = UserDefaults.standard
     
     if let userListener = self.userListener {
       userListener.remove()
+    }
+    if let blockUserListener = self.blockUserListener {
+      blockUserListener.remove()
+    }
+    if let blockingUserListener = self.blockingUserListener {
+      blockingUserListener.remove()
     }
     
     if userDefaults.bool(forKey: KEY_FIRST_LAUNCH) {
@@ -253,10 +271,15 @@ extension ANITabBarController {
       }
     }
 
-    ANISessionManager.shared.currentUserUid = Auth.auth().currentUser?.uid
-    if let currentUserUid = ANISessionManager.shared.currentUserUid {
+    if let currentUser = Auth.auth().currentUser, currentUser.isEmailVerified {
+      ANISessionManager.shared.currentUserUid = currentUser.uid
+      guard let currentUserUid = ANISessionManager.shared.currentUserUid else { return }
+      
       let database = Firestore.firestore()
-      DispatchQueue.global().async {
+      let group = DispatchGroup()
+      
+      group.enter()
+      DispatchQueue(label: "user").async {
         self.userListener = database.collection(KEY_USERS).document(currentUserUid).addSnapshotListener({ (snapshot, error) in
           guard let snapshot = snapshot, let data = snapshot.data() else { return }
           
@@ -274,11 +297,103 @@ extension ANITabBarController {
                 
                 self.oldIsHaveUnreadNoti = isHaveUnreadNoti
               }
+              
+              if !self.isLoadedFirstData {
+                group.leave()
+              }
             }
           } catch let error {
             DLog(error)
+            
+            if !self.isLoadedFirstData {
+              group.leave()
+            }
           }
         })
+      }
+      
+      group.enter()
+      DispatchQueue(label: "user").async {
+        self.blockUserListener =  database.collection(KEY_USERS).document(currentUserUid).collection(KEY_BLOCK_USER_IDS).order(by: KEY_DATE).addSnapshotListener({ (snapshot, error) in
+          guard let snapshot = snapshot else { return }
+          
+          snapshot.documentChanges.forEach({ (diff) in
+            if diff.type == .added {
+              let data = diff.document.data()
+              if let userId = data[KEY_USER_ID] as? String {
+                if ANISessionManager.shared.blockUserIds != nil {
+                  ANISessionManager.shared.blockUserIds?.insert(userId, at: 0)
+                } else {
+                  ANISessionManager.shared.blockUserIds = [userId]
+                }
+              }
+              
+              if snapshot.documents.count == ANISessionManager.shared.blockUserIds?.count, !self.isLoadedFirstData {
+                group.leave()
+              }
+            } else if diff.type == .removed {
+              guard let blockUserIds = ANISessionManager.shared.blockUserIds else { return }
+              
+              let data = diff.document.data()
+              
+              for (index, blockUserId) in blockUserIds.enumerated() {
+                if let userId = data[KEY_USER_ID] as? String, userId == blockUserId {
+                  ANISessionManager.shared.blockUserIds?.remove(at: index)
+                }
+              }
+            }
+          })
+          
+          if snapshot.documents.isEmpty, !self.isLoadedFirstData {
+            group.leave()
+          }
+        })
+      }
+      
+      group.enter()
+      DispatchQueue(label: "user").async {
+        self.blockingUserListener = database.collection(KEY_USERS).document(currentUserUid).collection(KEY_BLOCKING_USER_IDS).order(by: KEY_DATE).addSnapshotListener({ (snapshot, error) in
+          guard let snapshot = snapshot else { return }
+          
+          snapshot.documentChanges.forEach({ (diff) in
+            if diff.type == .added {
+              let data = diff.document.data()
+              if let userId = data[KEY_USER_ID] as? String {
+                if ANISessionManager.shared.blockingUserIds != nil {
+                  ANISessionManager.shared.blockingUserIds?.insert(userId, at: 0)
+                } else {
+                  ANISessionManager.shared.blockingUserIds = [userId]
+                }
+                
+                if snapshot.documents.count == ANISessionManager.shared.blockingUserIds?.count, !self.isLoadedFirstData {
+                  group.leave()
+                }
+              }
+            } else if diff.type == .removed {
+              guard let blockingUserIds = ANISessionManager.shared.blockingUserIds else { return }
+              
+              let data = diff.document.data()
+              
+              for (index, blockingUserIds) in blockingUserIds.enumerated() {
+                if let userId = data[KEY_USER_ID] as? String, userId == blockingUserIds {
+                  ANISessionManager.shared.blockingUserIds?.remove(at: index)
+                }
+              }
+            }
+          })
+          
+          if snapshot.documents.isEmpty, !self.isLoadedFirstData {
+            group.leave()
+          }
+        })
+      }
+      
+      group.notify(queue: DispatchQueue(label: "user")) {
+        DispatchQueue.main.async {
+          ANINotificationManager.postLoadedCurrentUser()
+          self.isLoadedFirstData = true
+          completion?()
+        }
       }
     } else {
       do {
@@ -289,6 +404,8 @@ extension ANITabBarController {
         ANISessionManager.shared.isAnonymous = true
         
         ANINotificationManager.postLogout()
+        ANINotificationManager.postLoadedCurrentUser()
+        isLoadedFirstData = true
         
       } catch let signOutError as NSError {
         DLog("signOutError \(signOutError)")
@@ -296,7 +413,7 @@ extension ANITabBarController {
     }
   }
   
-  private func observeChatGroup() {
+  func observeChatGroup() {
     guard let crrentUserUid = ANISessionManager.shared.currentUserUid else { return }
     
     let database = Firestore.firestore()
