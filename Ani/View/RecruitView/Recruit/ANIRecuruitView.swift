@@ -94,7 +94,6 @@ class ANIRecuruitView: UIView {
     super.init(frame: frame)
     setup()
     setupNotifications()
-    loadRecruit(sender: nil)
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -158,6 +157,7 @@ class ANIRecuruitView: UIView {
     ANINotificationManager.receive(login: self, selector: #selector(reloadRecruitLayout))
     ANINotificationManager.receive(recruitTabTapped: self, selector: #selector(scrollToTop))
     ANINotificationManager.receive(deleteRecruit: self, selector: #selector(deleteRecruit))
+    ANINotificationManager.receive(loadedCurrentUser: self, selector: #selector(loadData))
   }
   
   @objc private func reloadRecruitLayout() {
@@ -249,6 +249,21 @@ class ANIRecuruitView: UIView {
     }
     
     self.isLoading = false
+  }
+  
+  @objc private func loadData() {
+    loadRecruit(sender: nil)
+  }
+  
+  private func isBlockRecruit(recruit: FirebaseRecruit) -> Bool {
+    if let blockUserIds = ANISessionManager.shared.blockUserIds, blockUserIds.contains(recruit.userId) {
+      return true
+    }
+    if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(recruit.userId) {
+      return true
+    }
+    
+    return false
   }
 }
 
@@ -403,7 +418,9 @@ extension ANIRecuruitView {
         for document in snapshot.documents {
           do {
             let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: document.data())
-            self.recruits.append(recruit)
+            if !self.isBlockRecruit(recruit: recruit) {
+              self.recruits.append(recruit)
+            }
 
             DispatchQueue.main.async {
               if let sender = sender {
@@ -472,7 +489,9 @@ extension ANIRecuruitView {
         for (index, document) in snapshot.documents.enumerated() {
           do {
             let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: document.data())
-            self.recruits.append(recruit)
+            if !self.isBlockRecruit(recruit: recruit) {
+              self.recruits.append(recruit)
+            }
             
             DispatchQueue.main.async {
               if index + 1 == snapshot.documents.count {

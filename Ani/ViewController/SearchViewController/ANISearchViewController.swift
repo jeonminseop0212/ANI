@@ -177,6 +177,7 @@ class ANISearchViewController: UIViewController {
   
   @objc private func rejectViewTapped() {
     let initialViewController = ANIInitialViewController()
+    initialViewController.myTabBarController = self.tabBarController as? ANITabBarController
     let navigationController = UINavigationController(rootViewController: initialViewController)
     self.present(navigationController, animated: true, completion: nil)
   }

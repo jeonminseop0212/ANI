@@ -14,6 +14,8 @@ class ANIInitialViewController: UIViewController {
   
   private weak var initialView: ANIInitialView?
   
+  var myTabBarController: ANITabBarController?
+  
   override func viewDidLoad() {
     setup()
   }
@@ -47,6 +49,7 @@ class ANIInitialViewController: UIViewController {
 extension ANIInitialViewController: ANIInitialViewDelegate {
   func loginButtonTapped() {
     let loginViewController = ANILoginViewController()
+    loginViewController.myTabBarController = myTabBarController
     self.navigationController?.pushViewController(loginViewController, animated: true)
   }
   

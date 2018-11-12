@@ -41,6 +41,9 @@ class ANISessionManager: NSObject {
   
   var isAnonymous: Bool = false
   
+  var blockUserIds: [String]?
+  var blockingUserIds: [String]?
+  
   #if DEBUG
   let client = Client(appID: "RBJYX5VF88", apiKey: "ebf262fa4367637cd49431402d70455c")
   #else
