@@ -11,6 +11,7 @@ import FirebaseFirestore
 import TinyConstraints
 import CodableFirebase
 import FirebaseStorage
+import NVActivityIndicatorView
 
 class ANIRecruitDetailViewController: UIViewController {
   
@@ -337,6 +338,7 @@ class ANIRecruitDetailViewController: UIViewController {
       popupOptionViewController.options = ["家族決定！😻", "募集中止", "編集する"]
     } else {
       popupOptionViewController.isMe = false
+      popupOptionViewController.options = ["非表示"]
     }
     popupOptionViewController.delegate = self
     self.tabBarController?.present(popupOptionViewController, animated: false, completion: nil)
@@ -448,47 +450,108 @@ extension ANIRecruitDetailViewController: ANIPopupOptionViewControllerDelegate {
   }
   
   func optionTapped(index: Int) {
-    if index == 0 {
-      let alertController = UIAlertController(title: "家族決定おめでどうございます！", message: "決定でよろしければこの募集を中止してください", preferredStyle: .alert)
-      
-      let stopAction = UIAlertAction(title: "中止", style: .default) { (action) in
-        if let recruit = self.recruit, let recruitId = recruit.id {
-          let database = Firestore.firestore()
+    guard let recruit = self.recruit else { return }
+
+    if let currentUserId = ANISessionManager.shared.currentUserUid {
+      if recruit.userId == currentUserId {
+        if index == 0 {
+          let alertController = UIAlertController(title: "家族決定おめでどうございます！", message: "決定でよろしければこの募集を中止してください", preferredStyle: .alert)
           
-          database.collection(KEY_RECRUITS).document(recruitId).updateData(["recruitState": 1])
+          let stopAction = UIAlertAction(title: "中止", style: .default) { (action) in
+            if let recruit = self.recruit, let recruitId = recruit.id {
+              let database = Firestore.firestore()
+              
+              database.collection(KEY_RECRUITS).document(recruitId).updateData([KEY_RECRUIT_STATE: 1])
+            }
+          }
+          let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
+          
+          alertController.addAction(stopAction)
+          alertController.addAction(cancelAction)
+          
+          self.present(alertController, animated: true, completion: nil)
+        } else if index == 1 {
+          let alertController = UIAlertController(title: nil, message: "この募集を中止しますか？", preferredStyle: .alert)
+          
+          let stopAction = UIAlertAction(title: "中止", style: .default) { (action) in
+            if let recruit = self.recruit, let recruitId = recruit.id {
+              let database = Firestore.firestore()
+              
+              database.collection(KEY_RECRUITS).document(recruitId).updateData([KEY_RECRUIT_STATE: 2])
+            }
+          }
+          let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
+          
+          alertController.addAction(stopAction)
+          alertController.addAction(cancelAction)
+          
+          self.present(alertController, animated: true, completion: nil)
+        } else if index == 2 {
+          let recruitContribtionViewController = ANIRecruitContributionViewController()
+          if let recruit = self.recruit {
+            recruitContribtionViewController.recruitContributionMode = .edit
+            recruitContribtionViewController.recruit = recruit
+            recruitContribtionViewController.delegate = self
+          }
+          let recruitContributionNV = UINavigationController(rootViewController: recruitContribtionViewController)
+          self.navigationController?.present(recruitContributionNV, animated: true, completion: nil)
+        }
+      } else {
+        if index == 0 {
+          let alertController = UIAlertController(title: "この募集を非表示にしますか？", message: "非表示にした募集はアプリの中で見えなくなります。後から非表示を解除することは出来ません。", preferredStyle: .alert)
+          
+          let hideAction = UIAlertAction(title: "非表示", style: .default) { (action) in
+            if let recruit = self.recruit, let recruitId = recruit.id {
+              let database = Firestore.firestore()
+              
+              let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.emerald)
+              NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData, nil)
+              
+              DispatchQueue.global().async {
+                database.collection(KEY_RECRUITS).document(recruitId).getDocument(completion: { (snapshot, error) in
+                  if let error = error {
+                    DLog("Error get document: \(error)")
+                    return
+                  }
+                  
+                  guard let snapshot = snapshot, let data = snapshot.data() else { return }
+                  
+                  do {
+                    let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: data)
+                    
+                    if let hideUserIds = recruit.hideUserIds {
+                      var hideUserIdsTemp = hideUserIds
+                      hideUserIdsTemp.append(currentUserId)
+                      
+                      database.collection(KEY_RECRUITS).document(recruitId).updateData([KEY_HIDE_USER_IDS: hideUserIdsTemp])
+                    } else {
+                      let hideUserIds = [currentUserId]
+                      
+                      database.collection(KEY_RECRUITS).document(recruitId).updateData([KEY_HIDE_USER_IDS: hideUserIds])
+                    }
+                    
+                    DispatchQueue.main.async {
+                      NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+                      self.navigationController?.popViewController(animated: true)
+                      ANINotificationManager.postDeleteRecruit(id: recruitId)
+                    }
+                  } catch let error {
+                    DLog(error)
+                  }
+                })
+              }
+            }
+          }
+          let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
+          
+          alertController.addAction(hideAction)
+          alertController.addAction(cancelAction)
+          
+          self.present(alertController, animated: true, completion: nil)
         }
       }
-      let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
-      
-      alertController.addAction(stopAction)
-      alertController.addAction(cancelAction)
-      
-      self.present(alertController, animated: true, completion: nil)
-    } else if index == 1 {
-      let alertController = UIAlertController(title: nil, message: "この募集を中止しますか？", preferredStyle: .alert)
-      
-      let stopAction = UIAlertAction(title: "中止", style: .default) { (action) in
-        if let recruit = self.recruit, let recruitId = recruit.id {
-          let database = Firestore.firestore()
-          
-          database.collection(KEY_RECRUITS).document(recruitId).updateData(["recruitState": 2])
-        }
-      }
-      let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
-      
-      alertController.addAction(stopAction)
-      alertController.addAction(cancelAction)
-      
-      self.present(alertController, animated: true, completion: nil)
-    } else if index == 2 {
-      let recruitContribtionViewController = ANIRecruitContributionViewController()
-      if let recruit = self.recruit {
-        recruitContribtionViewController.recruitContributionMode = .edit
-        recruitContribtionViewController.recruit = recruit
-        recruitContribtionViewController.delegate = self
-      }
-      let recruitContributionNV = UINavigationController(rootViewController: recruitContribtionViewController)
-      self.navigationController?.present(recruitContributionNV, animated: true, completion: nil)
+    } else {
+      //TODO: reject
     }
   }
 }

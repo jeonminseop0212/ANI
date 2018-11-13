@@ -28,4 +28,5 @@ struct FirebaseRecruit: Codable {
   var isLoved: Bool?
   var isCliped: Bool?
   var isSupported: Bool?
+  var hideUserIds: [String]?
 }

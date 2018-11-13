@@ -53,6 +53,8 @@ let KEY_RECRUIT_HOME = "home"
 let KEY_RECRUIT_KIND = "kind"
 let KEY_RECRUIT_AGE = "age"
 let KEY_RECRUIT_SEX = "sex"
+let KEY_RECRUIT_STATE = "recruitState"
+let KEY_HIDE_USER_IDS = "hideUserIds"
 
 //story
 let KEY_STORY_IMAGES = "story_images"

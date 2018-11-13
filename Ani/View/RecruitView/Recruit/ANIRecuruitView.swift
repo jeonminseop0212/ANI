@@ -224,7 +224,13 @@ class ANIRecuruitView: UIView {
       }
     }
 
-    recruitTableView.deleteRows(at: [indexPath], with: .automatic)
+    if recruits.isEmpty {
+      recruitTableView.reloadData()
+      recruitTableView.alpha = 0.0
+      showReloadView(sender: nil)
+    } else {
+      recruitTableView.deleteRows(at: [indexPath], with: .automatic)
+    }
   }
   
   private func showReloadView(sender: UIRefreshControl?) {
@@ -256,10 +262,15 @@ class ANIRecuruitView: UIView {
   }
   
   private func isBlockRecruit(recruit: FirebaseRecruit) -> Bool {
+    guard let currentUserUid = ANISessionManager.shared.currentUserUid else { return false }
+    
     if let blockUserIds = ANISessionManager.shared.blockUserIds, blockUserIds.contains(recruit.userId) {
       return true
     }
     if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(recruit.userId) {
+      return true
+    }
+    if let hideUserIds = recruit.hideUserIds, hideUserIds.contains(currentUserUid) {
       return true
     }
     
@@ -394,7 +405,7 @@ extension ANIRecuruitView {
       self.isLoading = true
       self.isLastRecruitPage = false
 
-      query.order(by: KEY_DATE, descending: true).limit(to: 15).getDocuments(completion: { (snapshot, error) in
+      query.order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
           self.isLoading = false
@@ -473,7 +484,7 @@ extension ANIRecuruitView {
     DispatchQueue.global().async {
       self.isLoading = true
       
-      query.order(by: KEY_DATE, descending: true).start(afterDocument: lastRecruit).limit(to: 15).getDocuments(completion: { (snapshot, error) in
+      query.order(by: KEY_DATE, descending: true).start(afterDocument: lastRecruit).limit(to: 20).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
           self.isLoading = false
