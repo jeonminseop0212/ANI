@@ -32,7 +32,7 @@ class ANICommentBar: UIView {
     
     setup()
     setProfileImage()
-    setupNotification()
+    setupNotifications()
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -98,7 +98,7 @@ class ANICommentBar: UIView {
     self.commentTextView = commentTextView
   }
   
-  private func setupNotification() {
+  private func setupNotifications() {
     ANINotificationManager.receive(viewScrolled: self, selector: #selector(keyboardHide))
   }
   

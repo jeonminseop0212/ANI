@@ -17,14 +17,14 @@ public class ANIPlaceHolderTextView: UITextView {
   public override init(frame: CGRect, textContainer: NSTextContainer?) {
     super.init(frame: frame, textContainer: textContainer)
     
-    setupNotification()
+    setupNotifications()
   }
   
   required public init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
   
-  private func setupNotification() {
+  private func setupNotifications() {
     ANINotificationManager.receive(textViewTextDidChange: self, selector: #selector(textChanged))
   }
   

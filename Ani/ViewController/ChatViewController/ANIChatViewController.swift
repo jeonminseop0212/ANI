@@ -72,17 +72,18 @@ class ANIChatViewController: UIViewController {
     setup()
   }
   
-  override func viewDidAppear(_ animated: Bool) {
-    UIApplication.shared.statusBarStyle = .default
+  override func viewWillAppear(_ animated: Bool) {
     setupNotifications()
   }
   
-  override func viewWillDisappear(_ animated: Bool) {
-    removeNotifications()
-    removeGroup()
+  override func viewDidAppear(_ animated: Bool) {
+    UIApplication.shared.statusBarStyle = .default
   }
   
   override func viewDidDisappear(_ animated: Bool) {
+    removeNotifications()
+    removeGroup()
+    
     guard let chatView = self.chatView,
           let chatViewChatGroupListener = chatView.chatGroupListener,
           let chatBarChatGroupListener = self.chatGroupListener,
@@ -276,6 +277,7 @@ class ANIChatViewController: UIViewController {
   
   //MARK: notification
   private func setupNotifications() {
+    removeNotifications()
     ANINotificationManager.receive(keyboardWillChangeFrame: self, selector: #selector(keyboardWillChangeFrame))
     ANINotificationManager.receive(keyboardWillHide: self, selector: #selector(keyboardWillHide))
     ANINotificationManager.receive(profileImageViewTapped: self, selector: #selector(pushOtherProfile))

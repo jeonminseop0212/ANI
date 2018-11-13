@@ -51,7 +51,7 @@ class ANIRecruitViewController: UIViewController {
     setupNotifications()
   }
   
-  override func viewWillDisappear(_ animated: Bool) {
+  override func viewDidDisappear(_ animated: Bool) {
     removeNotifications()
   }
   
@@ -151,6 +151,7 @@ class ANIRecruitViewController: UIViewController {
   
   //MARK: Notifications
   private func setupNotifications() {
+    removeNotifications()
     ANINotificationManager.receive(profileImageViewTapped: self, selector: #selector(pushOtherProfile))
     ANINotificationManager.receive(pickerViewDidSelect: self, selector: #selector(updateFilter))
   }

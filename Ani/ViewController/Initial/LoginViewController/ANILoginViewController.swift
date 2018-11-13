@@ -30,7 +30,14 @@ class ANILoginViewController: UIViewController {
   
   override func viewDidLoad() {
     setup()
-    setupNotification()
+  }
+  
+  override func viewWillAppear(_ animated: Bool) {
+    setupNotifications()
+  }
+  
+  override func viewDidDisappear(_ animated: Bool) {
+    removeNotifications()
   }
   
   private func setup() {
@@ -112,9 +119,14 @@ class ANILoginViewController: UIViewController {
     self.rejectLabel = rejectLabel
   }
   
-  private func setupNotification() {
+  private func setupNotifications() {
+    removeNotifications()
     ANINotificationManager.receive(keyboardWillChangeFrame: self, selector: #selector(keyboardWillChangeFrame))
     ANINotificationManager.receive(keyboardWillHide: self, selector: #selector(keyboardWillHide))
+  }
+  
+  private func removeNotifications() {
+    ANINotificationManager.remove(self)
   }
   
   @objc private func keyboardWillChangeFrame(_ notification: Notification) {

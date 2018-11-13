@@ -34,7 +34,7 @@ class ANIFollowUserViewContoller: UIViewController {
     setupNotifications()
   }
   
-  override func viewWillDisappear(_ animated: Bool) {
+  override func viewDidDisappear(_ animated: Bool) {
     removeNotifications()
   }
   
@@ -100,6 +100,7 @@ class ANIFollowUserViewContoller: UIViewController {
   
   //MARK: Notifications
   private func setupNotifications() {
+    removeNotifications()
     ANINotificationManager.receive(profileImageViewTapped: self, selector: #selector(pushOtherProfile))
   }
   

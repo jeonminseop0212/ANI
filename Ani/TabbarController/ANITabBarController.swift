@@ -39,7 +39,7 @@ class ANITabBarController: UITabBarController {
     setup()
     setupTabBar()
     setupBadge()
-    setupNotification()
+    setupNotifications()
   }
   
   override func viewDidAppear(_ animated: Bool) {
@@ -170,7 +170,7 @@ class ANITabBarController: UITabBarController {
     }
   }
   
-  private func setupNotification() {
+  private func setupNotifications() {
     ANINotificationManager.receive(changeIsHaveUnreadNoti: self, selector: #selector(updateBadge))
     ANINotificationManager.receive(changeIsHaveUnreadMessage: self, selector: #selector(updateBadge))
     ANINotificationManager.receive(login: self, selector: #selector(relogin))

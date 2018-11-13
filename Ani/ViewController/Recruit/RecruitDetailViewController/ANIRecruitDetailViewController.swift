@@ -57,7 +57,7 @@ class ANIRecruitDetailViewController: UIViewController {
     UIApplication.shared.statusBarStyle = statusBarStyle
   }
   
-  override func viewWillDisappear(_ animated: Bool) {
+  override func viewDidDisappear(_ animated: Bool) {
     removeNotifications()
   }
   
@@ -178,6 +178,7 @@ class ANIRecruitDetailViewController: UIViewController {
   
   //MARK: Notifications
   private func setupNotifications() {
+    removeNotifications()
     ANINotificationManager.receive(profileImageViewTapped: self, selector: #selector(pushOtherProfile))
   }
   

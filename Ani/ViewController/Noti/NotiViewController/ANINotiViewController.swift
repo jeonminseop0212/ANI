@@ -63,7 +63,7 @@ class ANINotiViewController: UIViewController {
     setupNotifications()
   }
   
-  override func viewWillDisappear(_ animated: Bool) {
+  override func viewDidDisappear(_ animated: Bool) {
     removeNotifications()
   }
   
@@ -120,6 +120,7 @@ class ANINotiViewController: UIViewController {
   }
   
   private func setupNotifications() {
+    removeNotifications()
     ANINotificationManager.receive(messageCellTapped: self, selector: #selector(pushChat))
     ANINotificationManager.receive(profileImageViewTapped: self, selector: #selector(pushOtherProfile))
     ANINotificationManager.receive(login: self, selector: #selector(showNeedLoginView))

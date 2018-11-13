@@ -45,10 +45,10 @@ class ANIOtherProfileViewController: UIViewController {
   
   override func viewWillAppear(_ animated: Bool) {
     UIApplication.shared.statusBarStyle = .default
-    setupNotification()
+    setupNotifications()
   }
 
-  override func viewWillDisappear(_ animated: Bool) {
+  override func viewDidDisappear(_ animated: Bool) {
     removeNotifications()
   }
   
@@ -183,7 +183,8 @@ class ANIOtherProfileViewController: UIViewController {
   }
   
   //MARK: notification
-  private func setupNotification() {
+  private func setupNotifications() {
+    removeNotifications()
     ANINotificationManager.receive(imageCellTapped: self, selector: #selector(presentImageBrowser(_:)))
   }
   

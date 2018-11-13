@@ -18,7 +18,7 @@ class ANINotiMenuBarCell: UICollectionViewCell {
   var menuLabel: UILabel?
   var menuKind: MenuKind = .noti {
     didSet {
-      setupNotification()
+      setupNotifications()
     }
   }
   
@@ -67,7 +67,7 @@ class ANINotiMenuBarCell: UICollectionViewCell {
     self.badge = badge
   }
   
-  private func setupNotification() {
+  private func setupNotifications() {
     if menuKind == .noti {
       ANINotificationManager.receive(changeIsHaveUnreadNoti: self, selector: #selector(updateNotiBadge))
     } else if menuKind == .message {
