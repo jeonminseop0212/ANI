@@ -660,28 +660,38 @@ class ANIRecruitContributionView: UIView {
     return recruitInfo
   }
   
+  @objc private func hideKeyboard() {
+    self.endEditing(true)
+  }
+  
   //MARK: action
   @objc private func kindSelectButtonTapped() {
+    self.endEditing(true)
     self.delegate?.kindSelectButtonTapped()
   }
   
   @objc private func ageSelectButtonTapped() {
+    self.endEditing(true)
     self.delegate?.ageSelectButtonTapped()
   }
   
   @objc private func sexSelectButtonTapped() {
+    self.endEditing(true)
     self.delegate?.sexSelectButtonTapped()
   }
   
   @objc private func homeSelectButtonTapped() {
+    self.endEditing(true)
     self.delegate?.homeSelectButtonTapped()
   }
   
   @objc private func vaccineSelectButtonTapped() {
+    self.endEditing(true)
     self.delegate?.vaccineSelectButtonTapped()
   }
   
   @objc private func castrationSelectButtonTapped() {
+    self.endEditing(true)
     self.delegate?.castrationSelectButtonTapped()
   }
   
@@ -773,6 +783,8 @@ extension ANIRecruitContributionView: UIScrollViewDelegate {
 //MARK: ANIButtonViewDelegate
 extension ANIRecruitContributionView: ANIButtonViewDelegate {
   func buttonViewTapped(view: ANIButtonView) {
+    self.endEditing(true)
+    
     if view === self.headerImagePickupButton {
       self.delegate?.imagePickButtonTapped()
     }
