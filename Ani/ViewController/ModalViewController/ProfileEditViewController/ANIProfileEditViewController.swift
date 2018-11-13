@@ -73,11 +73,11 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
       self.familyImages = images
     }
     setup()
-    setupNotification()
   }
   
   override func viewWillAppear(_ animated: Bool) {
     UIApplication.shared.isStatusBarHidden = false
+    setupNotifications()
   }
   
   override func viewDidAppear(_ animated: Bool) {
@@ -90,6 +90,10 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
     guard let rejectView = self.rejectView else { return }
     
     rejectView.isHidden = true
+  }
+  
+  override func viewDidDisappear(_ animated: Bool) {
+    removeNotifications()
   }
   
   private func setup() {
@@ -205,9 +209,14 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
     self.rejectLabel = rejectLabel
   }
   
-  private func setupNotification() {
+  private func setupNotifications() {
+    removeNotifications()
     ANINotificationManager.receive(keyboardWillChangeFrame: self, selector: #selector(keyboardWillChangeFrame))
     ANINotificationManager.receive(keyboardWillHide: self, selector: #selector(keyboardWillHide))
+  }
+  
+  private func removeNotifications() {
+    ANINotificationManager.remove(self)
   }
   
   private func getCropImages(images: [UIImage?], items: [Image]) -> [UIImage] {

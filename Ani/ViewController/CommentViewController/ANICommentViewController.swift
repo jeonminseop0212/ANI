@@ -49,10 +49,10 @@ class ANICommentViewController: UIViewController {
   }
   
   override func viewWillAppear(_ animated: Bool) {
-    setupNotification()
+    setupNotifications()
   }
   
-  override func viewWillDisappear(_ animated: Bool) {
+  override func viewDidDisappear(_ animated: Bool) {
     removeNotifications()
   }
   
@@ -193,7 +193,8 @@ class ANICommentViewController: UIViewController {
   }
   
   //MARK: notification
-  private func setupNotification() {
+  private func setupNotifications() {
+    removeNotifications()
     ANINotificationManager.receive(keyboardWillChangeFrame: self, selector: #selector(keyboardWillChangeFrame))
     ANINotificationManager.receive(keyboardWillHide: self, selector: #selector(keyboardWillHide))
     ANINotificationManager.receive(profileImageViewTapped: self, selector: #selector(pushOtherProfile))

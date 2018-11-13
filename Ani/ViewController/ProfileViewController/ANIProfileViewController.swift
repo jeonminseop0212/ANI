@@ -46,11 +46,11 @@ class ANIProfileViewController: UIViewController {
   
   override func viewWillAppear(_ animated: Bool) {
     UIApplication.shared.statusBarStyle = .default
-    setupNotification()
+    setupNotifications()
     showNeedLoginView()
   }
   
-  override func viewWillDisappear(_ animated: Bool) {
+  override func viewDidDisappear(_ animated: Bool) {
     removeNotifications()
   }
   
@@ -184,7 +184,8 @@ class ANIProfileViewController: UIViewController {
   }
   
   //MAKR: notification
-  private func setupNotification() {
+  private func setupNotifications() {
+    removeNotifications()
     ANINotificationManager.receive(imageCellTapped: self, selector: #selector(presentImageBrowser(_:)))
     ANINotificationManager.receive(profileEditButtonTapped: self, selector: #selector(openProfileEdit))
     ANINotificationManager.receive(login: self, selector: #selector(updateLayoutLogin))

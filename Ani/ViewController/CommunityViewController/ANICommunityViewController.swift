@@ -41,10 +41,10 @@ class ANICommunityViewController: UIViewController {
   override func viewWillAppear(_ animated: Bool) {
     UIApplication.shared.statusBarStyle = .default
     UIApplication.shared.isStatusBarHidden = false
-    setupNotification()
+    setupNotifications()
   }
   
-  override func viewWillDisappear(_ animated: Bool) {
+  override func viewDidDisappear(_ animated: Bool) {
     removeNotifications()
   }
   
@@ -124,7 +124,8 @@ class ANICommunityViewController: UIViewController {
   }
   
   //MAKR: notification
-  private func setupNotification() {
+  private func setupNotifications() {
+    removeNotifications()
     ANINotificationManager.receive(imageCellTapped: self, selector: #selector(presentImageBrowser(_:)))
     ANINotificationManager.receive(profileImageViewTapped: self, selector: #selector(pushOtherProfile))
   }

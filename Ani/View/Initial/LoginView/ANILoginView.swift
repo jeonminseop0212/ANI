@@ -45,7 +45,7 @@ class ANILoginView: UIView {
     super.init(frame: frame)
     
     setup()
-    setupNotification()
+    setupNotifications()
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -174,7 +174,7 @@ class ANILoginView: UIView {
     self.loginButtonLabel = loginButtonLabel
   }
   
-  private func setupNotification() {
+  private func setupNotifications() {
     ANINotificationManager.receive(keyboardWillChangeFrame: self, selector: #selector(keyboardWillChangeFrame))
   }
   
