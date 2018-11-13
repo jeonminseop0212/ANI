@@ -11,6 +11,7 @@ import TinyConstraints
 import FirebaseFirestore
 import CodableFirebase
 import FirebaseStorage
+import NVActivityIndicatorView
 
 class ANIOtherProfileViewController: UIViewController {
   
@@ -35,7 +36,7 @@ class ANIOtherProfileViewController: UIViewController {
   var userId: String?
   
   private var contentType: ContentType?
-  private var reportId: String?
+  private var contributionId: String?
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -218,7 +219,7 @@ class ANIOtherProfileViewController: UIViewController {
   
   @objc private func option() {
     self.contentType = .user
-    self.reportId = userId
+    self.contributionId = userId
     
     let popupOptionViewController = ANIPopupOptionViewController()
     popupOptionViewController.modalPresentationStyle = .overCurrentContext
@@ -340,11 +341,14 @@ extension ANIOtherProfileViewController: ANIOtherProfileBasicViewDelegate {
   
   func popupOptionView(isMe: Bool, contentType: ContentType, id: String) {
     self.contentType = contentType
-    self.reportId = id
+    self.contributionId = id
     
     let popupOptionViewController = ANIPopupOptionViewController()
     popupOptionViewController.modalPresentationStyle = .overCurrentContext
     popupOptionViewController.isMe = isMe
+    if !isMe {
+      popupOptionViewController.options = ["非表示"]
+    }
     popupOptionViewController.delegate = self
     self.tabBarController?.present(popupOptionViewController, animated: false, completion: nil)
   }
@@ -386,31 +390,143 @@ extension ANIOtherProfileViewController: ANIPopupOptionViewControllerDelegate {
   }
   
   func optionTapped(index: Int) {
-    if index == 0 {
-      guard let user = self.user,
-            let userId = self.userId,
-            let currentUserUid = ANISessionManager.shared.currentUserUid,
-            let userName = user.userName else { return }
-      
-      let alertController = UIAlertController(title: "\(userName)さんをブロックしますか？", message: "ブロックされた人はあなたのプロフィールや投稿を見られなくなります。ブロックしたことは相手に通知されません。", preferredStyle: .alert)
-      
-      let blockAction = UIAlertAction(title: "ブロック", style: .default) { (action) in
-        let database = Firestore.firestore()
-        let today = ANIFunction.shared.getToday()
-
-        database.collection(KEY_USERS).document(currentUserUid).collection(KEY_BLOCK_USER_IDS).document(userId).setData([KEY_USER_ID: userId, KEY_DATE: today])
-        database.collection(KEY_USERS).document(userId).collection(KEY_BLOCKING_USER_IDS).document(currentUserUid).setData([KEY_USER_ID: currentUserUid, KEY_DATE: today])
+    guard let contentType = self.contentType,
+          let contributionId = self.contributionId,
+          let currentUserId = ANISessionManager.shared.currentUserUid else { return }
+    
+    if contentType == .user {
+      if index == 0 {
+        guard let user = self.user,
+              let userId = self.userId,
+              let userName = user.userName else { return }
         
-        self.unfollow(userId: userId, currentUserUid: currentUserUid)
+        let alertController = UIAlertController(title: "\(userName)さんをブロックしますか？", message: "ブロックされた人はあなたのプロフィールや投稿を見られなくなります。ブロックしたことは相手に通知されません。", preferredStyle: .alert)
         
-        self.navigationController?.popViewController(animated: true)
+        let blockAction = UIAlertAction(title: "ブロック", style: .default) { (action) in
+          let database = Firestore.firestore()
+          let today = ANIFunction.shared.getToday()
+          
+          database.collection(KEY_USERS).document(currentUserId).collection(KEY_BLOCK_USER_IDS).document(userId).setData([KEY_USER_ID: userId, KEY_DATE: today])
+          database.collection(KEY_USERS).document(userId).collection(KEY_BLOCKING_USER_IDS).document(currentUserId).setData([KEY_USER_ID: currentUserId, KEY_DATE: today])
+          
+          self.unfollow(userId: userId, currentUserUid: currentUserId)
+          
+          self.navigationController?.popViewController(animated: true)
+        }
+        let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
+        
+        alertController.addAction(blockAction)
+        alertController.addAction(cancelAction)
+        
+        self.present(alertController, animated: true, completion: nil)
       }
-      let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
-      
-      alertController.addAction(blockAction)
-      alertController.addAction(cancelAction)
-      
-      self.present(alertController, animated: true, completion: nil)
+    } else {
+      if index == 0 {
+        var alertTitle = ""
+        var alertMessage = ""
+        var collection = ""
+        if contentType == .story {
+          alertTitle = "このストーリーを非表示にしますか？"
+          alertMessage = "非表示にしたストーリーはアプリの中で見えなくなります。後から非表示を解除することは出来ません。"
+          collection = KEY_STORIES
+        } else if contentType == .qna {
+          alertTitle = "このs質問を非表示にしますか？"
+          alertMessage = "非表示にしたs質問はアプリの中で見えなくなります。後から非表示を解除することは出来ません。"
+          collection = KEY_QNAS
+        }
+        
+        let alertController = UIAlertController(title: alertTitle, message: alertMessage, preferredStyle: .alert)
+        
+        let hideAction = UIAlertAction(title: "非表示", style: .default) { (action) in
+          let database = Firestore.firestore()
+          
+          let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.emerald)
+          NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData, nil)
+          
+          DispatchQueue.global().async {
+            database.collection(collection).document(contributionId).getDocument(completion: { (snapshot, error) in
+              if let error = error {
+                DLog("Error get document: \(error)")
+                return
+              }
+              
+              guard let snapshot = snapshot, let data = snapshot.data() else { return }
+              
+              if contentType == .story {
+                do {
+                  let story = try FirestoreDecoder().decode(FirebaseStory.self, from: data)
+                  
+                  if let hideUserIds = story.hideUserIds {
+                    var hideUserIdsTemp = hideUserIds
+                    hideUserIdsTemp.append(currentUserId)
+                    
+                    database.collection(collection).document(contributionId).updateData([KEY_HIDE_USER_IDS: hideUserIdsTemp])
+                    
+                    self.updateDataAlgolia(objectId: contributionId, data: [KEY_HIDE_USER_IDS: hideUserIdsTemp as AnyObject], indexName: KEY_STORIES_INDEX)
+                  } else {
+                    let hideUserIds = [currentUserId]
+                    
+                    database.collection(collection).document(contributionId).updateData([KEY_HIDE_USER_IDS: hideUserIds])
+                    
+                    self.updateDataAlgolia(objectId: contributionId, data: [KEY_HIDE_USER_IDS: hideUserIds as AnyObject], indexName: KEY_STORIES_INDEX)
+                  }
+                  
+                  DispatchQueue.main.async {
+                    NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+                    ANINotificationManager.postDeleteStory(id: contributionId)
+                  }
+                } catch let error {
+                  DLog(error)
+                }
+              } else if contentType == .qna {
+                do {
+                  let qna = try FirestoreDecoder().decode(FirebaseQna.self, from: data)
+                  
+                  if let hideUserIds = qna.hideUserIds {
+                    var hideUserIdsTemp = hideUserIds
+                    hideUserIdsTemp.append(currentUserId)
+                    
+                    database.collection(collection).document(contributionId).updateData([KEY_HIDE_USER_IDS: hideUserIdsTemp])
+                    
+                    self.updateDataAlgolia(objectId: contributionId, data: [KEY_HIDE_USER_IDS: hideUserIdsTemp as AnyObject], indexName: KEY_QNAS_INDEX)
+                  } else {
+                    let hideUserIds = [currentUserId]
+                    
+                    database.collection(collection).document(contributionId).updateData([KEY_HIDE_USER_IDS: hideUserIds])
+                    
+                    self.updateDataAlgolia(objectId: contributionId, data: [KEY_HIDE_USER_IDS: hideUserIds as AnyObject], indexName: KEY_QNAS_INDEX)
+                  }
+                  
+                  DispatchQueue.main.async {
+                    NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+                    ANINotificationManager.postDeleteQna(id: contributionId)
+                  }
+                } catch let error {
+                  DLog(error)
+                }
+              }
+            })
+          }
+        }
+        let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
+        
+        alertController.addAction(hideAction)
+        alertController.addAction(cancelAction)
+        
+        self.present(alertController, animated: true, completion: nil)
+      }
+    }
+  }
+  
+  private func updateDataAlgolia(objectId: String, data: [String: AnyObject], indexName: String) {
+    let index = ANISessionManager.shared.client.index(withName: indexName)
+    
+    DispatchQueue.global().async {
+      index.partialUpdateObject(data, withID: objectId, completionHandler: { (content, error) -> Void in
+        if error == nil {
+          DLog("Object IDs: \(content!)")
+        }
+      })
     }
   }
 }
@@ -418,7 +534,8 @@ extension ANIOtherProfileViewController: ANIPopupOptionViewControllerDelegate {
 //MAKR: data
 extension ANIOtherProfileViewController {
   private func reportData() {
-    guard let contentType = self.contentType, let reportId = self.reportId else { return }
+    guard let contentType = self.contentType,
+          let contributionId = self.contributionId else { return }
     
     let database = Firestore.firestore()
     
@@ -436,6 +553,6 @@ extension ANIOtherProfileViewController {
     
     let date = ANIFunction.shared.getToday()
     let values = ["contentType": contentTypeString, "date": date]
-    database.collection(KEY_REPORTS).document(reportId).collection(KEY_REPORT).addDocument(data: values)
+    database.collection(KEY_REPORTS).document(contributionId).collection(KEY_REPORT).addDocument(data: values)
   }
 }

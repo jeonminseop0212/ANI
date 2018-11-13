@@ -423,9 +423,11 @@ extension ANIProfileViewController {
         self.delegateDataAlgolia(contentType: contentType, contributionId: contributionId)
         
         DispatchQueue.main.async {
-          guard let profileBasicView = self.profileBasicView else { return }
-          
-          profileBasicView.deleteData(id: contributionId)
+          if contentType == .story {
+            ANINotificationManager.postDeleteStory(id: contributionId)
+          } else if contentType == .qna {
+            ANINotificationManager.postDeleteQna(id: contributionId)
+          }
         }
         
         guard let snapshot = snapshot, let data = snapshot.data() else { return }

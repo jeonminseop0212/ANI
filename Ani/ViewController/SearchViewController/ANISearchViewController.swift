@@ -374,11 +374,11 @@ extension ANISearchViewController: ANIPopupOptionViewControllerDelegate {
   }
   
   func optionTapped(index: Int) {
+    guard let contentType = self.contentType,
+          let contributionId = self.contributionId,
+          let currentUserId = ANISessionManager.shared.currentUserUid else { return }
+    
     if index == 0 {
-      guard let contentType = self.contentType,
-            let contributionId = self.contributionId,
-            let currentUserId = ANISessionManager.shared.currentUserUid else { return }
-      
       var alertTitle = ""
       var alertMessage = ""
       var collection = ""
