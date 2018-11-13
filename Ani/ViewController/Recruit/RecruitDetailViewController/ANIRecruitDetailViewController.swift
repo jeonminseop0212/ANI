@@ -625,7 +625,9 @@ extension ANIRecruitDetailViewController {
           database.collection(KEY_RECRUITS).document(recruitId).collection(KEY_LOVE_IDS).document(document.documentID).delete()
         }
       })
-      
+    }
+    
+    DispatchQueue.global().async {
       database.collection(KEY_RECRUITS).document(recruitId).collection(KEY_CLIP_IDS).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           DLog("Get document error \(error)")
@@ -636,7 +638,24 @@ extension ANIRecruitDetailViewController {
         guard let snapshot = snapshot else { return }
         
         for document in snapshot.documents {
+          database.collection(KEY_USERS).document(document.documentID).collection(KEY_CLIP_RECRUIT_IDS).document(recruitId).delete()
           database.collection(KEY_RECRUITS).document(recruitId).collection(KEY_CLIP_IDS).document(document.documentID).delete()
+        }
+      })
+    }
+    
+    DispatchQueue.global().async {
+      database.collection(KEY_RECRUITS).document(recruitId).collection(KEY_SUPPORT_IDS).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          DLog("Get document error \(error)")
+          
+          return
+        }
+        
+        guard let snapshot = snapshot else { return }
+        
+        for document in snapshot.documents {
+          database.collection(KEY_RECRUITS).document(recruitId).collection(KEY_SUPPORT_IDS).document(document.documentID).delete()
         }
       })
     }
