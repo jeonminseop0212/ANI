@@ -29,18 +29,21 @@ class ANIListView: UIView {
   var list: List? {
     didSet {
       guard let list = self.list,
-            let activityIndicatorView = self.activityIndicatorView else { return }
+            let activityIndicatorView = self.activityIndicatorView,
+            let listTableView = self.listTableView else { return }
       
       activityIndicatorView.startAnimating()
       
       switch list {
       case .loveRecruit:
+        listTableView.contentInset = UIEdgeInsets(top: 10.0, left: 0.0, bottom: 0.0, right: 0.0)
         loadLoveRecruit()
       case .loveStroy:
         loadLoveStory()
       case .loveQuestion:
         loadLoveQna()
       case .clipRecruit:
+        listTableView.contentInset = UIEdgeInsets(top: 10.0, left: 0.0, bottom: 0.0, right: 0.0)
         loadClipRecruit()
       }
     }
