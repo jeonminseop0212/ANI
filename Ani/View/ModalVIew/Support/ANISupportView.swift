@@ -159,7 +159,7 @@ extension ANISupportView: ANIButtonViewDelegate {
       let database = Firestore.firestore()
       let id = NSUUID().uuidString
       let date = ANIFunction.shared.getToday()
-      let story = FirebaseStory(id: id, storyImageUrls: nil, story: messageTextView.text, userId: uid, loveIds: nil, commentIds: nil, recruitId: recruitId, recruitTitle: recruit.title, recruitSubTitle: recruit.reason, date: date, isLoved: nil)
+      let story = FirebaseStory(id: id, storyImageUrls: nil, story: messageTextView.text, userId: uid, loveIds: nil, commentIds: nil, recruitId: recruitId, recruitTitle: recruit.title, recruitSubTitle: recruit.reason, date: date, isLoved: nil, hideUserIds: nil)
       
       DispatchQueue.global().async {
         do {

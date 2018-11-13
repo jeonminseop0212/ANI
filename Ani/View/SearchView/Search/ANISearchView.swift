@@ -129,6 +129,8 @@ class ANISearchView: UIView {
   
   private func setupNotifications() {
     ANINotificationManager.receive(searchTabTapped: self, selector: #selector(scrollToTop))
+    ANINotificationManager.receive(deleteStory: self, selector: #selector(deleteStory))
+    ANINotificationManager.receive(deleteQna: self, selector: #selector(deleteQna))
   }
   
   @objc private func scrollToTop() {
@@ -138,28 +140,44 @@ class ANISearchView: UIView {
     userTableView.scrollToRow(at: [0, 0], at: .top, animated: true)
   }
   
-  func deleteData(id: String) {
-    guard let tableView = self.tableView else { return }
+  @objc private func deleteStory(_ notification: NSNotification) {
+    guard let id = notification.object as? String,
+          let tableView = self.tableView else { return }
     
     var indexPath: IndexPath = [0, 0]
     
-    if selectedCategory == .story {
-      for (index, searchStory) in searchStories.enumerated() {
-        if searchStory.id == id {
-          searchStories.remove(at: index)
-          indexPath = [0, index]
-        }
-      }
-    } else if selectedCategory == .qna {
-      for (index, searchQna) in searchQnas.enumerated() {
-        if searchQna.id == id {
-          searchQnas.remove(at: index)
-          indexPath = [0, index]
+    for (index, searchStory) in searchStories.enumerated() {
+      if searchStory.id == id {
+        searchStories.remove(at: index)
+        indexPath = [0, index]
+        
+        if searchStories.isEmpty {
+          tableView.reloadData()
+        } else {
+          tableView.deleteRows(at: [indexPath], with: .automatic)
         }
       }
     }
+  }
+  
+  @objc private func deleteQna(_ notification: NSNotification) {
+    guard let id = notification.object as? String,
+          let tableView = self.tableView else { return }
     
-    tableView.deleteRows(at: [indexPath], with: .automatic)
+    var indexPath: IndexPath = [0, 0]
+    
+    for (index, searchQna) in searchQnas.enumerated() {
+      if searchQna.id == id {
+        searchQnas.remove(at: index)
+        indexPath = [0, index]
+        
+        if searchQnas.isEmpty {
+          tableView.reloadData()
+        } else {
+          tableView.deleteRows(at: [indexPath], with: .automatic)
+        }
+      }
+    }
   }
   
   private func isBlockUser(user: FirebaseUser) -> Bool {
@@ -176,10 +194,15 @@ class ANISearchView: UIView {
   }
   
   private func isBlockStory(story: FirebaseStory) -> Bool {
+    guard let currentUserUid = ANISessionManager.shared.currentUserUid else { return false }
+    
     if let blockUserIds = ANISessionManager.shared.blockUserIds, blockUserIds.contains(story.userId) {
       return true
     }
     if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(story.userId) {
+      return true
+    }
+    if let hideUserIds = story.hideUserIds, hideUserIds.contains(currentUserUid) {
       return true
     }
     
@@ -187,10 +210,15 @@ class ANISearchView: UIView {
   }
   
   private func isBlockQna(qna: FirebaseQna) -> Bool {
+    guard let currentUserUid = ANISessionManager.shared.currentUserUid else { return false }
+    
     if let blockUserIds = ANISessionManager.shared.blockUserIds, blockUserIds.contains(qna.userId) {
       return true
     }
     if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(qna.userId) {
+      return true
+    }
+    if let hideUserIds = qna.hideUserIds, hideUserIds.contains(currentUserUid) {
       return true
     }
     
