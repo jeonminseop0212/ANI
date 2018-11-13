@@ -145,7 +145,13 @@ class ANIStoryView: UIView {
       }
     }
     
-    storyTableView.deleteRows(at: [indexPath], with: .automatic)
+    if stories.isEmpty {
+      storyTableView.reloadData()
+      storyTableView.alpha = 0.0
+      showReloadView(sender: nil)
+    } else {
+      storyTableView.deleteRows(at: [indexPath], with: .automatic)
+    }
   }
   
   private func showReloadView(sender: UIRefreshControl?) {
@@ -169,10 +175,15 @@ class ANIStoryView: UIView {
   }
   
   private func isBlockStory(story: FirebaseStory) -> Bool {
+    guard let currentUserUid = ANISessionManager.shared.currentUserUid else { return false }
+    
     if let blockUserIds = ANISessionManager.shared.blockUserIds, blockUserIds.contains(story.userId) {
       return true
     }
     if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(story.userId) {
+      return true
+    }
+    if let hideUserIds = story.hideUserIds, hideUserIds.contains(currentUserUid) {
       return true
     }
     
@@ -348,7 +359,7 @@ extension ANIStoryView {
       self.isLoading = true
       self.isLastStoryPage = false
       
-      database.collection(KEY_STORIES).order(by: KEY_DATE, descending: true).limit(to: 10).getDocuments(completion: { (snapshot, error) in
+      database.collection(KEY_STORIES).order(by: KEY_DATE, descending: true).limit(to: 15).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
           self.isLoading = false
@@ -426,7 +437,7 @@ extension ANIStoryView {
     DispatchQueue.global().async {
       self.isLoading = true
       
-      database.collection(KEY_STORIES).order(by: KEY_DATE, descending: true).start(afterDocument: lastStory).limit(to: 10).getDocuments(completion: { (snapshot, error) in
+      database.collection(KEY_STORIES).order(by: KEY_DATE, descending: true).start(afterDocument: lastStory).limit(to: 15).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
           self.isLoading = false

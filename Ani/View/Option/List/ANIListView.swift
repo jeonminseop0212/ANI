@@ -109,43 +109,10 @@ class ANIListView: UIView {
     self.activityIndicatorView = activityIndicatorView
   }
   
-  func deleteData(id: String) {
-    guard let list = self.list,
-          let listTableView = self.listTableView else { return }
-    
-    var indexPath: IndexPath = [0, 0]
-    
-    if list == .loveStroy {
-      for (index, loveStory) in loveStories.enumerated() {
-        if loveStory.id == id {
-          loveStories.remove(at: index)
-          indexPath = [0, index]
-          
-          if loveStories.isEmpty {
-            listTableView.reloadData()
-          } else {
-            listTableView.deleteRows(at: [indexPath], with: .automatic)
-          }
-        }
-      }
-    } else if list == .loveQuestion {
-      for (index, loveQna) in loveQnas.enumerated() {
-        if loveQna.id == id {
-          loveQnas.remove(at: index)
-          indexPath = [0, index]
-          
-          if loveQnas.isEmpty {
-            listTableView.reloadData()
-          } else {
-            listTableView.deleteRows(at: [indexPath], with: .automatic)
-          }
-        }
-      }
-    }
-  }
-  
   private func setupNotifications() {
     ANINotificationManager.receive(deleteRecruit: self, selector: #selector(deleteRecruit))
+    ANINotificationManager.receive(deleteStory: self, selector: #selector(deleteStory))
+    ANINotificationManager.receive(deleteQna: self, selector: #selector(deleteQna))
   }
   
   @objc private func deleteRecruit(_ notification: NSNotification) {
@@ -184,6 +151,46 @@ class ANIListView: UIView {
     }
   }
   
+  @objc private func deleteStory(_ notification: NSNotification) {
+    guard let id = notification.object as? String,
+          let listTableView = self.listTableView else { return }
+    
+    var indexPath: IndexPath = [0, 0]
+    
+    for (index, loveStory) in loveStories.enumerated() {
+      if loveStory.id == id {
+        loveStories.remove(at: index)
+        indexPath = [0, index]
+        
+        if loveStories.isEmpty {
+          listTableView.reloadData()
+        } else {
+          listTableView.deleteRows(at: [indexPath], with: .automatic)
+        }
+      }
+    }
+  }
+  
+  @objc private func deleteQna(_ notification: NSNotification) {
+    guard let id = notification.object as? String,
+          let listTableView = self.listTableView else { return }
+    
+    var indexPath: IndexPath = [0, 0]
+    
+    for (index, loveQna) in loveQnas.enumerated() {
+      if loveQna.id == id {
+        loveQnas.remove(at: index)
+        indexPath = [0, index]
+        
+        if loveQnas.isEmpty {
+          listTableView.reloadData()
+        } else {
+          listTableView.deleteRows(at: [indexPath], with: .automatic)
+        }
+      }
+    }
+  }
+  
   private func isBlockRecruit(recruit: FirebaseRecruit) -> Bool {
     guard let currentUserUid = ANISessionManager.shared.currentUserUid else { return false }
     
@@ -201,10 +208,15 @@ class ANIListView: UIView {
   }
   
   private func isBlockStory(story: FirebaseStory) -> Bool {
+    guard let currentUserUid = ANISessionManager.shared.currentUserUid else { return false }
+    
     if let blockUserIds = ANISessionManager.shared.blockUserIds, blockUserIds.contains(story.userId) {
       return true
     }
     if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(story.userId) {
+      return true
+    }
+    if let hideUserIds = story.hideUserIds, hideUserIds.contains(currentUserUid) {
       return true
     }
     
@@ -212,10 +224,15 @@ class ANIListView: UIView {
   }
   
   private func isBlockQna(qna: FirebaseQna) -> Bool {
+    guard let currentUserUid = ANISessionManager.shared.currentUserUid else { return false }
+    
     if let blockUserIds = ANISessionManager.shared.blockUserIds, blockUserIds.contains(qna.userId) {
       return true
     }
     if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(qna.userId) {
+      return true
+    }
+    if let hideUserIds = qna.hideUserIds, hideUserIds.contains(currentUserUid) {
       return true
     }
     

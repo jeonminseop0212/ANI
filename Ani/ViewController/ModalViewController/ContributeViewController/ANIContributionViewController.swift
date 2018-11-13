@@ -192,7 +192,7 @@ class ANIContributionViewController: UIViewController {
                   let id = NSUUID().uuidString
                   let date = ANIFunction.shared.getToday()
                   let content = contriButionView.getContent()
-                  let story = FirebaseStory(id: id, storyImageUrls: urls, story: content, userId: uid, loveIds: nil, commentIds: nil, recruitId: nil, recruitTitle: nil, recruitSubTitle: nil, date: date, isLoved: nil)
+                  let story = FirebaseStory(id: id, storyImageUrls: urls, story: content, userId: uid, loveIds: nil, commentIds: nil, recruitId: nil, recruitTitle: nil, recruitSubTitle: nil, date: date, isLoved: nil, hideUserIds: nil)
                 
                   self.upateStroyDatabase(story: story, id: id)
                 }
@@ -218,7 +218,7 @@ class ANIContributionViewController: UIViewController {
           let id = NSUUID().uuidString
           let date = ANIFunction.shared.getToday()
           let content = contriButionView.getContent()
-          let qna = FirebaseQna(id: id, qnaImageUrls: nil, qna: content, userId: uid, loveIds: nil, commentIds: nil, date: date, isLoved: nil)
+          let qna = FirebaseQna(id: id, qnaImageUrls: nil, qna: content, userId: uid, loveIds: nil, commentIds: nil, date: date, isLoved: nil, hideUserIds: nil)
         
           self.upateQnaDatabase(qna: qna, id: id)
         }
@@ -245,7 +245,7 @@ class ANIContributionViewController: UIViewController {
                     let id = NSUUID().uuidString
                     let date = ANIFunction.shared.getToday()
                     let content = contriButionView.getContent()
-                    let qna = FirebaseQna(id: id, qnaImageUrls: urls, qna: content, userId: uid, loveIds: nil, commentIds: nil, date: date, isLoved: nil)
+                    let qna = FirebaseQna(id: id, qnaImageUrls: urls, qna: content, userId: uid, loveIds: nil, commentIds: nil, date: date, isLoved: nil, hideUserIds: nil)
                   
                     self.upateQnaDatabase(qna: qna, id: id)
                   }

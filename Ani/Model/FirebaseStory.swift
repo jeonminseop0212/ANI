@@ -20,5 +20,6 @@ struct FirebaseStory: Codable {
   let recruitSubTitle: String?
   let date: String
   var isLoved: Bool?
+  var hideUserIds: [String]?
 }
 

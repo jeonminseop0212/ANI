@@ -141,7 +141,13 @@ class ANIQnaView: UIView {
       }
     }
     
-    qnaTableView.deleteRows(at: [indexPath], with: .automatic)
+    if qnas.isEmpty {
+      qnaTableView.reloadData()
+      qnaTableView.alpha = 0.0
+      showReloadView(sender: nil)
+    } else {
+      qnaTableView.deleteRows(at: [indexPath], with: .automatic)
+    }
   }
   
   private func showReloadView(sender: UIRefreshControl?) {
@@ -167,10 +173,15 @@ class ANIQnaView: UIView {
   }
   
   private func isBlockQna(qna: FirebaseQna) -> Bool {
+    guard let currentUserUid = ANISessionManager.shared.currentUserUid else { return false }
+
     if let blockUserIds = ANISessionManager.shared.blockUserIds, blockUserIds.contains(qna.userId) {
       return true
     }
     if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(qna.userId) {
+      return true
+    }
+    if let hideUserIds = qna.hideUserIds, hideUserIds.contains(currentUserUid) {
       return true
     }
     
@@ -286,7 +297,7 @@ extension ANIQnaView {
       self.isLoading = true
       self.isLastQnaPage = false
 
-      database.collection(KEY_QNAS).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments(completion: { (snapshot, error) in
+      database.collection(KEY_QNAS).order(by: KEY_DATE, descending: true).limit(to: 25).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
           self.isLoading = false
@@ -364,7 +375,7 @@ extension ANIQnaView {
     DispatchQueue.global().async {
       self.isLoading = true
       
-      database.collection(KEY_QNAS).order(by: KEY_DATE, descending: true).start(afterDocument: lastQna).limit(to: 20).getDocuments(completion: { (snapshot, error) in
+      database.collection(KEY_QNAS).order(by: KEY_DATE, descending: true).start(afterDocument: lastQna).limit(to: 25).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
           self.isLoading = false
