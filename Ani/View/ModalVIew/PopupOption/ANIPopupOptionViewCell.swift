@@ -41,7 +41,7 @@ class ANIPopupOptionViewCell: UITableViewCell {
     optionLabel.textColor = ANIColor.dark
     addSubview(optionLabel)
     optionLabel.edgesToSuperview(excluding: .bottom)
-    optionLabel.height(45)
+    optionLabel.height(45, priority: .defaultHigh)
     self.optionLabel = optionLabel
     
     //bottomLine
@@ -50,7 +50,7 @@ class ANIPopupOptionViewCell: UITableViewCell {
     addSubview(bottomLineImageView)
     bottomLineImageView.edgesToSuperview(excluding: .top)
     bottomLineImageView.topToBottom(of: optionLabel)
-    bottomLineImageView.height(0.5)
+    bottomLineImageView.height(0.5, priority: .defaultHigh)
     self.bottomLineImageView = bottomLineImageView
   }
 }
