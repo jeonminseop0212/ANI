@@ -74,12 +74,7 @@ class ANIOtherProfileTopCell: UITableViewCell {
     //menuBar
     let menuBar = ANIProfileMenuBar()
     stackView.addArrangedSubview(menuBar)
-    menuBar.topToBottom(of: familyView, offset: 10.0)
-    menuBar.leftToSuperview()
-    menuBar.rightToSuperview()
-    menuBar.widthToSuperview()
-    menuBar.height(MENU_BAR_HEIGHT)
-    menuBar.bottomToSuperview()
+    menuBar.height(MENU_BAR_HEIGHT, priority: .defaultHigh)
     self.menuBar = menuBar
     
     //bottomSpace
