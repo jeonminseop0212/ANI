@@ -141,6 +141,9 @@ class ANIProfileBasicView: UIView {
   private func setupNotifications() {
     ANINotificationManager.receive(login: self, selector: #selector(reloadUser))
     ANINotificationManager.receive(profileTabTapped: self, selector: #selector(scrollToTop))
+    ANINotificationManager.receive(deleteRecruit: self, selector: #selector(deleteRecruit))
+    ANINotificationManager.receive(deleteStory: self, selector: #selector(deleteStory))
+    ANINotificationManager.receive(deleteQna: self, selector: #selector(deleteQna))
   }
   
   @objc private func reloadUser() {
@@ -167,38 +170,64 @@ class ANIProfileBasicView: UIView {
     }
   }
   
-  func deleteData(id: String) {
-    guard let basicTableView = self.basicTableView else { return }
+  @objc private func deleteRecruit(_ notification: NSNotification) {
+    guard let id = notification.object as? String,
+          let basicTableView = self.basicTableView else { return }
+    
+    var indexPath: IndexPath = [0, 0]
+
+    for (index, recruit) in recruits.enumerated() {
+      if recruit.id == id {
+        recruits.remove(at: index)
+        indexPath = [1, index]
+        
+        if recruits.isEmpty {
+          basicTableView.reloadData()
+        } else {
+          basicTableView.deleteRows(at: [indexPath], with: .automatic)
+        }
+      }
+    }
+  }
+  
+  @objc private func deleteStory(_ notification: NSNotification) {
+    guard let id = notification.object as? String,
+          let basicTableView = self.basicTableView else { return }
     
     var indexPath: IndexPath = [0, 0]
     
-    switch contentType {
-    case .recruit:
-      for (index, recruit) in recruits.enumerated() {
-        if recruit.id == id {
-          recruits.remove(at: index)
-          indexPath = [1, index]
+    for (index, story) in stories.enumerated() {
+      if story.id == id {
+        stories.remove(at: index)
+        indexPath = [1, index]
+        
+        if stories.isEmpty {
+          basicTableView.reloadData()
+        } else {
+          basicTableView.deleteRows(at: [indexPath], with: .automatic)
         }
       }
-    case .story:
-      for (index, story) in stories.enumerated() {
-        if story.id == id {
-          stories.remove(at: index)
-          indexPath = [1, index]
-        }
-      }
-    case .qna:
-      for (index, qna) in qnas.enumerated() {
-        if qna.id == id {
-          qnas.remove(at: index)
-          indexPath = [1, index]
-        }
-      }
-    default:
-      DLog("profile")
     }
+  }
+  
+  @objc private func deleteQna(_ notification: NSNotification) {
+    guard let id = notification.object as? String,
+          let basicTableView = self.basicTableView else { return }
     
-    basicTableView.deleteRows(at: [indexPath], with: .automatic)
+    var indexPath: IndexPath = [0, 0]
+    
+    for (index, ana) in qnas.enumerated() {
+      if ana.id == id {
+        qnas.remove(at: index)
+        indexPath = [1, index]
+        
+        if qnas.isEmpty {
+          basicTableView.reloadData()
+        } else {
+          basicTableView.deleteRows(at: [indexPath], with: .automatic)
+        }
+      }
+    }
   }
   
   private func unobserveBeforeMenu() {

@@ -86,6 +86,7 @@ class ANIOtherProfileBasicView: UIView {
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()
+    setupNotifications()
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -190,6 +191,12 @@ class ANIOtherProfileBasicView: UIView {
     }
   }
   
+  private func setupNotifications() {
+    ANINotificationManager.receive(deleteRecruit: self, selector: #selector(deleteRecruit))
+    ANINotificationManager.receive(deleteStory: self, selector: #selector(deleteStory))
+    ANINotificationManager.receive(deleteQna: self, selector: #selector(deleteQna))
+  }
+  
   @objc private func reloadData(sender: UIRefreshControl?) {
     loadUser(sender: sender)
   }
@@ -222,6 +229,114 @@ class ANIOtherProfileBasicView: UIView {
         }
       }
     }
+  }
+  
+  @objc private func deleteRecruit(_ notification: NSNotification) {
+    guard let id = notification.object as? String,
+          let basicTableView = self.basicTableView else { return }
+    
+    var indexPath: IndexPath = [0, 0]
+    
+    for (index, recruit) in recruits.enumerated() {
+      if recruit.id == id {
+        recruits.remove(at: index)
+        indexPath = [1, index]
+        
+        if recruits.isEmpty {
+          basicTableView.reloadData()
+        } else {
+          basicTableView.deleteRows(at: [indexPath], with: .automatic)
+        }
+      }
+    }
+  }
+  
+  @objc private func deleteStory(_ notification: NSNotification) {
+    guard let id = notification.object as? String,
+          let basicTableView = self.basicTableView else { return }
+    
+    var indexPath: IndexPath = [0, 0]
+    
+    for (index, story) in stories.enumerated() {
+      if story.id == id {
+        stories.remove(at: index)
+        indexPath = [1, index]
+        
+        if stories.isEmpty {
+          basicTableView.reloadData()
+        } else {
+          basicTableView.deleteRows(at: [indexPath], with: .automatic)
+        }
+      }
+    }
+  }
+  
+  @objc private func deleteQna(_ notification: NSNotification) {
+    guard let id = notification.object as? String,
+          let basicTableView = self.basicTableView else { return }
+    
+    var indexPath: IndexPath = [0, 0]
+    
+    for (index, qna) in qnas.enumerated() {
+      if qna.id == id {
+        qnas.remove(at: index)
+        indexPath = [1, index]
+        
+        if qnas.isEmpty {
+          basicTableView.reloadData()
+        } else {
+          basicTableView.deleteRows(at: [indexPath], with: .automatic)
+        }
+      }
+    }
+  }
+  
+  private func isBlockRecruit(recruit: FirebaseRecruit) -> Bool {
+    guard let currentUserUid = ANISessionManager.shared.currentUserUid else { return false }
+    
+    if let blockUserIds = ANISessionManager.shared.blockUserIds, blockUserIds.contains(recruit.userId) {
+      return true
+    }
+    if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(recruit.userId) {
+      return true
+    }
+    if let hideUserIds = recruit.hideUserIds, hideUserIds.contains(currentUserUid) {
+      return true
+    }
+    
+    return false
+  }
+  
+  private func isBlockStory(story: FirebaseStory) -> Bool {
+    guard let currentUserUid = ANISessionManager.shared.currentUserUid else { return false }
+    
+    if let blockUserIds = ANISessionManager.shared.blockUserIds, blockUserIds.contains(story.userId) {
+      return true
+    }
+    if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(story.userId) {
+      return true
+    }
+    if let hideUserIds = story.hideUserIds, hideUserIds.contains(currentUserUid) {
+      return true
+    }
+    
+    return false
+  }
+  
+  private func isBlockQna(qna: FirebaseQna) -> Bool {
+    guard let currentUserUid = ANISessionManager.shared.currentUserUid else { return false }
+    
+    if let blockUserIds = ANISessionManager.shared.blockUserIds, blockUserIds.contains(qna.userId) {
+      return true
+    }
+    if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(qna.userId) {
+      return true
+    }
+    if let hideUserIds = qna.hideUserIds, hideUserIds.contains(currentUserUid) {
+      return true
+    }
+    
+    return false
   }
 }
 
@@ -669,7 +784,9 @@ extension ANIOtherProfileBasicView {
         for document in snapshot.documents {
           do {
             let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: document.data())
-            self.recruits.append(recruit)
+            if !self.isBlockRecruit(recruit: recruit) {
+              self.recruits.append(recruit)
+            }
             
             DispatchQueue.main.async {
               guard let basicTableView = self.basicTableView else { return }
@@ -721,7 +838,9 @@ extension ANIOtherProfileBasicView {
         for (index, document) in snapshot.documents.enumerated() {
           do {
             let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: document.data())
-            self.recruits.append(recruit)
+            if !self.isBlockRecruit(recruit: recruit) {
+              self.recruits.append(recruit)
+            }
             
             DispatchQueue.main.async {
               if index + 1 == snapshot.documents.count {
@@ -777,7 +896,9 @@ extension ANIOtherProfileBasicView {
         for document in snapshot.documents {
           do {
             let story = try FirestoreDecoder().decode(FirebaseStory.self, from: document.data())
-            self.stories.append(story)
+            if !self.isBlockStory(story: story) {
+              self.stories.append(story)
+            }
             
             DispatchQueue.main.async {
               guard let basicTableView = self.basicTableView else { return }
@@ -829,7 +950,9 @@ extension ANIOtherProfileBasicView {
         for (index, document) in snapshot.documents.enumerated() {
           do {
             let story = try FirestoreDecoder().decode(FirebaseStory.self, from: document.data())
-            self.stories.append(story)
+            if !self.isBlockStory(story: story) {
+              self.stories.append(story)
+            }
             
             DispatchQueue.main.async {
               if index + 1 == snapshot.documents.count {
@@ -883,7 +1006,9 @@ extension ANIOtherProfileBasicView {
         for document in snapshot.documents {
           do {
             let qna = try FirestoreDecoder().decode(FirebaseQna.self.self, from: document.data())
-            self.qnas.append(qna)
+            if !self.isBlockQna(qna: qna) {
+              self.qnas.append(qna)
+            }
             
             DispatchQueue.main.async {
               
@@ -936,7 +1061,9 @@ extension ANIOtherProfileBasicView {
         for (index, document) in snapshot.documents.enumerated() {
           do {
             let qna = try FirestoreDecoder().decode(FirebaseQna.self, from: document.data())
-            self.qnas.append(qna)
+            if !self.isBlockQna(qna: qna) {
+              self.qnas.append(qna)
+            }
             
             DispatchQueue.main.async {
               if index + 1 == snapshot.documents.count {
