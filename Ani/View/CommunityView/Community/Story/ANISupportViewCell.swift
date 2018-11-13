@@ -26,6 +26,10 @@ class ANISupportViewCell: UITableViewCell {
   private weak var messageLabel: UILabel?
   
   private let RECRUIT_BASE_BORDER_WIDHT: CGFloat = 1.2
+  private weak var deleteRecruitBase: UIView?
+  private weak var deleteRecruitImageView: UIImageView?
+  private weak var deleteRecruitAlertLabel: UILabel?
+  
   private weak var recruitBase: UIView?
   private weak var recruitImageView: UIImageView?
   private weak var basicInfoStackView: UIStackView?
@@ -35,10 +39,6 @@ class ANISupportViewCell: UITableViewCell {
   private weak var sexLabel: UILabel?
   private weak var titleLabel: UILabel?
   private weak var subTitleLabel: UILabel?
-  
-  private weak var deleteRecruitBase: UIView?
-  private weak var deleteRecruitImageView: UIImageView?
-  private weak var deleteRecruitAlertLabel: UILabel?
   
   private let PROFILE_IMAGE_VIEW_HEIGHT: CGFloat = 32.0
   private weak var profileImageView: UIImageView?
@@ -73,26 +73,28 @@ class ANISupportViewCell: UITableViewCell {
   
   var recruit: FirebaseRecruit? {
     didSet {
-      guard let recruit = self.recruit else { return }
-      
-      loadRecruitUser()
-      reloadRecruitLayout(recruit: recruit)
+      guard let recruitBase = self.recruitBase else { return }
+
+      if let recruit = self.recruit {
+        recruitBase.alpha = 1.0
+        loadRecruitUser()
+        reloadRecruitLayout(recruit: recruit)
+      } else {
+        recruitBase.alpha = 0.0
+      }
     }
   }
   
   var isDeleteRecruit: Bool? {
     didSet {
       guard let isDeleteRecruit = self.isDeleteRecruit,
-            let deleteRecruitBase = self.deleteRecruitBase,
             let deleteRecruitImageView = self.deleteRecruitImageView,
             let deleteRecruitAlertLabel = self.deleteRecruitAlertLabel else { return }
 
       if isDeleteRecruit {
-        deleteRecruitBase.isHidden = false
         deleteRecruitImageView.isHidden = false
         deleteRecruitAlertLabel.isHidden = false
       } else {
-        deleteRecruitBase.isHidden = true
         deleteRecruitImageView.isHidden = true
         deleteRecruitAlertLabel.isHidden = true
       }
@@ -128,6 +130,41 @@ class ANISupportViewCell: UITableViewCell {
     self.selectionStyle = .none
     self.backgroundColor = .white
     
+    //deleteRecruitBase
+    let deleteRecruitBase = UIView()
+    deleteRecruitBase.backgroundColor = .white
+    deleteRecruitBase.layer.cornerRadius = 10.0
+    deleteRecruitBase.layer.masksToBounds = true
+    deleteRecruitBase.layer.borderColor = ANIColor.gray.cgColor
+    deleteRecruitBase.layer.borderWidth = RECRUIT_BASE_BORDER_WIDHT
+    addSubview(deleteRecruitBase)
+    self.deleteRecruitBase = deleteRecruitBase
+    
+    //deleteRecruitImageView
+    let deleteRecruitImageView = UIImageView()
+    deleteRecruitImageView.image = UIImage(named: "notSee")
+    deleteRecruitImageView.contentMode = .center
+    deleteRecruitImageView.isHidden = true
+    deleteRecruitBase.addSubview(deleteRecruitImageView)
+    deleteRecruitImageView.widthToSuperview(multiplier: 0.2)
+    deleteRecruitImageView.heightToWidth(of: deleteRecruitImageView)
+    deleteRecruitImageView.centerXToSuperview()
+    deleteRecruitImageView.centerYToSuperview(offset: -20.0)
+    self.deleteRecruitImageView = deleteRecruitImageView
+    
+    //deleteRecruitAlertLabel
+    let deleteRecruitAlertLabel = UILabel()
+    deleteRecruitAlertLabel.text = "削除された募集です。"
+    deleteRecruitAlertLabel.textColor = ANIColor.dark
+    deleteRecruitAlertLabel.textAlignment = .center
+    deleteRecruitAlertLabel.font = UIFont.boldSystemFont(ofSize: 17.0)
+    deleteRecruitAlertLabel.isHidden = true
+    deleteRecruitBase.addSubview(deleteRecruitAlertLabel)
+    deleteRecruitAlertLabel.topToBottom(of: deleteRecruitImageView, offset: 30)
+    deleteRecruitAlertLabel.leftToSuperview(offset: 10)
+    deleteRecruitAlertLabel.rightToSuperview(offset: -10)
+    self.deleteRecruitAlertLabel = deleteRecruitAlertLabel
+    
     //recruitBase
     let recruitBase = UIView()
     recruitBase.backgroundColor = .white
@@ -143,6 +180,8 @@ class ANISupportViewCell: UITableViewCell {
     recruitBase.leftToSuperview(offset: 10.0)
     recruitBase.rightToSuperview(offset: -10.0)
     self.recruitBase = recruitBase
+    
+    deleteRecruitBase.edges(to: recruitBase)
     
     //recruitImageView
     let recruitImageView = UIImageView()
@@ -260,42 +299,6 @@ class ANISupportViewCell: UITableViewCell {
     messageLabel.leftToSuperview(offset: 10.0)
     messageLabel.rightToSuperview(offset: -10.0)
     self.messageLabel = messageLabel
-    
-    //deleteRecruitBase
-    let deleteRecruitBase = UIView()
-    deleteRecruitBase.backgroundColor = .white
-    deleteRecruitBase.layer.cornerRadius = 10.0
-    deleteRecruitBase.layer.masksToBounds = true
-    deleteRecruitBase.layer.borderColor = ANIColor.gray.cgColor
-    deleteRecruitBase.layer.borderWidth = RECRUIT_BASE_BORDER_WIDHT
-    addSubview(deleteRecruitBase)
-    deleteRecruitBase.edges(to: recruitBase)
-    self.deleteRecruitBase = deleteRecruitBase
-    
-    //deleteRecruitImageView
-    let deleteRecruitImageView = UIImageView()
-    deleteRecruitImageView.image = UIImage(named: "notSee")
-    deleteRecruitImageView.contentMode = .center
-    deleteRecruitImageView.isHidden = true
-    deleteRecruitBase.addSubview(deleteRecruitImageView)
-    deleteRecruitImageView.widthToSuperview(multiplier: 0.2)
-    deleteRecruitImageView.heightToWidth(of: deleteRecruitImageView)
-    deleteRecruitImageView.centerXToSuperview()
-    deleteRecruitImageView.centerYToSuperview(offset: -20.0)
-    self.deleteRecruitImageView = deleteRecruitImageView
-    
-    //deleteRecruitAlertLabel
-    let deleteRecruitAlertLabel = UILabel()
-    deleteRecruitAlertLabel.text = "削除された募集です。"
-    deleteRecruitAlertLabel.textColor = ANIColor.dark
-    deleteRecruitAlertLabel.textAlignment = .center
-    deleteRecruitAlertLabel.font = UIFont.boldSystemFont(ofSize: 17.0)
-    deleteRecruitAlertLabel.isHidden = true
-    deleteRecruitBase.addSubview(deleteRecruitAlertLabel)
-    deleteRecruitAlertLabel.topToBottom(of: deleteRecruitImageView, offset: 30)
-    deleteRecruitAlertLabel.leftToSuperview(offset: 10)
-    deleteRecruitAlertLabel.rightToSuperview(offset: -10)
-    self.deleteRecruitAlertLabel = deleteRecruitAlertLabel
     
     //profileImageView
     let profileImageView = UIImageView()
