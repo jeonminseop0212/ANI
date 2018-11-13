@@ -70,6 +70,7 @@ class ANIListView: UIView {
     super.init(frame: frame)
     
     setup()
+    setupNotifications()
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -114,45 +115,85 @@ class ANIListView: UIView {
     
     var indexPath: IndexPath = [0, 0]
     
-    switch list {
-    case .loveRecruit:
-      for (index, loveRecruit) in loveRecruits.enumerated() {
-        if loveRecruit.id == id {
-          loveRecruits.remove(at: index)
-          indexPath = [0, index]
-        }
-      }
-    case .loveStroy:
+    if list == .loveStroy {
       for (index, loveStory) in loveStories.enumerated() {
         if loveStory.id == id {
           loveStories.remove(at: index)
           indexPath = [0, index]
+          
+          if loveStories.isEmpty {
+            listTableView.reloadData()
+          } else {
+            listTableView.deleteRows(at: [indexPath], with: .automatic)
+          }
         }
       }
-    case .loveQuestion:
+    } else if list == .loveQuestion {
       for (index, loveQna) in loveQnas.enumerated() {
         if loveQna.id == id {
           loveQnas.remove(at: index)
           indexPath = [0, index]
-        }
-      }
-    case .clipRecruit:
-      for (index, clipRecruit) in clipRecruits.enumerated() {
-        if clipRecruit.id == id {
-          clipRecruits.remove(at: index)
-          indexPath = [0, index]
+          
+          if loveQnas.isEmpty {
+            listTableView.reloadData()
+          } else {
+            listTableView.deleteRows(at: [indexPath], with: .automatic)
+          }
         }
       }
     }
+  }
+  
+  private func setupNotifications() {
+    ANINotificationManager.receive(deleteRecruit: self, selector: #selector(deleteRecruit))
+  }
+  
+  @objc private func deleteRecruit(_ notification: NSNotification) {
+    guard let id = notification.object as? String,
+          let list = self.list,
+          let listTableView = self.listTableView else { return }
     
-    listTableView.deleteRows(at: [indexPath], with: .automatic)
+    var indexPath: IndexPath = [0, 0]
+    
+    if list == .loveRecruit {
+      for (index, recruit) in loveRecruits.enumerated() {
+        if recruit.id == id {
+          loveRecruits.remove(at: index)
+          indexPath = [0, index]
+          
+          if loveRecruits.isEmpty {
+            listTableView.reloadData()
+          } else {
+            listTableView.deleteRows(at: [indexPath], with: .automatic)
+          }
+        }
+      }
+    } else if list == .clipRecruit {
+      for (index, recruit) in clipRecruits.enumerated() {
+        if recruit.id == id {
+          clipRecruits.remove(at: index)
+          indexPath = [0, index]
+          
+          if clipRecruits.isEmpty {
+            listTableView.reloadData()
+          } else {
+            listTableView.deleteRows(at: [indexPath], with: .automatic)
+          }
+        }
+      }
+    }
   }
   
   private func isBlockRecruit(recruit: FirebaseRecruit) -> Bool {
+    guard let currentUserUid = ANISessionManager.shared.currentUserUid else { return false }
+    
     if let blockUserIds = ANISessionManager.shared.blockUserIds, blockUserIds.contains(recruit.userId) {
       return true
     }
     if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(recruit.userId) {
+      return true
+    }
+    if let hideUserIds = recruit.hideUserIds, hideUserIds.contains(currentUserUid) {
       return true
     }
     
@@ -527,7 +568,7 @@ extension ANIListView {
       self.isLoading = true
       self.isLastPage = false
       
-      database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_RECRUIT_IDS).order(by: KEY_DATE, descending: true).limit(to: 15).getDocuments(completion: { (snapshot, error) in
+      database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_RECRUIT_IDS).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
           self.isLoading = false
@@ -617,7 +658,7 @@ extension ANIListView {
     DispatchQueue.global().async {
       self.isLoading = true
       
-      database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_RECRUIT_IDS).order(by: KEY_DATE, descending: true).start(afterDocument: lastContent).limit(to: 15).getDocuments(completion: { (snapshot, error) in
+      database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_RECRUIT_IDS).order(by: KEY_DATE, descending: true).start(afterDocument: lastContent).limit(to: 20).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
           self.isLoading = false
@@ -1041,7 +1082,7 @@ extension ANIListView {
       self.isLoading = true
       self.isLastPage = false
       
-      database.collection(KEY_USERS).document(currentUserId).collection(KEY_CLIP_RECRUIT_IDS).order(by: KEY_DATE, descending: true).limit(to: 15).getDocuments(completion: { (snapshot, error) in
+      database.collection(KEY_USERS).document(currentUserId).collection(KEY_CLIP_RECRUIT_IDS).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
           self.isLoading = false
@@ -1132,7 +1173,7 @@ extension ANIListView {
     DispatchQueue.global().async {
       self.isLoading = true
       
-      database.collection(KEY_USERS).document(currentUserId).collection(KEY_CLIP_RECRUIT_IDS).order(by: KEY_DATE, descending: true).start(afterDocument: lastContent).limit(to: 15).getDocuments(completion: { (snapshot, error) in
+      database.collection(KEY_USERS).document(currentUserId).collection(KEY_CLIP_RECRUIT_IDS).order(by: KEY_DATE, descending: true).start(afterDocument: lastContent).limit(to: 20).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
           self.isLoading = false
