@@ -43,6 +43,7 @@ class ANITabBarController: UITabBarController {
   }
   
   override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
     if !isLoadedFirstData {
       loadUser()
       observeChatGroup()
