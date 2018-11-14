@@ -165,11 +165,30 @@ class ANINotiDetailView: UIView {
     
     tableView.reloadData()
     
+    self.isLoading = false
+
     UIView.animate(withDuration: 0.2, animations: {
       tableView.alpha = 1.0
     })
+  }
+  
+  private func loadLoveUserDone() {
+    guard let tableView = self.tableView,
+          let activityIndicatorView = self.activityIndicatorView else { return }
+    
+    tableView.reloadData()
     
     self.isLoading = false
+    
+    if self.loveUsers.isEmpty {
+      self.loadMoreLoveUser()
+    } else {
+      activityIndicatorView.stopAnimating()
+
+      UIView.animate(withDuration: 0.2, animations: {
+        tableView.alpha = 1.0
+      })
+    }
   }
   
   private func isBlockUser(user: FirebaseUser) -> Bool {
@@ -261,6 +280,8 @@ extension ANINotiDetailView: UITableViewDataSource {
           if let user = self.user {
             cell.user = user
           }
+          cell.recruit = nil
+          cell.isDeleteRecruit = nil
           cell.story = story
           cell.delegate = self
           cell.indexPath = indexPath.row
@@ -387,7 +408,7 @@ extension ANINotiDetailView: UITableViewDelegate {
     if let notiKind = self.notiKind, notiKind == .love {
       let element = loveUsers.count + COUNT_NOTI_AND_HEADER_CELL - COUNT_LAST_CELL
       if !isLoading, indexPath.row >= element {
-        loadMoreUser()
+        loadMoreLoveUser()
       }
     }
 
@@ -758,7 +779,7 @@ extension ANINotiDetailView {
               }
             }
             
-            self.loadDone()
+            self.loadLoveUserDone()
           }
         }
         
@@ -771,7 +792,7 @@ extension ANINotiDetailView {
     }
   }
   
-  private func loadMoreUser() {
+  private func loadMoreLoveUser() {
     guard let noti = self.noti,
           let contributionKind = self.contributionKind,
           let lastUserId = self.lastUserId,
@@ -854,7 +875,7 @@ extension ANINotiDetailView {
               }
             }
             
-            self.loadDone()
+            self.loadLoveUserDone()
           }
         }
 

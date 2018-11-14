@@ -380,7 +380,7 @@ extension ANIStoryView {
         
         self.lastStory = lastStory
         
-        for document in snapshot.documents {
+        for (index, document) in snapshot.documents.enumerated() {
           do {
             let story = try FirestoreDecoder().decode(FirebaseStory.self, from: document.data())
             if !self.isBlockStory(story: story) {
@@ -388,23 +388,26 @@ extension ANIStoryView {
             }
             
             DispatchQueue.main.async {
-              if let sender = sender {
-                sender.endRefreshing()
+              if index + 1 == snapshot.documents.count {
+                if let sender = sender {
+                  sender.endRefreshing()
+                }
+                
+                storyTableView.reloadData()
+                
+                self.isLoading = false
+                
+                if self.stories.isEmpty {
+                  self.loadMoreStory()
+                } else {
+                  activityIndicatorView.stopAnimating()
+
+                  UIView.animate(withDuration: 0.2, animations: {
+                    storyTableView.alpha = 1.0
+                  })
+                }
+                
               }
-              
-              activityIndicatorView.stopAnimating()
-              
-              storyTableView.reloadData()
-              
-              if self.stories.count > 0 {
-                UIView.animate(withDuration: 0.2, animations: {
-                  storyTableView.alpha = 1.0
-                })
-              } else {
-                self.showReloadView(sender: sender)
-              }
-              
-              self.isLoading = false
             }
           } catch let error {
             DLog(error)
@@ -429,6 +432,7 @@ extension ANIStoryView {
   private func loadMoreStory() {
     guard let storyTableView = self.storyTableView,
           let lastStory = self.lastStory,
+          let activityIndicatorView = self.activityIndicatorView,
           !isLoading,
           !isLastStoryPage else { return }
     
@@ -466,6 +470,18 @@ extension ANIStoryView {
                 storyTableView.reloadData()
                 
                 self.isLoading = false
+                
+                if self.stories.isEmpty {
+                  self.loadMoreStory()
+                } else {
+                  if storyTableView.alpha == 0 {
+                    activityIndicatorView.stopAnimating()
+                    
+                    UIView.animate(withDuration: 0.2, animations: {
+                      storyTableView.alpha = 1.0
+                    })
+                  }
+                }
               }
             }
           } catch let error {

@@ -650,13 +650,17 @@ extension ANIListView {
             
             listTableView.reloadData()
             
-            activityIndicatorView.stopAnimating()
-            
-            UIView.animate(withDuration: 0.2, animations: {
-              listTableView.alpha = 1.0
-            })
-            
             self.isLoading = false
+            
+            if self.loveRecruits.isEmpty {
+              self.loadMoreLoveRecruit()
+            } else {
+              activityIndicatorView.stopAnimating()
+              
+              UIView.animate(withDuration: 0.2, animations: {
+                listTableView.alpha = 1.0
+              })
+            }
           }
         }
       })
@@ -667,6 +671,7 @@ extension ANIListView {
     guard let listTableView = self.listTableView,
           let lastContent = self.lastContent,
           let currentUserId = ANISessionManager.shared.currentUserUid,
+          let activityIndicatorView = self.activityIndicatorView,
           !isLoading,
           !isLastPage else { return }
     
@@ -740,6 +745,16 @@ extension ANIListView {
             listTableView.reloadData()
             
             self.isLoading = false
+            
+            if self.loveRecruits.isEmpty {
+              self.loadMoreLoveRecruit()
+            } else {
+              activityIndicatorView.stopAnimating()
+              
+              UIView.animate(withDuration: 0.2, animations: {
+                listTableView.alpha = 1.0
+              })
+            }
           }
         }
       })
@@ -822,13 +837,17 @@ extension ANIListView {
             
             listTableView.reloadData()
             
-            activityIndicatorView.stopAnimating()
-            
-            UIView.animate(withDuration: 0.2, animations: {
-              listTableView.alpha = 1.0
-            })
-            
             self.isLoading = false
+
+            if self.loveStories.isEmpty {
+              self.loadMoreLoveStory()
+            } else {
+              activityIndicatorView.stopAnimating()
+              
+              UIView.animate(withDuration: 0.2, animations: {
+                listTableView.alpha = 1.0
+              })
+            }
           }
         }
       })
@@ -839,6 +858,7 @@ extension ANIListView {
     guard let listTableView = self.listTableView,
           let lastContent = self.lastContent,
           let currentUserId = ANISessionManager.shared.currentUserUid,
+          let activityIndicatorView = self.activityIndicatorView,
           !isLoading,
           !isLastPage else { return }
     
@@ -912,6 +932,16 @@ extension ANIListView {
             listTableView.reloadData()
             
             self.isLoading = false
+            
+            if self.loveStories.isEmpty {
+              self.loadMoreLoveStory()
+            } else {
+              activityIndicatorView.stopAnimating()
+              
+              UIView.animate(withDuration: 0.2, animations: {
+                listTableView.alpha = 1.0
+              })
+            }
           }
         }
       })
@@ -993,13 +1023,17 @@ extension ANIListView {
             
             listTableView.reloadData()
             
-            activityIndicatorView.stopAnimating()
-            
-            UIView.animate(withDuration: 0.2, animations: {
-              listTableView.alpha = 1.0
-            })
-            
             self.isLoading = false
+            
+            if self.loveQnas.isEmpty {
+              self.loadMoreLoveQna()
+            } else {
+              activityIndicatorView.stopAnimating()
+              
+              UIView.animate(withDuration: 0.2, animations: {
+                listTableView.alpha = 1.0
+              })
+            }
           }
         }
       })
@@ -1010,6 +1044,7 @@ extension ANIListView {
     guard let listTableView = self.listTableView,
           let lastContent = self.lastContent,
           let currentUserId = ANISessionManager.shared.currentUserUid,
+          let activityIndicatorView = self.activityIndicatorView,
           !isLoading,
           !isLastPage else { return }
     
@@ -1083,6 +1118,16 @@ extension ANIListView {
             listTableView.reloadData()
             
             self.isLoading = false
+            
+            if self.loveQnas.isEmpty {
+              self.loadMoreLoveQna()
+            } else {
+              activityIndicatorView.stopAnimating()
+              
+              UIView.animate(withDuration: 0.2, animations: {
+                listTableView.alpha = 1.0
+              })
+            }
           }
         }
       })
@@ -1165,13 +1210,17 @@ extension ANIListView {
             
             listTableView.reloadData()
             
-            activityIndicatorView.stopAnimating()
-            
-            UIView.animate(withDuration: 0.2, animations: {
-              listTableView.alpha = 1.0
-            })
-            
             self.isLoading = false
+
+            if self.clipRecruits.isEmpty {
+              self.loadMoreClipRecruit()
+            } else {
+              activityIndicatorView.stopAnimating()
+              
+              UIView.animate(withDuration: 0.2, animations: {
+                listTableView.alpha = 1.0
+              })
+            }
           }
         }
       })
@@ -1182,6 +1231,7 @@ extension ANIListView {
     guard let listTableView = self.listTableView,
           let lastContent = self.lastContent,
           let currentUserId = ANISessionManager.shared.currentUserUid,
+          let activityIndicatorView = self.activityIndicatorView,
           !isLoading,
           !isLastPage else { return }
     
@@ -1252,9 +1302,20 @@ extension ANIListView {
                 }
               }
             }
+            
             listTableView.reloadData()
             
             self.isLoading = false
+            
+            if self.clipRecruits.isEmpty {
+              self.loadClipRecruit()
+            } else {
+              activityIndicatorView.stopAnimating()
+              
+              UIView.animate(withDuration: 0.2, animations: {
+                listTableView.alpha = 1.0
+              })
+            }
           }
         }
       })
