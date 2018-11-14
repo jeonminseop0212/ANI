@@ -38,11 +38,6 @@ class ANIMessageView: UIView {
   
   private func setup() {
     self.backgroundColor = ANIColor.bg
-    let window = UIApplication.shared.keyWindow
-    var bottomSafeArea: CGFloat = 0.0
-    if let windowUnrap = window {
-      bottomSafeArea = windowUnrap.safeAreaInsets.bottom
-    }
     
     //reloadView
     let reloadView = ANIReloadView()
@@ -58,8 +53,8 @@ class ANIMessageView: UIView {
     
     //messageTableView
     let messageTableView = UITableView()
-    messageTableView.contentInset = UIEdgeInsets(top: ANICommunityViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: bottomSafeArea, right: 0)
-    messageTableView.scrollIndicatorInsets  = UIEdgeInsets(top: UIViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: bottomSafeArea, right: 0)
+    messageTableView.contentInset = UIEdgeInsets(top: ANICommunityViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: 0, right: 0)
+    messageTableView.scrollIndicatorInsets  = UIEdgeInsets(top: UIViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: 0, right: 0)
     let id = NSStringFromClass(ANIMessageViewCell.self)
     messageTableView.register(ANIMessageViewCell.self, forCellReuseIdentifier: id)
     messageTableView.backgroundColor = ANIColor.bg

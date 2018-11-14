@@ -51,11 +51,7 @@ class ANINotiView: UIView {
   }
   
   private func setup() {
-    let window = UIApplication.shared.keyWindow
-    var bottomSafeArea: CGFloat = 0.0
-    if let windowUnrap = window {
-      bottomSafeArea = windowUnrap.safeAreaInsets.bottom
-    }
+    self.backgroundColor = ANIColor.bg
     
     //reloadView
     let reloadView = ANIReloadView()
@@ -71,8 +67,8 @@ class ANINotiView: UIView {
     
     //notiTableView
     let notiTableView = UITableView()
-    notiTableView.contentInset = UIEdgeInsets(top: ANICommunityViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: bottomSafeArea, right: 0)
-    notiTableView.scrollIndicatorInsets  = UIEdgeInsets(top: UIViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: bottomSafeArea, right: 0)
+    notiTableView.contentInset = UIEdgeInsets(top: ANICommunityViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: 0, right: 0)
+    notiTableView.scrollIndicatorInsets  = UIEdgeInsets(top: UIViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: 0, right: 0)
     let basicNotiId = NSStringFromClass(ANIBasicNotiViewCell.self)
     notiTableView.register(ANIBasicNotiViewCell.self, forCellReuseIdentifier: basicNotiId)
     let followNotiId = NSStringFromClass(ANIFollowNotiViewCell.self)
