@@ -65,6 +65,8 @@ class ANISearchView: UIView {
     }
   }
   
+  private var category: SearchCategory = .user
+  
   private var index: Index?
   private var nbPages = UInt()
   private var page: UInt = 0
@@ -468,6 +470,8 @@ extension ANISearchView {
   private func search(category: SearchCategory, searchText: String) {
     guard let activityIndicatorView = self.activityIndicatorView else { return }
     
+    self.category = category
+    
     switch category {
     case .user:
       index = ANISessionManager.shared.client.index(withName: KEY_USERS_INDEX)
@@ -555,15 +559,42 @@ extension ANISearchView {
               
               DispatchQueue.main.async {
                 if hitIndex + 1 == hits.count {
-                  activityIndicatorView.stopAnimating()
-                  
                   tableView.reloadData()
                   
-                  UIView.animate(withDuration: 0.2, animations: {
-                    tableView.alpha = 1.0
-                  })
-                  
                   self.isLoading = false
+                  
+                  switch category {
+                  case .user:
+                    if self.searchUsers.isEmpty, nbPages != 1 {
+                      self.loadMoreSearch()
+                    } else {
+                      activityIndicatorView.stopAnimating()
+
+                      UIView.animate(withDuration: 0.2, animations: {
+                        tableView.alpha = 1.0
+                      })
+                    }
+                  case .story:
+                    if self.searchStories.isEmpty, nbPages != 1 {
+                      self.loadMoreSearch()
+                    } else {
+                      activityIndicatorView.stopAnimating()
+
+                      UIView.animate(withDuration: 0.2, animations: {
+                        tableView.alpha = 1.0
+                      })
+                    }
+                  case .qna:
+                    if self.searchQnas.isEmpty, nbPages != 1 {
+                      self.loadMoreSearch()
+                    } else {
+                      activityIndicatorView.stopAnimating()
+
+                      UIView.animate(withDuration: 0.2, animations: {
+                        tableView.alpha = 1.0
+                      })
+                    }
+                  }
                 }
               }
             } catch let error {
@@ -599,7 +630,8 @@ extension ANISearchView {
     guard page + 1 < nbPages,
           let index = self.index,
           !isLoading,
-          let tableView = self.tableView else { return }
+          let tableView = self.tableView,
+          let activityIndicatorView = self.activityIndicatorView else { return }
     
     page = page + 1
     query.page = page
@@ -654,6 +686,45 @@ extension ANISearchView {
                   tableView.reloadData()
                   
                   self.isLoading = false
+                  
+                  switch self.category {
+                  case .user:
+                    if self.searchUsers.isEmpty {
+                      self.loadMoreSearch()
+                    } else {
+                      if tableView.alpha == 0 {
+                        activityIndicatorView.stopAnimating()
+
+                        UIView.animate(withDuration: 0.2, animations: {
+                          tableView.alpha = 1.0
+                        })
+                      }
+                    }
+                  case .story:
+                    if self.searchStories.isEmpty {
+                      self.loadMoreSearch()
+                    } else {
+                      if tableView.alpha == 0 {
+                        activityIndicatorView.stopAnimating()
+
+                        UIView.animate(withDuration: 0.2, animations: {
+                          tableView.alpha = 1.0
+                        })
+                      }
+                    }
+                  case .qna:
+                    if self.searchQnas.isEmpty {
+                      self.loadMoreSearch()
+                    } else {
+                      if tableView.alpha == 0 {
+                        activityIndicatorView.stopAnimating()
+
+                        UIView.animate(withDuration: 0.2, animations: {
+                          tableView.alpha = 1.0
+                        })
+                      }
+                    }
+                  }
                 }
               }
             } catch let error {

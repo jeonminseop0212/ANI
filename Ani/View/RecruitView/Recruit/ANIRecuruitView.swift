@@ -426,7 +426,7 @@ extension ANIRecuruitView {
         
         self.lastRecruit = lastRecruit
         
-        for document in snapshot.documents {
+        for (index, document) in snapshot.documents.enumerated() {
           do {
             let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: document.data())
             if !self.isBlockRecruit(recruit: recruit) {
@@ -434,25 +434,24 @@ extension ANIRecuruitView {
             }
 
             DispatchQueue.main.async {
-              if let sender = sender {
-                sender.endRefreshing()
-              }
-              
-              activityIndicatorView.stopAnimating()
-              
-              recruitTableView.reloadData()
-              
-              if self.recruits.count > 0 {
-                UIView.animate(withDuration: 0.4, animations: {
+              if index + 1 == snapshot.documents.count {
+                if let sender = sender {
+                  sender.endRefreshing()
+                }
+                
+                recruitTableView.reloadData()
+                
+                self.isLoading = false
+                
+                if self.recruits.isEmpty {
+                  self.loadMoreRecruit()
+                } else {
+                  activityIndicatorView.stopAnimating()
+
                   recruitTableView.alpha = 1.0
-                }, completion: { (complete) in
                   ANINotificationManager.postDismissSplash()
-                })
-              } else {
-                self.showReloadView(sender: sender)
+                }
               }
-              
-              self.isLoading = false
             }
           } catch let error {
             DLog(error)
@@ -478,6 +477,7 @@ extension ANIRecuruitView {
     guard let query = self.query,
           let recruitTableView = self.recruitTableView,
           let lastRecruit = self.lastRecruit,
+          let activityIndicatorView = self.activityIndicatorView,
           !isLoading,
           !isLastRecruitPage else { return }
     
@@ -513,6 +513,17 @@ extension ANIRecuruitView {
                 recruitTableView.reloadData()
                 
                 self.isLoading = false
+                
+                if self.recruits.isEmpty {
+                  self.loadMoreRecruit()
+                } else {
+                  if recruitTableView.alpha == 0.0 {
+                    activityIndicatorView.stopAnimating()
+
+                    recruitTableView.alpha = 1.0
+                    ANINotificationManager.postDismissSplash()
+                  }
+                }
               }
             }
           } catch let error {

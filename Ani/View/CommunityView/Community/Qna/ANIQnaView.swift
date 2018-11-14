@@ -318,7 +318,7 @@ extension ANIQnaView {
         
         self.lastQna = lastQna
         
-        for document in snapshot.documents {
+        for (index, document) in snapshot.documents.enumerated() {
           do {
             let qna = try FirestoreDecoder().decode(FirebaseQna.self, from: document.data())
             if !self.isBlockQna(qna: qna) {
@@ -326,23 +326,25 @@ extension ANIQnaView {
             }
             
             DispatchQueue.main.async {
-              if let sender = sender {
-                sender.endRefreshing()
+              if index + 1 == snapshot.documents.count {
+                if let sender = sender {
+                  sender.endRefreshing()
+                }
+                
+                qnaTableView.reloadData()
+                
+                self.isLoading = false
+                
+                if self.qnas.isEmpty {
+                  self.loadMoreQna()
+                } else {
+                  activityIndicatorView.stopAnimating()
+                  
+                  UIView.animate(withDuration: 0.2, animations: {
+                    qnaTableView.alpha = 1.0
+                  })
+                }
               }
-              
-              activityIndicatorView.stopAnimating()
-              
-              qnaTableView.reloadData()
-              
-              if self.qnas.count > 0 {
-                UIView.animate(withDuration: 0.2, animations: {
-                  qnaTableView.alpha = 1.0
-                })
-              } else {
-                self.showReloadView(sender: sender)
-              }
-              
-              self.isLoading = false
             }
           } catch let error {
             DLog(error)
@@ -367,6 +369,7 @@ extension ANIQnaView {
   private func loadMoreQna() {
     guard let qnaTableView = self.qnaTableView,
           let lastQna = self.lastQna,
+          let activityIndicatorView = self.activityIndicatorView,
           !isLoading,
           !isLastQnaPage else { return }
     
@@ -404,6 +407,18 @@ extension ANIQnaView {
                 qnaTableView.reloadData()
                 
                 self.isLoading = false
+                
+                if self.qnas.isEmpty {
+                  self.loadMoreQna()
+                } else {
+                  if qnaTableView.alpha == 0.0 {
+                    activityIndicatorView.stopAnimating()
+                    
+                    UIView.animate(withDuration: 0.2, animations: {
+                      qnaTableView.alpha = 1.0
+                    })
+                  }
+                }
               }
             }
           } catch let error {

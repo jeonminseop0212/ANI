@@ -304,7 +304,7 @@ extension ANINotiView {
         
         var updated: Bool = false
         
-        for document in snapshot.documents {
+        for (index, document) in snapshot.documents.enumerated() {
           do {
             let notification = try FirestoreDecoder().decode(FirebaseNotification.self, from: document.data())
             if !self.isBlockNotification(notification: notification) {
@@ -312,30 +312,32 @@ extension ANINotiView {
             }
             
             DispatchQueue.main.async {
-              if let sender = sender {
-                sender.endRefreshing()
-              }
-              
-              activityIndicatorView.stopAnimating()
-              
-              notiTableView.reloadData() {
-                if !updated {
-                  self.updateCheckNotiDate()
-                  updated = true
+              if index + 1 == snapshot.documents.count {
+                if let sender = sender {
+                  sender.endRefreshing()
+                }
+                
+                notiTableView.reloadData() {
+                  if !updated {
+                    self.updateCheckNotiDate()
+                    updated = true
+                  }
+                }
+                
+                self.isLoading = false
+                
+                if self.notifications.isEmpty {
+                  self.loadMoreNoti()
+                } else {
+                  activityIndicatorView.stopAnimating()
+
+                  UIView.animate(withDuration: 0.2, animations: {
+                    notiTableView.alpha = 1.0
+                  }, completion: { (complete) in
+                    ANINotificationManager.postDismissSplash()
+                  })
                 }
               }
-              
-              if self.notifications.count > 0 {
-                UIView.animate(withDuration: 0.2, animations: {
-                  notiTableView.alpha = 1.0
-                }, completion: { (complete) in
-                  ANINotificationManager.postDismissSplash()
-                })
-              } else {
-                self.showReloadView(sender: sender)
-              }
-              
-              self.isLoading = false
             }
           } catch let error {
             DLog(error)
@@ -361,6 +363,7 @@ extension ANINotiView {
     guard let currentUserUid = ANISessionManager.shared.currentUserUid,
           let notiTableView = self.notiTableView,
           let lastNoti = self.lastNoti,
+          let activityIndicatorView = self.activityIndicatorView,
           !isLoading,
           !isLastNotiPage else { return }
     
@@ -397,6 +400,18 @@ extension ANINotiView {
                 notiTableView.reloadData()
                 
                 self.isLoading = false
+                
+                if self.notifications.isEmpty {
+                  self.loadMoreNoti()
+                } else {
+                  if notiTableView.alpha == 0.0 {
+                    activityIndicatorView.stopAnimating()
+                    
+                    UIView.animate(withDuration: 0.2, animations: {
+                      notiTableView.alpha = 1.0
+                    })
+                  }
+                }
               }
             }
           } catch let error {

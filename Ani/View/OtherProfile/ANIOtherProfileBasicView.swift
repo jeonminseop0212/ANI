@@ -756,7 +756,9 @@ extension ANIOtherProfileBasicView {
   
   private func loadRecruit() {
     guard let user = self.user,
-          let uid = user.uid else { return }
+          let uid = user.uid,
+          let basicTableView = self.basicTableView else { return }
+
     
     if !self.recruits.isEmpty {
       self.recruits.removeAll()
@@ -786,7 +788,7 @@ extension ANIOtherProfileBasicView {
         
         self.lastRecruit = lastRecruit
         
-        for document in snapshot.documents {
+        for (index, document) in snapshot.documents.enumerated() {
           do {
             let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: document.data())
             if !self.isBlockRecruit(recruit: recruit) {
@@ -794,11 +796,15 @@ extension ANIOtherProfileBasicView {
             }
             
             DispatchQueue.main.async {
-              guard let basicTableView = self.basicTableView else { return }
-              
-              basicTableView.reloadData()
-              
-              self.isLoading = false
+              if index + 1 == snapshot.documents.count {
+                basicTableView.reloadData()
+                
+                self.isLoading = false
+                
+                if self.recruits.isEmpty {
+                  self.loadMoreRecruit()
+                }
+              }
             }
           } catch let error {
             DLog(error)
@@ -852,6 +858,10 @@ extension ANIOtherProfileBasicView {
                 basicTableView.reloadData()
                 
                 self.isLoading = false
+                
+                if self.recruits.isEmpty {
+                  self.loadMoreRecruit()
+                }
               }
             }
           } catch let error {
@@ -865,7 +875,8 @@ extension ANIOtherProfileBasicView {
   
   private func loadStory() {
     guard let user = self.user,
-          let uid = user.uid else { return }
+          let uid = user.uid,
+          let basicTableView = self.basicTableView else { return }
     
     if !self.stories.isEmpty {
       self.stories.removeAll()
@@ -898,7 +909,7 @@ extension ANIOtherProfileBasicView {
         
         self.lastStory = lastStory
         
-        for document in snapshot.documents {
+        for (index, document) in snapshot.documents.enumerated() {
           do {
             let story = try FirestoreDecoder().decode(FirebaseStory.self, from: document.data())
             if !self.isBlockStory(story: story) {
@@ -906,11 +917,15 @@ extension ANIOtherProfileBasicView {
             }
             
             DispatchQueue.main.async {
-              guard let basicTableView = self.basicTableView else { return }
-              
-              basicTableView.reloadData()
-              
-              self.isLoading = false
+              if index + 1 == snapshot.documents.count {
+                basicTableView.reloadData()
+                
+                self.isLoading = false
+                
+                if self.stories.isEmpty {
+                  self.loadMoreStory()
+                }
+              }
             }
           } catch let error {
             DLog(error)
@@ -964,6 +979,10 @@ extension ANIOtherProfileBasicView {
                 basicTableView.reloadData()
                 
                 self.isLoading = false
+                
+                if self.stories.isEmpty {
+                  self.loadMoreStory()
+                }
               }
             }
           } catch let error {
@@ -977,7 +996,8 @@ extension ANIOtherProfileBasicView {
   
   private func loadQna() {
     guard let user = self.user,
-          let uid = user.uid else { return }
+          let uid = user.uid,
+          let basicTableView = self.basicTableView else { return }
     
     if !self.qnas.isEmpty {
       self.qnas.removeAll()
@@ -1008,7 +1028,7 @@ extension ANIOtherProfileBasicView {
         
         self.lastQna = lastQna
         
-        for document in snapshot.documents {
+        for (index, document) in snapshot.documents.enumerated() {
           do {
             let qna = try FirestoreDecoder().decode(FirebaseQna.self.self, from: document.data())
             if !self.isBlockQna(qna: qna) {
@@ -1016,12 +1036,15 @@ extension ANIOtherProfileBasicView {
             }
             
             DispatchQueue.main.async {
-              
-              guard let basicTableView = self.basicTableView else { return }
-              
-              basicTableView.reloadData()
-              
-              self.isLoading = false
+              if index + 1 == snapshot.documents.count {
+                basicTableView.reloadData()
+                
+                self.isLoading = false
+                
+                if self.qnas.isEmpty {
+                  self.loadMoreQna()
+                }
+              }
             }
           } catch let error {
             DLog(error)
@@ -1075,6 +1098,10 @@ extension ANIOtherProfileBasicView {
                 basicTableView.reloadData()
                 
                 self.isLoading = false
+                
+                if self.qnas.isEmpty {
+                  self.loadMoreQna()
+                }
               }
             }
           } catch let error {
