@@ -166,4 +166,9 @@ class ANINotificationManager: NSObject {
   private static let N_LOADED_CURRENT_USER = "N_LOADED_CURRENT_USER"
   static func postLoadedCurrentUser() { self.post(name: N_LOADED_CURRENT_USER, object: nil, userInfo:nil) }
   static func receive(loadedCurrentUser observer:Any, selector:Selector) { receive(name: N_LOADED_CURRENT_USER, observer: observer, selector: selector) }
+    
+  //MARK: fail load version
+  private static let N_FAIL_LOAD_VERSION = "N_FAIL_LOAD_VERSION"
+  static func postFailLoadVersion() { self.post(name: N_FAIL_LOAD_VERSION, object: nil, userInfo:nil) }
+  static func receive(failLoadVersion observer:Any, selector:Selector) { receive(name: N_FAIL_LOAD_VERSION, observer: observer, selector: selector) }
 }

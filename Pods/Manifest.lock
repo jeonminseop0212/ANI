@@ -102,6 +102,7 @@ PODS:
   - SDWebImage (4.3.3):
     - SDWebImage/Core (= 4.3.3)
   - SDWebImage/Core (4.3.3)
+  - Siren (3.9.1)
 
 DEPENDENCIES:
   - Firebase/Auth
@@ -111,6 +112,7 @@ DEPENDENCIES:
   - Firebase/Storage
   - FirebaseUI/Storage (~> 3.0)
   - Gallery
+  - Siren
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -136,6 +138,7 @@ SPEC REPOS:
     - nanopb
     - Protobuf
     - SDWebImage
+    - Siren
 
 SPEC CHECKSUMS:
   BoringSSL: c46efb47593135382bc0934196f16d2f726f5f36
@@ -160,7 +163,8 @@ SPEC CHECKSUMS:
   nanopb: 5601e6bca2dbf1ed831b519092ec110f66982ca3
   Protobuf: 0fc0ad8bec688b2a3017a139953e01374fedbd5f
   SDWebImage: de4d90b5bff3571eae7bd16202b1f43135409fa5
+  Siren: 22b68056e52c5b6707bcbfac09d2d16874ee098a
 
-PODFILE CHECKSUM: 3d49cebd4f716338825a89c0a4c7bc8a1830725a
+PODFILE CHECKSUM: 82c7c45deef041f3a9185b7a8c3621a5d762bf9c
 
 COCOAPODS: 1.5.3
