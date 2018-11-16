@@ -575,7 +575,7 @@ class ANIRecruitContributionView: UIView {
     basicInfoSexLabel.text = "性別：" + recruit.sex
     basicInfoHomeLabel.text = "お家：" + recruit.home
     basicInfoVaccineLabel.text = "ワクチン：" + recruit.vaccine
-    basicInfoCastrationLabel.text = "去勢：" + recruit.vaccine
+    basicInfoCastrationLabel.text = "去勢：" + recruit.castration
     reasonTextView.text = recruit.reason
     introduceTextView.text = recruit.introduce
     passingTextView.text = recruit.passing
