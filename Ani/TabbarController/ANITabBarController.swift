@@ -222,8 +222,10 @@ class ANITabBarController: UITabBarController {
     guard let splashView = splashView else { return }
     
     if ANISessionManager.shared.isLoadedCurrentUser && ANISessionManager.shared.isCheckedVersion {
-      UIView.animate(withDuration: 0.2) {
-        splashView.alpha = 0.0
+      DispatchQueue.main.async {
+        UIView.animate(withDuration: 0.2) {
+          splashView.alpha = 0.0
+        }
       }
     }
   }
