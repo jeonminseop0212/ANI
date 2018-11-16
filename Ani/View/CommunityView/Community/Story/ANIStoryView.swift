@@ -181,6 +181,9 @@ class ANIStoryView: UIView {
     if let hideUserIds = story.hideUserIds, hideUserIds.contains(currentUserUid) {
       return true
     }
+    if story.storyImageUrls == nil {
+      return true
+    }
     
     return false
   }

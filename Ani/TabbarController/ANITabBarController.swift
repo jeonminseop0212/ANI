@@ -176,6 +176,7 @@ class ANITabBarController: UITabBarController {
     ANINotificationManager.receive(login: self, selector: #selector(relogin))
     ANINotificationManager.receive(logout: self, selector: #selector(logout))
     ANINotificationManager.receive(dismissSplash: self, selector: #selector(dismissSplash))
+    ANINotificationManager.receive(failLoadVersion: self, selector: #selector(showFailMessage))
   }
   
   @objc private func updateBadge() {
@@ -220,9 +221,16 @@ class ANITabBarController: UITabBarController {
   @objc private func dismissSplash() {
     guard let splashView = splashView else { return }
     
-    UIView.animate(withDuration: 0.2) {
-      splashView.alpha = 0.0
+    if ANISessionManager.shared.isLoadedCurrentUser && ANISessionManager.shared.isCheckedVersion {
+      UIView.animate(withDuration: 0.2) {
+        splashView.alpha = 0.0
+      }
     }
+  }
+  
+  @objc private func showFailMessage() {
+    let alertController = UIAlertController(title: "データのローディングに失敗しました", message: "アプリを再起動してください。", preferredStyle: .alert)
+    self.present(alertController, animated: true, completion: nil)
   }
 }
 
@@ -392,6 +400,7 @@ extension ANITabBarController {
       group.notify(queue: DispatchQueue(label: "user")) {
         DispatchQueue.main.async {
           ANINotificationManager.postLoadedCurrentUser()
+          ANISessionManager.shared.isLoadedCurrentUser = true
           self.isLoadedFirstData = true
           completion?()
         }
@@ -406,6 +415,7 @@ extension ANITabBarController {
         
         ANINotificationManager.postLogout()
         ANINotificationManager.postLoadedCurrentUser()
+        ANISessionManager.shared.isLoadedCurrentUser = true
         isLoadedFirstData = true
         
       } catch let signOutError as NSError {

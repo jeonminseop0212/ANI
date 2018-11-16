@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import TinyConstraints
 
 class ANICommunityMenuBarCell: UICollectionViewCell {
   var menuLabel: UILabel?

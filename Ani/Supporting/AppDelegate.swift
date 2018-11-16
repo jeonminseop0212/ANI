@@ -10,6 +10,7 @@ import UIKit
 import Firebase
 import FirebaseMessaging
 import UserNotifications
+import Siren
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -46,6 +47,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     window?.rootViewController = tabBarController
     window?.makeKeyAndVisible()
     
+    let siren = Siren.shared
+    siren.forceLanguageLocalization = .japanese
+    siren.alertType = .skip
+    siren.alertMessaging = SirenAlertMessaging(updateTitle: NSAttributedString(string: "アップデートのお知らせ"),
+                                               updateMessage: NSAttributedString(string: "MYAUの新規バージョンがご利用になれます。アップデートしてください。"),
+                                               updateButtonMessage: NSAttributedString(string: "アップデート"),
+                                               nextTimeButtonMessage: NSAttributedString(string: "次回"),
+                                               skipVersionButtonMessage: NSAttributedString(string: "このバージョンをスキップ"))
+    siren.countryCode = "jp"
+    siren.delegate = self
+    siren.checkVersion(checkType: .immediately)
+    
     //navigation bar
     let navigationBarAppearane = UINavigationBar.appearance()
     navigationBarAppearane.barTintColor = .white
@@ -71,7 +84,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
 
   func applicationWillEnterForeground(_ application: UIApplication) {
-    // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
+    if !ANISessionManager.shared.isCheckedVersion {
+      Siren.shared.checkVersion(checkType: .immediately)
+    }
   }
 
   func applicationDidBecomeActive(_ application: UIApplication) {
@@ -133,7 +148,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
   }
 }
 
-// MARK: - MessagingDelegate
+// MARK: MessagingDelegate
 extension AppDelegate: MessagingDelegate {
   func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String) {
     UserDefaults.standard.set(fcmToken, forKey: KEY_FCM_TOKEN)
@@ -141,5 +156,33 @@ extension AppDelegate: MessagingDelegate {
   }
   
   func messaging(_ messaging: Messaging, didReceive remoteMessage: MessagingRemoteMessage) {
+  }
+}
+
+
+//MARK: SirenDelegate
+extension AppDelegate: SirenDelegate {
+  func sirenLatestVersionInstalled() {
+    ANISessionManager.shared.isCheckedVersion = true
+    ANINotificationManager.postDismissSplash()
+  }
+  
+  func sirenVersionIsSkip() {
+    ANISessionManager.shared.isCheckedVersion = true
+    ANINotificationManager.postDismissSplash()
+  }
+  
+  func sirenUserDidCancel() {
+    ANISessionManager.shared.isCheckedVersion = true
+    ANINotificationManager.postDismissSplash()
+  }
+  
+  func sirenUserDidSkipVersion() {
+    ANISessionManager.shared.isCheckedVersion = true
+    ANINotificationManager.postDismissSplash()
+  }
+  
+  func sirenDidFailVersionCheck(error: Error) {
+    ANINotificationManager.postFailLoadVersion()
   }
 }
