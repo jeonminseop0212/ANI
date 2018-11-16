@@ -390,7 +390,11 @@ extension ANIOtherProfileViewController: ANIPopupOptionViewControllerDelegate {
     let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
     
     let reportAction = UIAlertAction(title: "通報", style: .default) { (action) in
-      self.reportData()
+      if !ANISessionManager.shared.isAnonymous {
+        self.reportData()
+      } else {
+        self.reject()
+      }
     }
     let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
     
@@ -402,129 +406,138 @@ extension ANIOtherProfileViewController: ANIPopupOptionViewControllerDelegate {
   
   func optionTapped(index: Int) {
     guard let contentType = self.contentType,
-          let contributionId = self.contributionId,
-          let currentUserId = ANISessionManager.shared.currentUserUid else { return }
+          let contributionId = self.contributionId else { return }
     
     if contentType == .user {
-      if index == 0 {
-        guard let user = self.user,
-              let userId = self.userId,
-              let userName = user.userName else { return }
-        
-        let alertController = UIAlertController(title: "\(userName)さんをブロックしますか？", message: "ブロックされた人はあなたのプロフィールや投稿を見られなくなります。ブロックしたことは相手に通知されません。", preferredStyle: .alert)
-        
-        let blockAction = UIAlertAction(title: "ブロック", style: .default) { (action) in
-          let database = Firestore.firestore()
-          let today = ANIFunction.shared.getToday()
+      if let currentUserId = ANISessionManager.shared.currentUserUid {
+        if index == 0 {
+          guard let user = self.user,
+                let userId = self.userId,
+                let userName = user.userName else { return }
           
-          database.collection(KEY_USERS).document(currentUserId).collection(KEY_BLOCK_USER_IDS).document(userId).setData([KEY_USER_ID: userId, KEY_DATE: today])
-          database.collection(KEY_USERS).document(userId).collection(KEY_BLOCKING_USER_IDS).document(currentUserId).setData([KEY_USER_ID: currentUserId, KEY_DATE: today])
+          let alertController = UIAlertController(title: "\(userName)さんをブロックしますか？", message: "ブロックされた人はあなたのプロフィールや投稿を見られなくなります。ブロックしたことは相手に通知されません。", preferredStyle: .alert)
           
-          self.unfollow(userId: userId, currentUserUid: currentUserId)
+          let blockAction = UIAlertAction(title: "ブロック", style: .default) { (action) in
+            let database = Firestore.firestore()
+            let today = ANIFunction.shared.getToday()
+            
+            database.collection(KEY_USERS).document(currentUserId).collection(KEY_BLOCK_USER_IDS).document(userId).setData([KEY_USER_ID: userId, KEY_DATE: today])
+            database.collection(KEY_USERS).document(userId).collection(KEY_BLOCKING_USER_IDS).document(currentUserId).setData([KEY_USER_ID: currentUserId, KEY_DATE: today])
+            
+            self.unfollow(userId: userId, currentUserUid: currentUserId)
+            
+            self.navigationController?.popViewController(animated: true)
+          }
+          let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
           
-          self.navigationController?.popViewController(animated: true)
+          alertController.addAction(blockAction)
+          alertController.addAction(cancelAction)
+          
+          self.present(alertController, animated: true, completion: nil)
         }
-        let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
-        
-        alertController.addAction(blockAction)
-        alertController.addAction(cancelAction)
-        
-        self.present(alertController, animated: true, completion: nil)
+      } else {
+        self.reject()
       }
     } else {
-      if index == 0 {
-        var alertTitle = ""
-        var alertMessage = ""
-        var collection = ""
-        if contentType == .story {
-          alertTitle = "このストーリーを非表示にしますか？"
-          alertMessage = "非表示にしたストーリーはアプリの中で見えなくなります。後から非表示を解除することは出来ません。"
-          collection = KEY_STORIES
-        } else if contentType == .qna {
-          alertTitle = "このs質問を非表示にしますか？"
-          alertMessage = "非表示にしたs質問はアプリの中で見えなくなります。後から非表示を解除することは出来ません。"
-          collection = KEY_QNAS
-        }
-        
-        let alertController = UIAlertController(title: alertTitle, message: alertMessage, preferredStyle: .alert)
-        
-        let hideAction = UIAlertAction(title: "非表示", style: .default) { (action) in
-          let database = Firestore.firestore()
-          
-          let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.emerald)
-          NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData, nil)
-          
-          DispatchQueue.global().async {
-            database.collection(collection).document(contributionId).getDocument(completion: { (snapshot, error) in
-              if let error = error {
-                DLog("Error get document: \(error)")
-                return
-              }
-              
-              guard let snapshot = snapshot, let data = snapshot.data() else { return }
-              
-              if contentType == .story {
-                do {
-                  let story = try FirestoreDecoder().decode(FirebaseStory.self, from: data)
-                  
-                  if let hideUserIds = story.hideUserIds {
-                    var hideUserIdsTemp = hideUserIds
-                    hideUserIdsTemp.append(currentUserId)
-                    
-                    database.collection(collection).document(contributionId).updateData([KEY_HIDE_USER_IDS: hideUserIdsTemp])
-                    
-                    self.updateDataAlgolia(objectId: contributionId, data: [KEY_HIDE_USER_IDS: hideUserIdsTemp as AnyObject], indexName: KEY_STORIES_INDEX)
-                  } else {
-                    let hideUserIds = [currentUserId]
-                    
-                    database.collection(collection).document(contributionId).updateData([KEY_HIDE_USER_IDS: hideUserIds])
-                    
-                    self.updateDataAlgolia(objectId: contributionId, data: [KEY_HIDE_USER_IDS: hideUserIds as AnyObject], indexName: KEY_STORIES_INDEX)
-                  }
-                  
-                  DispatchQueue.main.async {
-                    NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
-                    ANINotificationManager.postDeleteStory(id: contributionId)
-                  }
-                } catch let error {
-                  DLog(error)
-                }
-              } else if contentType == .qna {
-                do {
-                  let qna = try FirestoreDecoder().decode(FirebaseQna.self, from: data)
-                  
-                  if let hideUserIds = qna.hideUserIds {
-                    var hideUserIdsTemp = hideUserIds
-                    hideUserIdsTemp.append(currentUserId)
-                    
-                    database.collection(collection).document(contributionId).updateData([KEY_HIDE_USER_IDS: hideUserIdsTemp])
-                    
-                    self.updateDataAlgolia(objectId: contributionId, data: [KEY_HIDE_USER_IDS: hideUserIdsTemp as AnyObject], indexName: KEY_QNAS_INDEX)
-                  } else {
-                    let hideUserIds = [currentUserId]
-                    
-                    database.collection(collection).document(contributionId).updateData([KEY_HIDE_USER_IDS: hideUserIds])
-                    
-                    self.updateDataAlgolia(objectId: contributionId, data: [KEY_HIDE_USER_IDS: hideUserIds as AnyObject], indexName: KEY_QNAS_INDEX)
-                  }
-                  
-                  DispatchQueue.main.async {
-                    NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
-                    ANINotificationManager.postDeleteQna(id: contributionId)
-                  }
-                } catch let error {
-                  DLog(error)
-                }
-              }
-            })
+      if let currentUserId = ANISessionManager.shared.currentUserUid {
+        if index == 0 {
+          var alertTitle = ""
+          var alertMessage = ""
+          var collection = ""
+          if contentType == .story {
+            alertTitle = "このストーリーを非表示にしますか？"
+            alertMessage = "非表示にしたストーリーはアプリの中で見えなくなります。後から非表示を解除することは出来ません。"
+            collection = KEY_STORIES
+          } else if contentType == .qna {
+            alertTitle = "このs質問を非表示にしますか？"
+            alertMessage = "非表示にしたs質問はアプリの中で見えなくなります。後から非表示を解除することは出来ません。"
+            collection = KEY_QNAS
           }
+          
+          let alertController = UIAlertController(title: alertTitle, message: alertMessage, preferredStyle: .alert)
+          
+          let hideAction = UIAlertAction(title: "非表示", style: .default) { (action) in
+            let database = Firestore.firestore()
+            
+            let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.emerald)
+            NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData, nil)
+            
+            DispatchQueue.global().async {
+              database.collection(collection).document(contributionId).getDocument(completion: { (snapshot, error) in
+                if let error = error {
+                  DLog("Error get document: \(error)")
+                  return
+                }
+                
+                guard let snapshot = snapshot, let data = snapshot.data() else { return }
+                
+                if contentType == .story {
+                  do {
+                    let story = try FirestoreDecoder().decode(FirebaseStory.self, from: data)
+                    
+                    if let hideUserIds = story.hideUserIds {
+                      var hideUserIdsTemp = hideUserIds
+                      hideUserIdsTemp.append(currentUserId)
+                      
+                      database.collection(collection).document(contributionId).updateData([KEY_HIDE_USER_IDS: hideUserIdsTemp])
+                      
+                      self.updateDataAlgolia(objectId: contributionId, data: [KEY_HIDE_USER_IDS: hideUserIdsTemp as AnyObject], indexName: KEY_STORIES_INDEX)
+                    } else {
+                      let hideUserIds = [currentUserId]
+                      
+                      database.collection(collection).document(contributionId).updateData([KEY_HIDE_USER_IDS: hideUserIds])
+                      
+                      self.updateDataAlgolia(objectId: contributionId, data: [KEY_HIDE_USER_IDS: hideUserIds as AnyObject], indexName: KEY_STORIES_INDEX)
+                    }
+                    
+                    DispatchQueue.main.async {
+                      NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+                      ANINotificationManager.postDeleteStory(id: contributionId)
+                    }
+                  } catch let error {
+                    DLog(error)
+                  }
+                } else if contentType == .qna {
+                  do {
+                    let qna = try FirestoreDecoder().decode(FirebaseQna.self, from: data)
+                    
+                    if let hideUserIds = qna.hideUserIds {
+                      var hideUserIdsTemp = hideUserIds
+                      hideUserIdsTemp.append(currentUserId)
+                      
+                      database.collection(collection).document(contributionId).updateData([KEY_HIDE_USER_IDS: hideUserIdsTemp])
+                      
+                      self.updateDataAlgolia(objectId: contributionId, data: [KEY_HIDE_USER_IDS: hideUserIdsTemp as AnyObject], indexName: KEY_QNAS_INDEX)
+                    } else {
+                      let hideUserIds = [currentUserId]
+                      
+                      database.collection(collection).document(contributionId).updateData([KEY_HIDE_USER_IDS: hideUserIds])
+                      
+                      self.updateDataAlgolia(objectId: contributionId, data: [KEY_HIDE_USER_IDS: hideUserIds as AnyObject], indexName: KEY_QNAS_INDEX)
+                    }
+                    
+                    DispatchQueue.main.async {
+                      NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+                      ANINotificationManager.postDeleteQna(id: contributionId)
+                    }
+                  } catch let error {
+                    DLog(error)
+                  }
+                }
+              })
+            }
+          }
+          let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
+          
+          alertController.addAction(hideAction)
+          alertController.addAction(cancelAction)
+          
+          self.present(alertController, animated: true, completion: nil)
         }
-        let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
-        
-        alertController.addAction(hideAction)
-        alertController.addAction(cancelAction)
-        
-        self.present(alertController, animated: true, completion: nil)
+      } else {
+        if index == 0 {
+          self.reject()
+        }
       }
     }
   }
