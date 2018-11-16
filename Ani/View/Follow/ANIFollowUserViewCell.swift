@@ -10,6 +10,10 @@ import UIKit
 import FirebaseFirestore
 import CodableFirebase
 
+protocol ANIFollowUserViewCellDelegate {
+  func reject()
+}
+
 class ANIFollowUserViewCell: UITableViewCell {
   
   private weak var stackView: UIStackView?
@@ -23,9 +27,10 @@ class ANIFollowUserViewCell: UITableViewCell {
     didSet {
       reloadLayout()
       checkFollowed()
-      reloadFollowButtonLayout()
     }
   }
+  
+  var delegate: ANIFollowUserViewCellDelegate?
   
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -77,7 +82,6 @@ class ANIFollowUserViewCell: UITableViewCell {
     followButton.base?.backgroundColor = ANIColor.emerald
     followButton.base?.layer.borderWidth = 1.8
     followButton.base?.layer.borderColor = ANIColor.emerald.cgColor
-    followButton.alpha = 0.0
     followButton.delegate = self
     stackView.addArrangedSubview(followButton)
     followButton.centerY(to: profileImageView)
@@ -104,18 +108,6 @@ class ANIFollowUserViewCell: UITableViewCell {
     
     profileImageView.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
     userNameLabel.text = user.userName
-  }
-  
-  private func reloadFollowButtonLayout() {
-    guard let user = self.user,
-          let currentUserUid = ANISessionManager.shared.currentUserUid,
-          let followButton = self.followButton else { return }
-    
-    if user.uid == currentUserUid {
-      followButton.isHidden = true
-    } else {
-      followButton.isHidden = false
-    }
   }
   
   private func checkFollowed() {
@@ -204,35 +196,38 @@ class ANIFollowUserViewCell: UITableViewCell {
 extension ANIFollowUserViewCell: ANIButtonViewDelegate {
   func buttonViewTapped(view: ANIButtonView) {
     if view === followButton {
-      guard let currentUserUid = ANISessionManager.shared.currentUserUid,
-            let user = self.user,
+      guard let user = self.user,
             let userId = user.uid,
             let followButton = self.followButton,
             let followLabel = self.followLabel else { return }
       
-      let database = Firestore.firestore()
-      
-      if followButton.base?.backgroundColor == ANIColor.emerald {
-        DispatchQueue.global().async {
-          let date = ANIFunction.shared.getToday()
-          database.collection(KEY_USERS).document(currentUserUid).collection(KEY_FOLLOWING_USER_IDS).document(userId).setData([KEY_DATE: date])
-          database.collection(KEY_USERS).document(userId).collection(KEY_FOLLOWER_IDS).document(currentUserUid).setData([KEY_DATE: date])
+      if let currentUserUid = ANISessionManager.shared.currentUserUid {
+        let database = Firestore.firestore()
+        
+        if followButton.base?.backgroundColor == ANIColor.emerald {
+          DispatchQueue.global().async {
+            let date = ANIFunction.shared.getToday()
+            database.collection(KEY_USERS).document(currentUserUid).collection(KEY_FOLLOWING_USER_IDS).document(userId).setData([KEY_DATE: date])
+            database.collection(KEY_USERS).document(userId).collection(KEY_FOLLOWER_IDS).document(currentUserUid).setData([KEY_DATE: date])
+            
+            self.updateNoti()
+          }
           
-          self.updateNoti()
+          followButton.base?.backgroundColor = .clear
+          followLabel.text = "フォロー中"
+          followLabel.textColor = ANIColor.emerald
+        } else {
+          DispatchQueue.global().async {
+            database.collection(KEY_USERS).document(currentUserUid).collection(KEY_FOLLOWING_USER_IDS).document(userId).delete()
+            database.collection(KEY_USERS).document(userId).collection(KEY_FOLLOWER_IDS).document(currentUserUid).delete()
+          }
+          
+          followButton.base?.backgroundColor = ANIColor.emerald
+          followLabel.text = "フォロー"
+          followLabel.textColor = .white
         }
-        
-        followButton.base?.backgroundColor = .clear
-        followLabel.text = "フォロー中"
-        followLabel.textColor = ANIColor.emerald
       } else {
-        DispatchQueue.global().async {
-          database.collection(KEY_USERS).document(currentUserUid).collection(KEY_FOLLOWING_USER_IDS).document(userId).delete()
-          database.collection(KEY_USERS).document(userId).collection(KEY_FOLLOWER_IDS).document(currentUserUid).delete()
-        }
-        
-        followButton.base?.backgroundColor = ANIColor.emerald
-        followLabel.text = "フォロー"
-        followLabel.textColor = .white
+        self.delegate?.reject()
       }
     }
   }

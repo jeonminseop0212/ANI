@@ -11,6 +11,10 @@ import FirebaseFirestore
 import CodableFirebase
 import NVActivityIndicatorView
 
+protocol ANIFollowUserViewDeleate {
+  func reject()
+}
+
 class ANIFollowUserView: UIView {
   
   private weak var followUserTableView: UITableView?
@@ -41,6 +45,8 @@ class ANIFollowUserView: UIView {
   private let COUNT_LAST_CELL: Int = 4
   
   private var cellHeight = [IndexPath: CGFloat]()
+  
+  var delegate: ANIFollowUserViewDeleate?
 
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -124,6 +130,8 @@ extension ANIFollowUserView: UITableViewDataSource {
       }
     }
     
+    cell.delegate = self
+    
     return cell
   }
 }
@@ -155,6 +163,13 @@ extension ANIFollowUserView: UITableViewDelegate {
     } else {
       return UITableView.automaticDimension
     }
+  }
+}
+
+//MARK: ANIFollowUserViewCellDelegate
+extension ANIFollowUserView: ANIFollowUserViewCellDelegate {
+  func reject() {
+    self.delegate?.reject()
   }
 }
 
