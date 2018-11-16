@@ -399,7 +399,7 @@ class ANIRecruitDetailView: UIView {
     basicInfoSexLabel.text = "性別：\(recruit.sex)"
     basicInfoHomeLabel.text = "お家：\(recruit.home)"
     basicInfoVaccineLabel.text = "ワクチン：\(recruit.vaccine)"
-    basicInfoCastrationLabel.text = "去勢生：\(recruit.castration)"
+    basicInfoCastrationLabel.text = "去勢：\(recruit.castration)"
     
     reasonLabel.text = recruit.reason
     
