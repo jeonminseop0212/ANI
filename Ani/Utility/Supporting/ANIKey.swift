@@ -102,3 +102,6 @@ let KEY_HITS = "hits"
 let KEY_REPORTS = "reports"
 let KEY_REPORT = "report"
 
+//remote congif
+let KEY_SIREN_ALERT_TYPE = "sirenAlertType"
+

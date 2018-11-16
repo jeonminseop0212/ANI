@@ -20,20 +20,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   private weak var tabBarController: ANITabBarController?
   private let NOTI_VIEW_CONTROLLER_INDEX: Int = 2
 
+  enum SirenAlertType: String {
+    case force;
+    case option;
+    case skip;
+    case none;
+  }
+  
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
     
     self.orientationLock = .portrait
     
-    var firebasePlistName = ""
-    
-    if IS_DEBUG {
-      firebasePlistName = "GoogleService-Info"
-    } else {
-      firebasePlistName = "GoogleService-Info-release"
-    }
-    if let path = Bundle.main.path(forResource: firebasePlistName, ofType: "plist"), let firbaseOptions = FirebaseOptions(contentsOfFile: path) {
-      FirebaseApp.configure(options: firbaseOptions)
-    }
+    ANIFirebaseRemoteConfigManager.shared.fetch()
     
     //notification
     application.registerForRemoteNotifications()
@@ -49,7 +47,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     let siren = Siren.shared
     siren.forceLanguageLocalization = .japanese
-    siren.alertType = .skip
+    ANIFirebaseRemoteConfigManager.shared.getSirenAlertType { (type, error) in
+      if error == nil, let type = type {
+        switch type {
+        case SirenAlertType.force.rawValue:
+          siren.alertType = .force
+        case SirenAlertType.option.rawValue:
+          siren.alertType = .option
+        case SirenAlertType.skip.rawValue:
+          siren.alertType = .skip
+        case SirenAlertType.none.rawValue:
+          siren.alertType = .none
+        default:
+          siren.alertType = .skip
+        }
+      } else{
+        siren.alertType = .skip
+      }
+    }
     siren.alertMessaging = SirenAlertMessaging(updateTitle: NSAttributedString(string: "アップデートのお知らせ"),
                                                updateMessage: NSAttributedString(string: "MYAUの新規バージョンがご利用になれます。アップデートしてください。"),
                                                updateButtonMessage: NSAttributedString(string: "アップデート"),
@@ -183,6 +198,8 @@ extension AppDelegate: SirenDelegate {
   }
   
   func sirenDidFailVersionCheck(error: Error) {
-    ANINotificationManager.postFailLoadVersion()
+    ANISessionManager.shared.isCheckedVersion = true
+    ANINotificationManager.postDismissSplash()
+//    ANINotificationManager.postFailLoadVersion()
   }
 }

@@ -13,6 +13,7 @@ pod 'Firebase/Storage'
 pod 'FirebaseUI/Storage', '~> 3.0'
 pod 'Firebase/Firestore'
 pod 'Firebase/Messaging'
+pod 'Firebase/RemoteConfig'
 pod 'Siren'
 
   target 'AniTests' do

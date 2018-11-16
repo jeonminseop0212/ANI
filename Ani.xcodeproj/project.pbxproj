@@ -61,6 +61,8 @@
 		CD9E52BB2094614400715F50 /* ANIAreaButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD9E52BA2094614400715F50 /* ANIAreaButtonView.swift */; };
 		CD9E963320F2EF8600AD4F64 /* FirebaseNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD9E963220F2EF8600AD4F64 /* FirebaseNotification.swift */; };
 		CD9E963520F2FEB400AD4F64 /* ANIFollowNotiViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD9E963420F2FEB400AD4F64 /* ANIFollowNotiViewCell.swift */; };
+		CD9EEB30219E92E50079B50E /* ANIFirebase.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD9EEB2F219E92E50079B50E /* ANIFirebase.swift */; };
+		CD9EEB32219E93FA0079B50E /* ANIFirebaseRemoteConfigManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD9EEB31219E93FA0079B50E /* ANIFirebaseRemoteConfigManager.swift */; };
 		CDA32A1320A93422008A2AC1 /* ANIScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A1220A93422008A2AC1 /* ANIScrollView.swift */; };
 		CDA32A2320AA6041008A2AC1 /* ANIPopupPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A2220AA6041008A2AC1 /* ANIPopupPickerViewController.swift */; };
 		CDA32A2720AA6652008A2AC1 /* ANIPopupPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA32A2620AA6652008A2AC1 /* ANIPopupPickerView.swift */; };
@@ -254,6 +256,8 @@
 		CD9E52BA2094614400715F50 /* ANIAreaButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIAreaButtonView.swift; sourceTree = "<group>"; };
 		CD9E963220F2EF8600AD4F64 /* FirebaseNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseNotification.swift; sourceTree = "<group>"; };
 		CD9E963420F2FEB400AD4F64 /* ANIFollowNotiViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIFollowNotiViewCell.swift; sourceTree = "<group>"; };
+		CD9EEB2F219E92E50079B50E /* ANIFirebase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIFirebase.swift; sourceTree = "<group>"; };
+		CD9EEB31219E93FA0079B50E /* ANIFirebaseRemoteConfigManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIFirebaseRemoteConfigManager.swift; sourceTree = "<group>"; };
 		CDA32A1220A93422008A2AC1 /* ANIScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIScrollView.swift; sourceTree = "<group>"; };
 		CDA32A2220AA6041008A2AC1 /* ANIPopupPickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIPopupPickerViewController.swift; sourceTree = "<group>"; };
 		CDA32A2620AA6652008A2AC1 /* ANIPopupPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIPopupPickerView.swift; sourceTree = "<group>"; };
@@ -606,6 +610,15 @@
 				CD85F559215F547300AB9A0C /* Info.plist */,
 			);
 			path = AniTests;
+			sourceTree = "<group>";
+		};
+		CD9EEB2E219E92D60079B50E /* Firebas */ = {
+			isa = PBXGroup;
+			children = (
+				CD9EEB2F219E92E50079B50E /* ANIFirebase.swift */,
+				CD9EEB31219E93FA0079B50E /* ANIFirebaseRemoteConfigManager.swift */,
+			);
+			path = Firebas;
 			sourceTree = "<group>";
 		};
 		CDA32A1420A9347A008A2AC1 /* ScrollView */ = {
@@ -1066,6 +1079,7 @@
 		F51D220E20767E49009D1B26 /* Utility */ = {
 			isa = PBXGroup;
 			children = (
+				CD9EEB2E219E92D60079B50E /* Firebas */,
 				CDA32A1420A9347A008A2AC1 /* ScrollView */,
 				CD6B675220A90F78009BF63D /* PlaceholderTextView */,
 				CDF7F16F208F650600254A0F /* Button */,
@@ -1907,6 +1921,7 @@
 				CDAFD75F20DE1D1B00AEDD83 /* ANIRejectView.swift in Sources */,
 				CD0BFF1820C7AD9C00D5959B /* FirebaseQna.swift in Sources */,
 				CD9E52B7209441C900715F50 /* ANIRecruitDetailImagesViewCell.swift in Sources */,
+				CD9EEB32219E93FA0079B50E /* ANIFirebaseRemoteConfigManager.swift in Sources */,
 				CDDD04A820B271090094DBFA /* ANICommentCell.swift in Sources */,
 				CDDE4B6020E07B58005762A1 /* ANIListView.swift in Sources */,
 				F5E9E2332079AFF40021D4CC /* ANICommunityViewController.swift in Sources */,
@@ -1916,6 +1931,7 @@
 				CDDE4B6720E20D3E005762A1 /* ANIFollowUserViewContoller.swift in Sources */,
 				CDDD04C020B53A8B0094DBFA /* ANIInitialView.swift in Sources */,
 				CD4F0EF720F481030093C543 /* ANINotiCommentViewCell.swift in Sources */,
+				CD9EEB30219E92E50079B50E /* ANIFirebase.swift in Sources */,
 				CDA32A2920ABBA21008A2AC1 /* ANIRecruitContributionImagesView.swift in Sources */,
 				CD08A73120915C2A00F0B72D /* ANIRecruitDetailViewController.swift in Sources */,
 				F53E87C62085F13800B19A2F /* ANIProfileMenuBar.swift in Sources */,
@@ -2165,7 +2181,7 @@
 				);
 				INFOPLIST_FILE = Ani/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.gmail-jeonminsopdev.MYAU.dev";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.gmail-jeonminsopdev.MYAU";
 				PRODUCT_NAME = MYAU;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.2;
