@@ -54,7 +54,7 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
     }
   }
   
-  var familyImages: [UIImage?]? {
+  private var familyImages: [UIImage?]? {
     didSet {
       guard let profileEditView = self.profileEditView,
             let familyImages = self.familyImages else { return }
