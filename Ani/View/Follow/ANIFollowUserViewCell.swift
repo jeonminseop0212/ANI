@@ -27,6 +27,7 @@ class ANIFollowUserViewCell: UITableViewCell {
     didSet {
       reloadLayout()
       checkFollowed()
+      reloadFollowButtonLayout()
     }
   }
   
@@ -108,6 +109,18 @@ class ANIFollowUserViewCell: UITableViewCell {
     
     profileImageView.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
     userNameLabel.text = user.userName
+  }
+  
+  private func reloadFollowButtonLayout() {
+    guard let user = self.user,
+          let currentUserUid = ANISessionManager.shared.currentUserUid,
+          let followButton = self.followButton else { return }
+    
+    if user.uid == currentUserUid {
+      followButton.isHidden = true
+    } else {
+      followButton.isHidden = false
+    }
   }
   
   private func checkFollowed() {
