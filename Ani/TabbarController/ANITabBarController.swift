@@ -258,6 +258,8 @@ extension ANITabBarController {
         ANISessionManager.shared.currentUser = nil
         ANISessionManager.shared.currentUserUid = nil
         ANISessionManager.shared.isAnonymous = true
+        ANISessionManager.shared.blockUserIds = nil
+        ANISessionManager.shared.blockingUserIds = nil
         
         ANINotificationManager.postLogout()
       } catch let signOutError as NSError {
@@ -273,6 +275,8 @@ extension ANITabBarController {
           ANISessionManager.shared.currentUser = nil
           ANISessionManager.shared.currentUserUid = nil
           ANISessionManager.shared.isAnonymous = true
+          ANISessionManager.shared.blockUserIds = nil
+          ANISessionManager.shared.blockingUserIds = nil
           
           ANINotificationManager.postLogout()
           
@@ -414,6 +418,8 @@ extension ANITabBarController {
         ANISessionManager.shared.currentUser = nil
         ANISessionManager.shared.currentUserUid = nil
         ANISessionManager.shared.isAnonymous = true
+        ANISessionManager.shared.blockUserIds = nil
+        ANISessionManager.shared.blockingUserIds = nil
         
         ANINotificationManager.postLogout()
         ANINotificationManager.postLoadedCurrentUser()

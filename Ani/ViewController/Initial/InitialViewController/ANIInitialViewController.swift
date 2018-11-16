@@ -67,6 +67,8 @@ extension ANIInitialViewController: ANIInitialViewDelegate {
       ANISessionManager.shared.currentUser = nil
       ANISessionManager.shared.currentUserUid = nil
       ANISessionManager.shared.isAnonymous = true
+      ANISessionManager.shared.blockUserIds = nil
+      ANISessionManager.shared.blockingUserIds = nil
       
       ANINotificationManager.postLogout()
       
