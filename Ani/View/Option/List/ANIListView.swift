@@ -219,6 +219,9 @@ class ANIListView: UIView {
     if let hideUserIds = story.hideUserIds, hideUserIds.contains(currentUserUid) {
       return true
     }
+    if story.storyImageUrls == nil && story.recruitId == nil {
+      return true
+    }
     
     return false
   }
