@@ -73,6 +73,26 @@ class ANIRecruitViewCell: UITableViewCell {
     }
   }
   
+  private var supportCount: Int = 0 {
+    didSet {
+      guard let supportCountLabel = self.supportCountLabel else { return }
+      
+      DispatchQueue.main.async {
+        supportCountLabel.text = "\(self.supportCount)"
+      }
+    }
+  }
+  
+  private var loveCount: Int = 0 {
+    didSet {
+      guard let loveCountLabel = self.loveCountLabel else { return }
+      
+      DispatchQueue.main.async {
+        loveCountLabel.text = "\(self.loveCount)"
+      }
+    }
+  }
+  
   private var loveListener: ListenerRegistration?
   private var supportListener: ListenerRegistration?
   
@@ -403,10 +423,9 @@ class ANIRecruitViewCell: UITableViewCell {
   
   private func observeLove() {
     guard let recruit = self.recruit,
-          let recuritId = recruit.id,
-          let loveCountLabel = self.loveCountLabel else { return }
+          let recuritId = recruit.id else { return }
     
-    loveCountLabel.text = "0"
+    self.loveCount = 0
 
     let database = Firestore.firestore()
     DispatchQueue.global().async {
@@ -417,12 +436,10 @@ class ANIRecruitViewCell: UITableViewCell {
           return
         }
         
-        DispatchQueue.main.async {
-          if let snapshot = snapshot {
-            loveCountLabel.text = "\(snapshot.documents.count)"
-          } else {
-            loveCountLabel.text = "0"
-          }
+        if let snapshot = snapshot {
+          self.loveCount = snapshot.documents.count
+        } else {
+          self.loveCount = 0
         }
       })
     }
@@ -436,10 +453,9 @@ class ANIRecruitViewCell: UITableViewCell {
   
   private func observeSupport() {
     guard let recruit = self.recruit,
-          let recuritId = recruit.id,
-          let supportCountLabel = self.supportCountLabel else { return }
+          let recuritId = recruit.id else { return }
     
-    supportCountLabel.text = "0"
+    self.supportCount = 0
     
     let database = Firestore.firestore()
     DispatchQueue.global().async {
@@ -452,9 +468,9 @@ class ANIRecruitViewCell: UITableViewCell {
         
         DispatchQueue.main.async {
           if let snapshot = snapshot {
-            supportCountLabel.text = "\(snapshot.documents.count)"
+            self.supportCount = snapshot.documents.count
           } else {
-            supportCountLabel.text = "0"
+            self.supportCount = 0
           }
           
           self.isSupported()
@@ -651,9 +667,13 @@ class ANIRecruitViewCell: UITableViewCell {
       DispatchQueue.global().async {
         let date = ANIFunction.shared.getToday()
  
-        database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_LOVE_IDS).document(currentUserId).setData([currentUserId: true, KEY_DATE: date])
+        DispatchQueue.global().async {
+          database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_LOVE_IDS).document(currentUserId).setData([currentUserId: true, KEY_DATE: date])
+        }
         
-        database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_RECRUIT_IDS).document(recuritId).setData([KEY_DATE: date])
+        DispatchQueue.global().async {
+          database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_RECRUIT_IDS).document(recuritId).setData([KEY_DATE: date])
+        }
 
         self.updateNoti()
         
@@ -662,10 +682,13 @@ class ANIRecruitViewCell: UITableViewCell {
     } else {
       DispatchQueue.global().async {
         database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_LOVE_IDS).document(currentUserId).delete()
-        database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_RECRUIT_IDS).document(recuritId).delete()
-        
-        self.delegate?.loadedRecruitIsLoved(indexPath: indexPath, isLoved: false)
       }
+      
+      DispatchQueue.global().async {
+        database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_RECRUIT_IDS).document(recuritId).delete()
+      }
+      
+      self.delegate?.loadedRecruitIsLoved(indexPath: indexPath, isLoved: false)
     }
   }
   
@@ -702,11 +725,14 @@ class ANIRecruitViewCell: UITableViewCell {
         
         DispatchQueue.global().async {
         database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_CLIP_IDS).document(currentUserId).setData([currentUserId: true])
+        }
+        
+        DispatchQueue.global().async {
           let date = ANIFunction.shared.getToday()
           database.collection(KEY_USERS).document(currentUserId).collection(KEY_CLIP_RECRUIT_IDS).document(recuritId).setData([KEY_DATE: date])
-          
-          self.delegate?.loadedRecruitIsCliped(indexPath: indexPath, isCliped: true)
         }
+        
+        self.delegate?.loadedRecruitIsCliped(indexPath: indexPath, isCliped: true)
       } else {
         UIView.animate(withDuration: 0.15) {
           clipButton.tintColor = ANIColor.gray

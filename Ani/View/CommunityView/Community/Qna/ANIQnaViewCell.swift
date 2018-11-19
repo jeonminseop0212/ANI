@@ -61,6 +61,26 @@ class ANIQnaViewCell: UITableViewCell {
     }
   }
   
+  private var loveCount: Int = 0 {
+    didSet {
+      guard let loveCountLabel = self.loveCountLabel else { return }
+      
+      DispatchQueue.main.async {
+        loveCountLabel.text = "\(self.loveCount)"
+      }
+    }
+  }
+  
+  private var commentCount: Int = 0 {
+    didSet {
+      guard let commentCountLabel = self.commentCountLabel else { return }
+      
+      DispatchQueue.main.async {
+        commentCountLabel.text = "\(self.commentCount)"
+      }
+    }
+  }
+  
   private var loveListener: ListenerRegistration?
   private var commentListener: ListenerRegistration?
   
@@ -274,10 +294,9 @@ class ANIQnaViewCell: UITableViewCell {
   
   private func observeLove() {
     guard let qna = self.qna,
-          let qnaId = qna.id,
-          let loveCountLabel = self.loveCountLabel else { return }
+          let qnaId = qna.id else { return }
     
-    loveCountLabel.text = "0"
+    self.loveCount = 0
 
     let database = Firestore.firestore()
     DispatchQueue.global().async {
@@ -288,13 +307,11 @@ class ANIQnaViewCell: UITableViewCell {
           return
         }
         
-        DispatchQueue.main.async {
           if let snapshot = snapshot {
-            loveCountLabel.text = "\(snapshot.documents.count)"
+            self.loveCount = snapshot.documents.count
           } else {
-            loveCountLabel.text = "0"
+            self.loveCount = 0
           }
-        }
       })
     }
   }
@@ -307,10 +324,9 @@ class ANIQnaViewCell: UITableViewCell {
   
   private func observeComment() {
     guard let qna = self.qna,
-          let qnaId = qna.id,
-          let commentCountLabel = self.commentCountLabel else { return }
+          let qnaId = qna.id else { return }
     
-    commentCountLabel.text = "0"
+    self.commentCount = 0
 
     let database = Firestore.firestore()
     DispatchQueue.global().async {
@@ -321,12 +337,10 @@ class ANIQnaViewCell: UITableViewCell {
           return
         }
         
-        DispatchQueue.main.async {
-          if let snapshot = snapshot {
-            commentCountLabel.text = "\(snapshot.documents.count)"
-          } else {
-            commentCountLabel.text = "0"
-          }
+        if let snapshot = snapshot {
+          self.commentCount = snapshot.documents.count
+        } else {
+          self.commentCount = 0
         }
       })
     }

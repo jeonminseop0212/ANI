@@ -82,7 +82,8 @@ class ANIStoryImagesView: UIView {
   }
 }
 
-extension ANIStoryImagesView: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+//MARK: UICollectionViewDataSource
+extension ANIStoryImagesView: UICollectionViewDataSource {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
     return imageUrls.count
   }
@@ -93,14 +94,20 @@ extension ANIStoryImagesView: UICollectionViewDataSource, UICollectionViewDelega
     cell.imageView?.sd_setImage(with: URL(string: imageUrls[indexPath.item]), completed: nil)
     return cell
   }
-  
-  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-    let size = CGSize(width: collectionView.frame.width, height: collectionView.frame.width)
-    return size
-  }
-  
+}
+
+//MARK: UICollectionViewDelegate
+extension ANIStoryImagesView: UICollectionViewDelegate {
   func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
     guard let pageControl = self.pageControl else { return }
     pageControl.currentPage = Int(targetContentOffset.pointee.x / pageControl.frame.width)
+  }
+}
+
+//MARK: UICollectionViewDelegateFlowLayout
+extension ANIStoryImagesView: UICollectionViewDelegateFlowLayout {
+  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    let size = CGSize(width: collectionView.frame.width, height: collectionView.frame.width)
+    return size
   }
 }
