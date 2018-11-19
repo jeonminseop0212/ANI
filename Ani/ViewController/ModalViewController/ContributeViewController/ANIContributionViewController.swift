@@ -200,8 +200,9 @@ class ANIContributionViewController: UIViewController {
                 DispatchQueue.main.async {
                   let id = NSUUID().uuidString
                   let date = ANIFunction.shared.getToday()
+                  let day = ANIFunction.shared.getToday(format: "yyyy/MM/dd")
                   let content = contriButionView.getContent()
-                  let story = FirebaseStory(id: id, storyImageUrls: urls, story: content, userId: uid, loveIds: nil, commentIds: nil, recruitId: nil, recruitTitle: nil, recruitSubTitle: nil, date: date, isLoved: nil, hideUserIds: nil)
+                  let story = FirebaseStory(id: id, storyImageUrls: urls, story: content, userId: uid, loveIds: nil, commentIds: nil, recruitId: nil, recruitTitle: nil, recruitSubTitle: nil, date: date, day: day, isLoved: nil, hideUserIds: nil, loveCount: 0)
                 
                   self.upateStroyDatabase(story: story, id: id)
                 }

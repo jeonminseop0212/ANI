@@ -111,6 +111,26 @@ class ANISupportViewCell: UITableViewCell {
 
   private var recruitUser: FirebaseUser?
   
+  private var loveCount: Int = 0 {
+    didSet {
+      guard let loveCountLabel = self.loveCountLabel else { return }
+      
+      DispatchQueue.main.async {
+        loveCountLabel.text = "\(self.loveCount)"
+      }
+    }
+  }
+  
+  private var commentCount: Int = 0 {
+    didSet {
+      guard let commentCountLabel = self.commentCountLabel else { return }
+      
+      DispatchQueue.main.async {
+        commentCountLabel.text = "\(self.commentCount)"
+      }
+    }
+  }
+  
   private var loveListener: ListenerRegistration?
   private var commentListener: ListenerRegistration?
   
@@ -509,10 +529,9 @@ class ANISupportViewCell: UITableViewCell {
   
   private func observeLove() {
     guard let story = self.story,
-          let storyId = story.id,
-          let loveCountLabel = self.loveCountLabel else { return }
+          let storyId = story.id else { return }
     
-    loveCountLabel.text = "0"
+    self.loveCount = 0
 
     let database = Firestore.firestore()
     DispatchQueue.global().async {
@@ -523,12 +542,10 @@ class ANISupportViewCell: UITableViewCell {
           return
         }
         
-        DispatchQueue.main.async {
-          if let snapshot = snapshot {
-            loveCountLabel.text = "\(snapshot.documents.count)"
-          } else {
-            loveCountLabel.text = "0"
-          }
+        if let snapshot = snapshot {
+          self.loveCount = snapshot.documents.count
+        } else {
+          self.loveCount = 0
         }
       })
     }
@@ -542,10 +559,9 @@ class ANISupportViewCell: UITableViewCell {
   
   private func observeComment() {
     guard let story = self.story,
-      let storyId = story.id,
-      let commentCountLabel = self.commentCountLabel else { return }
+      let storyId = story.id else { return }
     
-    commentCountLabel.text = "0"
+    self.commentCount = 0
     
     let database = Firestore.firestore()
     DispatchQueue.global().async {
@@ -556,12 +572,10 @@ class ANISupportViewCell: UITableViewCell {
           return
         }
         
-        DispatchQueue.main.async {
-          if let snapshot = snapshot {
-            commentCountLabel.text = "\(snapshot.documents.count)"
-          } else {
-            commentCountLabel.text = "0"
-          }
+        if let snapshot = snapshot {
+          self.commentCount = snapshot.documents.count
+        } else {
+          self.commentCount = 0
         }
       })
     }
@@ -667,24 +681,29 @@ class ANISupportViewCell: UITableViewCell {
     let database = Firestore.firestore()
     
     if loveButton.isSelected == true {
+      let date = ANIFunction.shared.getToday()
+      
       DispatchQueue.global().async {
-        let date = ANIFunction.shared.getToday()
-        
         database.collection(KEY_STORIES).document(storyId).collection(KEY_LOVE_IDS).document(currentUserId).setData([currentUserId: true, KEY_DATE: date])
-        
-        database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_STORY_IDS).document(storyId).setData([KEY_DATE: date])
-        
-        self.updateNoti()
-        
-        self.delegate?.loadedStoryIsLoved(indexPath: indexPath, isLoved: true)
       }
+      
+      DispatchQueue.global().async {
+        database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_STORY_IDS).document(storyId).setData([KEY_DATE: date])
+      }
+        
+      self.updateNoti()
+      
+      self.delegate?.loadedStoryIsLoved(indexPath: indexPath, isLoved: true)
     } else {
       DispatchQueue.global().async {
         database.collection(KEY_STORIES).document(storyId).collection(KEY_LOVE_IDS).document(currentUserId).delete()
-        database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_STORY_IDS).document(storyId).delete()
-        
-        self.delegate?.loadedStoryIsLoved(indexPath: indexPath, isLoved: false)
       }
+      
+      DispatchQueue.global().async {
+        database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_STORY_IDS).document(storyId).delete()
+      }
+      
+      self.delegate?.loadedStoryIsLoved(indexPath: indexPath, isLoved: false)
     }
   }
   

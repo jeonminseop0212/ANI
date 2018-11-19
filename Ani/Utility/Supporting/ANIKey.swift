@@ -59,6 +59,8 @@ let KEY_HIDE_USER_IDS = "hideUserIds"
 //story
 let KEY_STORY_IMAGES = "story_images"
 let KEY_STORIES = "stories"
+let KEY_DAY = "day"
+let KEY_LOVE_COUNT = "loveCount"
 
 //qna
 let KEY_QNA_IMAGES = "qna_images"
