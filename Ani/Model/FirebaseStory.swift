@@ -13,8 +13,6 @@ struct FirebaseStory: Codable {
   let storyImageUrls: [String]?
   let story: String
   let userId: String
-  let loveIds: [String: Bool]?
-  var commentIds: [String: Bool]?
   let recruitId: String?
   let recruitTitle: String?
   let recruitSubTitle: String?

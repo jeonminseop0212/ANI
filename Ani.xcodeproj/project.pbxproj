@@ -37,6 +37,7 @@
 		CD3A64B9219FED500056ABA2 /* ANIRankingViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD3A64B8219FED500056ABA2 /* ANIRankingViewCell.swift */; };
 		CD3A64BC219FF3640056ABA2 /* ANIStoryRankingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD3A64BB219FF3640056ABA2 /* ANIStoryRankingView.swift */; };
 		CD3A64BE219FF4D10056ABA2 /* ANIStoryRankingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD3A64BD219FF4D10056ABA2 /* ANIStoryRankingCell.swift */; };
+		CD3A64C021A287DC0056ABA2 /* ANICellButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD3A64BF21A287DC0056ABA2 /* ANICellButtonView.swift */; };
 		CD3DBF97215A31F50010A219 /* Macros.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD3DBF96215A31F50010A219 /* Macros.swift */; };
 		CD47936B2186A5F7002643E2 /* ANIOpinionBoxViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD47936A2186A5F7002643E2 /* ANIOpinionBoxViewController.swift */; };
 		CD47936E2186A6E8002643E2 /* ANIOpinionBoxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD47936D2186A6E8002643E2 /* ANIOpinionBoxView.swift */; };
@@ -86,7 +87,6 @@
 		CDA97AC920AFFFEC00F46DA4 /* ANIProfileEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA97AC820AFFFEC00F46DA4 /* ANIProfileEditView.swift */; };
 		CDA97ACC20B000FF00F46DA4 /* ANIProfileEditFamilyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA97ACB20B000FF00F46DA4 /* ANIProfileEditFamilyView.swift */; };
 		CDA97ACE20B0018600F46DA4 /* ANIProfileEditFamilyCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA97ACD20B0018600F46DA4 /* ANIProfileEditFamilyCell.swift */; };
-		CDA97B5420B2497200F46DA4 /* WCLShineButton.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CDA97B5320B2497200F46DA4 /* WCLShineButton.framework */; };
 		CDA97B5820B25F3B00F46DA4 /* ANICommentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA97B5720B25F3B00F46DA4 /* ANICommentViewController.swift */; };
 		CDA97B5A20B263B500F46DA4 /* ANICommentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA97B5920B263B500F46DA4 /* ANICommentView.swift */; };
 		CDAFD75720DC9B4D00AEDD83 /* ANIOptionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDAFD75620DC9B4D00AEDD83 /* ANIOptionViewController.swift */; };
@@ -231,6 +231,7 @@
 		CD3A64B8219FED500056ABA2 /* ANIRankingViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRankingViewCell.swift; sourceTree = "<group>"; };
 		CD3A64BB219FF3640056ABA2 /* ANIStoryRankingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIStoryRankingView.swift; sourceTree = "<group>"; };
 		CD3A64BD219FF4D10056ABA2 /* ANIStoryRankingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIStoryRankingCell.swift; sourceTree = "<group>"; };
+		CD3A64BF21A287DC0056ABA2 /* ANICellButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANICellButtonView.swift; sourceTree = "<group>"; };
 		CD3DBF96215A31F50010A219 /* Macros.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Macros.swift; sourceTree = "<group>"; };
 		CD47936A2186A5F7002643E2 /* ANIOpinionBoxViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIOpinionBoxViewController.swift; sourceTree = "<group>"; };
 		CD47936D2186A6E8002643E2 /* ANIOpinionBoxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIOpinionBoxView.swift; sourceTree = "<group>"; };
@@ -403,7 +404,6 @@
 				CD0BFF1020C6186500D5959B /* CodableFirebase.framework in Frameworks */,
 				CD047EBE20C4E9A000248958 /* NVActivityIndicatorView.framework in Frameworks */,
 				CDDD04AF20B4F8130094DBFA /* GrowingTextView.framework in Frameworks */,
-				CDA97B5420B2497200F46DA4 /* WCLShineButton.framework in Frameworks */,
 				F5B1EFC520726658000CFB0B /* TinyConstraints.framework in Frameworks */,
 				23BE6C66072673B423ABA35D /* Pods_Ani.framework in Frameworks */,
 			);
@@ -1085,6 +1085,7 @@
 			isa = PBXGroup;
 			children = (
 				CDF7F170208F651E00254A0F /* ANIButtonView.swift */,
+				CD3A64BF21A287DC0056ABA2 /* ANICellButtonView.swift */,
 				CDF7F173208F658E00254A0F /* ANIImageButtonView.swift */,
 				CD9E52BA2094614400715F50 /* ANIAreaButtonView.swift */,
 			);
@@ -1787,7 +1788,6 @@
 			);
 			inputPaths = (
 				"$(SRCROOT)/Carthage/Build/iOS/TinyConstraints.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/WCLShineButton.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/GrowingTextView.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/NVActivityIndicatorView.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/CodableFirebase.framework",
@@ -1958,6 +1958,7 @@
 				CD0BFF1620C7807F00D5959B /* FirebaseComment.swift in Sources */,
 				CDA97AC920AFFFEC00F46DA4 /* ANIProfileEditView.swift in Sources */,
 				CD3A64BC219FF3640056ABA2 /* ANIStoryRankingView.swift in Sources */,
+				CD3A64C021A287DC0056ABA2 /* ANICellButtonView.swift in Sources */,
 				F57F7D61208322D3008A2645 /* ANIMessageView.swift in Sources */,
 				CD9E52B120921EB400715F50 /* UIViewController.swift in Sources */,
 				CD033E4420D8D28D002FB770 /* ANISupportView.swift in Sources */,

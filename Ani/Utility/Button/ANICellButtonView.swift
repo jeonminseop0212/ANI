@@ -1,21 +1,21 @@
 //
-//  ANIImageButtonView.swift
+//  ANILoveButtonView.swift
 //  Ani
 //
-//  Created by jeonminseop on 2018/04/24.
+//  Created by jeonminseop on 2018/11/19.
 //  Copyright © 2018年 JeonMinseop. All rights reserved.
 //
 
 import UIKit
 import TinyConstraints
 
-class ANIImageButtonView: ANIButtonView {
+class ANICellButtonView: ANIButtonView {
   
   var imageView: UIImageView?
   private var imageWidthConst: Constraint?
   private var imageHeightConst: Constraint?
   
-  var imageSize:CGSize = .zero{
+  var imageSize: CGSize = .zero{
     didSet {
       if self.imageWidthConst == nil {
         if imageSize == .zero, let size = self.imageView?.image?.size {
@@ -48,7 +48,7 @@ class ANIImageButtonView: ANIButtonView {
     }
   }
   
-  var image:UIImage?{
+  var image: UIImage?{
     get {
       return self.imageView?.image
     }
@@ -56,6 +56,19 @@ class ANIImageButtonView: ANIButtonView {
       self.imageView?.image = v
       if imageSize == .zero, let size = v?.size{
         self.imageSize = size
+      }
+    }
+  }
+  
+  var unSelectedImage: UIImage?
+  var selectedImage: UIImage?
+  
+  var isSelected: Bool = false {
+    didSet {
+      if self.isSelected {
+        self.image = selectedImage
+      } else {
+        self.image = unSelectedImage
       }
     }
   }
@@ -88,9 +101,12 @@ class ANIImageButtonView: ANIButtonView {
   
   override func touchDown(_ contain: Bool) {
     super.touchDown(contain)
+    
+    self.isSelected = !isSelected
+    
     if isAnimation {
-      UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseInOut, animations: {
-        self.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
+      UIView.animate(withDuration: 0.15, delay: 0, options: .curveEaseInOut, animations: {
+        self.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
       })
     }
   }
@@ -98,8 +114,13 @@ class ANIImageButtonView: ANIButtonView {
   override func touchUp(_ contain: Bool) {
     super.touchUp(contain)
     if isAnimation {
-      UIView.animate(withDuration: 0.2, delay: 0.2, options: .curveEaseInOut, animations: {
+      UIView.animate(withDuration: 0.15, delay: 0.15, options: .curveEaseInOut, animations: {
         self.transform = .identity
+        if self.isSelected {
+          self.image = self.selectedImage
+        } else {
+          self.image = self.unSelectedImage
+        }
       })
     }
   }

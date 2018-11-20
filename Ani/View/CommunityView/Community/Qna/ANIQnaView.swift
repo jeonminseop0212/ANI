@@ -205,9 +205,9 @@ extension ANIQnaView: UITableViewDataSource {
       } else {
         cell.user = nil
       }
+      cell.indexPath = indexPath.row
       cell.qna = qnas[indexPath.row]
       cell.delegate = self
-      cell.indexPath = indexPath.row
     }
     
     return cell
