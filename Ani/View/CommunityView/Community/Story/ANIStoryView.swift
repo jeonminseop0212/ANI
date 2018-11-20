@@ -147,7 +147,11 @@ class ANIStoryView: UIView {
     for (index, story) in stories.enumerated() {
       if story.id == id {
         stories.remove(at: index)
-        indexPath = [0, index + 1]
+        if rankingStories.isEmpty {
+          indexPath = [0, index]
+        } else {
+          indexPath = [0, index + 1]
+        }
       }
     }
     
@@ -240,9 +244,9 @@ extension ANIStoryView: UITableViewDataSource {
           } else {
             cell.user = nil
           }
+          cell.indexPath = indexPath.row
           cell.story = stories[indexPath.row]
           cell.delegate = self
-          cell.indexPath = indexPath.row
           
           return cell
         } else {
@@ -259,9 +263,9 @@ extension ANIStoryView: UITableViewDataSource {
           } else {
             cell.user = nil
           }
+          cell.indexPath = indexPath.row
           cell.story = stories[indexPath.row]
           cell.delegate = self
-          cell.indexPath = indexPath.row
           
           return cell
         }
@@ -305,9 +309,9 @@ extension ANIStoryView: UITableViewDataSource {
             } else {
               cell.user = nil
             }
+            cell.indexPath = indexPath.row - 1
             cell.story = stories[indexPath.row - 1]
             cell.delegate = self
-            cell.indexPath = indexPath.row - 1
             
             return cell
           } else {
@@ -324,9 +328,9 @@ extension ANIStoryView: UITableViewDataSource {
             } else {
               cell.user = nil
             }
+            cell.indexPath = indexPath.row - 1
             cell.story = stories[indexPath.row - 1]
             cell.delegate = self
-            cell.indexPath = indexPath.row - 1
             
             return cell
           }

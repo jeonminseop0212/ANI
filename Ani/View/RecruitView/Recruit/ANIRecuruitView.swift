@@ -299,9 +299,9 @@ extension ANIRecuruitView: UITableViewDataSource {
       } else {
         cell.user = nil
       }
+      cell.indexPath = indexPath.row
       cell.recruit = recruits[indexPath.row]
       cell.delegate = self
-      cell.indexPath = indexPath.row
     }
     
     return cell

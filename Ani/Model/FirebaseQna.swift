@@ -13,8 +13,6 @@ struct FirebaseQna: Codable {
   let qnaImageUrls: [String]?
   let qna: String
   let userId: String
-  let loveIds: [String: Bool]?
-  var commentIds: [String: Bool]?
   let date: String
   var isLoved: Bool?
   var hideUserIds: [String]?

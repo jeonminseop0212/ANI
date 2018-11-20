@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import WCLShineButton
 import FirebaseFirestore
 import CodableFirebase
 import TinyConstraints
@@ -31,7 +30,7 @@ class ANIQnaViewCell: UITableViewCell {
   private weak var profileImageView: UIImageView?
   private weak var userNameLabel: UILabel?
   private weak var loveButtonBG: UIView?
-  private weak var loveButton: WCLShineButton?
+  private weak var loveButton: ANICellButtonView?
   private weak var loveCountLabel: UILabel?
   private weak var commentButton: UIButton?
   private weak var commentCountLabel: UILabel?
@@ -158,14 +157,13 @@ class ANIQnaViewCell: UITableViewCell {
     
     //optionButton
     let optionButton = UIButton()
-    optionButton.setImage(UIImage(named: "optionButton")?.withRenderingMode(.alwaysTemplate), for: .normal)
+    optionButton.setImage(UIImage(named: "cellOptionButton"), for: .normal)
     optionButton.addTarget(self, action: #selector(showOption), for: .touchUpInside)
-    optionButton.tintColor = ANIColor.darkGray
     addSubview(optionButton)
     optionButton.centerY(to: profileImageView)
     optionButton.rightToSuperview(offset: -10.0)
-    optionButton.width(25.0)
-    optionButton.height(25.0)
+    optionButton.width(30.0)
+    optionButton.height(30.0)
     self.optionButton = optionButton
 
     //commentCountLabel
@@ -174,20 +172,20 @@ class ANIQnaViewCell: UITableViewCell {
     commentCountLabel.textColor = ANIColor.dark
     addSubview(commentCountLabel)
     commentCountLabel.centerY(to: profileImageView)
-    commentCountLabel.rightToLeft(of: optionButton, offset: -10.0)
+    commentCountLabel.rightToLeft(of: optionButton, offset: -5.0)
     commentCountLabel.width(25.0)
     commentCountLabel.height(20.0)
     self.commentCountLabel = commentCountLabel
 
     //commentButton
     let commentButton = UIButton()
-    commentButton.setImage(UIImage(named: "comment"), for: .normal)
+    commentButton.setImage(UIImage(named: "commentButton"), for: .normal)
     commentButton.addTarget(self, action: #selector(cellTapped), for: .touchUpInside)
     addSubview(commentButton)
     commentButton.centerY(to: profileImageView)
-    commentButton.rightToLeft(of: commentCountLabel, offset: -10.0)
-    commentButton.width(25.0)
-    commentButton.height(24.0)
+    commentButton.rightToLeft(of: commentCountLabel, offset: -5.0)
+    commentButton.width(30.0)
+    commentButton.height(30.0)
     self.commentButton = commentButton
 
     //loveCountLabel
@@ -196,7 +194,7 @@ class ANIQnaViewCell: UITableViewCell {
     loveCountLabel.textColor = ANIColor.dark
     addSubview(loveCountLabel)
     loveCountLabel.centerY(to: profileImageView)
-    loveCountLabel.rightToLeft(of: commentButton, offset: -10.0)
+    loveCountLabel.rightToLeft(of: commentButton, offset: -5.0)
     loveCountLabel.width(25.0)
     loveCountLabel.height(20.0)
     self.loveCountLabel = loveCountLabel
@@ -208,25 +206,22 @@ class ANIQnaViewCell: UITableViewCell {
     loveButtonBG.addGestureRecognizer(loveButtonBGtapGesture)
     addSubview(loveButtonBG)
     loveButtonBG.centerY(to: profileImageView)
-    loveButtonBG.rightToLeft(of: loveCountLabel, offset: -10.0)
-    loveButtonBG.width(20.0)
-    loveButtonBG.height(20.0)
+    loveButtonBG.rightToLeft(of: loveCountLabel, offset: -5.0)
+    loveButtonBG.width(30.0)
+    loveButtonBG.height(30.0)
     self.loveButtonBG = loveButtonBG
 
     //loveButton
-    var param = WCLShineParams()
-    param.bigShineColor = ANIColor.pink
-    param.smallShineColor = ANIColor.lightPink
-    let loveButton = WCLShineButton(frame: CGRect(x: 0.0, y: 0.0, width: 20.0, height: 20.0), params: param)
-    loveButton.fillColor = ANIColor.pink
-    loveButton.color = ANIColor.gray
-    loveButton.image = .heart
-    loveButton.addTarget(self, action: #selector(love), for: .valueChanged)
+    let loveButton = ANICellButtonView()
+    loveButton.image = UIImage(named: "loveButton")
+    loveButton.unSelectedImage = UIImage(named: "loveButton")
+    loveButton.selectedImage = UIImage(named: "loveButtonSelected")
+    loveButton.delegate = self
     addSubview(loveButton)
     loveButton.centerY(to: profileImageView)
-    loveButton.rightToLeft(of: loveCountLabel, offset: -10.0)
-    loveButton.width(21.0)
-    loveButton.height(21.0)
+    loveButton.rightToLeft(of: loveCountLabel, offset: -5.0)
+    loveButton.width(30.0)
+    loveButton.height(30.0)
     self.loveButton = loveButton
 
     //userNameLabel
@@ -260,10 +255,10 @@ class ANIQnaViewCell: UITableViewCell {
 
     if ANISessionManager.shared.isAnonymous {
       loveButtonBG.isUserInteractionEnabled = true
-      loveButton.isEnabled = false
+      loveButton.isUserInteractionEnabled = false
     } else {
       loveButtonBG.isUserInteractionEnabled = false
-      loveButton.isEnabled = true
+      loveButton.isUserInteractionEnabled = true
     }
     loveButton.isSelected = false
     if let isLoved = qna.isLoved {
@@ -355,7 +350,8 @@ class ANIQnaViewCell: UITableViewCell {
   private func isLoved() {
     guard let qna = self.qna,
           let qnaId = qna.id,
-          let loveButton = self.loveButton else { return }
+          let loveButton = self.loveButton,
+          let indexPath = self.indexPath else { return }
     
     if let currentUserId = ANISessionManager.shared.currentUserUid {
       let database = Firestore.firestore()
@@ -369,21 +365,18 @@ class ANIQnaViewCell: UITableViewCell {
           
           guard let snapshot = snapshot else { return }
           
-          var isLoved = false
-          
           DispatchQueue.main.async {
+            var documentIDTemp = [String]()
             for document in snapshot.documents {
-              if document.documentID == currentUserId {
-                loveButton.isSelected = true
-                isLoved = true
-                break
-              } else {
-                isLoved = false
-              }
+              
+              documentIDTemp.append(document.documentID)
             }
             
-            if let indexPath = self.indexPath {
-              self.delegate?.loadedQnaIsLoved(indexPath: indexPath, isLoved: isLoved)
+            if documentIDTemp.contains(currentUserId) {
+              loveButton.isSelected = true
+              self.delegate?.loadedQnaIsLoved(indexPath: indexPath, isLoved: true)
+            } else {
+              self.delegate?.loadedQnaIsLoved(indexPath: indexPath, isLoved: false)
             }
           }
         })
@@ -496,6 +489,16 @@ class ANIQnaViewCell: UITableViewCell {
       self.delegate?.popupOptionView(isMe: true, contentType: contentType, id: qnaId)
     } else {
       self.delegate?.popupOptionView(isMe: false, contentType: contentType, id: qnaId)
+    }
+  }
+}
+
+
+//MARK: ANIButtonViewDelegate
+extension ANIQnaViewCell: ANIButtonViewDelegate {
+  func buttonViewTapped(view: ANIButtonView) {
+    if view === self.loveButton {
+      love()
     }
   }
 }
