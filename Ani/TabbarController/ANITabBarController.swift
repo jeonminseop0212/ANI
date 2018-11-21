@@ -76,17 +76,17 @@ class ANITabBarController: UITabBarController {
   }
   
   private func setupTabBar() {
-    let recruitVC = ANIRecruitViewController()
-    recruitVC.tabBarItem.image = UIImage(named: "home")?.withRenderingMode(.alwaysOriginal)
-    recruitVC.tabBarItem.selectedImage = UIImage(named: "homeSelected")?.withRenderingMode(.alwaysOriginal)
-    recruitVC.tabBarItem.tag = 0
-    let recruitNV = UINavigationController(rootViewController: recruitVC)
-    
     let communityVC = ANICommunityViewController()
     communityVC.tabBarItem.image = UIImage(named: "community")?.withRenderingMode(.alwaysOriginal)
     communityVC.tabBarItem.selectedImage = UIImage(named: "communitySelected")?.withRenderingMode(.alwaysOriginal)
-    communityVC.tabBarItem.tag = 1
+    communityVC.tabBarItem.tag = 0
     let communityNV = UINavigationController(rootViewController: communityVC)
+    
+    let recruitVC = ANIRecruitViewController()
+    recruitVC.tabBarItem.image = UIImage(named: "recruit")?.withRenderingMode(.alwaysOriginal)
+    recruitVC.tabBarItem.selectedImage = UIImage(named: "recruitSelected")?.withRenderingMode(.alwaysOriginal)
+    recruitVC.tabBarItem.tag = 1
+    let recruitNV = UINavigationController(rootViewController: recruitVC)
     
     let notiVC = ANINotiViewController()
     notiVC.tabBarItem.image = UIImage(named: "noti")?.withRenderingMode(.alwaysOriginal)
@@ -106,7 +106,7 @@ class ANITabBarController: UITabBarController {
     profileVC.tabBarItem.tag = 4
     let profileNV = UINavigationController(rootViewController: profileVC)
     
-    setViewControllers([recruitNV, communityNV, notiNV, searchNV, profileNV], animated: false)
+    setViewControllers([communityNV, recruitNV, notiNV, searchNV, profileNV], animated: false)
     
     if let items = tabBar.items {
       for item in items {
@@ -142,12 +142,12 @@ class ANITabBarController: UITabBarController {
     switch item.tag {
     case 0:
       if showingTabTag == 0 {
-        ANINotificationManager.postRecruitTabTapped()
+        ANINotificationManager.postCommunityTabTapped()
       }
       showingTabTag = 0
     case 1:
       if showingTabTag == 1 {
-        ANINotificationManager.postCommunityTabTapped()
+        ANINotificationManager.postRecruitTabTapped()
       }
       showingTabTag = 1
     case 2:
@@ -221,7 +221,7 @@ class ANITabBarController: UITabBarController {
   @objc private func dismissSplash() {
     guard let splashView = splashView else { return }
     
-    if ANISessionManager.shared.isLoadedCurrentUser && ANISessionManager.shared.isCheckedVersion {
+    if ANISessionManager.shared.isLoadedFirstData && ANISessionManager.shared.isCheckedVersion {
       DispatchQueue.main.async {
         UIView.animate(withDuration: 0.2) {
           splashView.alpha = 0.0
@@ -406,7 +406,6 @@ extension ANITabBarController {
       group.notify(queue: DispatchQueue(label: "user")) {
         DispatchQueue.main.async {
           ANINotificationManager.postLoadedCurrentUser()
-          ANISessionManager.shared.isLoadedCurrentUser = true
           self.isLoadedFirstData = true
           completion?()
         }
@@ -423,7 +422,6 @@ extension ANITabBarController {
         
         ANINotificationManager.postLogout()
         ANINotificationManager.postLoadedCurrentUser()
-        ANISessionManager.shared.isLoadedCurrentUser = true
         isLoadedFirstData = true
         
       } catch let signOutError as NSError {

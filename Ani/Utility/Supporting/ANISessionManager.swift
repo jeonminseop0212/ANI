@@ -44,7 +44,7 @@ class ANISessionManager: NSObject {
   var blockUserIds: [String]?
   var blockingUserIds: [String]?
   
-  var isLoadedCurrentUser: Bool = false
+  var isLoadedFirstData: Bool = false
   var isCheckedVersion: Bool = false
   
   #if DEBUG

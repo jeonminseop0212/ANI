@@ -40,7 +40,7 @@ class ANIRankingViewCell: UITableViewCell {
     let titleLabel = UILabel()
     titleLabel.textColor = ANIColor.dark
     titleLabel.font = UIFont.boldSystemFont(ofSize: 16.0)
-    titleLabel.text = "今日の猫"
+    titleLabel.text = "今日のニャンズ"
     addSubview(titleLabel)
     titleLabel.topToSuperview(offset: 10.0)
     titleLabel.leftToSuperview(offset: 10.0)

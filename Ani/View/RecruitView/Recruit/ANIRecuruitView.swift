@@ -93,6 +93,7 @@ class ANIRecuruitView: UIView {
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()
+    loadRecruit(sender: nil)
     setupNotifications()
   }
   
@@ -157,7 +158,6 @@ class ANIRecuruitView: UIView {
     ANINotificationManager.receive(login: self, selector: #selector(reloadRecruitLayout))
     ANINotificationManager.receive(recruitTabTapped: self, selector: #selector(scrollToTop))
     ANINotificationManager.receive(deleteRecruit: self, selector: #selector(deleteRecruit))
-    ANINotificationManager.receive(loadedCurrentUser: self, selector: #selector(loadData))
   }
   
   @objc private func reloadRecruitLayout() {
@@ -248,17 +248,11 @@ class ANIRecuruitView: UIView {
     
     recruitTableView.alpha = 0.0
     
-    UIView.animate(withDuration: 0.2, animations: {
+    UIView.animate(withDuration: 0.2) {
       reloadView.alpha = 1.0
-    }) { (complete) in
-      ANINotificationManager.postDismissSplash()
     }
     
     self.isLoading = false
-  }
-  
-  @objc private func loadData() {
-    loadRecruit(sender: nil)
   }
   
   private func isBlockRecruit(recruit: FirebaseRecruit) -> Bool {
@@ -448,8 +442,9 @@ extension ANIRecuruitView {
                 } else {
                   activityIndicatorView.stopAnimating()
 
-                  recruitTableView.alpha = 1.0
-                  ANINotificationManager.postDismissSplash()
+                  UIView.animate(withDuration: 0.2, animations: {
+                    recruitTableView.alpha = 1.0
+                  })
                 }
               }
             }
@@ -520,8 +515,9 @@ extension ANIRecuruitView {
                   if recruitTableView.alpha == 0.0 {
                     activityIndicatorView.stopAnimating()
 
-                    recruitTableView.alpha = 1.0
-                    ANINotificationManager.postDismissSplash()
+                    UIView.animate(withDuration: 0.2, animations: {
+                      recruitTableView.alpha = 1.0
+                    })
                   }
                 }
               }
