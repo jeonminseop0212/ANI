@@ -249,9 +249,9 @@ extension ANINotiDetailView: UITableViewDataSource {
         if let user = self.user {
           cell.user = user
         }
+        cell.indexPath = indexPath.row
         cell.recruit = recruit
         cell.delegate = self
-        cell.indexPath = indexPath.row
         
         return cell
       } else if indexPath.row == 1 {
@@ -280,11 +280,11 @@ extension ANINotiDetailView: UITableViewDataSource {
           if let user = self.user {
             cell.user = user
           }
+          cell.indexPath = indexPath.row
           cell.recruit = nil
           cell.isDeleteRecruit = nil
           cell.story = story
           cell.delegate = self
-          cell.indexPath = indexPath.row
           
           return cell
         } else if indexPath.row == 1 {
@@ -323,9 +323,9 @@ extension ANINotiDetailView: UITableViewDataSource {
           if let user = self.user {
             cell.user = user
           }
+          cell.indexPath = indexPath.row
           cell.story = story
           cell.delegate = self
-          cell.indexPath = indexPath.row
           
           return cell
         } else if indexPath.row == 1 {
@@ -365,9 +365,9 @@ extension ANINotiDetailView: UITableViewDataSource {
         if let user = self.user {
           cell.user = user
         }
+        cell.indexPath = indexPath.row
         cell.qna = qna
         cell.delegate = self
-        cell.indexPath = indexPath.row
         
         return cell
       } else if indexPath.row == 1 {

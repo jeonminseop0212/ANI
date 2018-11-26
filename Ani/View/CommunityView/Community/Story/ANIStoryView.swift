@@ -12,10 +12,11 @@ import CodableFirebase
 import NVActivityIndicatorView
 
 protocol ANIStoryViewDelegate {
-  func storyViewCellDidSelect(selectedStory: FirebaseStory, user: FirebaseUser)
+  func didSelectStoryViewCell(selectedStory: FirebaseStory, user: FirebaseUser)
   func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser)
   func reject()
   func popupOptionView(isMe: Bool, contentType: ContentType, id: String)
+  func didSelectRankingCell(rankingStory: FirebaseStory, ranking: Int)
 }
 
 class ANIStoryView: UIView {
@@ -287,6 +288,7 @@ extension ANIStoryView: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: rankingCellId, for: indexPath) as! ANIRankingViewCell
         
         cell.rankingStories = rankingStories
+        cell.delegate = self
         
         return cell
       } else {
@@ -409,7 +411,7 @@ extension ANIStoryView: UITableViewDelegate {
 //MARK: ANIStoryViewCellDelegate
 extension ANIStoryView: ANIStoryViewCellDelegate {
   func storyCellTapped(story: FirebaseStory, user: FirebaseUser) {
-    self.delegate?.storyViewCellDidSelect(selectedStory: story, user: user)
+    self.delegate?.didSelectStoryViewCell(selectedStory: story, user: user)
   }
   
   func reject() {
@@ -434,7 +436,7 @@ extension ANIStoryView: ANIStoryViewCellDelegate {
 //MARK: ANISupportViewCellDelegate
 extension ANIStoryView: ANISupportViewCellDelegate {
   func supportCellTapped(story: FirebaseStory, user: FirebaseUser) {
-    self.delegate?.storyViewCellDidSelect(selectedStory: story, user: user)
+    self.delegate?.didSelectStoryViewCell(selectedStory: story, user: user)
   }
   
   func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser) {
@@ -443,6 +445,13 @@ extension ANIStoryView: ANISupportViewCellDelegate {
   
   func loadedRecruit(recruitId: String, recruit: FirebaseRecruit?) {
     self.supportRecruits[recruitId] = recruit
+  }
+}
+
+//MARK: ANIRankingViewCellDelegate
+extension ANIStoryView: ANIRankingViewCellDelegate {
+  func didSelectRankingCell(rankingStory: FirebaseStory, ranking: Int) {
+    self.delegate?.didSelectRankingCell(rankingStory: rankingStory, ranking: ranking)
   }
 }
 

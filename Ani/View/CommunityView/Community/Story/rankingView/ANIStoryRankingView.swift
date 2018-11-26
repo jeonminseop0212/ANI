@@ -8,6 +8,10 @@
 
 import UIKit
 
+protocol ANIStoryRankingViewDelegate {
+  func didSelectRankingCell(rankingStory: FirebaseStory, ranking: Int)
+}
+
 class ANIStoryRankingView: UIView {
   
   private weak var rankingColletionView: UICollectionView?
@@ -21,6 +25,8 @@ class ANIStoryRankingView: UIView {
   }
   
   private var users = [FirebaseUser]()
+  
+  var delegate: ANIStoryRankingViewDelegate?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -86,6 +92,14 @@ extension ANIStoryRankingView: UICollectionViewDataSource {
     return cell
   }
 }
+
+//MARK: UICollectionViewDelegate
+extension ANIStoryRankingView: UICollectionViewDelegate {
+  func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    self.delegate?.didSelectRankingCell(rankingStory: rankingStories[indexPath.item], ranking: indexPath.item)
+  }
+}
+
 
 //MARK: UICollectionViewDelegateFlowLayout
 extension ANIStoryRankingView: UICollectionViewDelegateFlowLayout {
