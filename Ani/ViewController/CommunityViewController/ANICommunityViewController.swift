@@ -273,7 +273,7 @@ extension ANICommunityViewController: ANICommunityMenuBarDelegate {
 
 //MARK: ANIStoryViewDelegate
 extension ANICommunityViewController: ANIStoryViewDelegate {
-  func storyViewCellDidSelect(selectedStory: FirebaseStory, user: FirebaseUser) {
+  func didSelectStoryViewCell(selectedStory: FirebaseStory, user: FirebaseUser) {
     let commentViewController = ANICommentViewController()
     commentViewController.hidesBottomBarWhenPushed = true
     commentViewController.commentMode = CommentMode.story
@@ -327,6 +327,14 @@ extension ANICommunityViewController: ANIStoryViewDelegate {
     }
     popupOptionViewController.delegate = self
     self.tabBarController?.present(popupOptionViewController, animated: false, completion: nil)
+  }
+  
+  func didSelectRankingCell(rankingStory: FirebaseStory, ranking: Int) {
+    let rankingStoryDetailViewController = ANIRankingStoryDetailViewController()
+    rankingStoryDetailViewController.hidesBottomBarWhenPushed = true
+    rankingStoryDetailViewController.rankingStory = rankingStory
+    rankingStoryDetailViewController.ranking = ranking
+    self.navigationController?.pushViewController(rankingStoryDetailViewController, animated: true)
   }
 }
 

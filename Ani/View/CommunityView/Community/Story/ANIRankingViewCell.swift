@@ -8,6 +8,10 @@
 
 import UIKit
 
+protocol ANIRankingViewCellDelegate {
+  func didSelectRankingCell(rankingStory: FirebaseStory, ranking: Int)
+}
+
 class ANIRankingViewCell: UITableViewCell {
   
   private weak var titleLabel: UILabel?
@@ -22,6 +26,8 @@ class ANIRankingViewCell: UITableViewCell {
       storyRankingView.rankingStories = rankingStories
     }
   }
+  
+  var delegate: ANIRankingViewCellDelegate?
   
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -49,6 +55,7 @@ class ANIRankingViewCell: UITableViewCell {
     
     //storyRankingView
     let storyRankingView = ANIStoryRankingView()
+    storyRankingView.delegate = self
     addSubview(storyRankingView)
     storyRankingView.topToBottom(of: titleLabel, offset: 10.0)
     storyRankingView.leftToSuperview()
@@ -57,5 +64,12 @@ class ANIRankingViewCell: UITableViewCell {
     let height = ANIStoryRankingCell.share.RANKING_COLLECTION_VIEW_CELL_WIDHT + ANIStoryRankingCell.share.STORY_LABEL_HEIHGT + ANIStoryRankingCell.share.PROFILE_IMAGE_VIEW_HEIGHT + ANIStoryRankingCell.share.MARGIN
     storyRankingView.height(height)
     self.storyRankingView = storyRankingView
+  }
+}
+
+//MARK: ANIStoryRankingViewDelegate
+extension ANIRankingViewCell: ANIStoryRankingViewDelegate {
+  func didSelectRankingCell(rankingStory: FirebaseStory, ranking: Int) {
+    self.delegate?.didSelectRankingCell(rankingStory: rankingStory, ranking: ranking)
   }
 }

@@ -20,7 +20,6 @@ class ANICommentViewController: UIViewController {
   private weak var myNavigationBase: UIView?
   private weak var backButton: UIButton?
   private let NAVIGATION_PROFILE_IMAGE_VIEW_HEIGHT: CGFloat = 30.0
-  private weak var navigationProfileImageShadowView: UIView?
   private weak var navigationProfileImageView: UIImageView?
   
   private weak var commentView: ANICommentView?
@@ -90,23 +89,15 @@ class ANICommentViewController: UIViewController {
     backButton.centerYToSuperview()
     self.backButton = backButton
     
-    //navigationProfileImageShadowView
-    let navigationProfileImageShadowView = UIView()
-    navigationProfileImageShadowView.layer.cornerRadius = NAVIGATION_PROFILE_IMAGE_VIEW_HEIGHT / 2
-    navigationProfileImageShadowView.dropShadow(opacity: 0.25, offset: CGSize(width: 0.0, height: 1.0))
-    myNavigationBase.addSubview(navigationProfileImageShadowView)
-    navigationProfileImageShadowView.width(NAVIGATION_PROFILE_IMAGE_VIEW_HEIGHT)
-    navigationProfileImageShadowView.height(NAVIGATION_PROFILE_IMAGE_VIEW_HEIGHT)
-    navigationProfileImageShadowView.centerInSuperview()
-    self.navigationProfileImageShadowView = navigationProfileImageShadowView
-    
     //navigationProfileImageView
     let navigationProfileImageView = UIImageView()
     navigationProfileImageView.contentMode = .scaleAspectFit
     navigationProfileImageView.layer.cornerRadius = NAVIGATION_PROFILE_IMAGE_VIEW_HEIGHT / 2
     navigationProfileImageView.layer.masksToBounds = true
-    navigationProfileImageShadowView.addSubview(navigationProfileImageView)
-    navigationProfileImageView.edgesToSuperview()
+    myNavigationBase.addSubview(navigationProfileImageView)
+    navigationProfileImageView.width(NAVIGATION_PROFILE_IMAGE_VIEW_HEIGHT)
+    navigationProfileImageView.height(NAVIGATION_PROFILE_IMAGE_VIEW_HEIGHT)
+    navigationProfileImageView.centerInSuperview()
     self.navigationProfileImageView = navigationProfileImageView
     
     //commentBar
@@ -267,8 +258,8 @@ class ANICommentViewController: UIViewController {
   
   @objc private func reject() {
     guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
-      !isRejectAnimating,
-      let rejectTapView = self.rejectTapView else { return }
+          !isRejectAnimating,
+          let rejectTapView = self.rejectTapView else { return }
     
     rejectViewBottomConstraint.constant = UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
     rejectTapView.isHidden = false
