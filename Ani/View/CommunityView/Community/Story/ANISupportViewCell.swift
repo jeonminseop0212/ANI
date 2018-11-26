@@ -162,10 +162,10 @@ class ANISupportViewCell: UITableViewCell {
     //deleteRecruitImageView
     let deleteRecruitImageView = UIImageView()
     deleteRecruitImageView.image = UIImage(named: "notSee")
-    deleteRecruitImageView.contentMode = .center
+    deleteRecruitImageView.contentMode = .scaleAspectFill
     deleteRecruitImageView.isHidden = true
     deleteRecruitBase.addSubview(deleteRecruitImageView)
-    deleteRecruitImageView.widthToSuperview(multiplier: 0.2)
+    deleteRecruitImageView.width(UIScreen.main.bounds.width * 0.12)
     deleteRecruitImageView.heightToWidth(of: deleteRecruitImageView)
     deleteRecruitImageView.centerXToSuperview()
     deleteRecruitImageView.centerYToSuperview(offset: -20.0)
@@ -173,13 +173,13 @@ class ANISupportViewCell: UITableViewCell {
     
     //deleteRecruitAlertLabel
     let deleteRecruitAlertLabel = UILabel()
-    deleteRecruitAlertLabel.text = "削除された募集です。"
+    deleteRecruitAlertLabel.text = "削除された募集です"
     deleteRecruitAlertLabel.textColor = ANIColor.dark
     deleteRecruitAlertLabel.textAlignment = .center
     deleteRecruitAlertLabel.font = UIFont.boldSystemFont(ofSize: 17.0)
     deleteRecruitAlertLabel.isHidden = true
     deleteRecruitBase.addSubview(deleteRecruitAlertLabel)
-    deleteRecruitAlertLabel.topToBottom(of: deleteRecruitImageView, offset: 30)
+    deleteRecruitAlertLabel.topToBottom(of: deleteRecruitImageView, offset: 20)
     deleteRecruitAlertLabel.leftToSuperview(offset: 10)
     deleteRecruitAlertLabel.rightToSuperview(offset: -10)
     self.deleteRecruitAlertLabel = deleteRecruitAlertLabel

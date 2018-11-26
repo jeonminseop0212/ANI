@@ -83,9 +83,9 @@ class ANIRecruitViewController: UIViewController {
     
     //navigaitonTitleLabel
     let navigaitonTitleLabel = UILabel()
-    navigaitonTitleLabel.text = "M Y A U"
+    navigaitonTitleLabel.text = "家族さがし"
     navigaitonTitleLabel.textColor = ANIColor.dark
-    navigaitonTitleLabel.font = UIFont.boldSystemFont(ofSize: 22)
+    navigaitonTitleLabel.font = UIFont.boldSystemFont(ofSize: 17)
     myNavigationBar.addSubview(navigaitonTitleLabel)
     navigaitonTitleLabel.centerInSuperview()
     self.navigaitonTitleLabel = navigaitonTitleLabel

@@ -145,6 +145,7 @@ class ANINotiView: UIView {
     UIView.animate(withDuration: 0.2, animations: {
       reloadView.alpha = 1.0
     }) { (complete) in
+      ANISessionManager.shared.isLoadedFirstData = true
       ANINotificationManager.postDismissSplash()
     }
     
@@ -330,6 +331,7 @@ extension ANINotiView {
                   UIView.animate(withDuration: 0.2, animations: {
                     notiTableView.alpha = 1.0
                   }, completion: { (complete) in
+                    ANISessionManager.shared.isLoadedFirstData = true
                     ANINotificationManager.postDismissSplash()
                   })
                 }

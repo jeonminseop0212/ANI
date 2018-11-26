@@ -32,6 +32,10 @@ class ANIStoryRankingCell: UICollectionViewCell {
   
   private weak var userNameLabel: UILabel?
   
+  private weak var blurBackGroundView: UIView?
+  private weak var blockImageView: UIImageView?
+  private weak var blockAlertLabel: UILabel?
+  
   static var share = ANIStoryRankingCell()
   
   var rankingStory: FirebaseStory? {
@@ -89,14 +93,6 @@ class ANIStoryRankingCell: UICollectionViewCell {
     storyImageView.height(RANKING_COLLECTION_VIEW_CELL_WIDHT)
     self.storyImageView = storyImageView
     
-    //crownImageView
-    let crownImageView = UIImageView()
-    crownImageView.backgroundColor = .clear
-    base.addSubview(crownImageView)
-    crownImageView.topToSuperview(offset: 10.0)
-    crownImageView.leftToSuperview(offset: 10.0)
-    self.crownImageView = crownImageView
-    
     //storyLabel
     let storyLabel = UILabel()
     storyLabel.text = "story"
@@ -134,16 +130,68 @@ class ANIStoryRankingCell: UICollectionViewCell {
     userNameLabel.leftToRight(of: profileImageView, offset: 10.0)
     userNameLabel.rightToSuperview(offset: -10.0)
     self.userNameLabel = userNameLabel
+    
+    //blurBackGroundView
+    let blurBackGroundView = UIView()
+    blurBackGroundView.isHidden = true
+    base.addSubview(blurBackGroundView)
+    blurBackGroundView.edgesToSuperview()
+    self.blurBackGroundView = blurBackGroundView
+    
+    //effectView
+    let blurEffect = UIBlurEffect(style: .light)
+    let effectView = UIVisualEffectView(effect: blurEffect)
+    blurBackGroundView.addSubview(effectView)
+    effectView.edgesToSuperview()
+    
+    //crownImageView
+    let crownImageView = UIImageView()
+    crownImageView.backgroundColor = .clear
+    base.addSubview(crownImageView)
+    crownImageView.topToSuperview(offset: 10.0)
+    crownImageView.leftToSuperview(offset: 10.0)
+    self.crownImageView = crownImageView
+    
+    //blockImageView
+    let blockImageView = UIImageView()
+    blockImageView.image = UIImage(named: "notSee")
+    blockImageView.contentMode = .scaleAspectFill
+    blurBackGroundView.addSubview(blockImageView)
+    blockImageView.width(self.RANKING_COLLECTION_VIEW_CELL_WIDHT * 0.15)
+    blockImageView.heightToWidth(of: blockImageView)
+    blockImageView.centerXToSuperview()
+    blockImageView.centerYToSuperview(offset: -20.0)
+    self.blockImageView = blockImageView
+    
+    //blockAlertLabel
+    let blockAlertLabel = UILabel()
+    blockAlertLabel.text = "ブロックした\nストーリーです"
+    blockAlertLabel.textColor = ANIColor.dark
+    blockAlertLabel.textAlignment = .center
+    blockAlertLabel.font = UIFont.boldSystemFont(ofSize: 15.0)
+    blockAlertLabel.numberOfLines = 0
+    blurBackGroundView.addSubview(blockAlertLabel)
+    blockAlertLabel.topToBottom(of: blockImageView, offset: 10)
+    blockAlertLabel.leftToSuperview(offset: 10)
+    blockAlertLabel.rightToSuperview(offset: -10)
+    self.blockAlertLabel = blockAlertLabel
   }
   
   private func reloadLayout() {
     guard let rankingStory = self.rankingStory,
           let storyImageUrls = rankingStory.storyImageUrls,
           let storyImageView = self.storyImageView,
-          let storyLabel = self.storyLabel else { return }
+          let storyLabel = self.storyLabel,
+          let blurBackGroundView = self.blurBackGroundView else { return }
     
     storyImageView.sd_setImage(with: URL(string: storyImageUrls[0]), completed: nil)
     storyLabel.text = rankingStory.story
+    
+    if isBlockStory(story: rankingStory) {
+      blurBackGroundView.isHidden = false
+    } else {
+      blurBackGroundView.isHidden = true
+    }
   }
   
   private func reloadUserLayout() {
@@ -161,6 +209,25 @@ class ANIStoryRankingCell: UICollectionViewCell {
     } else {
       userNameLabel.text = "user name"
     }
+  }
+  
+  private func isBlockStory(story: FirebaseStory) -> Bool {
+    guard let currentUserUid = ANISessionManager.shared.currentUserUid else { return false }
+    
+    if let blockUserIds = ANISessionManager.shared.blockUserIds, blockUserIds.contains(story.userId) {
+      return true
+    }
+    if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(story.userId) {
+      return true
+    }
+    if let hideUserIds = story.hideUserIds, hideUserIds.contains(currentUserUid) {
+      return true
+    }
+    if story.storyImageUrls == nil && story.recruitId == nil {
+      return true
+    }
+    
+    return false
   }
 }
 
