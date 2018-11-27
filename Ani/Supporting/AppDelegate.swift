@@ -49,6 +49,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     let siren = Siren.shared
     siren.forceLanguageLocalization = .japanese
+    siren.alertMessaging = SirenAlertMessaging(updateTitle: NSAttributedString(string: "アップデートのお知らせ"),
+                                               updateMessage: NSAttributedString(string: "MYAUの新規バージョンがご利用になれます。アップデートしてください。"),
+                                               updateButtonMessage: NSAttributedString(string: "アップデート"),
+                                               nextTimeButtonMessage: NSAttributedString(string: "次回"),
+                                               skipVersionButtonMessage: NSAttributedString(string: "このバージョンをスキップ"))
+    siren.countryCode = "jp"
+    siren.delegate = self
+    
     ANIFirebaseRemoteConfigManager.shared.getSirenAlertType { (type, error) in
       if error == nil, let type = type {
         switch type {
@@ -63,18 +71,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         default:
           siren.alertType = .skip
         }
+        
+        siren.checkVersion(checkType: .immediately)
       } else{
         siren.alertType = .skip
+        
+        siren.checkVersion(checkType: .immediately)
       }
     }
-    siren.alertMessaging = SirenAlertMessaging(updateTitle: NSAttributedString(string: "アップデートのお知らせ"),
-                                               updateMessage: NSAttributedString(string: "MYAUの新規バージョンがご利用になれます。アップデートしてください。"),
-                                               updateButtonMessage: NSAttributedString(string: "アップデート"),
-                                               nextTimeButtonMessage: NSAttributedString(string: "次回"),
-                                               skipVersionButtonMessage: NSAttributedString(string: "このバージョンをスキップ"))
-    siren.countryCode = "jp"
-    siren.delegate = self
-    siren.checkVersion(checkType: .immediately)
     
     //navigation bar
     let navigationBarAppearane = UINavigationBar.appearance()
