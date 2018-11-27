@@ -105,9 +105,7 @@ class ANIStoryView: UIView {
   }
   
   @objc private func reloadData(sender:  UIRefreshControl?) {
-    loadRankingStory() {
-      self.loadStory(sender: sender)
-    }
+    self.loadStory(sender: sender)
   }
   
   //MARK: Notifications
@@ -132,9 +130,7 @@ class ANIStoryView: UIView {
   }
   
   @objc private func loadData() {
-    loadRankingStory() {
-      self.loadStory(sender: nil)
-    }
+    self.loadStory(sender: nil)
   }
   
   @objc private func scrollToTop() {
@@ -165,33 +161,23 @@ class ANIStoryView: UIView {
     if stories.isEmpty {
       storyTableView.reloadData()
       storyTableView.alpha = 0.0
-      showReloadView(sender: nil)
+      showReloadView()
     } else {
       storyTableView.deleteRows(at: [indexPath], with: .automatic)
     }
   }
   
-  private func showReloadView(sender: UIRefreshControl?) {
-    guard let activityIndicatorView = self.activityIndicatorView,
-          let reloadView = self.reloadView,
+  private func showReloadView() {
+    guard let reloadView = self.reloadView,
           let storyTableView = self.storyTableView else { return }
-    
-    if let sender = sender {
-      sender.endRefreshing()
-    }
-    
-    activityIndicatorView.stopAnimating()
     
     storyTableView.alpha = 0.0
     
     UIView.animate(withDuration: 0.2, animations: {
       reloadView.alpha = 1.0
     }) { (complete) in
-      ANISessionManager.shared.isLoadedFirstData = true
       ANINotificationManager.postDismissSplash()
     }
-    
-    self.isLoading = false
   }
   
   private func isBlockStory(story: FirebaseStory) -> Bool {
@@ -479,15 +465,19 @@ extension ANIStoryView {
     }
     
     let database = Firestore.firestore()
-
-    DispatchQueue.global().async {
+    
+    let group = DispatchGroup()
+    
+    //story
+    group.enter()
+    DispatchQueue(label: "story").async {
       self.isLoading = true
       self.isLastStoryPage = false
       
       database.collection(KEY_STORIES).order(by: KEY_DATE, descending: true).limit(to: 15).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
-          self.isLoading = false
+          group.leave()
           
           return
         }
@@ -498,9 +488,7 @@ extension ANIStoryView {
                   self.stories.removeAll()
                 }
                 
-                self.isLoading = false
-
-                self.showReloadView(sender: sender)
+                group.leave()
                 return }
         
         self.lastStory = lastStory
@@ -514,43 +502,83 @@ extension ANIStoryView {
             
             DispatchQueue.main.async {
               if index + 1 == snapshot.documents.count {
-                if let sender = sender {
-                  sender.endRefreshing()
-                }
-                
-                storyTableView.reloadData()
-                
-                self.isLoading = false
-                
-                if self.stories.isEmpty {
-                  self.loadMoreStory()
-                } else {
-                  activityIndicatorView.stopAnimating()
-
-                  storyTableView.alpha = 1.0
-                  ANISessionManager.shared.isLoadedFirstData = true
-                  ANINotificationManager.postDismissSplash()
-                }
-                
+                group.leave()
               }
             }
           } catch let error {
             DLog(error)
             
-            activityIndicatorView.stopAnimating()
-            
-            UIView.animate(withDuration: 0.2, animations: {
-              reloadView.alpha = 1.0
-            })
-            
-            if let sender = sender {
-              sender.endRefreshing()
-            }
-            
-            self.isLoading = false
+            group.leave()
           }
         }
       })
+    }
+    
+    //ranking story
+    if !self.rankingStories.isEmpty {
+      self.rankingStories.removeAll()
+    }
+    
+    let today = ANIFunction.shared.getToday(format: "yyyy/MM/dd")
+    
+    group.enter()
+    DispatchQueue(label: "story").async {
+      database.collection(KEY_STORIES).whereField(KEY_DAY, isEqualTo: today).order(by: KEY_LOVE_COUNT, descending: true).order(by: KEY_DATE, descending: true).limit(to: 3).getDocuments { (snapshot, error) in
+        if let error = error {
+          DLog("Error get document: \(error)")
+          group.leave()
+          
+          return
+        }
+        
+        guard let snapshot = snapshot else { return }
+        if let lastRankingStory = snapshot.documents.last {
+          self.lastRankingStory = lastRankingStory
+          
+          for (index, document) in snapshot.documents.enumerated() {
+            do {
+              let story = try FirestoreDecoder().decode(FirebaseStory.self, from: document.data())
+              self.rankingStories.append(story)
+              
+              DispatchQueue.main.async {
+                if index + 1 == snapshot.documents.count {
+                  group.leave()
+                }
+              }
+            } catch let error {
+              DLog(error)
+              group.leave()
+            }
+          }
+        } else {
+          group.leave()
+        }
+      }
+    }
+    
+    group.notify(queue: DispatchQueue(label: "story")) {
+      DispatchQueue.main.async {
+        self.isLoading = false
+        
+        if let sender = sender {
+          sender.endRefreshing()
+        }
+        
+        activityIndicatorView.stopAnimating()
+
+        if self.lastStory != nil {
+          storyTableView.reloadData()
+          
+          if self.stories.isEmpty {
+            self.loadMoreStory()
+          } else {
+            storyTableView.alpha = 1.0
+            ANINotificationManager.postDismissSplash()
+          }
+        } else {
+          self.showReloadView()
+        }
+      }
     }
   }
   
@@ -603,7 +631,6 @@ extension ANIStoryView {
                     activityIndicatorView.stopAnimating()
                     
                     storyTableView.alpha = 1.0
-                    ANISessionManager.shared.isLoadedFirstData = true
                     ANINotificationManager.postDismissSplash()
                   }
                 }
@@ -615,49 +642,6 @@ extension ANIStoryView {
           }
         }
       })
-    }
-  }
-  
-  private func loadRankingStory(completion:(()->())? = nil) {
-    if !self.rankingStories.isEmpty {
-      self.rankingStories.removeAll()
-    }
-    
-    let database = Firestore.firestore()
-    let today = ANIFunction.shared.getToday(format: "yyyy/MM/dd")
-    
-    DispatchQueue.global().async {
-      database.collection(KEY_STORIES).whereField(KEY_DAY, isEqualTo: today).order(by: KEY_LOVE_COUNT, descending: true).order(by: KEY_DATE, descending: true).limit(to: 3).getDocuments { (snapshot, error) in
-        if let error = error {
-          DLog("Error get document: \(error)")
-          
-          return
-        }
-        
-        guard let snapshot = snapshot else { return }
-        guard let lastRankingStory = snapshot.documents.last else {
-          completion?()
-          return
-        }
-        
-        self.lastRankingStory = lastRankingStory
-        
-        for (index, document) in snapshot.documents.enumerated() {
-          do {
-            let story = try FirestoreDecoder().decode(FirebaseStory.self, from: document.data())
-            self.rankingStories.append(story)
-            
-            DispatchQueue.main.async {
-              if index + 1 == snapshot.documents.count {
-                completion?()
-              }
-            }
-          } catch let error {
-            DLog(error)
-            completion?()
-          }
-        }
-      }
     }
   }
 }

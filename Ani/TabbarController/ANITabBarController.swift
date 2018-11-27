@@ -221,11 +221,9 @@ class ANITabBarController: UITabBarController {
   @objc private func dismissSplash() {
     guard let splashView = splashView else { return }
     
-    if ANISessionManager.shared.isLoadedFirstData && ANISessionManager.shared.isCheckedVersion {
-      DispatchQueue.main.async {
-        UIView.animate(withDuration: 0.2) {
-          splashView.alpha = 0.0
-        }
+    DispatchQueue.main.async {
+      UIView.animate(withDuration: 0.2) {
+        splashView.alpha = 0.0
       }
     }
   }
