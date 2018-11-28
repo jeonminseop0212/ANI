@@ -405,9 +405,11 @@ extension ANIStoryView: ANIStoryViewCellDelegate {
   }
   
   func loadedStoryIsLoved(indexPath: Int, isLoved: Bool) {
-    var story = self.stories[indexPath]
-    story.isLoved = isLoved
-    self.stories[indexPath] = story
+    if !self.stories.isEmpty {
+      var story = self.stories[indexPath]
+      story.isLoved = isLoved
+      self.stories[indexPath] = story
+    }
   }
   
   func loadedStoryUser(user: FirebaseUser) {
@@ -572,7 +574,9 @@ extension ANIStoryView {
           if self.stories.isEmpty {
             self.loadMoreStory()
           } else {
-            storyTableView.alpha = 1.0
+            UIView.animate(withDuration: 0.2, animations: {
+              storyTableView.alpha = 1.0
+            })
             ANINotificationManager.postDismissSplash()
           }
         } else {
@@ -630,7 +634,10 @@ extension ANIStoryView {
                   if storyTableView.alpha == 0 {
                     activityIndicatorView.stopAnimating()
                     
-                    storyTableView.alpha = 1.0
+                    UIView.animate(withDuration: 0.2, animations: {
+                      storyTableView.alpha = 1.0
+                    })
+
                     ANINotificationManager.postDismissSplash()
                   }
                 }

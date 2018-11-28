@@ -245,6 +245,13 @@ extension ANITabBarController {
     if let blockingUserListener = self.blockingUserListener {
       blockingUserListener.remove()
     }
+    if ANISessionManager.shared.blockUserIds != nil {
+      ANISessionManager.shared.blockUserIds?.removeAll()
+    }
+    if ANISessionManager.shared.blockingUserIds != nil {
+      ANISessionManager.shared.blockingUserIds?.removeAll()
+    }
+    
     
     if userDefaults.bool(forKey: KEY_FIRST_LAUNCH) {
       do {

@@ -166,9 +166,8 @@ class ANILoginViewController: UIViewController {
 //MARK: ANILoginViewDelegate
 extension ANILoginViewController: ANILoginViewDelegate {
   func loginSuccess() {
-    self.navigationController?.dismiss(animated: true, completion: {
-      ANINotificationManager.postLogin()
-    })
+    ANINotificationManager.postLogin()
+    self.navigationController?.dismiss(animated: true, completion: nil)
   }
   
   func reject(notiText: String) {
