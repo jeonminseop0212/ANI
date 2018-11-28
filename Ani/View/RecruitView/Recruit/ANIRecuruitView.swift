@@ -154,24 +154,18 @@ class ANIRecuruitView: UIView {
   
   //MARK: Notifications
   private func setupNotifications() {
-    ANINotificationManager.receive(logout: self, selector: #selector(reloadRecruitLayout))
-    ANINotificationManager.receive(login: self, selector: #selector(reloadRecruitLayout))
+    ANINotificationManager.receive(logout: self, selector: #selector(reloadRecruit))
+    ANINotificationManager.receive(login: self, selector: #selector(reloadRecruit))
     ANINotificationManager.receive(recruitTabTapped: self, selector: #selector(scrollToTop))
     ANINotificationManager.receive(deleteRecruit: self, selector: #selector(deleteRecruit))
   }
   
-  @objc private func reloadRecruitLayout() {
+  @objc private func reloadRecruit() {
     guard let recruitTableView = self.recruitTableView else { return }
+
+    recruitTableView.alpha = 0.0
     
-    for (index, recruit) in recruits.enumerated() {
-      var recruitTemp = recruit
-      recruitTemp.isLoved = nil
-      recruitTemp.isCliped = nil
-      recruitTemp.isSupported = nil
-      self.recruits[index] = recruitTemp
-    }
-    
-    recruitTableView.reloadData()
+    loadRecruit(sender: nil)
   }
   
   @objc private func scrollToTop() {

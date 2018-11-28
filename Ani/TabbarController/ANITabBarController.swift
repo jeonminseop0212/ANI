@@ -190,9 +190,6 @@ class ANITabBarController: UITabBarController {
   }
   
   @objc private func relogin() {
-    loadUser()
-    observeChatGroup()
-    
     //notification
     let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
     UNUserNotificationCenter.current().requestAuthorization(options: authOptions) { _, _ in

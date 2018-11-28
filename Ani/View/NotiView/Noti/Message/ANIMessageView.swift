@@ -90,6 +90,10 @@ class ANIMessageView: UIView {
   }
   
   @objc private func reloadChatGroups() {
+    guard let messageTableView = self.messageTableView else { return }
+    
+    messageTableView.alpha = 0.0
+    
     loadChatGroup()
   }
   

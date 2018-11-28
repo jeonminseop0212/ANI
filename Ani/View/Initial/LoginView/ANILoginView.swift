@@ -227,9 +227,9 @@ extension ANILoginView: ANIButtonViewDelegate {
               self.myTabBarController?.isLoadedFirstData = false
               self.myTabBarController?.loadUser() {
                 self.delegate?.loginSuccess()
+                self.myTabBarController?.observeChatGroup()
                 NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
               }
-              self.myTabBarController?.observeChatGroup()
             } else {
               NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
               
