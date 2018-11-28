@@ -110,23 +110,19 @@ class ANIStoryView: UIView {
   
   //MARK: Notifications
   private func setupNotifications() {
-    ANINotificationManager.receive(logout: self, selector: #selector(reloadStoryLayout))
-    ANINotificationManager.receive(login: self, selector: #selector(reloadStoryLayout))
+    ANINotificationManager.receive(logout: self, selector: #selector(reloadStory))
+    ANINotificationManager.receive(login: self, selector: #selector(reloadStory))
     ANINotificationManager.receive(communityTabTapped: self, selector: #selector(scrollToTop))
     ANINotificationManager.receive(deleteStory: self, selector: #selector(deleteStory))
     ANINotificationManager.receive(loadedCurrentUser: self, selector: #selector(loadData))
   }
   
-  @objc private func reloadStoryLayout() {
+  @objc private func reloadStory() {
     guard let storyTableView = self.storyTableView else { return }
     
-    for (index, story) in stories.enumerated() {
-      var storyTemp = story
-      storyTemp.isLoved = nil
-      self.stories[index] = storyTemp
-    }
+    storyTableView.alpha = 0.0
     
-    storyTableView.reloadData()
+    self.loadStory(sender: nil)
   }
   
   @objc private func loadData() {
@@ -458,6 +454,10 @@ extension ANIStoryView {
     }
     if !self.users.isEmpty {
       self.users.removeAll()
+    }
+    
+    if !self.rankingStories.isEmpty {
+      self.rankingStories.removeAll()
     }
     
     if sender == nil {
