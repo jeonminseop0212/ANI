@@ -42,14 +42,6 @@ class ANITabBarController: UITabBarController {
     setupNotifications()
   }
   
-  override func viewDidAppear(_ animated: Bool) {
-    super.viewDidAppear(animated)
-    if !isLoadedFirstData {
-      loadUser()
-      observeChatGroup()
-    }
-  }
-  
   private func setup() {
     //basic
     ANIOrientation.lockOrientation(.portrait)
@@ -188,6 +180,7 @@ class ANITabBarController: UITabBarController {
     ANINotificationManager.receive(logout: self, selector: #selector(logout))
     ANINotificationManager.receive(dismissSplash: self, selector: #selector(dismissSplash))
     ANINotificationManager.receive(failLoadVersion: self, selector: #selector(showFailMessage))
+    ANINotificationManager.receive(didSetupStoryViewNotifications: self, selector: #selector(loadFirstData))
   }
   
   @objc private func updateBadge() {
@@ -243,6 +236,13 @@ class ANITabBarController: UITabBarController {
   @objc private func showFailMessage() {
     let alertController = UIAlertController(title: "データのローディングに失敗しました", message: "アプリを再起動してください。", preferredStyle: .alert)
     self.present(alertController, animated: true, completion: nil)
+  }
+  
+  @objc private func loadFirstData() {
+    if !isLoadedFirstData {
+      loadUser()
+      observeChatGroup()
+    }
   }
 }
 

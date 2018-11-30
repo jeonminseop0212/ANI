@@ -115,6 +115,7 @@ class ANIStoryView: UIView {
     ANINotificationManager.receive(communityTabTapped: self, selector: #selector(scrollToTop))
     ANINotificationManager.receive(deleteStory: self, selector: #selector(deleteStory))
     ANINotificationManager.receive(loadedCurrentUser: self, selector: #selector(reloadStory))
+    ANINotificationManager.postDidSetupStoryViewNotifications()
   }
   
   @objc private func reloadStory() {

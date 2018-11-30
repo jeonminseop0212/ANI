@@ -171,4 +171,9 @@ class ANINotificationManager: NSObject {
   private static let N_FAIL_LOAD_VERSION = "N_FAIL_LOAD_VERSION"
   static func postFailLoadVersion() { self.post(name: N_FAIL_LOAD_VERSION, object: nil, userInfo:nil) }
   static func receive(failLoadVersion observer:Any, selector:Selector) { receive(name: N_FAIL_LOAD_VERSION, observer: observer, selector: selector) }
+  
+  //MARK: setup stoy view notifications
+  private static let N_DID_SETUP_STORY_VIEW_NOTIFICATIONS = "N_DID_SETUP_STORY_VIEW_NOTIFICATIONS"
+  static func postDidSetupStoryViewNotifications() { self.post(name: N_DID_SETUP_STORY_VIEW_NOTIFICATIONS, object: nil, userInfo:nil) }
+  static func receive(didSetupStoryViewNotifications observer:Any, selector:Selector) { receive(name: N_DID_SETUP_STORY_VIEW_NOTIFICATIONS, observer: observer, selector: selector) }
 }
