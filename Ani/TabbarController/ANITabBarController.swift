@@ -173,6 +173,17 @@ class ANITabBarController: UITabBarController {
     userDefaults.set(false, forKey: KEY_FIRST_LAUNCH)
   }
   
+  private func showPushNotificationAlert() {
+    UNUserNotificationCenter.current().getNotificationSettings { (settings) in
+      if settings.authorizationStatus != .authorized {
+        let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
+        UNUserNotificationCenter.current().requestAuthorization(options: authOptions) { _, _ in
+          DLog("push permission finished")
+        }
+      }
+    }
+  }
+  
   private func setupNotifications() {
     ANINotificationManager.receive(changeIsHaveUnreadNoti: self, selector: #selector(updateBadge))
     ANINotificationManager.receive(changeIsHaveUnreadMessage: self, selector: #selector(updateBadge))
@@ -194,15 +205,7 @@ class ANITabBarController: UITabBarController {
   }
   
   @objc private func relogin() {
-    //notification
-    UNUserNotificationCenter.current().getNotificationSettings { (settings) in
-      if settings.authorizationStatus != .authorized {
-        let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
-        UNUserNotificationCenter.current().requestAuthorization(options: authOptions) { _, _ in
-          DLog("push permission finished")
-        }
-      }
-    }
+    showPushNotificationAlert()
   }
   
   @objc private func logout() {
@@ -308,6 +311,12 @@ extension ANITabBarController {
       ANISessionManager.shared.currentUserUid = currentUser.uid
       guard let currentUserUid = ANISessionManager.shared.currentUserUid else { return }
       
+      if userDefaults.bool(forKey: KEY_FIRST_LAUNCH) {
+        showPushNotificationAlert()
+        let userDefaults = UserDefaults.standard
+        userDefaults.set(false, forKey: KEY_FIRST_LAUNCH)
+      }
+      
       let database = Firestore.firestore()
       let group = DispatchGroup()
       
@@ -322,6 +331,10 @@ extension ANITabBarController {
             DispatchQueue.main.async {
               ANISessionManager.shared.currentUser = user
               ANISessionManager.shared.isAnonymous = false
+              
+              if let fcmToken = UserDefaults.standard.string(forKey: KEY_FCM_TOKEN), user.fcmToken != fcmToken {
+                database.collection(KEY_USERS).document(currentUserUid).updateData([KEY_FCM_TOKEN: fcmToken])
+              }
               
               if let isHaveUnreadNoti = user.isHaveUnreadNoti {
                 if self.oldIsHaveUnreadNoti != isHaveUnreadNoti {
