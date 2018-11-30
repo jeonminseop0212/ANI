@@ -60,21 +60,6 @@ extension ANIInitialViewController: ANIInitialViewDelegate {
   
   func startAnonymous() {
     self.dismiss(animated: true, completion: nil)
-    
-    do {
-      try Auth.auth().signOut()
-      
-      ANISessionManager.shared.currentUser = nil
-      ANISessionManager.shared.currentUserUid = nil
-      ANISessionManager.shared.isAnonymous = true
-      ANISessionManager.shared.blockUserIds = nil
-      ANISessionManager.shared.blockingUserIds = nil
-      
-      ANINotificationManager.postLogout()
-      
-    } catch let signOutError as NSError {
-      DLog("signOutError \(signOutError)")
-    }
   }
   
   func showTerms() {
