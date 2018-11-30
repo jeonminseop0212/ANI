@@ -202,9 +202,13 @@ class ANITabBarController: UITabBarController {
   
   @objc private func relogin() {
     //notification
-    let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
-    UNUserNotificationCenter.current().requestAuthorization(options: authOptions) { _, _ in
-      DLog("push permission finished")
+    UNUserNotificationCenter.current().getNotificationSettings { (settings) in
+      if settings.authorizationStatus != .authorized {
+        let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
+        UNUserNotificationCenter.current().requestAuthorization(options: authOptions) { _, _ in
+          DLog("push permission finished")
+        }
+      }
     }
   }
   
