@@ -170,6 +170,17 @@ class ANITabBarController: UITabBarController {
     }
   }
   
+  private func ifNeedsShowInitialView() {
+    let userDefaults = UserDefaults.standard
+    
+    let initialViewController = ANIInitialViewController()
+    initialViewController.myTabBarController = self.tabBarController as? ANITabBarController
+    let initialNV = UINavigationController(rootViewController: initialViewController)
+    self.present(initialNV, animated: true, completion: nil)
+    
+    userDefaults.set(false, forKey: KEY_FIRST_LAUNCH)
+  }
+  
   private func setupNotifications() {
     ANINotificationManager.receive(changeIsHaveUnreadNoti: self, selector: #selector(updateBadge))
     ANINotificationManager.receive(changeIsHaveUnreadMessage: self, selector: #selector(updateBadge))
@@ -252,23 +263,6 @@ extension ANITabBarController {
       ANISessionManager.shared.blockingUserIds?.removeAll()
     }
     
-    
-    if userDefaults.bool(forKey: KEY_FIRST_LAUNCH) {
-      do {
-        try Auth.auth().signOut()
-        
-        ANISessionManager.shared.currentUser = nil
-        ANISessionManager.shared.currentUserUid = nil
-        ANISessionManager.shared.isAnonymous = true
-        ANISessionManager.shared.blockUserIds = nil
-        ANISessionManager.shared.blockingUserIds = nil
-        
-        ANINotificationManager.postLogout()
-      } catch let signOutError as NSError {
-        DLog("signOutError \(signOutError)")
-      }
-    }
-    
     if let currentUser = Auth.auth().currentUser {
       if !currentUser.isEmailVerified {
         do {
@@ -285,6 +279,22 @@ extension ANITabBarController {
         } catch let signOutError as NSError {
           DLog("signOutError \(signOutError)")
         }
+      }
+    } else if userDefaults.bool(forKey: KEY_FIRST_LAUNCH) {
+      do {
+        try Auth.auth().signOut()
+        
+        ANISessionManager.shared.currentUser = nil
+        ANISessionManager.shared.currentUserUid = nil
+        ANISessionManager.shared.isAnonymous = true
+        ANISessionManager.shared.blockUserIds = nil
+        ANISessionManager.shared.blockingUserIds = nil
+        
+        ANINotificationManager.postLogout()
+        
+        ifNeedsShowInitialView()
+      } catch let signOutError as NSError {
+        DLog("signOutError \(signOutError)")
       }
     }
 
@@ -423,7 +433,6 @@ extension ANITabBarController {
         ANISessionManager.shared.blockingUserIds = nil
         
         ANINotificationManager.postLogout()
-        ANINotificationManager.postLoadedCurrentUser()
         isLoadedFirstData = true
         
       } catch let signOutError as NSError {

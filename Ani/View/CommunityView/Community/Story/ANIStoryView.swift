@@ -114,7 +114,7 @@ class ANIStoryView: UIView {
     ANINotificationManager.receive(login: self, selector: #selector(reloadStory))
     ANINotificationManager.receive(communityTabTapped: self, selector: #selector(scrollToTop))
     ANINotificationManager.receive(deleteStory: self, selector: #selector(deleteStory))
-    ANINotificationManager.receive(loadedCurrentUser: self, selector: #selector(loadData))
+    ANINotificationManager.receive(loadedCurrentUser: self, selector: #selector(reloadStory))
   }
   
   @objc private func reloadStory() {
@@ -122,10 +122,6 @@ class ANIStoryView: UIView {
     
     storyTableView.alpha = 0.0
     
-    self.loadStory(sender: nil)
-  }
-  
-  @objc private func loadData() {
     self.loadStory(sender: nil)
   }
   
@@ -574,10 +570,12 @@ extension ANIStoryView {
           if self.stories.isEmpty {
             self.loadMoreStory()
           } else {
-            UIView.animate(withDuration: 0.2, animations: {
-              storyTableView.alpha = 1.0
-            })
-            ANINotificationManager.postDismissSplash()
+            if storyTableView.alpha == 0 {
+              UIView.animate(withDuration: 0.2, animations: {
+                storyTableView.alpha = 1.0
+              })
+              ANINotificationManager.postDismissSplash()
+            }
           }
         } else {
           self.showReloadView()
