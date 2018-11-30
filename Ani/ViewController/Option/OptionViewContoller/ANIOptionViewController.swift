@@ -97,6 +97,11 @@ extension ANIOptionViewController: ANIOptionViewDelegate {
       do {
         try Auth.auth().signOut()
         
+        if let currentUserUid = ANISessionManager.shared.currentUserUid {
+          let database = Firestore.firestore()
+          database.collection(KEY_USERS).document(currentUserUid).updateData([KEY_FCM_TOKEN: ""])
+        }
+        
         ANISessionManager.shared.currentUser = nil
         ANISessionManager.shared.currentUserUid = nil
         ANISessionManager.shared.isAnonymous = true
