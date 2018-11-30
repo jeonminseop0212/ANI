@@ -169,6 +169,7 @@ class ANIStoryView: UIView {
     UIView.animate(withDuration: 0.2, animations: {
       reloadView.alpha = 1.0
     }) { (complete) in
+      ANISessionManager.shared.isLoadedFirstData = true
       ANINotificationManager.postDismissSplash()
     }
   }
@@ -575,6 +576,7 @@ extension ANIStoryView {
               UIView.animate(withDuration: 0.2, animations: {
                 storyTableView.alpha = 1.0
               })
+              ANISessionManager.shared.isLoadedFirstData = true
               ANINotificationManager.postDismissSplash()
             }
           }
@@ -637,6 +639,7 @@ extension ANIStoryView {
                       storyTableView.alpha = 1.0
                     })
 
+                    ANISessionManager.shared.isLoadedFirstData = true
                     ANINotificationManager.postDismissSplash()
                   }
                 }

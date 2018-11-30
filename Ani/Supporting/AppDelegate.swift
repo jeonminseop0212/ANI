@@ -20,8 +20,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   private weak var tabBarController: ANITabBarController?
   private let NOTI_VIEW_CONTROLLER_INDEX: Int = 2
   
-  private var isCheckedVersion: Bool = false
-
   enum SirenAlertType: String {
     case force;
     case option;
@@ -73,7 +71,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         siren.checkVersion(checkType: .immediately)
-      } else{
+      } else {
         siren.alertType = .skip
         
         siren.checkVersion(checkType: .immediately)
@@ -105,7 +103,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
 
   func applicationWillEnterForeground(_ application: UIApplication) {
-    if !isCheckedVersion {
+    if !ANISessionManager.shared.isCheckedVersion {
       Siren.shared.checkVersion(checkType: .immediately)
     }
   }
@@ -184,24 +182,29 @@ extension AppDelegate: MessagingDelegate {
 //MARK: SirenDelegate
 extension AppDelegate: SirenDelegate {
   func sirenLatestVersionInstalled() {
-    isCheckedVersion = true
+    ANISessionManager.shared.isCheckedVersion = true
+    ANINotificationManager.postDismissSplash()
   }
   
   func sirenVersionIsSkip() {
-    isCheckedVersion = true
+    ANISessionManager.shared.isCheckedVersion = true
+    ANINotificationManager.postDismissSplash()
   }
   
   func sirenUserDidCancel() {
-    isCheckedVersion = true
+    ANISessionManager.shared.isCheckedVersion = true
+    ANINotificationManager.postDismissSplash()
   }
   
   func sirenUserDidSkipVersion() {
-    isCheckedVersion = true
+    ANISessionManager.shared.isCheckedVersion = true
+    ANINotificationManager.postDismissSplash()
   }
   
   func sirenDidFailVersionCheck(error: Error) {
     if IS_DEBUG {
-      isCheckedVersion = true
+      ANISessionManager.shared.isCheckedVersion = true
+      ANINotificationManager.postDismissSplash()
     } else {
       ANINotificationManager.postFailLoadVersion()
     }
