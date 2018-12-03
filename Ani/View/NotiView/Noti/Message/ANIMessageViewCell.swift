@@ -26,6 +26,10 @@ class ANIMessageViewCell: UITableViewCell {
   
   var chatGroup: FirebaseChatGroup? {
     didSet {
+      guard let base = self.base else { return }
+      
+      base.backgroundColor = .white
+
       loadUser()
     }
   }
