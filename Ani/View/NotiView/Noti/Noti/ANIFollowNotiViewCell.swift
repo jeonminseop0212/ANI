@@ -140,13 +140,12 @@ class ANIFollowNotiViewCell: UITableViewCell {
     
     notiLabel.text = noti.noti
     
+    base.backgroundColor = .white
     if !checkRead(noti: noti) {
       base.backgroundColor = ANIColor.emerald.withAlphaComponent(0.1)
       UIView.animate(withDuration: 0.2, delay: 1, options: .curveEaseOut, animations: {
         base.backgroundColor = .white
       }, completion: nil)
-    } else {
-      base.backgroundColor = .white
     }
   }
   
