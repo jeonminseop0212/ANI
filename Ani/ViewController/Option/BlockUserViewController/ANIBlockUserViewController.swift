@@ -94,6 +94,21 @@ class ANIBlockUserViewController: UIViewController {
               return
             }
             group.leave()
+            
+            DispatchQueue.global().async {
+              database.collection(KEY_USERS).document(currentUserUid).collection(KEY_BLOCK_USER_IDS).getDocuments(completion: { (snapshot, error) in
+                if let error = error {
+                  DLog("Error get block user ids document: \(error)")
+                  return
+                }
+                
+                guard let snapshot = snapshot else { return }
+                
+                if snapshot.documents.isEmpty {
+                  database.collection(KEY_USERS).document(currentUserUid).updateData([KEY_IS_HAVE_BLOCK_USER: false])
+                }
+              })
+            }
           })
         }
         
@@ -105,6 +120,21 @@ class ANIBlockUserViewController: UIViewController {
               return
             }
             group.leave()
+            
+            DispatchQueue.global().async {
+              database.collection(KEY_USERS).document(userId).collection(KEY_BLOCKING_USER_IDS).getDocuments(completion: { (snapshot, error) in
+                if let error = error {
+                  DLog("Error get block user ids document: \(error)")
+                  return
+                }
+                
+                guard let snapshot = snapshot else { return }
+                
+                if snapshot.documents.isEmpty {
+                  database.collection(KEY_USERS).document(userId).updateData([KEY_IS_HAVE_BLOCKING_USER: false])
+                }
+              })
+            }
           })
         }
         
@@ -141,6 +171,10 @@ class ANIBlockUserViewController: UIViewController {
           })
         }
         
+        DispatchQueue.global().async {
+          database.collection(KEY_USERS).document(currentUserUid).updateData([KEY_IS_HAVE_BLOCK_USER: true])
+        }
+        
         group.enter()
         DispatchQueue(label: "blockUser").async {
           database.collection(KEY_USERS).document(userId).collection(KEY_BLOCKING_USER_IDS).document(currentUserUid).setData([KEY_USER_ID: currentUserUid, KEY_DATE: today], completion: { (error) in
@@ -150,6 +184,10 @@ class ANIBlockUserViewController: UIViewController {
             }
             group.leave()
           })
+        }
+        
+        DispatchQueue.global().async {
+          database.collection(KEY_USERS).document(userId).updateData([KEY_IS_HAVE_BLOCKING_USER: true])
         }
         
         group.notify(queue: DispatchQueue(label: "blockUser")) {
