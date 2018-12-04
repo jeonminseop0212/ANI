@@ -45,7 +45,7 @@ class ANISessionManager: NSObject {
   var blockingUserIds: [String]?
   
   var isLoadedFirstData: Bool = false
-  var isCheckedVersion: Bool = false
+  var isCheckedVersion: Bool = true
   
   #if DEBUG
   let client = Client(appID: "RBJYX5VF88", apiKey: "ebf262fa4367637cd49431402d70455c")

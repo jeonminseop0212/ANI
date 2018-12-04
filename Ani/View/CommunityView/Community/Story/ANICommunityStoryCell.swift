@@ -24,6 +24,14 @@ class ANICommunityStoryCell: UICollectionViewCell {
     set(v) { self.storyView?.delegate = v }
   }
   
+  var tabBarController: ANITabBarController? {
+    didSet {
+      guard let storyView = self.storyView else { return }
+      
+      storyView.tabBarController = tabBarController
+    }
+  }
+  
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()

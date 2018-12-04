@@ -45,6 +45,8 @@ class ANIStoryView: UIView {
   
   private var cellHeight = [IndexPath: CGFloat]()
   
+  var tabBarController: ANITabBarController?
+  
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()
@@ -444,6 +446,9 @@ extension ANIStoryView {
           let reloadView = self.reloadView,
           let storyTableView = self.storyTableView else { return }
 
+    guard let tabBarController = self.tabBarController,
+          let testLabel = tabBarController.testLabel else { return }
+    
     reloadView.alpha = 0.0
     
     if !self.stories.isEmpty {
@@ -467,6 +472,8 @@ extension ANIStoryView {
     let database = Firestore.firestore()
     
     let group = DispatchGroup()
+    
+    testLabel.text = testLabel.text! + ANIFunction.shared.getToday() + "\n" + "load story start\n"
     
     //story
     group.enter()
@@ -502,6 +509,8 @@ extension ANIStoryView {
             
             DispatchQueue.main.async {
               if index + 1 == snapshot.documents.count {
+                testLabel.text = testLabel.text! + ANIFunction.shared.getToday() + "\n" + "load story done\n"
+
                 group.leave()
               }
             }
@@ -521,6 +530,8 @@ extension ANIStoryView {
     
     let today = ANIFunction.shared.getToday(format: "yyyy/MM/dd")
     
+    testLabel.text = testLabel.text! + ANIFunction.shared.getToday() + "\n" + "load ranking story start\n"
+
     group.enter()
     DispatchQueue(label: "story").async {
       database.collection(KEY_STORIES).whereField(KEY_DAY, isEqualTo: today).order(by: KEY_LOVE_COUNT, descending: true).order(by: KEY_DATE, descending: true).limit(to: 3).getDocuments { (snapshot, error) in
@@ -542,6 +553,8 @@ extension ANIStoryView {
               
               DispatchQueue.main.async {
                 if index + 1 == snapshot.documents.count {
+                  testLabel.text = testLabel.text! + ANIFunction.shared.getToday() + "\n" + "load ranking story done\n"
+
                   group.leave()
                 }
               }
@@ -551,6 +564,8 @@ extension ANIStoryView {
             }
           }
         } else {
+          testLabel.text = testLabel.text! + ANIFunction.shared.getToday() + "\n" + "load ranking story done\n"
+
           group.leave()
         }
       }
@@ -577,6 +592,9 @@ extension ANIStoryView {
                 storyTableView.alpha = 1.0
               })
               ANISessionManager.shared.isLoadedFirstData = true
+              
+              testLabel.text = testLabel.text! + ANIFunction.shared.getToday() + "\n" + "story post dismiss splash\n"
+
               ANINotificationManager.postDismissSplash()
             }
           }
