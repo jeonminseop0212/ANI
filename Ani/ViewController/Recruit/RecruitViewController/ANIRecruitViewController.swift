@@ -51,7 +51,11 @@ class ANIRecruitViewController: UIViewController {
   }
   
   override func viewDidDisappear(_ animated: Bool) {
+    guard let recruitView = self.recruitView else { return }
+    
     removeNotifications()
+    
+    recruitView.endRefresh()
   }
   
   private func setup() {

@@ -65,6 +65,8 @@ class ANINotiViewController: UIViewController {
   
   override func viewDidDisappear(_ animated: Bool) {
     removeNotifications()
+    
+    ANINotiView.endRefresh()
   }
   
   private func setup(completion:(()->())? = nil) {

@@ -37,6 +37,7 @@ class ANICommunityQnaCell: UICollectionViewCell {
     self.backgroundColor = ANIColor.bg
     
     let qnaView = ANIQnaView()
+    ANIQnaView.shared = qnaView
     addSubview(qnaView)
     qnaView.edgesToSuperview()
     self.qnaView = qnaView

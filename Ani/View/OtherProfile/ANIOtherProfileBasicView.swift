@@ -39,6 +39,8 @@ class ANIOtherProfileBasicView: UIView {
   }
   
   private weak var basicTableView: UITableView?
+    
+  private weak var activityIndicatorView: NVActivityIndicatorView?
   
   private var lastRecruit: QueryDocumentSnapshot?
   private var recruits = [FirebaseRecruit]()
@@ -69,8 +71,6 @@ class ANIOtherProfileBasicView: UIView {
       loadUser(sender: nil)
     }
   }
-  
-  private weak var activityIndicatorView: NVActivityIndicatorView?
   
   private var isMenuChange: Bool = false
   

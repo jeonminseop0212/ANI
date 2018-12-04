@@ -38,6 +38,7 @@ class ANINotiNotiCell: UICollectionViewCell {
   private func setup() {
     let notiView = ANINotiView()
     notiView.delegate = self
+    ANINotiView.shared = notiView
     addSubview(notiView)
     notiView.edgesToSuperview()
     self.notiView = notiView

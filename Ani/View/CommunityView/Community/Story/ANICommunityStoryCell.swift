@@ -35,6 +35,7 @@ class ANICommunityStoryCell: UICollectionViewCell {
   
   private func setup() {
     let storyView = ANIStoryView()
+    ANIStoryView.shared = storyView
     addSubview(storyView)
     storyView.edgesToSuperview()
     self.storyView = storyView
