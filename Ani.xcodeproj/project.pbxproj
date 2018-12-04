@@ -639,13 +639,13 @@
 			path = RankingStoryDetailViewController;
 			sourceTree = "<group>";
 		};
-		CD9EEB2E219E92D60079B50E /* Firebas */ = {
+		CD9EEB2E219E92D60079B50E /* Firebase */ = {
 			isa = PBXGroup;
 			children = (
 				CD9EEB2F219E92E50079B50E /* ANIFirebase.swift */,
 				CD9EEB31219E93FA0079B50E /* ANIFirebaseRemoteConfigManager.swift */,
 			);
-			path = Firebas;
+			path = Firebase;
 			sourceTree = "<group>";
 		};
 		CDA32A1420A9347A008A2AC1 /* ScrollView */ = {
@@ -1115,7 +1115,7 @@
 		F51D220E20767E49009D1B26 /* Utility */ = {
 			isa = PBXGroup;
 			children = (
-				CD9EEB2E219E92D60079B50E /* Firebas */,
+				CD9EEB2E219E92D60079B50E /* Firebase */,
 				CDA32A1420A9347A008A2AC1 /* ScrollView */,
 				CD6B675220A90F78009BF63D /* PlaceholderTextView */,
 				CDF7F16F208F650600254A0F /* Button */,
