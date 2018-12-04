@@ -278,9 +278,9 @@ extension ANIListView: UITableViewDataSource {
       } else {
         cell.user = nil
       }
+      cell.indexPath = indexPath.row
       cell.recruit = loveRecruits[indexPath.row]
       cell.delegate = self
-      cell.indexPath = indexPath.row
       
       return cell
     case .loveStroy:
@@ -312,9 +312,9 @@ extension ANIListView: UITableViewDataSource {
           } else {
             cell.user = nil
           }
+          cell.indexPath = indexPath.row
           cell.story = loveStories[indexPath.row]
           cell.delegate = self
-          cell.indexPath = indexPath.row
           
           return cell
         } else {
@@ -331,9 +331,9 @@ extension ANIListView: UITableViewDataSource {
           } else {
             cell.user = nil
           }
+          cell.indexPath = indexPath.row
           cell.story = loveStories[indexPath.row]
           cell.delegate = self
-          cell.indexPath = indexPath.row
           
           return cell
         }
@@ -354,9 +354,9 @@ extension ANIListView: UITableViewDataSource {
       } else {
         cell.user = nil
       }
+      cell.indexPath = indexPath.row
       cell.qna = loveQnas[indexPath.row]
       cell.delegate = self
-      cell.indexPath = indexPath.row
       
       return cell
     case .clipRecruit:
@@ -373,9 +373,9 @@ extension ANIListView: UITableViewDataSource {
       } else {
         cell.user = nil
       }
+      cell.indexPath = indexPath.row
       cell.recruit = clipRecruits[indexPath.row]
       cell.delegate = self
-      cell.indexPath = indexPath.row
       
       return cell
     }

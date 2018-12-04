@@ -327,9 +327,9 @@ extension ANIProfileBasicView: UITableViewDataSource {
         } else {
           cell.user = nil
         }
+        cell.indexPath = indexPath.row
         cell.recruit = recruits[indexPath.row]
         cell.delegate = self
-        cell.indexPath = indexPath.row
 
         return cell
       } else if contentType == .story {
@@ -361,9 +361,9 @@ extension ANIProfileBasicView: UITableViewDataSource {
             } else {
               cell.user = nil
             }
+            cell.indexPath = indexPath.row
             cell.story = stories[indexPath.row]
             cell.delegate = self
-            cell.indexPath = indexPath.row
             
             return cell
           } else {
@@ -380,9 +380,9 @@ extension ANIProfileBasicView: UITableViewDataSource {
             } else {
               cell.user = nil
             }
+            cell.indexPath = indexPath.row
             cell.story = stories[indexPath.row]
             cell.delegate = self
-            cell.indexPath = indexPath.row
             
             return cell
           }
@@ -403,9 +403,9 @@ extension ANIProfileBasicView: UITableViewDataSource {
         } else {
           cell.user = nil
         }
+        cell.indexPath = indexPath.row
         cell.qna = qnas[indexPath.row]
         cell.delegate = self
-        cell.indexPath = indexPath.row
 
         return cell
       }
