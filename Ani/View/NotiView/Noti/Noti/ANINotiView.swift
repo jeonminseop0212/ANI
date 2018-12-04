@@ -22,6 +22,10 @@ class ANINotiView: UIView {
   
   private weak var notiTableView: UITableView?
   
+  private weak var refreshControl: UIRefreshControl?
+  
+  private weak var activityIndicatorView: NVActivityIndicatorView?
+  
   private var notifications = [FirebaseNotification]()
   
   private var users = [FirebaseUser]()
@@ -33,11 +37,11 @@ class ANINotiView: UIView {
   
   var isCellSelected: Bool = false
   
-  private weak var activityIndicatorView: NVActivityIndicatorView?
-  
   var delegate: ANINotiViewDelegate?
   
   private var cellHeight = [IndexPath: CGFloat]()
+  
+  static var shared: ANINotiView?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -85,6 +89,7 @@ class ANINotiView: UIView {
     refreshControl.tintColor = ANIColor.moreDarkGray
     refreshControl.addTarget(self, action: #selector(loadNoti(sender:)), for: .valueChanged)
     notiTableView.addSubview(refreshControl)
+    self.refreshControl = refreshControl
     addSubview(notiTableView)
     notiTableView.edgesToSuperview()
     self.notiTableView = notiTableView
@@ -96,6 +101,19 @@ class ANINotiView: UIView {
     activityIndicatorView.height(40.0)
     activityIndicatorView.centerInSuperview()
     self.activityIndicatorView = activityIndicatorView
+  }
+  
+  static func endRefresh() {
+    guard let shared = ANINotiView.shared,
+          let refreshControl = shared.refreshControl,
+          let notiTableView = shared.notiTableView else { return }
+    
+    refreshControl.endRefreshing()
+    
+    let topInset = ANICommunityViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    if notiTableView.contentOffset.y + topInset < 0 {
+      notiTableView.scrollToRow(at: [0, 0], at: .top, animated: false)
+    }
   }
   
   private func setupNotifications() {

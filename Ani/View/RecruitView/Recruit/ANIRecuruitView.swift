@@ -30,6 +30,10 @@ class ANIRecuruitView: UIView {
     }
   }
   
+  private weak var refreshControl: UIRefreshControl?
+  
+  private weak var activityIndicatorView: NVActivityIndicatorView?
+  
   private let TABLE_VIEW_TOP_MARGIN: CGFloat = 10.0
   
   private var recruits = [FirebaseRecruit]()
@@ -84,8 +88,6 @@ class ANIRecuruitView: UIView {
   
   private var query: Query?
   
-  private weak var activityIndicatorView: NVActivityIndicatorView?
-  
   var delegate:ANIRecruitViewDelegate?
   
   private var cellHeight = [IndexPath: CGFloat]()
@@ -135,6 +137,7 @@ class ANIRecuruitView: UIView {
     tableView.alpha = 0.0
     tableView.rowHeight = UITableView.automaticDimension
     tableView.addSubview(refreshControl)
+    self.refreshControl = refreshControl
     addSubview(tableView)
     tableView.edgesToSuperview()
     self.recruitTableView = tableView
@@ -203,6 +206,18 @@ class ANIRecuruitView: UIView {
     query = queryTemp
     
     loadRecruit(sender: nil)
+  }
+  
+  func endRefresh() {
+    guard let refreshControl = self.refreshControl,
+          let recruitTableView = self.recruitTableView else { return }
+    
+    refreshControl.endRefreshing()
+    
+    let topInset = UIViewController.NAVIGATION_BAR_HEIGHT + ANIRecruitViewController.FILTERS_VIEW_HEIGHT + TABLE_VIEW_TOP_MARGIN
+    if recruitTableView.contentOffset.y + topInset < 0 {
+      recruitTableView.scrollToRow(at: [0, 0], at: .top, animated: false)
+    }
   }
   
   @objc private func deleteRecruit(_ notification: NSNotification) {

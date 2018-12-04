@@ -46,6 +46,9 @@ class ANICommunityViewController: UIViewController {
   
   override func viewDidDisappear(_ animated: Bool) {
     removeNotifications()
+    
+    ANIStoryView.endRefresh()
+    ANIQnaView.endRefresh()
   }
   
   private func setup() {
