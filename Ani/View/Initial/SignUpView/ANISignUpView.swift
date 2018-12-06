@@ -32,6 +32,7 @@ class ANISignUpView: UIView {
   private weak var profileImagePickButton: ANIImageButtonView?
   
   private weak var adressTitleLabel: UILabel?
+  private weak var adressDescriptionLabel: UILabel?
   private weak var adressTextFieldBG: UIView?
   private weak var adressTextField: UITextField?
   
@@ -123,8 +124,17 @@ class ANISignUpView: UIView {
     contentView.addSubview(adressTitleLabel)
     adressTitleLabel.topToBottom(of: profileImageView, offset: CONTENT_SPACE)
     adressTitleLabel.leftToSuperview(offset: 10.0)
-    adressTitleLabel.rightToSuperview(offset: -10.0)
     self.adressTitleLabel = adressTitleLabel
+    
+    //adressDescriptionLabel
+    let adressDescriptionLabel = UILabel()
+    adressDescriptionLabel.font = UIFont.boldSystemFont(ofSize: 13.0)
+    adressDescriptionLabel.textColor = ANIColor.moreDarkGray
+    adressDescriptionLabel.text = "(メールアドレス)"
+    contentView.addSubview(adressDescriptionLabel)
+    adressDescriptionLabel.bottom(to: adressTitleLabel, offset: -2.0)
+    adressDescriptionLabel.leftToRight(of: adressTitleLabel)
+    self.adressDescriptionLabel = adressDescriptionLabel
     
     //adressTextFieldBG
     let adressTextFieldBG = UIView()
@@ -314,7 +324,7 @@ class ANISignUpView: UIView {
         } else if nsError.code == 17008 {
           self.delegate?.reject(notiText: "メールアドレスの書式が正しくありません！")
         } else if nsError.code == 17026 {
-          self.delegate?.reject(notiText: "パスワードが短いです！")
+          self.delegate?.reject(notiText: "パスワードが６文字未満です！")
         } else {
           self.delegate?.reject(notiText: "登録に失敗しました！")
         }
