@@ -184,10 +184,6 @@ extension ANICommunityViewController: UICollectionViewDataSource {
       let storyId = NSStringFromClass(ANICommunityStoryCell.self)
       let cell = collectionView.dequeueReusableCell(withReuseIdentifier: storyId, for: indexPath) as! ANICommunityStoryCell
       
-      if let tabBarController = self.tabBarController as? ANITabBarController {
-        cell.tabBarController = tabBarController
-      }
-      
       cell.frame.origin.y = collectionView.frame.origin.y
       cell.delegate = self
       return cell

@@ -35,8 +35,12 @@ class ANITabBarController: UITabBarController {
   
   weak var testLabel: UILabel?
   
+  static var shared: ANITabBarController?
+  
   override func viewDidLoad() {
     super.viewDidLoad()
+    
+    ANITabBarController.shared = self
     
     setup()
     setupTabBar()
@@ -265,6 +269,18 @@ extension ANITabBarController {
     if let userListener = self.userListener {
       userListener.remove()
     }
+    if let blockUserListener = self.blockUserListener {
+      blockUserListener.remove()
+    }
+    if let blockingUserListener = self.blockingUserListener {
+      blockingUserListener.remove()
+    }
+    if ANISessionManager.shared.blockUserIds != nil {
+      ANISessionManager.shared.blockUserIds?.removeAll()
+    }
+    if ANISessionManager.shared.blockingUserIds != nil {
+      ANISessionManager.shared.blockingUserIds?.removeAll()
+    }
     
     if let currentUser = Auth.auth().currentUser {
       if !currentUser.isEmailVerified {
@@ -306,9 +322,12 @@ extension ANITabBarController {
       guard let currentUserUid = ANISessionManager.shared.currentUserUid else { return }
       
       let database = Firestore.firestore()
+      let group = DispatchGroup()
       
       testLabel.text = testLabel.text! + ANIFunction.shared.getToday() + "\n" + "load user start\n"
-      DispatchQueue.global().async {
+      
+      group.enter()
+      DispatchQueue(label: "user").async {
         self.userListener = database.collection(KEY_USERS).document(currentUserUid).addSnapshotListener({ (snapshot, error) in
           guard let snapshot = snapshot, let data = snapshot.data() else { return }
           
@@ -330,13 +349,118 @@ extension ANITabBarController {
               if !self.isLoadedFirstData {
                 testLabel.text = testLabel.text! + ANIFunction.shared.getToday() + "\n" + "load user done\n"
 
-                self.observeBlockUser(currentUser: user, completion: completion)
+                group.leave()
               }
             }
           } catch let error {
             DLog(error)
           }
         })
+      }
+      
+      testLabel.text = testLabel.text! + ANIFunction.shared.getToday() + "\n" + "observe block user ids start\n"
+
+      group.enter()
+      DispatchQueue(label: "user").async {
+        self.blockUserListener =  database.collection(KEY_USERS).document(currentUserUid).collection(KEY_BLOCK_USER_IDS).order(by: KEY_DATE).addSnapshotListener({ (snapshot, error) in
+          guard let snapshot = snapshot else { return }
+          
+          snapshot.documentChanges.forEach({ (diff) in
+            if diff.type == .added {
+              let data = diff.document.data()
+              if let userId = data[KEY_USER_ID] as? String {
+                if ANISessionManager.shared.blockUserIds != nil {
+                  ANISessionManager.shared.blockUserIds?.insert(userId, at: 0)
+                } else {
+                  ANISessionManager.shared.blockUserIds = [userId]
+                }
+              }
+              
+              if snapshot.documents.count == ANISessionManager.shared.blockUserIds?.count {
+                testLabel.text = testLabel.text! + ANIFunction.shared.getToday() + "\n" + "observe block user ids done\n"
+                
+                group.leave()
+              }
+            } else if diff.type == .removed {
+              guard let blockUserIds = ANISessionManager.shared.blockUserIds else { return }
+              
+              let data = diff.document.data()
+              
+              for (index, blockUserId) in blockUserIds.enumerated() {
+                if let userId = data[KEY_USER_ID] as? String, userId == blockUserId {
+                  ANISessionManager.shared.blockUserIds?.remove(at: index)
+                }
+              }
+            }
+          })
+          
+          if snapshot.documents.isEmpty {
+            testLabel.text = testLabel.text! + ANIFunction.shared.getToday() + "\n" + "observe block user ids done\n"
+            
+            group.leave()
+          }
+        })
+      }
+      
+      testLabel.text = testLabel.text! + ANIFunction.shared.getToday() + "\n" + "observe blocking user ids start\n"
+      
+      group.enter()
+      DispatchQueue(label: "user").async {
+        self.blockingUserListener = database.collection(KEY_USERS).document(currentUserUid).collection(KEY_BLOCKING_USER_IDS).order(by: KEY_DATE).addSnapshotListener({ (snapshot, error) in
+          guard let snapshot = snapshot else { return }
+          
+          snapshot.documentChanges.forEach({ (diff) in
+            if diff.type == .added {
+              let data = diff.document.data()
+              if let userId = data[KEY_USER_ID] as? String {
+                if ANISessionManager.shared.blockingUserIds != nil {
+                  ANISessionManager.shared.blockingUserIds?.insert(userId, at: 0)
+                } else {
+                  ANISessionManager.shared.blockingUserIds = [userId]
+                }
+                
+                if snapshot.documents.count == ANISessionManager.shared.blockingUserIds?.count {
+                  testLabel.text = testLabel.text! + ANIFunction.shared.getToday() + "\n" + "observe blocking user ids done\n"
+                  
+                  group.leave()
+                }
+              }
+            } else if diff.type == .removed {
+              guard let blockingUserIds = ANISessionManager.shared.blockingUserIds else { return }
+              
+              let data = diff.document.data()
+              
+              for (index, blockingUserIds) in blockingUserIds.enumerated() {
+                if let userId = data[KEY_USER_ID] as? String, userId == blockingUserIds {
+                  ANISessionManager.shared.blockingUserIds?.remove(at: index)
+                }
+              }
+            }
+          })
+          
+          if snapshot.documents.isEmpty {
+            testLabel.text = testLabel.text! + ANIFunction.shared.getToday() + "\n" + "observe blocking user ids done\n"
+
+            group.leave()
+          }
+        })
+      }
+      
+      group.notify(queue: DispatchQueue(label: "user")) {
+        DispatchQueue.main.async {
+          testLabel.text = testLabel.text! + ANIFunction.shared.getToday() + "\n" + "post loaded current user\n"
+          
+          ANINotificationManager.postLoadedCurrentUser()
+          self.isLoadedFirstData = true
+          
+          if let fcmToken = UserDefaults.standard.string(forKey: KEY_FCM_TOKEN),
+            let currentUser = ANISessionManager.shared.currentUser,
+            currentUser.fcmToken != fcmToken {
+            database.collection(KEY_USERS).document(currentUserUid).updateData([KEY_FCM_TOKEN: fcmToken])
+          }
+          
+          completion?()
+        }
       }
     } else {
       do {
@@ -353,136 +477,6 @@ extension ANITabBarController {
         
       } catch let signOutError as NSError {
         DLog("signOutError \(signOutError)")
-      }
-    }
-  }
-  
-  private func observeBlockUser(currentUser: FirebaseUser, completion:(()->())? = nil) {
-    guard let currentUserUid = currentUser.uid,
-          let isHaveBlockUser = currentUser.isHaveBlockUser,
-          let isHaveBlockingUser = currentUser.isHaveBlockingUser else { return }
-    
-    guard let testLabel = self.testLabel else { return }
-    
-    if let blockUserListener = self.blockUserListener {
-      blockUserListener.remove()
-    }
-    if let blockingUserListener = self.blockingUserListener {
-      blockingUserListener.remove()
-    }
-    if ANISessionManager.shared.blockUserIds != nil {
-      ANISessionManager.shared.blockUserIds?.removeAll()
-    }
-    if ANISessionManager.shared.blockingUserIds != nil {
-      ANISessionManager.shared.blockingUserIds?.removeAll()
-    }
-    
-    let database = Firestore.firestore()
-    let group = DispatchGroup()
-    
-    testLabel.text = testLabel.text! + ANIFunction.shared.getToday() + "\n" + "observe block user ids start\n"
-
-    group.enter()
-    if !isHaveBlockUser {
-      testLabel.text = testLabel.text! + ANIFunction.shared.getToday() + "\n" + "observe block user ids done\n"
-
-      group.leave()
-    }
-    DispatchQueue(label: "user").async {
-      self.blockUserListener =  database.collection(KEY_USERS).document(currentUserUid).collection(KEY_BLOCK_USER_IDS).order(by: KEY_DATE).addSnapshotListener({ (snapshot, error) in
-        guard let snapshot = snapshot else { return }
-        
-        snapshot.documentChanges.forEach({ (diff) in
-          if diff.type == .added {
-            let data = diff.document.data()
-            if let userId = data[KEY_USER_ID] as? String {
-              if ANISessionManager.shared.blockUserIds != nil {
-                ANISessionManager.shared.blockUserIds?.insert(userId, at: 0)
-              } else {
-                ANISessionManager.shared.blockUserIds = [userId]
-              }
-            }
-            
-            if snapshot.documents.count == ANISessionManager.shared.blockUserIds?.count {
-              if isHaveBlockUser {
-                testLabel.text = testLabel.text! + ANIFunction.shared.getToday() + "\n" + "observe block user ids done\n"
-
-                group.leave()
-              }
-            }
-          } else if diff.type == .removed {
-            guard let blockUserIds = ANISessionManager.shared.blockUserIds else { return }
-            
-            let data = diff.document.data()
-            
-            for (index, blockUserId) in blockUserIds.enumerated() {
-              if let userId = data[KEY_USER_ID] as? String, userId == blockUserId {
-                ANISessionManager.shared.blockUserIds?.remove(at: index)
-              }
-            }
-          }
-        })
-      })
-    }
-    
-    testLabel.text = testLabel.text! + ANIFunction.shared.getToday() + "\n" + "observe blocking user ids start\n"
-
-    group.enter()
-    if !isHaveBlockingUser {
-      testLabel.text = testLabel.text! + ANIFunction.shared.getToday() + "\n" + "observe blocking user ids done\n"
-
-      group.leave()
-    }
-    DispatchQueue(label: "user").async {
-      self.blockingUserListener = database.collection(KEY_USERS).document(currentUserUid).collection(KEY_BLOCKING_USER_IDS).order(by: KEY_DATE).addSnapshotListener({ (snapshot, error) in
-        guard let snapshot = snapshot else { return }
-        
-        snapshot.documentChanges.forEach({ (diff) in
-          if diff.type == .added {
-            let data = diff.document.data()
-            if let userId = data[KEY_USER_ID] as? String {
-              if ANISessionManager.shared.blockingUserIds != nil {
-                ANISessionManager.shared.blockingUserIds?.insert(userId, at: 0)
-              } else {
-                ANISessionManager.shared.blockingUserIds = [userId]
-              }
-              
-              if snapshot.documents.count == ANISessionManager.shared.blockingUserIds?.count {
-                if isHaveBlockingUser {
-                  testLabel.text = testLabel.text! + ANIFunction.shared.getToday() + "\n" + "observe blocking user ids done\n"
-
-                  group.leave()
-                }
-              }
-            }
-          } else if diff.type == .removed {
-            guard let blockingUserIds = ANISessionManager.shared.blockingUserIds else { return }
-            
-            let data = diff.document.data()
-            
-            for (index, blockingUserIds) in blockingUserIds.enumerated() {
-              if let userId = data[KEY_USER_ID] as? String, userId == blockingUserIds {
-                ANISessionManager.shared.blockingUserIds?.remove(at: index)
-              }
-            }
-          }
-        })
-      })
-    }
-    
-    group.notify(queue: DispatchQueue(label: "user")) {
-      DispatchQueue.main.async {
-        testLabel.text = testLabel.text! + ANIFunction.shared.getToday() + "\n" + "post loaded current user\n"
-
-        ANINotificationManager.postLoadedCurrentUser()
-        self.isLoadedFirstData = true
-        
-        if let fcmToken = UserDefaults.standard.string(forKey: KEY_FCM_TOKEN),
-          currentUser.fcmToken != fcmToken {
-          database.collection(KEY_USERS).document(currentUserUid).updateData([KEY_FCM_TOKEN: fcmToken])
-        }
-
-        completion?()
       }
     }
   }

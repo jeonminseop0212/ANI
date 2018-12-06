@@ -188,26 +188,26 @@ class ANIContributionViewController: UIViewController {
               return
             }
             
-            if let contentImageUrl = metaData?.downloadURL() {
-              contentImageUrls[index] = contentImageUrl.absoluteString
-              if contentImageUrls.count == self.contentImages.count {
-                let sortdUrls = contentImageUrls.sorted(by: {$0.0 < $1.0})
-                var urls = [String]()
-                for url in sortdUrls {
-                  urls.append(url.value)
-                }
-                
-                DispatchQueue.main.async {
-                  let id = NSUUID().uuidString
-                  let date = ANIFunction.shared.getToday()
-                  let day = ANIFunction.shared.getToday(format: "yyyy/MM/dd")
-                  let content = contriButionView.getContent()
-                  let story = FirebaseStory(id: id, storyImageUrls: urls, story: content, userId: uid, recruitId: nil, recruitTitle: nil, recruitSubTitle: nil, date: date, day: day, isLoved: nil, hideUserIds: nil, loveCount: 0)
-                
-                  self.upateStroyDatabase(story: story, id: id)
-                }
-              }
-            }
+//            if let contentImageUrl = metaData?.downloadURL() {
+//              contentImageUrls[index] = contentImageUrl.absoluteString
+//              if contentImageUrls.count == self.contentImages.count {
+//                let sortdUrls = contentImageUrls.sorted(by: {$0.0 < $1.0})
+//                var urls = [String]()
+//                for url in sortdUrls {
+//                  urls.append(url.value)
+//                }
+//
+//                DispatchQueue.main.async {
+//                  let id = NSUUID().uuidString
+//                  let date = ANIFunction.shared.getToday()
+//                  let day = ANIFunction.shared.getToday(format: "yyyy/MM/dd")
+//                  let content = contriButionView.getContent()
+//                  let story = FirebaseStory(id: id, storyImageUrls: urls, story: content, userId: uid, recruitId: nil, recruitTitle: nil, recruitSubTitle: nil, date: date, day: day, isLoved: nil, hideUserIds: nil, loveCount: 0)
+//
+//                  self.upateStroyDatabase(story: story, id: id)
+//                }
+//              }
+//            }
           }
         }
       }
@@ -242,25 +242,25 @@ class ANIContributionViewController: UIViewController {
                 return
               }
               
-              if let contentImageUrl = metaData?.downloadURL() {
-                contentImageUrls[index] = contentImageUrl.absoluteString
-                if contentImageUrls.count == self.contentImages.count {
-                  let sortdUrls = contentImageUrls.sorted(by: {$0.0 < $1.0})
-                  var urls = [String]()
-                  for url in sortdUrls {
-                    urls.append(url.value)
-                  }
-                  
-                  DispatchQueue.main.async {
-                    let id = NSUUID().uuidString
-                    let date = ANIFunction.shared.getToday()
-                    let content = contriButionView.getContent()
-                    let qna = FirebaseQna(id: id, qnaImageUrls: urls, qna: content, userId: uid, date: date, isLoved: nil, hideUserIds: nil)
-                  
-                    self.upateQnaDatabase(qna: qna, id: id)
-                  }
-                }
-              }
+//              if let contentImageUrl = metaData?.downloadURL() {
+//                contentImageUrls[index] = contentImageUrl.absoluteString
+//                if contentImageUrls.count == self.contentImages.count {
+//                  let sortdUrls = contentImageUrls.sorted(by: {$0.0 < $1.0})
+//                  var urls = [String]()
+//                  for url in sortdUrls {
+//                    urls.append(url.value)
+//                  }
+//                  
+//                  DispatchQueue.main.async {
+//                    let id = NSUUID().uuidString
+//                    let date = ANIFunction.shared.getToday()
+//                    let content = contriButionView.getContent()
+//                    let qna = FirebaseQna(id: id, qnaImageUrls: urls, qna: content, userId: uid, date: date, isLoved: nil, hideUserIds: nil)
+//                  
+//                    self.upateQnaDatabase(qna: qna, id: id)
+//                  }
+//                }
+//              }
             }
           }
         }

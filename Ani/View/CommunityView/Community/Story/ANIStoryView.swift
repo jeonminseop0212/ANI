@@ -45,7 +45,6 @@ class ANIStoryView: UIView {
   
   private var cellHeight = [IndexPath: CGFloat]()
   
-  var tabBarController: ANITabBarController?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -446,8 +445,8 @@ extension ANIStoryView {
           let reloadView = self.reloadView,
           let storyTableView = self.storyTableView else { return }
 
-    guard let tabBarController = self.tabBarController,
-          let testLabel = tabBarController.testLabel else { return }
+    guard let shared = ANITabBarController.shared,
+          let testLabel = shared.testLabel else { return }
     
     reloadView.alpha = 0.0
     

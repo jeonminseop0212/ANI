@@ -393,17 +393,17 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
                 return
               }
               
-              if let familyImageUrl = metaData?.downloadURL() {
-                familyImageUrls[index] = familyImageUrl.absoluteString
-                if familyImageUrls.count == familyImages.count {
-                  let sortdUrls = familyImageUrls.sorted(by: {$0.0 < $1.0})
-                  var urls = [String]()
-                  for url in sortdUrls {
-                    urls.append(url.value)
-                  }
-                  completion?(urls)
-                }
-              }
+//              if let familyImageUrl = metaData?.downloadURL() {
+//                familyImageUrls[index] = familyImageUrl.absoluteString
+//                if familyImageUrls.count == familyImages.count {
+//                  let sortdUrls = familyImageUrls.sorted(by: {$0.0 < $1.0})
+//                  var urls = [String]()
+//                  for url in sortdUrls {
+//                    urls.append(url.value)
+//                  }
+//                  completion?(urls)
+//                }
+//              }
             }
           }
         }
@@ -462,10 +462,10 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
             return
           }
           
-          if let profileImageUrl = metaData?.downloadURL() {
-            let values = [KEY_USER_NAME: userName, KEY_KIND: kind, KEY_INTRODUCE: introduce, KEY_PROFILE_IMAGE_URL: profileImageUrl.absoluteString] as [String : AnyObject]
-            self.updateUserData(uid: currentUserUid, values: values)
-          }
+//          if let profileImageUrl = metaData?.downloadURL() {
+//            let values = [KEY_USER_NAME: userName, KEY_KIND: kind, KEY_INTRODUCE: introduce, KEY_PROFILE_IMAGE_URL: profileImageUrl.absoluteString] as [String : AnyObject]
+//            self.updateUserData(uid: currentUserUid, values: values)
+//          }
         }
       } else {
         let values = [KEY_USER_NAME: userName, KEY_KIND: kind, KEY_INTRODUCE: introduce] as [String : AnyObject]
@@ -492,10 +492,10 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
                   return
                 }
                 
-                if let profileImageUrl = metaData?.downloadURL() {
-                  let values = [KEY_USER_NAME: userName, KEY_KIND: kind, KEY_INTRODUCE: introduce, KEY_PROFILE_IMAGE_URL: profileImageUrl.absoluteString] as [String : AnyObject]
-                  self.updateUserData(uid: currentUserUid, values: values)
-                }
+//                if let profileImageUrl = metaData?.downloadURL() {
+//                  let values = [KEY_USER_NAME: userName, KEY_KIND: kind, KEY_INTRODUCE: introduce, KEY_PROFILE_IMAGE_URL: profileImageUrl.absoluteString] as [String : AnyObject]
+//                  self.updateUserData(uid: currentUserUid, values: values)
+//                }
               }
             } else {
               let values = [KEY_USER_NAME: userName, KEY_KIND: kind, KEY_INTRODUCE: introduce] as [String : AnyObject]
