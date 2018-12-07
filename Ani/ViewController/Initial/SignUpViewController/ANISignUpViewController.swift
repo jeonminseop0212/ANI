@@ -197,6 +197,8 @@ extension ANISignUpViewController: ANISignUpViewDelegate {
   }
   
   func prifileImagePickButtonTapped() {
+    self.view.endEditing(true)
+    
     gallery = GalleryController()
     if let galleryUnrap = gallery {
       galleryUnrap.delegate = self
