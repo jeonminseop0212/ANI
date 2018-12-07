@@ -50,7 +50,7 @@ class ANIAutoLoginView: UIView {
     
     //introduceLabel
     let introduceLabel = UILabel()
-    introduceLabel.text = "ログインするにはメールの認証が必要です。\n認証メールをお送りしましたので\n認証後下のログインボタンをクリック\nすることでアドレス、パスワードの\n入力なしでログインできます。"
+    introduceLabel.text = "ログインするにはメールの認証が必要です。\n認証メールをお送りしましたので\n認証後、ログインボタンをクリックしてください。\n\n*承認メールが迷惑メールに入る場合があります*"
     introduceLabel.numberOfLines = 0
     introduceLabel.font = UIFont.systemFont(ofSize: 15.0)
     introduceLabel.textColor = ANIColor.subTitle

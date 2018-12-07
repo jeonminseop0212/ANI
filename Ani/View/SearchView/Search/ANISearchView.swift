@@ -283,9 +283,9 @@ extension ANISearchView: UITableViewDataSource {
           } else {
             cell.user = nil
           }
+          cell.indexPath = indexPath.row
           cell.story = searchStories[indexPath.row]
           cell.delegate = self
-          cell.indexPath = indexPath.row
           
           return cell
         } else {
@@ -302,9 +302,9 @@ extension ANISearchView: UITableViewDataSource {
           } else {
             cell.user = nil
           }
+          cell.indexPath = indexPath.row
           cell.story = searchStories[indexPath.row]
           cell.delegate = self
-          cell.indexPath = indexPath.row
           
           return cell
         }
@@ -325,9 +325,9 @@ extension ANISearchView: UITableViewDataSource {
       } else {
         cell.user = nil
       }
+      cell.indexPath = indexPath.row
       cell.qna = searchQnas[indexPath.row]
       cell.delegate = self
-      cell.indexPath = indexPath.row
       
       return cell
     }

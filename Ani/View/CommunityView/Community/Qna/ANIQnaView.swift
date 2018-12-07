@@ -23,10 +23,13 @@ class ANIQnaView: UIView {
   
   private weak var qnaTableView: UITableView?
   
+  private weak var refreshControl: UIRefreshControl?
+  
+  private weak var activityIndicatorView: NVActivityIndicatorView?
+  
   private var qnas = [FirebaseQna]()
   private var users = [FirebaseUser]()
   
-  private weak var activityIndicatorView: NVActivityIndicatorView?
   
   var isCellSelected: Bool = false
   
@@ -38,6 +41,8 @@ class ANIQnaView: UIView {
   var delegate: ANIQnaViewDelegate?
   
   private var cellHeight = [IndexPath: CGFloat]()
+  
+  static var shared: ANIQnaView?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -82,6 +87,7 @@ class ANIQnaView: UIView {
     refreshControl.tintColor = ANIColor.moreDarkGray
     refreshControl.addTarget(self, action: #selector(loadQna(sender:)), for: .valueChanged)
     tableView.addSubview(refreshControl)
+    self.refreshControl = refreshControl
     addSubview(tableView)
     tableView.edgesToSuperview()
     self.qnaTableView = tableView
@@ -93,6 +99,19 @@ class ANIQnaView: UIView {
     activityIndicatorView.height(40.0)
     activityIndicatorView.centerInSuperview()
     self.activityIndicatorView = activityIndicatorView
+  }
+  
+  static func endRefresh() {
+    guard let shared = ANIQnaView.shared,
+          let refreshControl = shared.refreshControl,
+          let qnaTableView = shared.qnaTableView else { return }
+    
+    refreshControl.endRefreshing()
+
+    let topInset = ANICommunityViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    if qnaTableView.contentOffset.y + topInset < 0 {
+      qnaTableView.scrollToRow(at: [0, 0], at: .top, animated: false)
+    }
   }
   
   //MARK: Notifications

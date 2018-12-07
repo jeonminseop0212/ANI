@@ -25,6 +25,8 @@ class ANIStoryView: UIView {
   
   private weak var storyTableView: UITableView?
   
+  private weak var refreshControl: UIRefreshControl?
+  
   private var stories = [FirebaseStory]()
   private var supportRecruits = [String: FirebaseRecruit?]()
   private var rankingStories = [FirebaseStory]()
@@ -42,6 +44,8 @@ class ANIStoryView: UIView {
   var isCellSelected: Bool = false
   
   var delegate: ANIStoryViewDelegate?
+  
+  static var shared: ANIStoryView?
   
   private var cellHeight = [IndexPath: CGFloat]()
   
@@ -91,6 +95,7 @@ class ANIStoryView: UIView {
     refreshControl.tintColor = ANIColor.moreDarkGray
     refreshControl.addTarget(self, action: #selector(reloadData(sender:)), for: .valueChanged)
     tableView.addSubview(refreshControl)
+    self.refreshControl = refreshControl
     addSubview(tableView)
     tableView.edgesToSuperview()
     self.storyTableView = tableView
@@ -108,10 +113,22 @@ class ANIStoryView: UIView {
     self.loadStory(sender: sender)
   }
   
+  static func endRefresh() {
+    guard let shared = ANIStoryView.shared,
+          let refreshControl = shared.refreshControl,
+          let storyTableView = shared.storyTableView else { return }
+    
+    refreshControl.endRefreshing()
+    
+    let topInset = ANICommunityViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    if storyTableView.contentOffset.y + topInset < 0 {
+      storyTableView.scrollToRow(at: [0, 0], at: .top, animated: false)
+    }
+  }
+  
   //MARK: Notifications
   private func setupNotifications() {
     ANINotificationManager.receive(logout: self, selector: #selector(reloadStory))
-    ANINotificationManager.receive(login: self, selector: #selector(reloadStory))
     ANINotificationManager.receive(communityTabTapped: self, selector: #selector(scrollToTop))
     ANINotificationManager.receive(deleteStory: self, selector: #selector(deleteStory))
     ANINotificationManager.receive(loadedCurrentUser: self, selector: #selector(reloadStory))
@@ -455,7 +472,6 @@ extension ANIStoryView {
     if !self.users.isEmpty {
       self.users.removeAll()
     }
-    
     if !self.rankingStories.isEmpty {
       self.rankingStories.removeAll()
     }

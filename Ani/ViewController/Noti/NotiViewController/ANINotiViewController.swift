@@ -65,6 +65,8 @@ class ANINotiViewController: UIViewController {
   
   override func viewDidDisappear(_ animated: Bool) {
     removeNotifications()
+    
+    ANINotiView.endRefresh()
   }
   
   private func setup(completion:(()->())? = nil) {
@@ -296,6 +298,7 @@ extension ANINotiViewController: ANINotiNotiCellDelegate {
   func cellTapped(noti: FirebaseNotification) {
     let notiDetailViewController = ANINotiDetailViewController()
     notiDetailViewController.noti = noti
+    notiDetailViewController.hidesBottomBarWhenPushed = true
     
     if noti.notiKind == KEY_NOTI_KIND_FOLLOW {
       notiDetailViewController.notiKind = .follow
