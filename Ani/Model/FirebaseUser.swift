@@ -20,6 +20,4 @@ struct FirebaseUser: Codable {
   var unreadNotiCount: Int?
   var unreadMessageCount: Int?
   var fcmToken: String?
-  var isHaveBlockUser: Bool?
-  var isHaveBlockingUser: Bool?
 }

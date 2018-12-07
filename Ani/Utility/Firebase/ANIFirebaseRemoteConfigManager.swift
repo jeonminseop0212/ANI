@@ -22,7 +22,8 @@ class ANIFirebaseRemoteConfigManager: ANIFirebase {
   private override init() {
     super.init()
     self.config = RemoteConfig.remoteConfig()
-    if IS_DEBUG, let configSetting = RemoteConfigSettings(developerModeEnabled: true){
+    if IS_DEBUG {
+      let configSetting = RemoteConfigSettings(developerModeEnabled: true)
       self.config?.configSettings = configSetting
     }
   }

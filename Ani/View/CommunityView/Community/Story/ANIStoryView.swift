@@ -593,6 +593,7 @@ extension ANIStoryView {
                 storyTableView.alpha = 1.0
               })
               ANISessionManager.shared.isLoadedFirstData = true
+              
               ANINotificationManager.postDismissSplash()
             }
           }

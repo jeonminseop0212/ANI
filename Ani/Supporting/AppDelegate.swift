@@ -54,7 +54,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                                skipVersionButtonMessage: NSAttributedString(string: "このバージョンをスキップ"))
     siren.countryCode = "jp"
     siren.delegate = self
-    
+
     ANIFirebaseRemoteConfigManager.shared.getSirenAlertType { (type, error) in
       if error == nil, let type = type {
         switch type {
@@ -69,11 +69,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         default:
           siren.alertType = .skip
         }
-        
+
         siren.checkVersion(checkType: .immediately)
       } else {
         siren.alertType = .skip
-        
+
         siren.checkVersion(checkType: .immediately)
       }
     }
@@ -178,29 +178,28 @@ extension AppDelegate: MessagingDelegate {
   }
 }
 
-
 //MARK: SirenDelegate
 extension AppDelegate: SirenDelegate {
   func sirenLatestVersionInstalled() {
     ANISessionManager.shared.isCheckedVersion = true
     ANINotificationManager.postDismissSplash()
   }
-  
+
   func sirenVersionIsSkip() {
     ANISessionManager.shared.isCheckedVersion = true
     ANINotificationManager.postDismissSplash()
   }
-  
+
   func sirenUserDidCancel() {
     ANISessionManager.shared.isCheckedVersion = true
     ANINotificationManager.postDismissSplash()
   }
-  
+
   func sirenUserDidSkipVersion() {
     ANISessionManager.shared.isCheckedVersion = true
     ANINotificationManager.postDismissSplash()
   }
-  
+
   func sirenDidFailVersionCheck(error: Error) {
     if IS_DEBUG {
       ANISessionManager.shared.isCheckedVersion = true

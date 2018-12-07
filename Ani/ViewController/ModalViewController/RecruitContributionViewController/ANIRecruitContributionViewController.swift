@@ -557,13 +557,20 @@ extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
                 return
               }
               
-              if let recruitHeaderImageUrl = metaData?.downloadURL() {
-                recruit.headerImageUrl = recruitHeaderImageUrl.absoluteString
-                
-                DispatchQueue.main.async {
-                  self.updateDatabase(recruit: recruit, id: id)
+              storageRef.child(KEY_RECRUIT_HEADER_IMAGES).child(uuid).downloadURL(completion: { (url, error) in
+                if error != nil {
+                  DLog("storage download url error")
+                  return
                 }
-              }
+                
+                if let recruitHeaderImageUrl = url {
+                  recruit.headerImageUrl = recruitHeaderImageUrl.absoluteString
+  
+                  DispatchQueue.main.async {
+                    self.updateDatabase(recruit: recruit, id: id)
+                  }
+                }
+              })
             }
           }
         }
@@ -579,22 +586,29 @@ extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
                   return
                 }
                 
-                if let introduceImageUrl = metaData?.downloadURL() {
-                  introduceImageUrls[index] = introduceImageUrl.absoluteString
-                  if introduceImageUrls.count == recruitInfo.introduceImages.count {
-                    let sortdUrls = introduceImageUrls.sorted(by: {$0.0 < $1.0})
-                    var urls = [String]()
-                    for url in sortdUrls {
-                      urls.append(url.value)
-                    }
-                    
-                    recruit.introduceImageUrls = urls
-                    
-                    DispatchQueue.main.async {
-                      self.updateDatabase(recruit: recruit, id: id)
+                storageRef.child(KEY_RECRUIT_INTRODUCE_IMAGES).child(uuid).downloadURL(completion: { (url, error) in
+                  if error != nil {
+                    DLog("storage download url error")
+                    return
+                  }
+                  
+                  if let introduceImageUrl = url {
+                    introduceImageUrls[index] = introduceImageUrl.absoluteString
+                    if introduceImageUrls.count == recruitInfo.introduceImages.count {
+                      let sortdUrls = introduceImageUrls.sorted(by: {$0.0 < $1.0})
+                      var urls = [String]()
+                      for url in sortdUrls {
+                        urls.append(url.value)
+                      }
+  
+                      recruit.introduceImageUrls = urls
+  
+                      DispatchQueue.main.async {
+                        self.updateDatabase(recruit: recruit, id: id)
+                      }
                     }
                   }
-                }
+                })
               }
             }
           }

@@ -179,7 +179,7 @@ extension ANISupportView: ANIButtonViewDelegate {
       }
       
       DispatchQueue.global().async {
-        database.collection(KEY_RECRUITS).document(recruitId).collection(KEY_SUPPORT_IDS).document(uid).setData([uid: true], options: .merge())
+//        database.collection(KEY_RECRUITS).document(recruitId).collection(KEY_SUPPORT_IDS).document(uid).setData([uid: true], options: .merge())
       }
       
       updateNoti(storyId: id)
