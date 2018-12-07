@@ -41,7 +41,15 @@ class DropdownController: UIViewController {
     view.backgroundColor = UIColor.clear
     tableView.backgroundColor = UIColor.clear
     tableView.backgroundView = blurView
-    
+    if #available(iOS 11.0, *) {
+      tableView.contentInsetAdjustmentBehavior = .never
+      
+      if let window = UIApplication.shared.keyWindow {
+        let bottomSafeArea = window.safeAreaInsets.bottom
+        tableView.contentInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: bottomSafeArea + 15.0, right: 0.0)
+      }
+    } else {
+    }
     view.addSubview(tableView)
     tableView.register(AlbumCell.self, forCellReuseIdentifier: String(describing: AlbumCell.self))
     
