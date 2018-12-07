@@ -33,14 +33,8 @@ class ANITabBarController: UITabBarController {
   
   var isLoadedFirstData: Bool = false
   
-  weak var testLabel: UILabel?
-  
-  static var shared: ANITabBarController?
-  
   override func viewDidLoad() {
     super.viewDidLoad()
-    
-    ANITabBarController.shared = self
     
     setup()
     setupTabBar()
@@ -71,15 +65,6 @@ class ANITabBarController: UITabBarController {
     if userDefaults.object(forKey: KEY_FIRST_LAUNCH) == nil {
       userDefaults.set(true, forKey: KEY_FIRST_LAUNCH)
     }
-    
-    let testLabel = UILabel()
-    testLabel.numberOfLines = 0
-    testLabel.text = "test\n"
-    testLabel.backgroundColor = .yellow
-    self.view.addSubview(testLabel)
-    testLabel.width(300)
-    testLabel.centerInSuperview()
-    self.testLabel = testLabel
   }
   
   private func setupTabBar() {
@@ -262,8 +247,6 @@ class ANITabBarController: UITabBarController {
 //MARK: data
 extension ANITabBarController {
   func loadUser(completion:(()->())? = nil) {
-    guard let testLabel = self.testLabel else { return }
-    
     let userDefaults = UserDefaults.standard
     
     if let userListener = self.userListener {
@@ -324,8 +307,6 @@ extension ANITabBarController {
       let database = Firestore.firestore()
       let group = DispatchGroup()
       
-      testLabel.text = testLabel.text! + ANIFunction.shared.getToday() + "\n" + "load user start\n"
-      
       group.enter()
       DispatchQueue(label: "user").async {
         self.userListener = database.collection(KEY_USERS).document(currentUserUid).addSnapshotListener({ (snapshot, error) in
@@ -347,8 +328,6 @@ extension ANITabBarController {
               }
               
               if !self.isLoadedFirstData {
-                testLabel.text = testLabel.text! + ANIFunction.shared.getToday() + "\n" + "load user done\n"
-
                 group.leave()
               }
             }
@@ -358,8 +337,6 @@ extension ANITabBarController {
         })
       }
       
-      testLabel.text = testLabel.text! + ANIFunction.shared.getToday() + "\n" + "observe block user ids start\n"
-
       group.enter()
       DispatchQueue(label: "user").async {
         self.blockUserListener =  database.collection(KEY_USERS).document(currentUserUid).collection(KEY_BLOCK_USER_IDS).order(by: KEY_DATE).addSnapshotListener({ (snapshot, error) in
@@ -377,8 +354,6 @@ extension ANITabBarController {
               }
               
               if snapshot.documents.count == ANISessionManager.shared.blockUserIds?.count {
-                testLabel.text = testLabel.text! + ANIFunction.shared.getToday() + "\n" + "observe block user ids done\n"
-                
                 group.leave()
               }
             } else if diff.type == .removed {
@@ -395,14 +370,10 @@ extension ANITabBarController {
           })
           
           if snapshot.documents.isEmpty {
-            testLabel.text = testLabel.text! + ANIFunction.shared.getToday() + "\n" + "observe block user ids done\n"
-            
             group.leave()
           }
         })
       }
-      
-      testLabel.text = testLabel.text! + ANIFunction.shared.getToday() + "\n" + "observe blocking user ids start\n"
       
       group.enter()
       DispatchQueue(label: "user").async {
@@ -420,8 +391,6 @@ extension ANITabBarController {
                 }
                 
                 if snapshot.documents.count == ANISessionManager.shared.blockingUserIds?.count {
-                  testLabel.text = testLabel.text! + ANIFunction.shared.getToday() + "\n" + "observe blocking user ids done\n"
-                  
                   group.leave()
                 }
               }
@@ -439,8 +408,6 @@ extension ANITabBarController {
           })
           
           if snapshot.documents.isEmpty {
-            testLabel.text = testLabel.text! + ANIFunction.shared.getToday() + "\n" + "observe blocking user ids done\n"
-
             group.leave()
           }
         })
@@ -448,8 +415,6 @@ extension ANITabBarController {
       
       group.notify(queue: DispatchQueue(label: "user")) {
         DispatchQueue.main.async {
-          testLabel.text = testLabel.text! + ANIFunction.shared.getToday() + "\n" + "post loaded current user\n"
-          
           ANINotificationManager.postLoadedCurrentUser()
           self.isLoadedFirstData = true
           

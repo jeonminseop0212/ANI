@@ -351,11 +351,18 @@ class ANISignUpView: UIView {
         return
       }
       
-//      if let profileImageUrl = metaData?.downloadURL() {
-//        let fcmToken = UserDefaults.standard.string(forKey: KEY_FCM_TOKEN)
-//        let user = FirebaseUser(uid: currentUser.uid, userName: userName, kind: "個人", introduce: "", profileImageUrl: profileImageUrl.absoluteString, familyImageUrls: nil, checkNotiDate: nil, isHaveUnreadNoti: false, unreadNotiCount: 0, unreadMessageCount: 0, fcmToken: fcmToken, isHaveBlockUser: false, isHaveBlockingUser: false)
-//        self.uploadUserIntoDatabase(uid: currentUser.uid, user: user)
-//      }
+      storageRef.child(KEY_PROFILE_IMAGES).child("\(currentUser.uid).jpeg").downloadURL(completion: { (url, error) in
+        if error != nil {
+          DLog("storage download url error")
+          return
+        }
+        
+        if let profileImageUrl = url {
+          let fcmToken = UserDefaults.standard.string(forKey: KEY_FCM_TOKEN)
+          let user = FirebaseUser(uid: currentUser.uid, userName: userName, kind: "個人", introduce: "", profileImageUrl: profileImageUrl.absoluteString, familyImageUrls: nil, checkNotiDate: nil, isHaveUnreadNoti: false, unreadNotiCount: 0, unreadMessageCount: 0, fcmToken: fcmToken, isHaveBlockUser: false, isHaveBlockingUser: false)
+          self.uploadUserIntoDatabase(uid: currentUser.uid, user: user)
+        }
+      })
     }
   }
   
