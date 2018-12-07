@@ -10,7 +10,7 @@ import UIKit
 import Firebase
 import FirebaseMessaging
 import UserNotifications
-//import Siren
+import Siren
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -31,11 +31,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     self.orientationLock = .portrait
     
-//    ANIFirebaseRemoteConfigManager.shared.fetch()
-    let pathString = IS_DEBUG ? "GoogleService-Info" : "GoogleService-Info-release"
-    if let path = Bundle.main.path(forResource: pathString, ofType: "plist"), let firbaseOptions = FirebaseOptions(contentsOfFile: path) {
-      FirebaseApp.configure(options: firbaseOptions)
-    }
+    ANIFirebaseRemoteConfigManager.shared.fetch()
     
     //notification
     application.registerForRemoteNotifications()
@@ -49,45 +45,38 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     window?.rootViewController = tabBarController
     window?.makeKeyAndVisible()
     
-//    let siren = Siren.shared
-//    siren.forceLanguageLocalization = .japanese
-//    siren.alertMessaging = SirenAlertMessaging(updateTitle: NSAttributedString(string: "アップデートのお知らせ"),
-//                                               updateMessage: NSAttributedString(string: "MYAUの新規バージョンがご利用になれます。アップデートしてください。"),
-//                                               updateButtonMessage: NSAttributedString(string: "アップデート"),
-//                                               nextTimeButtonMessage: NSAttributedString(string: "次回"),
-//                                               skipVersionButtonMessage: NSAttributedString(string: "このバージョンをスキップ"))
-//    siren.countryCode = "jp"
-//    siren.delegate = self
-//
-//    guard let testLabel = tabBarController.testLabel else { return false }
-//
-//    testLabel.text = testLabel.text! + ANIFunction.shared.getToday() + "\n" + "remote config start\n"
-//    ANIFirebaseRemoteConfigManager.shared.getSirenAlertType { (type, error) in
-//      testLabel.text = testLabel.text! + ANIFunction.shared.getToday() + "\n" + "remote config done\n"
-//
-//      if error == nil, let type = type {
-//        switch type {
-//        case SirenAlertType.force.rawValue:
-//          siren.alertType = .force
-//        case SirenAlertType.option.rawValue:
-//          siren.alertType = .option
-//        case SirenAlertType.skip.rawValue:
-//          siren.alertType = .skip
-//        case SirenAlertType.none.rawValue:
-//          siren.alertType = .none
-//        default:
-//          siren.alertType = .skip
-//        }
-//
-//        testLabel.text = testLabel.text! + ANIFunction.shared.getToday() + "\n" + "check version start\n"
-//
-//        siren.checkVersion(checkType: .immediately)
-//      } else {
-//        siren.alertType = .skip
-//
-//        siren.checkVersion(checkType: .immediately)
-//      }
-//    }
+    let siren = Siren.shared
+    siren.forceLanguageLocalization = .japanese
+    siren.alertMessaging = SirenAlertMessaging(updateTitle: NSAttributedString(string: "アップデートのお知らせ"),
+                                               updateMessage: NSAttributedString(string: "MYAUの新規バージョンがご利用になれます。アップデートしてください。"),
+                                               updateButtonMessage: NSAttributedString(string: "アップデート"),
+                                               nextTimeButtonMessage: NSAttributedString(string: "次回"),
+                                               skipVersionButtonMessage: NSAttributedString(string: "このバージョンをスキップ"))
+    siren.countryCode = "jp"
+    siren.delegate = self
+
+    ANIFirebaseRemoteConfigManager.shared.getSirenAlertType { (type, error) in
+      if error == nil, let type = type {
+        switch type {
+        case SirenAlertType.force.rawValue:
+          siren.alertType = .force
+        case SirenAlertType.option.rawValue:
+          siren.alertType = .option
+        case SirenAlertType.skip.rawValue:
+          siren.alertType = .skip
+        case SirenAlertType.none.rawValue:
+          siren.alertType = .none
+        default:
+          siren.alertType = .skip
+        }
+
+        siren.checkVersion(checkType: .immediately)
+      } else {
+        siren.alertType = .skip
+
+        siren.checkVersion(checkType: .immediately)
+      }
+    }
     
     //navigation bar
     let navigationBarAppearane = UINavigationBar.appearance()
@@ -114,9 +103,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
 
   func applicationWillEnterForeground(_ application: UIApplication) {
-//    if !ANISessionManager.shared.isCheckedVersion {
-//      Siren.shared.checkVersion(checkType: .immediately)
-//    }
+    if !ANISessionManager.shared.isCheckedVersion {
+      Siren.shared.checkVersion(checkType: .immediately)
+    }
   }
 
   func applicationDidBecomeActive(_ application: UIApplication) {
@@ -189,42 +178,34 @@ extension AppDelegate: MessagingDelegate {
   }
 }
 
-
 //MARK: SirenDelegate
-//extension AppDelegate: SirenDelegate {
-//  func sirenLatestVersionInstalled() {
-//    ANISessionManager.shared.isCheckedVersion = true
-//    ANINotificationManager.postDismissSplash()
-//  }
-//
-//  func sirenVersionIsSkip() {
-//    ANISessionManager.shared.isCheckedVersion = true
-//    ANINotificationManager.postDismissSplash()
-//  }
-//
-//  func sirenUserDidCancel() {
-//    ANISessionManager.shared.isCheckedVersion = true
-//    ANINotificationManager.postDismissSplash()
-//  }
-//
-//  func sirenUserDidSkipVersion() {
-//    ANISessionManager.shared.isCheckedVersion = true
-//    ANINotificationManager.postDismissSplash()
-//  }
-//
-//  func sirenDidFailVersionCheck(error: Error) {
-//    guard let tabBarController = self.tabBarController,
-//          let testLabel = tabBarController.testLabel else { return }
-//
-//    if IS_DEBUG {
-//      ANISessionManager.shared.isCheckedVersion = true
-//      DispatchQueue.main.async {
-//        testLabel.text = testLabel.text! + ANIFunction.shared.getToday() + "\n" + "check version done\n"
-//        testLabel.text = testLabel.text! + ANIFunction.shared.getToday() + "\n" + "siren post dismiss splash\n"
-//      }
-//      ANINotificationManager.postDismissSplash()
-//    } else {
-//      ANINotificationManager.postFailLoadVersion()
-//    }
-//  }
-//}
+extension AppDelegate: SirenDelegate {
+  func sirenLatestVersionInstalled() {
+    ANISessionManager.shared.isCheckedVersion = true
+    ANINotificationManager.postDismissSplash()
+  }
+
+  func sirenVersionIsSkip() {
+    ANISessionManager.shared.isCheckedVersion = true
+    ANINotificationManager.postDismissSplash()
+  }
+
+  func sirenUserDidCancel() {
+    ANISessionManager.shared.isCheckedVersion = true
+    ANINotificationManager.postDismissSplash()
+  }
+
+  func sirenUserDidSkipVersion() {
+    ANISessionManager.shared.isCheckedVersion = true
+    ANINotificationManager.postDismissSplash()
+  }
+
+  func sirenDidFailVersionCheck(error: Error) {
+    if IS_DEBUG {
+      ANISessionManager.shared.isCheckedVersion = true
+      ANINotificationManager.postDismissSplash()
+    } else {
+      ANINotificationManager.postFailLoadVersion()
+    }
+  }
+}

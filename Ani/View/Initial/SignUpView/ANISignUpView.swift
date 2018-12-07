@@ -359,7 +359,7 @@ class ANISignUpView: UIView {
         
         if let profileImageUrl = url {
           let fcmToken = UserDefaults.standard.string(forKey: KEY_FCM_TOKEN)
-          let user = FirebaseUser(uid: currentUser.uid, userName: userName, kind: "個人", introduce: "", profileImageUrl: profileImageUrl.absoluteString, familyImageUrls: nil, checkNotiDate: nil, isHaveUnreadNoti: false, unreadNotiCount: 0, unreadMessageCount: 0, fcmToken: fcmToken, isHaveBlockUser: false, isHaveBlockingUser: false)
+          let user = FirebaseUser(uid: currentUser.uid, userName: userName, kind: "個人", introduce: "", profileImageUrl: profileImageUrl.absoluteString, familyImageUrls: nil, checkNotiDate: nil, isHaveUnreadNoti: false, unreadNotiCount: 0, unreadMessageCount: 0, fcmToken: fcmToken)
           self.uploadUserIntoDatabase(uid: currentUser.uid, user: user)
         }
       })

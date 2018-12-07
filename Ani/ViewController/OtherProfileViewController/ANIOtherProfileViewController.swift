@@ -422,9 +422,7 @@ extension ANIOtherProfileViewController: ANIPopupOptionViewControllerDelegate {
             let today = ANIFunction.shared.getToday()
             
             database.collection(KEY_USERS).document(currentUserId).collection(KEY_BLOCK_USER_IDS).document(userId).setData([KEY_USER_ID: userId, KEY_DATE: today])
-            database.collection(KEY_USERS).document(currentUserId).updateData([KEY_IS_HAVE_BLOCK_USER: true])
             database.collection(KEY_USERS).document(userId).collection(KEY_BLOCKING_USER_IDS).document(currentUserId).setData([KEY_USER_ID: currentUserId, KEY_DATE: today])
-            database.collection(KEY_USERS).document(userId).updateData([KEY_IS_HAVE_BLOCKING_USER: true])
             
             self.unfollow(userId: userId, currentUserUid: currentUserId)
             
