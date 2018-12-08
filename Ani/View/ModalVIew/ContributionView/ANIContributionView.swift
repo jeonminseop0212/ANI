@@ -158,6 +158,7 @@ extension ANIContributionView: ANIContributionImagesViewDelegate {
   }
 }
 
+//MARK: UITextViewDelegate
 extension ANIContributionView: UITextViewDelegate {
   func textViewDidChange(_ textView: UITextView) {
     if isContributable() {

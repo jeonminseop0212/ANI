@@ -233,7 +233,7 @@ extension ImagesController: DropdownControllerDelegate {
   }
 }
 
-extension ImagesController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+extension ImagesController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UICollectionViewDelegate {
   
   // MARK: - UICollectionViewDataSource
   
@@ -300,6 +300,12 @@ extension ImagesController: UICollectionViewDataSource, UICollectionViewDelegate
     configureFrameViews()
   }
   
+  func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+    let cell = cell as! ImageCell
+    
+    configureFrameView(cell, indexPath: indexPath)
+  }
+  
   func configureFrameViews() {
     for case let cell as ImageCell in gridView.collectionView.visibleCells {
       if let indexPath = gridView.collectionView.indexPath(for: cell) {
@@ -315,9 +321,16 @@ extension ImagesController: UICollectionViewDataSource, UICollectionViewDelegate
       cell.frameView.g_quickFade()
       if !Config.Camera.oneImageMode {
         cell.frameView.label.text = "\(index + 1)"
+        cell.coverView.alpha = 0.0
       }
     } else {
       cell.frameView.alpha = 0
+    }
+    
+    if !Config.Camera.oneImageMode && Config.Camera.imageLimit <= cart.images.count && !cart.images.contains(item) {
+      cell.coverView.alpha = 0.5
+    } else {
+      cell.coverView.alpha = 0.0
     }
   }
 }
