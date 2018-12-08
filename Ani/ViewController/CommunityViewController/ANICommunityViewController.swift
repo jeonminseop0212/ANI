@@ -28,6 +28,8 @@ class ANICommunityViewController: UIViewController {
   private var isRejectAnimating: Bool = false
   private var rejectTapView: UIView?
   
+  private weak var uploadProgressView: ANIUploadProgressView?
+  
   private var selectedIndex: Int = 0
   
   private var contentType: ContentType?
@@ -124,6 +126,18 @@ class ANICommunityViewController: UIViewController {
     rejectTapView.size(to: rejectView)
     rejectTapView.topToSuperview()
     self.rejectTapView = rejectTapView
+    
+    //uploadProgressView
+    let uploadProgressView = ANIUploadProgressView()
+    uploadProgressView.alpha = 0.95
+    uploadProgressView.isHidden = true
+    uploadProgressView.delegate = self
+    self.view.addSubview(uploadProgressView)
+    uploadProgressView.topToBottom(of: menuBar)
+    uploadProgressView.leftToSuperview()
+    uploadProgressView.rightToSuperview()
+    uploadProgressView.height(50.0)
+    self.uploadProgressView = uploadProgressView
   }
   
   //MAKR: notification
@@ -250,12 +264,14 @@ extension ANICommunityViewController: ANIButtonViewDelegate{
           let contributionViewController = ANIContributionViewController()
           contributionViewController.navigationTitle = "STORY"
           contributionViewController.selectedContributionMode = ContributionMode.story
+          contributionViewController.delegate = self
           let contributionNV = UINavigationController(rootViewController: contributionViewController)
           self.present(contributionNV, animated: true, completion: nil)
         } else {
           let contributionViewController = ANIContributionViewController()
           contributionViewController.navigationTitle = "Q&A"
           contributionViewController.selectedContributionMode = ContributionMode.qna
+          contributionViewController.delegate = self
           let contributionNV = UINavigationController(rootViewController: contributionViewController)
           self.present(contributionNV, animated: true, completion: nil)
         }
@@ -514,6 +530,55 @@ extension ANICommunityViewController: ANIPopupOptionViewControllerDelegate {
   }
 }
 
+//MARK: UIGestureRecognizerDelegate
+extension ANICommunityViewController: UIGestureRecognizerDelegate {
+  func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+    return true
+  }
+}
+
+//MARK: ANIContributionViewControllerDelegate
+extension ANICommunityViewController: ANIContributionViewControllerDelegate {
+  func loadThumnailImage(thumbnailImage: UIImage?) {
+    guard let uploadProgressView = self.uploadProgressView,
+          let thumbnailImageView = uploadProgressView.thumbnailImageView else { return }
+
+    if let thumbnailImage = thumbnailImage {
+      thumbnailImageView.image = thumbnailImage
+      thumbnailImageView.isHidden = false
+    } else {
+      thumbnailImageView.image = nil
+      thumbnailImageView.isHidden = true
+    }
+  }
+  
+  func updateProgress(progress: CGFloat) {
+    guard let uploadProgressView = self.uploadProgressView else { return }
+    
+    uploadProgressView.updateProgress(progress: progress)
+    
+    if progress != 1.0 {
+      UIView.animate(withDuration: 0.2) {
+        uploadProgressView.alpha = 0.95
+      }
+      uploadProgressView.isHidden = false
+    }
+  }
+}
+
+//MARK: ANIUploadProgressViewDelegate
+extension ANICommunityViewController: ANIUploadProgressViewDelegate {
+  func completeProgress() {
+    guard let uploadProgressView = self.uploadProgressView else { return }
+    
+    UIView.animate(withDuration: 0.2, animations: {
+      uploadProgressView.alpha = 0.0
+    }) { (complete) in
+      uploadProgressView.isHidden = true
+    }
+  }
+}
+
 //MAKR: data
 extension ANICommunityViewController {
   private func deleteData() {
@@ -556,16 +621,36 @@ extension ANICommunityViewController {
         do {
           if contentType == .story {
             let story = try FirestoreDecoder().decode(FirebaseStory.self, from: data)
-            
+            let storage = Storage.storage()
+
             if let urls = story.storyImageUrls {
               for url in urls {
-                let storage = Storage.storage()
                 let storageRef = storage.reference(forURL: url)
                 
                 storageRef.delete { error in
                   if let error = error {
                     DLog(error)
                   }
+                }
+              }
+            }
+            
+            if let videoUrl = story.storyVideoUrl {
+              let storageRef = storage.reference(forURL: videoUrl)
+              
+              storageRef.delete { error in
+                if let error = error {
+                  DLog(error)
+                }
+              }
+            }
+            
+            if let thumbnailImageUrl = story.thumbnailImageUrl {
+              let storageRef = storage.reference(forURL: thumbnailImageUrl)
+              
+              storageRef.delete { error in
+                if let error = error {
+                  DLog(error)
                 }
               }
             }
@@ -655,12 +740,5 @@ extension ANICommunityViewController {
     DispatchQueue.global().async {
       index?.deleteObject(withID: contributionId)
     }
-  }
-}
-
-//MARK: UIGestureRecognizerDelegate
-extension ANICommunityViewController: UIGestureRecognizerDelegate {
-  func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-    return true
   }
 }

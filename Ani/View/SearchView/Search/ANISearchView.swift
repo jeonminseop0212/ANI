@@ -10,6 +10,7 @@ import UIKit
 import CodableFirebase
 import NVActivityIndicatorView
 import InstantSearchClient
+import AVKit
 
 protocol ANISearchViewDelegate {
   func searchViewDidScroll(scrollY: CGFloat)
@@ -32,6 +33,7 @@ class ANISearchView: UIView {
   
   private var searchUsers = [FirebaseUser]()
   private var searchStories = [FirebaseStory]()
+  private var storyVideoAssets = [String: AVAsset]()
   private var storyUsers = [FirebaseUser]()
   private var searchQnas = [FirebaseQna]()
   private var qnaUsers = [FirebaseUser]()
@@ -74,6 +76,8 @@ class ANISearchView: UIView {
   private var isLoading: Bool = false
   private let COUNT_LAST_CELL: Int = 4
   
+  private var beforeVideoViewCell: ANIVideoStoryViewCell?
+  
   private var userCellHeight = [IndexPath: CGFloat]()
   private var storyCellHeight = [IndexPath: CGFloat]()
   private var qnaCellHeight = [IndexPath: CGFloat]()
@@ -108,6 +112,8 @@ class ANISearchView: UIView {
     tableView.register(ANIUserSearchViewCell.self, forCellReuseIdentifier: userId)
     let storyId = NSStringFromClass(ANIStoryViewCell.self)
     tableView.register(ANIStoryViewCell.self, forCellReuseIdentifier: storyId)
+    let videoStoryCellId = NSStringFromClass(ANIVideoStoryViewCell.self)
+    tableView.register(ANIVideoStoryViewCell.self, forCellReuseIdentifier: videoStoryCellId)
     let supportCellId = NSStringFromClass(ANISupportViewCell.self)
     tableView.register(ANISupportViewCell.self, forCellReuseIdentifier: supportCellId)
     let qnaId = NSStringFromClass(ANIQnaViewCell.self)
@@ -207,7 +213,7 @@ class ANISearchView: UIView {
     if let hideUserIds = story.hideUserIds, hideUserIds.contains(currentUserUid) {
       return true
     }
-    if story.storyImageUrls == nil && story.recruitId == nil {
+    if story.storyImageUrls == nil && story.recruitId == nil && story.thumbnailImageUrl == nil {
       return true
     }
     
@@ -288,10 +294,38 @@ extension ANISearchView: UITableViewDataSource {
           cell.delegate = self
           
           return cell
+        } else if searchStories[indexPath.row].thumbnailImageUrl != nil {
+          let videoStoryCellId = NSStringFromClass(ANIVideoStoryViewCell.self)
+          let cell = tableView.dequeueReusableCell(withIdentifier: videoStoryCellId, for: indexPath) as! ANIVideoStoryViewCell
+          cell.delegate = self
+          
+          if storyUsers.contains(where: { $0.uid == searchStories[indexPath.row].userId }) {
+            for user in storyUsers {
+              if searchStories[indexPath.row].userId == user.uid {
+                cell.user = user
+                break
+              }
+            }
+          } else {
+            cell.user = nil
+          }
+          
+          if let storyVideoUrl = searchStories[indexPath.row].storyVideoUrl,
+            storyVideoAssets.contains(where: { $0.0 == storyVideoUrl }) {
+            cell.videoAsset = storyVideoAssets[storyVideoUrl]
+          } else {
+            cell.videoAsset = nil
+          }
+          
+          cell.indexPath = indexPath.row
+          cell.story = searchStories[indexPath.row]
+          
+          return cell
         } else {
           let storyCellId = NSStringFromClass(ANIStoryViewCell.self)
           let cell = tableView.dequeueReusableCell(withIdentifier: storyCellId, for: indexPath) as! ANIStoryViewCell
-          
+          cell.delegate = self
+
           if storyUsers.contains(where: { $0.uid == searchStories[indexPath.row].userId }) {
             for user in storyUsers {
               if searchStories[indexPath.row].userId == user.uid {
@@ -304,7 +338,6 @@ extension ANISearchView: UITableViewDataSource {
           }
           cell.indexPath = indexPath.row
           cell.story = searchStories[indexPath.row]
-          cell.delegate = self
           
           return cell
         }
@@ -314,7 +347,8 @@ extension ANISearchView: UITableViewDataSource {
     case .qna:
       let qnaId = NSStringFromClass(ANIQnaViewCell.self)
       let cell = tableView.dequeueReusableCell(withIdentifier: qnaId, for: indexPath) as! ANIQnaViewCell
-      
+      cell.delegate = self
+
       if qnaUsers.contains(where: { $0.uid == searchQnas[indexPath.row].userId }) {
         for user in qnaUsers {
           if searchQnas[indexPath.row].userId == user.uid {
@@ -327,7 +361,6 @@ extension ANISearchView: UITableViewDataSource {
       }
       cell.indexPath = indexPath.row
       cell.qna = searchQnas[indexPath.row]
-      cell.delegate = self
       
       return cell
     }
@@ -336,25 +369,25 @@ extension ANISearchView: UITableViewDataSource {
 
 //MARK: UITableViewDelegate
 extension ANISearchView: UITableViewDelegate {
-  func scrollViewDidScroll(_ scrollView: UIScrollView) {
-    ANINotificationManager.postViewScrolled()
-    
-    //navigation bar animation
-    let scrollY = scrollView.contentOffset.y
-    self.delegate?.searchViewDidScroll(scrollY: scrollY)
-  }
-  
   func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
     if selectedCategory == .story {
       if !searchStories.isEmpty {
         if searchStories[indexPath.row].recruitId != nil, let cell = cell as? ANISupportViewCell {
           cell.unobserveLove()
+          cell.unobserveComment()
+        } else if searchStories[indexPath.row].thumbnailImageUrl != nil, let cell = cell as? ANIVideoStoryViewCell {
+          cell.unobserveLove()
+          cell.unobserveComment()
+          cell.storyVideoView?.removeReachEndObserver()
+          cell.storyVideoView?.stop()
         } else if let cell = cell as? ANIStoryViewCell {
           cell.unobserveLove()
+          cell.unobserveComment()
         }
       }
-    } else if selectedCategory == .qna, let cell = cell as? ANIRecruitViewCell {
+    } else if selectedCategory == .qna, let cell = cell as? ANIQnaViewCell {
       cell.unobserveLove()
+      cell.unobserveComment()
     }
   }
   
@@ -406,6 +439,42 @@ extension ANISearchView: UITableViewDelegate {
       }
     }
   }
+  
+  func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    guard let tableView = self.tableView else { return }
+    
+    ANINotificationManager.postViewScrolled()
+    
+    //navigation bar animation
+    let scrollY = scrollView.contentOffset.y
+    self.delegate?.searchViewDidScroll(scrollY: scrollY)
+    
+    //play video
+    let centerX = tableView.center.x
+    let centerY = tableView.center.y + scrollView.contentOffset.y + UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    
+    if let indexPath = tableView.indexPathForRow(at: CGPoint(x: centerX, y: centerY)) {
+      if let videoCell = tableView.cellForRow(at: indexPath) as? ANIVideoStoryViewCell,
+        let storyVideoView = videoCell.storyVideoView {
+        if beforeVideoViewCell != videoCell {
+          if let beforeVideoViewCell = self.beforeVideoViewCell,
+            let beforeStoryVideoView = beforeVideoViewCell.storyVideoView {
+            beforeStoryVideoView.stop()
+          }
+          
+          storyVideoView.play()
+          beforeVideoViewCell = videoCell
+        }
+      } else {
+        if let beforeVideoViewCell = self.beforeVideoViewCell,
+          let beforeStoryVideoView = beforeVideoViewCell.storyVideoView {
+          beforeStoryVideoView.stop()
+        }
+        
+        beforeVideoViewCell = nil
+      }
+    }
+  }
 }
 
 //MARK: ANIUserSearchViewCellDelegate
@@ -415,8 +484,8 @@ extension ANISearchView: ANIUserSearchViewCellDelegate {
   }
 }
 
-//MARK: ANIStoryViewCellDelegate
-extension ANISearchView: ANIStoryViewCellDelegate {
+//MARK: ANIStoryViewCellDelegate, ANIVideoStoryViewCellDelegate
+extension ANISearchView: ANIStoryViewCellDelegate, ANIVideoStoryViewCellDelegate {
   func storyCellTapped(story: FirebaseStory, user: FirebaseUser) {
     self.delegate?.storyViewCellDidSelect(selectedStory: story, user: user)
   }
@@ -433,6 +502,10 @@ extension ANISearchView: ANIStoryViewCellDelegate {
   
   func loadedStoryUser(user: FirebaseUser) {
     self.storyUsers.append(user)
+  }
+  
+  func loadedVideo(urlString: String, asset: AVAsset) {
+    storyVideoAssets[urlString] = asset
   }
 }
 
@@ -550,6 +623,12 @@ extension ANISearchView {
                 let story = try FirebaseDecoder().decode(FirebaseStory.self, from: hitDic)
                 
                 if !self.isBlockStory(story: story) {
+                  if let storyVideoUrl = story.storyVideoUrl, let url = URL(string: storyVideoUrl) {
+                    let asset = AVAsset(url: url)
+                    
+                    self.storyVideoAssets[storyVideoUrl] = asset
+                  }
+                  
                   self.searchStories.append(story)
                 }
               case .qna:
@@ -671,6 +750,12 @@ extension ANISearchView {
                 
                 if !self.searchStories.contains(where: { $0.id == story.id }) {
                   if !self.isBlockStory(story: story) {
+                    if let storyVideoUrl = story.storyVideoUrl, let url = URL(string: storyVideoUrl) {
+                      let asset = AVAsset(url: url)
+                      
+                      self.storyVideoAssets[storyVideoUrl] = asset
+                    }
+                    
                     self.searchStories.append(story)
                   }
                 }

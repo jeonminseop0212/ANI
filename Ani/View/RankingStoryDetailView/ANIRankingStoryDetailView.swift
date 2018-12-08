@@ -18,7 +18,7 @@ class ANIRankingStoryDetailView: UIView {
   
   private weak var rankingStoryTableView: UITableView?
   
-  var stroy: FirebaseStory? {
+  var story: FirebaseStory? {
     didSet {
       guard let rankingStoryTableView = self.rankingStoryTableView else { return }
       
@@ -48,6 +48,8 @@ class ANIRankingStoryDetailView: UIView {
     rankingStoryTableView.backgroundColor = ANIColor.bg
     let storyCellId = NSStringFromClass(ANIStoryViewCell.self)
     rankingStoryTableView.register(ANIStoryViewCell.self, forCellReuseIdentifier: storyCellId)
+    let videoStoryCellId = NSStringFromClass(ANIVideoStoryViewCell.self)
+    rankingStoryTableView.register(ANIVideoStoryViewCell.self, forCellReuseIdentifier: videoStoryCellId)
     rankingStoryTableView.rowHeight = UITableView.automaticDimension
     rankingStoryTableView.dataSource = self
     addSubview(rankingStoryTableView)
@@ -63,14 +65,26 @@ extension ANIRankingStoryDetailView: UITableViewDataSource {
   }
   
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let storyCellId = NSStringFromClass(ANIStoryViewCell.self)
-    let cell = tableView.dequeueReusableCell(withIdentifier: storyCellId, for: indexPath) as! ANIStoryViewCell
-
-    cell.indexPath = indexPath.row
-    cell.story = stroy
-    cell.delegate = self
+    guard let story = self.story else { return UITableViewCell() }
     
-    return cell
+    if story.thumbnailImageUrl != nil {
+      let videoStoryCellId = NSStringFromClass(ANIVideoStoryViewCell.self)
+      let cell = tableView.dequeueReusableCell(withIdentifier: videoStoryCellId, for: indexPath) as! ANIVideoStoryViewCell
+      
+      cell.indexPath = indexPath.row
+      cell.story = story
+      
+      return cell
+    } else {
+      let storyCellId = NSStringFromClass(ANIStoryViewCell.self)
+      let cell = tableView.dequeueReusableCell(withIdentifier: storyCellId, for: indexPath) as! ANIStoryViewCell
+      cell.delegate = self
+
+      cell.indexPath = indexPath.row
+      cell.story = story
+      
+      return cell
+    }
   }
 }
 

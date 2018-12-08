@@ -104,8 +104,9 @@ class CameraController: UIViewController {
   }
   
   @objc func shutterButtonTouched(_ button: ShutterButton) {
-    guard isBelowImageLimit() else { return }
-    guard let previewLayer = cameraView.previewLayer else { return }
+    guard isBelowImageLimit(),
+          let previewLayer = cameraView.previewLayer,
+          cart.video == nil else { return }
     
     button.isEnabled = false
     UIView.animate(withDuration: 0.1, animations: {
@@ -131,7 +132,9 @@ class CameraController: UIViewController {
       }
       
       if let asset = asset {
-        strongSelf.cart.add(Image(asset: asset), newlyTaken: true)
+        if Config.Camera.imageLimit == 0 || Config.Camera.imageLimit > self?.cart.images.count ?? 0 {
+          strongSelf.cart.add(Image(asset: asset), newlyTaken: true)
+        }
       }
     }
   }

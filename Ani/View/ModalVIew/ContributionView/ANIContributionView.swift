@@ -11,6 +11,7 @@ import UIKit
 protocol ANIContributionViewDelegate {
   func imagesPickCellTapped()
   func imageDeleteButtonTapped(index: Int)
+  func videoDeleteButtonTapped()
   func contributionButtonOn(on: Bool)
 }
 
@@ -37,16 +38,35 @@ class ANIContributionView: UIView {
     }
   }
   
+  var videoLength: Int = 0
+  var thumbnailImage: UIImage? {
+    didSet {
+      guard let contentImagesView = self.contentImagesView else { return }
+      
+      contentImagesView.videoLength = videoLength
+      contentImagesView.thumbnailImage = thumbnailImage
+      
+      if isContributable() {
+        self.delegate?.contributionButtonOn(on: true)
+      } else {
+        self.delegate?.contributionButtonOn(on: false)
+      }
+    }
+  }
+  
   var selectedContributionMode: ContributionMode? {
     didSet {
       guard let selectedContributionMode = self.selectedContributionMode,
-            let contentTextView = self.contentTextView else { return }
+            let contentTextView = self.contentTextView,
+            let contentImagesView = self.contentImagesView else { return }
       
       if selectedContributionMode == .story {
         contentTextView.placeHolder = "どんな話でも大丈夫です*^_^*"
       } else if selectedContributionMode == .qna {
         contentTextView.placeHolder = "どんな質問でも大丈夫です*^_^*"
       }
+      
+      contentImagesView.selectedContributionMode = selectedContributionMode
     }
   }
   
@@ -115,7 +135,7 @@ class ANIContributionView: UIView {
     
     switch selectedContributionMode {
     case .story:
-      if contentTextView.text.count > 0 && !contentImages.isEmpty {
+      if contentTextView.text.count > 0 && (!contentImages.isEmpty || thumbnailImage != nil) {
         return true
       } else {
         return false
@@ -155,6 +175,11 @@ extension ANIContributionView: ANIContributionImagesViewDelegate {
   func imageDelete(index: Int) {
     contentImages.remove(at: index)
     self.delegate?.imageDeleteButtonTapped(index: index)
+  }
+  
+  func videoDelete() {
+    thumbnailImage = nil
+    self.delegate?.videoDeleteButtonTapped()
   }
 }
 

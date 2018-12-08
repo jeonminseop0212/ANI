@@ -163,6 +163,11 @@ class PagesController: UIViewController {
     guard selectedIndex != index else { return }
     
     selectedIndex = index
+    if selectedIndex == 0, let imagesController = controllers[selectedIndex] as? ImagesController {
+      imagesController.gridView.collectionView.reloadData()
+    } else if selectedIndex == 1, let videosController = controllers[selectedIndex] as? VideosController {
+      videosController.gridView.collectionView.reloadData()
+    }
     notify()
   }
   
@@ -170,13 +175,16 @@ class PagesController: UIViewController {
     //videoviewから出るとき動画を止める
     if controllers[selectedIndex] as? VideosController == nil {
       if controllers.count > 2 {
-        if let videosController = controllers[2] as? VideosController {
+        if let videosController = controllers[1] as? VideosController {
           videosController.gridView.player?.pause()
         }
       }
     }
-    if let controller = controllers[selectedIndex] as? PageAware {
-      controller.pageDidShow()
+    
+    for controller in controllers {
+      if let controller = controller as? PageAware {
+        controller.pageDidShow()
+      }
     }
   }
 }
@@ -192,8 +200,13 @@ extension PagesController: PageIndicatorDelegate {
 extension PagesController: UIScrollViewDelegate {
   
   func scrollViewDidScroll(_ scrollView: UIScrollView) {
-    let index = Int(round(scrollView.contentOffset.x / scrollView.frame.size.width))
-    pageIndicator.select(index: index)
-    updateAndNotify(index)
+    if scrollView.frame.size.width != 0.0 {
+      let index = Int(round(scrollView.contentOffset.x / scrollView.frame.size.width))
+      pageIndicator.select(index: index)
+      updateAndNotify(index)
+    } else {
+      pageIndicator.select(index: 0)
+      updateAndNotify(0)
+    }
   }
 }

@@ -687,4 +687,10 @@ extension ANIRecruitDetailViewController: ANIRecruitContributionViewControllerDe
     self.recruit = recruit
     recruitDetailView.recruit = recruit
   }
+  
+  func loadThumnailImage(thumbnailImage: UIImage?) {
+  }
+  
+  func updateProgress(progress: CGFloat) {
+  }
 }

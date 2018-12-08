@@ -10,6 +10,7 @@ import UIKit
 import FirebaseFirestore
 import CodableFirebase
 import NVActivityIndicatorView
+import AVKit
 
 protocol ANIStoryViewDelegate {
   func didSelectStoryViewCell(selectedStory: FirebaseStory, user: FirebaseUser)
@@ -29,6 +30,7 @@ class ANIStoryView: UIView {
   
   private var stories = [FirebaseStory]()
   private var supportRecruits = [String: FirebaseRecruit?]()
+  private var storyVideoAssets = [String: AVAsset]()
   private var rankingStories = [FirebaseStory]()
   private var users = [FirebaseUser]()
   
@@ -42,6 +44,8 @@ class ANIStoryView: UIView {
   private weak var activityIndicatorView: NVActivityIndicatorView?
   
   var isCellSelected: Bool = false
+  
+  private var beforeVideoViewCell: ANIVideoStoryViewCell?
   
   var delegate: ANIStoryViewDelegate?
   
@@ -80,6 +84,8 @@ class ANIStoryView: UIView {
     tableView.scrollIndicatorInsets  = UIEdgeInsets(top: UIViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: 0, right: 0)
     let storyCellId = NSStringFromClass(ANIStoryViewCell.self)
     tableView.register(ANIStoryViewCell.self, forCellReuseIdentifier: storyCellId)
+    let videoStoryCellId = NSStringFromClass(ANIVideoStoryViewCell.self)
+    tableView.register(ANIVideoStoryViewCell.self, forCellReuseIdentifier: videoStoryCellId)
     let supportCellId = NSStringFromClass(ANISupportViewCell.self)
     tableView.register(ANISupportViewCell.self, forCellReuseIdentifier: supportCellId)
     let rankingCellId = NSStringFromClass(ANIRankingViewCell.self)
@@ -203,7 +209,7 @@ class ANIStoryView: UIView {
     if let hideUserIds = story.hideUserIds, hideUserIds.contains(currentUserUid) {
       return true
     }
-    if story.storyImageUrls == nil && story.recruitId == nil {
+    if story.storyImageUrls == nil && story.recruitId == nil && story.thumbnailImageUrl == nil {
       return true
     }
     
@@ -227,7 +233,8 @@ extension ANIStoryView: UITableViewDataSource {
         if let recruitId = stories[indexPath.row].recruitId {
           let supportCellId = NSStringFromClass(ANISupportViewCell.self)
           let cell = tableView.dequeueReusableCell(withIdentifier: supportCellId, for: indexPath) as! ANISupportViewCell
-          
+          cell.delegate = self
+
           if let supportRecruit = supportRecruits[recruitId] {
             if let supportRecruit = supportRecruit {
               cell.recruit = supportRecruit
@@ -253,12 +260,39 @@ extension ANIStoryView: UITableViewDataSource {
           }
           cell.indexPath = indexPath.row
           cell.story = stories[indexPath.row]
+          
+          return cell
+        } else if stories[indexPath.row].thumbnailImageUrl != nil {
+          let videoStoryCellId = NSStringFromClass(ANIVideoStoryViewCell.self)
+          let cell = tableView.dequeueReusableCell(withIdentifier: videoStoryCellId, for: indexPath) as! ANIVideoStoryViewCell
           cell.delegate = self
+          
+          if users.contains(where: { $0.uid == stories[indexPath.row].userId }) {
+            for user in users {
+              if stories[indexPath.row].userId == user.uid {
+                cell.user = user
+                break
+              }
+            }
+          } else {
+            cell.user = nil
+          }
+          
+          if let storyVideoUrl = stories[indexPath.row].storyVideoUrl,
+            storyVideoAssets.contains(where: { $0.0 == storyVideoUrl }) {
+            cell.videoAsset = storyVideoAssets[storyVideoUrl]
+          } else {
+            cell.videoAsset = nil
+          }
+          
+          cell.indexPath = indexPath.row
+          cell.story = stories[indexPath.row]
           
           return cell
         } else {
           let storyCellId = NSStringFromClass(ANIStoryViewCell.self)
           let cell = tableView.dequeueReusableCell(withIdentifier: storyCellId, for: indexPath) as! ANIStoryViewCell
+          cell.delegate = self
           
           if users.contains(where: { $0.uid == stories[indexPath.row].userId }) {
             for user in users {
@@ -272,7 +306,6 @@ extension ANIStoryView: UITableViewDataSource {
           }
           cell.indexPath = indexPath.row
           cell.story = stories[indexPath.row]
-          cell.delegate = self
           
           return cell
         }
@@ -283,9 +316,9 @@ extension ANIStoryView: UITableViewDataSource {
       if indexPath.row == 0 {
         let rankingCellId = NSStringFromClass(ANIRankingViewCell.self)
         let cell = tableView.dequeueReusableCell(withIdentifier: rankingCellId, for: indexPath) as! ANIRankingViewCell
+        cell.delegate = self
         
         cell.rankingStories = rankingStories
-        cell.delegate = self
         
         return cell
       } else {
@@ -293,7 +326,8 @@ extension ANIStoryView: UITableViewDataSource {
           if let recruitId = stories[indexPath.row - 1].recruitId {
             let supportCellId = NSStringFromClass(ANISupportViewCell.self)
             let cell = tableView.dequeueReusableCell(withIdentifier: supportCellId, for: indexPath) as! ANISupportViewCell
-            
+            cell.delegate = self
+
             if let supportRecruit = supportRecruits[recruitId] {
               if let supportRecruit = supportRecruit {
                 cell.recruit = supportRecruit
@@ -319,13 +353,40 @@ extension ANIStoryView: UITableViewDataSource {
             }
             cell.indexPath = indexPath.row - 1
             cell.story = stories[indexPath.row - 1]
+            
+            return cell
+          } else if stories[indexPath.row - 1].thumbnailImageUrl != nil {
+            let videoStoryCellId = NSStringFromClass(ANIVideoStoryViewCell.self)
+            let cell = tableView.dequeueReusableCell(withIdentifier: videoStoryCellId, for: indexPath) as! ANIVideoStoryViewCell
             cell.delegate = self
+            
+            if users.contains(where: { $0.uid == stories[indexPath.row - 1].userId }) {
+              for user in users {
+                if stories[indexPath.row - 1].userId == user.uid {
+                  cell.user = user
+                  break
+                }
+              }
+            } else {
+              cell.user = nil
+            }
+            
+            if let storyVideoUrl = stories[indexPath.row - 1].storyVideoUrl,
+              storyVideoAssets.contains(where: { $0.0 == storyVideoUrl }) {
+              cell.videoAsset = storyVideoAssets[storyVideoUrl]
+            } else {
+              cell.videoAsset = nil
+            }
+            
+            cell.indexPath = indexPath.row - 1
+            cell.story = stories[indexPath.row - 1]
             
             return cell
           } else {
             let storyCellId = NSStringFromClass(ANIStoryViewCell.self)
             let cell = tableView.dequeueReusableCell(withIdentifier: storyCellId, for: indexPath) as! ANIStoryViewCell
-            
+            cell.delegate = self
+
             if users.contains(where: { $0.uid == stories[indexPath.row - 1].userId }) {
               for user in users {
                 if stories[indexPath.row - 1].userId == user.uid {
@@ -338,7 +399,6 @@ extension ANIStoryView: UITableViewDataSource {
             }
             cell.indexPath = indexPath.row - 1
             cell.story = stories[indexPath.row - 1]
-            cell.delegate = self
             
             return cell
           }
@@ -358,6 +418,11 @@ extension ANIStoryView: UITableViewDelegate {
         if stories[indexPath.row].recruitId != nil, let cell = cell as? ANISupportViewCell {
           cell.unobserveLove()
           cell.unobserveComment()
+        } else if stories[indexPath.row].thumbnailImageUrl != nil, let cell = cell as? ANIVideoStoryViewCell {
+          cell.unobserveLove()
+          cell.unobserveComment()
+          cell.storyVideoView?.removeReachEndObserver()
+          cell.storyVideoView?.stop()
         } else if let cell = cell as? ANIStoryViewCell {
           cell.unobserveLove()
           cell.unobserveComment()
@@ -368,6 +433,11 @@ extension ANIStoryView: UITableViewDelegate {
         if stories[indexPath.row - 1].recruitId != nil, let cell = cell as? ANISupportViewCell {
           cell.unobserveLove()
           cell.unobserveComment()
+        } else if stories[indexPath.row - 1].thumbnailImageUrl != nil, let cell = cell as? ANIVideoStoryViewCell {
+          cell.unobserveLove()
+          cell.unobserveComment()
+          cell.storyVideoView?.removeReachEndObserver()
+          cell.storyVideoView?.stop()
         } else if let cell = cell as? ANIStoryViewCell {
           cell.unobserveLove()
           cell.unobserveComment()
@@ -403,10 +473,40 @@ extension ANIStoryView: UITableViewDelegate {
       return UITableView.automaticDimension
     }
   }
+  
+  func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    guard let storyTableView = self.storyTableView else { return }
+    
+    //play video
+    let centerX = storyTableView.center.x
+    let centerY = storyTableView.center.y + scrollView.contentOffset.y + UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+
+    if let indexPath = storyTableView.indexPathForRow(at: CGPoint(x: centerX, y: centerY)) {
+      if let videoCell = storyTableView.cellForRow(at: indexPath) as? ANIVideoStoryViewCell,
+        let storyVideoView = videoCell.storyVideoView {
+        if beforeVideoViewCell != videoCell {
+          if let beforeVideoViewCell = self.beforeVideoViewCell,
+            let beforeStoryVideoView = beforeVideoViewCell.storyVideoView {
+            beforeStoryVideoView.stop()
+          }
+          
+          storyVideoView.play()
+          beforeVideoViewCell = videoCell
+        }
+      } else {
+        if let beforeVideoViewCell = self.beforeVideoViewCell,
+          let beforeStoryVideoView = beforeVideoViewCell.storyVideoView {
+          beforeStoryVideoView.stop()
+        }
+        
+        beforeVideoViewCell = nil
+      }
+    }
+  }
 }
 
-//MARK: ANIStoryViewCellDelegate
-extension ANIStoryView: ANIStoryViewCellDelegate {
+//MARK: ANIStoryViewCellDelegate, ANIVideoStoryViewCellDelegate
+extension ANIStoryView: ANIStoryViewCellDelegate, ANIVideoStoryViewCellDelegate {
   func storyCellTapped(story: FirebaseStory, user: FirebaseUser) {
     self.delegate?.didSelectStoryViewCell(selectedStory: story, user: user)
   }
@@ -429,6 +529,10 @@ extension ANIStoryView: ANIStoryViewCellDelegate {
   
   func loadedStoryUser(user: FirebaseUser) {
     self.users.append(user)
+  }
+  
+  func loadedVideo(urlString: String, asset: AVAsset) {
+    storyVideoAssets[urlString] = asset
   }
 }
 
@@ -512,7 +616,14 @@ extension ANIStoryView {
         for (index, document) in snapshot.documents.enumerated() {
           do {
             let story = try FirestoreDecoder().decode(FirebaseStory.self, from: document.data())
+            
             if !self.isBlockStory(story: story) {
+              if let storyVideoUrl = story.storyVideoUrl, let url = URL(string: storyVideoUrl) {
+                let asset = AVAsset(url: url)
+                
+                self.storyVideoAssets[storyVideoUrl] = asset
+              }
+              
               self.stories.append(story)
             }
             
@@ -636,7 +747,14 @@ extension ANIStoryView {
         for (index, document) in snapshot.documents.enumerated() {
           do {
             let story = try FirestoreDecoder().decode(FirebaseStory.self, from: document.data())
+            
             if !self.isBlockStory(story: story) {
+              if let storyVideoUrl = story.storyVideoUrl, let url = URL(string: storyVideoUrl) {
+                let asset = AVAsset(url: url)
+                
+                self.storyVideoAssets[storyVideoUrl] = asset
+              }
+              
               self.stories.append(story)
             }
             

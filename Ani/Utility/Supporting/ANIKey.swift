@@ -58,6 +58,8 @@ let KEY_HIDE_USER_IDS = "hideUserIds"
 
 //story
 let KEY_STORY_IMAGES = "story_images"
+let KEY_STORY_VIDEOS = "story_videos"
+let KYE_THUMNAIL_IMAGES = "thumbnail_images"
 let KEY_STORIES = "stories"
 let KEY_DAY = "day"
 let KEY_LOVE_COUNT = "loveCount"

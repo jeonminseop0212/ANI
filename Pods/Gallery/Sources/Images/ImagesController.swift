@@ -207,6 +207,9 @@ extension ImagesController: CartDelegate {
     
     if newlyTaken {
       refreshSelectedAlbum()
+      selectedItem = image
+      changeImage(image)
+      selectedItemIndex = 0
     }
   }
   
@@ -242,7 +245,6 @@ extension ImagesController: UICollectionViewDataSource, UICollectionViewDelegate
   }
   
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-    
     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: ImageCell.self), for: indexPath)
       as! ImageCell
     let item = items[(indexPath as NSIndexPath).item]
@@ -266,38 +268,48 @@ extension ImagesController: UICollectionViewDataSource, UICollectionViewDelegate
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
     let item = items[(indexPath as NSIndexPath).item]
     selectedItem = item
-
-    if Config.Camera.oneImageMode {
-      if !cart.images.contains(item) {
-        cart.images.removeAll()
-        
-        cart.add(item)
-        
-        changeImage(item)
-      }
-    } else {
-      if cart.images.contains(item) {
-        if selectedItemIndex == indexPath.item {
-          cart.remove(item)
-        }
-        selectedItemIndex = indexPath.item
-        
-        changeSelectedImage(item)
-      } else {
-        if Config.Camera.imageLimit == 0 || Config.Camera.imageLimit > cart.images.count{
+    
+    if cart.video == nil {
+      if Config.Camera.oneImageMode {
+        if !cart.images.contains(item) {
+          cart.images.removeAll()
+          
           cart.add(item)
           
           changeImage(item)
         }
-        
-        selectedItemIndex = indexPath.item
+      } else {
+        if cart.images.contains(item) {
+          if selectedItemIndex == indexPath.item {
+            cart.remove(item)
+          }
+          selectedItemIndex = indexPath.item
+          
+          for image in cart.images {
+            if image == item {
+              changeSelectedImage(image)
+            }
+          }
+        } else {
+          if Config.Camera.imageLimit == 0 || Config.Camera.imageLimit > cart.images.count{
+            cart.add(item)
+            
+            changeImage(item)
+          }
+          
+          selectedItemIndex = indexPath.item
+        }
       }
+      
+      //    gridView.panGestureHelper.resetToOriginalState()
+      gridView.panGestureHelper.resetToOriginalStateTappedCell(index: indexPath)
+      
+      configureFrameViews()
+    } else {
+      changeImage(item)
+      
+      gridView.panGestureHelper.resetToOriginalStateTappedCell(index: indexPath)
     }
-    
-    //    gridView.panGestureHelper.resetToOriginalState()
-    gridView.panGestureHelper.resetToOriginalStateTappedCell(index: indexPath)
-    
-    configureFrameViews()
   }
   
   func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
@@ -317,20 +329,26 @@ extension ImagesController: UICollectionViewDataSource, UICollectionViewDelegate
   func configureFrameView(_ cell: ImageCell, indexPath: IndexPath) {
     let item = items[(indexPath as NSIndexPath).item]
     
-    if let index = cart.images.index(of: item) {
-      cell.frameView.g_quickFade()
-      if !Config.Camera.oneImageMode {
-        cell.frameView.label.text = "\(index + 1)"
+    if cart.video == nil {
+      if let index = cart.images.index(of: item) {
+        cell.frameView.g_quickFade()
+        if !Config.Camera.oneImageMode {
+          cell.frameView.label.text = "\(index + 1)"
+          cell.coverView.alpha = 0.0
+        }
+      } else {
+        cell.coverView.alpha = 0.0
+        cell.frameView.alpha = 0.0
+      }
+      
+      if !Config.Camera.oneImageMode && Config.Camera.imageLimit <= cart.images.count && !cart.images.contains(item) {
+        cell.coverView.alpha = 0.5
+      } else {
         cell.coverView.alpha = 0.0
       }
     } else {
-      cell.frameView.alpha = 0
-    }
-    
-    if !Config.Camera.oneImageMode && Config.Camera.imageLimit <= cart.images.count && !cart.images.contains(item) {
+      cell.frameView.alpha = 0.0
       cell.coverView.alpha = 0.5
-    } else {
-      cell.coverView.alpha = 0.0
     }
   }
 }
@@ -386,5 +404,11 @@ extension ImagesController: GridViewDelegate {
         cart.images[index].scale = scale
       }
     }
+  }
+  
+  func previewVideoDidScroll(offset: CGPoint) {
+  }
+  
+  func previewVideoDidZoom(scale: CGFloat) {
   }
 }

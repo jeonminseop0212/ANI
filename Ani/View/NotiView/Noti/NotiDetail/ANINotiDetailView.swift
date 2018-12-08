@@ -10,6 +10,7 @@ import UIKit
 import FirebaseFirestore
 import CodableFirebase
 import NVActivityIndicatorView
+import AVKit
 
 protocol ANINotiDetailViewDelegate {
   func recruitViewCellDidSelect(selectedRecruit: FirebaseRecruit, user: FirebaseUser)
@@ -85,12 +86,15 @@ class ANINotiDetailView: UIView {
   private var comment: FirebaseComment?
   private var loveUsers = [FirebaseUser]()
   private var user: FirebaseUser?
+  private var storyVideoAsset: AVAsset?
   
   private var isLastPage: Bool = false
   private var lastUserId: QueryDocumentSnapshot?
   private var isLoading: Bool = false
   private let COUNT_LAST_CELL: Int = 4
   private let COUNT_NOTI_AND_HEADER_CELL: Int = 2
+  
+  private var beforeVideoViewCell: ANIVideoStoryViewCell?
   
   private var cellHeight = [IndexPath: CGFloat]()
   
@@ -117,6 +121,8 @@ class ANINotiDetailView: UIView {
     tableView.register(ANIRecruitViewCell.self, forCellReuseIdentifier: recruitCellId)
     let storyCellId = NSStringFromClass(ANIStoryViewCell.self)
     tableView.register(ANIStoryViewCell.self, forCellReuseIdentifier: storyCellId)
+    let videoStoryCellId = NSStringFromClass(ANIVideoStoryViewCell.self)
+    tableView.register(ANIVideoStoryViewCell.self, forCellReuseIdentifier: videoStoryCellId)
     let supportCellId = NSStringFromClass(ANISupportViewCell.self)
     tableView.register(ANISupportViewCell.self, forCellReuseIdentifier: supportCellId)
     let qnaCellId = NSStringFromClass(ANIQnaViewCell.self)
@@ -272,11 +278,14 @@ extension ANINotiDetailView: UITableViewDataSource {
         return cell
       }
     case .story:
-      if story?.recruitId != nil {
+      guard let story = self.story else { return UITableViewCell() }
+      
+      if story.recruitId != nil {
         if indexPath.row == 0 {
           let supportCellId = NSStringFromClass(ANISupportViewCell.self)
           let cell = tableView.dequeueReusableCell(withIdentifier: supportCellId, for: indexPath) as! ANISupportViewCell
-          
+          cell.delegate = self
+
           if let user = self.user {
             cell.user = user
           }
@@ -284,7 +293,6 @@ extension ANINotiDetailView: UITableViewDataSource {
           cell.recruit = nil
           cell.isDeleteRecruit = nil
           cell.story = story
-          cell.delegate = self
           
           return cell
         } else if indexPath.row == 1 {
@@ -315,17 +323,65 @@ extension ANINotiDetailView: UITableViewDataSource {
           
           return cell
         }
+      } else if story.thumbnailImageUrl != nil {
+        if indexPath.row == 0 {
+          let videoStoryCellId = NSStringFromClass(ANIVideoStoryViewCell.self)
+          let cell = tableView.dequeueReusableCell(withIdentifier: videoStoryCellId, for: indexPath) as! ANIVideoStoryViewCell
+          cell.delegate = self
+
+          if let user = self.user {
+            cell.user = user
+          }
+          
+          if let storyVideoAsset = self.storyVideoAsset {
+            cell.videoAsset = storyVideoAsset
+          } else {
+            cell.videoAsset = nil
+          }
+          
+          cell.indexPath = indexPath.row
+          cell.story = story
+          
+          return cell
+        } else if indexPath.row == 1 {
+          let headerCellId = NSStringFromClass(ANINotiHeaderViewCell.self)
+          let cell = tableView.dequeueReusableCell(withIdentifier: headerCellId, for: indexPath) as! ANINotiHeaderViewCell
+          
+          if noti.commentId != nil {
+            cell.headerText = "新しいコメント"
+          } else {
+            cell.headerText = "いいねユーザー"
+          }
+          
+          return cell
+        } else if noti.commentId != nil  {
+          let commentCellId = NSStringFromClass(ANINotiCommentViewCell.self)
+          let cell = tableView.dequeueReusableCell(withIdentifier: commentCellId, for: indexPath) as! ANINotiCommentViewCell
+          
+          cell.comment = comment
+          
+          return cell
+        } else {
+          let userCellId = NSStringFromClass(ANIUserSearchViewCell.self)
+          let cell = tableView.dequeueReusableCell(withIdentifier: userCellId, for: indexPath) as! ANIUserSearchViewCell
+          
+          if !loveUsers.isEmpty {
+            cell.user = loveUsers[indexPath.row - 2]
+          }
+          
+          return cell
+        }
       } else {
         if indexPath.row == 0 {
           let storyCellId = NSStringFromClass(ANIStoryViewCell.self)
           let cell = tableView.dequeueReusableCell(withIdentifier: storyCellId, for: indexPath) as! ANIStoryViewCell
-          
+          cell.delegate = self
+
           if let user = self.user {
             cell.user = user
           }
           cell.indexPath = indexPath.row
           cell.story = story
-          cell.delegate = self
           
           return cell
         } else if indexPath.row == 1 {
@@ -361,13 +417,13 @@ extension ANINotiDetailView: UITableViewDataSource {
       if indexPath.row == 0 {
         let qnaCellId = NSStringFromClass(ANIQnaViewCell.self)
         let cell = tableView.dequeueReusableCell(withIdentifier: qnaCellId, for: indexPath) as! ANIQnaViewCell
-        
+        cell.delegate = self
+
         if let user = self.user {
           cell.user = user
         }
         cell.indexPath = indexPath.row
         cell.qna = qna
-        cell.delegate = self
         
         return cell
       } else if indexPath.row == 1 {
@@ -422,6 +478,36 @@ extension ANINotiDetailView: UITableViewDelegate {
       return UITableView.automaticDimension
     }
   }
+  
+  func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    guard let tableView = self.tableView else { return }
+    
+    //play video
+    let centerX = tableView.center.x
+    let centerY = tableView.center.y + scrollView.contentOffset.y + UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    
+    if let indexPath = tableView.indexPathForRow(at: CGPoint(x: centerX, y: centerY)) {
+      if let videoCell = tableView.cellForRow(at: indexPath) as? ANIVideoStoryViewCell,
+        let storyVideoView = videoCell.storyVideoView {
+        if beforeVideoViewCell != videoCell {
+          if let beforeVideoViewCell = self.beforeVideoViewCell,
+            let beforeStoryVideoView = beforeVideoViewCell.storyVideoView {
+            beforeStoryVideoView.stop()
+          }
+          
+          storyVideoView.play()
+          beforeVideoViewCell = videoCell
+        }
+      } else {
+        if let beforeVideoViewCell = self.beforeVideoViewCell,
+          let beforeStoryVideoView = beforeVideoViewCell.storyVideoView {
+          beforeStoryVideoView.stop()
+        }
+        
+        beforeVideoViewCell = nil
+      }
+    }
+  }
 }
 
 //MARK: ANIRecruitViewCellDelegate
@@ -466,8 +552,8 @@ extension ANINotiDetailView: ANIRecruitViewCellDelegate {
   }
 }
 
-//MARK: ANIStoryViewCellDelegate
-extension ANINotiDetailView: ANIStoryViewCellDelegate {
+//MARK: ANIStoryViewCellDelegate, ANIVideoStoryViewCellDelegate
+extension ANINotiDetailView: ANIStoryViewCellDelegate, ANIVideoStoryViewCellDelegate {
   func storyCellTapped(story: FirebaseStory, user: FirebaseUser) {
     self.delegate?.storyViewCellDidSelect(selectedStory: story, user: user)
   }
@@ -486,6 +572,10 @@ extension ANINotiDetailView: ANIStoryViewCellDelegate {
   
   func loadedStoryUser(user: FirebaseUser) {
     self.user = user
+  }
+  
+  func loadedVideo(urlString: String, asset: AVAsset) {
+    self.storyVideoAsset = asset
   }
 }
 
@@ -587,6 +677,12 @@ extension ANINotiDetailView {
         if let snapshot = snapshot, let data = snapshot.data() {
           do {
             let story = try FirestoreDecoder().decode(FirebaseStory.self, from: data)
+            if let storyVideoUrl = story.storyVideoUrl, let url = URL(string: storyVideoUrl) {
+              let asset = AVAsset(url: url)
+              
+              self.storyVideoAsset = asset
+            }
+            
             self.story = story
             
             if notiKind == .support {

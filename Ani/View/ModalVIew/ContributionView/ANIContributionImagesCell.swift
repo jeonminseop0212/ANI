@@ -53,6 +53,6 @@ class ANIContributionImagesCell: UICollectionViewCell {
   
   @objc private func imageDelegate() {
     guard let deleteButton = self.deleteButton else { return }
-    delegate?.deleteButtonTapped(index: deleteButton.tag)
+    self.delegate?.deleteButtonTapped(index: deleteButton.tag)
   }
 }

@@ -10,6 +10,7 @@ import UIKit
 import FirebaseFirestore
 import CodableFirebase
 import NVActivityIndicatorView
+import AVKit
 
 protocol ANIListViewDelegate {
   func recruitViewCellDidSelect(selectedRecruit: FirebaseRecruit, user: FirebaseUser)
@@ -51,6 +52,7 @@ class ANIListView: UIView {
   
   private var loveRecruits = [FirebaseRecruit]()
   private var loveStories = [FirebaseStory]()
+  private var storyVideoAssets = [String: AVAsset]()
   private var loveQnas = [FirebaseQna]()
   private var supportRecruits = [String: FirebaseRecruit?]()
   private var clipRecruits = [FirebaseRecruit]()
@@ -61,6 +63,8 @@ class ANIListView: UIView {
   private var lastContent: QueryDocumentSnapshot?
   private var isLoading: Bool = false
   private let COUNT_LAST_CELL: Int = 4
+  
+  private var beforeVideoViewCell: ANIVideoStoryViewCell?
 
   private var cellHeight = [IndexPath: CGFloat]()
   
@@ -86,6 +90,8 @@ class ANIListView: UIView {
     listTableView.register(ANIRecruitViewCell.self, forCellReuseIdentifier: recruitCellId)
     let storyCellId = NSStringFromClass(ANIStoryViewCell.self)
     listTableView.register(ANIStoryViewCell.self, forCellReuseIdentifier: storyCellId)
+    let videoStoryCellId = NSStringFromClass(ANIVideoStoryViewCell.self)
+    listTableView.register(ANIVideoStoryViewCell.self, forCellReuseIdentifier: videoStoryCellId)
     let supportCellId = NSStringFromClass(ANISupportViewCell.self)
     listTableView.register(ANISupportViewCell.self, forCellReuseIdentifier: supportCellId)
     let qnaCellId = NSStringFromClass(ANIQnaViewCell.self)
@@ -219,7 +225,7 @@ class ANIListView: UIView {
     if let hideUserIds = story.hideUserIds, hideUserIds.contains(currentUserUid) {
       return true
     }
-    if story.storyImageUrls == nil && story.recruitId == nil {
+    if story.storyImageUrls == nil && story.recruitId == nil && story.thumbnailImageUrl == nil {
       return true
     }
     
@@ -267,6 +273,7 @@ extension ANIListView: UITableViewDataSource {
     case .loveRecruit:
       let recruitCellid = NSStringFromClass(ANIRecruitViewCell.self)
       let cell = tableView.dequeueReusableCell(withIdentifier: recruitCellid, for: indexPath) as! ANIRecruitViewCell
+      cell.delegate = self
 
       if users.contains(where: { $0.uid == loveRecruits[indexPath.row].userId }) {
         for user in users {
@@ -280,7 +287,6 @@ extension ANIListView: UITableViewDataSource {
       }
       cell.indexPath = indexPath.row
       cell.recruit = loveRecruits[indexPath.row]
-      cell.delegate = self
       
       return cell
     case .loveStroy:
@@ -288,7 +294,8 @@ extension ANIListView: UITableViewDataSource {
         if let recruitId = loveStories[indexPath.row].recruitId {
           let supportCellId = NSStringFromClass(ANISupportViewCell.self)
           let cell = tableView.dequeueReusableCell(withIdentifier: supportCellId, for: indexPath) as! ANISupportViewCell
-          
+          cell.delegate = self
+
           if let supportRecruit = supportRecruits[recruitId] {
             if let supportRecruit = supportRecruit {
               cell.recruit = supportRecruit
@@ -314,7 +321,33 @@ extension ANIListView: UITableViewDataSource {
           }
           cell.indexPath = indexPath.row
           cell.story = loveStories[indexPath.row]
+          
+          return cell
+        } else if loveStories[indexPath.row].thumbnailImageUrl != nil {
+          let videoStoryCellId = NSStringFromClass(ANIVideoStoryViewCell.self)
+          let cell = tableView.dequeueReusableCell(withIdentifier: videoStoryCellId, for: indexPath) as! ANIVideoStoryViewCell
           cell.delegate = self
+          
+          if users.contains(where: { $0.uid == loveStories[indexPath.row].userId }) {
+            for user in users {
+              if loveStories[indexPath.row].userId == user.uid {
+                cell.user = user
+                break
+              }
+            }
+          } else {
+            cell.user = nil
+          }
+          
+          if let storyVideoUrl = loveStories[indexPath.row].storyVideoUrl,
+            storyVideoAssets.contains(where: { $0.0 == storyVideoUrl }) {
+            cell.videoAsset = storyVideoAssets[storyVideoUrl]
+          } else {
+            cell.videoAsset = nil
+          }
+          
+          cell.indexPath = indexPath.row
+          cell.story = loveStories[indexPath.row]
           
           return cell
         } else {
@@ -343,7 +376,8 @@ extension ANIListView: UITableViewDataSource {
     case .loveQuestion:
       let qnaCellid = NSStringFromClass(ANIQnaViewCell.self)
       let cell = tableView.dequeueReusableCell(withIdentifier: qnaCellid, for: indexPath) as! ANIQnaViewCell
-      
+      cell.delegate = self
+
       if users.contains(where: { $0.uid == loveQnas[indexPath.row].userId }) {
         for user in users {
           if loveQnas[indexPath.row].userId == user.uid {
@@ -356,13 +390,13 @@ extension ANIListView: UITableViewDataSource {
       }
       cell.indexPath = indexPath.row
       cell.qna = loveQnas[indexPath.row]
-      cell.delegate = self
       
       return cell
     case .clipRecruit:
       let recruitCellid = NSStringFromClass(ANIRecruitViewCell.self)
       let cell = tableView.dequeueReusableCell(withIdentifier: recruitCellid, for: indexPath) as! ANIRecruitViewCell
-      
+      cell.delegate = self
+
       if users.contains(where: { $0.uid == clipRecruits[indexPath.row].userId }) {
         for user in users {
           if clipRecruits[indexPath.row].userId == user.uid {
@@ -375,7 +409,6 @@ extension ANIListView: UITableViewDataSource {
       }
       cell.indexPath = indexPath.row
       cell.recruit = clipRecruits[indexPath.row]
-      cell.delegate = self
       
       return cell
     }
@@ -398,6 +431,11 @@ extension ANIListView: UITableViewDelegate {
         if loveStories[indexPath.row].recruitId != nil, let cell = cell as? ANISupportViewCell {
           cell.unobserveLove()
           cell.unobserveComment()
+        } else if loveStories[indexPath.row].thumbnailImageUrl != nil, let cell = cell as? ANIVideoStoryViewCell {
+          cell.unobserveLove()
+          cell.unobserveComment()
+          cell.storyVideoView?.removeReachEndObserver()
+          cell.storyVideoView?.stop()
         } else if let cell = cell as? ANIStoryViewCell {
           cell.unobserveLove()
           cell.unobserveComment()
@@ -450,6 +488,36 @@ extension ANIListView: UITableViewDelegate {
       return height
     } else {
       return UITableView.automaticDimension
+    }
+  }
+  
+  func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    guard let listTableView = self.listTableView else { return }
+    
+    //play video
+    let centerX = listTableView.center.x
+    let centerY = listTableView.center.y + scrollView.contentOffset.y + UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    
+    if let indexPath = listTableView.indexPathForRow(at: CGPoint(x: centerX, y: centerY)) {
+      if let videoCell = listTableView.cellForRow(at: indexPath) as? ANIVideoStoryViewCell,
+        let storyVideoView = videoCell.storyVideoView {
+        if beforeVideoViewCell != videoCell {
+          if let beforeVideoViewCell = self.beforeVideoViewCell,
+            let beforeStoryVideoView = beforeVideoViewCell.storyVideoView {
+            beforeStoryVideoView.stop()
+          }
+          
+          storyVideoView.play()
+          beforeVideoViewCell = videoCell
+        }
+      } else {
+        if let beforeVideoViewCell = self.beforeVideoViewCell,
+          let beforeStoryVideoView = beforeVideoViewCell.storyVideoView {
+          beforeStoryVideoView.stop()
+        }
+        
+        beforeVideoViewCell = nil
+      }
     }
   }
 }
@@ -515,8 +583,8 @@ extension ANIListView: ANIRecruitViewCellDelegate {
   }
 }
 
-//MARK: ANIStoryViewCellDelegate
-extension ANIListView: ANIStoryViewCellDelegate {
+//MARK: ANIStoryViewCellDelegate, ANIVideoStoryViewCellDelegate
+extension ANIListView: ANIStoryViewCellDelegate, ANIVideoStoryViewCellDelegate {
   func storyCellTapped(story: FirebaseStory, user: FirebaseUser) {
     self.delegate?.storyViewCellDidSelect(selectedStory: story, user: user)
   }
@@ -537,6 +605,10 @@ extension ANIListView: ANIStoryViewCellDelegate {
   
   func loadedStoryUser(user: FirebaseUser) {
     self.users.append(user)
+  }
+  
+  func loadedVideo(urlString: String, asset: AVAsset) {
+    storyVideoAssets[urlString] = asset
   }
 }
 

@@ -290,7 +290,8 @@ extension ANIRecuruitView: UITableViewDataSource {
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let id = NSStringFromClass(ANIRecruitViewCell.self)
     let cell = tableView.dequeueReusableCell(withIdentifier: id, for: indexPath) as! ANIRecruitViewCell
-    
+    cell.delegate = self
+
     if !recruits.isEmpty {
       if users.contains(where: { $0.uid == recruits[indexPath.row].userId }) {
         for user in users {
@@ -304,7 +305,6 @@ extension ANIRecuruitView: UITableViewDataSource {
       }
       cell.indexPath = indexPath.row
       cell.recruit = recruits[indexPath.row]
-      cell.delegate = self
     }
     
     return cell

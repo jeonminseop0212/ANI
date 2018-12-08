@@ -1,0 +1,18 @@
+{
+  "Mac" : [
+
+  ],
+  "watchOS" : [
+
+  ],
+  "tvOS" : [
+
+  ],
+  "commitish" : "3.0.0",
+  "iOS" : [
+    {
+      "name" : "PryntTrimmerView",
+      "hash" : "73fe1fa4cda1d65b559850e25f68baf460e7c13d6c187c63b6eba74829197951"
+    }
+  ]
+}
