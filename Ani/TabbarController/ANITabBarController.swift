@@ -307,7 +307,9 @@ extension ANITabBarController {
       let database = Firestore.firestore()
       let group = DispatchGroup()
       
-      group.enter()
+      if !self.isLoadedFirstData {
+        group.enter()
+      }
       DispatchQueue(label: "user").async {
         self.userListener = database.collection(KEY_USERS).document(currentUserUid).addSnapshotListener({ (snapshot, error) in
           guard let snapshot = snapshot, let data = snapshot.data() else { return }
@@ -337,7 +339,9 @@ extension ANITabBarController {
         })
       }
       
-      group.enter()
+      if !self.isLoadedFirstData {
+        group.enter()
+      }
       DispatchQueue(label: "user").async {
         self.blockUserListener =  database.collection(KEY_USERS).document(currentUserUid).collection(KEY_BLOCK_USER_IDS).order(by: KEY_DATE).addSnapshotListener({ (snapshot, error) in
           guard let snapshot = snapshot else { return }
@@ -353,7 +357,7 @@ extension ANITabBarController {
                 }
               }
               
-              if snapshot.documents.count == ANISessionManager.shared.blockUserIds?.count {
+              if snapshot.documents.count == ANISessionManager.shared.blockUserIds?.count, !self.isLoadedFirstData {
                 group.leave()
               }
             } else if diff.type == .removed {
@@ -369,13 +373,15 @@ extension ANITabBarController {
             }
           })
           
-          if snapshot.documents.isEmpty {
+          if snapshot.documents.isEmpty, !self.isLoadedFirstData {
             group.leave()
           }
         })
       }
       
-      group.enter()
+      if !self.isLoadedFirstData {
+        group.enter()
+      }
       DispatchQueue(label: "user").async {
         self.blockingUserListener = database.collection(KEY_USERS).document(currentUserUid).collection(KEY_BLOCKING_USER_IDS).order(by: KEY_DATE).addSnapshotListener({ (snapshot, error) in
           guard let snapshot = snapshot else { return }
@@ -390,7 +396,7 @@ extension ANITabBarController {
                   ANISessionManager.shared.blockingUserIds = [userId]
                 }
                 
-                if snapshot.documents.count == ANISessionManager.shared.blockingUserIds?.count {
+                if snapshot.documents.count == ANISessionManager.shared.blockingUserIds?.count, !self.isLoadedFirstData {
                   group.leave()
                 }
               }
@@ -407,7 +413,7 @@ extension ANITabBarController {
             }
           })
           
-          if snapshot.documents.isEmpty {
+          if snapshot.documents.isEmpty, !self.isLoadedFirstData {
             group.leave()
           }
         })
