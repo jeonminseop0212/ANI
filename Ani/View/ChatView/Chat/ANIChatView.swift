@@ -170,11 +170,14 @@ class ANIChatView: UIView {
       
       self.scrollToBottom()
       
+      activityIndicatorView.stopAnimating()
+      
       UIView.animate(withDuration: 0.2, animations: {
+        ANISessionManager.shared.isLoadedFirstData = true
+        ANINotificationManager.postDismissSplash()
+        
         chatTableView.alpha = 1.0
       })
-      
-      activityIndicatorView.stopAnimating()
       
       self.isLoading = false
       

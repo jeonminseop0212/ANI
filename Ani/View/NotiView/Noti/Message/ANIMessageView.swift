@@ -79,6 +79,8 @@ class ANIMessageView: UIView {
     ANINotificationManager.receive(notiTabTapped: self, selector: #selector(scrollToTop))
     ANINotificationManager.receive(login: self, selector: #selector(reloadChatGroups))
     ANINotificationManager.receive(logout: self, selector: #selector(hideTableView))
+    ANINotificationManager.receive(loadedCurrentUser: self, selector: #selector(reloadChatGroups))
+    ANINotificationManager.postDidSetupViewNotifications()
   }
   
   @objc private func scrollToTop() {
@@ -152,10 +154,8 @@ extension ANIMessageView: ANIMessageViewCellDelegate {
     
     activityIndicatorView.stopAnimating()
     
-    UIView.animate(withDuration: 0.2, animations: {
+    UIView.animate(withDuration: 0.2) {
       messageTableView.alpha = 1.0
-    }) { (complete) in
-      ANINotificationManager.postDismissSplash()
     }
   }
 }
@@ -174,6 +174,9 @@ extension ANIMessageView {
     
     activityIndicatorView.startAnimating()
     
+    if !chatGroups.isEmpty {
+      chatGroups.removeAll()
+    }
     if let chatGroupListener = self.chatGroupListener {
       chatGroupListener.remove()
     }
@@ -209,8 +212,6 @@ extension ANIMessageView {
               
               UIView.animate(withDuration: 0.2, animations: {
                 reloadView.alpha = 1.0
-              }, completion: { (complete) in
-                ANINotificationManager.postDismissSplash()
               })
             }
           } else if diff.type == .modified {
@@ -245,8 +246,6 @@ extension ANIMessageView {
           
           UIView.animate(withDuration: 0.2, animations: {
             reloadView.alpha = 1.0
-          }, completion: { (complete) in
-            ANINotificationManager.postDismissSplash()
           })
         }
       })
