@@ -53,6 +53,10 @@ class ANIStoryView: UIView {
     super.init(frame: frame)
     setup()
     setupNotifications()
+    
+    if ANISessionManager.shared.isLaunchNoti {
+      loadStory(sender: nil)
+    }
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -132,7 +136,7 @@ class ANIStoryView: UIView {
     ANINotificationManager.receive(communityTabTapped: self, selector: #selector(scrollToTop))
     ANINotificationManager.receive(deleteStory: self, selector: #selector(deleteStory))
     ANINotificationManager.receive(loadedCurrentUser: self, selector: #selector(reloadStory))
-    ANINotificationManager.postDidSetupStoryViewNotifications()
+    ANINotificationManager.postDidSetupViewNotifications()
   }
   
   @objc private func reloadStory() {

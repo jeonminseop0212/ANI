@@ -179,7 +179,7 @@ class ANITabBarController: UITabBarController {
     ANINotificationManager.receive(logout: self, selector: #selector(logout))
     ANINotificationManager.receive(dismissSplash: self, selector: #selector(dismissSplash))
     ANINotificationManager.receive(failLoadVersion: self, selector: #selector(showFailMessage))
-    ANINotificationManager.receive(didSetupStoryViewNotifications: self, selector: #selector(loadFirstData))
+    ANINotificationManager.receive(didSetupViewNotifications: self, selector: #selector(loadFirstData))
   }
   
   @objc private func updateBadge() {
@@ -214,7 +214,7 @@ class ANITabBarController: UITabBarController {
     guard let splashView = splashView else { return }
     
     DispatchQueue.main.async {
-      if ANISessionManager.shared.isLoadedFirstData && ANISessionManager.shared.isCheckedVersion {
+      if ANISessionManager.shared.isLoadedFirstData && ANISessionManager.shared.isCheckedVersion && splashView.alpha != 0.0 {
         UIView.animate(withDuration: 0.2, delay: 0.2, animations: {
           splashView.alpha = 0.0
         }, completion: { (complete) in
