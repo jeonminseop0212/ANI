@@ -32,6 +32,7 @@ class ANITabBarController: UITabBarController {
   private var chatGroupListener: ListenerRegistration?
   
   var isLoadedFirstData: Bool = false
+  var isLoadedUser: Bool = false
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -329,8 +330,9 @@ extension ANITabBarController {
                 self.oldIsHaveUnreadNoti = isHaveUnreadNoti
               }
               
-              if !self.isLoadedFirstData {
+              if !self.isLoadedFirstData && !self.isLoadedUser {
                 group.leave()
+                self.isLoadedUser = true
               }
             }
           } catch let error {
