@@ -212,13 +212,16 @@ class ANITabBarController: UITabBarController {
   }
   
   @objc private func dismissSplash() {
-    guard let splashView = splashView else { return }
+    guard let splashView = splashView,
+          let activityIndicatorView = splashView.activityIndicatorView else { return }
     
     DispatchQueue.main.async {
-      if ANISessionManager.shared.isLoadedFirstData && ANISessionManager.shared.isCheckedVersion && splashView.alpha != 0.0 {
+      if ANISessionManager.shared.isLoadedFirstData && ANISessionManager.shared.isCheckedVersion && splashView.alpha != 0.0 && activityIndicatorView.isAnimatedOneCycle {
         UIView.animate(withDuration: 0.2, delay: 0.2, animations: {
           splashView.alpha = 0.0
         }, completion: { (complete) in
+          activityIndicatorView.stopAnimaing()
+
           UNUserNotificationCenter.current().getNotificationSettings { (settings) in
             if settings.authorizationStatus != .authorized {
               let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
