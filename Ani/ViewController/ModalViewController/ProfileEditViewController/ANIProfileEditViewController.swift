@@ -12,13 +12,12 @@ import TinyConstraints
 import FirebaseFirestore
 import FirebaseStorage
 import CodableFirebase
-import NVActivityIndicatorView
 
 protocol ANIProfileEditViewControllerDelegate {
   func didEdit()
 }
 
-class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewable {
+class ANIProfileEditViewController: UIViewController {
   
   private weak var myNavigationBar: UIView?
   private weak var myNavigationBase: UIView?
@@ -67,6 +66,8 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
   private let IMAGE_SIZE: CGSize = CGSize(width: 500.0, height: 500.0)
   
   var delegate: ANIProfileEditViewControllerDelegate?
+  
+  private weak var activityIndicatorView: ANIActivityIndicator?
   
   override func viewDidLoad() {
     setFamilyImages { (images) in
@@ -207,6 +208,13 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
     rejectBaseView.addSubview(rejectLabel)
     rejectLabel.edgesToSuperview()
     self.rejectLabel = rejectLabel
+    
+    //activityIndicatorView
+    let activityIndicatorView = ANIActivityIndicator()
+    activityIndicatorView.isFull = true
+    self.view.addSubview(activityIndicatorView)
+    activityIndicatorView.edgesToSuperview()
+    self.activityIndicatorView = activityIndicatorView
   }
   
   private func setupNotifications() {
@@ -312,7 +320,7 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
           let user = try FirestoreDecoder().decode(FirebaseUser.self, from: data)
           ANISessionManager.shared.currentUser = user
           
-          NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+          self.activityIndicatorView?.stopAnimating()
           
           self.delegate?.didEdit()
           self.dismiss(animated: true, completion: nil)
@@ -431,8 +439,7 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
     guard let currentUser = ANISessionManager.shared.currentUser,
           let currentUserUid = ANISessionManager.shared.currentUserUid else { return }
     
-    let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.emerald)
-    NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData, nil)
+    self.activityIndicatorView?.startAnimating()
 
     if familyImagesChange {
       if let familyUrls = currentUser.familyImageUrls {
@@ -523,7 +530,8 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
               self.updateUserData(uid: currentUserUid, values: values)
             }
           } else {
-            NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+            self.activityIndicatorView?.stopAnimating()
+
             self.reject(notiText: "すでに存在するユーザーネームです！")
           }
         })

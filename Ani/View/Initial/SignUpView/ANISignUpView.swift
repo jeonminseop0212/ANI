@@ -11,12 +11,13 @@ import FirebaseAuth
 import FirebaseStorage
 import FirebaseFirestore
 import CodableFirebase
-import NVActivityIndicatorView
 
 protocol ANISignUpViewDelegate {
   func prifileImagePickButtonTapped()
   func reject(notiText: String)
   func signUpSuccess(adress: String, password: String, userId: String)
+  func startAnimaing()
+  func stopAnimating()
 }
 
 class ANISignUpView: UIView {
@@ -287,8 +288,7 @@ class ANISignUpView: UIView {
     guard let userNameTextField = self.userNameTextField,
           let userName = userNameTextField.text else { return }
     
-    let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.emerald)
-    NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData, nil)
+    self.delegate?.startAnimaing()
     
     let database = Firestore.firestore()
     DispatchQueue.global().async {
@@ -304,7 +304,7 @@ class ANISignUpView: UIView {
         if snapshot.documents.isEmpty {
           self.createAccount(adress: adress, password: password)
         } else {
-          NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+          self.delegate?.stopAnimating()
 
           self.delegate?.reject(notiText: "すでに存在するユーザーネームです！")
         }
@@ -317,7 +317,7 @@ class ANISignUpView: UIView {
       if let errorUnrap = error {
         let nsError = errorUnrap as NSError
         
-        NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+        self.delegate?.stopAnimating()
 
         if nsError.code == 17007 {
           self.delegate?.reject(notiText: "すでに存在するメールアドレスです！")
@@ -357,7 +357,7 @@ class ANISignUpView: UIView {
     storageRef.child(KEY_PROFILE_IMAGES).child("\(currentUser.uid).jpeg").putData(profileImageData, metadata: nil) { (metaData, error) in
       if error != nil {
         DLog("storageError")
-        NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+        self.delegate?.stopAnimating()
         return
       }
       
@@ -392,13 +392,13 @@ class ANISignUpView: UIView {
         
         self.delegate?.signUpSuccess(adress: self.adress, password: self.password, userId: uid)
         
-        NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+        self.delegate?.stopAnimating()
       }
       
       self.endEditing(true)
     } catch let error {
       DLog(error)
-      NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+      self.delegate?.stopAnimating()
     }
   }
   

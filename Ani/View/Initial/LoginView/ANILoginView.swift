@@ -10,11 +10,12 @@ import UIKit
 import FirebaseFirestore
 import FirebaseAuth
 import CodableFirebase
-import NVActivityIndicatorView
 
 protocol ANILoginViewDelegate {
   func reject(notiText: String)
   func loginSuccess()
+  func startAnimaing()
+  func stopAnimating()
 }
 
 class ANILoginView: UIView {
@@ -202,8 +203,7 @@ extension ANILoginView: ANIButtonViewDelegate {
             let passwordTextField = self.passwordTextField,
             let password = passwordTextField.text else { return }
       
-      let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.emerald)
-      NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData, nil)
+      self.delegate?.startAnimaing()
       
       self.endEditing(true)
       
@@ -211,8 +211,8 @@ extension ANILoginView: ANIButtonViewDelegate {
         if let errorUnrap = error {
           let nsError = errorUnrap as NSError
           
-          NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
-
+          self.delegate?.stopAnimating()
+          
           DLog("nsError \(nsError)")
           if nsError.code == 17008 || nsError.code == 17011 {
             self.delegate?.reject(notiText: "存在しないメールアドレスです！")
@@ -224,14 +224,16 @@ extension ANILoginView: ANIButtonViewDelegate {
         } else {
           if let currentUser = Auth.auth().currentUser {
             if currentUser.isEmailVerified {
+              self.myTabBarController?.isLoadedUser = false
               self.myTabBarController?.isLoadedFirstData = false
               self.myTabBarController?.loadUser() {
                 self.delegate?.loginSuccess()
                 self.myTabBarController?.observeChatGroup()
-                NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+                
+                self.delegate?.stopAnimating()
               }
             } else {
-              NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+              self.delegate?.stopAnimating()
               
               self.delegate?.reject(notiText: "アドレスの認証メールを確認してください！")
             }

@@ -11,7 +11,6 @@ import FirebaseFirestore
 import CodableFirebase
 import FirebaseStorage
 import InstantSearchClient
-import NVActivityIndicatorView
 
 class ANIListViewController: UIViewController {
   
@@ -26,6 +25,8 @@ class ANIListViewController: UIViewController {
   
   private var contentType: ContentType?
   private var contributionId: String?
+  
+  private weak var activityIndicatorView: ANIActivityIndicator?
   
   override func viewDidLoad() {
     setup()
@@ -94,6 +95,13 @@ class ANIListViewController: UIViewController {
     listView.topToBottom(of: myNavigationBar)
     listView.edgesToSuperview(excluding: .top)
     self.listView = listView
+    
+    //activityIndicatorView
+    let activityIndicatorView = ANIActivityIndicator()
+    activityIndicatorView.isFull = true
+    self.view.addSubview(activityIndicatorView)
+    activityIndicatorView.edgesToSuperview()
+    self.activityIndicatorView = activityIndicatorView
   }
   
   //MARK: Notifications
@@ -248,8 +256,7 @@ extension ANIListViewController: ANIPopupOptionViewControllerDelegate {
       let hideAction = UIAlertAction(title: "非表示", style: .default) { (action) in
         let database = Firestore.firestore()
         
-        let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.emerald)
-        NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData, nil)
+        self.activityIndicatorView?.startAnimating()
         
         DispatchQueue.global().async {
           database.collection(collection).document(contributionId).getDocument(completion: { (snapshot, error) in
@@ -280,7 +287,8 @@ extension ANIListViewController: ANIPopupOptionViewControllerDelegate {
                 }
                 
                 DispatchQueue.main.async {
-                  NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+                  self.activityIndicatorView?.stopAnimating()
+
                   ANINotificationManager.postDeleteStory(id: contributionId)
                 }
               } catch let error {
@@ -306,7 +314,8 @@ extension ANIListViewController: ANIPopupOptionViewControllerDelegate {
                 }
                 
                 DispatchQueue.main.async {
-                  NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+                  self.activityIndicatorView?.stopAnimating()
+
                   ANINotificationManager.postDeleteQna(id: contributionId)
                 }
               } catch let error {

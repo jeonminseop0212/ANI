@@ -9,7 +9,6 @@
 import UIKit
 import FirebaseFirestore
 import CodableFirebase
-import NVActivityIndicatorView
 
 class ANIMessageView: UIView {
   
@@ -21,8 +20,8 @@ class ANIMessageView: UIView {
   
   private var chatGroupListener: ListenerRegistration?
   
-  private weak var activityIndicatorView: NVActivityIndicatorView?
-  
+  private weak var activityIndicatorView: ANIActivityIndicator?
+
   var isCellSelected: Bool = false
   
   override init(frame: CGRect) {
@@ -67,11 +66,10 @@ class ANIMessageView: UIView {
     self.messageTableView = messageTableView
     
     //activityIndicatorView
-    let activityIndicatorView = NVActivityIndicatorView(frame: .zero, type: .lineScale, color: ANIColor.emerald, padding: 0)
-    addSubview(activityIndicatorView)
-    activityIndicatorView.width(40.0)
-    activityIndicatorView.height(40.0)
-    activityIndicatorView.centerInSuperview()
+    let activityIndicatorView = ANIActivityIndicator()
+    activityIndicatorView.isFull = false
+    self.addSubview(activityIndicatorView)
+    activityIndicatorView.edgesToSuperview()
     self.activityIndicatorView = activityIndicatorView
   }
   

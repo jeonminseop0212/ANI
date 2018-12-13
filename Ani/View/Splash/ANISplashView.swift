@@ -47,6 +47,7 @@ class ANISplashView: UIView {
     //activityIndicatorView
     let activityIndicatorView = ANIActivityIndicator()
     activityIndicatorView.isSplash = true
+    activityIndicatorView.isFull = false
     activityIndicatorView.startAnimating()
     addSubview(activityIndicatorView)
     activityIndicatorView.width(43.0)

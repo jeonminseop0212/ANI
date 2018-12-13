@@ -9,7 +9,6 @@
 import UIKit
 import FirebaseFirestore
 import CodableFirebase
-import NVActivityIndicatorView
 
 protocol ANINotiDetailViewDelegate {
   func recruitViewCellDidSelect(selectedRecruit: FirebaseRecruit, user: FirebaseUser)
@@ -94,8 +93,8 @@ class ANINotiDetailView: UIView {
   
   private var cellHeight = [IndexPath: CGFloat]()
   
-  private weak var activityIndicatorView: NVActivityIndicatorView?
-  
+  private weak var activityIndicatorView: ANIActivityIndicator?
+
   var delegate: ANINotiDetailViewDelegate?
   
   override init(frame: CGRect) {
@@ -149,11 +148,10 @@ class ANINotiDetailView: UIView {
     self.alertLabel = alertLabel
     
     //activityIndicatorView
-    let activityIndicatorView = NVActivityIndicatorView(frame: .zero, type: .lineScale, color: ANIColor.emerald, padding: 0)
-    addSubview(activityIndicatorView)
-    activityIndicatorView.width(40.0)
-    activityIndicatorView.height(40.0)
-    activityIndicatorView.centerInSuperview()
+    let activityIndicatorView = ANIActivityIndicator()
+    activityIndicatorView.isFull = false
+    self.addSubview(activityIndicatorView)
+    activityIndicatorView.edgesToSuperview()
     self.activityIndicatorView = activityIndicatorView
   }
   
@@ -701,9 +699,7 @@ extension ANINotiDetailView {
           let activityIndicatorView = self.activityIndicatorView else { return }
     
     let database = Firestore.firestore()
-    
-    activityIndicatorView.startAnimating()
-    
+        
     var collection: String = ""
     if contributionKind == .recruit {
       collection = KEY_RECRUITS
