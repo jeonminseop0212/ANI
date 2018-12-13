@@ -8,7 +8,6 @@
 
 import UIKit
 import TinyConstraints
-import NVActivityIndicatorView
 
 protocol ANIRecruitContributionViewDelegate {
   func recruitContributeViewDidScroll(offset: CGFloat)
@@ -67,8 +66,8 @@ class ANIRecruitContributionView: UIView {
   private weak var passingBG: UIView?
   private weak var passingTextView: ANIPlaceHolderTextView?
   
-  private weak var activityIndicatorView: NVActivityIndicatorView?
-  
+  private weak var activityIndicatorView: ANIActivityIndicator?
+
   private let KEYBOARD_HIDE_TOOL_BAR_HEIGHT: CGFloat = 40.0
   
   var headerMinHeight: CGFloat?
@@ -548,11 +547,10 @@ class ANIRecruitContributionView: UIView {
     setHideButtonOnKeyboard(textView: passingTextView)
     
     //activityIndicatorView
-    let activityIndicatorView = NVActivityIndicatorView(frame: .zero, type: .lineScale, color: ANIColor.emerald, padding: 0)
-    addSubview(activityIndicatorView)
-    activityIndicatorView.width(40.0)
-    activityIndicatorView.height(40.0)
-    activityIndicatorView.centerInSuperview()
+    let activityIndicatorView = ANIActivityIndicator()
+    activityIndicatorView.isFull = false
+    self.addSubview(activityIndicatorView)
+    activityIndicatorView.edgesToSuperview()
     self.activityIndicatorView = activityIndicatorView
   }
   

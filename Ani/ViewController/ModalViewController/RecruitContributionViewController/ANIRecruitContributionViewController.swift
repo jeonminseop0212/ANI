@@ -12,7 +12,6 @@ import TinyConstraints
 import FirebaseStorage
 import FirebaseFirestore
 import CodableFirebase
-import NVActivityIndicatorView
 
 enum BasicInfoPickMode {
   case kind
@@ -75,6 +74,8 @@ class ANIRecruitContributionViewController: UIViewController {
   var recruit: FirebaseRecruit?
   
   var delegate: ANIRecruitContributionViewControllerDelegate?
+  
+  private weak var activityIndicatorView: ANIActivityIndicator?
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -192,6 +193,13 @@ class ANIRecruitContributionViewController: UIViewController {
     rejectBaseView.addSubview(rejectLabel)
     rejectLabel.edgesToSuperview()
     self.rejectLabel = rejectLabel
+    
+    //activityIndicatorView
+    let activityIndicatorView = ANIActivityIndicator()
+    activityIndicatorView.isFull = true
+    self.view.addSubview(activityIndicatorView)
+    activityIndicatorView.edgesToSuperview()
+    self.activityIndicatorView = activityIndicatorView
   }
   
   private func setupNotifications() {
@@ -307,7 +315,7 @@ class ANIRecruitContributionViewController: UIViewController {
             if let error = error {
               DLog(error)
             } else {
-              NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+              self.activityIndicatorView?.stopAnimating()
               
               self.delegate?.doneEditingRecruit(recruit: recruit)
               self.dismiss(animated: true, completion: nil)
@@ -528,8 +536,7 @@ extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
       if recruitInfo.headerImage != UIImage(named: "headerDefault") && recruitInfo.title.count > 0 && recruitInfo.kind.count > 0 && recruitInfo.age.count > 0 && recruitInfo.age.count > 0 && recruitInfo.sex.count > 0 && recruitInfo.home.count > 0 && recruitInfo.vaccine.count > 0 && recruitInfo.castration.count > 0 && recruitInfo.reason.count > 0 && recruitInfo.introduce.count > 0 && recruitInfo.passing.count > 0 && !recruitInfo.introduceImages.isEmpty {
         
         if recruitContributionMode == .edit {
-          let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.emerald)
-          NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData, nil)
+          self.activityIndicatorView?.startAnimating()
         }
         
         let storageRef = Storage.storage().reference()

@@ -10,6 +10,8 @@ import UIKit
 
 class ANIActivityIndicator: UIView {
   
+  private weak var backgrounView: UIView?
+  
   private let imageNames: [String] = ["splashFoot1", "splashFoot2", "splashFoot3", "splashFoot4", "splashFoot5"]
   private var imageViews: [UIImageView]?
   
@@ -20,10 +22,22 @@ class ANIActivityIndicator: UIView {
   }
   var isSplash: Bool = false
   
+  var isFull: Bool = false {
+    didSet {
+      if isFull {
+        setupFullSize()
+      } else {
+        setup()
+      }
+    }
+  }
+  
+  private var isAnimating: Bool = true
+  
   override init(frame: CGRect) {
     super.init(frame: frame)
     
-    setup()
+    self.isHidden = true
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -42,19 +56,45 @@ class ANIActivityIndicator: UIView {
         self.imageViews = [imageView]
       }
       self.addSubview(imageView)
-      imageView.edgesToSuperview()
+      imageView.centerInSuperview()
+      imageView.width(43.0)
+      imageView.height(35.0)
     }
   }
   
-  func startAnimating() {
-    self.roofAnimation()
+  private func setupFullSize() {
+    let backgrounView = UIView()
+    backgrounView.alpha = 0.0
+    backgrounView.backgroundColor = .black
+    self.addSubview(backgrounView)
+    backgrounView.edgesToSuperview()
+    self.backgrounView = backgrounView
+    
+    setup()
   }
   
-  func stopAnimaing() {
-    self.subviews.forEach({
-      $0.layer.removeAllAnimations()
-      $0.layoutIfNeeded()
-    })
+  func startAnimating() {
+    stopAnimating()
+    
+    if let backgrounView = self.backgrounView {
+      backgrounView.alpha = 0.5
+    }
+    
+    isAnimating = true
+
+    self.roopAnimation()
+    
+    self.isHidden = false
+  }
+  
+  func stopAnimating() {
+    if let backgrounView = self.backgrounView {
+      backgrounView.alpha = 0.0
+    }
+    
+    isAnimating = false
+
+    self.isHidden = true
   }
   
   private func animation(index: Int, completion:(()->())?) {
@@ -69,9 +109,10 @@ class ANIActivityIndicator: UIView {
     }
   }
   
-  private func roofAnimation(isFirst: Bool = true) {
-    guard let imageViews = self.imageViews else { return }
-
+  private func roopAnimation(isFirst: Bool = true) {
+    guard let imageViews = self.imageViews,
+          isAnimating else { return }
+    
     let duration = isFirst ? 0.0 : 0.3
     UIView.animate(withDuration: duration, animations: {
       for imageView in imageViews {
@@ -86,7 +127,7 @@ class ANIActivityIndicator: UIView {
                 if self.isSplash {
                   self.isAnimatedOneCycle = true
                 }
-                self.roofAnimation(isFirst: false)
+                self.roopAnimation(isFirst: false)
               })
             })
           })

@@ -10,7 +10,6 @@
 import UIKit
 import FirebaseFirestore
 import CodableFirebase
-import NVActivityIndicatorView
 
 protocol ANINotiViewDelegate {
   func cellTapped(noti: FirebaseNotification)
@@ -24,8 +23,8 @@ class ANINotiView: UIView {
   
   private weak var refreshControl: UIRefreshControl?
   
-  private weak var activityIndicatorView: NVActivityIndicatorView?
-  
+  private weak var activityIndicatorView: ANIActivityIndicator?
+
   private var notifications = [FirebaseNotification]()
   
   private var users = [FirebaseUser]()
@@ -95,11 +94,10 @@ class ANINotiView: UIView {
     self.notiTableView = notiTableView
     
     //activityIndicatorView
-    let activityIndicatorView = NVActivityIndicatorView(frame: .zero, type: .lineScale, color: ANIColor.emerald, padding: 0)
-    addSubview(activityIndicatorView)
-    activityIndicatorView.width(40.0)
-    activityIndicatorView.height(40.0)
-    activityIndicatorView.centerInSuperview()
+    let activityIndicatorView = ANIActivityIndicator()
+    activityIndicatorView.isFull = false
+    self.addSubview(activityIndicatorView)
+    activityIndicatorView.edgesToSuperview()
     self.activityIndicatorView = activityIndicatorView
   }
   

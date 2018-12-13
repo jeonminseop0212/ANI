@@ -220,7 +220,7 @@ class ANITabBarController: UITabBarController {
         UIView.animate(withDuration: 0.2, delay: 0.2, animations: {
           splashView.alpha = 0.0
         }, completion: { (complete) in
-          activityIndicatorView.stopAnimaing()
+          activityIndicatorView.stopAnimating()
 
           UNUserNotificationCenter.current().getNotificationSettings { (settings) in
             if settings.authorizationStatus != .authorized {
