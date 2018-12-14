@@ -45,10 +45,14 @@ class ANIActivityIndicator: UIView {
   }
   
   private func setup() {
-    for imageName in imageNames {
+    for (index, imageName) in imageNames.enumerated() {
       let imageView = UIImageView()
       imageView.contentMode = .scaleAspectFit
-      imageView.alpha = 0.0
+      if index == 0 {
+        imageView.alpha = 1.0
+      } else {
+        imageView.alpha = 0.0
+      }
       imageView.image = UIImage(named: imageName)
       if self.imageViews != nil {
         self.imageViews?.append(imageView)
@@ -82,7 +86,7 @@ class ANIActivityIndicator: UIView {
     
     isAnimating = true
 
-    self.roopAnimation()
+    self.loopAnimation()
     
     self.isHidden = false
   }
@@ -108,27 +112,27 @@ class ANIActivityIndicator: UIView {
       completion?()
     }
   }
-  
-  private func roopAnimation(isFirst: Bool = true) {
+
+  private func loopAnimation(isFirst: Bool = true) {
     guard let imageViews = self.imageViews,
           isAnimating else { return }
     
     let duration = isFirst ? 0.0 : 0.3
     UIView.animate(withDuration: duration, animations: {
-      for imageView in imageViews {
-        imageView.alpha = 0.0
+      for (index, imageView) in imageViews.enumerated() {
+        if index != 0 {
+          imageView.alpha = 0.0
+        }
       }
     }) { (complete) in
-      self.animation(index: 0, completion: {
-        self.animation(index: 1, completion: {
-          self.animation(index: 2, completion: {
-            self.animation(index: 3, completion: {
-              self.animation(index: 4, completion: {
-                if self.isSplash {
-                  self.isAnimatedOneCycle = true
-                }
-                self.roopAnimation(isFirst: false)
-              })
+      self.animation(index: 1, completion: {
+        self.animation(index: 2, completion: {
+          self.animation(index: 3, completion: {
+            self.animation(index: 4, completion: {
+              if self.isSplash {
+                self.isAnimatedOneCycle = true
+              }
+              self.loopAnimation(isFirst: false)
             })
           })
         })
