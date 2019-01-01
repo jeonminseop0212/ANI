@@ -439,6 +439,8 @@ class ANIProfileEditViewController: UIViewController {
     guard let currentUser = ANISessionManager.shared.currentUser,
           let currentUserUid = ANISessionManager.shared.currentUserUid else { return }
     
+    self.view.endEditing(true)
+    
     self.activityIndicatorView?.startAnimating()
 
     if familyImagesChange {
