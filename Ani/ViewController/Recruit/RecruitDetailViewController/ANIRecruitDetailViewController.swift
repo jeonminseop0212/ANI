@@ -11,7 +11,6 @@ import FirebaseFirestore
 import TinyConstraints
 import CodableFirebase
 import FirebaseStorage
-import NVActivityIndicatorView
 
 class ANIRecruitDetailViewController: UIViewController {
   
@@ -44,6 +43,8 @@ class ANIRecruitDetailViewController: UIViewController {
   private var isClipped: Bool = false
   
   private var clipButtonColor = UIColor()
+  
+  private weak var activityIndicatorView: ANIActivityIndicator?
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -174,6 +175,13 @@ class ANIRecruitDetailViewController: UIViewController {
     rejectTapView.size(to: rejectView)
     rejectTapView.topToSuperview()
     self.rejectTapView = rejectTapView
+    
+    //activityIndicatorView
+    let activityIndicatorView = ANIActivityIndicator()
+    activityIndicatorView.isFull = true
+    self.view.addSubview(activityIndicatorView)
+    activityIndicatorView.edgesToSuperview()
+    self.activityIndicatorView = activityIndicatorView
   }
   
   //MARK: Notifications
@@ -505,8 +513,7 @@ extension ANIRecruitDetailViewController: ANIPopupOptionViewControllerDelegate {
             if let recruit = self.recruit, let recruitId = recruit.id {
               let database = Firestore.firestore()
               
-              let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.emerald)
-              NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData, nil)
+              self.activityIndicatorView?.startAnimating()
               
               DispatchQueue.global().async {
                 database.collection(KEY_RECRUITS).document(recruitId).getDocument(completion: { (snapshot, error) in
@@ -532,7 +539,8 @@ extension ANIRecruitDetailViewController: ANIPopupOptionViewControllerDelegate {
                     }
                     
                     DispatchQueue.main.async {
-                      NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+                      self.activityIndicatorView?.stopAnimating()
+                      
                       self.navigationController?.popViewController(animated: true)
                       ANINotificationManager.postDeleteRecruit(id: recruitId)
                     }

@@ -13,6 +13,7 @@
 		CD033E4120D8D25E002FB770 /* ANISupportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD033E4020D8D25E002FB770 /* ANISupportViewController.swift */; };
 		CD033E4420D8D28D002FB770 /* ANISupportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD033E4320D8D28D002FB770 /* ANISupportView.swift */; };
 		CD033E4620DA14B3002FB770 /* ANISupportViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD033E4520DA14B3002FB770 /* ANISupportViewCell.swift */; };
+		CD0417D021BF865C0017571A /* ANIActivityIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0417CF21BF865C0017571A /* ANIActivityIndicator.swift */; };
 		CD047EBE20C4E9A000248958 /* NVActivityIndicatorView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD047EBD20C4E9A000248958 /* NVActivityIndicatorView.framework */; };
 		CD04F05521CB64C70084AE73 /* ANIVideoStoryViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD04F05421CB64C70084AE73 /* ANIVideoStoryViewCell.swift */; };
 		CD04F05D21D0AB780084AE73 /* ANIStoryVideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD04F05C21D0AB780084AE73 /* ANIStoryVideoView.swift */; };
@@ -55,6 +56,7 @@
 		CD492A0921C898DF00C5AF81 /* URL.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD492A0821C898DF00C5AF81 /* URL.swift */; };
 		CD492A0B21C8990300C5AF81 /* AVFileType.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD492A0A21C8990300C5AF81 /* AVFileType.swift */; };
 		CD492A0D21C8999800C5AF81 /* AVAssetTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD492A0C21C8999800C5AF81 /* AVAssetTrack.swift */; };
+		CD4CBFE721DB66690030C595 /* uploadProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD4CBFE621DB66690030C595 /* uploadProgressView.swift */; };
 		CD4F0EF720F481030093C543 /* ANINotiCommentViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD4F0EF620F481030093C543 /* ANINotiCommentViewCell.swift */; };
 		CD50A46720EC6A2500CFF16F /* UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD50A46620EC6A2500CFF16F /* UIImage.swift */; };
 		CD516FBE2161ED82002FF41C /* ANINotiHeaderViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD516FBD2161ED82002FF41C /* ANINotiHeaderViewCell.swift */; };
@@ -219,6 +221,7 @@
 		CD033E4020D8D25E002FB770 /* ANISupportViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANISupportViewController.swift; sourceTree = "<group>"; };
 		CD033E4320D8D28D002FB770 /* ANISupportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANISupportView.swift; sourceTree = "<group>"; };
 		CD033E4520DA14B3002FB770 /* ANISupportViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANISupportViewCell.swift; sourceTree = "<group>"; };
+		CD0417CF21BF865C0017571A /* ANIActivityIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIActivityIndicator.swift; sourceTree = "<group>"; };
 		CD047EBD20C4E9A000248958 /* NVActivityIndicatorView.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NVActivityIndicatorView.framework; path = Carthage/Build/iOS/NVActivityIndicatorView.framework; sourceTree = "<group>"; };
 		CD04F05421CB64C70084AE73 /* ANIVideoStoryViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIVideoStoryViewCell.swift; sourceTree = "<group>"; };
 		CD04F05C21D0AB780084AE73 /* ANIStoryVideoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIStoryVideoView.swift; sourceTree = "<group>"; };
@@ -262,6 +265,7 @@
 		CD492A0821C898DF00C5AF81 /* URL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URL.swift; sourceTree = "<group>"; };
 		CD492A0A21C8990300C5AF81 /* AVFileType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVFileType.swift; sourceTree = "<group>"; };
 		CD492A0C21C8999800C5AF81 /* AVAssetTrack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVAssetTrack.swift; sourceTree = "<group>"; };
+		CD4CBFE621DB66690030C595 /* uploadProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = uploadProgressView.swift; sourceTree = "<group>"; };
 		CD4F0EF620F481030093C543 /* ANINotiCommentViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotiCommentViewCell.swift; sourceTree = "<group>"; };
 		CD50A46620EC6A2500CFF16F /* UIImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImage.swift; sourceTree = "<group>"; };
 		CD50A46820EC89BD00CFF16F /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
@@ -476,6 +480,14 @@
 			path = SupportViewController;
 			sourceTree = "<group>";
 		};
+		CD0417CE21BF86400017571A /* ActivityIndicator */ = {
+			isa = PBXGroup;
+			children = (
+				CD0417CF21BF865C0017571A /* ANIActivityIndicator.swift */,
+			);
+			path = ActivityIndicator;
+			sourceTree = "<group>";
+		};
 		CD08A72C20915BB400F0B72D /* Detail */ = {
 			isa = PBXGroup;
 			children = (
@@ -634,6 +646,14 @@
 				CD492A0421C749D600C5AF81 /* VideoView */,
 			);
 			path = VideoFilter;
+			sourceTree = "<group>";
+		};
+		CD4CBFE521DB665E0030C595 /* uploadProgressView */ = {
+			isa = PBXGroup;
+			children = (
+				CD4CBFE621DB66690030C595 /* uploadProgressView.swift */,
+			);
+			path = uploadProgressView;
 			sourceTree = "<group>";
 		};
 		CD66F49020C4C0CD00FF563C /* Supporting */ = {
@@ -1544,6 +1564,7 @@
 		F5E9E2342079B1660021D4CC /* View */ = {
 			isa = PBXGroup;
 			children = (
+				CD4CBFE521DB665E0030C595 /* uploadProgressView */,
 				CD47937521896FC1002643E2 /* Splash */,
 				CDDD04C120B53C110094DBFA /* Initial */,
 				F56634842075265E006CB81B /* RecruitView */,
@@ -1564,6 +1585,7 @@
 				CDAFD76020DE1D2100AEDD83 /* RejectView */,
 				CDDE4B5720DF7636005762A1 /* NeedLoginView */,
 				CD334E8021421C5F001C6289 /* ReloadView */,
+				CD0417CE21BF86400017571A /* ActivityIndicator */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -2002,6 +2024,7 @@
 				F53E87BD2085AFC700B19A2F /* ANIProfileViewController.swift in Sources */,
 				CD33BEE120F3212400D2A367 /* ANINotiDetailView.swift in Sources */,
 				F5B1EF9320725964000CFB0B /* ANIRecruitViewController.swift in Sources */,
+				CD0417D021BF865C0017571A /* ANIActivityIndicator.swift in Sources */,
 				F51D221520768B24009D1B26 /* UISearchBar.swift in Sources */,
 				F5E9E2392079B9D20021D4CC /* ANICommunityMenuBarCell.swift in Sources */,
 				CD1A97C0219949770008EC98 /* ANIBlockUserView.swift in Sources */,
@@ -2045,6 +2068,7 @@
 				CDDE4B6E20E31390005762A1 /* ANIFollowUserViewCell.swift in Sources */,
 				CDAFD75F20DE1D1B00AEDD83 /* ANIRejectView.swift in Sources */,
 				CD0BFF1820C7AD9C00D5959B /* FirebaseQna.swift in Sources */,
+				CD4CBFE721DB66690030C595 /* uploadProgressView.swift in Sources */,
 				CD9E52B7209441C900715F50 /* ANIRecruitDetailImagesViewCell.swift in Sources */,
 				CD9EEB32219E93FA0079B50E /* ANIFirebaseRemoteConfigManager.swift in Sources */,
 				CDDD04A820B271090094DBFA /* ANICommentCell.swift in Sources */,

@@ -56,14 +56,14 @@ class ANIFirebaseRemoteConfigManager: ANIFirebase {
   
   func getSirenAlertType(completion: ((String?, Error?)->())? = nil) {
     dispatchGroup.notify(queue: .main) {
-      let DEF_TYPE = "skip"
+      let DEF_TYPE = "force"
       guard let config = self.config else{
         completion?(DEF_TYPE, NSError.init(domain: "config is nill", code: -1, userInfo: nil))
         return
       }
       
       if let remoteConfigText = config[KEY_SIREN_ALERT_TYPE].stringValue, remoteConfigText.count == 0 {
-        completion?(DEF_TYPE,nil)
+        completion?(DEF_TYPE, nil)
       } else {
         completion?(config[KEY_SIREN_ALERT_TYPE].stringValue ?? DEF_TYPE, nil)
       }

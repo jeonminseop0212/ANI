@@ -9,7 +9,6 @@
 import UIKit
 import FirebaseFirestore
 import CodableFirebase
-import NVActivityIndicatorView
 
 protocol ANIRecruitViewDelegate {
   func recruitCellTap(selectedRecruit: FirebaseRecruit, user: FirebaseUser)
@@ -32,8 +31,8 @@ class ANIRecuruitView: UIView {
   
   private weak var refreshControl: UIRefreshControl?
   
-  private weak var activityIndicatorView: NVActivityIndicatorView?
-  
+  private weak var activityIndicatorView: ANIActivityIndicator?
+
   private let TABLE_VIEW_TOP_MARGIN: CGFloat = 10.0
   
   private var recruits = [FirebaseRecruit]()
@@ -143,11 +142,10 @@ class ANIRecuruitView: UIView {
     self.recruitTableView = tableView
     
     //activityIndicatorView
-    let activityIndicatorView = NVActivityIndicatorView(frame: .zero, type: .lineScale, color: ANIColor.emerald, padding: 0)
-    addSubview(activityIndicatorView)
-    activityIndicatorView.width(40.0)
-    activityIndicatorView.height(40.0)
-    activityIndicatorView.centerInSuperview()
+    let activityIndicatorView = ANIActivityIndicator()
+    activityIndicatorView.isFull = false
+    self.addSubview(activityIndicatorView)
+    activityIndicatorView.edgesToSuperview()
     self.activityIndicatorView = activityIndicatorView
     
     let database = Firestore.firestore()
@@ -450,7 +448,7 @@ extension ANIRecuruitView {
                   self.loadMoreRecruit()
                 } else {
                   activityIndicatorView.stopAnimating()
-
+                  
                   UIView.animate(withDuration: 0.2, animations: {
                     recruitTableView.alpha = 1.0
                   })

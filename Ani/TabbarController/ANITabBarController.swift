@@ -32,6 +32,7 @@ class ANITabBarController: UITabBarController {
   private var chatGroupListener: ListenerRegistration?
   
   var isLoadedFirstData: Bool = false
+  var isLoadedUser: Bool = false
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -179,7 +180,7 @@ class ANITabBarController: UITabBarController {
     ANINotificationManager.receive(logout: self, selector: #selector(logout))
     ANINotificationManager.receive(dismissSplash: self, selector: #selector(dismissSplash))
     ANINotificationManager.receive(failLoadVersion: self, selector: #selector(showFailMessage))
-    ANINotificationManager.receive(didSetupStoryViewNotifications: self, selector: #selector(loadFirstData))
+    ANINotificationManager.receive(didSetupViewNotifications: self, selector: #selector(loadFirstData))
   }
   
   @objc private func updateBadge() {
@@ -211,13 +212,16 @@ class ANITabBarController: UITabBarController {
   }
   
   @objc private func dismissSplash() {
-    guard let splashView = splashView else { return }
+    guard let splashView = splashView,
+          let activityIndicatorView = splashView.activityIndicatorView else { return }
     
     DispatchQueue.main.async {
-      if ANISessionManager.shared.isLoadedFirstData && ANISessionManager.shared.isCheckedVersion {
+      if ANISessionManager.shared.isLoadedFirstData && ANISessionManager.shared.isCheckedVersion && splashView.alpha != 0.0 && activityIndicatorView.isAnimatedOneCycle {
         UIView.animate(withDuration: 0.2, delay: 0.2, animations: {
           splashView.alpha = 0.0
         }, completion: { (complete) in
+          activityIndicatorView.stopAnimating()
+
           UNUserNotificationCenter.current().getNotificationSettings { (settings) in
             if settings.authorizationStatus != .authorized {
               let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
@@ -307,7 +311,9 @@ extension ANITabBarController {
       let database = Firestore.firestore()
       let group = DispatchGroup()
       
-      group.enter()
+      if !self.isLoadedFirstData {
+        group.enter()
+      }
       DispatchQueue(label: "user").async {
         self.userListener = database.collection(KEY_USERS).document(currentUserUid).addSnapshotListener({ (snapshot, error) in
           guard let snapshot = snapshot, let data = snapshot.data() else { return }
@@ -327,8 +333,9 @@ extension ANITabBarController {
                 self.oldIsHaveUnreadNoti = isHaveUnreadNoti
               }
               
-              if !self.isLoadedFirstData {
+              if !self.isLoadedFirstData && !self.isLoadedUser {
                 group.leave()
+                self.isLoadedUser = true
               }
             }
           } catch let error {
@@ -337,7 +344,9 @@ extension ANITabBarController {
         })
       }
       
-      group.enter()
+      if !self.isLoadedFirstData {
+        group.enter()
+      }
       DispatchQueue(label: "user").async {
         self.blockUserListener =  database.collection(KEY_USERS).document(currentUserUid).collection(KEY_BLOCK_USER_IDS).order(by: KEY_DATE).addSnapshotListener({ (snapshot, error) in
           guard let snapshot = snapshot else { return }
@@ -353,7 +362,7 @@ extension ANITabBarController {
                 }
               }
               
-              if snapshot.documents.count == ANISessionManager.shared.blockUserIds?.count {
+              if snapshot.documents.count == ANISessionManager.shared.blockUserIds?.count, !self.isLoadedFirstData {
                 group.leave()
               }
             } else if diff.type == .removed {
@@ -369,13 +378,15 @@ extension ANITabBarController {
             }
           })
           
-          if snapshot.documents.isEmpty {
+          if snapshot.documents.isEmpty, !self.isLoadedFirstData {
             group.leave()
           }
         })
       }
       
-      group.enter()
+      if !self.isLoadedFirstData {
+        group.enter()
+      }
       DispatchQueue(label: "user").async {
         self.blockingUserListener = database.collection(KEY_USERS).document(currentUserUid).collection(KEY_BLOCKING_USER_IDS).order(by: KEY_DATE).addSnapshotListener({ (snapshot, error) in
           guard let snapshot = snapshot else { return }
@@ -390,7 +401,7 @@ extension ANITabBarController {
                   ANISessionManager.shared.blockingUserIds = [userId]
                 }
                 
-                if snapshot.documents.count == ANISessionManager.shared.blockingUserIds?.count {
+                if snapshot.documents.count == ANISessionManager.shared.blockingUserIds?.count, !self.isLoadedFirstData {
                   group.leave()
                 }
               }
@@ -407,7 +418,7 @@ extension ANITabBarController {
             }
           })
           
-          if snapshot.documents.isEmpty {
+          if snapshot.documents.isEmpty, !self.isLoadedFirstData {
             group.leave()
           }
         })

@@ -9,7 +9,6 @@
 import UIKit
 import FirebaseFirestore
 import CodableFirebase
-import NVActivityIndicatorView
 
 protocol ANIChatViewDelegate {
   func loadedMessage(messages: [FirebaseChatMessage])
@@ -54,8 +53,8 @@ class ANIChatView: UIView {
   
   private var cellHeight = [IndexPath: CGFloat]()
   
-  private weak var activityIndicatorView: NVActivityIndicatorView?
-  
+  private weak var activityIndicatorView: ANIActivityIndicator?
+
   override init(frame: CGRect) {
     super.init(frame: frame)
     
@@ -87,11 +86,10 @@ class ANIChatView: UIView {
     self.chatTableView = chatTableView
     
     //activityIndicatorView
-    let activityIndicatorView = NVActivityIndicatorView(frame: .zero, type: .lineScale, color: ANIColor.emerald, padding: 0)
-    addSubview(activityIndicatorView)
-    activityIndicatorView.width(40.0)
-    activityIndicatorView.height(40.0)
-    activityIndicatorView.centerInSuperview()
+    let activityIndicatorView = ANIActivityIndicator()
+    activityIndicatorView.isFull = false
+    self.addSubview(activityIndicatorView)
+    activityIndicatorView.edgesToSuperview()
     self.activityIndicatorView = activityIndicatorView
   }
   
@@ -170,11 +168,14 @@ class ANIChatView: UIView {
       
       self.scrollToBottom()
       
+      activityIndicatorView.stopAnimating()
+      
       UIView.animate(withDuration: 0.2, animations: {
+        ANISessionManager.shared.isLoadedFirstData = true
+        ANINotificationManager.postDismissSplash()
+        
         chatTableView.alpha = 1.0
       })
-      
-      activityIndicatorView.stopAnimating()
       
       self.isLoading = false
       

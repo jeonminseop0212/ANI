@@ -10,7 +10,6 @@
 import UIKit
 import FirebaseFirestore
 import CodableFirebase
-import NVActivityIndicatorView
 
 protocol ANINotiViewDelegate {
   func cellTapped(noti: FirebaseNotification)
@@ -24,8 +23,8 @@ class ANINotiView: UIView {
   
   private weak var refreshControl: UIRefreshControl?
   
-  private weak var activityIndicatorView: NVActivityIndicatorView?
-  
+  private weak var activityIndicatorView: ANIActivityIndicator?
+
   private var notifications = [FirebaseNotification]()
   
   private var users = [FirebaseUser]()
@@ -95,11 +94,10 @@ class ANINotiView: UIView {
     self.notiTableView = notiTableView
     
     //activityIndicatorView
-    let activityIndicatorView = NVActivityIndicatorView(frame: .zero, type: .lineScale, color: ANIColor.emerald, padding: 0)
-    addSubview(activityIndicatorView)
-    activityIndicatorView.width(40.0)
-    activityIndicatorView.height(40.0)
-    activityIndicatorView.centerInSuperview()
+    let activityIndicatorView = ANIActivityIndicator()
+    activityIndicatorView.isFull = false
+    self.addSubview(activityIndicatorView)
+    activityIndicatorView.edgesToSuperview()
     self.activityIndicatorView = activityIndicatorView
   }
   
@@ -121,6 +119,8 @@ class ANINotiView: UIView {
     ANINotificationManager.receive(login: self, selector: #selector(reloadNotifications))
     ANINotificationManager.receive(logout: self, selector: #selector(hideTableView))
     ANINotificationManager.receive(tapNotiNotification: self, selector: #selector(reloadNotifications))
+    ANINotificationManager.receive(loadedCurrentUser: self, selector: #selector(reloadNotifications))
+    ANINotificationManager.postDidSetupViewNotifications()
   }
   
   @objc private func scrollToTop() {
@@ -163,6 +163,7 @@ class ANINotiView: UIView {
     UIView.animate(withDuration: 0.2, animations: {
       reloadView.alpha = 1.0
     }) { (complete) in
+      ANISessionManager.shared.isLoadedFirstData = true
       ANINotificationManager.postDismissSplash()
     }
     
@@ -348,6 +349,7 @@ extension ANINotiView {
                   UIView.animate(withDuration: 0.2, animations: {
                     notiTableView.alpha = 1.0
                   }, completion: { (complete) in
+                    ANISessionManager.shared.isLoadedFirstData = true
                     ANINotificationManager.postDismissSplash()
                   })
                 }
@@ -423,6 +425,9 @@ extension ANINotiView {
                     
                     UIView.animate(withDuration: 0.2, animations: {
                       notiTableView.alpha = 1.0
+                    }, completion: { (complete) in
+                      ANISessionManager.shared.isLoadedFirstData = true
+                      ANINotificationManager.postDismissSplash()
                     })
                   }
                 }

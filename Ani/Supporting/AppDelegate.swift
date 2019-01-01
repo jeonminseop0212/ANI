@@ -150,6 +150,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
           let notiNavigationController = viewControllers[NOTI_VIEW_CONTROLLER_INDEX] as? UINavigationController,
           let notiViewController = notiNavigationController.viewControllers.first as? ANINotiViewController else { return }
     
+    ANISessionManager.shared.isLaunchNoti = true
     
     let userInfo = response.notification.request.content.userInfo
     if let notificationKind = userInfo[AnyHashable("notificationKind")] as? String {

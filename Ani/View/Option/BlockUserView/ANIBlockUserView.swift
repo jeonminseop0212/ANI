@@ -9,7 +9,6 @@
 import UIKit
 import FirebaseFirestore
 import CodableFirebase
-import NVActivityIndicatorView
 
 protocol ANIBlockUserViewDelegate {
   func blockButtonTapped(user: FirebaseUser, isBlock: Bool)
@@ -19,8 +18,8 @@ class ANIBlockUserView: UIView {
   
   private weak var blockUserTableView: UITableView?
   
-  private weak var activityIndicatorView: NVActivityIndicatorView?
-  
+  private weak var activityIndicatorView: ANIActivityIndicator?
+
   private var blockUsers = [FirebaseUser]()
   
   private var isLastPage: Bool = false
@@ -65,11 +64,10 @@ class ANIBlockUserView: UIView {
     self.blockUserTableView = blockUserTableView
     
     //activityIndicatorView
-    let activityIndicatorView = NVActivityIndicatorView(frame: .zero, type: .lineScale, color: ANIColor.emerald, padding: 0)
-    addSubview(activityIndicatorView)
-    activityIndicatorView.width(40.0)
-    activityIndicatorView.height(40.0)
-    activityIndicatorView.centerInSuperview()
+    let activityIndicatorView = ANIActivityIndicator()
+    activityIndicatorView.isFull = false
+    self.addSubview(activityIndicatorView)
+    activityIndicatorView.edgesToSuperview()
     self.activityIndicatorView = activityIndicatorView
   }
   

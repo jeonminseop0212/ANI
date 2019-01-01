@@ -9,7 +9,6 @@
 import UIKit
 import FirebaseFirestore
 import CodableFirebase
-import NVActivityIndicatorView
 import AVKit
 
 protocol ANIStoryViewDelegate {
@@ -41,8 +40,8 @@ class ANIStoryView: UIView {
   
   private var lastRankingStory: QueryDocumentSnapshot?
   
-  private weak var activityIndicatorView: NVActivityIndicatorView?
-  
+  private weak var activityIndicatorView: ANIActivityIndicator?
+
   var isCellSelected: Bool = false
   
   private var beforeVideoViewCell: ANIVideoStoryViewCell?
@@ -57,6 +56,10 @@ class ANIStoryView: UIView {
     super.init(frame: frame)
     setup()
     setupNotifications()
+    
+    if ANISessionManager.shared.isLaunchNoti {
+      loadStory(sender: nil)
+    }
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -107,11 +110,10 @@ class ANIStoryView: UIView {
     self.storyTableView = tableView
     
     //activityIndicatorView
-    let activityIndicatorView = NVActivityIndicatorView(frame: .zero, type: .lineScale, color: ANIColor.emerald, padding: 0)
-    addSubview(activityIndicatorView)
-    activityIndicatorView.width(40.0)
-    activityIndicatorView.height(40.0)
-    activityIndicatorView.centerInSuperview()
+    let activityIndicatorView = ANIActivityIndicator()
+    activityIndicatorView.isFull = false
+    self.addSubview(activityIndicatorView)
+    activityIndicatorView.edgesToSuperview()
     self.activityIndicatorView = activityIndicatorView
   }
   
@@ -138,7 +140,7 @@ class ANIStoryView: UIView {
     ANINotificationManager.receive(communityTabTapped: self, selector: #selector(scrollToTop))
     ANINotificationManager.receive(deleteStory: self, selector: #selector(deleteStory))
     ANINotificationManager.receive(loadedCurrentUser: self, selector: #selector(reloadStory))
-    ANINotificationManager.postDidSetupStoryViewNotifications()
+    ANINotificationManager.postDidSetupViewNotifications()
   }
   
   @objc private func reloadStory() {

@@ -9,7 +9,6 @@
 import UIKit
 import FirebaseFirestore
 import CodableFirebase
-import NVActivityIndicatorView
 import AVKit
 
 protocol ANIOtherProfileBasicViewDelegate {
@@ -41,8 +40,8 @@ class ANIOtherProfileBasicView: UIView {
   
   private weak var basicTableView: UITableView?
     
-  private weak var activityIndicatorView: NVActivityIndicatorView?
-  
+  private weak var activityIndicatorView: ANIActivityIndicator?
+
   private var lastRecruit: QueryDocumentSnapshot?
   private var recruits = [FirebaseRecruit]()
   private var recruitUsers = [FirebaseUser]()
@@ -130,11 +129,10 @@ class ANIOtherProfileBasicView: UIView {
     self.basicTableView = basicTableView
     
     //activityIndicatorView
-    let activityIndicatorView = NVActivityIndicatorView(frame: .zero, type: .lineScale, color: ANIColor.emerald, padding: 0)
-    addSubview(activityIndicatorView)
-    activityIndicatorView.width(40.0)
-    activityIndicatorView.height(40.0)
-    activityIndicatorView.centerInSuperview()
+    let activityIndicatorView = ANIActivityIndicator()
+    activityIndicatorView.isFull = false
+    self.addSubview(activityIndicatorView)
+    activityIndicatorView.edgesToSuperview()
     self.activityIndicatorView = activityIndicatorView
   }
   

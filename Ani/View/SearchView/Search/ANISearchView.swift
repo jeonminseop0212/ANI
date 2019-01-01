@@ -8,7 +8,6 @@
 
 import UIKit
 import CodableFirebase
-import NVActivityIndicatorView
 import InstantSearchClient
 import AVKit
 
@@ -82,8 +81,8 @@ class ANISearchView: UIView {
   private var storyCellHeight = [IndexPath: CGFloat]()
   private var qnaCellHeight = [IndexPath: CGFloat]()
   
-  private weak var activityIndicatorView: NVActivityIndicatorView?
-  
+  private weak var activityIndicatorView: ANIActivityIndicator?
+
   var delegate: ANISearchViewDelegate?
 
   override init(frame: CGRect) {
@@ -126,13 +125,12 @@ class ANISearchView: UIView {
     tableView.edgesToSuperview()
     self.tableView = tableView
     
-    //activityIndicatorView
-    let activityIndicatorView = NVActivityIndicatorView(frame: .zero, type: .lineScale, color: ANIColor.emerald, padding: 0)
-    addSubview(activityIndicatorView)
-    activityIndicatorView.width(40.0)
-    activityIndicatorView.height(40.0)
-    activityIndicatorView.centerInSuperview()
-    self.activityIndicatorView = activityIndicatorView
+//    //activityIndicatorView
+//    let activityIndicatorView = ANIActivityIndicator()
+//    activityIndicatorView.isFull = false
+//    self.addSubview(activityIndicatorView)
+//    activityIndicatorView.edgesToSuperview()
+//    self.activityIndicatorView = activityIndicatorView
   }
   
   private func setupNotifications() {
@@ -234,6 +232,25 @@ class ANISearchView: UIView {
     }
     
     return false
+  }
+  
+  private func activityIndicatorStartAnimating() {
+    activityIndicatorStopAnimating()
+    
+    let activityIndicatorView = ANIActivityIndicator()
+    activityIndicatorView.isFull = false
+    activityIndicatorView.startAnimating()
+    self.addSubview(activityIndicatorView)
+    activityIndicatorView.edgesToSuperview()
+    self.activityIndicatorView = activityIndicatorView
+  }
+  
+  private func activityIndicatorStopAnimating() {
+    if self.activityIndicatorView != nil {
+      self.activityIndicatorView?.stopAnimating()
+      self.activityIndicatorView?.removeFromSuperview()
+      self.activityIndicatorView = nil
+    }
   }
 }
 
@@ -495,9 +512,11 @@ extension ANISearchView: ANIStoryViewCellDelegate, ANIVideoStoryViewCellDelegate
   }
   
   func loadedStoryIsLoved(indexPath: Int, isLoved: Bool) {
-    var searchStory = self.searchStories[indexPath]
-    searchStory.isLoved = isLoved
-    self.searchStories[indexPath] = searchStory
+    if self.searchStories.count - 1 >= indexPath {
+      var searchStory = self.searchStories[indexPath]
+      searchStory.isLoved = isLoved
+      self.searchStories[indexPath] = searchStory
+    }
   }
   
   func loadedStoryUser(user: FirebaseUser) {
@@ -544,7 +563,7 @@ extension ANISearchView: ANIQnaViewCellDelegate {
 //MARK: data
 extension ANISearchView {
   private func search(category: SearchCategory, searchText: String) {
-    guard let activityIndicatorView = self.activityIndicatorView else { return }
+//    guard let activityIndicatorView = self.activityIndicatorView else { return }
     
     self.category = category
     
@@ -585,7 +604,7 @@ extension ANISearchView {
       }
     }
     
-    activityIndicatorView.startAnimating()
+    activityIndicatorStartAnimating()
     
     DispatchQueue.global().async {
       guard let index = self.index,
@@ -650,7 +669,7 @@ extension ANISearchView {
                     if self.searchUsers.isEmpty, nbPages != 1 {
                       self.loadMoreSearch()
                     } else {
-                      activityIndicatorView.stopAnimating()
+                      self.activityIndicatorStopAnimating()
 
                       UIView.animate(withDuration: 0.2, animations: {
                         tableView.alpha = 1.0
@@ -660,7 +679,7 @@ extension ANISearchView {
                     if self.searchStories.isEmpty, nbPages != 1 {
                       self.loadMoreSearch()
                     } else {
-                      activityIndicatorView.stopAnimating()
+                      self.activityIndicatorStopAnimating()
 
                       UIView.animate(withDuration: 0.2, animations: {
                         tableView.alpha = 1.0
@@ -670,7 +689,7 @@ extension ANISearchView {
                     if self.searchQnas.isEmpty, nbPages != 1 {
                       self.loadMoreSearch()
                     } else {
-                      activityIndicatorView.stopAnimating()
+                      self.activityIndicatorStopAnimating()
 
                       UIView.animate(withDuration: 0.2, animations: {
                         tableView.alpha = 1.0
@@ -684,8 +703,8 @@ extension ANISearchView {
 
               DLog(error)
               
-              activityIndicatorView.stopAnimating()
-              
+              self.activityIndicatorStopAnimating()
+
               self.isLoading = false
             }
           }
@@ -694,14 +713,14 @@ extension ANISearchView {
           
           DLog("error: \(error)")
           
-          activityIndicatorView.stopAnimating()
-          
+          self.activityIndicatorStopAnimating()
+
           self.isLoading = false
         } else {
           tableView.reloadData()
           
-          activityIndicatorView.stopAnimating()
-          
+          self.activityIndicatorStopAnimating()
+
           self.isLoading = false
         }
       })
@@ -712,8 +731,8 @@ extension ANISearchView {
     guard page + 1 < nbPages,
           let index = self.index,
           !isLoading,
-          let tableView = self.tableView,
-          let activityIndicatorView = self.activityIndicatorView else { return }
+          let tableView = self.tableView else { return }
+//          let activityIndicatorView = self.activityIndicatorView else { return }
     
     page = page + 1
     query.page = page
@@ -781,7 +800,7 @@ extension ANISearchView {
                       self.loadMoreSearch()
                     } else {
                       if tableView.alpha == 0 {
-                        activityIndicatorView.stopAnimating()
+                        self.activityIndicatorStopAnimating()
 
                         UIView.animate(withDuration: 0.2, animations: {
                           tableView.alpha = 1.0
@@ -793,7 +812,7 @@ extension ANISearchView {
                       self.loadMoreSearch()
                     } else {
                       if tableView.alpha == 0 {
-                        activityIndicatorView.stopAnimating()
+                        self.activityIndicatorStopAnimating()
 
                         UIView.animate(withDuration: 0.2, animations: {
                           tableView.alpha = 1.0
@@ -805,7 +824,7 @@ extension ANISearchView {
                       self.loadMoreSearch()
                     } else {
                       if tableView.alpha == 0 {
-                        activityIndicatorView.stopAnimating()
+                        self.activityIndicatorStopAnimating()
 
                         UIView.animate(withDuration: 0.2, animations: {
                           tableView.alpha = 1.0

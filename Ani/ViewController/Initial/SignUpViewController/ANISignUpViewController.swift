@@ -30,6 +30,8 @@ class ANISignUpViewController: UIViewController {
   
   private let IMAGE_SIZE: CGSize = CGSize(width: 500.0, height: 500.0)
   
+  private weak var activityIndicatorView: ANIActivityIndicator?
+  
   override func viewDidLoad() {
     setup()
   }
@@ -117,6 +119,13 @@ class ANISignUpViewController: UIViewController {
     rejectBaseView.addSubview(rejectLabel)
     rejectLabel.edgesToSuperview()
     self.rejectLabel = rejectLabel
+    
+    //activityIndicatorView
+    let activityIndicatorView = ANIActivityIndicator()
+    activityIndicatorView.isFull = true
+    self.view.addSubview(activityIndicatorView)
+    activityIndicatorView.edgesToSuperview()
+    self.activityIndicatorView = activityIndicatorView
   }
   
   private func setupNotifications() {
@@ -239,6 +248,14 @@ extension ANISignUpViewController: ANISignUpViewDelegate {
         self.isRejectAnimating = false
       })
     }
+  }
+  
+  func startAnimaing() {
+    self.activityIndicatorView?.startAnimating()
+  }
+  
+  func stopAnimating() {
+    self.activityIndicatorView?.stopAnimating()
   }
 }
 
