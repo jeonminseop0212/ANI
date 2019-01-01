@@ -18,7 +18,7 @@ protocol ANIOptionViewDelegate {
 
 enum List: String {
   case loveRecruit = "『いいね』した募集";
-  case loveStroy = "『いいね』したストーリ";
+  case loveStroy = "『いいね』したストーリー";
   case loveQuestion = "『いいね』した質問";
   case clipRecruit = "『クリップ』した募集";
 }
