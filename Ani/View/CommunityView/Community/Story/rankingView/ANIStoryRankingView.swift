@@ -32,6 +32,7 @@ class ANIStoryRankingView: UIView {
     super.init(frame: frame)
     
     setup()
+    setupNotifications()
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -54,6 +55,19 @@ class ANIStoryRankingView: UIView {
     addSubview(rankingColletionView)
     rankingColletionView.edgesToSuperview()
     self.rankingColletionView = rankingColletionView
+  }
+  
+  private func setupNotifications() {
+    removeNotifications()
+    ANINotificationManager.receive(reloadRankingStory: self, selector: #selector(deleteUsers))
+  }
+  
+  private func removeNotifications() {
+    ANINotificationManager.remove(self)
+  }
+  
+  @objc private func deleteUsers() {
+    self.users.removeAll()
   }
 }
 

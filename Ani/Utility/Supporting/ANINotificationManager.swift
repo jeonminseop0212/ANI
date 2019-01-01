@@ -176,4 +176,9 @@ class ANINotificationManager: NSObject {
   private static let N_DID_SETUP_VIEW_NOTIFICATIONS = "N_DID_SETUP_VIEW_NOTIFICATIONS"
   static func postDidSetupViewNotifications() { self.post(name: N_DID_SETUP_VIEW_NOTIFICATIONS, object: nil, userInfo:nil) }
   static func receive(didSetupViewNotifications observer:Any, selector:Selector) { receive(name: N_DID_SETUP_VIEW_NOTIFICATIONS, observer: observer, selector: selector) }
+  
+  //MARK: reload ranking story
+  private static let N_RELOAD_RANKING_STORY = "N_RELOAD_RANKING_STORY"
+  static func postReloadRankingStory() { self.post(name: N_RELOAD_RANKING_STORY, object: nil, userInfo:nil) }
+  static func receive(reloadRankingStory observer:Any, selector:Selector) { receive(name: N_RELOAD_RANKING_STORY, observer: observer, selector: selector) }
 }

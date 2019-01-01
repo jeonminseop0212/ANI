@@ -580,6 +580,7 @@ extension ANIStoryView {
     }
     if !self.rankingStories.isEmpty {
       self.rankingStories.removeAll()
+      ANINotificationManager.postReloadRankingStory()
     }
     
     if sender == nil {
