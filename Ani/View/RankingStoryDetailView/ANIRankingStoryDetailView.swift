@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import AVKit
 
 protocol ANIRankingStoryDetailViewDelegate {
   func storyViewCellDidSelect(selectedStory: FirebaseStory, user: FirebaseUser)
@@ -70,6 +71,7 @@ extension ANIRankingStoryDetailView: UITableViewDataSource {
     if story.thumbnailImageUrl != nil {
       let videoStoryCellId = NSStringFromClass(ANIVideoStoryViewCell.self)
       let cell = tableView.dequeueReusableCell(withIdentifier: videoStoryCellId, for: indexPath) as! ANIVideoStoryViewCell
+      cell.delegate = self
       
       cell.indexPath = indexPath.row
       cell.story = story
@@ -89,7 +91,7 @@ extension ANIRankingStoryDetailView: UITableViewDataSource {
 }
 
 //MARK: ANIStoryViewCellDelegate
-extension ANIRankingStoryDetailView: ANIStoryViewCellDelegate {
+extension ANIRankingStoryDetailView: ANIStoryViewCellDelegate, ANIVideoStoryViewCellDelegate {
   func storyCellTapped(story: FirebaseStory, user: FirebaseUser) {
     self.delegate?.storyViewCellDidSelect(selectedStory: story, user: user)
   }
@@ -106,5 +108,8 @@ extension ANIRankingStoryDetailView: ANIStoryViewCellDelegate {
   
   func reject() {
     self.delegate?.reject()
+  }
+  
+  func loadedVideo(urlString: String, asset: AVAsset) {
   }
 }
