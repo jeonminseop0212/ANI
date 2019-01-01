@@ -39,6 +39,8 @@ class ANIRecruitViewController: UIViewController {
   private var isRejectAnimating: Bool = false
   private var rejectTapView: UIView?
   
+  private weak var uploadProgressView: ANIUploadProgressView?
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     setup()
@@ -137,6 +139,18 @@ class ANIRecruitViewController: UIViewController {
     rejectTapView.size(to: rejectView)
     rejectTapView.topToSuperview()
     self.rejectTapView = rejectTapView
+    
+    //uploadProgressView
+    let uploadProgressView = ANIUploadProgressView()
+    uploadProgressView.alpha = 0.95
+    uploadProgressView.isHidden = true
+    uploadProgressView.delegate = self
+    self.view.addSubview(uploadProgressView)
+    uploadProgressView.topToBottom(of: filtersView)
+    uploadProgressView.leftToSuperview()
+    uploadProgressView.rightToSuperview()
+    uploadProgressView.height(50.0)
+    self.uploadProgressView = uploadProgressView
   }
   
   //MARK: Notifications
@@ -194,6 +208,7 @@ extension ANIRecruitViewController:ANIButtonViewDelegate {
     if view === self.contributionButon {
       if ANISessionManager.shared.isAnonymous == false {
         let recruitContribtionViewController = ANIRecruitContributionViewController()
+        recruitContribtionViewController.delegate = self
         let recruitContributionNV = UINavigationController(rootViewController: recruitContribtionViewController)
         self.navigationController?.present(recruitContributionNV, animated: true, completion: nil)
       } else {
@@ -323,5 +338,50 @@ extension ANIRecruitViewController: ANIRecruitFiltersViewDelegate {
 extension ANIRecruitViewController: UIGestureRecognizerDelegate {
   func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
     return true
+  }
+}
+
+//MARK: ANIRecruitContributionViewDelegate
+extension ANIRecruitViewController: ANIRecruitContributionViewControllerDelegate {
+  func doneEditingRecruit(recruit: FirebaseRecruit) {
+  }
+  
+  func loadThumnailImage(thumbnailImage: UIImage?) {
+    guard let uploadProgressView = self.uploadProgressView,
+          let thumbnailImageView = uploadProgressView.thumbnailImageView else { return }
+    
+    if let thumbnailImage = thumbnailImage {
+      thumbnailImageView.image = thumbnailImage
+      thumbnailImageView.isHidden = false
+    } else {
+      thumbnailImageView.image = nil
+      thumbnailImageView.isHidden = true
+    }
+  }
+  
+  func updateProgress(progress: CGFloat) {
+    guard let uploadProgressView = self.uploadProgressView else { return }
+    
+    uploadProgressView.updateProgress(progress: progress)
+    
+    if progress != 1.0 {
+      UIView.animate(withDuration: 0.2) {
+        uploadProgressView.alpha = 0.95
+      }
+      uploadProgressView.isHidden = false
+    }
+  }
+}
+
+//MARK: ANIUploadProgressViewDelegate
+extension ANIRecruitViewController: ANIUploadProgressViewDelegate {
+  func completeProgress() {
+    guard let uploadProgressView = self.uploadProgressView else { return }
+    
+    UIView.animate(withDuration: 0.2, animations: {
+      uploadProgressView.alpha = 0.0
+    }) { (complete) in
+      uploadProgressView.isHidden = true
+    }
   }
 }

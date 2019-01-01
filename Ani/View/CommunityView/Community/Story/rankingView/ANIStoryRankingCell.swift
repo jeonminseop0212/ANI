@@ -24,6 +24,8 @@ class ANIStoryRankingCell: UICollectionViewCell {
   
   private weak var crownImageView: UIImageView?
   
+  private weak var videoImageView: UIImageView?
+  
   let STORY_LABEL_HEIHGT: CGFloat = 35.0
   private weak var storyLabel: UILabel?
   
@@ -152,6 +154,17 @@ class ANIStoryRankingCell: UICollectionViewCell {
     crownImageView.leftToSuperview(offset: 10.0)
     self.crownImageView = crownImageView
     
+    //videoImageView
+    let videoImageView = UIImageView()
+    videoImageView.image = UIImage(named: "videoIcon")
+    videoImageView.alpha = 0.0
+    addSubview(videoImageView)
+    videoImageView.centerY(to: crownImageView)
+    videoImageView.leftToRight(of: crownImageView, offset: 10.0)
+    videoImageView.width(25.0)
+    videoImageView.height(15.0)
+    self.videoImageView = videoImageView
+    
     //blockImageView
     let blockImageView = UIImageView()
     blockImageView.image = UIImage(named: "notSee")
@@ -179,13 +192,23 @@ class ANIStoryRankingCell: UICollectionViewCell {
   
   private func reloadLayout() {
     guard let rankingStory = self.rankingStory,
-          let storyImageUrls = rankingStory.storyImageUrls,
           let storyImageView = self.storyImageView,
           let storyLabel = self.storyLabel,
+          let videoImageView = self.videoImageView,
           let blurBackGroundView = self.blurBackGroundView else { return }
     
-    storyImageView.sd_setImage(with: URL(string: storyImageUrls[0]), completed: nil)
+    if let storyImageUrls = rankingStory.storyImageUrls {
+      storyImageView.sd_setImage(with: URL(string: storyImageUrls[0]), completed: nil)
+    } else if let thumbnailImageUrl = rankingStory.thumbnailImageUrl {
+      storyImageView.sd_setImage(with: URL(string: thumbnailImageUrl), completed: nil)
+    }
     storyLabel.text = rankingStory.story
+    
+    if rankingStory.storyVideoUrl != nil {
+      videoImageView.alpha = 1.0
+    } else {
+      videoImageView.alpha = 0.0
+    }
     
     if isBlockStory(story: rankingStory) {
       blurBackGroundView.isHidden = false
@@ -223,7 +246,7 @@ class ANIStoryRankingCell: UICollectionViewCell {
     if let hideUserIds = story.hideUserIds, hideUserIds.contains(currentUserUid) {
       return true
     }
-    if story.storyImageUrls == nil && story.recruitId == nil {
+    if story.storyImageUrls == nil && story.recruitId == nil && story.thumbnailImageUrl == nil {
       return true
     }
     

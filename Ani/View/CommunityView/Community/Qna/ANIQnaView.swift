@@ -206,6 +206,7 @@ extension ANIQnaView: UITableViewDataSource {
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let id = NSStringFromClass(ANIQnaViewCell.self)
     let cell = tableView.dequeueReusableCell(withIdentifier: id, for: indexPath) as! ANIQnaViewCell
+    cell.delegate = self
 
     if !qnas.isEmpty {
       if users.contains(where: { $0.uid == qnas[indexPath.row].userId }) {
@@ -220,7 +221,6 @@ extension ANIQnaView: UITableViewDataSource {
       }
       cell.indexPath = indexPath.row
       cell.qna = qnas[indexPath.row]
-      cell.delegate = self
     }
     
     return cell

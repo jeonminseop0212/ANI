@@ -4,6 +4,8 @@ import Photos
 protocol GridViewDelegate {
   func previewImageDidScroll(offset: CGPoint)
   func previewImageDidZoom(scale: CGFloat)
+  func previewVideoDidScroll(offset: CGPoint)
+  func previewVideoDidZoom(scale: CGFloat)
 }
 
 class GridView: UIView {
@@ -22,6 +24,11 @@ class GridView: UIView {
   lazy var videoPreviewView: UIView = self.makeVideoPreviewView()
   var player: AVPlayer?
   var paused: Bool = false
+  var thumnailImage: UIImage? {
+    didSet {
+      self.previewImageView.image = thumnailImage
+    }
+  }
   var videoPlayerItem: AVPlayerItem? {
     didSet {
       let asset = self.videoPlayerItem?.asset
@@ -63,28 +70,33 @@ class GridView: UIView {
       let w = image.size.width
       let h = image.size.height
       
-      if w >= h { // Landscape
+      if w >= h {
         squareZoomScale = (1.0 / (w / h))
         self.previewImageView.frame.size.width = screenSize
         self.previewImageView.frame.size.height = screenSize*squareZoomScale
-        
-      } else if h > w { // Portrait
+      } else if h > w {
         squareZoomScale = (1.0 / (h / w))
         self.previewImageView.frame.size.width = screenSize*squareZoomScale
         self.previewImageView.frame.size.height = screenSize
       }
       self.previewImageView.center = self.previewScollView.center
       
+      if w == h {
+        self.previewImageView.frame.origin.x = 0
+        self.previewImageView.frame.origin.y = 0
+      }
+      
       self.previewImageView.image = self.image
       previewImageView.clipsToBounds = true
       refreshZoomScale()
       
       previewScollView.setZoomScale(squaredZoomScale, animated: false)
+      previewScollView.contentOffset.x = (previewImageView.frame.size.width - previewScollView.bounds.size.width) / 2.0
+      previewScollView.contentOffset.y = (previewImageView.frame.size.height - previewScollView.bounds.size.height) / 2.0
       
       if Config.Camera.oneImageMode {
         self.previewScollView.minimumZoomScale = squaredZoomScale
       }
-      
     }
   }
   var selectedImage: UIImage! = nil {
@@ -101,15 +113,34 @@ class GridView: UIView {
         squareZoomScale = (1.0 / (w / h))
         self.previewImageView.frame.size.width = screenSize
         self.previewImageView.frame.size.height = screenSize*squareZoomScale
-        
       } else if h > w { // Portrait
         squareZoomScale = (1.0 / (h / w))
         self.previewImageView.frame.size.width = screenSize*squareZoomScale
         self.previewImageView.frame.size.height = screenSize
       }
       
-      self.previewImageView.center = self.previewScollView.center
-      self.previewImageView.frame.origin.y = self.previewImageView.frame.origin.y - self.topView.frame.height - 1
+      if w == h {
+        self.previewImageView.frame.origin.x = 0
+        self.previewImageView.frame.origin.y = 0
+      }
+      
+      if squaredZoomScale == 1 {
+        let boundsSize = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width)
+        var contentsFrame = previewImageView.frame
+        if contentsFrame.size.width < boundsSize.width {
+          contentsFrame.origin.x = (boundsSize.width - contentsFrame.size.width) / 2.0
+        } else {
+          contentsFrame.origin.x = 0.0
+        }
+        
+        if contentsFrame.size.height < boundsSize.height {
+          contentsFrame.origin.y = (boundsSize.height - contentsFrame.size.height) / 2.0
+        } else {
+          contentsFrame.origin.y = 0.0
+        }
+        
+        previewImageView.frame = contentsFrame
+      }
       
       self.previewImageView.image = selectedImage
       previewImageView.clipsToBounds = true
@@ -289,7 +320,26 @@ class GridView: UIView {
   private func setFitImage(_ fit: Bool, animated isAnimated: Bool = true) {
     let animated = isAnimated
     if fit {
-      self.previewScollView.setZoomScale(squaredZoomScale, animated: animated)
+      if isSelectedImage {
+        var squareZoomScale: CGFloat = 1.0
+        var w: CGFloat = 0.0
+        var h: CGFloat = 0.0
+        
+        if let selectedImage = self.selectedImage {
+          w = selectedImage.size.width
+          h = selectedImage.size.height
+        }
+
+        if w >= h {
+          squareZoomScale = (w / h)
+        } else if h > w {
+          squareZoomScale = (h / w)
+        }
+        
+        self.previewScollView.setZoomScale(squareZoomScale, animated: animated)
+      } else {
+        self.previewScollView.setZoomScale(squaredZoomScale, animated: animated)
+      }
     } else {
       self.previewScollView.setZoomScale(1, animated: animated)
     }
@@ -327,6 +377,10 @@ class GridView: UIView {
   }
   
   private func setVideoPlayer(size: CGSize) {
+    self.previewScollView.minimumZoomScale = 1.0
+    self.previewScollView.setZoomScale(1.0, animated: false)
+    self.previewScollView.contentOffset = CGPoint(x: 0, y: 0)
+    
     videoPreviewView.layer.sublayers?.forEach { $0.removeFromSuperlayer() }
     
     player = AVPlayer.init(playerItem: self.videoPlayerItem)
@@ -334,8 +388,6 @@ class GridView: UIView {
     playerLayer.videoGravity = .resizeAspect
     videoPreviewView.layer.insertSublayer(playerLayer, at: 0)
     
-    previewScollView.setZoomScale(1.0, animated: false)
-    
     let screenSize: CGFloat = UIScreen.main.bounds.width
     self.videoPreviewView.frame.size.width = screenSize
     self.videoPreviewView.frame.size.height = screenSize
@@ -357,44 +409,28 @@ class GridView: UIView {
     }
     self.videoPreviewView.center = self.previewScollView.center
     self.videoPreviewView.frame.origin.y = self.videoPreviewView.frame.origin.y - self.topView.frame.height - 1
+
     playerLayer.frame = CGRect(x: 0, y: 0, width: videoPreviewView.frame.width, height: videoPreviewView.frame.height)
     
-    refreshZoomScale()
+    self.previewImageView.center = self.previewScollView.center
+    self.previewImageView.frame.size.width = self.videoPreviewView.frame.size.width
+    self.previewImageView.frame.size.height = self.videoPreviewView.frame.size.height
+    self.previewImageView.frame.origin.y = self.videoPreviewView.frame.origin.y
+    if w == h {
+      self.previewImageView.frame.origin.x = 0
+      self.previewImageView.frame.origin.y = 0
+      self.videoPreviewView.frame.origin.x = 0
+      self.videoPreviewView.frame.origin.y = 0
+    }
+    self.previewImageView.clipsToBounds = true
+    
+    refreshZoomScale(videoSize: size)
     
     previewScollView.setZoomScale(squaredZoomScale, animated: false)
+    previewScollView.contentOffset.x = (previewImageView.frame.size.width - previewScollView.bounds.size.width) / 2.0
+    previewScollView.contentOffset.y = (previewImageView.frame.size.height - previewScollView.bounds.size.height) / 2.0
     
     player?.play()
-  }
-  
-  private func updateVideoPreviewViewFrame(size: CGSize) {
-    previewScollView.setZoomScale(1.0, animated: false)
-    
-    let screenSize: CGFloat = UIScreen.main.bounds.width
-    self.videoPreviewView.frame.size.width = screenSize
-    self.videoPreviewView.frame.size.height = screenSize
-    
-    var squareZoomScale: CGFloat = 1.0
-    
-    let w = size.width
-    let h = size.height
-    
-    if w >= h { // Landscape
-      squareZoomScale = (1.0 / (w / h))
-      self.videoPreviewView.frame.size.width = screenSize
-      self.videoPreviewView.frame.size.height = screenSize*squareZoomScale
-      
-    } else if h > w { // Portrait
-      squareZoomScale = (1.0 / (h / w))
-      self.videoPreviewView.frame.size.width = screenSize*squareZoomScale
-      self.videoPreviewView.frame.size.height = screenSize
-    }
-    self.videoPreviewView.center = self.previewScollView.center
-    self.videoPreviewView.frame.origin.y = self.videoPreviewView.frame.origin.y - self.topView.frame.height - 1
-    //    playerLayer?.frame = CGRect(x: 0, y: 0, width: videoPreviewView.frame.width, height: videoPreviewView.frame.height)
-    
-    refreshZoomScale()
-    
-    previewScollView.setZoomScale(squaredZoomScale, animated: false)
   }
   
   private func makeEmptyView() -> EmptyView {
@@ -412,7 +448,7 @@ class GridView: UIView {
     return view
   }
   
-  func refreshZoomScale() {
+  func refreshZoomScale(videoSize: CGSize? = nil) {
     var squareZoomScale: CGFloat = 1.0
     var w: CGFloat = 0.0
     var h: CGFloat = 0.0
@@ -429,41 +465,15 @@ class GridView: UIView {
       }
     }
     
-    if let videoPlayerItem = self.videoPlayerItem {
-      let asset = videoPlayerItem.asset
-      let track = asset.tracks(withMediaType: .video).first
-      let size = track?.naturalSize
-      
-      guard let sizeUnrap = size else { return }
-      
-      w = sizeUnrap.width
-      h = sizeUnrap.height
+    if let videoSize = videoSize {
+      w = videoSize.width
+      h = videoSize.height
     }
     
-    if w >= h { // Landscape
-      if h >= w * Config.Grid.previewRatio {
-        squareZoomScale = 1.0
-        
-        
-        let boundsSize = previewScollView.bounds.size
-        var contentsFrame = previewImageView.frame
-        
-        if contentsFrame.size.height < boundsSize.height {
-          contentsFrame.origin.y = (boundsSize.height - contentsFrame.size.height) / 2.0
-        } else {
-          contentsFrame.origin.y = 0.0
-          previewScollView.contentOffset.y = (contentsFrame.size.height - boundsSize.height) / 2.0
-        }
-        previewImageView.frame = contentsFrame
-        
-        
-        
-      } else {
-        squareZoomScale = (w / h)
-      }
-    } else if h > w { // Portrait
+    if w >= h {
+      squareZoomScale = (w / h)
+    } else if h > w {
       squareZoomScale = (h / w)
-      previewScollView.contentOffset.y = (previewImageView.frame.size.height - previewScollView.bounds.size.height) / 2.0
     }
     squaredZoomScale = squareZoomScale
   }
@@ -586,9 +596,11 @@ public class PanGestureHelper: NSObject, UIGestureRecognizerDelegate {
     } else if sender.state == UIGestureRecognizer.State.changed {
       let currentPos = sender.location(in: v)
       if dragDirection == .up && currentPos.y < bottomY - dragDiff {
-        v.topViewTopConstraint?.constant =
-          max(v.imageCropViewMinimalVisibleHeight - preViewHeight,
-              currentPos.y + dragDiff - preViewHeight)
+        let moveY = max(v.imageCropViewMinimalVisibleHeight - preViewHeight,
+                      currentPos.y + dragDiff - preViewHeight)
+        if moveY < 0 {
+          v.topViewTopConstraint?.constant = moveY
+        }
       } else if dragDirection == .down && currentPos.y > bottomY {
         v.topViewTopConstraint?.constant =
           min(topViewOriginalConstraintTop, currentPos.y - preViewHeight)
@@ -671,6 +683,9 @@ extension GridView: UIScrollViewDelegate {
         contentsFrame.origin.y = 0.0
       }
       videoPreviewView.frame = contentsFrame
+      previewImageView.frame = videoPreviewView.frame
+      
+      self.delegate?.previewVideoDidZoom(scale: scrollView.zoomScale)
     }
   }
   
@@ -685,6 +700,8 @@ extension GridView: UIScrollViewDelegate {
   func scrollViewDidScroll(_ scrollView: UIScrollView) {
     if self.image != nil {
       self.delegate?.previewImageDidScroll(offset: scrollView.contentOffset)
+    } else {
+      self.delegate?.previewVideoDidScroll(offset: scrollView.contentOffset)
     }
   }
 }

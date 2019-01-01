@@ -29,6 +29,8 @@ enum RecruitContributionMode {
 
 protocol ANIRecruitContributionViewControllerDelegate {
   func doneEditingRecruit(recruit: FirebaseRecruit)
+  func loadThumnailImage(thumbnailImage: UIImage?)
+  func updateProgress(progress: CGFloat)
 }
 
 class ANIRecruitContributionViewController: UIViewController {
@@ -270,6 +272,7 @@ class ANIRecruitContributionViewController: UIViewController {
       Gallery.Config.initialTab = .imageTab
       Gallery.Config.PageIndicator.backgroundColor = .white
       Gallery.Config.Camera.oneImageMode = false
+      Gallery.Config.Camera.imageLimit = 10
       Gallery.Config.Font.Main.regular = UIFont.boldSystemFont(ofSize: 17)
       Gallery.Config.Grid.ArrowButton.tintColor = ANIColor.dark
       Gallery.Config.Grid.FrameView.borderColor = ANIColor.emerald
@@ -309,7 +312,14 @@ class ANIRecruitContributionViewController: UIViewController {
         let data = try FirestoreEncoder().encode(recruit) as [String: AnyObject]
         
         if recruitContributionMode == .new {
-          database.collection(KEY_RECRUITS).document(id).setData(data)
+          database.collection(KEY_RECRUITS).document(id).setData(data) { (error) in
+            if let error = error {
+              DLog("Error set document: \(error)")
+              return
+            }
+            
+            self.delegate?.updateProgress(progress: 1.0)
+          }
         } else if recruitContributionMode == .edit {
           database.collection(KEY_RECRUITS).document(id).setData(data) { (error) in
             if let error = error {
@@ -556,6 +566,10 @@ extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
         var recruit = FirebaseRecruit(id: id, headerImageUrl: nil, title: recruitInfo.title, kind: recruitInfo.kind, age: recruitInfo.age, sex: recruitInfo.sex, home: recruitInfo.home, vaccine: recruitInfo.vaccine, castration: recruitInfo.castration, reason: recruitInfo.reason, introduce: recruitInfo.introduce, introduceImageUrls: nil, passing: recruitInfo.passing, recruitState: 0, userId: userId, date: date, isLoved: nil, isCliped: nil, isSupported: nil, hideUserIds: nil)
         
         DispatchQueue.global().async {
+          DispatchQueue.main.async {
+            self.delegate?.loadThumnailImage(thumbnailImage: recruitInfo.headerImage)
+          }
+          
           if let recruitHeaderImageData = recruitInfo.headerImage.jpegData(compressionQuality: 0.5) {
             let uuid = NSUUID().uuidString
             storageRef.child(KEY_RECRUIT_HEADER_IMAGES).child(uuid).putData(recruitHeaderImageData, metadata: nil) { (metaData, error) in
@@ -587,7 +601,7 @@ extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
           for (index, introduceImage) in recruitInfo.introduceImages.enumerated() {
             if let introduceImage = introduceImage, let introduceImageData = introduceImage.jpegData(compressionQuality: 0.5) {
               let uuid = NSUUID().uuidString
-              storageRef.child(KEY_RECRUIT_INTRODUCE_IMAGES).child(uuid).putData(introduceImageData, metadata: nil) { (metaData, error) in
+              let uploadTask = storageRef.child(KEY_RECRUIT_INTRODUCE_IMAGES).child(uuid).putData(introduceImageData, metadata: nil) { (metaData, error) in
                 if error != nil {
                   DLog("storageError")
                   return
@@ -615,6 +629,16 @@ extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
                       }
                     }
                   }
+                })
+              }
+              
+              if index == 0 {
+                uploadTask.observe(.progress, handler: { (snpashot) in
+                  guard let progress = snpashot.progress else { return }
+                  
+                  let floorProgress = (floor((CGFloat(progress.completedUnitCount) / CGFloat(progress.totalUnitCount)) * 10) / 10) * 0.9
+                  
+                  self.delegate?.updateProgress(progress: floorProgress)
                 })
               }
             }

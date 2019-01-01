@@ -436,16 +436,36 @@ extension ANIProfileViewController {
         do {
           if contentType == .story {
             let story = try FirestoreDecoder().decode(FirebaseStory.self, from: data)
-            
+            let storage = Storage.storage()
+
             if let urls = story.storyImageUrls {
               for url in urls {
-                let storage = Storage.storage()
                 let storageRef = storage.reference(forURL: url)
                 
                 storageRef.delete { error in
                   if let error = error {
                     DLog(error)
                   }
+                }
+              }
+            }
+            
+            if let videoUrl = story.storyVideoUrl {
+              let storageRef = storage.reference(forURL: videoUrl)
+              
+              storageRef.delete { error in
+                if let error = error {
+                  DLog(error)
+                }
+              }
+            }
+            
+            if let thumbnailImageUrl = story.thumbnailImageUrl {
+              let storageRef = storage.reference(forURL: thumbnailImageUrl)
+              
+              storageRef.delete { error in
+                if let error = error {
+                  DLog(error)
                 }
               }
             }

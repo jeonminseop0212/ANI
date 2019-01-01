@@ -1,6 +1,6 @@
+github "HHK1/PryntTrimmerView" "3.0.0"
 github "KennethTsang/GrowingTextView" "0.5.6"
 github "algolia/algoliasearch-client-swift" "6.0.0"
 github "alickbass/CodableFirebase" "0.2.1"
-github "imwcl/WCLShineButton" "1.0.7"
 github "ninjaprox/NVActivityIndicatorView" "4.4.0"
 github "roberthein/TinyConstraints" "3.3.0"

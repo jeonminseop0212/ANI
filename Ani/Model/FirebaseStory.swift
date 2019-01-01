@@ -11,6 +11,8 @@ import UIKit
 struct FirebaseStory: Codable {
   var id: String?
   let storyImageUrls: [String]?
+  var storyVideoUrl: String?
+  var thumbnailImageUrl: String?
   let story: String
   let userId: String
   let recruitId: String?

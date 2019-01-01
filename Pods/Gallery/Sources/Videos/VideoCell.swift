@@ -24,7 +24,7 @@ class VideoCell: ImageCell {
   override func setup() {
     super.setup()
     
-    [bottomOverlay, cameraImageView, durationLabel].forEach {
+    [bottomOverlay, cameraImageView, durationLabel, coverView].forEach {
       self.insertSubview($0, belowSubview: self.highlightOverlay)
     }
     
@@ -37,6 +37,8 @@ class VideoCell: ImageCell {
     
     durationLabel.g_pin(on: .right, constant: -4)
     durationLabel.g_pin(on: .bottom, constant: -2)
+    
+    coverView.g_pinEdges()    
   }
   
   // MARK: - Controls

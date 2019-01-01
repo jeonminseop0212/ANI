@@ -13,6 +13,13 @@ import FirebaseStorage
 import FirebaseFirestore
 import CodableFirebase
 import InstantSearchClient
+import AVKit
+import Photos
+
+protocol ANIContributionViewControllerDelegate {
+  func loadThumnailImage(thumbnailImage: UIImage?)
+  func updateProgress(progress: CGFloat)
+}
 
 enum ContributionMode {
   case story
@@ -46,11 +53,26 @@ class ANIContributionViewController: UIViewController {
     }
   }
   
+  private var contentVideo: TrimmingVideo?
+  private var videoLength: Int = 0
+  private var thumbnailImage: UIImage? {
+    didSet {
+      guard let contriButionView = self.contriButionView else { return }
+      
+      contriButionView.videoLength = videoLength
+      contriButionView.thumbnailImage = thumbnailImage
+    }
+  }
+  
+  private var exportTimer: Timer?
+  
+  var delegate: ANIContributionViewControllerDelegate?
+  
   private let IMAGE_SIZE: CGSize = CGSize(width: 500.0, height: 500.0)
   
   override func viewDidLoad() {
     setup()
-    setupImagePickGalleryController()
+    setupGalleryController()
   }
   
   override func viewWillAppear(_ animated: Bool) {
@@ -147,13 +169,9 @@ class ANIContributionViewController: UIViewController {
     self.contriButionView = contriButionView
   }
   
-  private func setupImagePickGalleryController() {
+  private func setupGalleryController() {
     imagePickGallery.delegate = self
-    Gallery.Config.initialTab = .imageTab
     Gallery.Config.PageIndicator.backgroundColor = .white
-    Gallery.Config.Camera.oneImageMode = false
-    Gallery.Config.Camera.imageLimit = 10
-    Gallery.Config.tabsToShow = [.imageTab, .cameraTab]
     Gallery.Config.Font.Main.regular = UIFont.boldSystemFont(ofSize: 17)
     Gallery.Config.Grid.ArrowButton.tintColor = ANIColor.dark
     Gallery.Config.Grid.FrameView.borderColor = ANIColor.emerald
@@ -170,7 +188,7 @@ class ANIContributionViewController: UIViewController {
     ANINotificationManager.remove(self)
   }
   
-  func uploadStory() {
+  func uploadImageStory() {
     guard let contriButionView = self.contriButionView,
           let currentUser = ANISessionManager.shared.currentUser,
           let uid = currentUser.uid else { return }
@@ -182,9 +200,9 @@ class ANIContributionViewController: UIViewController {
       for (index, contentImage) in self.contentImages.enumerated() {
         if let contentImage = contentImage, let contentImageData = contentImage.jpegData(compressionQuality: 0.5) {
           let uuid = UUID().uuidString
-          storageRef.child(KEY_STORY_IMAGES).child(uuid).putData(contentImageData, metadata: nil) { (metaData, error) in
+          let uploadTask = storageRef.child(KEY_STORY_IMAGES).child(uuid).putData(contentImageData, metadata: nil) { (metaData, error) in
             if error != nil {
-              DLog("storage error")
+              DLog("storage put image error")
               return
             }
             
@@ -208,7 +226,7 @@ class ANIContributionViewController: UIViewController {
                     let date = ANIFunction.shared.getToday()
                     let day = ANIFunction.shared.getToday(format: "yyyy/MM/dd")
                     let content = contriButionView.getContent()
-                    let story = FirebaseStory(id: id, storyImageUrls: urls, story: content, userId: uid, recruitId: nil, recruitTitle: nil, recruitSubTitle: nil, date: date, day: day, isLoved: nil, hideUserIds: nil, loveCount: 0)
+                    let story = FirebaseStory(id: id, storyImageUrls: urls, storyVideoUrl: nil, thumbnailImageUrl: nil, story: content, userId: uid, recruitId: nil, recruitTitle: nil, recruitSubTitle: nil, date: date, day: day, isLoved: nil, hideUserIds: nil, loveCount: 0)
                     
                     self.upateStroyDatabase(story: story, id: id)
                   }
@@ -216,6 +234,110 @@ class ANIContributionViewController: UIViewController {
               }
             })
           }
+          
+          if index == 0 {
+            DispatchQueue.main.async {
+              self.delegate?.loadThumnailImage(thumbnailImage: contentImage)
+            }
+
+            uploadTask.observe(.progress, handler: { (snpashot) in
+              guard let progress = snpashot.progress else { return }
+              
+              let floorProgress = (floor((CGFloat(progress.completedUnitCount) / CGFloat(progress.totalUnitCount)) * 10) / 10) * 0.9
+              
+              self.delegate?.updateProgress(progress: floorProgress)
+            })
+          }
+        }
+      }
+    }
+  }
+  
+  private func uploadVideoStory() {
+    guard let contriButionView = self.contriButionView,
+          let currentUser = ANISessionManager.shared.currentUser,
+          let uid = currentUser.uid,
+          let contentVideo = self.contentVideo else { return }
+    
+    let cropRect = getVisibleRect(video: contentVideo.video)
+    
+    guard let thumbnailImage = self.thumbnailImage,
+          let thumbnailImageData = thumbnailImage.jpegData(compressionQuality: 0.5) else { return }
+    
+    self.delegate?.loadThumnailImage(thumbnailImage: thumbnailImage)
+    
+    fetchVideoUrlAndCrop(video: contentVideo, cropRect: cropRect) { (url) in
+      let storageRef = Storage.storage().reference()
+      
+      let group = DispatchGroup()
+      
+      var thumbnailImageUrl = ""
+      var videoUrl = ""
+
+      group.enter()
+      DispatchQueue(label: "putData").async {
+        let thumnailImageUuid = UUID().uuidString
+        storageRef.child(KYE_THUMNAIL_IMAGES).child(thumnailImageUuid).putData(thumbnailImageData, metadata: nil, completion: { (thumnailImageMetaData, thumbnailImageError) in
+          if thumbnailImageError != nil {
+            DLog("storage put thumbnail image error")
+            return
+          }
+
+          storageRef.child(KYE_THUMNAIL_IMAGES).child(thumnailImageUuid).downloadURL(completion: { (url, error) in
+            if thumbnailImageError != nil {
+              DLog("thumbnail image download url error")
+              return
+            }
+
+            guard let url = url else { return }
+
+            thumbnailImageUrl = url.absoluteString
+            group.leave()
+          })
+        })
+      }
+      
+
+      group.enter()
+      DispatchQueue(label: "putData").async {
+        let videoUuid = UUID().uuidString
+        let uploadTask = storageRef.child(KEY_STORY_VIDEOS).child(videoUuid).putFile(from: url, metadata: nil, completion: { (metaData, error) in
+          if error != nil {
+            DLog("storage put video error")
+            return
+          }
+
+          storageRef.child(KEY_STORY_VIDEOS).child(videoUuid).downloadURL(completion: { (url, error) in
+            if error != nil {
+              DLog("storage download video url error")
+              return
+            }
+
+            guard let url = url else { return }
+
+            videoUrl = url.absoluteString
+            group.leave()
+          })
+        })
+        
+        uploadTask.observe(.progress, handler: { (snpashot) in
+          guard let progress = snpashot.progress else { return }
+          
+          let floorProgress = (floor((CGFloat(progress.completedUnitCount) / CGFloat(progress.totalUnitCount)) * 10) / 10) * 0.7
+          
+          self.delegate?.updateProgress(progress: floorProgress + 0.2)
+        })
+      }
+      
+      group.notify(queue: DispatchQueue(label: "putData")) {
+        DispatchQueue.main.async {
+          let id = NSUUID().uuidString
+          let date = ANIFunction.shared.getToday()
+          let day = ANIFunction.shared.getToday(format: "yyyy/MM/dd")
+          let content = contriButionView.getContent()
+          let story = FirebaseStory(id: id, storyImageUrls: nil, storyVideoUrl: videoUrl, thumbnailImageUrl: thumbnailImageUrl, story: content, userId: uid, recruitId: nil, recruitTitle: nil, recruitSubTitle: nil, date: date, day: day, isLoved: nil, hideUserIds: nil, loveCount: 0)
+
+          self.upateStroyDatabase(story: story, id: id)
         }
       }
     }
@@ -236,6 +358,12 @@ class ANIContributionViewController: UIViewController {
           let date = ANIFunction.shared.getToday()
           let content = contriButionView.getContent()
           let qna = FirebaseQna(id: id, qnaImageUrls: nil, qna: content, userId: uid, date: date, isLoved: nil, hideUserIds: nil)
+          
+          DispatchQueue.main.async {
+            self.delegate?.loadThumnailImage(thumbnailImage: nil)
+          }
+          
+          self.delegate?.updateProgress(progress: 0.9)
         
           self.upateQnaDatabase(qna: qna, id: id)
         }
@@ -243,7 +371,7 @@ class ANIContributionViewController: UIViewController {
         for (index, contentImage) in self.contentImages.enumerated() {
           if let contentImage = contentImage, let contentImageData = contentImage.jpegData(compressionQuality: 0.5) {
             let uuid = UUID().uuidString
-            storageRef.child(KEY_QNA_IMAGES).child(uuid).putData(contentImageData, metadata: nil) { (metaData, error) in
+            let uploadTask = storageRef.child(KEY_QNA_IMAGES).child(uuid).putData(contentImageData, metadata: nil) { (metaData, error) in
               if error != nil {
                 DLog("storage error")
                 return
@@ -276,6 +404,20 @@ class ANIContributionViewController: UIViewController {
                 }
               })
             }
+            
+            if index == 0 {
+              DispatchQueue.main.async {
+                self.delegate?.loadThumnailImage(thumbnailImage: contentImage)
+              }
+              
+              uploadTask.observe(.progress, handler: { (snpashot) in
+                guard let progress = snpashot.progress else { return }
+                
+                let floorProgress = (floor((CGFloat(progress.completedUnitCount) / CGFloat(progress.totalUnitCount)) * 10) / 10) * 0.9
+                
+                self.delegate?.updateProgress(progress: floorProgress)
+              })
+            }
           }
         }
       }
@@ -294,6 +436,8 @@ class ANIContributionViewController: UIViewController {
         }
         
         self.pushDataAlgolia(data: data as [String : AnyObject])
+        
+        self.delegate?.updateProgress(progress: 1.0)
       }
     } catch let error {
       DLog(error)
@@ -312,6 +456,8 @@ class ANIContributionViewController: UIViewController {
         }
         
         self.pushDataAlgolia(data: data as [String : AnyObject])
+        
+        self.delegate?.updateProgress(progress: 1.0)
       }
     } catch let error {
       DLog(error)
@@ -344,30 +490,29 @@ class ANIContributionViewController: UIViewController {
   }
   
   private func contentImagesPick(animation: Bool) {
+    if selectedContributionMode == .story {
+      Gallery.Config.tabsToShow = [.imageTab, .videoTab, .cameraTab]
+    } else {
+      Gallery.Config.tabsToShow = [.imageTab, .cameraTab]
+    }
+    Gallery.Config.initialTab = .imageTab
+    Gallery.Config.Camera.oneImageMode = false
+    Gallery.Config.Camera.imageLimit = 10
+
     let imagePickgalleryNV = UINavigationController(rootViewController: imagePickGallery)
     present(imagePickgalleryNV, animated: animation, completion: nil)
   }
   
-  private func getCropImages(images: [UIImage?], items: [Image]) -> [UIImage] {
-    var croppedImages = [UIImage]()
-    
-    for (index, image) in images.enumerated() {
-      if let image = image {
-        let imageSize = image.size
-        let scrollViewWidth = self.view.frame.width
-        let widthScale =  scrollViewWidth / imageSize.width * items[index].scale
-        let heightScale = scrollViewWidth / imageSize.height * items[index].scale
-
-        let scale = 1 / min(widthScale, heightScale)
-        
-        let visibleRect = CGRect(x: floor(items[index].offset.x * scale), y: floor(items[index].offset.y * scale), width: scrollViewWidth * scale, height: scrollViewWidth * scale * Config.Grid.previewRatio)
-        let ref: CGImage = (image.cgImage?.cropping(to: visibleRect))!
-        let croppedImage:UIImage = UIImage(cgImage: ref)
-        
-        croppedImages.append(croppedImage)
+  @objc private func onTickExportTimer(sender: Timer) {
+    if let exportSession = sender.userInfo as? AVAssetExportSession {
+      
+      if exportSession.progress > 0.19 {
+        sender.invalidate()
+        self.exportTimer = nil
       }
+      
+      self.delegate?.updateProgress(progress: CGFloat(exportSession.progress * 0.2))
     }
-    return croppedImages
   }
   
   @objc private func keyboardWillChangeFrame(_ notification: Notification) {
@@ -410,9 +555,15 @@ class ANIContributionViewController: UIViewController {
     
     switch selectedContributionMode {
     case .story:
-      uploadStory()
-      
-      self.dismiss(animated: true, completion: nil)
+      if !contentImages.isEmpty {
+        uploadImageStory()
+        
+        self.dismiss(animated: true, completion: nil)
+      } else {
+        uploadVideoStory()
+        
+        self.dismiss(animated: true, completion: nil)
+      }
     case .qna:
       uploadQna()
       
@@ -433,8 +584,11 @@ extension ANIContributionViewController: GalleryControllerDelegate {
     }
   }
   
-  func galleryController(_ controller: GalleryController, didSelectVideo video: Video) {
-    controller.dismiss(animated: true, completion: nil)
+  func galleryController(_ controller: GalleryController, didSelectVideo video: Video) {    
+    let videoFilterViewController = ANIVideoFilterViewController()
+    videoFilterViewController.video = video
+    videoFilterViewController.delegate = self
+    controller.navigationController?.pushViewController(videoFilterViewController, animated: true)
   }
   
   func galleryController(_ controller: GalleryController, requestLightbox images: [Image]) {
@@ -458,6 +612,18 @@ extension ANIContributionViewController: ANIImageFilterViewControllerDelegate {
   }
 }
 
+//MARK: ANIVideoFilterViewControllerDelegate
+extension ANIContributionViewController: ANIVideoFilterViewControllerDelegate {
+  func doneFilterVideo(trimmingVideo: TrimmingVideo) {
+    let image = self.getCropThumbnailImage(image: trimmingVideo.coverImage, video: trimmingVideo.video)
+    let lenght = CGFloat(trimmingVideo.timeRange.duration.value) / CGFloat(trimmingVideo.timeRange.duration.timescale)
+    videoLength = Int(floor(lenght))
+    thumbnailImage = image.resize(size: IMAGE_SIZE)
+    
+    contentVideo = trimmingVideo
+  }
+}
+
 //MARK: ANIContributionViewDelegate
 extension ANIContributionViewController: ANIContributionViewDelegate {
   func imagesPickCellTapped() {
@@ -465,7 +631,15 @@ extension ANIContributionViewController: ANIContributionViewDelegate {
   }
   
   func imageDeleteButtonTapped(index: Int) {
+    contentImages.remove(at: index)
     imagePickGallery.cart.images.remove(at: index)
+  }
+  
+  func videoDeleteButtonTapped() {
+    contentVideo = nil
+    videoLength = 0
+    thumbnailImage = nil
+    imagePickGallery.cart.video = nil
   }
   
   func contributionButtonOn(on: Bool) {
@@ -478,5 +652,155 @@ extension ANIContributionViewController: ANIContributionViewDelegate {
       contributionButton.isEnabled = false
       contributionButtonBG.alpha = 0.5
     }
+  }
+}
+
+//MARK: image, video crop
+extension ANIContributionViewController {
+  private func getCropImages(images: [UIImage?], items: [Image]) -> [UIImage] {
+    var croppedImages = [UIImage]()
+    
+    for (index, image) in images.enumerated() {
+      if let image = image {
+        let imageSize = image.size
+        let scrollViewWidth = self.view.frame.width
+        let widthScale =  scrollViewWidth / imageSize.width * items[index].scale
+        let heightScale = scrollViewWidth / imageSize.height * items[index].scale
+        
+        let scale = 1 / min(widthScale, heightScale)
+        
+        let visibleRect = CGRect(x: floor(items[index].offset.x * scale), y: floor(items[index].offset.y * scale), width: scrollViewWidth * scale, height: scrollViewWidth * scale * Config.Grid.previewRatio)
+        let ref: CGImage = (image.cgImage?.cropping(to: visibleRect))!
+        let croppedImage: UIImage = UIImage(cgImage: ref)
+        
+        croppedImages.append(croppedImage)
+      }
+    }
+    return croppedImages
+  }
+  
+  private func fetchVideoUrlAndCrop(video: TrimmingVideo, cropRect: CGRect, callback: @escaping (URL) -> Void) {
+    let videosOptions = PHVideoRequestOptions()
+    videosOptions.isNetworkAccessAllowed = true
+    do {
+      let assetComposition = AVMutableComposition()
+      let trackTimeRange = video.timeRange
+      
+      // 1. Inserting audio and video tracks in composition
+      
+      guard let videoTrack = video.avAsset.tracks(withMediaType: AVMediaType.video).first,
+            let videoCompositionTrack = assetComposition.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid) else {
+        DLog("problems with video track")
+        return
+                            
+      }
+      if let audioTrack = video.avAsset.tracks(withMediaType: AVMediaType.audio).first,
+        let audioCompositionTrack = assetComposition
+          .addMutableTrack(withMediaType: AVMediaType.audio,
+                           preferredTrackID: kCMPersistentTrackID_Invalid) {
+        try audioCompositionTrack.insertTimeRange(trackTimeRange, of: audioTrack, at: CMTime.zero)
+      }
+      
+      try videoCompositionTrack.insertTimeRange(trackTimeRange, of: videoTrack, at: CMTime.zero)
+      
+      // 2. Create the instructions
+      
+      let mainInstructions = AVMutableVideoCompositionInstruction()
+      mainInstructions.timeRange = trackTimeRange
+      
+      // 3. Adding the layer instructions. Transforming
+      
+      let layerInstructions = AVMutableVideoCompositionLayerInstruction(assetTrack: videoCompositionTrack)
+      layerInstructions.setTransform(videoTrack.getTransform(cropRect: cropRect), at: CMTime.zero)
+      layerInstructions.setOpacity(1.0, at: CMTime.zero)
+      mainInstructions.layerInstructions = [layerInstructions]
+      
+      // 4. Create the main composition and add the instructions
+      
+      let videoComposition = AVMutableVideoComposition()
+      videoComposition.renderSize = cropRect.size
+      videoComposition.instructions = [mainInstructions]
+      videoComposition.frameDuration = CMTimeMake(value: 1, timescale: 30)
+      
+      // 5. Configuring export session
+      
+      let exportSession = AVAssetExportSession(asset: assetComposition,
+                                               presetName: AVAssetExportPresetMediumQuality)
+      exportSession?.outputFileType = .mp4
+      exportSession?.shouldOptimizeForNetworkUse = true
+      exportSession?.videoComposition = videoComposition
+      exportSession?.outputURL = URL(fileURLWithPath: NSTemporaryDirectory())
+        .appendingUniquePathComponent(pathExtension: AVFileType.mp4.fileExtension)
+      
+      // 6. Exporting
+      DispatchQueue.main.async {
+        self.exportTimer = Timer.scheduledTimer(timeInterval: 0.1,
+                                                target: self,
+                                                selector: #selector(self.onTickExportTimer),
+                                                userInfo: exportSession,
+                                                repeats: true)
+      }
+      
+      exportSession?.exportAsynchronously(completionHandler: {
+        DispatchQueue.main.async {
+          if let url = exportSession?.outputURL, exportSession?.status == .completed {
+            callback(url)
+          } else {
+            let error = exportSession?.error
+            DLog("error exporting video \(String(describing: error))")
+          }
+        }
+      })
+    } catch let error {
+      DLog("error \(error)")
+    }
+  }
+  
+  private func getVisibleRect(video: Video) -> CGRect {
+    let previewViewSize = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width)
+    var assetSize = CGSize(width: CGFloat(video.asset.pixelWidth), height: CGFloat(video.asset.pixelHeight))
+    let widthScale = previewViewSize.width / assetSize.width
+    let heightScale = previewViewSize.height / assetSize.height
+    
+    let minScale = min(widthScale, heightScale)
+    let screenVisibleVideoSize = CGSize(width: assetSize.width * minScale, height: assetSize.height * minScale)
+    let zoomSize = CGSize(width: screenVisibleVideoSize.width * video.scale, height: screenVisibleVideoSize.height * video.scale)
+    
+    if zoomSize.width > previewViewSize.width {
+      let scare = assetSize.width / zoomSize.width
+      assetSize.width = assetSize.width - ((zoomSize.width - previewViewSize.width) * scare)
+    }
+    
+    if zoomSize.height > previewViewSize.height {
+      let scare = assetSize.height / zoomSize.height
+      assetSize.height = assetSize.height - ((zoomSize.height - previewViewSize.height) * scare)
+    }
+    
+    assetSize.width = assetSize.width.rounded(.toNearestOrEven)
+    assetSize.width = (assetSize.width.truncatingRemainder(dividingBy: 2) == 0) ? assetSize.width : assetSize.width - 1
+    assetSize.height = assetSize.height.rounded(.toNearestOrEven)
+    assetSize.height = (assetSize.height.truncatingRemainder(dividingBy: 2) == 0) ? assetSize.height : assetSize.height - 1
+    
+    let visibleWidthScale = previewViewSize.width / assetSize.width * video.scale
+    let visibleHeightScale = previewViewSize.height / assetSize.height * video.scale
+    let scale = 1 / min(visibleWidthScale, visibleHeightScale)
+    let visibleRect = CGRect(x: floor(video.offset.x * scale), y: floor(video.offset.y * scale), width: assetSize.width, height: assetSize.height)
+    
+    return visibleRect
+  }
+  
+  private func getCropThumbnailImage(image: UIImage, video: Video) -> UIImage {
+    let imageSize = image.size
+    let scrollViewWidth = self.view.frame.width
+    let widthScale =  scrollViewWidth / imageSize.width * video.scale
+    let heightScale = scrollViewWidth / imageSize.height * video.scale
+    
+    let scale = 1 / min(widthScale, heightScale)
+    
+    let visibleRect = CGRect(x: floor(video.offset.x * scale), y: floor(video.offset.y * scale), width: scrollViewWidth * scale, height: scrollViewWidth * scale * Config.Grid.previewRatio)
+    let ref: CGImage = (image.cgImage?.cropping(to: visibleRect))!
+    let thumbnailImage: UIImage = UIImage(cgImage: ref)
+    
+    return thumbnailImage
   }
 }
