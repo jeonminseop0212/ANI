@@ -90,6 +90,8 @@ class ANIStoryRankingCell: UICollectionViewCell {
     //storyImageView
     let storyImageView = UIImageView()
     storyImageView.backgroundColor = ANIColor.gray
+    storyImageView.contentMode = .scaleAspectFill
+    storyImageView.layer.masksToBounds = true
     base.addSubview(storyImageView)
     storyImageView.edgesToSuperview(excluding: .bottom)
     storyImageView.height(RANKING_COLLECTION_VIEW_CELL_WIDHT)
