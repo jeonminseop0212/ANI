@@ -41,6 +41,7 @@ class ANIRankingViewCell: UITableViewCell {
   
   private func setup() {
     self.backgroundColor = ANIColor.bg
+    self.selectionStyle = .none
     
     //titleLabel
     let titleLabel = UILabel()
