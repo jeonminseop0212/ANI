@@ -43,9 +43,7 @@ class ANIQnaViewCell: UITableViewCell {
       if user == nil {
         loadUser()
       }
-      if qna.isLoved == nil {
-        isLoved()
-      }
+
       reloadLayout()
       observeLove()
       observeComment()
@@ -289,7 +287,9 @@ class ANIQnaViewCell: UITableViewCell {
   
   private func observeLove() {
     guard let qna = self.qna,
-          let qnaId = qna.id else { return }
+          let qnaId = qna.id,
+          let loveButton = self.loveButton,
+          let indexPath = self.indexPath else { return }
     
     self.loveCount = 0
 
@@ -304,8 +304,28 @@ class ANIQnaViewCell: UITableViewCell {
         
           if let snapshot = snapshot {
             self.loveCount = snapshot.documents.count
+            
+            DispatchQueue.main.async {
+              if let currentUserUid = ANISessionManager.shared.currentUserUid {
+                var documentIDTemp = [String]()
+                for document in snapshot.documents {
+                  documentIDTemp.append(document.documentID)
+                }
+                
+                if documentIDTemp.contains(currentUserUid) {
+                  loveButton.isSelected = true
+                  self.delegate?.loadedQnaIsLoved(indexPath: indexPath, isLoved: true)
+                } else {
+                  loveButton.isSelected = false
+                  self.delegate?.loadedQnaIsLoved(indexPath: indexPath, isLoved: false)
+                }
+              } else {
+                loveButton.isSelected = false
+              }
+            }
           } else {
             self.loveCount = 0
+            loveButton.isSelected = false
           }
       })
     }
@@ -345,45 +365,6 @@ class ANIQnaViewCell: UITableViewCell {
     guard let commentListener = self.commentListener else { return }
     
     commentListener.remove()
-  }
-  
-  private func isLoved() {
-    guard let qna = self.qna,
-          let qnaId = qna.id,
-          let loveButton = self.loveButton,
-          let indexPath = self.indexPath else { return }
-    
-    if let currentUserId = ANISessionManager.shared.currentUserUid {
-      let database = Firestore.firestore()
-      DispatchQueue.global().async {
-        database.collection(KEY_QNAS).document(qnaId).collection(KEY_LOVE_IDS).getDocuments(completion: { (snapshot, error) in
-          if let error = error {
-            DLog("Error get document: \(error)")
-            
-            return
-          }
-          
-          guard let snapshot = snapshot else { return }
-          
-          DispatchQueue.main.async {
-            var documentIDTemp = [String]()
-            for document in snapshot.documents {
-              
-              documentIDTemp.append(document.documentID)
-            }
-            
-            if documentIDTemp.contains(currentUserId) {
-              loveButton.isSelected = true
-              self.delegate?.loadedQnaIsLoved(indexPath: indexPath, isLoved: true)
-            } else {
-              self.delegate?.loadedQnaIsLoved(indexPath: indexPath, isLoved: false)
-            }
-          }
-        })
-      }
-    } else {
-      loveButton.isSelected = false
-    }
   }
   
   private func updateNoti() {

@@ -39,9 +39,7 @@ class ANIStoryViewCell: UITableViewCell {
       if user == nil {
         loadUser()
       }
-      if story.isLoved == nil {
-        isLoved()
-      }
+
       reloadLayout()
       observeLove()
       observeComment()
@@ -279,7 +277,9 @@ class ANIStoryViewCell: UITableViewCell {
   
   private func observeLove() {
     guard let story = self.story,
-          let storyId = story.id else { return }
+          let storyId = story.id,
+          let loveButton = self.loveButton,
+          let indexPath = self.indexPath else { return }
     
     self.loveCount = 0
     
@@ -294,8 +294,28 @@ class ANIStoryViewCell: UITableViewCell {
         
         if let snapshot = snapshot {
           self.loveCount = snapshot.documents.count
+          
+          DispatchQueue.main.async {
+            if let currentUserUid = ANISessionManager.shared.currentUserUid {
+              var documentIDTemp = [String]()
+              for document in snapshot.documents {
+                documentIDTemp.append(document.documentID)
+              }
+              
+              if documentIDTemp.contains(currentUserUid) {
+                loveButton.isSelected = true
+                self.delegate?.loadedStoryIsLoved(indexPath: indexPath, isLoved: true)
+              } else {
+                loveButton.isSelected = false
+                self.delegate?.loadedStoryIsLoved(indexPath: indexPath, isLoved: false)
+              }
+            } else {
+              loveButton.isSelected = false
+            }
+          }
         } else {
           self.loveCount = 0
+          loveButton.isSelected = false
         }
       })
     }
@@ -335,45 +355,6 @@ class ANIStoryViewCell: UITableViewCell {
     guard let commentListener = self.commentListener else { return }
     
     commentListener.remove()
-  }
-  
-  private func isLoved() {
-    guard let story = self.story,
-          let storyId = story.id,
-          let loveButton = self.loveButton,
-          let indexPath = self.indexPath else { return }
-    
-    if let currentUserId = ANISessionManager.shared.currentUserUid {
-      let database = Firestore.firestore()
-      DispatchQueue.global().async {
-        database.collection(KEY_STORIES).document(storyId).collection(KEY_LOVE_IDS).getDocuments(completion: { (snapshot, error) in
-          if let error = error {
-            DLog("Error get document: \(error)")
-            
-            return
-          }
-          
-          guard let snapshot = snapshot else { return }
-          
-          DispatchQueue.main.async {
-            var documentIDTemp = [String]()
-            for document in snapshot.documents {
-              
-              documentIDTemp.append(document.documentID)
-            }
-            
-            if documentIDTemp.contains(currentUserId) {
-              loveButton.isSelected = true
-              self.delegate?.loadedStoryIsLoved(indexPath: indexPath, isLoved: true)
-            } else {
-              self.delegate?.loadedStoryIsLoved(indexPath: indexPath, isLoved: false)
-            }
-          }
-        })
-      }
-    } else {
-      loveButton.isSelected = false
-    }
   }
   
   private func updateNoti() {

@@ -50,12 +50,6 @@ class ANIRecruitViewCell: UITableViewCell {
       if user == nil {
         loadUser()
       }
-      if recruit.isLoved == nil {
-        isLoved()
-      }
-      if recruit.isSupported == nil {
-        isSupported()
-      }
       if recruit.isCliped == nil {
         isClipped()
       }
@@ -439,7 +433,9 @@ class ANIRecruitViewCell: UITableViewCell {
   
   private func observeLove() {
     guard let recruit = self.recruit,
-          let recuritId = recruit.id else { return }
+          let recuritId = recruit.id,
+          let loveButton = self.loveButton,
+          let indexPath = self.indexPath else { return }
     
     self.loveCount = 0
 
@@ -454,8 +450,28 @@ class ANIRecruitViewCell: UITableViewCell {
         
         if let snapshot = snapshot {
           self.loveCount = snapshot.documents.count
+          
+          DispatchQueue.main.async {
+            if let currentUserUid = ANISessionManager.shared.currentUserUid {
+              var documentIDTemp = [String]()
+              for document in snapshot.documents {
+                documentIDTemp.append(document.documentID)
+              }
+              
+              if documentIDTemp.contains(currentUserUid) {
+                loveButton.isSelected = true
+                self.delegate?.loadedRecruitIsLoved(indexPath: indexPath, isLoved: true)
+              } else {
+                loveButton.isSelected = false
+                self.delegate?.loadedRecruitIsLoved(indexPath: indexPath, isLoved: false)
+              }
+            } else {
+              loveButton.isSelected = false
+            }
+          }
         } else {
           self.loveCount = 0
+          loveButton.isSelected = false
         }
       })
     }
@@ -469,7 +485,9 @@ class ANIRecruitViewCell: UITableViewCell {
   
   private func observeSupport() {
     guard let recruit = self.recruit,
-          let recuritId = recruit.id else { return }
+          let recuritId = recruit.id,
+          let supportButton = self.supportButton,
+          let indexPath = self.indexPath else { return }
     
     self.supportCount = 0
     
@@ -485,11 +503,28 @@ class ANIRecruitViewCell: UITableViewCell {
         DispatchQueue.main.async {
           if let snapshot = snapshot {
             self.supportCount = snapshot.documents.count
+            
+            DispatchQueue.main.async {
+              if let currentUserUid = ANISessionManager.shared.currentUserUid {
+                var documentIDTemp = [String]()
+                for document in snapshot.documents {
+                  
+                  documentIDTemp.append(document.documentID)
+                }
+                
+                if documentIDTemp.contains(currentUserUid) {
+                  supportButton.setImage(UIImage(named: "supportButtonSelected"), for: .normal)
+                  self.delegate?.loadedRecruitIsSupported(indexPath: indexPath, isSupported: true)
+                } else {
+                  supportButton.setImage(UIImage(named: "supportButton"), for: .normal)
+                  self.delegate?.loadedRecruitIsSupported(indexPath: indexPath, isSupported: false)
+                }
+              }
+            }
           } else {
             self.supportCount = 0
+            supportButton.setImage(UIImage(named: "supportButton"), for: .normal)
           }
-          
-          self.isSupported()
         }
       })
     }
@@ -500,87 +535,7 @@ class ANIRecruitViewCell: UITableViewCell {
     
     supportListener.remove()
   }
-  
-  private func isLoved() {
-    guard let recruit = self.recruit,
-          let recuritId = recruit.id,
-          let loveButton = self.loveButton,
-          let indexPath = self.indexPath else { return }
 
-    if let currentUserId = ANISessionManager.shared.currentUserUid {
-      let database = Firestore.firestore()
-      
-      DispatchQueue.global().async {
-        database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_LOVE_IDS).getDocuments(completion: { (snapshot, error) in
-          if let error = error {
-            DLog("Error get document: \(error)")
-            
-            return
-          }
-          
-          guard let snapshot = snapshot else { return }
-          
-          DispatchQueue.main.async {
-            var documentIDTemp = [String]()
-            for document in snapshot.documents {
-              
-              documentIDTemp.append(document.documentID)
-            }
-            
-            if documentIDTemp.contains(currentUserId) {
-              loveButton.isSelected = true
-              self.delegate?.loadedRecruitIsLoved(indexPath: indexPath, isLoved: true)
-            } else {
-              self.delegate?.loadedRecruitIsLoved(indexPath: indexPath, isLoved: false)
-            }
-          }
-        })
-      }
-    } else {
-      loveButton.isSelected = false
-    }
-  }
-  
-  private func isSupported() {
-    guard let recruit = self.recruit,
-          let recuritId = recruit.id,
-          let supportButton = self.supportButton,
-          let indexPath = self.indexPath else { return }
-
-    if let currentUserId = ANISessionManager.shared.currentUserUid {
-      let database = Firestore.firestore()
-      
-      DispatchQueue.global().async {
-        database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_SUPPORT_IDS).getDocuments(completion: { (snapshot, error) in
-          if let error = error {
-            DLog("Error get document: \(error)")
-            
-            return
-          }
-          
-          guard let snapshot = snapshot else { return }
-          
-          DispatchQueue.main.async {
-            var documentIDTemp = [String]()
-            for document in snapshot.documents {
-              
-              documentIDTemp.append(document.documentID)
-            }
-            
-            if documentIDTemp.contains(currentUserId) {
-              supportButton.setImage(UIImage(named: "supportButtonSelected"), for: .normal)
-              self.delegate?.loadedRecruitIsSupported(indexPath: indexPath, isSupported: true)
-            } else {
-              self.delegate?.loadedRecruitIsSupported(indexPath: indexPath, isSupported: false)
-            }
-          }
-        })
-      }
-    } else {
-      supportButton.setImage(UIImage(named: "supportButton"), for: .normal)
-    }
-  }
-  
   private func isClipped() {
     guard let recruit = self.recruit,
           let recuritId = recruit.id,
