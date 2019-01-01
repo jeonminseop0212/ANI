@@ -99,7 +99,7 @@ class ANIStoryRankingCell: UICollectionViewCell {
     
     //storyLabel
     let storyLabel = UILabel()
-    storyLabel.text = "story"
+    storyLabel.text = ""
     storyLabel.font = UIFont.systemFont(ofSize: 14.0)
     storyLabel.textColor = ANIColor.subTitle
     storyLabel.numberOfLines = 2
@@ -128,7 +128,7 @@ class ANIStoryRankingCell: UICollectionViewCell {
     userNameLabel.font = UIFont.systemFont(ofSize: 13.0)
     userNameLabel.textColor = ANIColor.subTitle
     userNameLabel.numberOfLines = 2
-    userNameLabel.text = "user name"
+    userNameLabel.text = ""
     base.addSubview(userNameLabel)
     userNameLabel.centerY(to: profileImageView)
     userNameLabel.leftToRight(of: profileImageView, offset: 10.0)
@@ -229,10 +229,9 @@ class ANIStoryRankingCell: UICollectionViewCell {
       profileImageView.image = UIImage()
     }
     
+    userNameLabel.text = ""
     if let user = self.user, let userName = user.userName {
       userNameLabel.text = userName
-    } else {
-      userNameLabel.text = "user name"
     }
   }
   
