@@ -467,6 +467,8 @@ class ANIProfileEditViewController: UIViewController {
           let updateUser = profileEditView.getUpdateUser(),
           let userName = updateUser.userName,
           let kind = updateUser.kind,
+          let twitterAccount = updateUser.twitterAccount,
+          let instagramAccount = updateUser.instagramAccount,
           let introduce = updateUser.introduce else { return }
     
     if currentUserName == userName {
@@ -485,13 +487,13 @@ class ANIProfileEditViewController: UIViewController {
             }
             
             if let profileImageUrl = url {
-              let values = [KEY_USER_NAME: userName, KEY_KIND: kind, KEY_INTRODUCE: introduce, KEY_PROFILE_IMAGE_URL: profileImageUrl.absoluteString] as [String : AnyObject]
+              let values = [KEY_USER_NAME: userName, KEY_KIND: kind, KEY_TWITTER_ACCOUNT: twitterAccount, KEY_INSTAGRAM_ACCOUNT: instagramAccount, KEY_INTRODUCE: introduce, KEY_PROFILE_IMAGE_URL: profileImageUrl.absoluteString] as [String : AnyObject]
               self.updateUserData(uid: currentUserUid, values: values)
             }
           })
         }
       } else {
-        let values = [KEY_USER_NAME: userName, KEY_KIND: kind, KEY_INTRODUCE: introduce] as [String : AnyObject]
+        let values = [KEY_USER_NAME: userName, KEY_KIND: kind, KEY_TWITTER_ACCOUNT: twitterAccount, KEY_INSTAGRAM_ACCOUNT: instagramAccount, KEY_INTRODUCE: introduce] as [String : AnyObject]
         self.updateUserData(uid: currentUserUid, values: values)
       }
     } else {
@@ -522,13 +524,13 @@ class ANIProfileEditViewController: UIViewController {
                   }
                   
                   if let profileImageUrl = url {
-                    let values = [KEY_USER_NAME: userName, KEY_KIND: kind, KEY_INTRODUCE: introduce, KEY_PROFILE_IMAGE_URL: profileImageUrl.absoluteString] as [String : AnyObject]
+                    let values = [KEY_USER_NAME: userName, KEY_KIND: kind, KEY_TWITTER_ACCOUNT: twitterAccount, KEY_INSTAGRAM_ACCOUNT: instagramAccount, KEY_INTRODUCE: introduce, KEY_PROFILE_IMAGE_URL: profileImageUrl.absoluteString] as [String : AnyObject]
                     self.updateUserData(uid: currentUserUid, values: values)
                   }
                 })
               }
             } else {
-              let values = [KEY_USER_NAME: userName, KEY_KIND: kind, KEY_INTRODUCE: introduce] as [String : AnyObject]
+              let values = [KEY_USER_NAME: userName, KEY_KIND: kind, KEY_TWITTER_ACCOUNT: twitterAccount, KEY_INSTAGRAM_ACCOUNT: instagramAccount, KEY_INTRODUCE: introduce] as [String : AnyObject]
               self.updateUserData(uid: currentUserUid, values: values)
             }
           } else {

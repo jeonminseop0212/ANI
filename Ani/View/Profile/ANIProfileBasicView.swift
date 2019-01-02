@@ -22,6 +22,8 @@ protocol ANIProfileBasicViewDelegate {
   func reject()
   func popupOptionView(isMe: Bool, contentType: ContentType, id: String)
   func presentImageBrowser(index: Int, imageUrls: [String])
+  func twitterOpenReject()
+  func instagramOpenReject()
 }
 
 enum ContentType: Int {
@@ -593,6 +595,14 @@ extension ANIProfileBasicView: ANIProfileCellDelegate {
   
   func followerTapped() {
     self.delegate?.followerTapped()
+  }
+  
+  func twitterOpenReject() {
+    self.delegate?.twitterOpenReject()
+  }
+  
+  func instagramOpenReject() {
+    self.delegate?.instagramOpenReject()
   }
 }
 

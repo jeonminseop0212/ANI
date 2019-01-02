@@ -218,6 +218,27 @@ class ANIProfileViewController: UIViewController {
     navigationTitleLabel.text = currentUser.userName
   }
   
+  private func rejectAnimation() {
+    guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
+          !isRejectAnimating else { return }
+    
+    rejectViewBottomConstraint.constant = UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut, animations: {
+      self.isRejectAnimating = true
+      self.view.layoutIfNeeded()
+    }) { (complete) in
+      guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
+        let rejectViewBottomConstraintOriginalConstant = self.rejectViewBottomConstraintOriginalConstant else { return }
+      
+      rejectViewBottomConstraint.constant = rejectViewBottomConstraintOriginalConstant
+      UIView.animate(withDuration: 0.3, delay: 1.0, options: .curveEaseInOut, animations: {
+        self.view.layoutIfNeeded()
+      }, completion: { (complete) in
+        self.isRejectAnimating = false
+      })
+    }
+  }
+  
   //MARK: action
   @objc private func back() {
     self.navigationController?.popViewController(animated: true)
@@ -295,24 +316,10 @@ extension ANIProfileViewController: ANIProfileBasicViewDelegate {
   }
   
   func reject() {
-    guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
-          !isRejectAnimating else { return }
+    guard let rejectView = self.rejectView else { return }
     
-    rejectViewBottomConstraint.constant = UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
-    UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut, animations: {
-      self.isRejectAnimating = true
-      self.view.layoutIfNeeded()
-    }) { (complete) in
-      guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
-        let rejectViewBottomConstraintOriginalConstant = self.rejectViewBottomConstraintOriginalConstant else { return }
-      
-      rejectViewBottomConstraint.constant = rejectViewBottomConstraintOriginalConstant
-      UIView.animate(withDuration: 0.3, delay: 1.0, options: .curveEaseInOut, animations: {
-        self.view.layoutIfNeeded()
-      }, completion: { (complete) in
-        self.isRejectAnimating = false
-      })
-    }
+    rejectView.setRejectText("ログインが必要です。")
+    self.rejectAnimation()
   }
   
   func popupOptionView(isMe: Bool, contentType: ContentType, id: String) {
@@ -334,6 +341,20 @@ extension ANIProfileViewController: ANIProfileBasicViewDelegate {
     imageBrowserViewController.delegate = self
     //overCurrentContextだとtabBarが消えないのでtabBarからpresentする
     self.tabBarController?.present(imageBrowserViewController, animated: false, completion: nil)
+  }
+  
+  func twitterOpenReject() {
+    guard let rejectView = self.rejectView else { return }
+    
+    rejectView.setRejectText("Twitterを開けません。")
+    self.rejectAnimation()
+  }
+  
+  func instagramOpenReject() {
+    guard let rejectView = self.rejectView else { return }
+    
+    rejectView.setRejectText("Instagramを開けません。")
+    self.rejectAnimation()
   }
 }
 

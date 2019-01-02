@@ -14,6 +14,8 @@ protocol ANIOtherProfileCellDelegate {
   func followingTapped()
   func followerTapped()
   func reject()
+  func twitterOpenReject()
+  func instagramOpenReject()
 }
 
 class ANIOtherProfileCell: UITableViewCell {
@@ -30,6 +32,13 @@ class ANIOtherProfileCell: UITableViewCell {
   private weak var followerCountLabel: UILabel?
   private weak var followerLabel: UILabel?
   private weak var groupLabel: UILabel?
+  private weak var instroduceStackView: UIStackView?
+  private weak var twitterBG: UIView?
+  private weak var twitterImageView: UIImageView?
+  private weak var twitterLabel: UILabel?
+  private weak var instagramBG: UIView?
+  private weak var instagramImageView: UIImageView?
+  private weak var instagramLabel: UILabel?
   private weak var introduceBG: UIView?
   private weak var introductionLabel: UILabel?
   
@@ -175,17 +184,89 @@ class ANIOtherProfileCell: UITableViewCell {
     groupLabel.leftToSuperview(offset: 10.0)
     self.groupLabel = groupLabel
     
+    //instroduceStackView
+    let instroduceStackView = UIStackView()
+    instroduceStackView.axis = .vertical
+    instroduceStackView.distribution = .equalSpacing
+    instroduceStackView.spacing = 10.0
+    addSubview(instroduceStackView)
+    instroduceStackView.topToBottom(of: groupLabel, offset: 10.0)
+    instroduceStackView.leftToSuperview(offset: 10.0)
+    instroduceStackView.rightToSuperview(offset: -10.0)
+    instroduceStackView.bottomToSuperview(offset: -10.0)
+    self.instroduceStackView = instroduceStackView
+    
+    //twitterBG
+    let twitterBG = UIView()
+    twitterBG.backgroundColor = .white
+    twitterBG.isHidden = true
+    twitterBG.isUserInteractionEnabled = true
+    twitterBG.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(twitterTapped)))
+    instroduceStackView.addArrangedSubview(twitterBG)
+    self.twitterBG = twitterBG
+    
+    //twitterImageView
+    let twitterImageView = UIImageView()
+    twitterImageView.image = UIImage(named: "twitter")
+    twitterImageView.contentMode = .scaleAspectFit
+    twitterBG.addSubview(twitterImageView)
+    twitterImageView.width(20.0)
+    twitterImageView.height(20.0)
+    twitterImageView.topToSuperview()
+    twitterImageView.leftToSuperview()
+    self.twitterImageView = twitterImageView
+    
+    //twitterLabel
+    let twitterLabel = UILabel()
+    twitterLabel.numberOfLines = 0
+    twitterLabel.font = UIFont.systemFont(ofSize: 17.0)
+    twitterLabel.textColor = ANIColor.dark
+    twitterBG.addSubview(twitterLabel)
+    twitterLabel.topToSuperview(offset: -2.0)
+    twitterLabel.leftToRight(of: twitterImageView, offset: 5.0)
+    twitterLabel.rightToSuperview()
+    twitterLabel.bottomToSuperview()
+    self.twitterLabel = twitterLabel
+    
+    //instagramBG
+    let instagramBG = UIView()
+    instagramBG.backgroundColor = .white
+    instagramBG.isHidden = true
+    instagramBG.isUserInteractionEnabled = true
+    instagramBG.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(instagramTapped)))
+    instroduceStackView.addArrangedSubview(instagramBG)
+    self.instagramBG = instagramBG
+    
+    //instagramImageView
+    let instagramImageView = UIImageView()
+    instagramImageView.image = UIImage(named: "instagram")
+    instagramImageView.contentMode = .scaleAspectFit
+    instagramBG.addSubview(instagramImageView)
+    instagramImageView.width(20.0)
+    instagramImageView.height(20.0)
+    instagramImageView.topToSuperview()
+    instagramImageView.leftToSuperview()
+    self.instagramImageView = instagramImageView
+    
+    //twitterLabel
+    let instagramLabel = UILabel()
+    instagramLabel.numberOfLines = 0
+    instagramLabel.font = UIFont.systemFont(ofSize: 17.0)
+    instagramLabel.textColor = ANIColor.dark
+    instagramBG.addSubview(instagramLabel)
+    instagramLabel.topToSuperview(offset: -2.0)
+    instagramLabel.leftToRight(of: instagramImageView, offset: 5.0)
+    instagramLabel.rightToSuperview()
+    instagramLabel.bottomToSuperview()
+    self.instagramLabel = instagramLabel
+    
     //introduceBG
     let introduceBG = UIView()
     introduceBG.backgroundColor = ANIColor.bg
     introduceBG.layer.cornerRadius = 10.0
     introduceBG.layer.masksToBounds = true
-    introduceBG.alpha = 0.0
-    addSubview(introduceBG)
-    introduceBG.topToBottom(of: groupLabel, offset: 10.0)
-    introduceBG.leftToSuperview(offset: 10.0)
-    introduceBG.rightToSuperview(offset: -10.0)
-    introduceBG.bottomToSuperview(offset: -10.0)
+    introduceBG.isHidden = true
+    instroduceStackView.addArrangedSubview(introduceBG)
     self.introduceBG = introduceBG
     
     //introductionLabel
@@ -202,6 +283,10 @@ class ANIOtherProfileCell: UITableViewCell {
   private func reloadLayout() {
     guard let nameLabel = self.nameLabel,
           let groupLabel = self.groupLabel,
+          let twitterBG = self.twitterBG,
+          let twitterLabel = self.twitterLabel,
+          let instagramBG = self.instagramBG,
+          let instagramLabel = self.instagramLabel,
           let introduceBG = self.introduceBG,
           let introductionLabel = self.introductionLabel,
           let user = self.user else { return }
@@ -210,15 +295,37 @@ class ANIOtherProfileCell: UITableViewCell {
     
     groupLabel.text = user.kind
     
+    twitterLabel.text = user.twitterAccount
+    if let twitterAccount = user.twitterAccount {
+      if twitterAccount.count != 0 {
+        twitterBG.isHidden = false
+      } else {
+        twitterBG.isHidden = true
+      }
+    } else {
+      twitterBG.isHidden = true
+    }
+    
+    instagramLabel.text = user.instagramAccount
+    if let instagramAccount = user.instagramAccount {
+      if instagramAccount.count != 0 {
+        instagramBG.isHidden = false
+      } else {
+        instagramBG.isHidden = true
+      }
+    } else {
+      instagramBG.isHidden = true
+    }
+    
     introductionLabel.text = user.introduce
     if let introduce = user.introduce {
       if introduce.count != 0 {
-        introduceBG.alpha = 1.0
+        introduceBG.isHidden = false
       } else {
-        introduceBG.alpha = 0.0
+        introduceBG.isHidden = true
       }
     } else {
-      introduceBG.alpha = 0.0
+      introduceBG.isHidden = true
     }
   }
   
@@ -303,6 +410,30 @@ class ANIOtherProfileCell: UITableViewCell {
   
   @objc private func followerTapped() {
     self.delegate?.followerTapped()
+  }
+  
+  @objc private func twitterTapped() {
+    guard let user = user,
+      let twitterAccount = user.twitterAccount else { return }
+    
+    if let twitterUrl = URL(string: "twitter://user?screen_name=" + twitterAccount),
+      UIApplication.shared.canOpenURL(twitterUrl) {
+      UIApplication.shared.open(twitterUrl, options: [:], completionHandler: nil)
+    } else {
+      self.delegate?.twitterOpenReject()
+    }
+  }
+  
+  @objc private func instagramTapped() {
+    guard let user = user,
+      let instagramAccount = user.instagramAccount else { return }
+    
+    if let instagramUrl = URL(string: "instagram://user?screen_name=" + instagramAccount),
+      UIApplication.shared.canOpenURL(instagramUrl) {
+      UIApplication.shared.open(instagramUrl, options: [:], completionHandler: nil)
+    } else {
+      self.delegate?.instagramOpenReject()
+    }
   }
 }
 
