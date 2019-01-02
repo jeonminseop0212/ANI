@@ -17,7 +17,7 @@ protocol ANIStoryRankingCellDelegate {
 class ANIStoryRankingCell: UICollectionViewCell {
   
   let RANKING_COLLECTION_VIEW_CELL_WIDHT: CGFloat = ceil(UIScreen.main.bounds.width / 2)
-  let MARGIN: CGFloat = 30.0
+  let MARGIN: CGFloat = 20.0
   
   private weak var base: UIView?
   private weak var storyImageView: UIImageView?
@@ -104,7 +104,7 @@ class ANIStoryRankingCell: UICollectionViewCell {
     storyLabel.textColor = ANIColor.subTitle
     storyLabel.numberOfLines = 2
     base.addSubview(storyLabel)
-    storyLabel.topToBottom(of: storyImageView, offset: 10.0)
+    storyLabel.topToBottom(of: storyImageView, offset: 5.0)
     storyLabel.leftToSuperview(offset: 10.0)
     storyLabel.rightToSuperview(offset: -10.0)
     storyLabel.height(STORY_LABEL_HEIHGT)
@@ -120,7 +120,7 @@ class ANIStoryRankingCell: UICollectionViewCell {
     let profileIamgetapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped))
     profileImageView.addGestureRecognizer(profileIamgetapGesture)
     base.addSubview(profileImageView)
-    profileImageView.topToBottom(of: storyLabel, offset: 10.0)
+    profileImageView.topToBottom(of: storyLabel, offset: 5.0)
     profileImageView.leftToSuperview(offset: 10.0)
     profileImageView.width(PROFILE_IMAGE_VIEW_HEIGHT)
     profileImageView.height(PROFILE_IMAGE_VIEW_HEIGHT)

@@ -545,6 +545,8 @@ class ANIContributionViewController: UIViewController {
   
   //MARK: action
   @objc private func contributeDismiss() {
+    self.view.endEditing(true)
+    
     self.navigationController?.dismiss(animated: true, completion: nil)
   }
   
