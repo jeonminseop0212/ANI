@@ -135,7 +135,7 @@ class ANIContributionView: UIView {
     
     switch selectedContributionMode {
     case .story:
-      if contentTextView.text.count > 0 && (!contentImages.isEmpty || thumbnailImage != nil) {
+      if !contentImages.isEmpty || thumbnailImage != nil {
         return true
       } else {
         return false

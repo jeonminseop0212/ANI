@@ -34,8 +34,6 @@ class ANIStoryViewCell: UITableViewCell {
   
   var story: FirebaseStory? {
     didSet {
-      guard let story = self.story else { return }
-      
       if user == nil {
         loadUser()
       }
