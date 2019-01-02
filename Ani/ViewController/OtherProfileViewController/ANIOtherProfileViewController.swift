@@ -214,6 +214,31 @@ class ANIOtherProfileViewController: UIViewController {
     self.tabBarController?.present(imageBrowserViewController, animated: false, completion: nil)
   }
   
+  private func rejectAnimation() {
+    guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
+          !isRejectAnimating,
+          let rejectTapView = self.rejectTapView else { return }
+    
+    rejectViewBottomConstraint.constant = UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    rejectTapView.isHidden = false
+    
+    UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut, animations: {
+      self.isRejectAnimating = true
+      self.view.layoutIfNeeded()
+    }) { (complete) in
+      guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
+        let rejectViewBottomConstraintOriginalConstant = self.rejectViewBottomConstraintOriginalConstant else { return }
+      
+      rejectViewBottomConstraint.constant = rejectViewBottomConstraintOriginalConstant
+      UIView.animate(withDuration: 0.3, delay: 1.0, options: .curveEaseInOut, animations: {
+        self.view.layoutIfNeeded()
+      }, completion: { (complete) in
+        self.isRejectAnimating = false
+        rejectTapView.isHidden = true
+      })
+    }
+  }
+  
   //MARK: action
   @objc private func back() {
     self.navigationController?.popViewController(animated: true)
@@ -324,28 +349,12 @@ extension ANIOtherProfileViewController: ANIOtherProfileBasicViewDelegate {
   }
   
   func reject() {
-    guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
-          !isRejectAnimating,
+    guard let rejectView = self.rejectView,
           let rejectTapView = self.rejectTapView else { return }
     
-    rejectViewBottomConstraint.constant = UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
-    rejectTapView.isHidden = false
-
-    UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut, animations: {
-      self.isRejectAnimating = true
-      self.view.layoutIfNeeded()
-    }) { (complete) in
-      guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
-        let rejectViewBottomConstraintOriginalConstant = self.rejectViewBottomConstraintOriginalConstant else { return }
-      
-      rejectViewBottomConstraint.constant = rejectViewBottomConstraintOriginalConstant
-      UIView.animate(withDuration: 0.3, delay: 1.0, options: .curveEaseInOut, animations: {
-        self.view.layoutIfNeeded()
-      }, completion: { (complete) in
-        self.isRejectAnimating = false
-        rejectTapView.isHidden = true
-      })
-    }
+    rejectTapView.isUserInteractionEnabled = true
+    rejectView.setRejectText("ログインが必要です。")
+    self.rejectAnimation()
   }
   
   func popupOptionView(isMe: Bool, contentType: ContentType, id: String) {
@@ -370,6 +379,24 @@ extension ANIOtherProfileViewController: ANIOtherProfileBasicViewDelegate {
     imageBrowserViewController.delegate = self
     //overCurrentContextだとtabBarが消えないのでtabBarからpresentする
     self.tabBarController?.present(imageBrowserViewController, animated: false, completion: nil)
+  }
+  
+  func twitterOpenReject() {
+    guard let rejectView = self.rejectView,
+          let rejectTapView = self.rejectTapView else { return }
+    
+    rejectTapView.isUserInteractionEnabled = false
+    rejectView.setRejectText("Twitterを開けません。")
+    self.rejectAnimation()
+  }
+  
+  func instagramOpenReject() {
+    guard let rejectView = self.rejectView,
+          let rejectTapView = self.rejectTapView else { return }
+    
+    rejectTapView.isUserInteractionEnabled = false
+    rejectView.setRejectText("Instagramを開けません。")
+    self.rejectAnimation()
   }
 }
 

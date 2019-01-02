@@ -23,6 +23,8 @@ protocol ANIOtherProfileBasicViewDelegate {
   func reject()
   func popupOptionView(isMe: Bool, contentType: ContentType, id: String)
   func presentImageBrowser(index: Int, imageUrls: [String])
+  func twitterOpenReject()
+  func instagramOpenReject()
 }
 
 class ANIOtherProfileBasicView: UIView {
@@ -679,6 +681,14 @@ extension ANIOtherProfileBasicView: ANIOtherProfileCellDelegate {
   
   func followerTapped() {
     self.delegate?.followerTapped()
+  }
+  
+  func twitterOpenReject() {
+    self.delegate?.twitterOpenReject()
+  }
+  
+  func instagramOpenReject() {
+    self.delegate?.instagramOpenReject()
   }
 }
 
