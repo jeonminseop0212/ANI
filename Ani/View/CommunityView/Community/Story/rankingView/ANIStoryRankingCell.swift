@@ -116,6 +116,9 @@ class ANIStoryRankingCell: UICollectionViewCell {
     profileImageView.layer.cornerRadius = PROFILE_IMAGE_VIEW_HEIGHT / 2
     profileImageView.layer.masksToBounds = true
     profileImageView.contentMode = .scaleAspectFill
+    profileImageView.isUserInteractionEnabled = true
+    let profileIamgetapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped))
+    profileImageView.addGestureRecognizer(profileIamgetapGesture)
     base.addSubview(profileImageView)
     profileImageView.topToBottom(of: storyLabel, offset: 10.0)
     profileImageView.leftToSuperview(offset: 10.0)
@@ -252,6 +255,13 @@ class ANIStoryRankingCell: UICollectionViewCell {
     }
     
     return false
+  }
+  
+  //MARK: action
+  @objc private func profileImageViewTapped() {
+    guard let rankingStory = self.rankingStory else { return }
+    
+    ANINotificationManager.postProfileImageViewTapped(userId: rankingStory.userId)
   }
 }
 
