@@ -1058,7 +1058,7 @@ extension ANIProfileBasicView {
     let database = Firestore.firestore()
     
     DispatchQueue.global().async {
-      self.recruitListener = database.collection(KEY_RECRUITS).whereField(KEY_USER_ID, isEqualTo: currentUserId).addSnapshotListener({ (snapshot, error) in
+      self.recruitListener = database.collection(KEY_RECRUITS).whereField(KEY_USER_ID, isEqualTo: currentUserId).order(by: KEY_DATE, descending: true).limit(to: 15).addSnapshotListener({ (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
           
@@ -1137,7 +1137,7 @@ extension ANIProfileBasicView {
     let database = Firestore.firestore()
     
     DispatchQueue.global().async {
-      self.storyListener = database.collection(KEY_STORIES).whereField(KEY_USER_ID, isEqualTo: currentUserId).addSnapshotListener({ (snapshot, error) in
+      self.storyListener = database.collection(KEY_STORIES).whereField(KEY_USER_ID, isEqualTo: currentUserId).order(by: KEY_DATE, descending: true).limit(to: 10).addSnapshotListener({ (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
           
@@ -1196,7 +1196,7 @@ extension ANIProfileBasicView {
     let database = Firestore.firestore()
 
     DispatchQueue.global().async {
-      self.qnaListener = database.collection(KEY_QNAS).whereField(KEY_USER_ID, isEqualTo: currentUserId).addSnapshotListener({ (snapshot, error) in
+      self.qnaListener = database.collection(KEY_QNAS).whereField(KEY_USER_ID, isEqualTo: currentUserId).order(by: KEY_DATE, descending: true).limit(to: 20).addSnapshotListener({ (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
           
