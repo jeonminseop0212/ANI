@@ -108,6 +108,7 @@
 		CDAFD75B20DC9D0000AEDD83 /* ANIOptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDAFD75A20DC9D0000AEDD83 /* ANIOptionView.swift */; };
 		CDAFD75D20DC9EE800AEDD83 /* ANIOptionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDAFD75C20DC9EE800AEDD83 /* ANIOptionViewCell.swift */; };
 		CDAFD75F20DE1D1B00AEDD83 /* ANIRejectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDAFD75E20DE1D1B00AEDD83 /* ANIRejectView.swift */; };
+		CDBAB5ED21DDAD30007AADF9 /* ActiveLabel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CDBAB5EC21DDAD2F007AADF9 /* ActiveLabel.framework */; };
 		CDC6AE4120CF6E7900A836F6 /* ANIOtherProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDC6AE4020CF6E7900A836F6 /* ANIOtherProfileViewController.swift */; };
 		CDC6AE4420CF724700A836F6 /* ANIOtherProfileBasicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDC6AE4320CF724700A836F6 /* ANIOtherProfileBasicView.swift */; };
 		CDC6AE4820CF74C600A836F6 /* ANIOtherProfileCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDC6AE4720CF74C600A836F6 /* ANIOtherProfileCell.swift */; };
@@ -322,6 +323,7 @@
 		CDAFD75A20DC9D0000AEDD83 /* ANIOptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIOptionView.swift; sourceTree = "<group>"; };
 		CDAFD75C20DC9EE800AEDD83 /* ANIOptionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIOptionViewCell.swift; sourceTree = "<group>"; };
 		CDAFD75E20DE1D1B00AEDD83 /* ANIRejectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRejectView.swift; sourceTree = "<group>"; };
+		CDBAB5EC21DDAD2F007AADF9 /* ActiveLabel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ActiveLabel.framework; path = Carthage/Build/iOS/ActiveLabel.framework; sourceTree = "<group>"; };
 		CDC6AE4020CF6E7900A836F6 /* ANIOtherProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIOtherProfileViewController.swift; sourceTree = "<group>"; };
 		CDC6AE4320CF724700A836F6 /* ANIOtherProfileBasicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIOtherProfileBasicView.swift; sourceTree = "<group>"; };
 		CDC6AE4720CF74C600A836F6 /* ANIOtherProfileCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIOtherProfileCell.swift; sourceTree = "<group>"; };
@@ -430,6 +432,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CDBAB5ED21DDAD30007AADF9 /* ActiveLabel.framework in Frameworks */,
 				CD492A0321C740FE00C5AF81 /* PryntTrimmerView.framework in Frameworks */,
 				CD6762DE20F8285E0098E033 /* InstantSearchClient.framework in Frameworks */,
 				CD0BFF1020C6186500D5959B /* CodableFirebase.framework in Frameworks */,
@@ -1471,6 +1474,7 @@
 		F5B1EFC320726657000CFB0B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				CDBAB5EC21DDAD2F007AADF9 /* ActiveLabel.framework */,
 				CD492A0221C740FE00C5AF81 /* PryntTrimmerView.framework */,
 				CD6762DD20F8285E0098E033 /* InstantSearchClient.framework */,
 				CD0BFF0F20C6186500D5959B /* CodableFirebase.framework */,
@@ -1910,6 +1914,7 @@
 				"$(SRCROOT)/Carthage/Build/iOS/CodableFirebase.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/InstantSearchClient.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/PryntTrimmerView.framework",
+				"$(SRCROOT)/Carthage/Build/iOS/ActiveLabel.framework",
 			);
 			outputPaths = (
 			);

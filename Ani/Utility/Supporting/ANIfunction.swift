@@ -28,4 +28,15 @@ class ANIFunction: NSObject {
       return Date()
     }
   }
+  
+  func webURLScheme(urlString: String) -> String {
+    guard urlString.count > 0 else { return "" }
+    
+    let castUrlString = urlString.lowercased()
+    if castUrlString.hasPrefix("http://") || castUrlString.hasPrefix("https://") {
+      return castUrlString
+    } else {
+      return "https://" + castUrlString
+    }
+  }
 }
