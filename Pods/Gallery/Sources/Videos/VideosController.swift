@@ -45,6 +45,15 @@ class VideosController: UIViewController {
     
     setup()
   }
+  override func viewWillAppear(_ animated: Bool) {
+      if #available(iOS 10.0, *) {
+        do {
+          try AVAudioSession.sharedInstance().setCategory(.ambient, mode: .default)
+        } catch {
+          print("AVAudioSession catgery set error \(error)")
+        }
+      }
+  }
   
   override func viewWillDisappear(_ animated: Bool) {
     self.gridView.player?.pause()

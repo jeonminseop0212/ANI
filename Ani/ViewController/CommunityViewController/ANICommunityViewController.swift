@@ -12,6 +12,7 @@ import FirebaseFirestore
 import CodableFirebase
 import FirebaseStorage
 import InstantSearchClient
+import AVKit
 
 class ANICommunityViewController: UIViewController {
   
@@ -45,6 +46,12 @@ class ANICommunityViewController: UIViewController {
     UIApplication.shared.statusBarStyle = .default
     UIApplication.shared.isStatusBarHidden = false
     setupNotifications()
+    
+    do {
+      try AVAudioSession.sharedInstance().setCategory(.ambient, mode: .default)
+    } catch {
+      DLog("AVAudioSession catgery set error \(error)")
+    }
   }
   
   override func viewDidDisappear(_ animated: Bool) {

@@ -138,8 +138,20 @@ class ANIStoryVideoView: UIView {
     player.isMuted = !player.isMuted
     
     if player.isMuted {
+      do {
+        try AVAudioSession.sharedInstance().setCategory(.ambient, mode: .default)
+      } catch {
+        DLog("AVAudioSession catgery set error \(error)")
+      }
+      
       speakerImageView.image = UIImage(named: "speakerOff")
     } else {
+      do {
+        try AVAudioSession.sharedInstance().setCategory(.soloAmbient, mode: .default)
+      } catch {
+        DLog("AVAudioSession catgery set error \(error)")
+      }
+
       speakerImageView.image = UIImage(named: "speakerOn")
     }
     
@@ -156,6 +168,12 @@ class ANIStoryVideoView: UIView {
     guard let previewImageView = self.previewImageView,
           let speakerImageView = self.speakerImageView,
           self.videoAsset != nil else { return }
+    
+    do {
+      try AVAudioSession.sharedInstance().setCategory(.ambient, mode: .default)
+    } catch {
+      DLog("AVAudioSession catgery set error \(error)")
+    }
     
     player.play()
     player.isMuted = true
