@@ -25,6 +25,7 @@ protocol ANIOtherProfileBasicViewDelegate {
   func presentImageBrowser(index: Int, imageUrls: [String])
   func twitterOpenReject()
   func instagramOpenReject()
+  func openUrl(url: URL)
 }
 
 class ANIOtherProfileBasicView: UIView {
@@ -689,6 +690,10 @@ extension ANIOtherProfileBasicView: ANIOtherProfileCellDelegate {
   
   func instagramOpenReject() {
     self.delegate?.instagramOpenReject()
+  }
+  
+  func openUrl(url: URL) {
+    self.delegate?.openUrl(url: url)
   }
 }
 

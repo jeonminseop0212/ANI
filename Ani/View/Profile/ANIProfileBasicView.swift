@@ -24,6 +24,7 @@ protocol ANIProfileBasicViewDelegate {
   func presentImageBrowser(index: Int, imageUrls: [String])
   func twitterOpenReject()
   func instagramOpenReject()
+  func openUrl(url: URL)
 }
 
 enum ContentType: Int {
@@ -603,6 +604,10 @@ extension ANIProfileBasicView: ANIProfileCellDelegate {
   
   func instagramOpenReject() {
     self.delegate?.instagramOpenReject()
+  }
+  
+  func openUrl(url: URL) {
+    self.delegate?.openUrl(url: url)
   }
 }
 

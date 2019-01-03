@@ -8,12 +8,14 @@
 
 import UIKit
 import FirebaseFirestore
+import ActiveLabel
 
 protocol ANIProfileCellDelegate {
   func followingTapped()
   func followerTapped()
   func twitterOpenReject()
   func instagramOpenReject()
+  func openUrl(url: URL)
 }
 
 class ANIProfileCell: UITableViewCell {
@@ -37,7 +39,7 @@ class ANIProfileCell: UITableViewCell {
   private weak var instagramImageView: UIImageView?
   private weak var instagramLabel: UILabel?
   private weak var introduceBG: UIView?
-  private weak var introductionLabel: UILabel?
+  private weak var introductionLabel: ActiveLabel?
   
   var user: FirebaseUser? {
     didSet {
@@ -252,10 +254,18 @@ class ANIProfileCell: UITableViewCell {
     self.introduceBG = introduceBG
 
     //introductionLabel
-    let introductionLabel = UILabel()
-    groupLabel.font = UIFont.systemFont(ofSize: 17.0)
+    let introductionLabel = ActiveLabel()
+    introductionLabel.font = UIFont.systemFont(ofSize: 17.0)
     introductionLabel.numberOfLines = 0
     introductionLabel.textColor = ANIColor.dark
+    introductionLabel.enabledTypes = [.url]
+    introductionLabel.urlMaximumLength = 30
+    introductionLabel.customize { (label) in
+      label.URLColor = ANIColor.link
+    }
+    introductionLabel.handleURLTap { (url) in
+      self.delegate?.openUrl(url: url)
+    }
     introduceBG.addSubview(introductionLabel)
     let insets = UIEdgeInsets.init(top: 10.0, left: 10.0, bottom: 10.0, right: 10.0)
     introductionLabel.edgesToSuperview(insets: insets)

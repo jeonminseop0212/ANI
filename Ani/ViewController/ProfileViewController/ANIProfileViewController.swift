@@ -12,6 +12,7 @@ import FirebaseFirestore
 import CodableFirebase
 import FirebaseStorage
 import InstantSearchClient
+import SafariServices
 
 class ANIProfileViewController: UIViewController {
   
@@ -355,6 +356,16 @@ extension ANIProfileViewController: ANIProfileBasicViewDelegate {
     
     rejectView.setRejectText("Instagramを開けません。")
     self.rejectAnimation()
+  }
+  
+  func openUrl(url: URL) {
+    let urlString = url.absoluteString
+    let webUrlString = ANIFunction.shared.webURLScheme(urlString: urlString)
+    
+    if let webUrl = URL(string: webUrlString) {
+      let safariViewController = SFSafariViewController(url: webUrl)
+      self.present(safariViewController, animated: true, completion: nil)
+    }
   }
 }
 
