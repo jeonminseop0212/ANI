@@ -73,6 +73,14 @@ class ANIVideoFilterViewController: UIViewController {
     trimLabelTap()
   }
   
+  override func viewWillAppear(_ animated: Bool) {
+    do {
+      try AVAudioSession.sharedInstance().setCategory(.ambient, mode: .default)
+    } catch {
+      DLog("AVAudioSession catgery set error \(error)")
+    }
+  }
+  
   override func viewDidAppear(_ animated: Bool) {
     guard let videoView = self.videoView,
           let trimmerView = self.trimmerView,
