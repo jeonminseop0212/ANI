@@ -186,7 +186,7 @@ class ANIProfileViewController: UIViewController {
     }
   }
   
-  private func playVideo() {
+  func playVideo() {
     guard let profileBasicView = self.profileBasicView else { return }
     
     profileBasicView.playVideo()

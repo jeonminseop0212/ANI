@@ -110,7 +110,7 @@ class ANIListViewController: UIViewController {
     self.activityIndicatorView = activityIndicatorView
   }
   
-  private func playVideo() {
+  func playVideo() {
     guard let listView = self.listView else { return }
     
     listView.playVideo()

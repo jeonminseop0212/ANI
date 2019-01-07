@@ -125,7 +125,7 @@ class ANIRankingStoryDetailViewController: UIViewController {
     self.rejectTapView = rejectTapView
   }
   
-  private func playVideo() {
+  func playVideo() {
     guard let rankingStoryDetailView = self.rankingStoryDetailView else { return }
     
     rankingStoryDetailView.playVideo()

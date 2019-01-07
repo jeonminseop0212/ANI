@@ -161,7 +161,7 @@ class ANICommunityViewController: UIViewController {
     self.activityIndicatorView = activityIndicatorView
   }
   
-  private func playVideo() {
+  func playVideo() {
     guard let containerCollectionView = self.containerCollectionView else { return }
     
     for visibleCell in containerCollectionView.visibleCells {
