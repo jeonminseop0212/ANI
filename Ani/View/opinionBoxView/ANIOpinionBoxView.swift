@@ -124,7 +124,7 @@ class ANIOpinionBoxView: UIView {
     
     let date = ANIFunction.shared.getToday()
     
-    let message = FirebaseChatMessage(sendUserId: "opinionBox", sendUserName: "意見箱", receiveUserId: adminUserId, message: text, date: date, isDiffrentBeforeDate: true)
+    let message = FirebaseChatMessage(sendUserId: "opinionBox", sendUserName: "意見箱", receiveUserId: adminUserId, message: text, date: date, isDiffrentBeforeDate: nil)
     
     let database = Firestore.firestore()
     

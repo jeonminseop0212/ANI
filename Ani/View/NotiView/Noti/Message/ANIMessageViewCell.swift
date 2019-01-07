@@ -133,7 +133,8 @@ class ANIMessageViewCell: UITableViewCell {
           let base = self.base,
           let currentUserId = ANISessionManager.shared.currentUserUid else { return }
     
-    updateDateLabel.text = String(chatGroup.updateDate.prefix(10))
+    let currentDate = ANIFunction.shared.getCurrentLocaleDateFromString(string: chatGroup.updateDate, format: "yyyy/MM/dd")
+    updateDateLabel.text = currentDate
     messageLabel.text = chatGroup.lastMessage
     
     if let isHaveUnreadMessage = chatGroup.isHaveUnreadMessage, let currentUserIsHaveUnreadMessage = isHaveUnreadMessage[currentUserId] {

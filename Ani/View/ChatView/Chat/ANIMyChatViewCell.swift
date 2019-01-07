@@ -143,7 +143,8 @@ class ANIMyChatViewCell: UITableViewCell {
     
     messageLabel.text = message.message
     
-    let suffixString = String(message.date.prefix(16))
+    let currentDate = ANIFunction.shared.getCurrentLocaleDateFromString(string: message.date)
+    let suffixString = String(currentDate.prefix(16))
     timeLabel.text = String(suffixString.suffix(5))
   }
 }
