@@ -34,6 +34,12 @@ class ANIListViewController: UIViewController {
   
   override func viewWillAppear(_ animated: Bool) {
     setupNotifications()
+    
+    playVideo()
+  }
+  
+  override func viewWillDisappear(_ animated: Bool) {
+    stopVideo()
   }
   
   override func viewDidDisappear(_ animated: Bool) {
@@ -102,6 +108,18 @@ class ANIListViewController: UIViewController {
     self.view.addSubview(activityIndicatorView)
     activityIndicatorView.edgesToSuperview()
     self.activityIndicatorView = activityIndicatorView
+  }
+  
+  private func playVideo() {
+    guard let listView = self.listView else { return }
+    
+    listView.playVideo()
+  }
+  
+  private func stopVideo() {
+    guard let listView = self.listView else { return }
+    
+    listView.stopVideo()
   }
   
   //MARK: Notifications

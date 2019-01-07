@@ -42,7 +42,15 @@ class ANIStoryView: UIView {
   
   private weak var activityIndicatorView: ANIActivityIndicator?
 
-  var isCellSelected: Bool = false
+  var isCellSelected: Bool = false {
+    didSet {
+      if isCellSelected {
+        playVideo()
+      } else {
+        stopVideo()
+      }
+    }
+  }
   
   private var beforeVideoViewCell: ANIVideoStoryViewCell?
   
@@ -51,6 +59,8 @@ class ANIStoryView: UIView {
   static var shared: ANIStoryView?
   
   private var cellHeight = [IndexPath: CGFloat]()
+  
+  private var scollViewContentOffsetY: CGFloat = 0.0
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -131,6 +141,34 @@ class ANIStoryView: UIView {
     let topInset = ANICommunityViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
     if storyTableView.contentOffset.y + topInset < 0 {
       storyTableView.scrollToRow(at: [0, 0], at: .top, animated: false)
+    }
+  }
+  
+  func playVideo() {
+    guard let storyTableView = self.storyTableView else { return }
+    
+    let centerX = storyTableView.center.x
+    let centerY = storyTableView.center.y + scollViewContentOffsetY + UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    
+    if let indexPath = storyTableView.indexPathForRow(at: CGPoint(x: centerX, y: centerY)) {
+      if let videoCell = storyTableView.cellForRow(at: indexPath) as? ANIVideoStoryViewCell,
+        let storyVideoView = videoCell.storyVideoView {
+        storyVideoView.play()
+      }
+    }
+  }
+
+  func stopVideo() {
+    guard let storyTableView = self.storyTableView else { return }
+    
+    let centerX = storyTableView.center.x
+    let centerY = storyTableView.center.y + scollViewContentOffsetY + UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    
+    if let indexPath = storyTableView.indexPathForRow(at: CGPoint(x: centerX, y: centerY)) {
+      if let videoCell = storyTableView.cellForRow(at: indexPath) as? ANIVideoStoryViewCell,
+        let storyVideoView = videoCell.storyVideoView {
+        storyVideoView.stop()
+      }
     }
   }
   
@@ -478,6 +516,8 @@ extension ANIStoryView: UITableViewDelegate {
   
   func scrollViewDidScroll(_ scrollView: UIScrollView) {
     guard let storyTableView = self.storyTableView else { return }
+    
+    scollViewContentOffsetY = scrollView.contentOffset.y
     
     //play video
     let centerX = storyTableView.center.x

@@ -41,4 +41,16 @@ class ANICommunityStoryCell: UICollectionViewCell {
     storyView.edgesToSuperview()
     self.storyView = storyView
   }
+  
+  func playVideo() {
+    guard let storyView = self.storyView else { return }
+    
+    storyView.playVideo()
+  }
+  
+  func stopVideo() {
+    guard let storyView = self.storyView else { return }
+    
+    storyView.stopVideo()
+  }
 }

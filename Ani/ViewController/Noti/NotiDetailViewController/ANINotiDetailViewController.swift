@@ -38,6 +38,12 @@ class ANINotiDetailViewController: UIViewController {
     UIApplication.shared.statusBarStyle = .default
     UIApplication.shared.isStatusBarHidden = false
     setupNotifications()
+    
+    playVideo()
+  }
+  
+  override func viewWillDisappear(_ animated: Bool) {
+    stopVideo()
   }
   
   override func viewDidDisappear(_ animated: Bool) {
@@ -97,6 +103,18 @@ class ANINotiDetailViewController: UIViewController {
     notiDetailView.topToBottom(of: myNavigationBase)
     notiDetailView.edgesToSuperview(excluding: .top)
     self.notiDetailView = notiDetailView
+  }
+  
+  private func playVideo() {
+    guard let notiDetailView = self.notiDetailView else { return }
+
+    notiDetailView.playVideo()
+  }
+  
+  private func stopVideo() {
+    guard let notiDetailView = self.notiDetailView else { return }
+
+    notiDetailView.stopVideo()
   }
   
   //MARK: Notifications

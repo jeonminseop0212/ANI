@@ -57,6 +57,26 @@ class ANIRankingStoryDetailView: UIView {
     rankingStoryTableView.edgesToSuperview()
     self.rankingStoryTableView = rankingStoryTableView
   }
+  
+  func playVideo() {
+    guard let rankingStoryTableView = self.rankingStoryTableView else { return }
+    
+    let indexPath = IndexPath(row: 0, section: 0)
+    if let videoCell = rankingStoryTableView.cellForRow(at: indexPath) as? ANIVideoStoryViewCell,
+      let storyVideoView = videoCell.storyVideoView {
+      storyVideoView.play()
+    }
+  }
+  
+  func stopVideo() {
+    guard let rankingStoryTableView = self.rankingStoryTableView else { return }
+    
+    let indexPath = IndexPath(row: 0, section: 0)
+    if let videoCell = rankingStoryTableView.cellForRow(at: indexPath) as? ANIVideoStoryViewCell,
+      let storyVideoView = videoCell.storyVideoView {
+      storyVideoView.stop()
+    }
+  }
 }
 
 //MARK: UITableViewDataSource

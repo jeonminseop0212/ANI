@@ -67,6 +67,8 @@ class ANIListView: UIView {
 
   private var cellHeight = [IndexPath: CGFloat]()
   
+  private var scollViewContentOffsetY: CGFloat = 0.0
+  
   var delegate: ANIListViewDelegate?
   
   override init(frame: CGRect) {
@@ -111,6 +113,34 @@ class ANIListView: UIView {
     self.addSubview(activityIndicatorView)
     activityIndicatorView.edgesToSuperview()
     self.activityIndicatorView = activityIndicatorView
+  }
+  
+  func playVideo() {
+    guard let listTableView = self.listTableView else { return }
+    
+    let centerX = listTableView.center.x
+    let centerY = listTableView.center.y + scollViewContentOffsetY + UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    
+    if let indexPath = listTableView.indexPathForRow(at: CGPoint(x: centerX, y: centerY)) {
+      if let videoCell = listTableView.cellForRow(at: indexPath) as? ANIVideoStoryViewCell,
+        let storyVideoView = videoCell.storyVideoView {
+        storyVideoView.play()
+      }
+    }
+  }
+  
+  func stopVideo() {
+    guard let listTableView = self.listTableView else { return }
+    
+    let centerX = listTableView.center.x
+    let centerY = listTableView.center.y + scollViewContentOffsetY + UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    
+    if let indexPath = listTableView.indexPathForRow(at: CGPoint(x: centerX, y: centerY)) {
+      if let videoCell = listTableView.cellForRow(at: indexPath) as? ANIVideoStoryViewCell,
+        let storyVideoView = videoCell.storyVideoView {
+        storyVideoView.stop()
+      }
+    }
   }
   
   private func setupNotifications() {
@@ -491,6 +521,8 @@ extension ANIListView: UITableViewDelegate {
   
   func scrollViewDidScroll(_ scrollView: UIScrollView) {
     guard let listTableView = self.listTableView else { return }
+    
+    scollViewContentOffsetY = scrollView.contentOffset.y
     
     //play video
     let centerX = listTableView.center.x
