@@ -34,6 +34,11 @@ class ANIOtherProfileBasicView: UIView {
   
   private var contentType: ContentType = .profile {
     didSet {
+      if contentType == .story {
+        playVideo()
+      } else {
+        stopVideo()
+      }
       self.basicTableView?.reloadData()
       self.layoutIfNeeded()
       
@@ -88,6 +93,8 @@ class ANIOtherProfileBasicView: UIView {
   private var storyCellHeight = [IndexPath: CGFloat]()
   private var qnaCellHeight = [IndexPath: CGFloat]()
   
+  private var scollViewContentOffsetY: CGFloat = 0.0
+  
   var delegate: ANIOtherProfileBasicViewDelegate?
   
   override init(frame: CGRect) {
@@ -137,6 +144,34 @@ class ANIOtherProfileBasicView: UIView {
     self.addSubview(activityIndicatorView)
     activityIndicatorView.edgesToSuperview()
     self.activityIndicatorView = activityIndicatorView
+  }
+  
+  func playVideo() {
+    guard let basicTableView = self.basicTableView else { return }
+    
+    let centerX = basicTableView.center.x
+    let centerY = basicTableView.center.y + scollViewContentOffsetY + UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    
+    if let indexPath = basicTableView.indexPathForRow(at: CGPoint(x: centerX, y: centerY)) {
+      if let videoCell = basicTableView.cellForRow(at: indexPath) as? ANIVideoStoryViewCell,
+        let storyVideoView = videoCell.storyVideoView {
+        storyVideoView.play()
+      }
+    }
+  }
+  
+  func stopVideo() {
+    guard let basicTableView = self.basicTableView else { return }
+    
+    let centerX = basicTableView.center.x
+    let centerY = basicTableView.center.y + scollViewContentOffsetY + UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    
+    if let indexPath = basicTableView.indexPathForRow(at: CGPoint(x: centerX, y: centerY)) {
+      if let videoCell = basicTableView.cellForRow(at: indexPath) as? ANIVideoStoryViewCell,
+        let storyVideoView = videoCell.storyVideoView {
+        storyVideoView.stop()
+      }
+    }
   }
   
   private func checkFollowed() {
@@ -616,6 +651,8 @@ extension ANIOtherProfileBasicView: UITableViewDelegate {
   
   func scrollViewDidScroll(_ scrollView: UIScrollView) {
     guard let basicTableView = self.basicTableView else { return }
+    
+    scollViewContentOffsetY = scrollView.contentOffset.y
     
     //play video
     let centerX = basicTableView.center.x

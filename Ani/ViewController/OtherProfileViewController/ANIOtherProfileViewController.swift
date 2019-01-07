@@ -48,6 +48,12 @@ class ANIOtherProfileViewController: UIViewController {
   override func viewWillAppear(_ animated: Bool) {
     UIApplication.shared.statusBarStyle = .default
     setupNotifications()
+    
+    playVideo()
+  }
+  
+  override func viewWillDisappear(_ animated: Bool) {
+    stopVideo()
   }
 
   override func viewDidDisappear(_ animated: Bool) {
@@ -189,6 +195,18 @@ class ANIOtherProfileViewController: UIViewController {
     
     database.collection(KEY_USERS).document(userId).collection(KEY_FOLLOWER_IDS).document(currentUserUid).delete()
     database.collection(KEY_USERS).document(userId).collection(KEY_FOLLOWING_USER_IDS).document(currentUserUid).delete()
+  }
+  
+  private func playVideo() {
+    guard let profileBasicView = self.profileBasicView else { return }
+    
+    profileBasicView.playVideo()
+  }
+  
+  private func stopVideo() {
+    guard let profileBasicView = self.profileBasicView else { return }
+    
+    profileBasicView.stopVideo()
   }
   
   //MARK: notification

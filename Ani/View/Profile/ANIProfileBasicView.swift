@@ -39,8 +39,13 @@ class ANIProfileBasicView: UIView {
   
   enum SectionType:Int { case top = 0; case content = 1 }
   
-  private var contentType:ContentType = .profile {
+  private var contentType: ContentType = .profile {
     didSet {
+      if contentType == .story {
+        playVideo()
+      } else {
+        stopVideo()
+      }
       self.basicTableView?.reloadData()
       self.layoutIfNeeded()
       
@@ -109,6 +114,8 @@ class ANIProfileBasicView: UIView {
   private var storyListener: ListenerRegistration?
   private var qnaListener: ListenerRegistration?
   
+  private var scollViewContentOffsetY: CGFloat = 0.0
+  
   var delegate: ANIProfileBasicViewDelegate?
   
   override init(frame: CGRect) {
@@ -145,6 +152,34 @@ class ANIProfileBasicView: UIView {
     addSubview(basicTableView)
     basicTableView.edgesToSuperview()
     self.basicTableView = basicTableView
+  }
+  
+  func playVideo() {
+    guard let basicTableView = self.basicTableView else { return }
+    
+    let centerX = basicTableView.center.x
+    let centerY = basicTableView.center.y + scollViewContentOffsetY + UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    
+    if let indexPath = basicTableView.indexPathForRow(at: CGPoint(x: centerX, y: centerY)) {
+      if let videoCell = basicTableView.cellForRow(at: indexPath) as? ANIVideoStoryViewCell,
+        let storyVideoView = videoCell.storyVideoView {
+        storyVideoView.play()
+      }
+    }
+  }
+  
+  func stopVideo() {
+    guard let basicTableView = self.basicTableView else { return }
+    
+    let centerX = basicTableView.center.x
+    let centerY = basicTableView.center.y + scollViewContentOffsetY + UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    
+    if let indexPath = basicTableView.indexPathForRow(at: CGPoint(x: centerX, y: centerY)) {
+      if let videoCell = basicTableView.cellForRow(at: indexPath) as? ANIVideoStoryViewCell,
+        let storyVideoView = videoCell.storyVideoView {
+        storyVideoView.stop()
+      }
+    }
   }
   
   private func setupNotifications() {
@@ -531,6 +566,8 @@ extension ANIProfileBasicView: UITableViewDelegate {
   func scrollViewDidScroll(_ scrollView: UIScrollView) {
     guard let basicTableView = self.basicTableView else { return }
     
+    scollViewContentOffsetY = scrollView.contentOffset.y
+
     //play video
     let centerX = basicTableView.center.x
     let centerY = basicTableView.center.y + scrollView.contentOffset.y + UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT

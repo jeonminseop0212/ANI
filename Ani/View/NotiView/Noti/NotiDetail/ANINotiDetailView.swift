@@ -98,6 +98,8 @@ class ANINotiDetailView: UIView {
   private var cellHeight = [IndexPath: CGFloat]()
   
   private weak var activityIndicatorView: ANIActivityIndicator?
+  
+  private var scollViewContentOffsetY: CGFloat = 0.0
 
   var delegate: ANINotiDetailViewDelegate?
   
@@ -159,6 +161,50 @@ class ANINotiDetailView: UIView {
     self.addSubview(activityIndicatorView)
     activityIndicatorView.edgesToSuperview()
     self.activityIndicatorView = activityIndicatorView
+  }
+  
+  func playVideo() {
+    guard let tableView = self.tableView else { return }
+    
+    if scollViewContentOffsetY != 0 {
+      let centerX = tableView.center.x
+      let centerY = tableView.center.y + scollViewContentOffsetY + UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+      
+      if let indexPath = tableView.indexPathForRow(at: CGPoint(x: centerX, y: centerY)) {
+        if let videoCell = tableView.cellForRow(at: indexPath) as? ANIVideoStoryViewCell,
+          let storyVideoView = videoCell.storyVideoView {
+          storyVideoView.play()
+        }
+      }
+    } else {
+      let indexPath = IndexPath(row: 0, section: 0)
+      if let videoCell = tableView.cellForRow(at: indexPath) as? ANIVideoStoryViewCell,
+        let storyVideoView = videoCell.storyVideoView {
+        storyVideoView.play()
+      }
+    }
+  }
+  
+  func stopVideo() {
+    guard let tableView = self.tableView else { return }
+    
+    if scollViewContentOffsetY != 0 {
+      let centerX = tableView.center.x
+      let centerY = tableView.center.y + scollViewContentOffsetY + UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+      
+      if let indexPath = tableView.indexPathForRow(at: CGPoint(x: centerX, y: centerY)) {
+        if let videoCell = tableView.cellForRow(at: indexPath) as? ANIVideoStoryViewCell,
+          let storyVideoView = videoCell.storyVideoView {
+          storyVideoView.stop()
+        }
+      }
+    } else {
+      let indexPath = IndexPath(row: 0, section: 0)
+      if let videoCell = tableView.cellForRow(at: indexPath) as? ANIVideoStoryViewCell,
+        let storyVideoView = videoCell.storyVideoView {
+        storyVideoView.stop()
+      }
+    }
   }
   
   private func loadDone() {
@@ -479,6 +525,8 @@ extension ANINotiDetailView: UITableViewDelegate {
   
   func scrollViewDidScroll(_ scrollView: UIScrollView) {
     guard let tableView = self.tableView else { return }
+    
+    scollViewContentOffsetY = scrollView.contentOffset.y
     
     //play video
     let centerX = tableView.center.x

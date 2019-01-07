@@ -38,6 +38,12 @@ class ANIRankingStoryDetailViewController: UIViewController {
   
   override func viewWillAppear(_ animated: Bool) {
     setupNotifications()
+    
+    playVideo()
+  }
+  
+  override func viewWillDisappear(_ animated: Bool) {
+    stopVideo()
   }
   
   override func viewDidDisappear(_ animated: Bool) {
@@ -117,6 +123,18 @@ class ANIRankingStoryDetailViewController: UIViewController {
     rejectTapView.size(to: rejectView)
     rejectTapView.topToSuperview()
     self.rejectTapView = rejectTapView
+  }
+  
+  private func playVideo() {
+    guard let rankingStoryDetailView = self.rankingStoryDetailView else { return }
+    
+    rankingStoryDetailView.playVideo()
+  }
+  
+  private func stopVideo() {
+    guard let rankingStoryDetailView = self.rankingStoryDetailView else { return }
+    
+    rankingStoryDetailView.stopVideo()
   }
   
   private func setupNavigationCrownImage(ranking: Int) {

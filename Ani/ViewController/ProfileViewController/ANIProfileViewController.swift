@@ -50,6 +50,12 @@ class ANIProfileViewController: UIViewController {
     setupNotifications()
     showNeedLoginView()
     reloadNavigationTitle()
+    
+    playVideo()
+  }
+  
+  override func viewWillDisappear(_ animated: Bool) {
+    stopVideo()
   }
   
   override func viewDidDisappear(_ animated: Bool) {
@@ -178,6 +184,18 @@ class ANIProfileViewController: UIViewController {
     } else {
       needLoginView.isHidden = true
     }
+  }
+  
+  private func playVideo() {
+    guard let profileBasicView = self.profileBasicView else { return }
+    
+    profileBasicView.playVideo()
+  }
+  
+  private func stopVideo() {
+    guard let profileBasicView = self.profileBasicView else { return }
+
+    profileBasicView.stopVideo()
   }
   
   //MAKR: notification

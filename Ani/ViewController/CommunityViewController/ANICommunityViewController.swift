@@ -52,6 +52,12 @@ class ANICommunityViewController: UIViewController {
     } catch {
       DLog("AVAudioSession catgery set error \(error)")
     }
+    
+    playVideo()
+  }
+  
+  override func viewWillDisappear(_ animated: Bool) {
+    stopVideo()
   }
   
   override func viewDidDisappear(_ animated: Bool) {
@@ -153,6 +159,26 @@ class ANICommunityViewController: UIViewController {
     self.tabBarController?.view.addSubview(activityIndicatorView)
     activityIndicatorView.edgesToSuperview()
     self.activityIndicatorView = activityIndicatorView
+  }
+  
+  private func playVideo() {
+    guard let containerCollectionView = self.containerCollectionView else { return }
+    
+    for visibleCell in containerCollectionView.visibleCells {
+      if let communityStoryCell = visibleCell as? ANICommunityStoryCell {
+        communityStoryCell.playVideo()
+      }
+    }
+  }
+  
+  private func stopVideo() {
+    guard let containerCollectionView = self.containerCollectionView else { return }
+    
+    for visibleCell in containerCollectionView.visibleCells {
+      if let communityStoryCell = visibleCell as? ANICommunityStoryCell {
+        communityStoryCell.stopVideo()
+      }
+    }
   }
   
   //MAKR: notification
