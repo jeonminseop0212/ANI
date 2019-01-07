@@ -23,7 +23,7 @@ class GridView: UIView {
   
   lazy var videoPreviewView: UIView = self.makeVideoPreviewView()
   var player: AVPlayer?
-  var paused: Bool = false
+  var isDefaultVideo: Bool = true
   var thumnailImage: UIImage? {
     didSet {
       self.previewImageView.image = thumnailImage
@@ -430,7 +430,9 @@ class GridView: UIView {
     previewScollView.contentOffset.x = (previewImageView.frame.size.width - previewScollView.bounds.size.width) / 2.0
     previewScollView.contentOffset.y = (previewImageView.frame.size.height - previewScollView.bounds.size.height) / 2.0
     
-    player?.play()
+    if !isDefaultVideo {
+      player?.play()
+    }
   }
   
   private func makeEmptyView() -> EmptyView {
