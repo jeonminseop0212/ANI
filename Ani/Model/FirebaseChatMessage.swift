@@ -14,5 +14,5 @@ struct FirebaseChatMessage: Codable {
   let receiveUserId: String
   let message: String
   let date: String
-  let isDiffrentBeforeDate: Bool
+  let isDiffrentBeforeDate: Bool?
 }
