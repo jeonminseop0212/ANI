@@ -17,7 +17,7 @@ class VideosController: UIViewController {
         gridView.collectionView.reloadData()
         
         items[0].fetchThumbnail(size: CGSize(width: UIScreen.main.bounds.width / 4, height: UIScreen.main.bounds.width / 4)) { (image) in
-          self.changeVideo(video: self.items[0], thumbnailImage: image)
+          self.changeVideo(video: self.items[0], thumbnailImage: image, isDefaultVideo: true)
         }
       }
     }
@@ -176,10 +176,11 @@ class VideosController: UIViewController {
   }
   
   //修正
-  func changeVideo(video: Video, thumbnailImage: UIImage? = nil) {
+  func changeVideo(video: Video, thumbnailImage: UIImage? = nil, isDefaultVideo: Bool) {
     video.fetchAVAsset { (myAVAsset) in
       guard let asset = myAVAsset else { return }
       
+      self.gridView.isDefaultVideo = isDefaultVideo
       self.gridView.thumnailImage = thumbnailImage
       self.gridView.videoPlayerItem = AVPlayerItem(asset: asset)
     }
@@ -264,7 +265,7 @@ extension VideosController: UICollectionViewDataSource, UICollectionViewDelegate
       if let videoCell = collectionView.cellForItem(at: indexPath) as? VideoCell,
         let thumbnailImage = videoCell.imageView.image {
         
-        changeVideo(video: item, thumbnailImage: thumbnailImage)
+        changeVideo(video: item, thumbnailImage: thumbnailImage, isDefaultVideo: false)
       }
     }
     
