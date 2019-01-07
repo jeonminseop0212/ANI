@@ -106,6 +106,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     if !ANISessionManager.shared.isCheckedVersion {
       Siren.shared.checkVersion(checkType: .immediately)
     }
+    
+    playTopViewControllerVideo()
   }
 
   func applicationDidBecomeActive(_ application: UIApplication) {
@@ -113,6 +115,29 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func applicationWillTerminate(_ application: UIApplication) {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+  }
+  
+  private func playTopViewControllerVideo() {
+    if let topController = UIApplication.topViewController() {
+      if let communityViewController = topController as? ANICommunityViewController {
+        communityViewController.playVideo()
+      }
+      if let rankingStoryDetailViewController = topController as? ANIRankingStoryDetailViewController {
+        rankingStoryDetailViewController.playVideo()
+      }
+      if let notiDetailViewController = topController as? ANINotiDetailViewController {
+        notiDetailViewController.playVideo()
+      }
+      if let profileViewController = topController as? ANIProfileViewController {
+        profileViewController.playVideo()
+      }
+      if let otherProfileViewController = topController as? ANIOtherProfileViewController {
+        otherProfileViewController.playVideo()
+      }
+      if let listViewController = topController as? ANIListViewController {
+        listViewController.playVideo()
+      }
+    }
   }
 }
 

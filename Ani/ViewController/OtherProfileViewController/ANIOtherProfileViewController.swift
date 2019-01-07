@@ -197,7 +197,7 @@ class ANIOtherProfileViewController: UIViewController {
     database.collection(KEY_USERS).document(userId).collection(KEY_FOLLOWING_USER_IDS).document(currentUserUid).delete()
   }
   
-  private func playVideo() {
+  func playVideo() {
     guard let profileBasicView = self.profileBasicView else { return }
     
     profileBasicView.playVideo()

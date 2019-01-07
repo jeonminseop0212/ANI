@@ -105,7 +105,7 @@ class ANINotiDetailViewController: UIViewController {
     self.notiDetailView = notiDetailView
   }
   
-  private func playVideo() {
+  func playVideo() {
     guard let notiDetailView = self.notiDetailView else { return }
 
     notiDetailView.playVideo()
