@@ -131,17 +131,16 @@ class ANIVideoFilterViewController: UIViewController {
     let myNavigationBar = UIView()
     myNavigationBar.backgroundColor = .white
     self.view.addSubview(myNavigationBar)
-    myNavigationBar.topToSuperview()
+    myNavigationBar.topToSuperview(usingSafeArea: true)
     myNavigationBar.leftToSuperview()
     myNavigationBar.rightToSuperview()
-    myNavigationBar.height(UIViewController.STATUS_BAR_HEIGHT + UIViewController.NAVIGATION_BAR_HEIGHT)
+    myNavigationBar.height(UIViewController.NAVIGATION_BAR_HEIGHT)
     self.myNavigationBar = myNavigationBar
     
     //myNavigationBase
     let myNavigationBase = UIView()
     myNavigationBar.addSubview(myNavigationBase)
-    myNavigationBase.edgesToSuperview(excluding: .top)
-    myNavigationBase.height(UIViewController.NAVIGATION_BAR_HEIGHT)
+    myNavigationBase.edgesToSuperview()
     self.myNavigationBase = myNavigationBase
     
     //backButton
