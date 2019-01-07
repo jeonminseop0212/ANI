@@ -858,9 +858,10 @@ extension ANIProfileBasicView {
           do {
             let story = try FirestoreDecoder().decode(FirebaseStory.self, from: document.data())
             
-            if let storyVideoUrl = story.storyVideoUrl, let url = URL(string: storyVideoUrl) {
+            if let storyVideoUrl = story.storyVideoUrl,
+              let url = URL(string: storyVideoUrl),
+              !self.storyVideoAssets.contains(where: { $0.0 == storyVideoUrl }) {
               let asset = AVAsset(url: url)
-              
               self.storyVideoAssets[storyVideoUrl] = asset
             }
             self.stories.append(story)
@@ -920,9 +921,10 @@ extension ANIProfileBasicView {
           do {
             let story = try FirestoreDecoder().decode(FirebaseStory.self, from: document.data())
             
-            if let storyVideoUrl = story.storyVideoUrl, let url = URL(string: storyVideoUrl) {
+            if let storyVideoUrl = story.storyVideoUrl,
+              let url = URL(string: storyVideoUrl),
+              !self.storyVideoAssets.contains(where: { $0.0 == storyVideoUrl }) {
               let asset = AVAsset(url: url)
-              
               self.storyVideoAssets[storyVideoUrl] = asset
             }
             self.stories.append(story)

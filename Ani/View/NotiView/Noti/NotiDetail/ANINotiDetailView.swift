@@ -677,7 +677,6 @@ extension ANINotiDetailView {
             let story = try FirestoreDecoder().decode(FirebaseStory.self, from: data)
             if let storyVideoUrl = story.storyVideoUrl, let url = URL(string: storyVideoUrl) {
               let asset = AVAsset(url: url)
-              
               self.storyVideoAsset = asset
             }
             
