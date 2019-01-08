@@ -9,9 +9,11 @@
 import UIKit
 
 struct FirebaseComment: Codable {
+  let id: String
   let userId: String
   let comment: String
-//  let loveCount: Int
-//  let commentCount: Int
   let date: String
+  var isLoved: Bool?
+  let parentCommentId: String?
+  let parentCommentUserId: String?
 }

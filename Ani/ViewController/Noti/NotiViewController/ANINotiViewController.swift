@@ -319,6 +319,12 @@ extension ANINotiViewController: ANINotiNotiCellDelegate {
     } else if noti.contributionKind == KEY_CONTRIBUTION_KIND_QNA {
       notiDetailViewController.navigationTitle = "Q&A"
       notiDetailViewController.contributionKind = .qna
+    } else if noti.contributionKind == KEY_CONTRIBUTION_KIND_STORY_COMMENT {
+      notiDetailViewController.navigationTitle = "ストーリー"
+      notiDetailViewController.contributionKind = .storyComment
+    } else if noti.contributionKind == KEY_CONTRIBUTION_KIND_QNA_COMMENT {
+      notiDetailViewController.navigationTitle = "Q&A"
+      notiDetailViewController.contributionKind = .qnaComment
     }
     
     self.navigationController?.pushViewController(notiDetailViewController, animated: true)

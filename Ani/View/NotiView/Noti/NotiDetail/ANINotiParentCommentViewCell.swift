@@ -1,23 +1,33 @@
 //
-//  ANINotiCommentViewCell.swift
+//  ANINotiParentCommentViewCell.swift
 //  Ani
 //
-//  Created by jeonminseop on 2018/07/10.
-//  Copyright © 2018年 JeonMinseop. All rights reserved.
+//  Created by jeonminseop on 2019/01/15.
+//  Copyright © 2019年 JeonMinseop. All rights reserved.
 //
 
 import UIKit
 import FirebaseFirestore
 import CodableFirebase
 
-protocol ANINotiCommentViewCellDelegate {
+protocol ANINotiParentCommentViewCellDelegate {
   func popupCommentOptionView(isMe: Bool, commentId: String)
   func loadedCommentIsLoved(isLoved: Bool)
   func commentCellTapped(comment: FirebaseComment, commentUser: FirebaseUser)
   func loadedCommentUser(user: FirebaseUser)
 }
 
-class ANINotiCommentViewCell: UITableViewCell {
+class ANINotiParentCommentViewCell: UITableViewCell {
+  
+  private weak var parentCommentView: UIView?
+  private weak var parentCommentBG: UIView?
+  private weak var parentCommentLabel: UILabel?
+  private let PARENT_COMMENT_PROFILE_IMAGE_VIEW_HEIGHT: CGFloat = 20.0
+  private weak var parentCommentProfileImageView: UIImageView?
+  private weak var parentCommentUserNameLabel: UILabel?
+  private weak var parentCommentLine: UIView?
+  private weak var deleteParentCommentView: UIView?
+  private weak var deleteLabel: UILabel?
   
   private weak var base: UIView?
   private weak var commentLabel: UILabel?
@@ -43,6 +53,15 @@ class ANINotiCommentViewCell: UITableViewCell {
       observeLove()
     }
   }
+  var parentComment: FirebaseComment? {
+    didSet {
+      reloadParentCommentLayout()
+      
+      if parentCommentUser == nil {
+        loadParentCommentUser()
+      }
+    }
+  }
   
   var user: FirebaseUser? {
     didSet {
@@ -52,12 +71,20 @@ class ANINotiCommentViewCell: UITableViewCell {
     }
   }
   
+  var parentCommentUser: FirebaseUser? {
+    didSet {
+      DispatchQueue.main.async {
+        self.reloadParentCommentUserLayout()
+      }
+    }
+  }
+  
   var contributionKind: ContributionKind?
   var notiId: String?
   
   private var loveListener: ListenerRegistration?
   
-  var delegate: ANINotiCommentViewCellDelegate?
+  var delegate: ANINotiParentCommentViewCellDelegate?
   
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -72,7 +99,6 @@ class ANINotiCommentViewCell: UITableViewCell {
   private func setup() {
     //basic
     self.selectionStyle = .none
-    self.backgroundColor = ANIColor.bg
     self.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(commentCellTapped)))
     
     //base
@@ -82,14 +108,86 @@ class ANINotiCommentViewCell: UITableViewCell {
     base.edgesToSuperview()
     self.base = base
     
+    //parentCommentView
+    let parentCommentView = UIView()
+    parentCommentView.isUserInteractionEnabled = true
+    parentCommentView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(parentCommentViewTapped)))
+    base.addSubview(parentCommentView)
+    parentCommentView.edgesToSuperview(excluding: .bottom)
+    self.parentCommentView = parentCommentView
+    
+    //parentCommentLabel
+    let parentCommentLabel = UILabel()
+    parentCommentLabel.textColor = ANIColor.dark
+    parentCommentLabel.font = UIFont.systemFont(ofSize: 14.0)
+    parentCommentLabel.numberOfLines = 0
+    parentCommentView.addSubview(parentCommentLabel)
+    let insets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: 10.0)
+    parentCommentLabel.edgesToSuperview(excluding: .bottom, insets: insets)
+    self.parentCommentLabel = parentCommentLabel
+    
+    //parentCommentProfileImageView
+    let parentCommentProfileImageView = UIImageView()
+    parentCommentProfileImageView.backgroundColor = ANIColor.gray
+    parentCommentProfileImageView.layer.cornerRadius = PARENT_COMMENT_PROFILE_IMAGE_VIEW_HEIGHT / 2
+    parentCommentProfileImageView.layer.masksToBounds = true
+    parentCommentProfileImageView.isUserInteractionEnabled = true
+    parentCommentProfileImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(parentCommentProfileImageViewTapped)))
+    parentCommentView.addSubview(parentCommentProfileImageView)
+    parentCommentProfileImageView.width(PARENT_COMMENT_PROFILE_IMAGE_VIEW_HEIGHT)
+    parentCommentProfileImageView.height(PARENT_COMMENT_PROFILE_IMAGE_VIEW_HEIGHT)
+    parentCommentProfileImageView.topToBottom(of: parentCommentLabel, offset: 10.0)
+    parentCommentProfileImageView.leftToSuperview(offset: 10.0)
+    parentCommentProfileImageView.bottomToSuperview(offset: -10.0)
+    self.parentCommentProfileImageView = parentCommentProfileImageView
+    
+    //parentCommentUserNameLabel
+    let parentCommentUserNameLabel = UILabel()
+    parentCommentUserNameLabel.textColor = ANIColor.dark
+    parentCommentUserNameLabel.font = UIFont.boldSystemFont(ofSize: 14.0)
+    parentCommentUserNameLabel.numberOfLines = 2
+    parentCommentView.addSubview(parentCommentUserNameLabel)
+    parentCommentUserNameLabel.leftToRight(of: parentCommentProfileImageView, offset: 10.0)
+    parentCommentUserNameLabel.rightToSuperview(offset: -10.0)
+    parentCommentUserNameLabel.centerY(to: parentCommentProfileImageView)
+    self.parentCommentUserNameLabel = parentCommentUserNameLabel
+    
+    //deleteParentCommentVIew
+    let deleteParentCommentView = UIView()
+    deleteParentCommentView.backgroundColor = .white
+    deleteParentCommentView.isHidden = true
+    parentCommentView.addSubview(deleteParentCommentView)
+    deleteParentCommentView.edgesToSuperview()
+    self.deleteParentCommentView = deleteParentCommentView
+    
+    //deleteLabel
+    let deleteLabel = UILabel()
+    deleteLabel.textColor = ANIColor.dark
+    deleteLabel.font = UIFont.systemFont(ofSize: 14.0)
+    deleteLabel.text = "削除されたコメントです。"
+    deleteParentCommentView.addSubview(deleteLabel)
+    deleteLabel.leftToSuperview(offset: 10.0)
+    deleteLabel.centerYToSuperview()
+    self.deleteLabel = deleteLabel
+    
+    //parentCommentLine
+    let parentCommentLine = UIView()
+    parentCommentLine.backgroundColor = ANIColor.bg
+    base.addSubview(parentCommentLine)
+    parentCommentLine.width(2.0)
+    parentCommentLine.topToBottom(of: parentCommentProfileImageView, offset: 5.0)
+    parentCommentLine.centerX(to: parentCommentProfileImageView)
+    self.parentCommentLine = parentCommentLine
+    
     //commentLabel
     let commentLabel = UILabel()
     commentLabel.textColor = ANIColor.dark
     commentLabel.font = UIFont.systemFont(ofSize: 15.0)
     commentLabel.numberOfLines = 0
     base.addSubview(commentLabel)
-    let insets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: 10.0)
-    commentLabel.edgesToSuperview(excluding: .bottom, insets: insets)
+    commentLabel.topToBottom(of: parentCommentView)
+    commentLabel.leftToRight(of: parentCommentLine, offset: 10.0)
+    commentLabel.rightToSuperview(offset: -10.0)
     self.commentLabel = commentLabel
     
     //profileImageView
@@ -98,14 +196,16 @@ class ANINotiCommentViewCell: UITableViewCell {
     profileImageView.layer.cornerRadius = PROFILE_IMAGE_VIEW_HEIGHT / 2
     profileImageView.layer.masksToBounds = true
     profileImageView.isUserInteractionEnabled = true
-    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped))
-    profileImageView.addGestureRecognizer(tapGesture)
+    profileImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped)))
     base.addSubview(profileImageView)
     profileImageView.width(PROFILE_IMAGE_VIEW_HEIGHT)
     profileImageView.height(PROFILE_IMAGE_VIEW_HEIGHT)
     profileImageView.topToBottom(of: commentLabel, offset: 10.0)
-    profileImageView.leftToSuperview(offset: 10.0)
+    profileImageView.leftToRight(of: parentCommentLine, offset: 10.0)
     self.profileImageView = profileImageView
+    
+    //parentCommentLineBottom
+    parentCommentLine.bottom(to: profileImageView)
     
     //optionButton
     let optionButton = UIButton()
@@ -189,9 +289,9 @@ class ANINotiCommentViewCell: UITableViewCell {
   
   private func reloadLayout() {
     guard let commentLabel = self.commentLabel,
-          let comment = self.comment,
-          let loveButtonBG = self.loveButtonBG,
-          let loveButton = self.loveButton else { return }
+      let comment = self.comment,
+      let loveButtonBG = self.loveButtonBG,
+      let loveButton = self.loveButton else { return }
     
     commentLabel.text = comment.comment
     
@@ -213,9 +313,21 @@ class ANINotiCommentViewCell: UITableViewCell {
     }
   }
   
+  private func reloadParentCommentLayout() {
+    guard let parentCommentLabel = self.parentCommentLabel,
+          let deleteParentCommentView = self.deleteParentCommentView else { return }
+    
+    if let parentComment = self.parentComment {
+      parentCommentLabel.text = parentComment.comment
+      deleteParentCommentView.isHidden = true
+    } else {
+      deleteParentCommentView.isHidden = false
+    }
+  }
+  
   private func reloadUserLayout() {
     guard let userNameLabel = self.userNameLabel,
-          let profileImageView = self.profileImageView else { return }
+      let profileImageView = self.profileImageView else { return }
     
     if let user = self.user, let profileImageUrl = user.profileImageUrl {
       profileImageView.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
@@ -230,12 +342,25 @@ class ANINotiCommentViewCell: UITableViewCell {
     }
   }
   
+  private func reloadParentCommentUserLayout() {
+    guard let parentCommentUser = self.parentCommentUser,
+          let parentCommentProfileImageView = self.parentCommentProfileImageView,
+          let parentCommentUserNameLabel = self.parentCommentUserNameLabel else { return }
+    
+    if let parentCommentUser = self.parentCommentUser, let profileImageUrl = parentCommentUser.profileImageUrl {
+      parentCommentProfileImageView.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
+    } else {
+      parentCommentProfileImageView.image = UIImage()
+    }
+    parentCommentUserNameLabel.text = parentCommentUser.userName
+  }
+  
   private func observeLove() {
     guard let contributionKind = self.contributionKind,
-          let notiId = self.notiId,
-          let comment = self.comment,
-          let loveButton = self.loveButton,
-          let loveCountLabel = self.loveCountLabel else { return }
+      let notiId = self.notiId,
+      let comment = self.comment,
+      let loveButton = self.loveButton,
+      let loveCountLabel = self.loveCountLabel else { return }
     
     loveCountLabel.text = "0"
     
@@ -292,14 +417,14 @@ class ANINotiCommentViewCell: UITableViewCell {
   
   private func updateNoti() {
     guard let contributionKind = self.contributionKind,
-          let notiId = self.notiId,
-          let comment = self.comment,
-          let currentUser = ANISessionManager.shared.currentUser,
-          let currentUserName = currentUser.userName,
-          let currentUserId = ANISessionManager.shared.currentUserUid,
-          let user = self.user,
-          let userId = user.uid,
-          currentUserId != userId else { return }
+      let notiId = self.notiId,
+      let comment = self.comment,
+      let currentUser = ANISessionManager.shared.currentUser,
+      let currentUserName = currentUser.userName,
+      let currentUserId = ANISessionManager.shared.currentUserUid,
+      let user = self.user,
+      let userId = user.uid,
+      currentUserId != userId else { return }
     
     let database = Firestore.firestore()
     
@@ -350,15 +475,22 @@ class ANINotiCommentViewCell: UITableViewCell {
     ANINotificationManager.postProfileImageViewTapped(userId: comment.userId)
   }
   
+  @objc private func parentCommentProfileImageViewTapped() {
+    guard let comment = self.comment,
+          let parentCommentUserId = comment.parentCommentUserId else { return }
+    
+    ANINotificationManager.postProfileImageViewTapped(userId: parentCommentUserId)
+  }
+  
   @objc private func loveButtonBGTapped() {
   }
   
   @objc private func love() {
     guard let comment = self.comment,
-          let contributionKind = self.contributionKind,
-          let notiId = self.notiId,
-          let currentUserId = ANISessionManager.shared.currentUserUid,
-          let loveButton = self.loveButton else { return }
+      let contributionKind = self.contributionKind,
+      let notiId = self.notiId,
+      let currentUserId = ANISessionManager.shared.currentUserUid,
+      let loveButton = self.loveButton else { return }
     
     let database = Firestore.firestore()
     
@@ -368,31 +500,38 @@ class ANINotiCommentViewCell: UITableViewCell {
     } else if contributionKind == .qna || contributionKind == .qnaComment {
       collection = KEY_QNAS
     }
-
+    
     if loveButton.isSelected == true {
       let date = ANIFunction.shared.getToday()
-
+      
       DispatchQueue.global().async {
         database.collection(collection).document(notiId).collection(KEY_COMMENTS).document(comment.id).collection(KEY_LOVE_IDS).document(currentUserId).setData([currentUserId: true, KEY_DATE: date])
       }
-
+      
       self.updateNoti()
-
+      
       self.delegate?.loadedCommentIsLoved(isLoved: true)
     } else {
       DispatchQueue.global().async {
         database.collection(collection).document(notiId).collection(KEY_COMMENTS).document(comment.id).collection(KEY_LOVE_IDS).document(currentUserId).delete()
       }
-
+      
       self.delegate?.loadedCommentIsLoved(isLoved: false)
     }
   }
   
   @objc private func commentCellTapped() {
     guard let comment = self.comment,
-          let user = self.user else { return }
+      let user = self.user else { return }
     
     self.delegate?.commentCellTapped(comment: comment, commentUser: user)
+  }
+  
+  @objc private func parentCommentViewTapped() {
+    guard let parentComment = self.parentComment,
+          let parentCommentUser = self.parentCommentUser else { return }
+    
+    self.delegate?.commentCellTapped(comment: parentComment, commentUser: parentCommentUser)
   }
   
   @objc private func showOption() {
@@ -407,7 +546,7 @@ class ANINotiCommentViewCell: UITableViewCell {
 }
 
 //MARK: ANIButtonViewDelegate
-extension ANINotiCommentViewCell: ANIButtonViewDelegate {
+extension ANINotiParentCommentViewCell: ANIButtonViewDelegate {
   func buttonViewTapped(view: ANIButtonView) {
     if view === self.loveButton {
       love()
@@ -416,7 +555,7 @@ extension ANINotiCommentViewCell: ANIButtonViewDelegate {
 }
 
 //MARK: data
-extension ANINotiCommentViewCell {
+extension ANINotiParentCommentViewCell {
   private func loadUser() {
     guard let comment = self.comment else { return }
     
@@ -435,6 +574,32 @@ extension ANINotiCommentViewCell {
         do {
           let user = try FirebaseDecoder().decode(FirebaseUser.self, from: data)
           self.user = user
+          self.delegate?.loadedCommentUser(user: user)
+        } catch let error {
+          DLog(error)
+        }
+      })
+    }
+  }
+  
+  private func loadParentCommentUser() {
+    guard let parentComment = self.parentComment else { return }
+    
+    let database = Firestore.firestore()
+    
+    DispatchQueue.global().async {
+      database.collection(KEY_USERS).document(parentComment.userId).getDocument(completion: { (snapshot, error) in
+        if let error = error {
+          DLog("Error get document: \(error)")
+          
+          return
+        }
+        
+        guard let snapshot = snapshot, let data = snapshot.data() else { return }
+        
+        do {
+          let user = try FirebaseDecoder().decode(FirebaseUser.self, from: data)
+          self.parentCommentUser = user
           self.delegate?.loadedCommentUser(user: user)
         } catch let error {
           DLog(error)

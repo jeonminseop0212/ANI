@@ -758,15 +758,15 @@ extension ANICommunityViewController {
     var contentTypeString = ""
 
     if contentType == .recruit {
-      contentTypeString = "recurit"
+      contentTypeString = KEY_RECRUIT
     } else if contentType == .story {
-      contentTypeString = "story"
+      contentTypeString = KEY_STORY
     } else if contentType == .qna {
-      contentTypeString = "qna"
+      contentTypeString = KEY_QNA
     }
     
     let date = ANIFunction.shared.getToday()
-    let values = ["contentType": contentTypeString, "date": date]
+    let values = [KEY_CONTENT_TYPE: contentTypeString, KEY_DATE: date]
     database.collection(KEY_REPORTS).document(contributionId).collection(KEY_REPORT).addDocument(data: values)
   }
   

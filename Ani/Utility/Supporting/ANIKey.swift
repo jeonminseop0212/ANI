@@ -12,6 +12,7 @@ let KEY_FIRST_LAUNCH = "firstLaunch"
 let KEY_ID = "id"
 let KEY_DATE = "date"
 let KEY_FCM_TOKEN = "fcmToken"
+let KEY_CONTENT_TYPE = "contentType"
 
 //user
 let KEY_UID = "uid"
@@ -46,6 +47,7 @@ let KEY_TWITTER_ACCOUNT = "twitterAccount"
 let KEY_INSTAGRAM_ACCOUNT = "instagramAccount"
 
 //recruit
+let KEY_RECRUIT = "recruit"
 let KEY_RECRUIT_HEADER_IMAGES = "recruit_header_images"
 let KEY_RECRUIT_INTRODUCE_IMAGES = "recruit_introduce_images"
 let KEY_RECRUITS = "recruits"
@@ -59,6 +61,7 @@ let KEY_RECRUIT_STATE = "recruitState"
 let KEY_HIDE_USER_IDS = "hideUserIds"
 
 //story
+let KEY_STORY = "story"
 let KEY_STORY_IMAGES = "story_images"
 let KEY_STORY_VIDEOS = "story_videos"
 let KYE_THUMNAIL_IMAGES = "thumbnail_images"
@@ -67,10 +70,12 @@ let KEY_DAY = "day"
 let KEY_LOVE_COUNT = "loveCount"
 
 //qna
+let KEY_QNA = "qna"
 let KEY_QNA_IMAGES = "qna_images"
 let KEY_QNAS = "qnas"
 
 //comment
+let KEY_COMMENT = "comment"
 let KEY_COMMENTS = "comments"
 
 //chat group
@@ -91,6 +96,8 @@ let KEY_CONTRIBUTION_KIND_RECRUIT = "recruit"
 let KEY_CONTRIBUTION_KIND_STROY = "story"
 let KEY_CONTRIBUTION_KIND_QNA = "qna"
 let KEY_CONTRIBUTION_KIND_USER = "user"
+let KEY_CONTRIBUTION_KIND_STORY_COMMENT = "storyComment"
+let KEY_CONTRIBUTION_KIND_QNA_COMMENT = "qnaComment"
 let KEY_NOTI_KIND_COMMENT = "comment"
 let KEY_NOTI_KIND_FOLLOW = "follow"
 let KEY_NOTI_KIND_LOVE = "love"

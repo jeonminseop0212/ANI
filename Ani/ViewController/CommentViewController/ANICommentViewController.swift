@@ -8,6 +8,8 @@
 
 import UIKit
 import TinyConstraints
+import FirebaseFirestore
+import CodableFirebase
 
 enum CommentMode {
   case story
@@ -40,6 +42,11 @@ class ANICommentViewController: UIViewController {
   var story: FirebaseStory?
   var qna: FirebaseQna?
   var user: FirebaseUser?
+  var selectedComment: FirebaseComment?
+  var selectedCommentUser: FirebaseUser?
+  
+  private var commentId: String?
+  private var contentId: String?
   
   override func viewDidLoad() {
     setup()
@@ -102,9 +109,6 @@ class ANICommentViewController: UIViewController {
     
     //commentBar
     let commentBar = ANICommentBar()
-    if let user = self.user {
-      commentBar.user = user
-    }
     self.view.addSubview(commentBar)
     commentBar.leftToSuperview()
     commentBar.rightToSuperview()
@@ -119,7 +123,7 @@ class ANICommentViewController: UIViewController {
     } else {
       anonymousCommentTapView.isUserInteractionEnabled = true
     }
-    let anonymousCommentTapGesture = UITapGestureRecognizer(target: self, action: #selector(reject))
+    let anonymousCommentTapGesture = UITapGestureRecognizer(target: self, action: #selector(rejectAnimation))
     anonymousCommentTapView.addGestureRecognizer(anonymousCommentTapGesture)
     self.view.addSubview(anonymousCommentTapView)
     anonymousCommentTapView.edges(to: commentBar)
@@ -127,6 +131,7 @@ class ANICommentViewController: UIViewController {
     
     //commentView
     let commentView = ANICommentView()
+    commentView.delegate = self
     self.view.addSubview(commentView)
     commentView.topToBottom(of: myNavigationBar)
     commentView.leftToSuperview()
@@ -160,10 +165,12 @@ class ANICommentViewController: UIViewController {
   private func passingData() {
     guard let commentView = self.commentView,
           let commentBar = self.commentBar,
-          let commentMode = self.commentMode else { return }
+          let commentMode = self.commentMode,
+          let user = self.user else { return }
 
     commentView.commentMode = commentMode
     commentBar.commentMode = commentMode
+    commentBar.user = user
     
     switch commentMode {
     case .story:
@@ -172,6 +179,10 @@ class ANICommentViewController: UIViewController {
     case .qna:
       commentView.qna = qna
       commentBar.qna = qna
+    }
+    
+    if let selectedComment = self.selectedComment {
+      commentView.selectedComment = selectedComment
     }
   }
   
@@ -256,7 +267,7 @@ class ANICommentViewController: UIViewController {
     }
   }
   
-  @objc private func reject() {
+  @objc private func rejectAnimation() {
     guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
           !isRejectAnimating,
           let rejectTapView = self.rejectTapView else { return }
@@ -291,5 +302,126 @@ class ANICommentViewController: UIViewController {
     initialViewController.myTabBarController = self.tabBarController as? ANITabBarController
     let navigationController = UINavigationController(rootViewController: initialViewController)
     self.present(navigationController, animated: true, completion: nil)
+  }
+}
+
+//MARK: ANICommentViewDelegate
+extension ANICommentViewController: ANICommentViewDelegate {
+  func reject() {
+    self.rejectAnimation()
+  }
+  
+  func popupOptionView(isMe: Bool, contentId: String, commentId: String) {
+    self.contentId = contentId
+    self.commentId = commentId
+    
+    let popupOptionViewController = ANIPopupOptionViewController()
+    popupOptionViewController.modalPresentationStyle = .overCurrentContext
+    popupOptionViewController.isMe = isMe
+    popupOptionViewController.delegate = self
+    self.tabBarController?.present(popupOptionViewController, animated: false, completion: nil)
+  }
+  
+  func commentCellTapped(comment: FirebaseComment, user: FirebaseUser) {
+    guard let commentBar = self.commentBar else { return }
+    
+    commentBar.showParentCommentUser(comment: comment, parentCommentUser: user, isAnimated: true)
+  }
+  
+  func loadedComments() {
+    guard let commentBar = self.commentBar else { return }
+    
+    if let selectedComment = self.selectedComment, let selectedCommentUser = self.selectedCommentUser {
+      commentBar.showParentCommentUser(comment: selectedComment, parentCommentUser: selectedCommentUser, isAnimated: false)
+    }
+  }
+}
+
+//MARK: ANIPopupOptionViewControllerDelegate
+extension ANICommentViewController: ANIPopupOptionViewControllerDelegate {
+  func deleteContribution() {
+    let alertController = UIAlertController(title: nil, message: "コメントを削除しますか？", preferredStyle: .alert)
+    
+    let deleteAction = UIAlertAction(title: "削除", style: .default) { (action) in
+      self.deleteData()
+    }
+    let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
+    
+    alertController.addAction(deleteAction)
+    alertController.addAction(cancelAction)
+    
+    self.present(alertController, animated: true, completion: nil)
+  }
+  
+  func reportContribution() {
+    let alertController = UIAlertController(title: nil, message: "コメントを通報しますか？", preferredStyle: .alert)
+    
+    let reportAction = UIAlertAction(title: "通報", style: .default) { (action) in
+      if !ANISessionManager.shared.isAnonymous {
+        self.reportData()
+      } else {
+        self.rejectAnimation()
+      }
+    }
+    let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
+    
+    alertController.addAction(reportAction)
+    alertController.addAction(cancelAction)
+    
+    self.present(alertController, animated: true, completion: nil)
+  }
+  
+  func optionTapped(index: Int) {
+  }
+}
+
+//MARK: data
+extension ANICommentViewController {
+  private func deleteData() {
+    guard let contentId = self.contentId,
+          let commentId = self.commentId else { return }
+    
+    let database = Firestore.firestore()
+    
+    var collection = ""
+    
+    if commentMode == .story {
+      collection = KEY_STORIES
+    } else if commentMode == .qna {
+      collection = KEY_QNAS
+    }
+    
+    DispatchQueue.global().async {
+     database.collection(collection).document(contentId).collection(KEY_COMMENTS).document(commentId).delete()
+      DispatchQueue.main.async {
+        ANINotificationManager.postDeleteComment(id: commentId)
+      }
+    }
+    
+    DispatchQueue.global().async {
+      database.collection(collection).document(contentId).collection(KEY_COMMENTS).document(commentId).collection(KEY_LOVE_IDS).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          DLog("Get document error \(error)")
+
+          return
+        }
+
+        guard let snapshot = snapshot else { return }
+
+        for document in snapshot.documents {
+          database.collection(collection).document(contentId).collection(KEY_COMMENTS).document(commentId).collection(KEY_LOVE_IDS).document(document.documentID).delete()
+        }
+      })
+    }
+  }
+  
+  private func reportData() {
+    guard let commentId = self.commentId else { return }
+    
+    let database = Firestore.firestore()
+    
+    let date = ANIFunction.shared.getToday()
+    let values = [KEY_CONTENT_TYPE: KEY_COMMENT, KEY_DATE: date]
+    database.collection(KEY_REPORTS).document(commentId).collection(KEY_REPORT).addDocument(data: values)
   }
 }
