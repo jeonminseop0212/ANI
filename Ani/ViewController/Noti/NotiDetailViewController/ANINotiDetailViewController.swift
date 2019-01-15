@@ -209,12 +209,43 @@ extension ANINotiDetailViewController: ANINotiDetailViewDelegate {
   func popupOptionView(isMe: Bool, contentType: ContentType, id: String) {
     self.contentType = contentType
     self.contributionId = id
+    let popupOptionViewController = ANIPopupOptionViewController()
+    popupOptionViewController.modalPresentationStyle = .overCurrentContext
+    popupOptionViewController.isMe = isMe
+    popupOptionViewController.delegate = self
+    self.tabBarController?.present(popupOptionViewController, animated: false, completion: nil)
+  }
+  
+  func popupCommentOptionView(isMe: Bool, commentId: String) {
+    self.contentType = .comment
     
     let popupOptionViewController = ANIPopupOptionViewController()
     popupOptionViewController.modalPresentationStyle = .overCurrentContext
     popupOptionViewController.isMe = isMe
     popupOptionViewController.delegate = self
     self.tabBarController?.present(popupOptionViewController, animated: false, completion: nil)
+  }
+  
+  func commentCellTapped(story: FirebaseStory, storyUser: FirebaseUser, comment: FirebaseComment, commentUser: FirebaseUser) {
+    let commentViewController = ANICommentViewController()
+    commentViewController.hidesBottomBarWhenPushed = true
+    commentViewController.commentMode = CommentMode.story
+    commentViewController.story = story
+    commentViewController.user = storyUser
+    commentViewController.selectedComment = comment
+    commentViewController.selectedCommentUser = commentUser
+    self.navigationController?.pushViewController(commentViewController, animated: true)
+  }
+  
+  func commentCellTapped(qna: FirebaseQna, qnaUser: FirebaseUser, comment: FirebaseComment, commentUser: FirebaseUser) {
+    let commentViewController = ANICommentViewController()
+    commentViewController.hidesBottomBarWhenPushed = true
+    commentViewController.commentMode = CommentMode.qna
+    commentViewController.qna = qna
+    commentViewController.user = qnaUser
+    commentViewController.selectedComment = comment
+    commentViewController.selectedCommentUser = commentUser
+    self.navigationController?.pushViewController(commentViewController, animated: true)
   }
 }
 
@@ -231,7 +262,13 @@ extension ANINotiDetailViewController: ANIPopupOptionViewControllerDelegate {
     let alertController = UIAlertController(title: nil, message: "投稿を削除しますか？", preferredStyle: .alert)
     
     let deleteAction = UIAlertAction(title: "削除", style: .default) { (action) in
-      self.deleteData()
+      guard let contentType = self.contentType else { return }
+      
+      if contentType == .comment {
+        self.deleteComment()
+      } else {
+        self.deleteData()
+      }
     }
     let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
     
@@ -251,7 +288,8 @@ extension ANINotiDetailViewController: ANIPopupOptionViewControllerDelegate {
 //MAKR: data
 extension ANINotiDetailViewController {
   private func deleteData() {
-    guard let contentType = self.contentType, let contributionId = self.contributionId else { return }
+    guard let contentType = self.contentType,
+          let noti = self.noti else { return }
     
     let database = Firestore.firestore()
     
@@ -267,15 +305,15 @@ extension ANINotiDetailViewController {
     }
     
     DispatchQueue.global().async {
-      database.collection(collection).document(contributionId).getDocument(completion: { (snapshot, error) in
+      database.collection(collection).document(noti.notiId).getDocument(completion: { (snapshot, error) in
         if let error = error {
           DLog("get document error \(error)")
           
           return
         }
         
-        database.collection(collection).document(contributionId).delete()
-        self.delegateDataAlgolia(contentType: contentType, contributionId: contributionId)
+        database.collection(collection).document(noti.notiId).delete()
+        self.delegateDataAlgolia(contentType: contentType, contributionId: noti.notiId)
         
         DispatchQueue.main.async {
           self.navigationController?.popViewController(animated: true)
@@ -342,7 +380,7 @@ extension ANINotiDetailViewController {
     }
     
     DispatchQueue.global().async {
-      database.collection(collection).document(contributionId).collection(KEY_LOVE_IDS).getDocuments(completion: { (snapshot, error) in
+      database.collection(collection).document(noti.notiId).collection(KEY_LOVE_IDS).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           DLog("Get document error \(error)")
           
@@ -352,12 +390,12 @@ extension ANINotiDetailViewController {
         guard let snapshot = snapshot else { return }
         
         for document in snapshot.documents {
-         database.collection(KEY_USERS).document(document.documentID).collection(loveIDsCollection).document(contributionId).delete()
-          database.collection(collection).document(contributionId).collection(KEY_LOVE_IDS).document(document.documentID).delete()
+         database.collection(KEY_USERS).document(document.documentID).collection(loveIDsCollection).document(noti.notiId).delete()
+          database.collection(collection).document(noti.notiId).collection(KEY_LOVE_IDS).document(document.documentID).delete()
         }
       })
       
-      database.collection(collection).document(contributionId).collection(KEY_COMMENTS).getDocuments(completion: { (snapshot, error) in
+      database.collection(collection).document(noti.notiId).collection(KEY_COMMENTS).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           DLog("Get document error \(error)")
           
@@ -367,7 +405,7 @@ extension ANINotiDetailViewController {
         guard let snapshot = snapshot else { return }
         
         for document in snapshot.documents {
-          database.collection(collection).document(contributionId).collection(KEY_COMMENTS).document(document.documentID).delete()
+          database.collection(collection).document(noti.notiId).collection(KEY_COMMENTS).document(document.documentID).delete()
         }
       })
     }
@@ -384,6 +422,44 @@ extension ANINotiDetailViewController {
     
     DispatchQueue.global().async {
       index?.deleteObject(withID: contributionId)
+    }
+  }
+  
+  private func deleteComment() {
+    guard let noti = self.noti,
+          let contributionKind = self.contributionKind,
+          let commentId = noti.commentId else { return }
+    
+    var collection = ""
+    if contributionKind == .storyComment {
+      collection = KEY_STORIES
+    } else {
+      collection = KEY_QNAS
+    }
+    
+    let database = Firestore.firestore()
+    
+    DispatchQueue.global().async {
+      database.collection(collection).document(noti.notiId).collection(KEY_COMMENTS).document(commentId).delete()
+
+      DispatchQueue.main.async {
+        self.navigationController?.popViewController(animated: true)
+      }
+    }
+    
+    DispatchQueue.global().async {
+      database.collection(collection).document(noti.notiId).collection(KEY_COMMENTS).document(commentId).collection(KEY_LOVE_IDS).getDocuments { (snapshot, error) in
+        if let error = error {
+          DLog("get documments error \(error)")
+          return
+        }
+        
+        guard let snapshot = snapshot else { return }
+        
+        for document in snapshot.documents {
+          database.collection(collection).document(noti.notiId).collection(KEY_COMMENTS).document(commentId).collection(KEY_LOVE_IDS).document(document.documentID).delete()
+        }
+      }
     }
   }
 }

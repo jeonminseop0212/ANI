@@ -108,7 +108,10 @@
 		CDAFD75B20DC9D0000AEDD83 /* ANIOptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDAFD75A20DC9D0000AEDD83 /* ANIOptionView.swift */; };
 		CDAFD75D20DC9EE800AEDD83 /* ANIOptionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDAFD75C20DC9EE800AEDD83 /* ANIOptionViewCell.swift */; };
 		CDAFD75F20DE1D1B00AEDD83 /* ANIRejectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDAFD75E20DE1D1B00AEDD83 /* ANIRejectView.swift */; };
+		CDB68F6421E8624C0032AEA8 /* ANIDeleteCommentCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDB68F6321E8624B0032AEA8 /* ANIDeleteCommentCell.swift */; };
+		CDB68F6621EDA2E40032AEA8 /* ANINotiParentCommentViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDB68F6521EDA2E40032AEA8 /* ANINotiParentCommentViewCell.swift */; };
 		CDBAB5ED21DDAD30007AADF9 /* ActiveLabel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CDBAB5EC21DDAD2F007AADF9 /* ActiveLabel.framework */; };
+		CDBAB5F121E57AE1007AADF9 /* ANIParentCommentCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDBAB5F021E57AE0007AADF9 /* ANIParentCommentCell.swift */; };
 		CDC6AE4120CF6E7900A836F6 /* ANIOtherProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDC6AE4020CF6E7900A836F6 /* ANIOtherProfileViewController.swift */; };
 		CDC6AE4420CF724700A836F6 /* ANIOtherProfileBasicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDC6AE4320CF724700A836F6 /* ANIOtherProfileBasicView.swift */; };
 		CDC6AE4820CF74C600A836F6 /* ANIOtherProfileCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDC6AE4720CF74C600A836F6 /* ANIOtherProfileCell.swift */; };
@@ -323,7 +326,10 @@
 		CDAFD75A20DC9D0000AEDD83 /* ANIOptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIOptionView.swift; sourceTree = "<group>"; };
 		CDAFD75C20DC9EE800AEDD83 /* ANIOptionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIOptionViewCell.swift; sourceTree = "<group>"; };
 		CDAFD75E20DE1D1B00AEDD83 /* ANIRejectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRejectView.swift; sourceTree = "<group>"; };
+		CDB68F6321E8624B0032AEA8 /* ANIDeleteCommentCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIDeleteCommentCell.swift; sourceTree = "<group>"; };
+		CDB68F6521EDA2E40032AEA8 /* ANINotiParentCommentViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotiParentCommentViewCell.swift; sourceTree = "<group>"; };
 		CDBAB5EC21DDAD2F007AADF9 /* ActiveLabel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ActiveLabel.framework; path = Carthage/Build/iOS/ActiveLabel.framework; sourceTree = "<group>"; };
+		CDBAB5F021E57AE0007AADF9 /* ANIParentCommentCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIParentCommentCell.swift; sourceTree = "<group>"; };
 		CDC6AE4020CF6E7900A836F6 /* ANIOtherProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIOtherProfileViewController.swift; sourceTree = "<group>"; };
 		CDC6AE4320CF724700A836F6 /* ANIOtherProfileBasicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIOtherProfileBasicView.swift; sourceTree = "<group>"; };
 		CDC6AE4720CF74C600A836F6 /* ANIOtherProfileCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIOtherProfileCell.swift; sourceTree = "<group>"; };
@@ -574,6 +580,8 @@
 				CD33BEE020F3212400D2A367 /* ANINotiDetailView.swift */,
 				CD516FBD2161ED82002FF41C /* ANINotiHeaderViewCell.swift */,
 				CD4F0EF620F481030093C543 /* ANINotiCommentViewCell.swift */,
+				CDB68F6521EDA2E40032AEA8 /* ANINotiParentCommentViewCell.swift */,
+				CDB68F6321E8624B0032AEA8 /* ANIDeleteCommentCell.swift */,
 			);
 			path = NotiDetail;
 			sourceTree = "<group>";
@@ -985,6 +993,7 @@
 				CDA97B5920B263B500F46DA4 /* ANICommentView.swift */,
 				CDDD04A520B26CD50094DBFA /* ANICommentContentCell.swift */,
 				CDDD04A720B271090094DBFA /* ANICommentCell.swift */,
+				CDBAB5F021E57AE0007AADF9 /* ANIParentCommentCell.swift */,
 			);
 			path = Comment;
 			sourceTree = "<group>";
@@ -1987,6 +1996,7 @@
 				CD0BFF1220C624EC00D5959B /* FirebaseRecruit.swift in Sources */,
 				CD9E52B520943C9500715F50 /* ANIRecruitDetailImagesViewFlowLayout.swift in Sources */,
 				F5C381FF207A068D000BBB8C /* ANIQnaView.swift in Sources */,
+				CDBAB5F121E57AE1007AADF9 /* ANIParentCommentCell.swift in Sources */,
 				CDF7F168208D772300254A0F /* ANINotificationManager.swift in Sources */,
 				CDA32A8320AE7B02008A2AC1 /* ANIImageBrowserViewController.swift in Sources */,
 				F5DF8367207A27E900EA7FBE /* ANIQnaViewCell.swift in Sources */,
@@ -2001,6 +2011,7 @@
 				F57F7D4F2081FC64008A2645 /* ANiNotiMenuBar.swift in Sources */,
 				F57F7D512081FC71008A2645 /* ANINotiMenuBarCell.swift in Sources */,
 				CDA32A3820AD1ED3008A2AC1 /* ANIContributionView.swift in Sources */,
+				CDB68F6421E8624C0032AEA8 /* ANIDeleteCommentCell.swift in Sources */,
 				CD492A0D21C8999800C5AF81 /* AVAssetTrack.swift in Sources */,
 				CDD0550E20A6B23B00BEF482 /* ANIImageFilterCell.swift in Sources */,
 				CD1A97BD219945570008EC98 /* ANIBlockUserViewController.swift in Sources */,
@@ -2044,6 +2055,7 @@
 				F57F7D572081FEBF008A2645 /* ANINotiMessageCell.swift in Sources */,
 				CDA97ACC20B000FF00F46DA4 /* ANIProfileEditFamilyView.swift in Sources */,
 				CDE2F41120E4660E005E1DE1 /* FirebaseChatMessage.swift in Sources */,
+				CDB68F6621EDA2E40032AEA8 /* ANINotiParentCommentViewCell.swift in Sources */,
 				CDC6AE4820CF74C600A836F6 /* ANIOtherProfileCell.swift in Sources */,
 				CDE2F3BF20E35CBF005E1DE1 /* ANIMyChatViewCell.swift in Sources */,
 				CD492A0121C72CAC00C5AF81 /* ANIVideoFilterViewController.swift in Sources */,

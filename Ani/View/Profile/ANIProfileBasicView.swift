@@ -33,6 +33,7 @@ enum ContentType: Int {
   case story;
   case qna;
   case user;
+  case comment;
 }
 
 class ANIProfileBasicView: UIView {
