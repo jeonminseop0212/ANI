@@ -575,7 +575,7 @@ public class PanGestureHelper: NSObject, UIGestureRecognizerDelegate {
     let p = gestureRecognizer.location(ofTouch: 0, in: v)
     // Desactivate pan on image when it is shown.
     if isImageShown {
-      if p.y < v.previewImageView.bounds.maxY {
+      if p.y < v.frame.width * Config.Grid.previewRatio {
         return false
       }
     }
