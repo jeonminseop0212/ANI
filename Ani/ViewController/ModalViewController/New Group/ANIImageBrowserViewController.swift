@@ -159,7 +159,6 @@ extension ANIImageBrowserViewController: UICollectionViewDataSource {
     let id = NSStringFromClass(ANIImageBrowserCell.self)
     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! ANIImageBrowserCell
     cell.draggableView?.imageView?.sd_setImage(with: URL(string: imageUrls[indexPath.item]), completed: nil)
-//    cell.draggableView?.imageView?.image = images[indexPath.item]
     cell.delegate = self
     return cell
   }
@@ -183,6 +182,7 @@ extension ANIImageBrowserViewController: UICollectionViewDelegate {
   }
 }
 
+//MARK: ANIImageBrowserCellDelegate
 extension ANIImageBrowserViewController: ANIImageBrowserCellDelegate {
   func viewBeginZooming() {
     hideNavigationBar()
