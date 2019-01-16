@@ -154,6 +154,7 @@ class VideosController: UIViewController {
     let view = GridView()
     view.bottomView.alpha = 0
     view.delegate = self
+    view.addReachEndObserver()
     
     return view
   }
