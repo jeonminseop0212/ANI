@@ -37,7 +37,7 @@ class ANIUploadProgressView: UIView {
     //stackView
     let stackView = UIStackView()
     stackView.axis = .horizontal
-    stackView.distribution = .equalSpacing
+    stackView.distribution = .fill
     stackView.spacing = 10
     addSubview(stackView)
     stackView.leftToSuperview(offset: 10.0)
@@ -54,8 +54,6 @@ class ANIUploadProgressView: UIView {
     stackView.addArrangedSubview(thumbnailImageView)
     thumbnailImageView.width(30.0)
     thumbnailImageView.height(30.0)
-    thumbnailImageView.leftToSuperview(offset: 10.0)
-    thumbnailImageView.centerYToSuperview()
     self.thumbnailImageView = thumbnailImageView
     
     //textLabel
@@ -65,8 +63,6 @@ class ANIUploadProgressView: UIView {
     textLabel.text = "投稿中です..."
     textLabel.alpha = 0.95
     stackView.addArrangedSubview(textLabel)
-    textLabel.leftToRight(of: thumbnailImageView, offset: 10.0)
-    textLabel.centerYToSuperview()
     self.textLabel = textLabel
     
     //progressView
