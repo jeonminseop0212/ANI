@@ -768,14 +768,13 @@ extension ANIContributionViewController {
     let screenVisibleVideoSize = CGSize(width: assetSize.width * minScale, height: assetSize.height * minScale)
     let zoomSize = CGSize(width: screenVisibleVideoSize.width * video.scale, height: screenVisibleVideoSize.height * video.scale)
     
+    let scale = assetSize.width / zoomSize.width
     if zoomSize.width > previewViewSize.width {
-      let scare = assetSize.width / zoomSize.width
-      assetSize.width = assetSize.width - ((zoomSize.width - previewViewSize.width) * scare)
+      assetSize.width = assetSize.width - ((zoomSize.width - previewViewSize.width) * scale)
     }
     
     if zoomSize.height > previewViewSize.height {
-      let scare = assetSize.height / zoomSize.height
-      assetSize.height = assetSize.height - ((zoomSize.height - previewViewSize.height) * scare)
+      assetSize.height = assetSize.height - ((zoomSize.height - previewViewSize.height) * scale)
     }
     
     assetSize.width = assetSize.width.rounded(.toNearestOrEven)
@@ -783,9 +782,6 @@ extension ANIContributionViewController {
     assetSize.height = assetSize.height.rounded(.toNearestOrEven)
     assetSize.height = (assetSize.height.truncatingRemainder(dividingBy: 2) == 0) ? assetSize.height : assetSize.height - 1
     
-    let visibleWidthScale = previewViewSize.width / assetSize.width * video.scale
-    let visibleHeightScale = previewViewSize.height / assetSize.height * video.scale
-    let scale = 1 / min(visibleWidthScale, visibleHeightScale)
     let visibleRect = CGRect(x: floor(video.offset.x * scale), y: floor(video.offset.y * scale), width: assetSize.width, height: assetSize.height)
     
     return visibleRect
