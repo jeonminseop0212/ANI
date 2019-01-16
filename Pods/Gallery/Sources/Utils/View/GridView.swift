@@ -488,6 +488,23 @@ class GridView: UIView {
       player.play()
     }
   }
+  
+  func addReachEndObserver() {
+    removeReachEndObserver()
+    NotificationCenter.default.addObserver(self, selector: #selector(playerItemDidReachEnd), name: .AVPlayerItemDidPlayToEndTime, object: nil)
+  }
+  
+  private func removeReachEndObserver() {
+    NotificationCenter.default.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: nil)
+  }
+  
+  @objc private func playerItemDidReachEnd() {
+    guard let player = self.player else { return }
+
+    player.actionAtItemEnd = .none
+    player.seek(to: CMTime.zero)
+    player.play()
+  }
 }
 
 enum DragDirection {
