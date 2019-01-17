@@ -154,18 +154,18 @@ class ANIListView: UIView {
           let list = self.list,
           let listTableView = self.listTableView else { return }
     
-    var indexPath: IndexPath = [0, 0]
-    
     if list == .loveRecruit {
       for (index, recruit) in loveRecruits.enumerated() {
         if recruit.id == id {
           loveRecruits.remove(at: index)
-          indexPath = [0, index]
           
-          if loveRecruits.isEmpty {
-            listTableView.reloadData()
-          } else {
+          if !loveRecruits.isEmpty {
+            listTableView.beginUpdates()
+            let indexPath: IndexPath = [0, index]
             listTableView.deleteRows(at: [indexPath], with: .automatic)
+            listTableView.endUpdates()
+          } else {
+            listTableView.reloadData()
           }
         }
       }
@@ -173,12 +173,14 @@ class ANIListView: UIView {
       for (index, recruit) in clipRecruits.enumerated() {
         if recruit.id == id {
           clipRecruits.remove(at: index)
-          indexPath = [0, index]
           
-          if clipRecruits.isEmpty {
-            listTableView.reloadData()
-          } else {
+          if !clipRecruits.isEmpty {
+            listTableView.beginUpdates()
+            let indexPath: IndexPath = [0, index]
             listTableView.deleteRows(at: [indexPath], with: .automatic)
+            listTableView.endUpdates()
+          } else {
+            listTableView.reloadData()
           }
         }
       }
@@ -189,17 +191,17 @@ class ANIListView: UIView {
     guard let id = notification.object as? String,
           let listTableView = self.listTableView else { return }
     
-    var indexPath: IndexPath = [0, 0]
-    
     for (index, loveStory) in loveStories.enumerated() {
       if loveStory.id == id {
         loveStories.remove(at: index)
-        indexPath = [0, index]
         
-        if loveStories.isEmpty {
-          listTableView.reloadData()
-        } else {
+        if !loveStories.isEmpty {
+          listTableView.beginUpdates()
+          let indexPath: IndexPath = [0, index]
           listTableView.deleteRows(at: [indexPath], with: .automatic)
+          listTableView.endUpdates()
+        } else {
+          listTableView.reloadData()
         }
       }
     }
@@ -209,17 +211,17 @@ class ANIListView: UIView {
     guard let id = notification.object as? String,
           let listTableView = self.listTableView else { return }
     
-    var indexPath: IndexPath = [0, 0]
-    
     for (index, loveQna) in loveQnas.enumerated() {
       if loveQna.id == id {
         loveQnas.remove(at: index)
-        indexPath = [0, index]
         
-        if loveQnas.isEmpty {
-          listTableView.reloadData()
-        } else {
+        if !loveQnas.isEmpty {
+          listTableView.beginUpdates()
+          let indexPath: IndexPath = [0, index]
           listTableView.deleteRows(at: [indexPath], with: .automatic)
+          listTableView.endUpdates()
+        } else {
+          listTableView.reloadData()
         }
       }
     }

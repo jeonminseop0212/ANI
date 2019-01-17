@@ -201,25 +201,26 @@ class ANIStoryView: UIView {
     guard let id = notification.object as? String,
           let storyTableView = self.storyTableView else { return }
     
-    var indexPath: IndexPath = [0, 0]
-    
     for (index, story) in stories.enumerated() {
       if story.id == id {
         stories.remove(at: index)
-        if rankingStories.isEmpty {
-          indexPath = [0, index]
+        
+        if !stories.isEmpty {
+          storyTableView.beginUpdates()
+          var indexPath: IndexPath = [0, 0]
+          if rankingStories.isEmpty {
+            indexPath = [0, index]
+          } else {
+            indexPath = [0, index + 1]
+          }
+          storyTableView.deleteRows(at: [indexPath], with: .automatic)
+          storyTableView.endUpdates()
         } else {
-          indexPath = [0, index + 1]
+          storyTableView.reloadData()
+          storyTableView.alpha = 0.0
+          showReloadView()
         }
       }
-    }
-    
-    if stories.isEmpty {
-      storyTableView.reloadData()
-      storyTableView.alpha = 0.0
-      showReloadView()
-    } else {
-      storyTableView.deleteRows(at: [indexPath], with: .automatic)
     }
   }
   

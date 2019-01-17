@@ -283,12 +283,14 @@ class ANIOtherProfileBasicView: UIView {
     for (index, recruit) in recruits.enumerated() {
       if recruit.id == id {
         recruits.remove(at: index)
-        indexPath = [1, index]
         
-        if recruits.isEmpty {
-          basicTableView.reloadData()
-        } else {
+        if !recruits.isEmpty {
+          basicTableView.beginUpdates()
+          let indexPath: IndexPath = [1, index]
           basicTableView.deleteRows(at: [indexPath], with: .automatic)
+          basicTableView.endUpdates()
+        } else {
+          basicTableView.reloadData()
         }
       }
     }
@@ -303,12 +305,14 @@ class ANIOtherProfileBasicView: UIView {
     for (index, story) in stories.enumerated() {
       if story.id == id {
         stories.remove(at: index)
-        indexPath = [1, index]
         
-        if stories.isEmpty {
-          basicTableView.reloadData()
-        } else {
+        if !stories.isEmpty {
+          basicTableView.beginUpdates()
+          let indexPath: IndexPath = [1, index]
           basicTableView.deleteRows(at: [indexPath], with: .automatic)
+          basicTableView.endUpdates()
+        } else {
+          basicTableView.reloadData()
         }
       }
     }
@@ -323,12 +327,14 @@ class ANIOtherProfileBasicView: UIView {
     for (index, qna) in qnas.enumerated() {
       if qna.id == id {
         qnas.remove(at: index)
-        indexPath = [1, index]
         
-        if qnas.isEmpty {
-          basicTableView.reloadData()
-        } else {
+        if !qnas.isEmpty {
+          basicTableView.beginUpdates()
+          let indexPath: IndexPath = [1, index]
           basicTableView.deleteRows(at: [indexPath], with: .automatic)
+          basicTableView.endUpdates()
+        } else {
+          basicTableView.reloadData()
         }
       }
     }

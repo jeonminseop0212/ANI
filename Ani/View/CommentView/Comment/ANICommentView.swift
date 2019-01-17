@@ -105,16 +105,15 @@ class ANICommentView: UIView {
     guard let id = notification.object as? String,
           let commentTableView = self.commentTableView else { return }
     
-    var indexPath: IndexPath = [0, 0]
-    
     for (index, comment) in comments.enumerated() {
       if comment.id == id {
+        commentTableView.beginUpdates()
         comments.remove(at: index)
-        indexPath = [0, index + 1]
+        let indexPath: IndexPath = [0, index + 1]
+        commentTableView.deleteRows(at: [indexPath], with: .automatic)
+        commentTableView.endUpdates()
       }
     }
-
-    commentTableView.deleteRows(at: [indexPath], with: .automatic)
   }
   
   private func isBlockComment(comment: FirebaseComment) -> Bool {

@@ -222,21 +222,21 @@ class ANIRecuruitView: UIView {
     guard let id = notification.object as? String,
           let recruitTableView = self.recruitTableView else { return }
 
-    var indexPath: IndexPath = [0, 0]
-
     for (index, recruit) in recruits.enumerated() {
       if recruit.id == id {
         recruits.remove(at: index)
-        indexPath = [0, index]
+        
+        if !recruits.isEmpty {
+          recruitTableView.beginUpdates()
+          let indexPath: IndexPath = [0, index]
+          recruitTableView.deleteRows(at: [indexPath], with: .automatic)
+          recruitTableView.endUpdates()
+        } else {
+          recruitTableView.reloadData()
+          recruitTableView.alpha = 0.0
+          showReloadView(sender: nil)
+        }
       }
-    }
-
-    if recruits.isEmpty {
-      recruitTableView.reloadData()
-      recruitTableView.alpha = 0.0
-      showReloadView(sender: nil)
-    } else {
-      recruitTableView.deleteRows(at: [indexPath], with: .automatic)
     }
   }
   
