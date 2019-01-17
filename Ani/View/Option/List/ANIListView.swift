@@ -799,6 +799,7 @@ extension ANIListView {
         guard let lastContent = snapshot.documents.last else {
           self.isLastPage = true
           self.isLoading = false
+          activityIndicatorView.stopAnimating()
           return
         }
         
@@ -986,6 +987,7 @@ extension ANIListView {
         guard let lastContent = snapshot.documents.last else {
           self.isLastPage = true
           self.isLoading = false
+          activityIndicatorView.stopAnimating()
           return
         }
         
@@ -1172,6 +1174,7 @@ extension ANIListView {
         guard let lastContent = snapshot.documents.last else {
           self.isLastPage = true
           self.isLoading = false
+          activityIndicatorView.stopAnimating()
           return
         }
         
@@ -1271,7 +1274,6 @@ extension ANIListView {
         var clipRecruitsTemp = [FirebaseRecruit?]()
         
         for (index, document) in snapshot.documents.enumerated() {
-          
           group.enter()
           clipRecruitsTemp.append(nil)
           
@@ -1359,6 +1361,7 @@ extension ANIListView {
         guard let lastContent = snapshot.documents.last else {
           self.isLastPage = true
           self.isLoading = false
+          activityIndicatorView.stopAnimating()
           return
         }
         
@@ -1415,7 +1418,7 @@ extension ANIListView {
             self.isLoading = false
             
             if self.clipRecruits.isEmpty {
-              self.loadClipRecruit()
+              self.loadMoreClipRecruit()
             } else {
               activityIndicatorView.stopAnimating()
               
