@@ -140,21 +140,21 @@ class ANIQnaView: UIView {
     guard let id = notification.object as? String,
           let qnaTableView = self.qnaTableView else { return }
     
-    var indexPath: IndexPath = [0, 0]
-    
     for (index, qna) in qnas.enumerated() {
       if qna.id == id {
         qnas.remove(at: index)
-        indexPath = [0, index]
+        
+        if !qnas.isEmpty {
+          qnaTableView.beginUpdates()
+          let indexPath: IndexPath = [0, index]
+          qnaTableView.deleteRows(at: [indexPath], with: .automatic)
+          qnaTableView.endUpdates()
+        } else {
+          qnaTableView.reloadData()
+          qnaTableView.alpha = 0.0
+          showReloadView(sender: nil)
+        }
       }
-    }
-    
-    if qnas.isEmpty {
-      qnaTableView.reloadData()
-      qnaTableView.alpha = 0.0
-      showReloadView(sender: nil)
-    } else {
-      qnaTableView.deleteRows(at: [indexPath], with: .automatic)
     }
   }
   

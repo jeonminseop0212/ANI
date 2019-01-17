@@ -150,17 +150,17 @@ class ANISearchView: UIView {
     guard let id = notification.object as? String,
           let tableView = self.tableView else { return }
     
-    var indexPath: IndexPath = [0, 0]
-    
     for (index, searchStory) in searchStories.enumerated() {
       if searchStory.id == id {
         searchStories.remove(at: index)
-        indexPath = [0, index]
         
-        if searchStories.isEmpty {
-          tableView.reloadData()
-        } else {
+        if !searchStories.isEmpty {
+          tableView.beginUpdates()
+          let indexPath: IndexPath = [0, index]
           tableView.deleteRows(at: [indexPath], with: .automatic)
+          tableView.endUpdates()
+        } else {
+          tableView.reloadData()
         }
       }
     }
@@ -170,17 +170,17 @@ class ANISearchView: UIView {
     guard let id = notification.object as? String,
           let tableView = self.tableView else { return }
     
-    var indexPath: IndexPath = [0, 0]
-    
     for (index, searchQna) in searchQnas.enumerated() {
       if searchQna.id == id {
         searchQnas.remove(at: index)
-        indexPath = [0, index]
-        
-        if searchQnas.isEmpty {
-          tableView.reloadData()
-        } else {
+
+        if !searchQnas.isEmpty {
+          tableView.beginUpdates()
+          let indexPath: IndexPath = [0, index]
           tableView.deleteRows(at: [indexPath], with: .automatic)
+          tableView.endUpdates()
+        } else {
+          tableView.reloadData()
         }
       }
     }
