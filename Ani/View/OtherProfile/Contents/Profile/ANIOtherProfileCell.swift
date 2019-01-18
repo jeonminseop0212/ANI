@@ -436,9 +436,14 @@ class ANIOtherProfileCell: UITableViewCell {
   
   @objc private func instagramTapped() {
     guard let user = user,
-      let instagramAccount = user.instagramAccount else { return }
+          let instagramAccount = user.instagramAccount else { return }
     
-    if let instagramUrl = URL(string: "instagram://user?screen_name=" + instagramAccount),
+    var instagramUserName = instagramAccount
+    if instagramAccount.prefix(1) == "@" || instagramAccount.prefix(1) == "＠" {
+      instagramUserName = String(instagramAccount.dropFirst())
+    }
+    
+    if let instagramUrl = URL(string: "instagram://user?username=" + instagramUserName),
       UIApplication.shared.canOpenURL(instagramUrl) {
       UIApplication.shared.open(instagramUrl, options: [:], completionHandler: nil)
     } else {
