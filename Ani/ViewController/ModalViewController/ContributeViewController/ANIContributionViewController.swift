@@ -435,8 +435,6 @@ class ANIContributionViewController: UIViewController {
           return
         }
         
-        self.pushDataAlgolia(data: data as [String : AnyObject])
-        
         self.delegate?.updateProgress(progress: 1.0)
       }
     } catch let error {
