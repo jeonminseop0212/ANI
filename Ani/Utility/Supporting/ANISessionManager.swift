@@ -49,6 +49,8 @@ class ANISessionManager: NSObject {
   
   var isLaunchNoti: Bool = false
   
+  var showReviewConditions: [String: Int]?
+  
   #if DEBUG
   let client = Client(appID: "RBJYX5VF88", apiKey: "ebf262fa4367637cd49431402d70455c")
   #else

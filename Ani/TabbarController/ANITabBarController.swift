@@ -222,15 +222,20 @@ class ANITabBarController: UITabBarController {
         }, completion: { (complete) in
           activityIndicatorView.stopAnimating()
 
-          UNUserNotificationCenter.current().getNotificationSettings { (settings) in
-            if settings.authorizationStatus != .authorized {
-              let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
-              UNUserNotificationCenter.current().requestAuthorization(options: authOptions) { _, _ in
-                DLog("push permission finished")
-              }
-            }
-          }
+          self.setPushNotification()
+          ANIFunction.shared.showReviewAlertOpenApp()
         })
+      }
+    }
+  }
+  
+  private func setPushNotification() {
+    UNUserNotificationCenter.current().getNotificationSettings { (settings) in
+      if settings.authorizationStatus != .authorized {
+        let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
+        UNUserNotificationCenter.current().requestAuthorization(options: authOptions) { _, _ in
+          DLog("push permission finished")
+        }
       }
     }
   }

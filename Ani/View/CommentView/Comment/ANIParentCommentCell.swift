@@ -525,6 +525,7 @@ class ANIParentCommentCell: UITableViewCell {
       }
       
       self.updateNoti()
+      ANIFunction.shared.showReviewAlertLove()
       
       self.delegate?.loadedCommentIsLoved(indexPath: indexPath, isLoved: true)
     } else {

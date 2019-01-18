@@ -648,7 +648,9 @@ extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
         self.view.endEditing(true)
         
         if recruitContributionMode == .new {
-          self.dismiss(animated: true, completion: nil)
+          self.dismiss(animated: true) {
+            ANIFunction.shared.showReviewAlertContribution()
+          }
         }
       } else {
         rejectViewBottomConstraint.constant = UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT

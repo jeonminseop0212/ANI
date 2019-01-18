@@ -429,6 +429,7 @@ class ANIQnaViewCell: UITableViewCell {
         database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_QNA_IDS).document(qnaId).setData([KEY_DATE: date])
         
         self.updateNoti()
+        ANIFunction.shared.showReviewAlertLove()
         
         self.delegate?.loadedQnaIsLoved(indexPath: indexPath, isLoved: true)
       }

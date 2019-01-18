@@ -69,4 +69,37 @@ class ANIFirebaseRemoteConfigManager: ANIFirebase {
       }
     }
   }
+  
+  func getShowReivewConditions(completion: (([String: Int]?, Error?)->())? = nil) {
+    dispatchGroup.notify(queue: .main) {
+      let DEF_CONDITIONS = [KEY_REVIEW_LOVE: 2, KEY_REVIEW_OPEN_APP: 9, KEY_REVIEW_COMMENT: 1, KEY_REVIEW_CONTRIBUTION: 1, KEY_REVIEW_FOLLOW: 2]
+      
+      guard let config = self.config else{
+        completion?(DEF_CONDITIONS, NSError.init(domain: "config is nill", code: -1, userInfo: nil))
+        return
+      }
+      
+      if let remoteConfigText = config[KEY_SHOW_REVIEW_CONDITIONS].stringValue, remoteConfigText.count == 0 {
+        completion?(DEF_CONDITIONS, nil)
+      } else {
+        guard let conditionsJson = config[KEY_SHOW_REVIEW_CONDITIONS].stringValue else {
+          completion?(DEF_CONDITIONS, NSError.init(domain: "config string value is nill", code: -1, userInfo: nil))
+          return
+        }
+        
+        do {
+          guard let data = conditionsJson.data(using: .utf8) else {
+            completion?(DEF_CONDITIONS, NSError.init(domain: "json data error", code: -1, userInfo: nil))
+            return
+          }
+          
+          let conditions = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Int]
+          
+          completion?(conditions, nil)
+        } catch {
+          completion?(DEF_CONDITIONS, NSError.init(domain: "jeon casting fail", code: -1, userInfo: nil))
+        }
+      }
+    }
+  }
 }

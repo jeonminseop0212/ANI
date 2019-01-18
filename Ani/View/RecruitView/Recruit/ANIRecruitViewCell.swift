@@ -641,6 +641,7 @@ class ANIRecruitViewCell: UITableViewCell {
         }
 
         self.updateNoti()
+        ANIFunction.shared.showReviewAlertLove()
         
         self.delegate?.loadedRecruitIsLoved(indexPath: indexPath, isLoved: true)
       }
