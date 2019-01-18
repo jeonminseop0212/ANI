@@ -646,10 +646,10 @@ class ANISupportViewCell: UITableViewCell {
   //MARK: action
   @objc private func love() {
     guard let story = self.story,
-      let storyId = story.id,
-      let currentUserId = ANISessionManager.shared.currentUserUid,
-      let loveButton = self.loveButton,
-      let indexPath = self.indexPath else { return }
+          let storyId = story.id,
+          let currentUserId = ANISessionManager.shared.currentUserUid,
+          let loveButton = self.loveButton,
+          let indexPath = self.indexPath else { return }
     
     let database = Firestore.firestore()
     
@@ -665,6 +665,7 @@ class ANISupportViewCell: UITableViewCell {
       }
         
       self.updateNoti()
+      ANIFunction.shared.showReviewAlertLove()
       
       self.delegate?.loadedStoryIsLoved(indexPath: indexPath, isLoved: true)
     } else {

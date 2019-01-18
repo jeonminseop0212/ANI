@@ -509,6 +509,7 @@ class ANINotiParentCommentViewCell: UITableViewCell {
       }
       
       self.updateNoti()
+      ANIFunction.shared.showReviewAlertLove()
       
       self.delegate?.loadedCommentIsLoved(isLoved: true)
     } else {

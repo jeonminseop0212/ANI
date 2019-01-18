@@ -328,6 +328,8 @@ class ANICommentBar: UIView {
             self.updateNoti(commentId: id, comment: comment.comment)
           }
         }
+        
+        ANIFunction.shared.showReviewAlertComment()
       }
     } catch let error {
       DLog(error)

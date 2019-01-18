@@ -559,17 +559,15 @@ class ANIContributionViewController: UIViewController {
     case .story:
       if !contentImages.isEmpty {
         uploadImageStory()
-        
-        self.dismiss(animated: true, completion: nil)
       } else {
         uploadVideoStory()
-        
-        self.dismiss(animated: true, completion: nil)
       }
     case .qna:
       uploadQna()
-      
-      self.dismiss(animated: true, completion: nil)
+    }
+    
+    self.dismiss(animated: true) {
+      ANIFunction.shared.showReviewAlertContribution()
     }
   }
 }

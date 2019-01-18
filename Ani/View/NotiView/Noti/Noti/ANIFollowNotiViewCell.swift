@@ -271,6 +271,7 @@ extension ANIFollowNotiViewCell: ANIButtonViewDelegate {
           database.collection(KEY_USERS).document(userId).collection(KEY_FOLLOWER_IDS).document(currentUserUid).setData([KEY_DATE: date])
           
           self.updateNoti()
+          ANIFunction.shared.showReviewAlertFollow()
         }
         
         followButton.base?.backgroundColor = .clear

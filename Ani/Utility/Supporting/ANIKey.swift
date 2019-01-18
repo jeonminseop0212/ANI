@@ -117,4 +117,17 @@ let KEY_REPORT = "report"
 
 //remote congif
 let KEY_SIREN_ALERT_TYPE = "sirenAlertType"
+let KEY_SHOW_REVIEW_CONDITIONS = "showReviewConditions"
+
+//review
+let KEY_REVIEW_LOVE = "love"
+let KEY_REVIEW_LOVE_MULTIPLY = "reviewLoveMultiply"
+let KEY_REVIEW_OPEN_APP = "openApp"
+let KEY_REVIEW_OPEN_APP_MULTIPLY = "reviewOppenAppMultiply"
+let KEY_REVIEW_COMMENT = "comment"
+let KEY_REVIEW_COMMENT_MULTIPLY = "reviewCommentMultiply"
+let KEY_REVIEW_CONTRIBUTION = "contribution"
+let KEY_REVIEW_CONTRIBUTION_MULTIPLY = "reviewContributionMultiply"
+let KEY_REVIEW_FOLLOW = "follow"
+let KEY_REVIEW_FOLLOW_MULTIPLY = "reviewFollowMultiply"
 

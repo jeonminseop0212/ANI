@@ -440,6 +440,7 @@ class ANIVideoStoryViewCell: UITableViewCell {
       }
       
       self.updateNoti()
+      ANIFunction.shared.showReviewAlertLove()
       
       self.delegate?.loadedStoryIsLoved(indexPath: indexPath, isLoved: true)
     } else {

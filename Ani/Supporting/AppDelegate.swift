@@ -54,6 +54,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                                skipVersionButtonMessage: NSAttributedString(string: "このバージョンをスキップ"))
     siren.countryCode = "jp"
     siren.delegate = self
+    
+    ANIFirebaseRemoteConfigManager.shared.getShowReivewConditions { (conditions, error) in
+      if error == nil, let conditions = conditions {
+        ANISessionManager.shared.showReviewConditions = conditions
+      }
+    }
 
     ANIFirebaseRemoteConfigManager.shared.getSirenAlertType { (type, error) in
       if error == nil, let type = type {

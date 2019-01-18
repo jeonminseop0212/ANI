@@ -9,6 +9,7 @@
 import UIKit
 import FirebaseFirestore
 import CodableFirebase
+import StoreKit
 
 protocol ANIStoryViewCellDelegate {
   func storyCellTapped(story: FirebaseStory, user: FirebaseUser)
@@ -423,6 +424,7 @@ class ANIStoryViewCell: UITableViewCell {
       }
         
       self.updateNoti()
+      ANIFunction.shared.showReviewAlertLove()
       
       self.delegate?.loadedStoryIsLoved(indexPath: indexPath, isLoved: true)
     } else {
