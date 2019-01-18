@@ -30,8 +30,6 @@ class ANISearchViewController: UIViewController {
 
       if selectedIndex == 0 {
         searchView.selectedCategory = .user
-      } else if selectedIndex == 1 {
-        searchView.selectedCategory = .story
       } else {
         searchView.selectedCategory = .qna
       }

@@ -128,23 +128,6 @@ class ANISupportView: UIView {
       }
     }
   }
-  
-  private func pushDataAlgolia(data: [String: AnyObject]) {
-    let index = ANISessionManager.shared.client.index(withName: KEY_STORIES_INDEX)
-    
-    var newData = data
-    if let objectId = data[KEY_ID] {
-      newData.updateValue(objectId, forKey: KEY_OBJECT_ID)
-    }
-    
-    DispatchQueue.global().async {
-      index.addObject(newData, completionHandler: { (content, error) -> Void in
-        if error == nil {
-          DLog("Object IDs: \(content!)")
-        }
-      })
-    }
-  }
 }
 
 //MARK: ANIButtonViewDelegate
@@ -170,8 +153,6 @@ extension ANISupportView: ANIButtonViewDelegate {
               DLog("Error set document: \(error)")
               return
             }
-            
-            self.pushDataAlgolia(data: data as [String : AnyObject])
           }
         } catch let error {
           DLog(error)
