@@ -216,7 +216,7 @@ class ANITabBarController: UITabBarController {
           let activityIndicatorView = splashView.activityIndicatorView else { return }
     
     DispatchQueue.main.async {
-      if ANISessionManager.shared.isLoadedFirstData && ANISessionManager.shared.isCheckedVersion && splashView.alpha != 0.0 && activityIndicatorView.isAnimatedOneCycle {
+      if ANISessionManager.shared.isLoadedFirstData && splashView.alpha != 0.0 && activityIndicatorView.isAnimatedOneCycle {
         UIView.animate(withDuration: 0.2, delay: 0.2, animations: {
           splashView.alpha = 0.0
         }, completion: { (complete) in
