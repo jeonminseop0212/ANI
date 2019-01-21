@@ -821,8 +821,9 @@ extension ANIStoryView {
                     })
 
                     ANISessionManager.shared.isLoadedFirstData = true
-                    ANINotificationManager.postDismissSplash()
                   }
+                  
+                  ANINotificationManager.postDismissSplash()
                 }
               }
             }

@@ -10,6 +10,7 @@ import UIKit
 import FirebaseAuth
 import FirebaseFirestore
 import CodableFirebase
+import TinyConstraints
 
 class ANIOptionViewController: UIViewController {
   
@@ -19,6 +20,15 @@ class ANIOptionViewController: UIViewController {
   private weak var backButton: UIButton?
   
   private weak var optionView: ANIOptionView?
+  
+  private var rejectViewBottomConstraint: Constraint?
+  private var rejectViewBottomConstraintOriginalConstant: CGFloat?
+  private weak var rejectView: UIView?
+  private weak var rejectBaseView: UIView?
+  private weak var rejectLabel: UILabel?
+  private var isRejectAnimating: Bool = false
+  
+  private weak var activityIndicatorView: ANIActivityIndicator?
   
   override func viewDidLoad() {
     setup()
@@ -74,6 +84,66 @@ class ANIOptionViewController: UIViewController {
     optionView.topToBottom(of: myNavigationBase)
     optionView.edgesToSuperview(excluding: .top)
     self.optionView = optionView
+    
+    //rejectView
+    let rejectView = UIView()
+    rejectView.backgroundColor = ANIColor.emerald
+    self.view.addSubview(rejectView)
+    rejectViewBottomConstraint = rejectView.bottomToTop(of: self.view)
+    rejectViewBottomConstraintOriginalConstant = rejectViewBottomConstraint?.constant
+    rejectView.leftToSuperview()
+    rejectView.rightToSuperview()
+    rejectView.height(UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT)
+    self.rejectView = rejectView
+    
+    //rejectBaseView
+    let rejectBaseView = UIView()
+    rejectBaseView.backgroundColor = ANIColor.emerald
+    rejectView.addSubview(rejectBaseView)
+    rejectBaseView.edgesToSuperview(excluding: .top)
+    rejectBaseView.height(UIViewController.NAVIGATION_BAR_HEIGHT)
+    self.rejectBaseView = rejectBaseView
+    
+    //rejectLabel
+    let rejectLabel = UILabel()
+    rejectLabel.textAlignment = .center
+    rejectLabel.textColor = .white
+    rejectLabel.font = UIFont.boldSystemFont(ofSize: 16.0)
+    rejectLabel.textAlignment = .center
+    rejectBaseView.addSubview(rejectLabel)
+    rejectLabel.edgesToSuperview()
+    self.rejectLabel = rejectLabel
+    
+    //activityIndicatorView
+    let activityIndicatorView = ANIActivityIndicator()
+    activityIndicatorView.isFull = true
+    self.view.addSubview(activityIndicatorView)
+    activityIndicatorView.edgesToSuperview()
+    self.activityIndicatorView = activityIndicatorView
+  }
+  
+  private func reject(notiText: String) {
+    guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
+          let rejectLabel = self.rejectLabel,
+          !isRejectAnimating else { return }
+    
+    rejectLabel.text = notiText
+    
+    rejectViewBottomConstraint.constant = UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut, animations: {
+      self.isRejectAnimating = true
+      self.view.layoutIfNeeded()
+    }) { (complete) in
+      guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
+        let rejectViewBottomConstraintOriginalConstant = self.rejectViewBottomConstraintOriginalConstant else { return }
+      
+      rejectViewBottomConstraint.constant = rejectViewBottomConstraintOriginalConstant
+      UIView.animate(withDuration: 0.3, delay: 1.0, options: .curveEaseInOut, animations: {
+        self.view.layoutIfNeeded()
+      }, completion: { (complete) in
+        self.isRejectAnimating = false
+      })
+    }
   }
   
   //MARK: action
@@ -88,6 +158,33 @@ extension ANIOptionViewController: ANIOptionViewDelegate {
     let listViewController = ANIListViewController()
     listViewController.list = list
     self.navigationController?.pushViewController(listViewController, animated: true)
+  }
+  
+  func linkTwitterTapped() {
+    guard let activityIndicatorView = self.activityIndicatorView else { return }
+    
+    let alertController = UIAlertController(title: "Twitter連携", message: "アカウントをTwitterと連携しますか？\nTwitterアカウントで再ログインできます。", preferredStyle: .alert)
+    
+    let logoutAction = UIAlertAction(title: "連携", style: .default) { (action) in
+      activityIndicatorView.startAnimating()
+
+      ANITwitter.login(isLink: true, completion: { (success, errorMessage) in
+        if !success, let errorMessage = errorMessage {
+          self.reject(notiText: errorMessage)
+          activityIndicatorView.stopAnimating()
+          return
+        }
+
+        activityIndicatorView.stopAnimating()
+        self.reject(notiText: "Twitterと連携できました。")
+      })
+    }
+    let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
+    
+    alertController.addAction(logoutAction)
+    alertController.addAction(cancelAction)
+    
+    self.present(alertController, animated: true, completion: nil)
   }
   
   func logoutTapped() {

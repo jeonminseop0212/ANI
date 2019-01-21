@@ -22,4 +22,5 @@ struct FirebaseUser: Codable {
   var fcmToken: String?
   var twitterAccount: String?
   var instagramAccount: String?
+  var isTwitterLink: Bool?
 }

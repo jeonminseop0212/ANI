@@ -256,6 +256,19 @@ class ANITabBarController: UITabBarController {
 //MARK: data
 extension ANITabBarController {
   func loadUser(completion:(()->())? = nil) {
+    var isAuthenticated = false
+    if let currentUser = Auth.auth().currentUser, currentUser.providerData.count == 1 {
+      for userInfo in currentUser.providerData {
+        if userInfo.providerID == "password" {
+          isAuthenticated = currentUser.isEmailVerified
+        } else {
+          isAuthenticated = true
+        }
+      }
+    } else {
+      isAuthenticated = true
+    }
+    
     let userDefaults = UserDefaults.standard
     
     if let userListener = self.userListener {
@@ -274,42 +287,16 @@ extension ANITabBarController {
       ANISessionManager.shared.blockingUserIds?.removeAll()
     }
     
-    if let currentUser = Auth.auth().currentUser {
-      if !currentUser.isEmailVerified {
-        do {
-          try Auth.auth().signOut()
-          
-          ANISessionManager.shared.currentUser = nil
-          ANISessionManager.shared.currentUserUid = nil
-          ANISessionManager.shared.isAnonymous = true
-          ANISessionManager.shared.blockUserIds = nil
-          ANISessionManager.shared.blockingUserIds = nil
-          
-          ANINotificationManager.postLogout()
-          
-        } catch let signOutError as NSError {
-          DLog("signOutError \(signOutError)")
-        }
+    if Auth.auth().currentUser != nil {
+      if !isAuthenticated {
+        signOut()
       }
     } else if userDefaults.bool(forKey: KEY_FIRST_LAUNCH) {
-      do {
-        try Auth.auth().signOut()
-        
-        ANISessionManager.shared.currentUser = nil
-        ANISessionManager.shared.currentUserUid = nil
-        ANISessionManager.shared.isAnonymous = true
-        ANISessionManager.shared.blockUserIds = nil
-        ANISessionManager.shared.blockingUserIds = nil
-        
-        ANINotificationManager.postLogout()
-        
-        ifNeedsShowInitialView()
-      } catch let signOutError as NSError {
-        DLog("signOutError \(signOutError)")
-      }
+      signOut()
+      ifNeedsShowInitialView()
     }
 
-    if let currentUser = Auth.auth().currentUser, currentUser.isEmailVerified {
+    if let currentUser = Auth.auth().currentUser, isAuthenticated {
       ANISessionManager.shared.currentUserUid = currentUser.uid
       guard let currentUserUid = ANISessionManager.shared.currentUserUid else { return }
       
@@ -321,7 +308,10 @@ extension ANITabBarController {
       }
       DispatchQueue(label: "user").async {
         self.userListener = database.collection(KEY_USERS).document(currentUserUid).addSnapshotListener({ (snapshot, error) in
-          guard let snapshot = snapshot, let data = snapshot.data() else { return }
+          guard let snapshot = snapshot, let data = snapshot.data() else {
+            self.signOut()
+            return
+          }
           
           do {
             let user = try FirestoreDecoder().decode(FirebaseUser.self, from: data)
@@ -444,21 +434,24 @@ extension ANITabBarController {
         }
       }
     } else {
-      do {
-        try Auth.auth().signOut()
-        
-        ANISessionManager.shared.currentUser = nil
-        ANISessionManager.shared.currentUserUid = nil
-        ANISessionManager.shared.isAnonymous = true
-        ANISessionManager.shared.blockUserIds = nil
-        ANISessionManager.shared.blockingUserIds = nil
-        
-        ANINotificationManager.postLogout()
-        isLoadedFirstData = true
-        
-      } catch let signOutError as NSError {
-        DLog("signOutError \(signOutError)")
-      }
+      signOut()
+      isLoadedFirstData = true
+    }
+  }
+  
+  private func signOut() {
+    do {
+      try Auth.auth().signOut()
+      
+      ANISessionManager.shared.currentUser = nil
+      ANISessionManager.shared.currentUserUid = nil
+      ANISessionManager.shared.isAnonymous = true
+      ANISessionManager.shared.blockUserIds = nil
+      ANISessionManager.shared.blockingUserIds = nil
+      
+      ANINotificationManager.postLogout()
+    } catch let signOutError as NSError {
+      DLog("signOutError \(signOutError)")
     }
   }
   
