@@ -494,7 +494,7 @@ extension ANIProfileBasicView: UITableViewDelegate {
         cell.unobserveLove()
         cell.unobserveSupport()
     } else if contentType == .story {
-      if !stories.isEmpty {
+      if !stories.isEmpty && stories.count > indexPath.row {
         if stories[indexPath.row].recruitId != nil, let cell = cell as? ANISupportViewCell {
           cell.unobserveLove()
           cell.unobserveComment()

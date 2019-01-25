@@ -10,6 +10,7 @@ import UIKit
 import FirebaseFirestore
 import CodableFirebase
 import AVKit
+import UserNotifications
 
 protocol ANIStoryViewDelegate {
   func didSelectStoryViewCell(selectedStory: FirebaseStory, user: FirebaseUser)
@@ -256,6 +257,19 @@ class ANIStoryView: UIView {
     
     return false
   }
+  
+  private func setPushNotification() {
+    if ANISessionManager.shared.currentUser != nil {
+      UNUserNotificationCenter.current().getNotificationSettings { (settings) in
+        if settings.authorizationStatus != .authorized {
+          let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
+          UNUserNotificationCenter.current().requestAuthorization(options: authOptions) { _, _ in
+            DLog("push permission finished")
+          }
+        }
+      }
+    }
+  }
 }
 
 //MARK: UITableViewDataSource
@@ -455,7 +469,7 @@ extension ANIStoryView: UITableViewDataSource {
 extension ANIStoryView: UITableViewDelegate {
   func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
     if rankingStories.isEmpty {
-      if !stories.isEmpty {
+      if !stories.isEmpty && stories.count > indexPath.row {
         if stories[indexPath.row].recruitId != nil, let cell = cell as? ANISupportViewCell {
           cell.unobserveLove()
           cell.unobserveComment()
@@ -470,7 +484,7 @@ extension ANIStoryView: UITableViewDelegate {
         }
       }
     } else {
-      if indexPath.row != 0, !stories.isEmpty {
+      if indexPath.row != 0, !stories.isEmpty && stories.count > indexPath.row - 1 {
         if stories[indexPath.row - 1].recruitId != nil, let cell = cell as? ANISupportViewCell {
           cell.unobserveLove()
           cell.unobserveComment()
@@ -752,6 +766,8 @@ extension ANIStoryView {
               
               ANINotificationManager.postDismissSplash()
             }
+            
+            self.setPushNotification()
           }
         } else {
           self.showReloadView()
