@@ -18,6 +18,7 @@ protocol ANIInitialViewDelegate {
   func startAnimaing()
   func stopAnimating()
   func successTwitterLogin()
+  func googleLoginButtonTapped()
 }
 
 class ANIInitialView: UIView {
@@ -28,7 +29,7 @@ class ANIInitialView: UIView {
   private weak var subTitleLabel: UILabel?
   
   private weak var buttonStackView: UIStackView?
-  private let LOGIN_BUTTON_HEIGHT: CGFloat = 45.0
+  private let LOGIN_BUTTON_HEIGHT: CGFloat = 40.0
   private weak var loginButton: ANIAreaButtonView?
   private weak var loginButtonLabel: UILabel?
   private weak var signUpButton: ANIAreaButtonView?
@@ -38,10 +39,13 @@ class ANIInitialView: UIView {
   private weak var otherLoginLabel: UILabel?
   private weak var otherLoginRightLineView: UIView?
   
-  private weak var otherLoginButtonStackView: UIStackView?
   private weak var twitterLoginButton: ANIAreaButtonView?
   private weak var twitterImageView: UIImageView?
   private weak var twitterLoginLabel: UILabel?
+  
+  private weak var googleLoginButton: ANIAreaButtonView?
+  private weak var googleImageView: UIImageView?
+  private weak var googleLoginLabel: UILabel?
   
   private weak var anonymousLabel: UILabel?
   
@@ -130,24 +134,49 @@ class ANIInitialView: UIView {
     anonymousLabel.centerXToSuperview()
     self.anonymousLabel = anonymousLabel
     
-    //otherLoginButtonStackView
-    let otherLoginButtonStackView = UIStackView()
-    otherLoginButtonStackView.axis = .horizontal
-    otherLoginButtonStackView.alignment = .center
-    otherLoginButtonStackView.distribution = .fillEqually
-    otherLoginButtonStackView.spacing = 10.0
-    addSubview(otherLoginButtonStackView)
-    otherLoginButtonStackView.bottomToTop(of: anonymousLabel, offset: -12.0)
-    otherLoginButtonStackView.leftToSuperview(offset: 40.0)
-    otherLoginButtonStackView.rightToSuperview(offset: -40.0)
-    self.otherLoginButtonStackView = otherLoginButtonStackView
+    //gooleLoginButton
+    let googleLoginButton = ANIAreaButtonView()
+    googleLoginButton.base?.layer.cornerRadius = LOGIN_BUTTON_HEIGHT / 2
+    googleLoginButton.base?.backgroundColor = ANIColor.pink
+    googleLoginButton.delegate = self
+    addSubview(googleLoginButton)
+    googleLoginButton.bottomToTop(of: anonymousLabel, offset: -12.0)
+    googleLoginButton.leftToSuperview(offset: 40.0)
+    googleLoginButton.rightToSuperview(offset: -40.0)
+    googleLoginButton.height(LOGIN_BUTTON_HEIGHT)
+    self.googleLoginButton = googleLoginButton
+    
+    //googleLoginLabel
+    let googleLoginLabel = UILabel()
+    googleLoginLabel.textColor = .white
+    googleLoginLabel.textAlignment = .center
+    googleLoginLabel.text = "Google"
+    googleLoginLabel.font = UIFont.boldSystemFont(ofSize: 16.0)
+    googleLoginButton.addContent(googleLoginLabel)
+    googleLoginLabel.centerXToSuperview(offset: 14.0)
+    googleLoginLabel.centerYToSuperview()
+    self.googleLoginLabel = googleLoginLabel
+    
+    //googleImageView
+    let googleImageView = UIImageView()
+    googleImageView.image = UIImage(named: "google")
+    googleImageView.contentMode = .scaleAspectFit
+    googleLoginButton.addContent(googleImageView)
+    googleImageView.width(25.0)
+    googleImageView.height(20.0)
+    googleImageView.rightToLeft(of: googleLoginLabel, offset: -5.0)
+    googleImageView.centerYToSuperview()
+    self.googleImageView = googleImageView
     
     //twitterLoginButton
     let twitterLoginButton = ANIAreaButtonView()
     twitterLoginButton.base?.layer.cornerRadius = LOGIN_BUTTON_HEIGHT / 2
     twitterLoginButton.base?.backgroundColor = ANIColor.lightBlue
     twitterLoginButton.delegate = self
-    otherLoginButtonStackView.addArrangedSubview(twitterLoginButton)
+    addSubview(twitterLoginButton)
+    twitterLoginButton.bottomToTop(of: googleLoginButton, offset: -10.0)
+    twitterLoginButton.leftToSuperview(offset: 40.0)
+    twitterLoginButton.rightToSuperview(offset: -40.0)
     twitterLoginButton.height(LOGIN_BUTTON_HEIGHT)
     self.twitterLoginButton = twitterLoginButton
     
@@ -158,7 +187,7 @@ class ANIInitialView: UIView {
     twitterLoginLabel.text = "Twitter"
     twitterLoginLabel.font = UIFont.boldSystemFont(ofSize: 16.0)
     twitterLoginButton.addContent(twitterLoginLabel)
-    twitterLoginLabel.centerXToSuperview()
+    twitterLoginLabel.centerXToSuperview(offset: 10.0)
     twitterLoginLabel.centerYToSuperview()
     self.twitterLoginLabel = twitterLoginLabel
     
@@ -180,7 +209,7 @@ class ANIInitialView: UIView {
     otherLoginLabel.textColor = ANIColor.darkGray
     addSubview(otherLoginLabel)
     otherLoginLabel.centerXToSuperview()
-    otherLoginLabel.bottomToTop(of: otherLoginButtonStackView, offset: -5.0)
+    otherLoginLabel.bottomToTop(of: twitterLoginButton, offset: -5.0)
     self.otherLoginLabel = otherLoginLabel
     
     //otherLoginLeftLineView
@@ -318,6 +347,9 @@ extension ANIInitialView: ANIButtonViewDelegate {
           self.delegate?.stopAnimating()
         }
       }
+    }
+    if view === googleLoginButton {
+      self.delegate?.googleLoginButtonTapped()
     }
   }
 }

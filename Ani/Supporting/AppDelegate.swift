@@ -12,6 +12,7 @@ import FirebaseMessaging
 import UserNotifications
 import Siren
 import TwitterKit
+import GoogleSignIn
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -126,10 +127,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
   
   func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-    if TWTRTwitter.sharedInstance().application(app, open: url, options: options) {
-      return true
-    }
-    return true
+    let twitter =  TWTRTwitter.sharedInstance().application(app, open: url, options: options)
+    let google = GIDSignIn.sharedInstance().handle(url, sourceApplication:options[UIApplication.OpenURLOptionsKey.sourceApplication] as? String, annotation: [:])
+    
+    return twitter || google
   }
   
   private func playTopViewControllerVideo() {
