@@ -14,6 +14,10 @@ protocol ANIInitialViewDelegate {
   func startAnonymous()
   func showTerms()
   func showPrivacyPolicy()
+  func reject(notiText: String)
+  func startAnimaing()
+  func stopAnimating()
+  func successTwitterLogin()
 }
 
 class ANIInitialView: UIView {
@@ -29,6 +33,16 @@ class ANIInitialView: UIView {
   private weak var loginButtonLabel: UILabel?
   private weak var signUpButton: ANIAreaButtonView?
   private weak var signUpButtonLabel: UILabel?
+  
+  private weak var otherLoginLeftLineView: UIView?
+  private weak var otherLoginLabel: UILabel?
+  private weak var otherLoginRightLineView: UIView?
+  
+  private weak var otherLoginButtonStackView: UIStackView?
+  private weak var twitterLoginButton: ANIAreaButtonView?
+  private weak var twitterImageView: UIImageView?
+  private weak var twitterLoginLabel: UILabel?
+  
   private weak var anonymousLabel: UILabel?
   
   private weak var bottomStackView: UIStackView?
@@ -36,6 +50,8 @@ class ANIInitialView: UIView {
   private let dotViewHeight: CGFloat = 2.0
   private weak var dotView: UIView?
   private weak var privacyPolicyLabel: UILabel?
+  
+  var myTabBarController: ANITabBarController?
   
   var delegate: ANIInitialViewDelegate?
   
@@ -114,6 +130,79 @@ class ANIInitialView: UIView {
     anonymousLabel.centerXToSuperview()
     self.anonymousLabel = anonymousLabel
     
+    //otherLoginButtonStackView
+    let otherLoginButtonStackView = UIStackView()
+    otherLoginButtonStackView.axis = .horizontal
+    otherLoginButtonStackView.alignment = .center
+    otherLoginButtonStackView.distribution = .fillEqually
+    otherLoginButtonStackView.spacing = 10.0
+    addSubview(otherLoginButtonStackView)
+    otherLoginButtonStackView.bottomToTop(of: anonymousLabel, offset: -12.0)
+    otherLoginButtonStackView.leftToSuperview(offset: 40.0)
+    otherLoginButtonStackView.rightToSuperview(offset: -40.0)
+    self.otherLoginButtonStackView = otherLoginButtonStackView
+    
+    //twitterLoginButton
+    let twitterLoginButton = ANIAreaButtonView()
+    twitterLoginButton.base?.layer.cornerRadius = LOGIN_BUTTON_HEIGHT / 2
+    twitterLoginButton.base?.backgroundColor = ANIColor.lightBlue
+    twitterLoginButton.delegate = self
+    otherLoginButtonStackView.addArrangedSubview(twitterLoginButton)
+    twitterLoginButton.height(LOGIN_BUTTON_HEIGHT)
+    self.twitterLoginButton = twitterLoginButton
+    
+    //twitterLoginLabel
+    let twitterLoginLabel = UILabel()
+    twitterLoginLabel.textColor = .white
+    twitterLoginLabel.textAlignment = .center
+    twitterLoginLabel.text = "Twitter"
+    twitterLoginLabel.font = UIFont.boldSystemFont(ofSize: 16.0)
+    twitterLoginButton.addContent(twitterLoginLabel)
+    twitterLoginLabel.centerXToSuperview()
+    twitterLoginLabel.centerYToSuperview()
+    self.twitterLoginLabel = twitterLoginLabel
+    
+    //twitterImageView
+    let twitterImageView = UIImageView()
+    twitterImageView.image = UIImage(named: "twitterWhite")
+    twitterImageView.contentMode = .scaleAspectFit
+    twitterLoginButton.addContent(twitterImageView)
+    twitterImageView.width(20.0)
+    twitterImageView.height(20.0)
+    twitterImageView.rightToLeft(of: twitterLoginLabel, offset: -5.0)
+    twitterImageView.centerYToSuperview()
+    self.twitterImageView = twitterImageView
+    
+    //otherLoginLabel
+    let otherLoginLabel = UILabel()
+    otherLoginLabel.text = "その他ログイン"
+    otherLoginLabel.font = UIFont.systemFont(ofSize: 13.0)
+    otherLoginLabel.textColor = ANIColor.darkGray
+    addSubview(otherLoginLabel)
+    otherLoginLabel.centerXToSuperview()
+    otherLoginLabel.bottomToTop(of: otherLoginButtonStackView, offset: -5.0)
+    self.otherLoginLabel = otherLoginLabel
+    
+    //otherLoginLeftLineView
+    let otherLoginLeftLineView = UIView()
+    otherLoginLeftLineView.backgroundColor = ANIColor.darkGray
+    addSubview(otherLoginLeftLineView)
+    otherLoginLeftLineView.leftToSuperview(offset: 50.0)
+    otherLoginLeftLineView.rightToLeft(of: otherLoginLabel, offset: -10.0)
+    otherLoginLeftLineView.height(0.5)
+    otherLoginLeftLineView.centerY(to: otherLoginLabel)
+    self.otherLoginLeftLineView = otherLoginLeftLineView
+    
+    //otherLoginRightLineView
+    let otherLoginRightLineView = UIView()
+    otherLoginRightLineView.backgroundColor = ANIColor.darkGray
+    addSubview(otherLoginRightLineView)
+    otherLoginRightLineView.leftToRight(of: otherLoginLabel, offset: 10.0)
+    otherLoginRightLineView.rightToSuperview(offset: -50.0)
+    otherLoginRightLineView.height(0.5)
+    otherLoginRightLineView.centerY(to: otherLoginLabel)
+    self.otherLoginRightLineView = otherLoginRightLineView
+    
     //buttonStackView
     let buttonStackView = UIStackView()
     buttonStackView.axis = .horizontal
@@ -121,7 +210,7 @@ class ANIInitialView: UIView {
     buttonStackView.distribution = .fillEqually
     buttonStackView.spacing = 10.0
     addSubview(buttonStackView)
-    buttonStackView.bottomToTop(of: anonymousLabel, offset: -12.0)
+    buttonStackView.bottomToTop(of: otherLoginLabel, offset: -5.0)
     buttonStackView.leftToSuperview(offset: 40.0)
     buttonStackView.rightToSuperview(offset: -40.0)
     self.buttonStackView = buttonStackView
@@ -140,7 +229,7 @@ class ANIInitialView: UIView {
     loginButtonLabel.textColor = .white
     loginButtonLabel.textAlignment = .center
     loginButtonLabel.text = "ログイン"
-    loginButtonLabel.font = UIFont.boldSystemFont(ofSize: 18.0)
+    loginButtonLabel.font = UIFont.boldSystemFont(ofSize: 16.0)
     loginButton.addContent(loginButtonLabel)
     loginButtonLabel.edgesToSuperview()
     self.loginButtonLabel = loginButtonLabel
@@ -161,7 +250,7 @@ class ANIInitialView: UIView {
     signUpButtonLabel.textColor = ANIColor.emerald
     signUpButtonLabel.textAlignment = .center
     signUpButtonLabel.text = "登録"
-    signUpButtonLabel.font = UIFont.boldSystemFont(ofSize: 18.0)
+    signUpButtonLabel.font = UIFont.boldSystemFont(ofSize: 16.0)
     signUpButton.addContent(signUpButtonLabel)
     signUpButtonLabel.edgesToSuperview()
     self.signUpButtonLabel = signUpButtonLabel
@@ -210,6 +299,25 @@ extension ANIInitialView: ANIButtonViewDelegate {
     }
     if view === signUpButton {
       self.delegate?.signUpButtonTapped()
+    }
+    if view === twitterLoginButton {
+      self.delegate?.startAnimaing()
+      ANITwitter.login(isLink: false) { (success, errorMessage) in
+        if !success, let errorMessage = errorMessage {
+          self.delegate?.reject(notiText: errorMessage)
+          self.delegate?.stopAnimating()
+          return
+        }
+        
+        self.myTabBarController?.isLoadedUser = false
+        self.myTabBarController?.isLoadedFirstData = false
+        self.myTabBarController?.loadUser() {
+          self.delegate?.successTwitterLogin()
+          self.myTabBarController?.observeChatGroup()
+          
+          self.delegate?.stopAnimating()
+        }
+      }
     }
   }
 }

@@ -9,10 +9,22 @@
 import UIKit
 import FirebaseAuth
 import SafariServices
+import TinyConstraints
+import FirebaseFirestore
+import CodableFirebase
 
 class ANIInitialViewController: UIViewController {
   
   private weak var initialView: ANIInitialView?
+  
+  private var rejectViewBottomConstraint: Constraint?
+  private var rejectViewBottomConstraintOriginalConstant: CGFloat?
+  private weak var rejectView: UIView?
+  private weak var rejectBaseView: UIView?
+  private weak var rejectLabel: UILabel?
+  private var isRejectAnimating: Bool = false
+
+  private weak var activityIndicatorView: ANIActivityIndicator?
   
   var myTabBarController: ANITabBarController?
   
@@ -38,10 +50,47 @@ class ANIInitialViewController: UIViewController {
     
     //initialView
     let initialView = ANIInitialView()
+    initialView.myTabBarController = myTabBarController
     initialView.delegate = self
     self.view.addSubview(initialView)
     initialView.edgesToSuperview()
     self.initialView = initialView
+    
+    //rejectView
+    let rejectView = UIView()
+    rejectView.backgroundColor = ANIColor.emerald
+    self.view.addSubview(rejectView)
+    rejectViewBottomConstraint = rejectView.bottomToTop(of: self.view)
+    rejectViewBottomConstraintOriginalConstant = rejectViewBottomConstraint?.constant
+    rejectView.leftToSuperview()
+    rejectView.rightToSuperview()
+    rejectView.height(UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT)
+    self.rejectView = rejectView
+    
+    //rejectBaseView
+    let rejectBaseView = UIView()
+    rejectBaseView.backgroundColor = ANIColor.emerald
+    rejectView.addSubview(rejectBaseView)
+    rejectBaseView.edgesToSuperview(excluding: .top)
+    rejectBaseView.height(UIViewController.NAVIGATION_BAR_HEIGHT)
+    self.rejectBaseView = rejectBaseView
+    
+    //rejectLabel
+    let rejectLabel = UILabel()
+    rejectLabel.textAlignment = .center
+    rejectLabel.textColor = .white
+    rejectLabel.font = UIFont.boldSystemFont(ofSize: 16.0)
+    rejectLabel.textAlignment = .center
+    rejectBaseView.addSubview(rejectLabel)
+    rejectLabel.edgesToSuperview()
+    self.rejectLabel = rejectLabel
+    
+    //activityIndicatorView
+    let activityIndicatorView = ANIActivityIndicator()
+    activityIndicatorView.isFull = true
+    self.view.addSubview(activityIndicatorView)
+    activityIndicatorView.edgesToSuperview()
+    self.activityIndicatorView = activityIndicatorView
   }
 }
 
@@ -77,6 +126,43 @@ extension ANIInitialViewController: ANIInitialViewDelegate {
     
     let safariVC = SFSafariViewController(url: url)
     present(safariVC, animated: true, completion: nil)
+  }
+  
+  func reject(notiText: String) {
+    guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
+          let rejectLabel = self.rejectLabel,
+          !isRejectAnimating else { return }
+    
+    rejectLabel.text = notiText
+    
+    rejectViewBottomConstraint.constant = UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut, animations: {
+      self.isRejectAnimating = true
+      self.view.layoutIfNeeded()
+    }) { (complete) in
+      guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
+        let rejectViewBottomConstraintOriginalConstant = self.rejectViewBottomConstraintOriginalConstant else { return }
+      
+      rejectViewBottomConstraint.constant = rejectViewBottomConstraintOriginalConstant
+      UIView.animate(withDuration: 0.3, delay: 1.0, options: .curveEaseInOut, animations: {
+        self.view.layoutIfNeeded()
+      }, completion: { (complete) in
+        self.isRejectAnimating = false
+      })
+    }
+  }
+  
+  func startAnimaing() {
+    self.activityIndicatorView?.startAnimating()
+  }
+  
+  func stopAnimating() {
+    self.activityIndicatorView?.stopAnimating()
+  }
+  
+  func successTwitterLogin() {
+    ANINotificationManager.postLogin()
+    self.navigationController?.dismiss(animated: true, completion: nil)
   }
 }
 

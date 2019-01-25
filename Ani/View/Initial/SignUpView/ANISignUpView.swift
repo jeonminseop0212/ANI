@@ -369,7 +369,7 @@ class ANISignUpView: UIView {
         
         if let profileImageUrl = url {
           let fcmToken = UserDefaults.standard.string(forKey: KEY_FCM_TOKEN)
-          let user = FirebaseUser(uid: currentUser.uid, userName: userName, kind: "個人", introduce: "", profileImageUrl: profileImageUrl.absoluteString, familyImageUrls: nil, checkNotiDate: nil, isHaveUnreadNoti: false, unreadNotiCount: 0, unreadMessageCount: 0, fcmToken: fcmToken, twitterAccount: nil, instagramAccount: nil)
+          let user = FirebaseUser(uid: currentUser.uid, userName: userName, kind: "個人", introduce: "", profileImageUrl: profileImageUrl.absoluteString, familyImageUrls: nil, checkNotiDate: nil, isHaveUnreadNoti: false, unreadNotiCount: 0, unreadMessageCount: 0, fcmToken: fcmToken, twitterAccount: nil, instagramAccount: nil, isTwitterLink: false)
           self.uploadUserIntoDatabase(uid: currentUser.uid, user: user)
         }
       })
@@ -412,9 +412,12 @@ class ANISignUpView: UIView {
     
     DispatchQueue.global().async {
       index.addObject(newData, completionHandler: { (content, error) -> Void in
-        if error == nil {
-          DLog("Object IDs: \(content!)")
+        if let error = error {
+          DLog("algolia error \(error)")
         }
+        
+        guard let content = content else { return }
+        DLog("Object IDs: \(content)")
       })
     }
   }

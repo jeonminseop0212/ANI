@@ -45,6 +45,7 @@ let KEY_BLOCK_USER_IDS = "blockUserIds"
 let KEY_BLOCKING_USER_IDS = "blockingUserIds"
 let KEY_TWITTER_ACCOUNT = "twitterAccount"
 let KEY_INSTAGRAM_ACCOUNT = "instagramAccount"
+let KEY_IS_TWITTER_LINK = "isTwitterLink"
 
 //recruit
 let KEY_RECRUIT = "recruit"
