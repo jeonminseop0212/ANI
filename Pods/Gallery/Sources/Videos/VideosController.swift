@@ -46,17 +46,23 @@ class VideosController: UIViewController {
     setup()
   }
   override func viewWillAppear(_ animated: Bool) {
-      if #available(iOS 10.0, *) {
-        do {
-          try AVAudioSession.sharedInstance().setCategory(.ambient, mode: .default)
-        } catch {
-          print("AVAudioSession catgery set error \(error)")
-        }
+    if #available(iOS 10.0, *) {
+      do {
+        try AVAudioSession.sharedInstance().setCategory(.ambient, mode: .default)
+      } catch {
+        print("AVAudioSession catgery set error \(error)")
       }
+    }
+    
+    self.gridView.addReachEndObserver()
   }
   
   override func viewWillDisappear(_ animated: Bool) {
     self.gridView.player?.pause()
+  }
+  
+  override func viewDidDisappear(_ animated: Bool) {
+    self.gridView.removeReachEndObserver()
   }
   
   // MARK: - Setup
@@ -154,7 +160,6 @@ class VideosController: UIViewController {
     let view = GridView()
     view.bottomView.alpha = 0
     view.delegate = self
-    view.addReachEndObserver()
     
     return view
   }
