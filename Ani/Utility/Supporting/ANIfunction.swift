@@ -66,13 +66,11 @@ class ANIFunction: NSObject {
     if reviewOpenApp >= Double(openApp) {
       SKStoreReviewController.requestReview()
       
-      var newMultiply: CGFloat = 0
+      var newMultiply = reviewOpenAppMultiply
       if reviewOpenAppMultiply == 1 {
         newMultiply = 0.5
       } else if reviewOpenAppMultiply == 0.5 {
         newMultiply = 0.3
-      } else {
-        return
       }
       UserDefaults.standard.set(newMultiply, forKey: KEY_REVIEW_OPEN_APP_MULTIPLY)
       UserDefaults.standard.set(0, forKey: KEY_REVIEW_OPEN_APP)
@@ -99,13 +97,11 @@ class ANIFunction: NSObject {
     if reviewLove >= Double(love) {
       SKStoreReviewController.requestReview()
       
-      var newMultiply: CGFloat = 0
+      var newMultiply = reviewLoveMultiply
       if reviewLoveMultiply == 1 {
         newMultiply = 0.5
       } else if reviewLoveMultiply == 0.5 {
         newMultiply = 0.3
-      } else {
-        return
       }
       UserDefaults.standard.set(newMultiply, forKey: KEY_REVIEW_LOVE_MULTIPLY)
       UserDefaults.standard.set(0, forKey: KEY_REVIEW_OPEN_APP)
@@ -132,13 +128,11 @@ class ANIFunction: NSObject {
     if reviewComment >= Double(comment) {
       SKStoreReviewController.requestReview()
       
-      var newMultiply: CGFloat = 0
+      var newMultiply = reviewCommentMultiply
       if reviewCommentMultiply == 1 {
         newMultiply = 0.5
       } else if reviewCommentMultiply == 0.5 {
         newMultiply = 0.3
-      } else {
-        return
       }
       UserDefaults.standard.set(newMultiply, forKey: KEY_REVIEW_COMMENT_MULTIPLY)
       UserDefaults.standard.set(0, forKey: KEY_REVIEW_OPEN_APP)
@@ -165,13 +159,11 @@ class ANIFunction: NSObject {
     if reviewContribution >= Double(contribution) {
       SKStoreReviewController.requestReview()
       
-      var newMultiply: CGFloat = 0
+      var newMultiply = reviewContributionMultiply
       if reviewContributionMultiply == 1 {
         newMultiply = 0.5
       } else if reviewContributionMultiply == 0.5 {
         newMultiply = 0.3
-      } else {
-        return
       }
       UserDefaults.standard.set(newMultiply, forKey: KEY_REVIEW_CONTRIBUTION_MULTIPLY)
       UserDefaults.standard.set(0, forKey: KEY_REVIEW_OPEN_APP)
@@ -198,13 +190,11 @@ class ANIFunction: NSObject {
     if reviewFollow >= Double(follow) {
       SKStoreReviewController.requestReview()
       
-      var newMultiply: CGFloat = 0
+      var newMultiply = reviewFollowMultiply
       if reviewFollowMultiply == 1 {
         newMultiply = 0.5
       } else if reviewFollowMultiply == 0.5 {
         newMultiply = 0.3
-      } else {
-        return
       }
       UserDefaults.standard.set(newMultiply, forKey: KEY_REVIEW_FOLLOW_MULTIPLY)
       UserDefaults.standard.set(0, forKey: KEY_REVIEW_OPEN_APP)
