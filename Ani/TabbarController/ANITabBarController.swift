@@ -10,7 +10,6 @@ import UIKit
 import FirebaseAuth
 import FirebaseFirestore
 import CodableFirebase
-import UserNotifications
 
 class ANITabBarController: UITabBarController {
   
@@ -222,23 +221,12 @@ class ANITabBarController: UITabBarController {
         }, completion: { (complete) in
           activityIndicatorView.stopAnimating()
 
-          self.setPushNotification()
           ANIFunction.shared.showReviewAlertOpenApp()
         })
       }
     }
   }
   
-  private func setPushNotification() {
-    UNUserNotificationCenter.current().getNotificationSettings { (settings) in
-      if settings.authorizationStatus != .authorized {
-        let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
-        UNUserNotificationCenter.current().requestAuthorization(options: authOptions) { _, _ in
-          DLog("push permission finished")
-        }
-      }
-    }
-  }
   
   @objc private func showFailMessage() {
     let alertController = UIAlertController(title: "データのローディングに失敗しました", message: "アプリを再起動してください。", preferredStyle: .alert)

@@ -457,7 +457,7 @@ extension ANIListView: UITableViewDelegate {
         cell.unobserveSupport()
       }
     case .loveStroy:
-      if !loveStories.isEmpty {
+      if !loveStories.isEmpty && loveStories.count > indexPath.row {
         if loveStories[indexPath.row].recruitId != nil, let cell = cell as? ANISupportViewCell {
           cell.unobserveLove()
           cell.unobserveComment()
