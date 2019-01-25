@@ -11,6 +11,7 @@ import FirebaseAuth
 import FirebaseFirestore
 import CodableFirebase
 import TinyConstraints
+import GoogleSignIn
 
 class ANIOptionViewController: UIViewController {
   
@@ -198,6 +199,9 @@ extension ANIOptionViewController: ANIOptionViewDelegate {
           let database = Firestore.firestore()
           database.collection(KEY_USERS).document(currentUserUid).updateData([KEY_FCM_TOKEN: ""])
         }
+        
+        ANITwitter.logOut()
+        GIDSignIn.sharedInstance().signOut()
         
         ANISessionManager.shared.currentUser = nil
         ANISessionManager.shared.currentUserUid = nil

@@ -48,6 +48,13 @@ class ANITwitter {
     }
   }
   
+  static func logOut() {
+    let sessionStore = TWTRTwitter.sharedInstance().sessionStore
+    if let session = sessionStore.session() {
+      sessionStore.logOutUserID(session.userID)
+    }
+  }
+  
   static func login(isLink: Bool, completion: @escaping ((Bool, String?)->())) {
     TWTRTwitter.sharedInstance().logIn(completion: { (session, error) in
       if let error = error {
@@ -115,7 +122,7 @@ class ANITwitter {
                   return
                 }
                 
-                if let snapshat = snapshot, let data = snapshot?.data() {
+                if let snapshot = snapshot, snapshot.data() != nil {
                   completion(true, nil)
                 } else {
                   getUniqueUserName(userName: user.name, count: 0, completion: { (uniqueUserName) in
@@ -158,6 +165,7 @@ class ANITwitter {
       storageRef.child(KEY_PROFILE_IMAGES).child("\(currentUser.uid).jpeg").putData(profileImageData, metadata: nil) { (metaData, error) in
         if error != nil {
           DLog("storageError")
+          signOut()
           completion(false, "データの書き込みに失敗しました。")
           return
         }
@@ -165,6 +173,7 @@ class ANITwitter {
         storageRef.child(KEY_PROFILE_IMAGES).child("\(currentUser.uid).jpeg").downloadURL(completion: { (url, error) in
           if error != nil {
             DLog("storage download url error")
+            signOut()
             completion(false, "データのロードに失敗しました。")
             return
           }
@@ -188,6 +197,7 @@ class ANITwitter {
         database.collection(KEY_USERS).document(uid).setData(userData) { error in
           if let error = error {
             DLog("Error set document: \(error)")
+            signOut()
             completion(false, "アカウント登録に失敗しました。")
             return
           }
