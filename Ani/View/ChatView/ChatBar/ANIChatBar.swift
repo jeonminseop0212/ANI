@@ -164,7 +164,6 @@ class ANIChatBar: UIView {
 
     let date = ANIFunction.shared.getToday()
     
-    
     let message = FirebaseChatMessage(sendUserId: currentuserUid, sendUserName: currentUserName, receiveUserId: userId, message: text, date: date, isDiffrentBeforeDate: nil)
     
     checkMember()

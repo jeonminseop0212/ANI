@@ -48,6 +48,8 @@ class ANICommentViewController: UIViewController {
   private var commentId: String?
   private var contentId: String?
   
+  private var isfirstLoad: Bool = true
+  
   override func viewDidLoad() {
     setup()
     passingData()
@@ -331,8 +333,12 @@ extension ANICommentViewController: ANICommentViewDelegate {
   func loadedComments() {
     guard let commentBar = self.commentBar else { return }
     
-    if let selectedComment = self.selectedComment, let selectedCommentUser = self.selectedCommentUser {
+    if let selectedComment = self.selectedComment,
+      let selectedCommentUser = self.selectedCommentUser,
+      isfirstLoad {
       commentBar.showParentCommentUser(comment: selectedComment, parentCommentUser: selectedCommentUser, isAnimated: false)
+      
+      isfirstLoad = false
     }
   }
 }
