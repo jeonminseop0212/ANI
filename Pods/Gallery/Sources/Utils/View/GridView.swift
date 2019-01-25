@@ -494,7 +494,7 @@ class GridView: UIView {
     NotificationCenter.default.addObserver(self, selector: #selector(playerItemDidReachEnd), name: .AVPlayerItemDidPlayToEndTime, object: nil)
   }
   
-  private func removeReachEndObserver() {
+  func removeReachEndObserver() {
     NotificationCenter.default.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: nil)
   }
   
