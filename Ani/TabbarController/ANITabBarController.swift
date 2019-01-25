@@ -167,7 +167,7 @@ class ANITabBarController: UITabBarController {
     let userDefaults = UserDefaults.standard
     
     let initialViewController = ANIInitialViewController()
-    initialViewController.myTabBarController = self.tabBarController as? ANITabBarController
+    initialViewController.myTabBarController = self
     let initialNV = UINavigationController(rootViewController: initialViewController)
     self.present(initialNV, animated: true, completion: nil)
     
