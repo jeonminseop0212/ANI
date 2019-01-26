@@ -271,7 +271,7 @@ class ANINotiParentCommentViewCell: UITableViewCell {
     userNameLabel.numberOfLines = 0
     base.addSubview(userNameLabel)
     userNameLabel.leftToRight(of: profileImageView, offset: 10.0)
-    userNameLabel.rightToSuperview(offset: -10.0)
+    userNameLabel.rightToLeft(of: loveButton, offset: -10.0)
     userNameLabel.centerY(to: profileImageView)
     self.userNameLabel = userNameLabel
     
