@@ -115,7 +115,11 @@ class ANIRecruitViewController: UIViewController {
     contributionButon.width(CONTRIBUTION_BUTTON_HEIGHT)
     contributionButon.height(CONTRIBUTION_BUTTON_HEIGHT)
     contributionButon.rightToSuperview(offset: -15.0)
-    contributionButon.bottomToSuperview(offset: -15, usingSafeArea: true)
+    var tabBarHeight: CGFloat = 0.0
+    if let tabBarController = self.tabBarController {
+      tabBarHeight = tabBarController.tabBar.height
+    }
+    contributionButon.bottomToSuperview(offset: -(15.0 + tabBarHeight))
     self.contributionButon = contributionButon
     
     //rejectView
