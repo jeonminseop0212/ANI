@@ -16,4 +16,5 @@ struct FirebaseQna: Codable {
   let date: String
   var isLoved: Bool?
   var hideUserIds: [String]?
+  var hashtags: [String: String]?
 }

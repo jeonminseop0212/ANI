@@ -9,6 +9,7 @@
 import UIKit
 import FirebaseFirestore
 import CodableFirebase
+import ActiveLabel
 
 protocol ANISupportViewDelegate {
   func supportButtonTapped()
@@ -142,7 +143,11 @@ extension ANISupportView: ANIButtonViewDelegate {
       let database = Firestore.firestore()
       let id = NSUUID().uuidString
       let date = ANIFunction.shared.getToday()
-      let story = FirebaseStory(id: id, storyImageUrls: nil, storyVideoUrl: nil, thumbnailImageUrl: nil, story: messageTextView.text, userId: uid, recruitId: recruitId, recruitTitle: recruit.title, recruitSubTitle: recruit.reason, date: date, day: nil, isLoved: nil, hideUserIds: nil, loveCount: nil)
+      let activityLabel = ActiveLabel()
+      activityLabel.enabledTypes = [.hashtag]
+      activityLabel.text = messageTextView.text
+      
+      let story = FirebaseStory(id: id, storyImageUrls: nil, storyVideoUrl: nil, thumbnailImageUrl: nil, story: messageTextView.text, userId: uid, recruitId: recruitId, recruitTitle: recruit.title, recruitSubTitle: recruit.reason, date: date, day: nil, isLoved: nil, hideUserIds: nil, loveCount: nil, hashtags: activityLabel.hashtagElements)
       
       DispatchQueue.global().async {
         do {

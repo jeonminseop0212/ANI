@@ -16,6 +16,7 @@ pod 'Firebase/Messaging'
 pod 'Firebase/RemoteConfig'
 pod 'Siren'
 pod 'GoogleSignIn'
+pod 'ActiveLabel'
 
   target 'AniTests' do
     inherit! :search_paths

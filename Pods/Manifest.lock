@@ -1,4 +1,5 @@
 PODS:
+  - ActiveLabel (1.0.1)
   - BoringSSL (10.0.6):
     - BoringSSL/Implementation (= 10.0.6)
     - BoringSSL/Interface (= 10.0.6)
@@ -161,6 +162,7 @@ PODS:
   - Siren (3.9.1)
 
 DEPENDENCIES:
+  - ActiveLabel
   - Firebase/Auth
   - Firebase/Database
   - Firebase/Firestore
@@ -174,6 +176,7 @@ DEPENDENCIES:
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
+    - ActiveLabel
     - BoringSSL
     - Firebase
     - FirebaseABTesting
@@ -204,6 +207,7 @@ SPEC REPOS:
     - Siren
 
 SPEC CHECKSUMS:
+  ActiveLabel: b8b2396fe25308d563601437d6605bf691c3b5db
   BoringSSL: e10f92a27043805c01071fe815a5cd98ae8212e7
   Firebase: 8bb9268bff82374f2cbaaabb143e725743c316ae
   FirebaseABTesting: 1f50b8d50f5e3469eea54e7463a7b7fe221d1f5e
@@ -233,6 +237,6 @@ SPEC CHECKSUMS:
   SDWebImage: c5594f1a19c48d526d321e548902b56b479cd508
   Siren: 22b68056e52c5b6707bcbfac09d2d16874ee098a
 
-PODFILE CHECKSUM: 2624f676b7f951ffa37f36f783ccd5c036daf1ac
+PODFILE CHECKSUM: 092b9f780ab6973b7d50a6c1f7c822dd9c635e8d
 
 COCOAPODS: 1.5.3

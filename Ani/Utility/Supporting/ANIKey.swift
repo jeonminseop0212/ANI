@@ -13,6 +13,7 @@ let KEY_ID = "id"
 let KEY_DATE = "date"
 let KEY_FCM_TOKEN = "fcmToken"
 let KEY_CONTENT_TYPE = "contentType"
+let KEY_CONTRIBUTION_KIND = "contributionKind"
 
 //user
 let KEY_UID = "uid"
@@ -69,6 +70,8 @@ let KYE_THUMNAIL_IMAGES = "thumbnail_images"
 let KEY_STORIES = "stories"
 let KEY_DAY = "day"
 let KEY_LOVE_COUNT = "loveCount"
+let KEY_HASHTAG = "hashtag"
+let KEY_HASHTAGS = "hashtags"
 
 //qna
 let KEY_QNA = "qna"
