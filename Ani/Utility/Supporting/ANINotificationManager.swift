@@ -186,4 +186,14 @@ class ANINotificationManager: NSObject {
   private static let N_RELOAD_RANKING_STORY = "N_RELOAD_RANKING_STORY"
   static func postReloadRankingStory() { self.post(name: N_RELOAD_RANKING_STORY, object: nil, userInfo:nil) }
   static func receive(reloadRankingStory observer:Any, selector:Selector) { receive(name: N_RELOAD_RANKING_STORY, observer: observer, selector: selector) }
+  
+  //MARK: tap hashtag
+  private static let N_TAP_HASHTAG = "N_TAP_HASHTAG"
+  static func postTapHashtag(contributionKind: String, hashtag: String) {
+    var userInfo:[AnyHashable: Any] = [AnyHashable: Any]()
+    userInfo[KEY_CONTRIBUTION_KIND] = contributionKind
+    userInfo[KEY_HASHTAG] = hashtag
+    self.post(name: N_TAP_HASHTAG, object: nil, userInfo:userInfo)
+  }
+  static func receive(tapHashtag observer:Any, selector:Selector) { receive(name: N_TAP_HASHTAG, observer: observer, selector: selector) }
 }

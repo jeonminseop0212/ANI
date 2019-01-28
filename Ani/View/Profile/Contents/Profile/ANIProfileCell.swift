@@ -267,8 +267,10 @@ class ANIProfileCell: UITableViewCell {
       self.delegate?.openUrl(url: url)
     }
     introduceBG.addSubview(introductionLabel)
-    let insets = UIEdgeInsets.init(top: 10.0, left: 10.0, bottom: 10.0, right: 10.0)
-    introductionLabel.edgesToSuperview(insets: insets)
+    introductionLabel.topToSuperview(offset: 10.0)
+    introductionLabel.leftToSuperview(offset: 10.0)
+    introductionLabel.rightToSuperview(offset: -10.0)
+    introductionLabel.bottomToSuperview(offset: -10.0, priority: .defaultHigh)
     self.introductionLabel = introductionLabel
   }
   

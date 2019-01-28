@@ -15,6 +15,7 @@ import CodableFirebase
 import InstantSearchClient
 import AVKit
 import Photos
+import ActiveLabel
 
 protocol ANIContributionViewControllerDelegate {
   func loadThumnailImage(thumbnailImage: UIImage?)
@@ -226,7 +227,11 @@ class ANIContributionViewController: UIViewController {
                     let date = ANIFunction.shared.getToday()
                     let day = ANIFunction.shared.getToday(format: "yyyy/MM/dd")
                     let content = contriButionView.getContent()
-                    let story = FirebaseStory(id: id, storyImageUrls: urls, storyVideoUrl: nil, thumbnailImageUrl: nil, story: content, userId: uid, recruitId: nil, recruitTitle: nil, recruitSubTitle: nil, date: date, day: day, isLoved: nil, hideUserIds: nil, loveCount: 0)
+                    let activityLabel = ActiveLabel()
+                    activityLabel.enabledTypes = [.hashtag]
+                    activityLabel.text = content
+                    
+                    let story = FirebaseStory(id: id, storyImageUrls: urls, storyVideoUrl: nil, thumbnailImageUrl: nil, story: content, userId: uid, recruitId: nil, recruitTitle: nil, recruitSubTitle: nil, date: date, day: day, isLoved: nil, hideUserIds: nil, loveCount: 0, hashtags: activityLabel.hashtagElements)
                     
                     self.upateStroyDatabase(story: story, id: id)
                   }
@@ -335,7 +340,11 @@ class ANIContributionViewController: UIViewController {
           let date = ANIFunction.shared.getToday()
           let day = ANIFunction.shared.getToday(format: "yyyy/MM/dd")
           let content = contriButionView.getContent()
-          let story = FirebaseStory(id: id, storyImageUrls: nil, storyVideoUrl: videoUrl, thumbnailImageUrl: thumbnailImageUrl, story: content, userId: uid, recruitId: nil, recruitTitle: nil, recruitSubTitle: nil, date: date, day: day, isLoved: nil, hideUserIds: nil, loveCount: 0)
+          let activityLabel = ActiveLabel()
+          activityLabel.enabledTypes = [.hashtag]
+          activityLabel.text = content
+          
+          let story = FirebaseStory(id: id, storyImageUrls: nil, storyVideoUrl: videoUrl, thumbnailImageUrl: thumbnailImageUrl, story: content, userId: uid, recruitId: nil, recruitTitle: nil, recruitSubTitle: nil, date: date, day: day, isLoved: nil, hideUserIds: nil, loveCount: 0, hashtags: activityLabel.hashtagElements)
 
           self.upateStroyDatabase(story: story, id: id)
         }
@@ -357,7 +366,11 @@ class ANIContributionViewController: UIViewController {
           let id = NSUUID().uuidString
           let date = ANIFunction.shared.getToday()
           let content = contriButionView.getContent()
-          let qna = FirebaseQna(id: id, qnaImageUrls: nil, qna: content, userId: uid, date: date, isLoved: nil, hideUserIds: nil)
+          let activityLabel = ActiveLabel()
+          activityLabel.enabledTypes = [.hashtag]
+          activityLabel.text = content
+          
+          let qna = FirebaseQna(id: id, qnaImageUrls: nil, qna: content, userId: uid, date: date, isLoved: nil, hideUserIds: nil, hashtags: activityLabel.hashtagElements)
           
           DispatchQueue.main.async {
             self.delegate?.loadThumnailImage(thumbnailImage: nil)
@@ -396,7 +409,11 @@ class ANIContributionViewController: UIViewController {
                       let id = NSUUID().uuidString
                       let date = ANIFunction.shared.getToday()
                       let content = contriButionView.getContent()
-                      let qna = FirebaseQna(id: id, qnaImageUrls: urls, qna: content, userId: uid, date: date, isLoved: nil, hideUserIds: nil)
+                      let activityLabel = ActiveLabel()
+                      activityLabel.enabledTypes = [.hashtag]
+                      activityLabel.text = content
+                      
+                      let qna = FirebaseQna(id: id, qnaImageUrls: urls, qna: content, userId: uid, date: date, isLoved: nil, hideUserIds: nil, hashtags: activityLabel.hashtagElements)
   
                       self.upateQnaDatabase(qna: qna, id: id)
                     }

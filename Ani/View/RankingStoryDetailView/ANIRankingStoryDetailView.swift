@@ -82,7 +82,11 @@ class ANIRankingStoryDetailView: UIView {
 //MARK: UITableViewDataSource
 extension ANIRankingStoryDetailView: UITableViewDataSource {
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return 1
+    if story != nil {
+      return 1
+    } else {
+      return 0
+    }
   }
   
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

@@ -153,6 +153,7 @@ class ANIRankingStoryDetailViewController: UIViewController {
   private func setupNotifications() {
     removeNotifications()
     ANINotificationManager.receive(profileImageViewTapped: self, selector: #selector(pushOtherProfile))
+    ANINotificationManager.receive(tapHashtag: self, selector: #selector(pushHashtagList))
   }
   
   private func removeNotifications() {
@@ -184,6 +185,22 @@ class ANIRankingStoryDetailViewController: UIViewController {
       otherProfileViewController.hidesBottomBarWhenPushed = true
       otherProfileViewController.userId = userId
       self.navigationController?.pushViewController(otherProfileViewController, animated: true)
+    }
+  }
+  
+  @objc private func pushHashtagList(_ notification: NSNotification) {
+    if let userInfo = notification.userInfo,
+      let contributionKind = userInfo[KEY_CONTRIBUTION_KIND] as? String,
+      let hashtag = userInfo[KEY_HASHTAG] as? String {
+      let hashtagListViewController = ANIHashtagListViewController()
+      hashtagListViewController.hashtag = hashtag
+      if contributionKind == KEY_CONTRIBUTION_KIND_STROY {
+        hashtagListViewController.hashtagList = .story
+      } else if contributionKind == KEY_CONTRIBUTION_KIND_QNA {
+        hashtagListViewController.hashtagList = .question
+      }
+      hashtagListViewController.hidesBottomBarWhenPushed = true
+      self.navigationController?.pushViewController(hashtagListViewController, animated: true)
     }
   }
 }

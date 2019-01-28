@@ -39,6 +39,8 @@
 		CD1C82A021F5875C00F4725F /* ANITwitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD1C829F21F5875C00F4725F /* ANITwitter.swift */; };
 		CD2C414520A556AE00581267 /* ANIRecruitContributionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2C414420A556AE00581267 /* ANIRecruitContributionViewController.swift */; };
 		CD2C414820A5A23C00581267 /* ANIImageFilterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2C414720A5A23C00581267 /* ANIImageFilterViewController.swift */; };
+		CD325F5921FEA5990044ADFD /* ANIHashtagListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD325F5821FEA5990044ADFD /* ANIHashtagListViewController.swift */; };
+		CD325F5C21FEA6810044ADFD /* ANIHashtagListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD325F5B21FEA6810044ADFD /* ANIHashtagListView.swift */; };
 		CD334E8221421C7F001C6289 /* ANIReloadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD334E8121421C7F001C6289 /* ANIReloadView.swift */; };
 		CD33BEDE20F31F9A00D2A367 /* ANINotiDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD33BEDD20F31F9A00D2A367 /* ANINotiDetailViewController.swift */; };
 		CD33BEE120F3212400D2A367 /* ANINotiDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD33BEE020F3212400D2A367 /* ANINotiDetailView.swift */; };
@@ -112,7 +114,6 @@
 		CDAFD75F20DE1D1B00AEDD83 /* ANIRejectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDAFD75E20DE1D1B00AEDD83 /* ANIRejectView.swift */; };
 		CDB68F6421E8624C0032AEA8 /* ANIDeleteCommentCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDB68F6321E8624B0032AEA8 /* ANIDeleteCommentCell.swift */; };
 		CDB68F6621EDA2E40032AEA8 /* ANINotiParentCommentViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDB68F6521EDA2E40032AEA8 /* ANINotiParentCommentViewCell.swift */; };
-		CDBAB5ED21DDAD30007AADF9 /* ActiveLabel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CDBAB5EC21DDAD2F007AADF9 /* ActiveLabel.framework */; };
 		CDBAB5F121E57AE1007AADF9 /* ANIParentCommentCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDBAB5F021E57AE0007AADF9 /* ANIParentCommentCell.swift */; };
 		CDC6AE4120CF6E7900A836F6 /* ANIOtherProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDC6AE4020CF6E7900A836F6 /* ANIOtherProfileViewController.swift */; };
 		CDC6AE4420CF724700A836F6 /* ANIOtherProfileBasicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDC6AE4320CF724700A836F6 /* ANIOtherProfileBasicView.swift */; };
@@ -254,6 +255,8 @@
 		CD1C829F21F5875C00F4725F /* ANITwitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANITwitter.swift; sourceTree = "<group>"; };
 		CD2C414420A556AE00581267 /* ANIRecruitContributionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitContributionViewController.swift; sourceTree = "<group>"; };
 		CD2C414720A5A23C00581267 /* ANIImageFilterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIImageFilterViewController.swift; sourceTree = "<group>"; };
+		CD325F5821FEA5990044ADFD /* ANIHashtagListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIHashtagListViewController.swift; sourceTree = "<group>"; };
+		CD325F5B21FEA6810044ADFD /* ANIHashtagListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIHashtagListView.swift; sourceTree = "<group>"; };
 		CD334E8121421C7F001C6289 /* ANIReloadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIReloadView.swift; sourceTree = "<group>"; };
 		CD33BEDD20F31F9A00D2A367 /* ANINotiDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotiDetailViewController.swift; sourceTree = "<group>"; };
 		CD33BEE020F3212400D2A367 /* ANINotiDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANINotiDetailView.swift; sourceTree = "<group>"; };
@@ -443,7 +446,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				CD1C829D21F5822400F4725F /* TwitterKit.framework in Frameworks */,
-				CDBAB5ED21DDAD30007AADF9 /* ActiveLabel.framework in Frameworks */,
 				CD492A0321C740FE00C5AF81 /* PryntTrimmerView.framework in Frameworks */,
 				CD6762DE20F8285E0098E033 /* InstantSearchClient.framework in Frameworks */,
 				CD0BFF1020C6186500D5959B /* CodableFirebase.framework in Frameworks */,
@@ -560,6 +562,22 @@
 				CD2C414720A5A23C00581267 /* ANIImageFilterViewController.swift */,
 			);
 			path = ImageFilterViewController;
+			sourceTree = "<group>";
+		};
+		CD325F5721FEA57A0044ADFD /* HashtagListViewController */ = {
+			isa = PBXGroup;
+			children = (
+				CD325F5821FEA5990044ADFD /* ANIHashtagListViewController.swift */,
+			);
+			path = HashtagListViewController;
+			sourceTree = "<group>";
+		};
+		CD325F5A21FEA66B0044ADFD /* HashtagListView */ = {
+			isa = PBXGroup;
+			children = (
+				CD325F5B21FEA6810044ADFD /* ANIHashtagListView.swift */,
+			);
+			path = HashtagListView;
 			sourceTree = "<group>";
 		};
 		CD334E8021421C5F001C6289 /* ReloadView */ = {
@@ -1569,6 +1587,7 @@
 				F57F7D8620844A62008A2645 /* SearchViewController */,
 				F53E87BB2085AF9D00B19A2F /* ProfileViewController */,
 				CDC6AE3F20CF6E5C00A836F6 /* OtherProfileViewController */,
+				CD325F5721FEA57A0044ADFD /* HashtagListViewController */,
 				CDDE4B5A20E079A5005762A1 /* Option */,
 				CD2C414620A5A1FF00581267 /* ImageFilterViewController */,
 				CD4929FF21C72C8800C5AF81 /* VideoFilterViewController */,
@@ -1602,6 +1621,7 @@
 				F57F7D8920844BD4008A2645 /* SearchView */,
 				F53E87BE2085B14A00B19A2F /* Profile */,
 				CDC6AE4220CF723000A836F6 /* OtherProfile */,
+				CD325F5A21FEA66B0044ADFD /* HashtagListView */,
 				CDAFD75920DC9CEB00AEDD83 /* Option */,
 				CDD0550420A5CF0100BEF482 /* ImageFilter */,
 				CD492A0521C749EA00C5AF81 /* VideoFilter */,
@@ -1897,6 +1917,7 @@
 			);
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-Ani/Pods-Ani-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/ActiveLabel/ActiveLabel.framework",
 				"${BUILT_PRODUCTS_DIR}/BoringSSL/openssl.framework",
 				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
 				"${BUILT_PRODUCTS_DIR}/Gallery/Gallery.framework",
@@ -1912,6 +1933,7 @@
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ActiveLabel.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/openssl.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Gallery.framework",
@@ -1942,7 +1964,6 @@
 				"$(SRCROOT)/Carthage/Build/iOS/CodableFirebase.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/InstantSearchClient.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/PryntTrimmerView.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/ActiveLabel.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/TwitterKit.framework",
 			);
 			outputPaths = (
@@ -2065,6 +2086,7 @@
 				F5E9E2392079B9D20021D4CC /* ANICommunityMenuBarCell.swift in Sources */,
 				CD1A97C0219949770008EC98 /* ANIBlockUserView.swift in Sources */,
 				CD492A0B21C8990300C5AF81 /* AVFileType.swift in Sources */,
+				CD325F5C21FEA6810044ADFD /* ANIHashtagListView.swift in Sources */,
 				CD0FAD0E20BFC02E00D8CD27 /* ANISessionManager.swift in Sources */,
 				F5E9E23D2079C10C0021D4CC /* ANIStoryView.swift in Sources */,
 				CDA32A2D20ABCE5F008A2AC1 /* RecruitInfo.swift in Sources */,
@@ -2078,6 +2100,7 @@
 				CDB68F6621EDA2E40032AEA8 /* ANINotiParentCommentViewCell.swift in Sources */,
 				CDC6AE4820CF74C600A836F6 /* ANIOtherProfileCell.swift in Sources */,
 				CDE2F3BF20E35CBF005E1DE1 /* ANIMyChatViewCell.swift in Sources */,
+				CD325F5921FEA5990044ADFD /* ANIHashtagListViewController.swift in Sources */,
 				CD492A0121C72CAC00C5AF81 /* ANIVideoFilterViewController.swift in Sources */,
 				CD516FBE2161ED82002FF41C /* ANINotiHeaderViewCell.swift in Sources */,
 				F530AB1C207A45D900114E6B /* ANIStoryImagesCell.swift in Sources */,

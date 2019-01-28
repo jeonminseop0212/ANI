@@ -10,6 +10,7 @@ import UIKit
 import FirebaseFirestore
 import CodableFirebase
 import AVKit
+import ActiveLabel
 
 protocol ANIVideoStoryViewCellDelegate {
   func storyCellTapped(story: FirebaseStory, user: FirebaseUser)
@@ -23,7 +24,9 @@ protocol ANIVideoStoryViewCellDelegate {
 class ANIVideoStoryViewCell: UITableViewCell {
   
   weak var storyVideoView: ANIStoryVideoView?
-  private weak var storyLabel: UILabel?
+  private weak var storyLabel: ActiveLabel?
+  
+  private weak var bottomArea: UIView?
   private let PROFILE_IMAGE_VIEW_HEIGHT: CGFloat = 32.0
   private weak var profileImageView: UIImageView?
   private weak var userNameLabel: UILabel?
@@ -36,8 +39,6 @@ class ANIVideoStoryViewCell: UITableViewCell {
   
   var story: FirebaseStory? {
     didSet {
-      guard let story = self.story else { return }
-      
       if user == nil {
         loadUser()
       }
@@ -95,6 +96,14 @@ class ANIVideoStoryViewCell: UITableViewCell {
     fatalError("init(coder:) has not been implemented")
   }
   
+  override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+    for touch: AnyObject in touches {
+      if let myTouch: UITouch = touch as? UITouch, let touchView = myTouch.view, touchView != bottomArea {
+        cellTapped()
+      }
+    }
+  }
+  
   private func setup() {
     self.selectionStyle = .none
     self.backgroundColor = .white
@@ -110,19 +119,30 @@ class ANIVideoStoryViewCell: UITableViewCell {
     self.storyVideoView = storyVideoView
     
     //storyLabel
-    let storyLabel = UILabel()
+    let storyLabel = ActiveLabel()
     storyLabel.font = UIFont.systemFont(ofSize: 14.0)
     storyLabel.textAlignment = .left
     storyLabel.textColor = ANIColor.subTitle
     storyLabel.numberOfLines = 0
-    storyLabel.isUserInteractionEnabled = true
-    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(cellTapped))
-    storyLabel.addGestureRecognizer(tapGesture)
+    storyLabel.enabledTypes = [.hashtag]
+    storyLabel.customize { (label) in
+      label.hashtagColor = ANIColor.link
+    }
+    storyLabel.handleHashtagTap { (hashtag) in
+      ANINotificationManager.postTapHashtag(contributionKind: KEY_CONTRIBUTION_KIND_STROY, hashtag: hashtag)
+    }
     addSubview(storyLabel)
     storyLabel.topToBottom(of: storyVideoView, offset: 10.0)
     storyLabel.leftToSuperview(offset: 10.0)
-    storyLabel.rightToSuperview(offset: -10.0)
+    storyLabel.rightToSuperview(offset: -10.0, priority: .defaultHigh)
     self.storyLabel = storyLabel
+    
+    //bottomArea
+    let bottomArea = UIView()
+    addSubview(bottomArea)
+    bottomArea.topToBottom(of: storyLabel, offset: 10.0)
+    bottomArea.edgesToSuperview(excluding: .top)
+    self.bottomArea = bottomArea
 
     //profileImageView
     let profileImageView = UIImageView()
@@ -214,7 +234,7 @@ class ANIVideoStoryViewCell: UITableViewCell {
     userNameLabel.textColor = ANIColor.subTitle
     userNameLabel.numberOfLines = 2
     addSubview(userNameLabel)
-    userNameLabel.leftToRight(of: profileImageView, offset: 10.0)
+    userNameLabel.leftToRight(of: profileImageView, offset: 10.0, priority: .defaultHigh)
     userNameLabel.rightToLeft(of: loveButton, offset: -10.0)
     userNameLabel.centerY(to: profileImageView)
     self.userNameLabel = userNameLabel

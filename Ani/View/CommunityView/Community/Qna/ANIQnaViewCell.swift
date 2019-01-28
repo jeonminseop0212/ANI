@@ -10,6 +10,7 @@ import UIKit
 import FirebaseFirestore
 import CodableFirebase
 import TinyConstraints
+import ActiveLabel
 
 protocol ANIQnaViewCellDelegate {
   func cellTapped(qna: FirebaseQna, user: FirebaseUser)
@@ -20,13 +21,14 @@ protocol ANIQnaViewCellDelegate {
 }
 
 class ANIQnaViewCell: UITableViewCell {
-  private weak var tapArea: UIView?
-  private weak var questionLabel: UILabel?
+  private weak var questionLabel: ActiveLabel?
   
+  private var qnaImagesViewTopConstraint: Constraint?
   private var qnaImagesViewHeightConstraint: Constraint?
   private var qnaImagesViewHeight: CGFloat = 0.0
   private weak var qnaImagesView: ANIQnaImagesView?
   
+  private weak var bottomArea: UIView?
   private weak var profileImageView: UIImageView?
   private weak var userNameLabel: UILabel?
   private weak var loveButtonBG: UIView?
@@ -38,8 +40,6 @@ class ANIQnaViewCell: UITableViewCell {
   
   var qna: FirebaseQna? {
     didSet {
-      guard let qna = self.qna else { return }
-      
       if user == nil {
         loadUser()
       }
@@ -94,39 +94,52 @@ class ANIQnaViewCell: UITableViewCell {
     fatalError("init(coder:) has not been implemented")
   }
   
+  override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+    for touch: AnyObject in touches {
+      if let myTouch: UITouch = touch as? UITouch, let touchView = myTouch.view, touchView != bottomArea {
+        cellTapped()
+      }
+    }
+  }
+  
   private func setup() {
     self.selectionStyle = .none
     self.backgroundColor = .white
-    
-    //tapArea
-    let tapArea = UIView()
-    let cellTapGesture = UITapGestureRecognizer(target: self, action: #selector(cellTapped))
-    tapArea.addGestureRecognizer(cellTapGesture)
-    addSubview(tapArea)
-    tapArea.edgesToSuperview(excluding: .bottom)
-    self.tapArea = tapArea
-    
+
     //questionLabel
-    let questionLabel = UILabel()
+    let questionLabel = ActiveLabel()
     questionLabel.font = UIFont.systemFont(ofSize: 14.0)
     questionLabel.textColor = ANIColor.subTitle
     questionLabel.numberOfLines = 0
-    tapArea.addSubview(questionLabel)
+    questionLabel.enabledTypes = [.hashtag]
+    questionLabel.customize { (label) in
+      label.hashtagColor = ANIColor.link
+    }
+    questionLabel.handleHashtagTap { (hashtag) in
+      ANINotificationManager.postTapHashtag(contributionKind: KEY_CONTRIBUTION_KIND_QNA, hashtag: hashtag)
+    }
+    addSubview(questionLabel)
     questionLabel.topToSuperview(offset: 10.0)
     questionLabel.leftToSuperview(offset: 10.0)
     questionLabel.rightToSuperview(offset: -10.0)
-    questionLabel.bottomToSuperview()
     self.questionLabel = questionLabel
     
     //qnaImagesView
     let qnaImagesView = ANIQnaImagesView()
     addSubview(qnaImagesView)
-    qnaImagesView.topToBottom(of: tapArea, offset: 10.0)
+    qnaImagesViewTopConstraint = qnaImagesView.topToBottom(of: questionLabel, offset: 10.0)
     qnaImagesView.leftToSuperview()
     qnaImagesView.rightToSuperview()
     qnaImagesViewHeight = UIScreen.main.bounds.width / 2 - 30
     qnaImagesViewHeightConstraint = qnaImagesView.height(0, priority: .defaultHigh)
     self.qnaImagesView = qnaImagesView
+    
+    //bottomArea
+    let bottomArea = UIView()
+    addSubview(bottomArea)
+    bottomArea.topToBottom(of: qnaImagesView, offset: 10.0)
+    bottomArea.edgesToSuperview(excluding: .top)
+    self.bottomArea = bottomArea
     
     //profileImageView
     let profileImageView = UIImageView()
@@ -240,15 +253,18 @@ class ANIQnaViewCell: UITableViewCell {
           let loveButtonBG = self.loveButtonBG,
           let loveButton = self.loveButton,
           let qna = self.qna,
+          let qnaImagesViewTopConstraint = self.qnaImagesViewTopConstraint,
           let qnaImagesViewHeightConstraint = self.qnaImagesViewHeightConstraint else { return }
     
     questionLabel.text = qna.qna
 
     if let qnaImageUrls = qna.qnaImageUrls {
+      qnaImagesViewTopConstraint.constant = 10.0
       qnaImagesViewHeightConstraint.constant = qnaImagesViewHeight
       qnaImagesView.imageUrls = qnaImageUrls
     } else {
-      qnaImagesViewHeightConstraint.constant = 0
+      qnaImagesViewTopConstraint.constant = 0.0
+      qnaImagesViewHeightConstraint.constant = 0.0
     }
 
     if ANISessionManager.shared.isAnonymous {

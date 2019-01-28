@@ -9,6 +9,7 @@
 import UIKit
 import FirebaseFirestore
 import CodableFirebase
+import ActiveLabel
 
 protocol ANIStoryRankingCellDelegate {
   func loadedUser(user: FirebaseUser)
@@ -27,7 +28,7 @@ class ANIStoryRankingCell: UICollectionViewCell {
   private weak var videoImageView: UIImageView?
   
   let STORY_LABEL_HEIHGT: CGFloat = 35.0
-  private weak var storyLabel: UILabel?
+  private weak var storyLabel: ActiveLabel?
   
   let PROFILE_IMAGE_VIEW_HEIGHT: CGFloat = 30.0
   private weak var profileImageView: UIImageView?
@@ -98,11 +99,17 @@ class ANIStoryRankingCell: UICollectionViewCell {
     self.storyImageView = storyImageView
     
     //storyLabel
-    let storyLabel = UILabel()
+    let storyLabel = ActiveLabel()
     storyLabel.text = ""
     storyLabel.font = UIFont.systemFont(ofSize: 14.0)
     storyLabel.textColor = ANIColor.subTitle
     storyLabel.numberOfLines = 2
+    storyLabel.customize { (label) in
+      label.hashtagColor = ANIColor.link
+    }
+    storyLabel.handleHashtagTap { (hashtag) in
+      ANINotificationManager.postTapHashtag(contributionKind: KEY_CONTRIBUTION_KIND_STROY, hashtag: hashtag)
+    }
     base.addSubview(storyLabel)
     storyLabel.topToBottom(of: storyImageView, offset: 5.0)
     storyLabel.leftToSuperview(offset: 10.0)

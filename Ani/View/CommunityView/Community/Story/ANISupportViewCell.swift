@@ -9,6 +9,7 @@
 import UIKit
 import FirebaseFirestore
 import CodableFirebase
+import ActiveLabel
 
 protocol ANISupportViewCellDelegate {
   func supportCellTapped(story: FirebaseStory, user: FirebaseUser)
@@ -22,7 +23,7 @@ protocol ANISupportViewCellDelegate {
 
 class ANISupportViewCell: UITableViewCell {
   
-  private weak var messageLabel: UILabel?
+  private weak var messageLabel: ActiveLabel?
   
   private let RECRUIT_BASE_BORDER_WIDHT: CGFloat = 1.2
   private weak var deleteRecruitBase: UIView?
@@ -39,6 +40,7 @@ class ANISupportViewCell: UITableViewCell {
   private weak var titleLabel: UILabel?
   private weak var subTitleLabel: UILabel?
   
+  private weak var bottomArea: UIView?
   private let PROFILE_IMAGE_VIEW_HEIGHT: CGFloat = 32.0
   private weak var profileImageView: UIImageView?
   private weak var userNameLabel: UILabel?
@@ -53,8 +55,6 @@ class ANISupportViewCell: UITableViewCell {
   
   var story: FirebaseStory? {
     didSet {
-      guard let story = self.story else { return }
-      
       if user == nil {
         loadUser()
       }
@@ -141,6 +141,14 @@ class ANISupportViewCell: UITableViewCell {
   
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
+  }
+  
+  override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+    for touch: AnyObject in touches {
+      if let myTouch: UITouch = touch as? UITouch, let touchView = myTouch.view, touchView != bottomArea {
+        cellTapped()
+      }
+    }
   }
   
   private func setup() {
@@ -303,19 +311,30 @@ class ANISupportViewCell: UITableViewCell {
     self.subTitleLabel = subTitleLabel
     
     //messageLabel
-    let messageLabel = UILabel()
+    let messageLabel = ActiveLabel()
     messageLabel.font = UIFont.systemFont(ofSize: 16.0)
     messageLabel.textAlignment = .left
     messageLabel.textColor = ANIColor.subTitle
     messageLabel.numberOfLines = 0
-    messageLabel.isUserInteractionEnabled = true
-    let labelTapGesture = UITapGestureRecognizer(target: self, action: #selector(cellTapped))
-    messageLabel.addGestureRecognizer(labelTapGesture)
+    messageLabel.enabledTypes = [.hashtag]
+    messageLabel.customize { (label) in
+      label.hashtagColor = ANIColor.link
+    }
+    messageLabel.handleHashtagTap { (hashtag) in
+      ANINotificationManager.postTapHashtag(contributionKind: KEY_CONTRIBUTION_KIND_STROY, hashtag: hashtag)
+    }
     addSubview(messageLabel)
     messageLabel.topToBottom(of: recruitBase, offset: 10.0)
     messageLabel.leftToSuperview(offset: 10.0)
     messageLabel.rightToSuperview(offset: -10.0)
     self.messageLabel = messageLabel
+    
+    //bottomArea
+    let bottomArea = UIView()
+    addSubview(bottomArea)
+    bottomArea.topToBottom(of: messageLabel, offset: 10.0)
+    bottomArea.edgesToSuperview(excluding: .top)
+    self.bottomArea = bottomArea
     
     //profileImageView
     let profileImageView = UIImageView()
