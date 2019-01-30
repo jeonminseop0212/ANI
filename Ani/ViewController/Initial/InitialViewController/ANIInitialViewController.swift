@@ -115,6 +115,7 @@ extension ANIInitialViewController: ANIInitialViewDelegate {
   }
   
   func startAnonymous() {
+    ANISessionManager.shared.isHiddenInitial = true
     self.dismiss(animated: true, completion: nil)
   }
   
@@ -169,6 +170,7 @@ extension ANIInitialViewController: ANIInitialViewDelegate {
   
   func successTwitterLogin() {
     ANINotificationManager.postLogin()
+    ANISessionManager.shared.isHiddenInitial = true
     self.navigationController?.dismiss(animated: true, completion: nil)
   }
   
@@ -228,6 +230,7 @@ extension ANIInitialViewController: GIDSignInDelegate, GIDSignInUIDelegate {
             self.myTabBarController?.loadUser() {
               ANINotificationManager.postLogin()
               self.activityIndicatorView?.stopAnimating()
+              ANISessionManager.shared.isHiddenInitial = true
               self.navigationController?.dismiss(animated: true, completion: nil)
               self.myTabBarController?.observeChatGroup()
             }
@@ -315,6 +318,7 @@ extension ANIInitialViewController: GIDSignInDelegate, GIDSignInUIDelegate {
         self.myTabBarController?.loadUser() {
           ANINotificationManager.postLogin()
           self.activityIndicatorView?.stopAnimating()
+          ANISessionManager.shared.isHiddenInitial = true
           self.navigationController?.dismiss(animated: true, completion: nil)
           self.myTabBarController?.observeChatGroup()
         }

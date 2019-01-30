@@ -222,6 +222,9 @@ class ANITabBarController: UITabBarController {
           activityIndicatorView.stopAnimating()
 
           ANIFunction.shared.showReviewAlertOpenApp()
+          
+          ANISessionManager.shared.isHiddenSplash = true
+          self.showEventIfNeeded()
         })
       }
     }
@@ -237,6 +240,51 @@ class ANITabBarController: UITabBarController {
     if !isLoadedFirstData {
       loadUser()
       observeChatGroup()
+    }
+  }
+  
+  private func showEventIfNeeded() {
+    let database = Firestore.firestore()
+    
+    let userDefaults = UserDefaults.standard
+    
+    if ANISessionManager.shared.isHiddenInitial && ANISessionManager.shared.isHiddenSplash && ANISessionManager.shared.isCheckedVersion {
+      DispatchQueue.global().async {
+        database.collection(KEY_EVENTS).getDocuments(completion: { (snapshot, error) in
+          if let error = error {
+            DLog("get event document error \(error)")
+            return
+          }
+          
+          guard let snapshot = snapshot else { return }
+          
+          for document in snapshot.documents {
+            do {
+              let event = try FirestoreDecoder().decode(FirebaseEvent.self, from: document.data())
+              
+              if userDefaults.object(forKey: KEY_SHOW_EVENT) == nil {
+                let showEvents = [Int]()
+                userDefaults.set(showEvents, forKey: KEY_SHOW_EVENT)
+              }
+              
+              if let eventId = Int(event.id),
+                let showEvents = userDefaults.object(forKey: KEY_SHOW_EVENT) as? [Int],
+                !showEvents.contains(eventId) {
+                let eventPopupViewController = ANIEventPopupViewController()
+                eventPopupViewController.event = event
+                eventPopupViewController.modalPresentationStyle = .overCurrentContext
+                self.present(eventPopupViewController, animated: false, completion: nil)
+                
+                userDefaults.set([eventId], forKey: KEY_SHOW_EVENT)
+                
+                ANISessionManager.shared.isShowEvent = true
+              }
+            } catch let error {
+              DLog(error)
+            }
+          }
+        })
+      }
     }
   }
 }
@@ -281,6 +329,7 @@ extension ANITabBarController {
       }
     } else if userDefaults.bool(forKey: KEY_FIRST_LAUNCH) {
       signOut()
+      ANISessionManager.shared.isHiddenInitial = false
       ifNeedsShowInitialView()
     }
 

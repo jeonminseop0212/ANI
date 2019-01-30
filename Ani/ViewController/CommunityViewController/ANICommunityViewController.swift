@@ -56,6 +56,12 @@ class ANICommunityViewController: UIViewController {
     playVideo()
   }
   
+  override func viewDidAppear(_ animated: Bool) {
+    if !ANISessionManager.shared.isShowEvent {
+      showEventIfNeeded()
+    }
+  }
+  
   override func viewWillDisappear(_ animated: Bool) {
     stopVideo()
   }
@@ -181,6 +187,51 @@ class ANICommunityViewController: UIViewController {
     for visibleCell in containerCollectionView.visibleCells {
       if let communityStoryCell = visibleCell as? ANICommunityStoryCell {
         communityStoryCell.stopVideo()
+      }
+    }
+  }
+  
+  private func showEventIfNeeded() {
+    let database = Firestore.firestore()
+    
+    let userDefaults = UserDefaults.standard
+    
+    if ANISessionManager.shared.isHiddenInitial && ANISessionManager.shared.isHiddenSplash && ANISessionManager.shared.isCheckedVersion {
+      DispatchQueue.global().async {
+        database.collection(KEY_EVENTS).getDocuments(completion: { (snapshot, error) in
+          if let error = error {
+            DLog("get event document error \(error)")
+            return
+          }
+          
+          guard let snapshot = snapshot else { return }
+          
+          for document in snapshot.documents {
+            do {
+              let event = try FirestoreDecoder().decode(FirebaseEvent.self, from: document.data())
+              
+              if userDefaults.object(forKey: KEY_SHOW_EVENT) == nil {
+                let showEvents = [Int]()
+                userDefaults.set(showEvents, forKey: KEY_SHOW_EVENT)
+              }
+              
+              if let eventId = Int(event.id),
+                let showEvents = userDefaults.object(forKey: KEY_SHOW_EVENT) as? [Int],
+                !showEvents.contains(eventId) {
+                let eventPopupViewController = ANIEventPopupViewController()
+                eventPopupViewController.event = event
+                eventPopupViewController.modalPresentationStyle = .overCurrentContext
+                self.tabBarController?.present(eventPopupViewController, animated: false, completion: nil)
+                
+                userDefaults.set([eventId], forKey: KEY_SHOW_EVENT)
+                
+                ANISessionManager.shared.isShowEvent = true
+              }
+            } catch let error {
+              DLog(error)
+            }
+          }
+        })
       }
     }
   }
@@ -417,6 +468,13 @@ extension ANICommunityViewController: ANIStoryViewDelegate {
     rankingStoryDetailViewController.rankingStory = rankingStory
     rankingStoryDetailViewController.ranking = ranking
     self.navigationController?.pushViewController(rankingStoryDetailViewController, animated: true)
+  }
+  
+  func showEvent(event: FirebaseEvent) {
+    let eventPopupViewController = ANIEventPopupViewController()
+    eventPopupViewController.event = event
+    eventPopupViewController.modalPresentationStyle = .overCurrentContext
+    self.tabBarController?.present(eventPopupViewController, animated: false, completion: nil)
   }
 }
 

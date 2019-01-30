@@ -13,6 +13,7 @@ import UserNotifications
 import Siren
 import TwitterKit
 import GoogleSignIn
+import CodableFirebase
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -155,6 +156,51 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       }
     }
   }
+  
+  private func showEventIfNeeded() {
+    let database = Firestore.firestore()
+    
+    let userDefaults = UserDefaults.standard
+    
+    if ANISessionManager.shared.isHiddenInitial && ANISessionManager.shared.isHiddenSplash && ANISessionManager.shared.isCheckedVersion {
+      DispatchQueue.global().async {
+        database.collection(KEY_EVENTS).getDocuments(completion: { (snapshot, error) in
+          if let error = error {
+            DLog("get event document error \(error)")
+            return
+          }
+          
+          guard let snapshot = snapshot else { return }
+          
+          for document in snapshot.documents {
+            do {
+              let event = try FirestoreDecoder().decode(FirebaseEvent.self, from: document.data())
+              
+              if userDefaults.object(forKey: KEY_SHOW_EVENT) == nil {
+                let showEvents = [Int]()
+                userDefaults.set(showEvents, forKey: KEY_SHOW_EVENT)
+              }
+              
+              if let eventId = Int(event.id),
+                let showEvents = userDefaults.object(forKey: KEY_SHOW_EVENT) as? [Int],
+                !showEvents.contains(eventId) {
+                let eventPopupViewController = ANIEventPopupViewController()
+                eventPopupViewController.event = event
+                eventPopupViewController.modalPresentationStyle = .overCurrentContext
+                self.tabBarController?.present(eventPopupViewController, animated: false, completion: nil)
+                
+                userDefaults.set([eventId], forKey: KEY_SHOW_EVENT)
+                
+                ANISessionManager.shared.isShowEvent = true
+              }
+            } catch let error {
+              DLog(error)
+            }
+          }
+        })
+      }
+    }
+  }
 }
 
 //MARK: UNUserNotificationCenterDelegate
@@ -224,23 +270,28 @@ extension AppDelegate: MessagingDelegate {
 extension AppDelegate: SirenDelegate {
   func sirenLatestVersionInstalled() {
     ANISessionManager.shared.isCheckedVersion = true
+    showEventIfNeeded()
   }
 
   func sirenVersionIsSkip() {
     ANISessionManager.shared.isCheckedVersion = true
+    showEventIfNeeded()
   }
 
   func sirenUserDidCancel() {
     ANISessionManager.shared.isCheckedVersion = true
+    showEventIfNeeded()
   }
 
   func sirenUserDidSkipVersion() {
     ANISessionManager.shared.isCheckedVersion = true
+    showEventIfNeeded()
   }
 
   func sirenDidFailVersionCheck(error: Error) {
     if IS_DEBUG {
       ANISessionManager.shared.isCheckedVersion = true
+      showEventIfNeeded()
     } else {
       ANINotificationManager.postFailLoadVersion()
     }
