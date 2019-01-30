@@ -134,7 +134,7 @@ class ANIVideoStoryViewCell: UITableViewCell {
     addSubview(storyLabel)
     storyLabel.topToBottom(of: storyVideoView, offset: 10.0)
     storyLabel.leftToSuperview(offset: 10.0)
-    storyLabel.rightToSuperview(offset: -10.0, priority: .defaultHigh)
+    storyLabel.rightToSuperview(offset: -10.0)
     self.storyLabel = storyLabel
     
     //bottomArea
