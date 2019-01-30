@@ -202,6 +202,7 @@ extension ANISignUpViewController: ANISignUpViewDelegate {
   }
   
   func donButtonTapped() {
+    ANISessionManager.shared.isHiddenInitial = true
     self.navigationController?.dismiss(animated: true, completion: nil)
   }
   

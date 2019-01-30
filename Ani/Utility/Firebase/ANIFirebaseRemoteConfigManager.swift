@@ -72,7 +72,7 @@ class ANIFirebaseRemoteConfigManager: ANIFirebase {
   
   func getShowReivewConditions(completion: (([String: Int]?, Error?)->())? = nil) {
     dispatchGroup.notify(queue: .main) {
-      let DEF_CONDITIONS = [KEY_REVIEW_LOVE: 2, KEY_REVIEW_OPEN_APP: 9, KEY_REVIEW_COMMENT: 1, KEY_REVIEW_CONTRIBUTION: 1, KEY_REVIEW_FOLLOW: 2]
+      let DEF_CONDITIONS = [KEY_REVIEW_LOVE: 3, KEY_REVIEW_OPEN_APP: 14, KEY_REVIEW_COMMENT: 2, KEY_REVIEW_CONTRIBUTION: 2, KEY_REVIEW_FOLLOW: 3]
       
       guard let config = self.config else{
         completion?(DEF_CONDITIONS, NSError.init(domain: "config is nill", code: -1, userInfo: nil))

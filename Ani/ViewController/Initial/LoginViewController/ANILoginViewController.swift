@@ -176,6 +176,8 @@ class ANILoginViewController: UIViewController {
 extension ANILoginViewController: ANILoginViewDelegate {
   func loginSuccess() {
     ANINotificationManager.postLogin()
+
+    ANISessionManager.shared.isHiddenInitial = true
     self.navigationController?.dismiss(animated: true, completion: nil)
   }
   

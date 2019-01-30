@@ -166,7 +166,9 @@ extension ANIAutoLoginViewController: ANIAutoLoginViewDelegate {
                 do {
                   let user = try FirestoreDecoder().decode(FirebaseUser.self, from: value)
                   
-                  DispatchQueue.main.async {                    
+                  DispatchQueue.main.async {
+                    ANISessionManager.shared.isHiddenInitial = true
+
                     self.navigationController?.dismiss(animated: true, completion: {
                       ANISessionManager.shared.currentUser = user
                       ANISessionManager.shared.currentUserUid = currentUser.uid

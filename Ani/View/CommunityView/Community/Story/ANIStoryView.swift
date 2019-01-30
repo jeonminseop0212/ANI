@@ -18,6 +18,7 @@ protocol ANIStoryViewDelegate {
   func reject()
   func popupOptionView(isMe: Bool, contentType: ContentType, id: String)
   func didSelectRankingCell(rankingStory: FirebaseStory, ranking: Int)
+  func showEvent(event: FirebaseEvent)
 }
 
 class ANIStoryView: UIView {
@@ -765,9 +766,8 @@ extension ANIStoryView {
               ANISessionManager.shared.isLoadedFirstData = true
               
               ANINotificationManager.postDismissSplash()
+              self.setPushNotification()
             }
-            
-            self.setPushNotification()
           }
         } else {
           self.showReloadView()

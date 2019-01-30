@@ -14,6 +14,7 @@ let KEY_DATE = "date"
 let KEY_FCM_TOKEN = "fcmToken"
 let KEY_CONTENT_TYPE = "contentType"
 let KEY_CONTRIBUTION_KIND = "contributionKind"
+let KEY_SHOW_EVENT = "showEvent"
 
 //user
 let KEY_UID = "uid"
@@ -134,4 +135,7 @@ let KEY_REVIEW_CONTRIBUTION = "contribution"
 let KEY_REVIEW_CONTRIBUTION_MULTIPLY = "reviewContributionMultiply"
 let KEY_REVIEW_FOLLOW = "follow"
 let KEY_REVIEW_FOLLOW_MULTIPLY = "reviewFollowMultiply"
+
+//event
+let KEY_EVENTS = "events"
 
