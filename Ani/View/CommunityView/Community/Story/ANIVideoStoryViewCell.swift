@@ -84,6 +84,8 @@ class ANIVideoStoryViewCell: UITableViewCell {
   
   var indexPath: Int?
   
+  var isRanking: Bool = false
+  
   var delegate: ANIVideoStoryViewCellDelegate?
   
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -134,7 +136,6 @@ class ANIVideoStoryViewCell: UITableViewCell {
     addSubview(storyLabel)
     storyLabel.topToBottom(of: storyVideoView, offset: 10.0)
     storyLabel.leftToSuperview(offset: 10.0)
-    storyLabel.rightToSuperview(offset: -10.0)
     self.storyLabel = storyLabel
     
     //bottomArea
@@ -274,6 +275,11 @@ class ANIVideoStoryViewCell: UITableViewCell {
     }
     
     storyLabel.text = story.story
+    if isRanking {
+      storyLabel.rightToSuperview(offset: -10.0, priority: .defaultHigh)
+    } else {
+      storyLabel.rightToSuperview(offset: -10.0)
+    }
     
     if ANISessionManager.shared.isAnonymous {
       loveButtonBG.isUserInteractionEnabled = true
