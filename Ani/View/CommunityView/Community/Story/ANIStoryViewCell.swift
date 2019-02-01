@@ -81,6 +81,8 @@ class ANIStoryViewCell: UITableViewCell {
   
   var indexPath: Int?
   
+  var isRanking: Bool = false
+  
   var delegate: ANIStoryViewCellDelegate?
   
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -134,7 +136,6 @@ class ANIStoryViewCell: UITableViewCell {
     addSubview(storyLabel)
     storyLabel.topToBottom(of: storyImagesView, offset: 5.0)
     storyLabel.leftToSuperview(offset: 10.0)
-    storyLabel.rightToSuperview(offset: -10.0)
     self.storyLabel = storyLabel
     
     //bottomArea
@@ -262,6 +263,11 @@ class ANIStoryViewCell: UITableViewCell {
       storyImagesView.pageControl?.numberOfPages = storyImageUrls.count
     }
     storyLabel.text = story.story
+    if isRanking {
+      storyLabel.rightToSuperview(offset: -10.0, priority: .defaultHigh)
+    } else {
+      storyLabel.rightToSuperview(offset: -10.0)
+    }
     
     if ANISessionManager.shared.isAnonymous {
       loveButtonBG.isUserInteractionEnabled = true
