@@ -9,6 +9,7 @@
 import UIKit
 import FirebaseFirestore
 import CodableFirebase
+import TinyConstraints
 
 protocol ANIQnaViewDelegate {
   func qnaViewCellDidSelect(selectedQna: FirebaseQna, user: FirebaseUser)
@@ -24,11 +25,17 @@ class ANIQnaView: UIView {
   
   private weak var refreshControl: UIRefreshControl?
   
+  private let NEW_QNA_BUTTON_OFFSET: CGFloat = ANICommunityViewController.NAVIGATION_BAR_HEIGHT + 7.0
+  private let NEW_QNA_BUTTON_HEIGHT: CGFloat = 30.0
+  private var newQnaButtonTopConstraint: Constraint?
+  private weak var newQnaButton: ANIAreaButtonView?
+  private weak var arrowImageView: UIImageView?
+  private weak var newQnaLabel: UILabel?
+  
   private weak var activityIndicatorView: ANIActivityIndicator?
 
   private var qnas = [FirebaseQna]()
   private var users = [FirebaseUser]()
-  
   
   var isCellSelected: Bool = false
   
@@ -36,6 +43,12 @@ class ANIQnaView: UIView {
   private var isLastQnaPage: Bool = false
   private var isLoading: Bool = false
   private let COUNT_LAST_CELL: Int = 4
+  
+  private var isLoadedFirstData: Bool = false
+  private var isNewQna: Bool = false
+  private var isShowNewQnaButton: Bool = false
+  
+  private var scrollBeginingPoint: CGPoint?
   
   var delegate: ANIQnaViewDelegate?
   
@@ -48,6 +61,7 @@ class ANIQnaView: UIView {
     setup()
     loadQna(sender: nil)
     setupNotifications()
+    observeQna()
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -84,12 +98,47 @@ class ANIQnaView: UIView {
     let refreshControl = UIRefreshControl()
     refreshControl.backgroundColor = .clear
     refreshControl.tintColor = ANIColor.moreDarkGray
-    refreshControl.addTarget(self, action: #selector(loadQna(sender:)), for: .valueChanged)
+    refreshControl.addTarget(self, action: #selector(reloadData(sender:)), for: .valueChanged)
     tableView.addSubview(refreshControl)
     self.refreshControl = refreshControl
     addSubview(tableView)
     tableView.edgesToSuperview()
     self.qnaTableView = tableView
+    
+    //newQnaButton
+    let newQnaButton = ANIAreaButtonView()
+    newQnaButton.base?.backgroundColor = ANIColor.emerald
+    newQnaButton.baseCornerRadius = NEW_QNA_BUTTON_HEIGHT / 2
+    newQnaButton.dropShadow(opacity: 0.1)
+    newQnaButton.delegate = self
+    addSubview(newQnaButton)
+    newQnaButtonTopConstraint = newQnaButton.topToSuperview(offset: -NEW_QNA_BUTTON_HEIGHT, usingSafeArea: true)
+    newQnaButton.centerXToSuperview()
+    newQnaButton.width(160.0)
+    newQnaButton.height(NEW_QNA_BUTTON_HEIGHT)
+    self.newQnaButton = newQnaButton
+    
+    //newQnaLabel
+    let newQnaLabel = UILabel()
+    newQnaLabel.text = "新しいQ&A"
+    newQnaLabel.textAlignment = .center
+    newQnaLabel.font = UIFont.boldSystemFont(ofSize: 12.0)
+    newQnaLabel.textColor = .white
+    newQnaButton.addContent(newQnaLabel)
+    newQnaLabel.centerXToSuperview(offset: 8.0)
+    newQnaLabel.centerYToSuperview()
+    self.newQnaLabel = newQnaLabel
+    
+    //arrowImageView
+    let arrowImageView = UIImageView()
+    arrowImageView.image = UIImage(named: "arrow")
+    arrowImageView.contentMode = .scaleAspectFit
+    newQnaButton.addContent(arrowImageView)
+    arrowImageView.centerYToSuperview()
+    arrowImageView.rightToLeft(of: newQnaLabel, offset: -5.0)
+    arrowImageView.width(12.0)
+    arrowImageView.height(11.0)
+    self.arrowImageView = arrowImageView
     
     //activityIndicatorView
     let activityIndicatorView = ANIActivityIndicator()
@@ -120,8 +169,18 @@ class ANIQnaView: UIView {
     ANINotificationManager.receive(deleteQna: self, selector: #selector(deleteQna))
   }
   
+  @objc private func reloadData(sender:  UIRefreshControl?) {
+    self.hideNewQnaButton()
+    self.isNewQna = false
+    
+    self.loadQna(sender: sender)
+  }
+  
   @objc private func reloadQna() {
     guard let qnaTableView = self.qnaTableView else { return }
+    
+    self.hideNewQnaButton()
+    self.isNewQna = false
     
     qnaTableView.alpha = 0.0
     
@@ -195,6 +254,54 @@ class ANIQnaView: UIView {
     
     return false
   }
+  
+  private func observeQna() {
+    let database = Firestore.firestore()
+    
+    database.collection(KEY_QNAS).order(by: KEY_DATE, descending: true).limit(to: 1).addSnapshotListener { (snapshot, error) in
+      if let error = error {
+        DLog("stories observe error \(error)")
+        return
+      }
+      
+      guard let snapshot = snapshot else { return }
+      
+      snapshot.documentChanges.forEach({ (diff) in
+        if diff.type == .added && self.isLoadedFirstData {
+          self.isNewQna = true
+          self.showNewQnaButton()
+        }
+      })
+    }
+  }
+  
+  private func showNewQnaButton() {
+    guard let newQnaButtonTopConstraint = self.newQnaButtonTopConstraint,
+          isNewQna,
+          !isShowNewQnaButton else { return }
+    
+    isShowNewQnaButton = true
+    
+    newQnaButtonTopConstraint.constant = self.NEW_QNA_BUTTON_OFFSET
+    
+    UIView.animate(withDuration: 0.4, delay: 0.0, options: .curveEaseInOut, animations: {
+      self.layoutIfNeeded()
+    }, completion: nil)
+  }
+  
+  private func hideNewQnaButton() {
+    guard let newQnaButtonTopConstraint = self.newQnaButtonTopConstraint,
+          isNewQna,
+          isShowNewQnaButton else { return }
+    
+    isShowNewQnaButton = false
+    
+    newQnaButtonTopConstraint.constant = -self.NEW_QNA_BUTTON_HEIGHT
+    
+    UIView.animate(withDuration: 0.4, delay: 0.0, options: .curveEaseInOut, animations: {
+      self.layoutIfNeeded()
+    }, completion: nil)
+  }
 }
 
 //MARK: UITableViewDataSource
@@ -208,7 +315,7 @@ extension ANIQnaView: UITableViewDataSource {
     let cell = tableView.dequeueReusableCell(withIdentifier: id, for: indexPath) as! ANIQnaViewCell
     cell.delegate = self
 
-    if !qnas.isEmpty {
+    if !qnas.isEmpty && qnas.count > indexPath.row {
       if users.contains(where: { $0.uid == qnas[indexPath.row].userId }) {
         for user in users {
           if qnas[indexPath.row].userId == user.uid {
@@ -252,6 +359,21 @@ extension ANIQnaView: UITableViewDelegate {
       return UITableView.automaticDimension
     }
   }
+  
+  func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+    scrollBeginingPoint = scrollView.contentOffset
+  }
+  
+  func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    //new story button show or hide
+    if let scrollBeginingPoint = self.scrollBeginingPoint {
+      if scrollBeginingPoint.y < scrollView.contentOffset.y {
+        hideNewQnaButton()
+      } else {
+        showNewQnaButton()
+      }
+    }
+  }
 }
 
 //MARK: ANIQnaViewCellDelegate
@@ -269,13 +391,44 @@ extension ANIQnaView: ANIQnaViewCellDelegate {
   }
   
   func loadedQnaIsLoved(indexPath: Int, isLoved: Bool) {
-    var qna = self.qnas[indexPath]
-    qna.isLoved = isLoved
-    self.qnas[indexPath] = qna
+    if qnas.count > indexPath {
+      var qna = self.qnas[indexPath]
+      qna.isLoved = isLoved
+      self.qnas[indexPath] = qna
+    }
   }
   
   func loadedQnaUser(user: FirebaseUser) {
     self.users.append(user)
+  }
+}
+
+//MARK: ANIButtonViewDelegate
+extension ANIQnaView: ANIButtonViewDelegate {
+  func buttonViewTapped(view: ANIButtonView) {
+    guard let qnaTableView = self.qnaTableView,
+          let refreshControl = self.refreshControl else { return }
+    
+    hideNewQnaButton()
+    isNewQna = false
+    
+    refreshControl.beginRefreshing()
+    let offsetY = 60 + ANICommunityViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    qnaTableView.setContentOffset(CGPoint(x: 0.0, y: -offsetY), animated: true)
+    
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+      self.loadQna(sender: refreshControl)
+    }
+  }
+}
+
+//MARK: ANIReloadViewDelegate
+extension ANIQnaView: ANIReloadViewDelegate {
+  func reloadButtonTapped() {
+    hideNewQnaButton()
+    isNewQna = false
+    
+    loadQna(sender: nil)
   }
 }
 
@@ -346,11 +499,15 @@ extension ANIQnaView {
                 if self.qnas.isEmpty {
                   self.loadMoreQna()
                 } else {
-                  activityIndicatorView.stopAnimating()
+                  if qnaTableView.alpha == 0.0 {
+                    activityIndicatorView.stopAnimating()
+                    
+                    UIView.animate(withDuration: 0.2, animations: {
+                      qnaTableView.alpha = 1.0
+                    })
+                  }
                   
-                  UIView.animate(withDuration: 0.2, animations: {
-                    qnaTableView.alpha = 1.0
-                  })
+                  self.isLoadedFirstData = true
                 }
               }
             }
@@ -426,6 +583,8 @@ extension ANIQnaView {
                       qnaTableView.alpha = 1.0
                     })
                   }
+                  
+                  self.isLoadedFirstData = true
                 }
               }
             }
@@ -436,12 +595,5 @@ extension ANIQnaView {
         }
       })
     }
-  }
-}
-
-//MARK: ANIReloadViewDelegate
-extension ANIQnaView: ANIReloadViewDelegate {
-  func reloadButtonTapped() {
-    loadQna(sender: nil)
   }
 }

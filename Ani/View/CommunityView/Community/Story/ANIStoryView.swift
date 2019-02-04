@@ -11,6 +11,7 @@ import FirebaseFirestore
 import CodableFirebase
 import AVKit
 import UserNotifications
+import TinyConstraints
 
 protocol ANIStoryViewDelegate {
   func didSelectStoryViewCell(selectedStory: FirebaseStory, user: FirebaseUser)
@@ -29,6 +30,15 @@ class ANIStoryView: UIView {
   
   private weak var refreshControl: UIRefreshControl?
   
+  private let NEW_STORY_BUTTON_OFFSET: CGFloat = ANICommunityViewController.NAVIGATION_BAR_HEIGHT + 7.0
+  private let NEW_STORY_BUTTON_HEIGHT: CGFloat = 30.0
+  private var newStoryButtonTopConstraint: Constraint?
+  private weak var newStoryButton: ANIAreaButtonView?
+  private weak var arrowImageView: UIImageView?
+  private weak var newStoryLabel: UILabel?
+  
+  private weak var activityIndicatorView: ANIActivityIndicator?
+  
   private var stories = [FirebaseStory]()
   private var supportRecruits = [String: FirebaseRecruit?]()
   private var storyVideoAssets = [String: AVAsset]()
@@ -42,8 +52,12 @@ class ANIStoryView: UIView {
   
   private var lastRankingStory: QueryDocumentSnapshot?
   
-  private weak var activityIndicatorView: ANIActivityIndicator?
-
+  private var isLoadedFirstData: Bool = false
+  private var isNewStory: Bool = false
+  private var isShowNewStoryButton: Bool = false
+  
+  private var scrollBeginingPoint: CGPoint?
+  
   var isCellSelected: Bool = false {
     didSet {
       if isCellSelected {
@@ -68,6 +82,7 @@ class ANIStoryView: UIView {
     super.init(frame: frame)
     setup()
     setupNotifications()
+    observeStory()
     
     if ANISessionManager.shared.isLaunchNoti {
       loadStory(sender: nil)
@@ -121,6 +136,41 @@ class ANIStoryView: UIView {
     tableView.edgesToSuperview()
     self.storyTableView = tableView
     
+    //newStoryButton
+    let newStoryButton = ANIAreaButtonView()
+    newStoryButton.base?.backgroundColor = ANIColor.emerald
+    newStoryButton.baseCornerRadius = NEW_STORY_BUTTON_HEIGHT / 2
+    newStoryButton.dropShadow(opacity: 0.1)
+    newStoryButton.delegate = self
+    addSubview(newStoryButton)
+    newStoryButtonTopConstraint = newStoryButton.topToSuperview(offset: -NEW_STORY_BUTTON_HEIGHT, usingSafeArea: true)
+    newStoryButton.centerXToSuperview()
+    newStoryButton.width(160.0)
+    newStoryButton.height(NEW_STORY_BUTTON_HEIGHT)
+    self.newStoryButton = newStoryButton
+    
+    //newStoryLabel
+    let newStoryLabel = UILabel()
+    newStoryLabel.text = "新しいストーリー"
+    newStoryLabel.textAlignment = .center
+    newStoryLabel.font = UIFont.boldSystemFont(ofSize: 12.0)
+    newStoryLabel.textColor = .white
+    newStoryButton.addContent(newStoryLabel)
+    newStoryLabel.centerXToSuperview(offset: 8.0)
+    newStoryLabel.centerYToSuperview()
+    self.newStoryLabel = newStoryLabel
+    
+    //arrowImageView
+    let arrowImageView = UIImageView()
+    arrowImageView.image = UIImage(named: "arrow")
+    arrowImageView.contentMode = .scaleAspectFit
+    newStoryButton.addContent(arrowImageView)
+    arrowImageView.centerYToSuperview()
+    arrowImageView.rightToLeft(of: newStoryLabel, offset: -5.0)
+    arrowImageView.width(12.0)
+    arrowImageView.height(11.0)
+    self.arrowImageView = arrowImageView
+    
     //activityIndicatorView
     let activityIndicatorView = ANIActivityIndicator()
     activityIndicatorView.isFull = false
@@ -130,7 +180,10 @@ class ANIStoryView: UIView {
   }
   
   @objc private func reloadData(sender:  UIRefreshControl?) {
-    self.loadStory(sender: sender)
+    hideNewStoryButton()
+    isNewStory = false
+    
+    loadStory(sender: sender)
   }
   
   static func endRefresh() {
@@ -186,9 +239,12 @@ class ANIStoryView: UIView {
   @objc private func reloadStory() {
     guard let storyTableView = self.storyTableView else { return }
     
+    hideNewStoryButton()
+    isNewStory = false
+
     storyTableView.alpha = 0.0
     
-    self.loadStory(sender: nil)
+    loadStory(sender: nil)
   }
   
   @objc private func scrollToTop() {
@@ -271,6 +327,54 @@ class ANIStoryView: UIView {
       }
     }
   }
+  
+  private func observeStory() {
+    let database = Firestore.firestore()
+    
+    database.collection(KEY_STORIES).order(by: KEY_DATE, descending: true).limit(to: 1).addSnapshotListener { (snapshot, error) in
+      if let error = error {
+        DLog("stories observe error \(error)")
+        return
+      }
+      
+      guard let snapshot = snapshot else { return }
+      
+      snapshot.documentChanges.forEach({ (diff) in
+        if diff.type == .added && self.isLoadedFirstData {
+          self.isNewStory = true
+          self.showNewStoryButton()
+        }
+      })
+    }
+  }
+  
+  private func showNewStoryButton() {
+    guard let newStoryButtonTopConstraint = self.newStoryButtonTopConstraint,
+          isNewStory,
+          !isShowNewStoryButton else { return }
+    
+    isShowNewStoryButton = true
+
+    newStoryButtonTopConstraint.constant = self.NEW_STORY_BUTTON_OFFSET
+    
+    UIView.animate(withDuration: 0.4, delay: 0.0, options: .curveEaseInOut, animations: {
+      self.layoutIfNeeded()
+    }, completion: nil)
+  }
+  
+  private func hideNewStoryButton() {
+    guard let newStoryButtonTopConstraint = self.newStoryButtonTopConstraint,
+          isNewStory,
+          isShowNewStoryButton else { return }
+    
+    isShowNewStoryButton = false
+
+    newStoryButtonTopConstraint.constant = -self.NEW_STORY_BUTTON_HEIGHT
+    
+    UIView.animate(withDuration: 0.4, delay: 0.0, options: .curveEaseInOut, animations: {
+      self.layoutIfNeeded()
+    }, completion: nil)
+  }
 }
 
 //MARK: UITableViewDataSource
@@ -285,7 +389,7 @@ extension ANIStoryView: UITableViewDataSource {
   
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     if rankingStories.isEmpty {
-      if !stories.isEmpty {
+      if !stories.isEmpty && stories.count > indexPath.row {
         if let recruitId = stories[indexPath.row].recruitId {
           let supportCellId = NSStringFromClass(ANISupportViewCell.self)
           let cell = tableView.dequeueReusableCell(withIdentifier: supportCellId, for: indexPath) as! ANISupportViewCell
@@ -378,7 +482,7 @@ extension ANIStoryView: UITableViewDataSource {
         
         return cell
       } else {
-        if !stories.isEmpty {
+        if !stories.isEmpty && stories.count > indexPath.row - 1 {
           if let recruitId = stories[indexPath.row - 1].recruitId {
             let supportCellId = NSStringFromClass(ANISupportViewCell.self)
             let cell = tableView.dequeueReusableCell(withIdentifier: supportCellId, for: indexPath) as! ANISupportViewCell
@@ -530,6 +634,10 @@ extension ANIStoryView: UITableViewDelegate {
     }
   }
   
+  func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+    scrollBeginingPoint = scrollView.contentOffset
+  }
+  
   func scrollViewDidScroll(_ scrollView: UIScrollView) {
     guard let storyTableView = self.storyTableView else { return }
     
@@ -560,6 +668,15 @@ extension ANIStoryView: UITableViewDelegate {
         beforeVideoViewCell = nil
       }
     }
+    
+    //new story button show or hide
+    if let scrollBeginingPoint = self.scrollBeginingPoint {
+      if scrollBeginingPoint.y < scrollView.contentOffset.y {
+        hideNewStoryButton()
+      } else {
+        showNewStoryButton()
+      }
+    }
   }
 }
 
@@ -578,7 +695,7 @@ extension ANIStoryView: ANIStoryViewCellDelegate, ANIVideoStoryViewCellDelegate 
   }
   
   func loadedStoryIsLoved(indexPath: Int, isLoved: Bool) {
-    if !self.stories.isEmpty {
+    if !self.stories.isEmpty && stories.count > indexPath {
       var story = self.stories[indexPath]
       story.isLoved = isLoved
       self.stories[indexPath] = story
@@ -613,6 +730,35 @@ extension ANIStoryView: ANISupportViewCellDelegate {
 extension ANIStoryView: ANIRankingViewCellDelegate {
   func didSelectRankingCell(rankingStory: FirebaseStory, ranking: Int) {
     self.delegate?.didSelectRankingCell(rankingStory: rankingStory, ranking: ranking)
+  }
+}
+
+//MARK: ANIButtonViewDelegate
+extension ANIStoryView: ANIButtonViewDelegate {
+  func buttonViewTapped(view: ANIButtonView) {
+    guard let storyTableView = self.storyTableView,
+          let refreshControl = self.refreshControl else { return }
+    
+    hideNewStoryButton()
+    isNewStory = false
+    
+    refreshControl.beginRefreshing()
+    let offsetY = 60 + ANICommunityViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    storyTableView.setContentOffset(CGPoint(x: 0.0, y: -offsetY), animated: true)
+
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+      self.loadStory(sender: refreshControl)
+    }
+  }
+}
+
+//MARK: ANIReloadViewDelegate
+extension ANIStoryView: ANIReloadViewDelegate {
+  func reloadButtonTapped() {
+    hideNewStoryButton()
+    isNewStory = false
+    
+    loadStory(sender: nil)
   }
 }
 
@@ -751,19 +897,20 @@ extension ANIStoryView {
           sender.endRefreshing()
         }
         
-        activityIndicatorView.stopAnimating()
-
         if self.lastStory != nil {
           storyTableView.reloadData()
           
           if self.stories.isEmpty {
             self.loadMoreStory()
           } else {
-            if storyTableView.alpha == 0 {
+            if storyTableView.alpha == 0.0 {
+              activityIndicatorView.stopAnimating()
+
               UIView.animate(withDuration: 0.2, animations: {
                 storyTableView.alpha = 1.0
               })
               ANISessionManager.shared.isLoadedFirstData = true
+              self.isLoadedFirstData = true
               
               ANINotificationManager.postDismissSplash()
               self.setPushNotification()
@@ -829,7 +976,7 @@ extension ANIStoryView {
                 if self.stories.isEmpty {
                   self.loadMoreStory()
                 } else {
-                  if storyTableView.alpha == 0 {
+                  if storyTableView.alpha == 0.0 {
                     activityIndicatorView.stopAnimating()
                     
                     UIView.animate(withDuration: 0.2, animations: {
@@ -837,9 +984,9 @@ extension ANIStoryView {
                     })
 
                     ANISessionManager.shared.isLoadedFirstData = true
+                    self.isLoadedFirstData = true
+                    ANINotificationManager.postDismissSplash()
                   }
-                  
-                  ANINotificationManager.postDismissSplash()
                 }
               }
             }
@@ -850,12 +997,5 @@ extension ANIStoryView {
         }
       })
     }
-  }
-}
-
-//MARK: ANIReloadViewDelegate
-extension ANIStoryView: ANIReloadViewDelegate {
-  func reloadButtonTapped() {
-    loadStory(sender: nil)
   }
 }

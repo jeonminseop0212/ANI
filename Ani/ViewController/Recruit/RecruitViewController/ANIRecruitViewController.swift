@@ -18,6 +18,7 @@ enum FilterPickMode: Int {
 
 class ANIRecruitViewController: UIViewController {
   
+  private weak var myNavigationBartopArea: UIView?
   private weak var myNavigationBar: UIView?
   private weak var myNavigationBarTopConstroint: Constraint?
   private weak var navigaitonTitleLabel: UILabel?
@@ -38,6 +39,14 @@ class ANIRecruitViewController: UIViewController {
   private weak var rejectView: ANIRejectView?
   private var isRejectAnimating: Bool = false
   private var rejectTapView: UIView?
+  
+  private let NEW_RECRUIT_BUTTON_OFFSET: CGFloat = 7.0
+  private let NEW_RECRUIT_BUTTON_HIDE_OFFSET: CGFloat = -60.0
+  private let NEW_RECRUIT_BUTTON_HEIGHT: CGFloat = 30.0
+  private var newRecruitButtonTopConstraint: Constraint?
+  private weak var newRecruitButton: ANIAreaButtonView?
+  private weak var arrowImageView: UIImageView?
+  private weak var newRecruitLabel: UILabel?
   
   private weak var uploadProgressView: ANIUploadProgressView?
   
@@ -76,6 +85,40 @@ class ANIRecruitViewController: UIViewController {
     recruitView.edgesToSuperview(excluding: .top)
     self.recruitView = recruitView
     
+    //newRecuritButton
+    let newRecruitButton = ANIAreaButtonView()
+    newRecruitButton.base?.backgroundColor = ANIColor.emerald
+    newRecruitButton.baseCornerRadius = NEW_RECRUIT_BUTTON_HEIGHT / 2
+    newRecruitButton.dropShadow(opacity: 0.1)
+    newRecruitButton.delegate = self
+    self.view.addSubview(newRecruitButton)
+    newRecruitButton.centerXToSuperview()
+    newRecruitButton.width(160.0)
+    newRecruitButton.height(NEW_RECRUIT_BUTTON_HEIGHT)
+    self.newRecruitButton = newRecruitButton
+    
+    //newRecruitLabel
+    let newRecruitLabel = UILabel()
+    newRecruitLabel.text = "新しい募集"
+    newRecruitLabel.textAlignment = .center
+    newRecruitLabel.font = UIFont.boldSystemFont(ofSize: 12.0)
+    newRecruitLabel.textColor = .white
+    newRecruitButton.addContent(newRecruitLabel)
+    newRecruitLabel.centerXToSuperview(offset: 8.0)
+    newRecruitLabel.centerYToSuperview()
+    self.newRecruitLabel = newRecruitLabel
+    
+    //arrowImageView
+    let arrowImageView = UIImageView()
+    arrowImageView.image = UIImage(named: "arrow")
+    arrowImageView.contentMode = .scaleAspectFit
+    newRecruitButton.addContent(arrowImageView)
+    arrowImageView.centerYToSuperview()
+    arrowImageView.rightToLeft(of: newRecruitLabel, offset: -5.0)
+    arrowImageView.width(12.0)
+    arrowImageView.height(11.0)
+    self.arrowImageView = arrowImageView
+    
     //myNavigationBar
     let myNavigationBar = UIView()
     myNavigationBar.backgroundColor = .white
@@ -95,6 +138,16 @@ class ANIRecruitViewController: UIViewController {
     navigaitonTitleLabel.centerInSuperview()
     self.navigaitonTitleLabel = navigaitonTitleLabel
     
+    //myNavigationBartopArea
+    let myNavigationBartopArea = UIView()
+    myNavigationBartopArea.backgroundColor = .white
+    self.view.addSubview(myNavigationBartopArea)
+    myNavigationBartopArea.leftToSuperview()
+    myNavigationBartopArea.rightToSuperview()
+    myNavigationBartopArea.bottomToTop(of: myNavigationBar)
+    myNavigationBartopArea.height(UIViewController.STATUS_BAR_HEIGHT)
+    self.myNavigationBartopArea = myNavigationBartopArea
+    
     //filtersView
     let filtersView = ANIRecruitFiltersView()
     filtersView.delegate = self
@@ -104,6 +157,8 @@ class ANIRecruitViewController: UIViewController {
     filtersView.rightToSuperview()
     filtersView.height(ANIRecruitViewController.FILTERS_VIEW_HEIGHT)
     self.filtersView = filtersView
+    
+    newRecruitButtonTopConstraint = newRecruitButton.topToBottom(of: filtersView, offset: NEW_RECRUIT_BUTTON_HIDE_OFFSET)
     
     //contributionButon
     let contributionButon = ANIImageButtonView()
@@ -197,6 +252,26 @@ class ANIRecruitViewController: UIViewController {
     recruitView.pickItem = pickItem
   }
   
+  func showNewRecruitButtonAnimation() {
+    guard let newRecruitButtonTopConstraint = self.newRecruitButtonTopConstraint else { return }
+    
+    newRecruitButtonTopConstraint.constant = self.NEW_RECRUIT_BUTTON_OFFSET
+    
+    UIView.animate(withDuration: 0.4, delay: 0.0, options: .curveEaseInOut, animations: {
+      self.view.layoutIfNeeded()
+    }, completion: nil)
+  }
+  
+  func hideNewRecruitButtonAnimation() {
+    guard let newRecruitButtonTopConstraint = self.newRecruitButtonTopConstraint else { return }
+    
+    newRecruitButtonTopConstraint.constant = NEW_RECRUIT_BUTTON_HIDE_OFFSET
+    
+    UIView.animate(withDuration: 0.4, delay: 0.0, options: .curveEaseInOut, animations: {
+      self.view.layoutIfNeeded()
+    }, completion: nil)
+  }
+  
   //MARK: Action
   @objc private func rejectViewTapped() {
     let initialViewController = ANIInitialViewController()
@@ -218,6 +293,12 @@ extension ANIRecruitViewController:ANIButtonViewDelegate {
       } else {
         reject()
       }
+    }
+    
+    if view === self.newRecruitButton {
+      guard let recruitView = self.recruitView else { return }
+      
+      recruitView.newRecruitButtonTapped()
     }
   }
 }
@@ -296,6 +377,14 @@ extension ANIRecruitViewController: ANIRecruitViewDelegate {
         rejectTapView.isHidden = true
       })
     }
+  }
+  
+  func showNewRecruitButton() {
+    showNewRecruitButtonAnimation()
+  }
+  
+  func hideNewRecruitButton() {
+    hideNewRecruitButtonAnimation()
   }
 }
 
