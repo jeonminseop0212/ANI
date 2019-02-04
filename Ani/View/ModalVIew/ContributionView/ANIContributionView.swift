@@ -100,6 +100,7 @@ class ANIContributionView: UIView {
     
     //contentTextView
     let contentTextView = ANIPlaceHolderTextView()
+    contentTextView.keyboardType = .twitter
     contentTextView.textColor = ANIColor.dark
     contentTextView.font = UIFont.systemFont(ofSize: 17.0)
     contentTextView.isScrollEnabled = false
