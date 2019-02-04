@@ -107,7 +107,7 @@ class ANIRecuruitView: UIView {
   
   private var recruitListener: ListenerRegistration?
   
-  var delegate:ANIRecruitViewDelegate?
+  var delegate: ANIRecruitViewDelegate?
   
   private var cellHeight = [IndexPath: CGFloat]()
   
