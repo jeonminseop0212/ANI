@@ -12,6 +12,7 @@ import FirebaseAuth
 import FirebaseFirestore
 import FirebaseStorage
 import CodableFirebase
+import GoogleSignIn
 
 class ANITwitter {
   
@@ -318,6 +319,11 @@ class ANITwitter {
           }
   
           try Auth.auth().signOut()
+          ANITwitter.logOut()
+          GIDSignIn.sharedInstance().signOut()
+          
+          let userDefaults = UserDefaults.standard
+          userDefaults.set(false, forKey: KEY_IS_TWITTER_SHARE)
   
           ANISessionManager.shared.currentUser = nil
           ANISessionManager.shared.currentUserUid = nil

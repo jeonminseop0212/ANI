@@ -16,6 +16,7 @@ import InstantSearchClient
 import AVKit
 import Photos
 import ActiveLabel
+import TwitterKit
 
 protocol ANIContributionViewControllerDelegate {
   func loadThumnailImage(thumbnailImage: UIImage?)
@@ -35,6 +36,15 @@ class ANIContributionViewController: UIViewController {
   private weak var titleLabel: UILabel?
   private weak var contributionButtonBG: UIView?
   private weak var contributionButton: UIButton?
+  
+  private var rejectViewBottomConstraint: Constraint?
+  private var rejectViewBottomConstraintOriginalConstant: CGFloat?
+  private weak var rejectView: UIView?
+  private weak var rejectBaseView: UIView?
+  private weak var rejectLabel: UILabel?
+  private var isRejectAnimating: Bool = false
+  
+  private weak var activityIndicatorView: ANIActivityIndicator?
   
   private var contributionViewOriginalBottomConstraintConstant: CGFloat?
   private var contributionViewBottomConstraint: Constraint?
@@ -168,6 +178,42 @@ class ANIContributionViewController: UIViewController {
     contributionViewBottomConstraint = contriButionView.bottomToSuperview()
     contributionViewOriginalBottomConstraintConstant = contributionViewBottomConstraint?.constant
     self.contriButionView = contriButionView
+    
+    //rejectView
+    let rejectView = UIView()
+    rejectView.backgroundColor = ANIColor.emerald
+    self.view.addSubview(rejectView)
+    rejectViewBottomConstraint = rejectView.bottomToTop(of: self.view)
+    rejectViewBottomConstraintOriginalConstant = rejectViewBottomConstraint?.constant
+    rejectView.leftToSuperview()
+    rejectView.rightToSuperview()
+    rejectView.height(UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT)
+    self.rejectView = rejectView
+    
+    //rejectBaseView
+    let rejectBaseView = UIView()
+    rejectBaseView.backgroundColor = ANIColor.emerald
+    rejectView.addSubview(rejectBaseView)
+    rejectBaseView.edgesToSuperview(excluding: .top)
+    rejectBaseView.height(UIViewController.NAVIGATION_BAR_HEIGHT)
+    self.rejectBaseView = rejectBaseView
+    
+    //rejectLabel
+    let rejectLabel = UILabel()
+    rejectLabel.textAlignment = .center
+    rejectLabel.textColor = .white
+    rejectLabel.font = UIFont.boldSystemFont(ofSize: 16.0)
+    rejectLabel.textAlignment = .center
+    rejectBaseView.addSubview(rejectLabel)
+    rejectLabel.edgesToSuperview()
+    self.rejectLabel = rejectLabel
+    
+    //activityIndicatorView
+    let activityIndicatorView = ANIActivityIndicator()
+    activityIndicatorView.isFull = true
+    self.view.addSubview(activityIndicatorView)
+    activityIndicatorView.edgesToSuperview()
+    self.activityIndicatorView = activityIndicatorView
   }
   
   private func setupGalleryController() {
@@ -453,6 +499,8 @@ class ANIContributionViewController: UIViewController {
         }
         
         self.delegate?.updateProgress(progress: 1.0)
+        
+        self.postTwitter(story: story)
       }
     } catch let error {
       DLog(error)
@@ -473,6 +521,8 @@ class ANIContributionViewController: UIViewController {
         self.pushDataAlgolia(data: data as [String : AnyObject])
         
         self.delegate?.updateProgress(progress: 1.0)
+        
+        self.postTwitter(qna: qna)
       }
     } catch let error {
       DLog(error)
@@ -501,6 +551,62 @@ class ANIContributionViewController: UIViewController {
           DLog("Object IDs: \(content!)")
         }
       })
+    }
+  }
+  
+  private func postTwitter(story: FirebaseStory? = nil, qna: FirebaseQna? = nil) {
+    if let story = story {
+      if story.storyImageUrls != nil {
+        if !self.contentImages.isEmpty, let image = self.contentImages[0] {
+          TWTRAPIClient.withCurrentUser().sendTweet(withText: story.story, image: image) { (tweet, error) in
+            if let error = error {
+              DLog("image story post twitter error \(error)")
+              DLog(error.localizedDescription)
+              return
+            }
+            
+            DLog("image story post twitter success")
+          }
+        }
+      } else if let storyVideoUrl = story.storyVideoUrl {
+        if let url = URL(string: storyVideoUrl), let videoData = try? Data(contentsOf: url) {
+          TWTRAPIClient.withCurrentUser().sendTweet(withText: story.story, videoData: videoData) { (tweet, error) in
+            if let error = error {
+              DLog("video story post twitter error \(error)")
+              DLog(error.localizedDescription)
+              return
+            }
+            
+            DLog("video story post twitter success")
+          }
+        }
+      }
+    }
+    
+    if let qna = qna {
+      if qna.qnaImageUrls != nil {
+        if !self.contentImages.isEmpty, let image = self.contentImages[0] {
+          TWTRAPIClient.withCurrentUser().sendTweet(withText: qna.qna, image: image) { (tweet, error) in
+            if let error = error {
+              DLog("image qna post twitter error \(error)")
+              DLog(error.localizedDescription)
+              return
+            }
+            
+            DLog("image qna post twitter success")
+          }
+        }
+      }  else {
+        TWTRAPIClient.withCurrentUser().sendTweet(withText: qna.qna) { (tweet, error) in
+          if let error = error {
+            DLog("qna post twitter error \(error)")
+            DLog(error.localizedDescription)
+            return
+          }
+          
+          DLog("qna post twitter success")
+        }
+      }
     }
   }
   
@@ -556,6 +662,30 @@ class ANIContributionViewController: UIViewController {
     UIView.animate(withDuration: duration, delay: 0, options: UIView.AnimationOptions(rawValue: curve), animations: {
       self.view.layoutIfNeeded()
     })
+  }
+  
+  private func reject(notiText: String) {
+    guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
+          let rejectLabel = self.rejectLabel,
+          !isRejectAnimating else { return }
+    
+    rejectLabel.text = notiText
+    
+    rejectViewBottomConstraint.constant = UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut, animations: {
+      self.isRejectAnimating = true
+      self.view.layoutIfNeeded()
+    }) { (complete) in
+      guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
+        let rejectViewBottomConstraintOriginalConstant = self.rejectViewBottomConstraintOriginalConstant else { return }
+      
+      rejectViewBottomConstraint.constant = rejectViewBottomConstraintOriginalConstant
+      UIView.animate(withDuration: 0.3, delay: 1.0, options: .curveEaseInOut, animations: {
+        self.view.layoutIfNeeded()
+      }, completion: { (complete) in
+        self.isRejectAnimating = false
+      })
+    }
   }
   
   //MARK: action
@@ -667,6 +797,35 @@ extension ANIContributionViewController: ANIContributionViewDelegate {
       contributionButton.isEnabled = false
       contributionButtonBG.alpha = 0.5
     }
+  }
+  
+  func twitterLink() {
+    guard let activityIndicatorView = self.activityIndicatorView else { return }
+    
+    let alertController = UIAlertController(title: "Twitter連携が必要です", message: "アカウントをTwitterに連携しますか？", preferredStyle: .alert)
+    
+    let deleteAction = UIAlertAction(title: "連携", style: .default) { (action) in
+      activityIndicatorView.startAnimating()
+      
+      ANITwitter.login(isLink: true, completion: { (success, errorMessage) in
+        if !success, let errorMessage = errorMessage {
+          self.reject(notiText: errorMessage)
+          activityIndicatorView.stopAnimating()
+          return
+        }
+        
+        activityIndicatorView.stopAnimating()
+        if let contriButionView = self.contriButionView {
+          contriButionView.twitterShareToggle()
+        }
+      })
+    }
+    let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
+    
+    alertController.addAction(deleteAction)
+    alertController.addAction(cancelAction)
+    
+    self.present(alertController, animated: true, completion: nil)
   }
 }
 

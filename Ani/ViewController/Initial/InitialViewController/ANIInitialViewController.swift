@@ -288,7 +288,7 @@ extension ANIInitialViewController: GIDSignInDelegate, GIDSignInUIDelegate {
         
         if let profileImageUrl = url {
           let fcmToken = UserDefaults.standard.string(forKey: KEY_FCM_TOKEN)
-          let user = FirebaseUser(uid: currentUser.uid, userName: userName, kind: "個人", introduce: "", profileImageUrl: profileImageUrl.absoluteString, familyImageUrls: nil, checkNotiDate: nil, isHaveUnreadNoti: false, unreadNotiCount: 0, unreadMessageCount: 0, fcmToken: fcmToken, twitterAccount: nil, instagramAccount: nil, isTwitterLink: true)
+          let user = FirebaseUser(uid: currentUser.uid, userName: userName, kind: "個人", introduce: "", profileImageUrl: profileImageUrl.absoluteString, familyImageUrls: nil, checkNotiDate: nil, isHaveUnreadNoti: false, unreadNotiCount: 0, unreadMessageCount: 0, fcmToken: fcmToken, twitterAccount: nil, instagramAccount: nil, isTwitterLink: false)
           
           self.uploadUserIntoDatabase(uid: currentUser.uid, user: user)
         }
@@ -384,6 +384,11 @@ extension ANIInitialViewController: GIDSignInDelegate, GIDSignInUIDelegate {
     if Auth.auth().currentUser != nil {
       do {
         try Auth.auth().signOut()
+        ANITwitter.logOut()
+        GIDSignIn.sharedInstance().signOut()
+        
+        let userDefaults = UserDefaults.standard
+        userDefaults.set(false, forKey: KEY_IS_TWITTER_SHARE)
         
         ANISessionManager.shared.currentUser = nil
         ANISessionManager.shared.currentUserUid = nil
