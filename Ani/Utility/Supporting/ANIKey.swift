@@ -15,6 +15,7 @@ let KEY_FCM_TOKEN = "fcmToken"
 let KEY_CONTENT_TYPE = "contentType"
 let KEY_CONTRIBUTION_KIND = "contributionKind"
 let KEY_SHOW_EVENT = "showEvent"
+let KEY_IS_TWITTER_SHARE = "isTwitterShare"
 
 //user
 let KEY_UID = "uid"

@@ -164,7 +164,7 @@ extension ANIOptionViewController: ANIOptionViewDelegate {
   func linkTwitterTapped() {
     guard let activityIndicatorView = self.activityIndicatorView else { return }
     
-    let alertController = UIAlertController(title: "Twitter連携", message: "アカウントをTwitterと連携しますか？\nTwitterアカウントで再ログインできます。", preferredStyle: .alert)
+    let alertController = UIAlertController(title: "Twitter連携", message: "アカウントをTwitterと連携しますか？\nTwitterアカウントで再ログイン、Twitterに投稿ができます。", preferredStyle: .alert)
     
     let logoutAction = UIAlertAction(title: "連携", style: .default) { (action) in
       activityIndicatorView.startAnimating()
@@ -202,6 +202,9 @@ extension ANIOptionViewController: ANIOptionViewDelegate {
         
         ANITwitter.logOut()
         GIDSignIn.sharedInstance().signOut()
+        
+        let userDefaults = UserDefaults.standard
+        userDefaults.set(false, forKey: KEY_IS_TWITTER_SHARE)
         
         ANISessionManager.shared.currentUser = nil
         ANISessionManager.shared.currentUserUid = nil
