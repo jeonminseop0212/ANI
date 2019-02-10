@@ -86,6 +86,7 @@ class ANIContributionView: UIView {
     super.init(frame: frame)
     
     setup()
+    
   }
   
   required init?(coder aDecoder: NSCoder) {
