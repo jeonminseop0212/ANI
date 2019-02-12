@@ -277,7 +277,12 @@ class ANIContributionViewController: UIViewController {
                     activityLabel.enabledTypes = [.hashtag]
                     activityLabel.text = content
                     
-                    let story = FirebaseStory(id: id, storyImageUrls: urls, storyVideoUrl: nil, thumbnailImageUrl: nil, story: content, userId: uid, recruitId: nil, recruitTitle: nil, recruitSubTitle: nil, date: date, day: day, isLoved: nil, hideUserIds: nil, loveCount: 0, hashtags: activityLabel.hashtagElements)
+                    var hashtags = [String: String]()
+                    for hashtagElement in activityLabel.hashtagElements {
+                      hashtags[hashtagElement] = date
+                    }
+                    
+                    let story = FirebaseStory(id: id, storyImageUrls: urls, storyVideoUrl: nil, thumbnailImageUrl: nil, story: content, userId: uid, recruitId: nil, recruitTitle: nil, recruitSubTitle: nil, date: date, day: day, isLoved: nil, hideUserIds: nil, loveCount: 0, hashtags: hashtags)
                     
                     self.upateStroyDatabase(story: story, id: id)
                   }
@@ -390,7 +395,12 @@ class ANIContributionViewController: UIViewController {
           activityLabel.enabledTypes = [.hashtag]
           activityLabel.text = content
           
-          let story = FirebaseStory(id: id, storyImageUrls: nil, storyVideoUrl: videoUrl, thumbnailImageUrl: thumbnailImageUrl, story: content, userId: uid, recruitId: nil, recruitTitle: nil, recruitSubTitle: nil, date: date, day: day, isLoved: nil, hideUserIds: nil, loveCount: 0, hashtags: activityLabel.hashtagElements)
+          var hashtags = [String: String]()
+          for hashtagElement in activityLabel.hashtagElements {
+            hashtags[hashtagElement] = date
+          }
+          
+          let story = FirebaseStory(id: id, storyImageUrls: nil, storyVideoUrl: videoUrl, thumbnailImageUrl: thumbnailImageUrl, story: content, userId: uid, recruitId: nil, recruitTitle: nil, recruitSubTitle: nil, date: date, day: day, isLoved: nil, hideUserIds: nil, loveCount: 0, hashtags: hashtags)
 
           self.upateStroyDatabase(story: story, id: id)
         }
@@ -416,7 +426,12 @@ class ANIContributionViewController: UIViewController {
           activityLabel.enabledTypes = [.hashtag]
           activityLabel.text = content
           
-          let qna = FirebaseQna(id: id, qnaImageUrls: nil, qna: content, userId: uid, date: date, isLoved: nil, hideUserIds: nil, hashtags: activityLabel.hashtagElements)
+          var hashtags = [String: String]()
+          for hashtagElement in activityLabel.hashtagElements {
+            hashtags[hashtagElement] = date
+          }
+          
+          let qna = FirebaseQna(id: id, qnaImageUrls: nil, qna: content, userId: uid, date: date, isLoved: nil, hideUserIds: nil, hashtags: hashtags)
           
           DispatchQueue.main.async {
             self.delegate?.loadThumnailImage(thumbnailImage: nil)
@@ -459,7 +474,12 @@ class ANIContributionViewController: UIViewController {
                       activityLabel.enabledTypes = [.hashtag]
                       activityLabel.text = content
                       
-                      let qna = FirebaseQna(id: id, qnaImageUrls: urls, qna: content, userId: uid, date: date, isLoved: nil, hideUserIds: nil, hashtags: activityLabel.hashtagElements)
+                      var hashtags = [String: String]()
+                      for hashtagElement in activityLabel.hashtagElements {
+                        hashtags[hashtagElement] = date
+                      }
+                      
+                      let qna = FirebaseQna(id: id, qnaImageUrls: urls, qna: content, userId: uid, date: date, isLoved: nil, hideUserIds: nil, hashtags: hashtags)
   
                       self.upateQnaDatabase(qna: qna, id: id)
                     }

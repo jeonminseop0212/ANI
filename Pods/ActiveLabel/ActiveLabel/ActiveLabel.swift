@@ -64,7 +64,7 @@ typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveTy
         didSet { updateTextStorage(parseText: false) }
     }
   
-    open var hashtagElements = [String: String]()
+    open var hashtagElements = [String]()
     
     // MARK: - Computed Properties
     private var hightlightFont: UIFont? {
@@ -362,13 +362,12 @@ typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveTy
             }
             let hashtagElements = ActiveBuilder.createElements(type: type, from: textString, range: textRange, filterPredicate: filter)
             activeElements[type] = hashtagElements
-            let date = getToday()
           
             self.hashtagElements.removeAll()
             for hashtagElement in hashtagElements {
               switch hashtagElement.element {
               case .hashtag(let hashtag):
-                self.hashtagElements[hashtag] = date
+                self.hashtagElements.append(hashtag)
               default:
                 print("default")
               }

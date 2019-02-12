@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import ActiveLabel
 
 protocol ANIContributionViewDelegate {
   func imagesPickCellTapped()
@@ -284,10 +285,39 @@ extension ANIContributionView: ANIContributionImagesViewDelegate {
 //MARK: UITextViewDelegate
 extension ANIContributionView: UITextViewDelegate {
   func textViewDidChange(_ textView: UITextView) {
+    if let textView = textView as? ANIPlaceHolderTextView, textView.markedTextRange == nil {
+      
+      var replaceText: String = textView.text
+      if let range = replaceText.range(of: "＃") {
+        replaceText.replaceSubrange(range, with: "#")
+        textView.text = replaceText
+      }
+      
+      let activtyLabel = ActiveLabel()
+      activtyLabel.text = replaceText
+      
+      if !activtyLabel.hashtagElements.isEmpty {
+        textView.resolveHashTags(text: replaceText, hashtagArray: activtyLabel.hashtagElements)
+      } else {
+        let attrs = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17.0), NSAttributedString.Key.foregroundColor: ANIColor.dark]
+
+        textView.typingAttributes = attrs
+        
+        let attrString = NSMutableAttributedString(string: replaceText, attributes: attrs)
+        textView.attributedText = attrString
+      }
+    }
+    
     if isContributable() {
       self.delegate?.contributionButtonOn(on: true)
     } else {
       self.delegate?.contributionButtonOn(on: false)
     }
+  }
+  
+  func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+    textView.typingAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17.0), NSAttributedString.Key.foregroundColor: ANIColor.dark]
+    
+    return true
   }
 }

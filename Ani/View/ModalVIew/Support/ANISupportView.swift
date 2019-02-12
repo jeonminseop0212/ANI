@@ -147,7 +147,12 @@ extension ANISupportView: ANIButtonViewDelegate {
       activityLabel.enabledTypes = [.hashtag]
       activityLabel.text = messageTextView.text
       
-      let story = FirebaseStory(id: id, storyImageUrls: nil, storyVideoUrl: nil, thumbnailImageUrl: nil, story: messageTextView.text, userId: uid, recruitId: recruitId, recruitTitle: recruit.title, recruitSubTitle: recruit.reason, date: date, day: nil, isLoved: nil, hideUserIds: nil, loveCount: nil, hashtags: activityLabel.hashtagElements)
+      var hashtags = [String: String]()
+      for hashtagElement in activityLabel.hashtagElements {
+        hashtags[hashtagElement] = date
+      }
+      
+      let story = FirebaseStory(id: id, storyImageUrls: nil, storyVideoUrl: nil, thumbnailImageUrl: nil, story: messageTextView.text, userId: uid, recruitId: recruitId, recruitTitle: recruit.title, recruitSubTitle: recruit.reason, date: date, day: nil, isLoved: nil, hideUserIds: nil, loveCount: nil, hashtags: hashtags)
       
       DispatchQueue.global().async {
         do {

@@ -72,4 +72,71 @@ public class ANIPlaceHolderTextView: UITextView {
   func showPlaceHolder() {
     self.viewWithTag(1)?.alpha = 1
   }
+  
+  func resolveHashTags(text: String, hashtagArray: [String]) {
+    var nsText: NSString = text as NSString
+
+    var ranges = [NSRange]()
+    for (index, var word) in hashtagArray.enumerated() {
+      if index == 0 {
+        word = "#" + word
+        if word.hasPrefix("#") {
+          var range = nsText.range(of: word as String)
+          if !ranges.isEmpty, let lastRage = ranges.last {
+            range = NSRange(location: lastRage.upperBound + range.lowerBound, length: word.count)
+          }
+          
+          ranges.append(range)
+          
+          nsText = text[text.index(text.startIndex, offsetBy: range.upperBound)...] as NSString
+        }
+      } else {
+        word = " #" + word
+        if word.hasPrefix(" #") {
+          var range = nsText.range(of: word as String)
+          if !ranges.isEmpty, let lastRage = ranges.last {
+            range = NSRange(location: lastRage.upperBound + range.lowerBound, length: word.count)
+          }
+          
+          ranges.append(range)
+          
+          nsText = text[text.index(text.startIndex, offsetBy: range.upperBound)...] as NSString
+        }
+      }
+    }
+    
+    let attrs = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17.0), NSAttributedString.Key.foregroundColor: ANIColor.dark]
+
+    let attrString = NSMutableAttributedString(string: text, attributes: attrs)
+
+    if(ranges.count != 0) {
+      var i = 0
+      for range in ranges {
+        attrString.addAttribute(NSAttributedString.Key.link, value: "\(i):", range: range)
+        i += 1
+      }
+    }
+    
+    let cursorPoint = getCursorPosition()
+
+    self.attributedText = attrString
+    
+    updateCursorPoint(cursorPoint: cursorPoint)
+  }
+  
+  private func getCursorPosition() -> Int {
+    if let selectedRange = self.selectedTextRange {
+      let cursorPosition = self.offset(from: self.beginningOfDocument, to: selectedRange.start)
+      
+      return cursorPosition
+    }
+    
+    return 0
+  }
+  
+  private func updateCursorPoint(cursorPoint: Int) {
+    if let newPosition = self.position(from: self.beginningOfDocument, offset: cursorPoint) {
+      self.selectedTextRange = self.textRange(from: newPosition, to: newPosition)
+    }
+  }
 }
