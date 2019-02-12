@@ -261,7 +261,7 @@ class ANIProfileCell: UITableViewCell {
     introductionLabel.enabledTypes = [.url]
     introductionLabel.urlMaximumLength = 30
     introductionLabel.customize { (label) in
-      label.URLColor = ANIColor.link
+      label.URLColor = ANIColor.darkblue
     }
     introductionLabel.handleURLTap { (url) in
       self.delegate?.openUrl(url: url)

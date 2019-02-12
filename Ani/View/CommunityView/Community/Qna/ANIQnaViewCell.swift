@@ -113,7 +113,7 @@ class ANIQnaViewCell: UITableViewCell {
     questionLabel.numberOfLines = 0
     questionLabel.enabledTypes = [.hashtag]
     questionLabel.customize { (label) in
-      label.hashtagColor = ANIColor.link
+      label.hashtagColor = ANIColor.darkblue
     }
     questionLabel.handleHashtagTap { (hashtag) in
       ANINotificationManager.postTapHashtag(contributionKind: KEY_CONTRIBUTION_KIND_QNA, hashtag: hashtag)

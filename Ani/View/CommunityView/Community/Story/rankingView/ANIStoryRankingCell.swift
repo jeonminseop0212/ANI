@@ -105,7 +105,7 @@ class ANIStoryRankingCell: UICollectionViewCell {
     storyLabel.textColor = ANIColor.subTitle
     storyLabel.numberOfLines = 2
     storyLabel.customize { (label) in
-      label.hashtagColor = ANIColor.link
+      label.hashtagColor = ANIColor.darkblue
     }
     storyLabel.handleHashtagTap { (hashtag) in
       ANINotificationManager.postTapHashtag(contributionKind: KEY_CONTRIBUTION_KIND_STROY, hashtag: hashtag)

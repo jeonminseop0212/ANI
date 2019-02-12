@@ -110,10 +110,9 @@ public class ANIPlaceHolderTextView: UITextView {
     let attrString = NSMutableAttributedString(string: text, attributes: attrs)
 
     if(ranges.count != 0) {
-      var i = 0
+      let attrs = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17.0), NSAttributedString.Key.foregroundColor: ANIColor.darkblue]
       for range in ranges {
-        attrString.addAttribute(NSAttributedString.Key.link, value: "\(i):", range: range)
-        i += 1
+        attrString.addAttributes(attrs, range: range)
       }
     }
     
