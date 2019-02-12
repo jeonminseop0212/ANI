@@ -312,13 +312,13 @@ class ANISupportViewCell: UITableViewCell {
     
     //messageLabel
     let messageLabel = ActiveLabel()
-    messageLabel.font = UIFont.systemFont(ofSize: 16.0)
+    messageLabel.font = UIFont.systemFont(ofSize: 14.0)
     messageLabel.textAlignment = .left
     messageLabel.textColor = ANIColor.subTitle
     messageLabel.numberOfLines = 0
     messageLabel.enabledTypes = [.hashtag]
     messageLabel.customize { (label) in
-      label.hashtagColor = ANIColor.link
+      label.hashtagColor = ANIColor.darkblue
     }
     messageLabel.handleHashtagTap { (hashtag) in
       ANINotificationManager.postTapHashtag(contributionKind: KEY_CONTRIBUTION_KIND_STROY, hashtag: hashtag)

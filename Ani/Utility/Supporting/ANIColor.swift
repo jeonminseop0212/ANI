@@ -20,6 +20,6 @@ struct ANIColor {
   static var red = UIColor(red: 224, green: 71, blue: 71)
   static var pink = UIColor(red: 243, green: 141, blue: 155)
   static var lightPink = UIColor(red: 255, green: 174, blue: 204)
-  static var link = UIColor(red: 0, green: 80, blue: 133)
   static var lightBlue = UIColor(red: 101, green: 187, blue: 242)
+  static var darkblue = UIColor(red: 33, green: 124, blue: 181)
 }

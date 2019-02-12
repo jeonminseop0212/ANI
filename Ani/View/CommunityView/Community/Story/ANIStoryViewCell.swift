@@ -128,7 +128,7 @@ class ANIStoryViewCell: UITableViewCell {
     storyLabel.numberOfLines = 0
     storyLabel.enabledTypes = [.hashtag]
     storyLabel.customize { (label) in
-      label.hashtagColor = ANIColor.link
+      label.hashtagColor = ANIColor.darkblue
     }
     storyLabel.handleHashtagTap { (hashtag) in
       ANINotificationManager.postTapHashtag(contributionKind: KEY_CONTRIBUTION_KIND_STROY, hashtag: hashtag)
