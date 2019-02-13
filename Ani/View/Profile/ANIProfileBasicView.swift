@@ -29,9 +29,9 @@ protocol ANIProfileBasicViewDelegate {
 
 enum ContentType: Int {
   case profile;
-  case recruit;
   case story;
   case qna;
+  case recruit;
   case user;
   case comment;
 }
