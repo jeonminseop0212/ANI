@@ -17,7 +17,7 @@ class ANIProfileMenuBar: UIView {
   var delegate: ANIProfileMenuBarDelegate?
 
   weak var menuCollectionView: UICollectionView?
-  private let menus = ["プロフィール", "募集", "ストーリー", "Q&A"]
+  private let menus = ["プロフィール", "ストーリー", "Q&A", "募集"]
   
   override init(frame: CGRect) {
     super.init(frame: frame)
