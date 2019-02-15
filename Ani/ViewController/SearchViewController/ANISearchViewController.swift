@@ -548,7 +548,7 @@ extension ANISearchViewController {
         }
         
         database.collection(collection).document(contributionId).delete()
-        self.delegateDataAlgolia(contentType: contentType, contributionId: contributionId)
+        self.deleteDataAlgolia(contentType: contentType, contributionId: contributionId)
         
         DispatchQueue.main.async {
           if contentType == .story {
@@ -670,7 +670,7 @@ extension ANISearchViewController {
     database.collection(KEY_REPORTS).document(contributionId).collection(KEY_REPORT).addDocument(data: values)
   }
   
-  private func delegateDataAlgolia(contentType: ContentType, contributionId: String) {
+  private func deleteDataAlgolia(contentType: ContentType, contributionId: String) {
     var index: Index?
     
     if contentType == .story {

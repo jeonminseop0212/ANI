@@ -330,7 +330,7 @@ extension ANINotiDetailViewController {
         }
         
         database.collection(collection).document(noti.notiId).delete()
-        self.delegateDataAlgolia(contentType: contentType, contributionId: noti.notiId)
+        self.deleteDataAlgolia(contentType: contentType, contributionId: noti.notiId)
         
         DispatchQueue.main.async {
           self.navigationController?.popViewController(animated: true)
@@ -428,7 +428,7 @@ extension ANINotiDetailViewController {
     }
   }
   
-  private func delegateDataAlgolia(contentType: ContentType, contributionId: String) {
+  private func deleteDataAlgolia(contentType: ContentType, contributionId: String) {
     var index: Index?
     
     if contentType == .story {
