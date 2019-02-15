@@ -11,6 +11,7 @@ import FirebaseFirestore
 import CodableFirebase
 import StoreKit
 import ActiveLabel
+import TinyConstraints
 
 protocol ANIStoryViewCellDelegate {
   func storyCellTapped(story: FirebaseStory, user: FirebaseUser)
@@ -23,8 +24,12 @@ protocol ANIStoryViewCellDelegate {
 class ANIStoryViewCell: UITableViewCell {
   private weak var tapArea: UIView?
   private weak var storyImagesView: ANIStoryImagesView?
+  private let STORY_LABEL_TOP_CONSTANT: CGFloat = 5.0
+  private var storyLabelTopConstraint: Constraint?
+  private var storyLabelHeightConstraint: Constraint?
   private weak var storyLabel: ActiveLabel?
   
+  private var bottomAreaTopConstraint: Constraint?
   private weak var bottomArea: UIView?
   private let PROFILE_IMAGE_VIEW_HEIGHT: CGFloat = 32.0
   private weak var profileImageView: UIImageView?
@@ -133,14 +138,15 @@ class ANIStoryViewCell: UITableViewCell {
       ANINotificationManager.postTapHashtag(contributionKind: KEY_CONTRIBUTION_KIND_STROY, hashtag: hashtag)
     }
     addSubview(storyLabel)
-    storyLabel.topToBottom(of: storyImagesView, offset: 5.0)
+    storyLabelTopConstraint = storyLabel.topToBottom(of: storyImagesView, offset: STORY_LABEL_TOP_CONSTANT)
     storyLabel.leftToSuperview(offset: 10.0)
+    storyLabelHeightConstraint = storyLabel.height(0.0)
     self.storyLabel = storyLabel
     
     //bottomArea
     let bottomArea = UIView()
     addSubview(bottomArea)
-    bottomArea.topToBottom(of: storyLabel, offset: 10.0)
+    bottomAreaTopConstraint = bottomArea.topToBottom(of: storyLabel, offset: 10.0)
     bottomArea.edgesToSuperview(excluding: .top)
     self.bottomArea = bottomArea
     
@@ -150,7 +156,7 @@ class ANIStoryViewCell: UITableViewCell {
     profileImageView.isUserInteractionEnabled = true
     profileImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped)))
     addSubview(profileImageView)
-    profileImageView.topToBottom(of: storyLabel, offset: 10.0)
+    profileImageView.top(to: bottomArea)
     profileImageView.leftToSuperview(offset: 10.0)
     profileImageView.width(PROFILE_IMAGE_VIEW_HEIGHT)
     profileImageView.height(PROFILE_IMAGE_VIEW_HEIGHT)
@@ -252,7 +258,10 @@ class ANIStoryViewCell: UITableViewCell {
   
   private func reloadLayout() {
     guard let storyImagesView = self.storyImagesView,
+          let storyLabelTopConstraint = self.storyLabelTopConstraint,
+          let storyLabelHeightConstraint = self.storyLabelHeightConstraint,
           let storyLabel = self.storyLabel,
+          let bottomAreaTopConstraint = self.bottomAreaTopConstraint,
           let loveButtonBG = self.loveButtonBG,
           let loveButton = self.loveButton,
           let story = self.story else { return }
@@ -266,6 +275,15 @@ class ANIStoryViewCell: UITableViewCell {
       storyLabel.rightToSuperview(offset: -10.0, priority: .defaultHigh)
     } else {
       storyLabel.rightToSuperview(offset: -10.0)
+    }
+    if story.story == "" {
+      storyLabelTopConstraint.constant = 0
+      storyLabelHeightConstraint.isActive = true
+      bottomAreaTopConstraint.constant = 5.0
+    } else {
+      storyLabelTopConstraint.constant = STORY_LABEL_TOP_CONSTANT
+      storyLabelHeightConstraint.isActive = false
+      bottomAreaTopConstraint.constant = 10.0
     }
     
     if ANISessionManager.shared.isAnonymous {

@@ -11,6 +11,7 @@ import FirebaseFirestore
 import CodableFirebase
 import AVKit
 import ActiveLabel
+import TinyConstraints
 
 protocol ANIVideoStoryViewCellDelegate {
   func storyCellTapped(story: FirebaseStory, user: FirebaseUser)
@@ -24,6 +25,9 @@ protocol ANIVideoStoryViewCellDelegate {
 class ANIVideoStoryViewCell: UITableViewCell {
   
   weak var storyVideoView: ANIStoryVideoView?
+  private let STORY_LABEL_TOP_CONSTANT: CGFloat = 10.0
+  private var storyLabelTopConstraint: Constraint?
+  private var storyLabelHeightConstraint: Constraint?
   private weak var storyLabel: ActiveLabel?
   
   private weak var bottomArea: UIView?
@@ -134,8 +138,9 @@ class ANIVideoStoryViewCell: UITableViewCell {
       ANINotificationManager.postTapHashtag(contributionKind: KEY_CONTRIBUTION_KIND_STROY, hashtag: hashtag)
     }
     addSubview(storyLabel)
-    storyLabel.topToBottom(of: storyVideoView, offset: 10.0)
+    storyLabelTopConstraint = storyLabel.topToBottom(of: storyVideoView, offset: STORY_LABEL_TOP_CONSTANT)
     storyLabel.leftToSuperview(offset: 10.0)
+    storyLabelHeightConstraint = storyLabel.height(0.0)
     self.storyLabel = storyLabel
     
     //bottomArea
@@ -253,6 +258,8 @@ class ANIVideoStoryViewCell: UITableViewCell {
   
   private func reloadLayout() {
     guard let storyVideoView = self.storyVideoView,
+          let storyLabelTopConstraint = self.storyLabelTopConstraint,
+          let storyLabelHeightConstraint = self.storyLabelHeightConstraint,
           let storyLabel = self.storyLabel,
           let loveButtonBG = self.loveButtonBG,
           let loveButton = self.loveButton,
@@ -279,6 +286,13 @@ class ANIVideoStoryViewCell: UITableViewCell {
       storyLabel.rightToSuperview(offset: -10.0, priority: .defaultHigh)
     } else {
       storyLabel.rightToSuperview(offset: -10.0)
+    }
+    if story.story == "" {
+      storyLabelTopConstraint.constant = 0
+      storyLabelHeightConstraint.isActive = true
+    } else {
+      storyLabelTopConstraint.constant = STORY_LABEL_TOP_CONSTANT
+      storyLabelHeightConstraint.isActive = false
     }
     
     if ANISessionManager.shared.isAnonymous {
