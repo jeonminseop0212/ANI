@@ -119,8 +119,7 @@ class ANIRecruitViewCell: UITableViewCell {
     
     //tapArea
     let tapArea = UIView()
-    let cellTapGesture = UITapGestureRecognizer(target: self, action: #selector(cellTapped))
-    tapArea.addGestureRecognizer(cellTapGesture)
+    tapArea.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(cellTapped)))
     base.addSubview(tapArea)
     tapArea.edgesToSuperview(excluding: .bottom)
     self.tapArea = tapArea
@@ -231,8 +230,7 @@ class ANIRecruitViewCell: UITableViewCell {
     //profileImageView
     let profileImageView = UIImageView()
     profileImageView.isUserInteractionEnabled = true
-    let profileImageTapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped))
-    profileImageView.addGestureRecognizer(profileImageTapGesture)
+    profileImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped)))
     profileImageView.backgroundColor = ANIColor.gray
     base.addSubview(profileImageView)
     profileImageView.topToBottom(of: tapArea, offset: 10.0)
@@ -247,8 +245,7 @@ class ANIRecruitViewCell: UITableViewCell {
     //clipButtonBG
     let clipButtonBG = UIView()
     clipButtonBG.isUserInteractionEnabled = false
-    let clipBGTapGesture = UITapGestureRecognizer(target: self, action: #selector(clipButtonBGTapped))
-    clipButtonBG.addGestureRecognizer(clipBGTapGesture)
+    clipButtonBG.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(clipButtonBGTapped)))
     base.addSubview(clipButtonBG)
     clipButtonBG.centerY(to: profileImageView)
     clipButtonBG.rightToSuperview(offset: -10.0)
@@ -283,8 +280,7 @@ class ANIRecruitViewCell: UITableViewCell {
     //loveButtonBG
     let loveButtonBG = UIView()
     loveButtonBG.isUserInteractionEnabled = false
-    let loveBGTapGesture = UITapGestureRecognizer(target: self, action: #selector(loveButtonBGTapped))
-    loveButtonBG.addGestureRecognizer(loveBGTapGesture)
+    loveButtonBG.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(loveButtonBGTapped)))
     base.addSubview(loveButtonBG)
     loveButtonBG.centerY(to: profileImageView)
     loveButtonBG.rightToLeft(of: loveCountLabel, offset: -5.0)
@@ -332,6 +328,8 @@ class ANIRecruitViewCell: UITableViewCell {
     userNameLabel.font = UIFont.systemFont(ofSize: 13.0)
     userNameLabel.textColor = ANIColor.subTitle
     userNameLabel.numberOfLines = 2
+    userNameLabel.isUserInteractionEnabled = true
+    userNameLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped)))
     base.addSubview(userNameLabel)
     userNameLabel.leftToRight(of: profileImageView, offset: 10.0)
     userNameLabel.rightToLeft(of: supportButton, offset: -10.0)
