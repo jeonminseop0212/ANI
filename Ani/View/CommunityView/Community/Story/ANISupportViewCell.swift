@@ -10,6 +10,7 @@ import UIKit
 import FirebaseFirestore
 import CodableFirebase
 import ActiveLabel
+import TinyConstraints
 
 protocol ANISupportViewCellDelegate {
   func supportCellTapped(story: FirebaseStory, user: FirebaseUser)
@@ -23,6 +24,9 @@ protocol ANISupportViewCellDelegate {
 
 class ANISupportViewCell: UITableViewCell {
   
+  private let MESSAGE_LABEL_TOP_CONSTANT: CGFloat = 10.0
+  private var messageLabelTopConstraint: Constraint?
+  private var messageLabelHeightConstraint: Constraint?
   private weak var messageLabel: ActiveLabel?
   
   private let RECRUIT_BASE_BORDER_WIDHT: CGFloat = 1.2
@@ -323,9 +327,10 @@ class ANISupportViewCell: UITableViewCell {
       ANINotificationManager.postTapHashtag(contributionKind: KEY_CONTRIBUTION_KIND_STROY, hashtag: hashtag)
     }
     addSubview(messageLabel)
-    messageLabel.topToBottom(of: recruitBase, offset: 10.0)
+    messageLabelTopConstraint = messageLabel.topToBottom(of: recruitBase, offset: MESSAGE_LABEL_TOP_CONSTANT)
     messageLabel.leftToSuperview(offset: 10.0)
     messageLabel.rightToSuperview(offset: -10.0)
+    messageLabelHeightConstraint = messageLabel.height(0.0)
     self.messageLabel = messageLabel
     
     //bottomArea
@@ -442,7 +447,9 @@ class ANISupportViewCell: UITableViewCell {
   }
   
   private func reloadLayout() {
-    guard let messageLabel = self.messageLabel,
+    guard let messageLabelTopConstraint = self.messageLabelTopConstraint,
+          let messageLabelHeightConstraint = self.messageLabelHeightConstraint,
+          let messageLabel = self.messageLabel,
           let titleLabel = self.titleLabel,
           let subTitleLabel = self.subTitleLabel,
           let loveButtonBG = self.loveButtonBG,
@@ -450,6 +457,13 @@ class ANISupportViewCell: UITableViewCell {
           let story = self.story else { return }
     
     messageLabel.text = story.story
+    if story.story == "" {
+      messageLabelTopConstraint.constant = 0
+      messageLabelHeightConstraint.isActive = true
+    } else {
+      messageLabelTopConstraint.constant = MESSAGE_LABEL_TOP_CONSTANT
+      messageLabelHeightConstraint.isActive = false
+    }
     
     titleLabel.text = story.recruitTitle
     subTitleLabel.text = story.recruitSubTitle
