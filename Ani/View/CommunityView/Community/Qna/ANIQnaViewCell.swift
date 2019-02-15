@@ -145,8 +145,7 @@ class ANIQnaViewCell: UITableViewCell {
     let profileImageView = UIImageView()
     profileImageView.backgroundColor = ANIColor.gray
     profileImageView.isUserInteractionEnabled = true
-    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped))
-    profileImageView.addGestureRecognizer(tapGesture)
+    profileImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped)))
     addSubview(profileImageView)
     profileImageView.topToBottom(of: qnaImagesView, offset: 10.0)
     profileImageView.leftToSuperview(offset: 10.0)
@@ -240,6 +239,8 @@ class ANIQnaViewCell: UITableViewCell {
     userNameLabel.font = UIFont.systemFont(ofSize: 13.0)
     userNameLabel.textColor = ANIColor.subTitle
     userNameLabel.numberOfLines = 2
+    userNameLabel.isUserInteractionEnabled = true
+    userNameLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped)))
     addSubview(userNameLabel)
     userNameLabel.leftToRight(of: profileImageView, offset: 10.0)
     userNameLabel.rightToLeft(of: loveButton, offset: -10)

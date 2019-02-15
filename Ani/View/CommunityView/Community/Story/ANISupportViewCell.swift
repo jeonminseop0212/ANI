@@ -198,8 +198,7 @@ class ANISupportViewCell: UITableViewCell {
     recruitBase.layer.borderColor = ANIColor.gray.cgColor
     recruitBase.layer.borderWidth = RECRUIT_BASE_BORDER_WIDHT
     recruitBase.isUserInteractionEnabled = true
-    let recruitTapGesture = UITapGestureRecognizer(target: self, action: #selector(recruitTapped))
-    recruitBase.addGestureRecognizer(recruitTapGesture)
+    recruitBase.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(recruitTapped)))
     addSubview(recruitBase)
     recruitBase.topToSuperview(offset: 10.0)
     recruitBase.leftToSuperview(offset: 10.0)
@@ -340,8 +339,7 @@ class ANISupportViewCell: UITableViewCell {
     let profileImageView = UIImageView()
     profileImageView.backgroundColor = ANIColor.gray
     profileImageView.isUserInteractionEnabled = true
-    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped))
-    profileImageView.addGestureRecognizer(tapGesture)
+    profileImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped)))
     addSubview(profileImageView)
     profileImageView.topToBottom(of: messageLabel, offset: 10.0)
     profileImageView.leftToSuperview(offset: 10.0)
@@ -398,8 +396,7 @@ class ANISupportViewCell: UITableViewCell {
     //loveButtonBG
     let loveButtonBG = UIView()
     loveButtonBG.isUserInteractionEnabled = false
-    let loveButtonBGtapGesture = UITapGestureRecognizer(target: self, action: #selector(loveButtonBGTapped))
-    loveButtonBG.addGestureRecognizer(loveButtonBGtapGesture)
+    loveButtonBG.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(loveButtonBGTapped)))
     addSubview(loveButtonBG)
     loveButtonBG.centerY(to: profileImageView)
     loveButtonBG.rightToLeft(of: loveCountLabel, offset: -5.0)
@@ -425,6 +422,8 @@ class ANISupportViewCell: UITableViewCell {
     userNameLabel.font = UIFont.systemFont(ofSize: 13.0)
     userNameLabel.textColor = ANIColor.subTitle
     userNameLabel.numberOfLines = 2
+    userNameLabel.isUserInteractionEnabled = true
+    userNameLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped)))
     addSubview(userNameLabel)
     userNameLabel.leftToRight(of: profileImageView, offset: 10.0)
     userNameLabel.rightToLeft(of: loveButton, offset: -10.0)

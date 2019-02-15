@@ -124,8 +124,7 @@ class ANIStoryRankingCell: UICollectionViewCell {
     profileImageView.layer.masksToBounds = true
     profileImageView.contentMode = .scaleAspectFill
     profileImageView.isUserInteractionEnabled = true
-    let profileIamgetapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped))
-    profileImageView.addGestureRecognizer(profileIamgetapGesture)
+    profileImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped)))
     base.addSubview(profileImageView)
     profileImageView.topToBottom(of: storyLabel, offset: 5.0)
     profileImageView.leftToSuperview(offset: 10.0)
@@ -139,6 +138,8 @@ class ANIStoryRankingCell: UICollectionViewCell {
     userNameLabel.textColor = ANIColor.subTitle
     userNameLabel.numberOfLines = 2
     userNameLabel.text = ""
+    userNameLabel.isUserInteractionEnabled = true
+    userNameLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped)))
     base.addSubview(userNameLabel)
     userNameLabel.centerY(to: profileImageView)
     userNameLabel.leftToRight(of: profileImageView, offset: 10.0)
