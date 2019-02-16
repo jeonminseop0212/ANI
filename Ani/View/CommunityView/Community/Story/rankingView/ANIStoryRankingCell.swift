@@ -191,7 +191,7 @@ class ANIStoryRankingCell: UICollectionViewCell {
     
     //blockAlertLabel
     let blockAlertLabel = UILabel()
-    blockAlertLabel.text = "ブロックした\nストーリーです"
+    blockAlertLabel.text = "見れない\nストーリーです"
     blockAlertLabel.textColor = ANIColor.dark
     blockAlertLabel.textAlignment = .center
     blockAlertLabel.font = UIFont.boldSystemFont(ofSize: 15.0)

@@ -12,7 +12,7 @@ import InstantSearchClient
 import AVKit
 
 protocol ANISearchViewDelegate {
-  func searchViewDidScroll(scrollY: CGFloat)
+  func viewDidScroll(scrollY: CGFloat)
   func storyViewCellDidSelect(selectedStory: FirebaseStory, user: FirebaseUser)
   func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser)
   func qnaViewCellDidSelect(selectedQna: FirebaseQna, user:FirebaseUser)
@@ -28,6 +28,8 @@ enum SearchCategory: String {
 class ANISearchView: UIView {
   
   private weak var tableView: UITableView?
+  
+  private weak var activityIndicatorView: ANIActivityIndicator?
   
   private var searchUsers = [FirebaseUser]()
   private var searchStories = [FirebaseStory]()
@@ -80,8 +82,6 @@ class ANISearchView: UIView {
   private var storyCellHeight = [IndexPath: CGFloat]()
   private var qnaCellHeight = [IndexPath: CGFloat]()
   
-  private weak var activityIndicatorView: ANIActivityIndicator?
-
   var delegate: ANISearchViewDelegate?
 
   override init(frame: CGRect) {
@@ -123,13 +123,6 @@ class ANISearchView: UIView {
     addSubview(tableView)
     tableView.edgesToSuperview()
     self.tableView = tableView
-    
-//    //activityIndicatorView
-//    let activityIndicatorView = ANIActivityIndicator()
-//    activityIndicatorView.isFull = false
-//    self.addSubview(activityIndicatorView)
-//    activityIndicatorView.edgesToSuperview()
-//    self.activityIndicatorView = activityIndicatorView
   }
   
   private func setupNotifications() {
@@ -192,25 +185,6 @@ class ANISearchView: UIView {
       return true
     }
     if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(userId) {
-      return true
-    }
-    
-    return false
-  }
-  
-  private func isBlockStory(story: FirebaseStory) -> Bool {
-    guard let currentUserUid = ANISessionManager.shared.currentUserUid else { return false }
-    
-    if let blockUserIds = ANISessionManager.shared.blockUserIds, blockUserIds.contains(story.userId) {
-      return true
-    }
-    if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(story.userId) {
-      return true
-    }
-    if let hideUserIds = story.hideUserIds, hideUserIds.contains(currentUserUid) {
-      return true
-    }
-    if story.storyImageUrls == nil && story.recruitId == nil && story.thumbnailImageUrl == nil {
       return true
     }
     
@@ -347,7 +321,7 @@ extension ANISearchView: UITableViewDelegate {
     
     //navigation bar animation
     let scrollY = scrollView.contentOffset.y
-    self.delegate?.searchViewDidScroll(scrollY: scrollY)
+    self.delegate?.viewDidScroll(scrollY: scrollY)
   }
 }
 

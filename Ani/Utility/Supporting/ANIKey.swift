@@ -140,3 +140,7 @@ let KEY_REVIEW_FOLLOW_MULTIPLY = "reviewFollowMultiply"
 //event
 let KEY_EVENTS = "events"
 
+//popular user
+let KEY_POPULAR_USERS = "popularUsers"
+let KEY_ORDER = "order"
+

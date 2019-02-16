@@ -24,23 +24,45 @@ class ANISearchViewController: UIViewController {
   private weak var searchBar: UISearchBar?
   private weak var searchView: ANISearchView?
   
+  private weak var popularUsersView: ANIPopularUsersView?
+  
   private var selectedIndex: Int = 0 {
     didSet {
-      guard let searchView = self.searchView else { return }
+      guard let searchView = self.searchView,
+            let searchBar = self.searchBar,
+            let popularUsersView = self.popularUsersView else { return }
+
+      if let text = searchBar.textField?.text, text != "" {
+        searchView.searchText = text
+      }
 
       if selectedIndex == 0 {
         searchView.selectedCategory = .user
       } else {
         searchView.selectedCategory = .qna
       }
+      
+      if searchBar.textField?.text != "" {
+        UIView.animate(withDuration: 0.2) {
+          popularUsersView.alpha = 0.0
+        }
+      }
     }
   }
   
   private var searchText: String = "" {
     didSet {
-      guard let searchView = self.searchView else { return }
+      guard let searchView = self.searchView,
+            let searchBar = self.searchBar,
+            let popularUsersView = self.popularUsersView else { return }
 
       searchView.searchText = searchText
+      
+      if searchBar.textField?.text != "" {
+        UIView.animate(withDuration: 0.2) {
+          popularUsersView.alpha = 0.0
+        }
+      }
     }
   }
   
@@ -66,7 +88,11 @@ class ANISearchViewController: UIViewController {
   }
   
   override func viewDidDisappear(_ animated: Bool) {
+    guard let popularUsersView = self.popularUsersView else { return }
+    
     removeNotifications()
+    
+    popularUsersView.endRefresh()
   }
   
   private func setup() {
@@ -76,6 +102,7 @@ class ANISearchViewController: UIViewController {
     self.navigationController?.setNavigationBarHidden(true, animated: false)
     self.navigationController?.navigationBar.isTranslucent = false
     self.navigationController?.interactivePopGestureRecognizer?.delegate = self
+    self.automaticallyAdjustsScrollViewInsets = false
     
     //searchView
     let searchView = ANISearchView()
@@ -84,6 +111,14 @@ class ANISearchViewController: UIViewController {
     searchView.topToSuperview(usingSafeArea: true)
     searchView.edgesToSuperview(excluding: .top)
     self.searchView = searchView
+    
+    //popularUsersView
+    let popularUsersView = ANIPopularUsersView()
+    popularUsersView.delegate = self
+    self.view.addSubview(popularUsersView)
+    popularUsersView.topToSuperview(usingSafeArea: true)
+    popularUsersView.edgesToSuperview(excluding: .top)
+    self.popularUsersView = popularUsersView
     
     //myNavigationBar
     let myNavigationBar = UIView()
@@ -227,6 +262,7 @@ extension ANISearchViewController: UISearchBarDelegate {
   func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
     guard let searchBarTextField = searchBar.textField,
           let text = searchBarTextField.text else { return }
+    
     if searchBarTextField.isFirstResponder {
       searchBarTextField.resignFirstResponder()
       
@@ -235,7 +271,9 @@ extension ANISearchViewController: UISearchBarDelegate {
   }
   
   func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-    guard let searchBarTextField = searchBar.textField else { return }
+    guard let searchBarTextField = searchBar.textField,
+          let popularUsersView = self.popularUsersView else { return }
+    
     if searchBarTextField.isFirstResponder {
       searchBarTextField.resignFirstResponder()
     }
@@ -243,6 +281,10 @@ extension ANISearchViewController: UISearchBarDelegate {
     searchBar.setShowsCancelButton(false, animated: true)
     if let searchCancelButton = searchBar.cancelButton {
       searchCancelButton.alpha = 0.0
+    }
+    
+    UIView.animate(withDuration: 0.2) {
+      popularUsersView.alpha = 1.0
     }
   }
 
@@ -256,8 +298,8 @@ extension ANISearchViewController: UISearchBarDelegate {
 }
 
 //MARK: ANIUserSearchViewDelegate
-extension ANISearchViewController: ANISearchViewDelegate {
-  func searchViewDidScroll(scrollY: CGFloat) {
+extension ANISearchViewController: ANISearchViewDelegate, ANIPopularUsersViewDelegate {
+  func viewDidScroll(scrollY: CGFloat) {
     guard let myNavigationBarTopConstroint = self.myNavigationBarTopConstroint else { return }
     
     let topHeight = UIViewController.NAVIGATION_BAR_HEIGHT + ANIRecruitViewController.FILTERS_VIEW_HEIGHT
