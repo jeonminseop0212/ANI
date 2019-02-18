@@ -1,25 +1,30 @@
 //
-//  ANIUserSearchViewCell.swift
+//  ANIPopularUserCell.swift
 //  Ani
 //
-//  Created by 전민섭 on 2018/04/16.
-//  Copyright © 2018年 JeonMinseop. All rights reserved.
+//  Created by jeonminseop on 2019/02/16.
+//  Copyright © 2019 JeonMinseop. All rights reserved.
 //
 
 import UIKit
 import FirebaseFirestore
+import TinyConstraints
 import CodableFirebase
 
-protocol ANIUserSearchViewCellDelegate {
+protocol ANIPopularUserCellDelegate {
   func reject()
 }
 
-class ANIUserSearchViewCell: UITableViewCell {
+class ANIPopularUserCell: UICollectionViewCell {
   
-  private weak var stackView: UIStackView?
-  private let PROFILE_IMAGE_VIEW_HEIGHT: CGFloat = 50.0
+  private weak var base: UIView?
+  private let PROFILE_IMAGE_VIEW_HEIGHT: CGFloat = 60.0
   private weak var profileImageView: UIImageView?
   private weak var userNameLabel: UILabel?
+  private weak var introduceLabel: UILabel?
+  private let FOLLOW_BUTTON_HEIGHT: CGFloat = 30.0
+  private var followButtonHeightConstraint: Constraint?
+  private var followButtonBottomConstraint: Constraint?
   private weak var followButton: ANIAreaButtonView?
   private weak var followLabel: UILabel?
   
@@ -31,10 +36,11 @@ class ANIUserSearchViewCell: UITableViewCell {
     }
   }
   
-  var delegate: ANIUserSearchViewCellDelegate?
+  var delegate: ANIPopularUserCellDelegate?
   
-  override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-    super.init(style: style, reuseIdentifier: reuseIdentifier)
+  override init(frame: CGRect) {
+    super.init(frame: frame)
+    
     setup()
   }
   
@@ -43,27 +49,27 @@ class ANIUserSearchViewCell: UITableViewCell {
   }
   
   private func setup() {
-    self.selectionStyle = .none
+    self.backgroundColor = ANIColor.bg
     self.isUserInteractionEnabled = true
     self.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped)))
     
-    //stackView
-    let stackView = UIStackView()
-    stackView.axis = .horizontal
-    stackView.alignment = .center
-    stackView.distribution = .fill
-    stackView.spacing = 10.0
-    addSubview(stackView)
-    let insets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: 10.0)
-    stackView.edgesToSuperview(insets: insets)
-    self.stackView = stackView
+    //base
+    let base = UIView()
+    base.backgroundColor = .white
+    base.layer.cornerRadius = 10.0
+    base.layer.masksToBounds = true
+    self.addSubview(base)
+    base.edgesToSuperview()
+    self.base = base
     
     //profileImageView
     let profileImageView = UIImageView()
+    profileImageView.backgroundColor = ANIColor.gray
     profileImageView.layer.cornerRadius = PROFILE_IMAGE_VIEW_HEIGHT / 2
     profileImageView.layer.masksToBounds = true
-    profileImageView.backgroundColor = ANIColor.gray
-    stackView.addArrangedSubview(profileImageView)
+    base.addSubview(profileImageView)
+    profileImageView.topToSuperview(offset: 10.0)
+    profileImageView.centerXToSuperview()
     profileImageView.width(PROFILE_IMAGE_VIEW_HEIGHT)
     profileImageView.height(PROFILE_IMAGE_VIEW_HEIGHT)
     self.profileImageView = profileImageView
@@ -71,22 +77,28 @@ class ANIUserSearchViewCell: UITableViewCell {
     //userNameLabel
     let userNameLabel = UILabel()
     userNameLabel.textColor = ANIColor.dark
-    stackView.addArrangedSubview(userNameLabel)
-    userNameLabel.centerY(to: profileImageView)
+    userNameLabel.font = UIFont.boldSystemFont(ofSize: 15.0)
+    userNameLabel.textAlignment = .center
+    userNameLabel.numberOfLines = 2
+    base.addSubview(userNameLabel)
+    userNameLabel.topToBottom(of: profileImageView, offset: 10.0)
+    userNameLabel.leftToSuperview(offset: 10.0)
+    userNameLabel.rightToSuperview(offset: -10.0)
+    userNameLabel.height(40.0)
     self.userNameLabel = userNameLabel
     
     //followButton
     let followButton = ANIAreaButtonView()
-    followButton.baseCornerRadius = 10.0
+    followButton.baseCornerRadius = FOLLOW_BUTTON_HEIGHT / 2
     followButton.base?.backgroundColor = ANIColor.emerald
     followButton.base?.layer.borderWidth = 1.8
     followButton.base?.layer.borderColor = ANIColor.emerald.cgColor
-    followButton.alpha = 0.0
     followButton.delegate = self
-    stackView.addArrangedSubview(followButton)
-    followButton.centerY(to: profileImageView)
-    followButton.width(85.0)
-    followButton.height(30.0)
+    base.addSubview(followButton)
+    followButton.centerXToSuperview()
+    followButton.width(100.0)
+    followButtonHeightConstraint = followButton.height(FOLLOW_BUTTON_HEIGHT)
+    followButtonBottomConstraint = followButton.bottomToSuperview(offset: -10.0)
     self.followButton = followButton
     
     //followLabel
@@ -98,34 +110,43 @@ class ANIUserSearchViewCell: UITableViewCell {
     followButton.addContent(followLabel)
     followLabel.edgesToSuperview()
     self.followLabel = followLabel
+    
+    //introduceLabel
+    let introduceLabel = UILabel()
+    introduceLabel.textColor = ANIColor.subTitle
+    introduceLabel.font = UIFont.systemFont(ofSize: 14.0)
+    introduceLabel.textAlignment = .center
+    introduceLabel.numberOfLines = 0
+    base.addSubview(introduceLabel)
+    introduceLabel.topToBottom(of: userNameLabel, offset: 10.0)
+    introduceLabel.leftToSuperview(offset: 10.0)
+    introduceLabel.rightToSuperview(offset: -10.0)
+    introduceLabel.bottomToTop(of: followButton, offset: -10.0)
+    self.introduceLabel = introduceLabel
   }
   
   private func reloadLayout() {
-    guard let profileImageView = self.profileImageView,
-          let userNameLabel = self.userNameLabel else { return }
+    guard let user = self.user,
+          let profileImageView = self.profileImageView,
+          let userNameLabel = self.userNameLabel,
+          let introduceLabel = self.introduceLabel else { return }
     
-    if let user = self.user, let profileImageUrl = user.profileImageUrl {
+    if let profileImageUrl = user.profileImageUrl {
       profileImageView.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
     } else {
       profileImageView.image = UIImage()
     }
     
-    if let user = self.user, let userName = user.userName {
+    if let userName = user.userName {
       userNameLabel.text = userName
     } else {
       userNameLabel.text = ""
     }
-  }
-  
-  private func reloadFollowButtonLayout() {
-    guard let user = self.user,
-          let currentUserUid = ANISessionManager.shared.currentUserUid,
-          let followButton = self.followButton else { return }
     
-    if user.uid == currentUserUid {
-      followButton.isHidden = true
+    if let introduce = user.introduce {
+      introduceLabel.text = introduce
     } else {
-      followButton.isHidden = false
+      introduceLabel.text = ""
     }
   }
   
@@ -186,6 +207,21 @@ class ANIUserSearchViewCell: UITableViewCell {
     }
   }
   
+  private func reloadFollowButtonLayout() {
+    guard let user = self.user,
+          let currentUserUid = ANISessionManager.shared.currentUserUid,
+          let followButtonHeightConstraint = self.followButtonHeightConstraint,
+          let followButtonBottomConstraint = self.followButtonBottomConstraint else { return }
+    
+    if user.uid == currentUserUid {
+      followButtonHeightConstraint.constant = 0.0
+      followButtonBottomConstraint.constant = 0.0
+    } else {
+      followButtonHeightConstraint.constant = FOLLOW_BUTTON_HEIGHT
+      followButtonBottomConstraint.constant = -10.0
+    }
+  }
+  
   private func updateNoti() {
     guard let currentUser = ANISessionManager.shared.currentUser,
           let currentUserName = currentUser.userName,
@@ -221,7 +257,7 @@ class ANIUserSearchViewCell: UITableViewCell {
 }
 
 //MARK: ANIButtonViewDelegate
-extension ANIUserSearchViewCell: ANIButtonViewDelegate {
+extension ANIPopularUserCell: ANIButtonViewDelegate {
   func buttonViewTapped(view: ANIButtonView) {
     if view === followButton {
       guard let user = self.user,

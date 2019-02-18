@@ -1380,6 +1380,7 @@ extension ANIListView {
               if let recruitError = recruitError {
                 DLog("Error get document: \(recruitError)")
                 self.isLoading = false
+                group.leave()
                 
                 return
               }
