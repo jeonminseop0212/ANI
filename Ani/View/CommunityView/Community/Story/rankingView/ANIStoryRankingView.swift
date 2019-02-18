@@ -69,6 +69,25 @@ class ANIStoryRankingView: UIView {
   @objc private func deleteUsers() {
     self.users.removeAll()
   }
+  
+  private func isBlockStory(story: FirebaseStory) -> Bool {
+    guard let currentUserUid = ANISessionManager.shared.currentUserUid else { return false }
+    
+    if let blockUserIds = ANISessionManager.shared.blockUserIds, blockUserIds.contains(story.userId) {
+      return true
+    }
+    if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(story.userId) {
+      return true
+    }
+    if let hideUserIds = story.hideUserIds, hideUserIds.contains(currentUserUid) {
+      return true
+    }
+    if story.storyImageUrls == nil && story.recruitId == nil && story.thumbnailImageUrl == nil {
+      return true
+    }
+    
+    return false
+  }
 }
 
 //MARK: UICollectionViewDataSource
@@ -110,7 +129,9 @@ extension ANIStoryRankingView: UICollectionViewDataSource {
 //MARK: UICollectionViewDelegate
 extension ANIStoryRankingView: UICollectionViewDelegate {
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-    self.delegate?.didSelectRankingCell(rankingStory: rankingStories[indexPath.item], ranking: indexPath.item)
+    if !isBlockStory(story: rankingStories[indexPath.item]) {
+      self.delegate?.didSelectRankingCell(rankingStory: rankingStories[indexPath.item], ranking: indexPath.item)
+    }
   }
 }
 

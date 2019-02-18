@@ -81,6 +81,18 @@ class ANIPopularUsersView: UIView {
     self.loadPopularUsers(sender: sender)
   }
   
+  func endRefresh() {
+    guard let refreshControl = self.refreshControl,
+          let collectionView = self.collectionView else { return }
+    
+    refreshControl.endRefreshing()
+    
+    let topInset = UIViewController.NAVIGATION_BAR_HEIGHT + ANIRecruitViewController.FILTERS_VIEW_HEIGHT
+    if collectionView.contentOffset.y + topInset < 0 {
+      collectionView.scrollToItem(at: [0, 0], at: .top, animated: false)
+    }
+  }
+  
   private func isBlockUser(user: FirebaseUser) -> Bool {
     guard let userId = user.uid else { return false }
     
@@ -92,18 +104,6 @@ class ANIPopularUsersView: UIView {
     }
     
     return false
-  }
-  
-  func endRefresh() {
-    guard let refreshControl = self.refreshControl,
-          let collectionView = self.collectionView else { return }
-    
-    refreshControl.endRefreshing()
-    
-    let topInset = UIViewController.NAVIGATION_BAR_HEIGHT + ANIRecruitViewController.FILTERS_VIEW_HEIGHT
-    if collectionView.contentOffset.y + topInset < 0 {
-      collectionView.scrollToItem(at: [0, 0], at: .top, animated: false)
-    }
   }
 }
 
@@ -123,7 +123,9 @@ extension ANIPopularUsersView: UICollectionViewDataSource {
       let cell = collectionView.dequeueReusableCell(withReuseIdentifier: userCellId, for: indexPath) as! ANIPopularUserCell
       cell.delegate = self
       
-      cell.user = users[indexPath.item - 1]
+      if users.count > indexPath.item - 1 {
+        cell.user = users[indexPath.item - 1]
+      }
       
       return cell
     }
@@ -227,9 +229,7 @@ extension ANIPopularUsersView {
           DispatchQueue.main.async {
             for user in usersTemp {
               if let user = user {
-                if !self.isBlockUser(user: user) {
-                  self.users.append(user)
-                }
+                self.users.append(user)
               }
             }
             

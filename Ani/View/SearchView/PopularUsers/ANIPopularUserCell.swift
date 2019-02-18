@@ -28,6 +28,10 @@ class ANIPopularUserCell: UICollectionViewCell {
   private weak var followButton: ANIAreaButtonView?
   private weak var followLabel: UILabel?
   
+  private weak var blurBackGroundView: UIView?
+  private weak var blockImageView: UIImageView?
+  private weak var blockAlertLabel: UILabel?
+  
   var user: FirebaseUser? {
     didSet {
       reloadLayout()
@@ -79,13 +83,26 @@ class ANIPopularUserCell: UICollectionViewCell {
     userNameLabel.textColor = ANIColor.dark
     userNameLabel.font = UIFont.boldSystemFont(ofSize: 15.0)
     userNameLabel.textAlignment = .center
-    userNameLabel.numberOfLines = 2
+    userNameLabel.numberOfLines = 1
     base.addSubview(userNameLabel)
     userNameLabel.topToBottom(of: profileImageView, offset: 10.0)
     userNameLabel.leftToSuperview(offset: 10.0)
     userNameLabel.rightToSuperview(offset: -10.0)
-    userNameLabel.height(40.0)
+    userNameLabel.height(20.0)
     self.userNameLabel = userNameLabel
+    
+    //introduceLabel
+    let introduceLabel = UILabel()
+    introduceLabel.textColor = ANIColor.subTitle
+    introduceLabel.font = UIFont.systemFont(ofSize: 14.0)
+    introduceLabel.textAlignment = .center
+    introduceLabel.numberOfLines = 0
+    base.addSubview(introduceLabel)
+    introduceLabel.topToBottom(of: userNameLabel, offset: 12.0)
+    introduceLabel.leftToSuperview(offset: 10.0)
+    introduceLabel.rightToSuperview(offset: -10.0)
+    introduceLabel.height(max: 86)
+    self.introduceLabel = introduceLabel
     
     //followButton
     let followButton = ANIAreaButtonView()
@@ -111,25 +128,50 @@ class ANIPopularUserCell: UICollectionViewCell {
     followLabel.edgesToSuperview()
     self.followLabel = followLabel
     
-    //introduceLabel
-    let introduceLabel = UILabel()
-    introduceLabel.textColor = ANIColor.subTitle
-    introduceLabel.font = UIFont.systemFont(ofSize: 14.0)
-    introduceLabel.textAlignment = .center
-    introduceLabel.numberOfLines = 0
-    base.addSubview(introduceLabel)
-    introduceLabel.topToBottom(of: userNameLabel, offset: 10.0)
-    introduceLabel.leftToSuperview(offset: 10.0)
-    introduceLabel.rightToSuperview(offset: -10.0)
-    introduceLabel.bottomToTop(of: followButton, offset: -10.0)
-    self.introduceLabel = introduceLabel
+    //blurBackGroundView
+    let blurBackGroundView = UIView()
+    blurBackGroundView.isHidden = true
+    base.addSubview(blurBackGroundView)
+    blurBackGroundView.edgesToSuperview()
+    self.blurBackGroundView = blurBackGroundView
+    
+    //effectView
+    let blurEffect = UIBlurEffect(style: .light)
+    let effectView = UIVisualEffectView(effect: blurEffect)
+    blurBackGroundView.addSubview(effectView)
+    effectView.edgesToSuperview()
+    
+    //blockImageView
+    let blockImageView = UIImageView()
+    blockImageView.image = UIImage(named: "notSee")
+    blockImageView.contentMode = .scaleAspectFill
+    blurBackGroundView.addSubview(blockImageView)
+    blockImageView.width(ceil(UIScreen.main.bounds.width / 2 * 0.15))
+    blockImageView.heightToWidth(of: blockImageView)
+    blockImageView.centerXToSuperview()
+    blockImageView.centerYToSuperview(offset: -20.0)
+    self.blockImageView = blockImageView
+    
+    //blockAlertLabel
+    let blockAlertLabel = UILabel()
+    blockAlertLabel.text = "見れない\nユーザーです"
+    blockAlertLabel.textColor = ANIColor.dark
+    blockAlertLabel.textAlignment = .center
+    blockAlertLabel.font = UIFont.boldSystemFont(ofSize: 15.0)
+    blockAlertLabel.numberOfLines = 0
+    blurBackGroundView.addSubview(blockAlertLabel)
+    blockAlertLabel.topToBottom(of: blockImageView, offset: 10)
+    blockAlertLabel.leftToSuperview(offset: 10)
+    blockAlertLabel.rightToSuperview(offset: -10)
+    self.blockAlertLabel = blockAlertLabel
   }
   
   private func reloadLayout() {
     guard let user = self.user,
           let profileImageView = self.profileImageView,
           let userNameLabel = self.userNameLabel,
-          let introduceLabel = self.introduceLabel else { return }
+          let introduceLabel = self.introduceLabel,
+          let blurBackGroundView = self.blurBackGroundView else { return }
     
     if let profileImageUrl = user.profileImageUrl {
       profileImageView.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
@@ -147,6 +189,12 @@ class ANIPopularUserCell: UICollectionViewCell {
       introduceLabel.text = introduce
     } else {
       introduceLabel.text = ""
+    }
+    
+    if isBlockUser(user: user) {
+      blurBackGroundView.isHidden = false
+    } else {
+      blurBackGroundView.isHidden = true
     }
   }
   
@@ -247,12 +295,27 @@ class ANIPopularUserCell: UICollectionViewCell {
     }
   }
   
+  private func isBlockUser(user: FirebaseUser) -> Bool {
+    guard let userId = user.uid else { return false }
+    
+    if let blockUserIds = ANISessionManager.shared.blockUserIds, blockUserIds.contains(userId) {
+      return true
+    }
+    if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(userId) {
+      return true
+    }
+    
+    return false
+  }
+  
   //MARK: action
   @objc private func profileImageViewTapped() {
     guard let user = self.user,
           let userId = user.uid else { return }
     
-    ANINotificationManager.postProfileImageViewTapped(userId: userId)
+    if !isBlockUser(user: user) {
+      ANINotificationManager.postProfileImageViewTapped(userId: userId)
+    }
   }
 }
 
