@@ -49,7 +49,7 @@ class ANIStoryImagesView: UIView {
     let id = NSStringFromClass(ANIStoryImagesCell.self)
     imagesCollectionView.register(ANIStoryImagesCell.self, forCellWithReuseIdentifier: id)
     addSubview(imagesCollectionView)
-    imagesCollectionView.height(UIScreen.main.bounds.width)
+    imagesCollectionView.height(UIScreen.main.bounds.width, priority: .defaultHigh)
     imagesCollectionView.edgesToSuperview(excluding: .bottom)
     self.imagesCollectionView = imagesCollectionView
     
@@ -63,7 +63,7 @@ class ANIStoryImagesView: UIView {
     pageControl.topToBottom(of: imagesCollectionView, offset: 5.0)
     pageControl.leftToSuperview()
     pageControl.rightToSuperview()
-    pageControlHeightConstraint = pageControl.height(PAGE_CONTROL_HEIGHT)
+    pageControlHeightConstraint = pageControl.height(PAGE_CONTROL_HEIGHT, priority: .defaultHigh)
     pageControl.bottomToSuperview()
     self.pageControl = pageControl
   }

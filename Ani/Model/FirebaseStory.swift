@@ -24,5 +24,6 @@ struct FirebaseStory: Codable {
   var hideUserIds: [String]?
   var loveCount: Int?
   var hashtags: [String: String]?
+  var comments: [FirebaseComment]?
 }
 

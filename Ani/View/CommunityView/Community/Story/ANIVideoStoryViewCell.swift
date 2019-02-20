@@ -24,11 +24,12 @@ protocol ANIVideoStoryViewCellDelegate {
 
 class ANIVideoStoryViewCell: UITableViewCell {
   
+  private weak var stackView: UIStackView?
   weak var storyVideoView: ANIStoryVideoView?
-  private let STORY_LABEL_TOP_CONSTANT: CGFloat = 10.0
-  private var storyLabelTopConstraint: Constraint?
-  private var storyLabelHeightConstraint: Constraint?
+  private weak var storyLabelBase: UIView?
   private weak var storyLabel: ActiveLabel?
+  
+  private weak var storyCommentView: ANIContributionCommentView?
   
   private weak var bottomArea: UIView?
   private let PROFILE_IMAGE_VIEW_HEIGHT: CGFloat = 32.0
@@ -43,9 +44,13 @@ class ANIVideoStoryViewCell: UITableViewCell {
   
   var story: FirebaseStory? {
     didSet {
+      guard let storyCommentView = self.storyCommentView else  { return }
+
       if user == nil {
         loadUser()
       }
+      
+      storyCommentView.story = story
 
       reloadLayout()
       observeLove()
@@ -57,6 +62,21 @@ class ANIVideoStoryViewCell: UITableViewCell {
     didSet {
       DispatchQueue.main.async {
         self.reloadUserLayout()
+      }
+    }
+  }
+  
+  var commentUsers: [FirebaseUser?]? {
+    didSet {
+      guard let storyCommentView = self.storyCommentView,
+            let commentUsers = self.commentUsers else  { return }
+      
+      if !commentUsers.isEmpty {
+        storyCommentView.commentOneUser = commentUsers[0]
+        
+        if commentUsers.count > 1 {
+          storyCommentView.commentTwoUser = commentUsers[1]
+        }
       }
     }
   }
@@ -114,15 +134,30 @@ class ANIVideoStoryViewCell: UITableViewCell {
     self.selectionStyle = .none
     self.backgroundColor = .white
     
+    //stackView
+    let stackView = UIStackView()
+    stackView.axis = .vertical
+    stackView.distribution = .equalSpacing
+    stackView.spacing = 0.0
+    addSubview(stackView)
+    stackView.edgesToSuperview(excluding: .bottom)
+    self.stackView = stackView
+    
     //storyVideoView
     let storyVideoView = ANIStoryVideoView()
     storyVideoView.backgroundColor = ANIColor.gray
     storyVideoView.removeReachEndObserver()
     storyVideoView.delegate = self
-    addSubview(storyVideoView)
+    stackView.addArrangedSubview(storyVideoView)
     storyVideoView.edgesToSuperview(excluding: .bottom)
-    storyVideoView.height(UIScreen.main.bounds.width)
+    storyVideoView.height(UIScreen.main.bounds.width, priority: .defaultHigh)
     self.storyVideoView = storyVideoView
+    
+    //storyLabelBase
+    let storyLabelBase = UIView()
+    storyLabelBase.backgroundColor = .white
+    stackView.addArrangedSubview(storyLabelBase)
+    self.storyLabelBase = storyLabelBase
     
     //storyLabel
     let storyLabel = ActiveLabel()
@@ -137,31 +172,38 @@ class ANIVideoStoryViewCell: UITableViewCell {
     storyLabel.handleHashtagTap { (hashtag) in
       ANINotificationManager.postTapHashtag(contributionKind: KEY_CONTRIBUTION_KIND_STROY, hashtag: hashtag)
     }
-    addSubview(storyLabel)
-    storyLabelTopConstraint = storyLabel.topToBottom(of: storyVideoView, offset: STORY_LABEL_TOP_CONSTANT)
+    storyLabelBase.addSubview(storyLabel)
+    storyLabel.topToSuperview(offset: 10.0)
     storyLabel.leftToSuperview(offset: 10.0)
-    storyLabelHeightConstraint = storyLabel.height(0.0)
+    storyLabel.rightToSuperview(offset: -10.0, priority: .defaultHigh)
+    storyLabel.bottomToSuperview()
     self.storyLabel = storyLabel
+    
+    //storyCommentView
+    let storyCommentView = ANIContributionCommentView()
+    storyCommentView.delegate = self
+    stackView.addArrangedSubview(storyCommentView)
+    self.storyCommentView = storyCommentView
     
     //bottomArea
     let bottomArea = UIView()
     addSubview(bottomArea)
-    bottomArea.topToBottom(of: storyLabel, offset: 10.0)
+    bottomArea.topToBottom(of: stackView, offset: 10.0)
     bottomArea.edgesToSuperview(excluding: .top)
     self.bottomArea = bottomArea
 
     //profileImageView
     let profileImageView = UIImageView()
     profileImageView.backgroundColor = ANIColor.gray
+    profileImageView.layer.cornerRadius = PROFILE_IMAGE_VIEW_HEIGHT / 2
+    profileImageView.layer.masksToBounds = true
     profileImageView.isUserInteractionEnabled = true
     profileImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped)))
     addSubview(profileImageView)
-    profileImageView.topToBottom(of: storyLabel, offset: 10.0)
+    profileImageView.top(to: bottomArea)
     profileImageView.leftToSuperview(offset: 10.0)
     profileImageView.width(PROFILE_IMAGE_VIEW_HEIGHT)
     profileImageView.height(PROFILE_IMAGE_VIEW_HEIGHT)
-    profileImageView.layer.cornerRadius = PROFILE_IMAGE_VIEW_HEIGHT / 2
-    profileImageView.layer.masksToBounds = true
     self.profileImageView = profileImageView
 
     //optionButton
@@ -258,9 +300,9 @@ class ANIVideoStoryViewCell: UITableViewCell {
   
   private func reloadLayout() {
     guard let storyVideoView = self.storyVideoView,
-          let storyLabelTopConstraint = self.storyLabelTopConstraint,
-          let storyLabelHeightConstraint = self.storyLabelHeightConstraint,
+          let storyLabelBase = self.storyLabelBase,
           let storyLabel = self.storyLabel,
+          let storyCommentView = self.storyCommentView,
           let loveButtonBG = self.loveButtonBG,
           let loveButton = self.loveButton,
           let story = self.story else { return }
@@ -282,17 +324,16 @@ class ANIVideoStoryViewCell: UITableViewCell {
     }
     
     storyLabel.text = story.story
-    if isRanking {
-      storyLabel.rightToSuperview(offset: -10.0, priority: .defaultHigh)
-    } else {
-      storyLabel.rightToSuperview(offset: -10.0)
-    }
     if story.story == "" {
-      storyLabelTopConstraint.constant = 0
-      storyLabelHeightConstraint.isActive = true
+      storyLabelBase.isHidden = true
     } else {
-      storyLabelTopConstraint.constant = STORY_LABEL_TOP_CONSTANT
-      storyLabelHeightConstraint.isActive = false
+      storyLabelBase.isHidden = false
+    }
+    
+    if story.comments != nil {
+      storyCommentView.isHidden = false
+    } else {
+      storyCommentView.isHidden = true
     }
     
     if ANISessionManager.shared.isAnonymous {
@@ -545,6 +586,13 @@ extension ANIVideoStoryViewCell: ANIButtonViewDelegate {
 extension ANIVideoStoryViewCell: ANIStoryVideoViewDelegate {
   func loadedVideo(urlString: String, asset: AVAsset) {
     self.delegate?.loadedVideo(urlString: urlString, asset: asset)
+  }
+}
+
+//MARK: ANIContributionCommentViewDelegate
+extension ANIVideoStoryViewCell: ANIContributionCommentViewDelegate {
+  func loadedCommentUser(user: FirebaseUser) {
+    self.delegate?.loadedStoryUser(user: user)
   }
 }
 

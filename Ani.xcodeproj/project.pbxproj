@@ -79,6 +79,7 @@
 		CD6762E020FD75AC0098E033 /* PickUpItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6762DF20FD75AC0098E033 /* PickUpItem.swift */; };
 		CD6B675120A8844B009BF63D /* ANIRecruitContributionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6B675020A8844B009BF63D /* ANIRecruitContributionView.swift */; };
 		CD6B675420A90F8A009BF63D /* ANIPlaceholderTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6B675320A90F8A009BF63D /* ANIPlaceholderTextView.swift */; };
+		CD7FD158221B988800BFEF11 /* ANIContributionCommentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD7FD157221B988800BFEF11 /* ANIContributionCommentView.swift */; };
 		CD85F558215F547300AB9A0C /* AniTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD85F557215F547300AB9A0C /* AniTests.swift */; };
 		CD92792220C0DCB400B1F006 /* ANIKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD92792120C0DCB400B1F006 /* ANIKey.swift */; };
 		CD9DB0C621AB955000091483 /* ANIRankingStoryDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD9DB0C521AB955000091483 /* ANIRankingStoryDetailViewController.swift */; };
@@ -303,6 +304,7 @@
 		CD6762DF20FD75AC0098E033 /* PickUpItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickUpItem.swift; sourceTree = "<group>"; };
 		CD6B675020A8844B009BF63D /* ANIRecruitContributionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitContributionView.swift; sourceTree = "<group>"; };
 		CD6B675320A90F8A009BF63D /* ANIPlaceholderTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIPlaceholderTextView.swift; sourceTree = "<group>"; };
+		CD7FD157221B988800BFEF11 /* ANIContributionCommentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIContributionCommentView.swift; sourceTree = "<group>"; };
 		CD85F555215F547200AB9A0C /* AniTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AniTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CD85F557215F547300AB9A0C /* AniTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AniTests.swift; sourceTree = "<group>"; };
 		CD85F559215F547300AB9A0C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -767,6 +769,14 @@
 				CD6B675320A90F8A009BF63D /* ANIPlaceholderTextView.swift */,
 			);
 			path = PlaceholderTextView;
+			sourceTree = "<group>";
+		};
+		CD7FD156221B986300BFEF11 /* ContributionCommentView */ = {
+			isa = PBXGroup;
+			children = (
+				CD7FD157221B988800BFEF11 /* ANIContributionCommentView.swift */,
+			);
+			path = ContributionCommentView;
 			sourceTree = "<group>";
 		};
 		CD85F556215F547200AB9A0C /* AniTests */ = {
@@ -1703,6 +1713,7 @@
 			children = (
 				F5DF835E207A1CA300EA7FBE /* Story */,
 				F5DF835F207A1CB000EA7FBE /* Qna */,
+				CD7FD156221B986300BFEF11 /* ContributionCommentView */,
 			);
 			path = Community;
 			sourceTree = "<group>";
@@ -2128,6 +2139,7 @@
 				F5B1EF9320725964000CFB0B /* ANIRecruitViewController.swift in Sources */,
 				CD0417D021BF865C0017571A /* ANIActivityIndicator.swift in Sources */,
 				F51D221520768B24009D1B26 /* UISearchBar.swift in Sources */,
+				CD7FD158221B988800BFEF11 /* ANIContributionCommentView.swift in Sources */,
 				F5E9E2392079B9D20021D4CC /* ANICommunityMenuBarCell.swift in Sources */,
 				CD1A97C0219949770008EC98 /* ANIBlockUserView.swift in Sources */,
 				CD492A0B21C8990300C5AF81 /* AVFileType.swift in Sources */,

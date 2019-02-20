@@ -22,12 +22,13 @@ protocol ANIStoryViewCellDelegate {
 }
 
 class ANIStoryViewCell: UITableViewCell {
+  private weak var stackView: UIStackView?
   private weak var tapArea: UIView?
   private weak var storyImagesView: ANIStoryImagesView?
-  private let STORY_LABEL_TOP_CONSTANT: CGFloat = 5.0
-  private var storyLabelTopConstraint: Constraint?
-  private var storyLabelHeightConstraint: Constraint?
+  private weak var storyLabelBase: UIView?
   private weak var storyLabel: ActiveLabel?
+  
+  private weak var storyCommentView: ANIContributionCommentView?
   
   private var bottomAreaTopConstraint: Constraint?
   private weak var bottomArea: UIView?
@@ -43,11 +44,16 @@ class ANIStoryViewCell: UITableViewCell {
   
   var story: FirebaseStory? {
     didSet {
+      guard let storyCommentView = self.storyCommentView else  { return }
+      
       if user == nil {
         loadUser()
       }
-
+      
       reloadLayout()
+      
+      storyCommentView.story = story
+
       observeLove()
       observeComment()
     }
@@ -57,6 +63,21 @@ class ANIStoryViewCell: UITableViewCell {
     didSet {
       DispatchQueue.main.async {
         self.reloadUserLayout()
+      }
+    }
+  }
+  
+  var commentUsers: [FirebaseUser?]? {
+    didSet {
+      guard let storyCommentView = self.storyCommentView,
+            let commentUsers = self.commentUsers else  { return }
+
+      if !commentUsers.isEmpty {
+        storyCommentView.commentOneUser = commentUsers[0]
+        
+        if commentUsers.count > 1 {
+          storyCommentView.commentTwoUser = commentUsers[1]
+        }
       }
     }
   }
@@ -86,8 +107,6 @@ class ANIStoryViewCell: UITableViewCell {
   
   var indexPath: Int?
   
-  var isRanking: Bool = false
-  
   var delegate: ANIStoryViewCellDelegate?
   
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -111,11 +130,19 @@ class ANIStoryViewCell: UITableViewCell {
     self.selectionStyle = .none
     self.backgroundColor = .white
     
+    //stackView
+    let stackView = UIStackView()
+    stackView.axis = .vertical
+    stackView.distribution = .equalSpacing
+    stackView.spacing = 0.0
+    addSubview(stackView)
+    stackView.edgesToSuperview(excluding: .bottom)
+    self.stackView = stackView
+    
     //tapArea
     let tapArea = UIView()
     tapArea.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(cellTapped)))
-    addSubview(tapArea)
-    tapArea.edgesToSuperview(excluding: .bottom)
+    stackView.addArrangedSubview(tapArea)
     self.tapArea = tapArea
     
     //storyImagesView
@@ -123,6 +150,12 @@ class ANIStoryViewCell: UITableViewCell {
     tapArea.addSubview(storyImagesView)
     storyImagesView.edgesToSuperview()
     self.storyImagesView = storyImagesView
+    
+    //storyLabelBase
+    let storyLabelBase = UIView()
+    storyLabelBase.backgroundColor = .white
+    stackView.addArrangedSubview(storyLabelBase)
+    self.storyLabelBase = storyLabelBase
 
     //storyLabel
     let storyLabel = ActiveLabel()
@@ -137,16 +170,23 @@ class ANIStoryViewCell: UITableViewCell {
     storyLabel.handleHashtagTap { (hashtag) in
       ANINotificationManager.postTapHashtag(contributionKind: KEY_CONTRIBUTION_KIND_STROY, hashtag: hashtag)
     }
-    addSubview(storyLabel)
-    storyLabelTopConstraint = storyLabel.topToBottom(of: storyImagesView, offset: STORY_LABEL_TOP_CONSTANT)
+    storyLabelBase.addSubview(storyLabel)
+    storyLabel.topToSuperview(offset: 5.0)
     storyLabel.leftToSuperview(offset: 10.0)
-    storyLabelHeightConstraint = storyLabel.height(0.0)
+    storyLabel.rightToSuperview(offset: -10.0, priority: .defaultHigh)
+    storyLabel.bottomToSuperview()
     self.storyLabel = storyLabel
+    
+    //storyCommentView
+    let storyCommentView = ANIContributionCommentView()
+    storyCommentView.delegate = self
+    stackView.addArrangedSubview(storyCommentView)
+    self.storyCommentView = storyCommentView
     
     //bottomArea
     let bottomArea = UIView()
     addSubview(bottomArea)
-    bottomAreaTopConstraint = bottomArea.topToBottom(of: storyLabel, offset: 10.0)
+    bottomAreaTopConstraint = bottomArea.topToBottom(of: stackView, offset: 10.0)
     bottomArea.edgesToSuperview(excluding: .top)
     self.bottomArea = bottomArea
     
@@ -155,13 +195,13 @@ class ANIStoryViewCell: UITableViewCell {
     profileImageView.backgroundColor = ANIColor.gray
     profileImageView.isUserInteractionEnabled = true
     profileImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped)))
+    profileImageView.layer.cornerRadius = PROFILE_IMAGE_VIEW_HEIGHT / 2
+    profileImageView.layer.masksToBounds = true
     addSubview(profileImageView)
     profileImageView.top(to: bottomArea)
     profileImageView.leftToSuperview(offset: 10.0)
     profileImageView.width(PROFILE_IMAGE_VIEW_HEIGHT)
     profileImageView.height(PROFILE_IMAGE_VIEW_HEIGHT)
-    profileImageView.layer.cornerRadius = PROFILE_IMAGE_VIEW_HEIGHT / 2
-    profileImageView.layer.masksToBounds = true
     self.profileImageView = profileImageView
     
     //optionButton
@@ -258,9 +298,9 @@ class ANIStoryViewCell: UITableViewCell {
   
   private func reloadLayout() {
     guard let storyImagesView = self.storyImagesView,
-          let storyLabelTopConstraint = self.storyLabelTopConstraint,
-          let storyLabelHeightConstraint = self.storyLabelHeightConstraint,
+          let storyLabelBase = self.storyLabelBase,
           let storyLabel = self.storyLabel,
+          let storyCommentView = self.storyCommentView,
           let bottomAreaTopConstraint = self.bottomAreaTopConstraint,
           let loveButtonBG = self.loveButtonBG,
           let loveButton = self.loveButton,
@@ -271,18 +311,22 @@ class ANIStoryViewCell: UITableViewCell {
       storyImagesView.pageControl?.numberOfPages = storyImageUrls.count
     }
     storyLabel.text = story.story
-    if isRanking {
-      storyLabel.rightToSuperview(offset: -10.0, priority: .defaultHigh)
-    } else {
-      storyLabel.rightToSuperview(offset: -10.0)
-    }
+
     if story.story == "" {
-      storyLabelTopConstraint.constant = 0
-      storyLabelHeightConstraint.isActive = true
+      storyLabelBase.isHidden = true
+    } else {
+      storyLabelBase.isHidden = false
+    }
+    
+    if story.comments != nil {
+      storyCommentView.isHidden = false
+    } else {
+      storyCommentView.isHidden = true
+    }
+    
+    if story.story == "" && story.comments == nil {
       bottomAreaTopConstraint.constant = 5.0
     } else {
-      storyLabelTopConstraint.constant = STORY_LABEL_TOP_CONSTANT
-      storyLabelHeightConstraint.isActive = false
       bottomAreaTopConstraint.constant = 10.0
     }
     
@@ -529,6 +573,13 @@ extension ANIStoryViewCell: ANIButtonViewDelegate {
     if view === self.loveButton {
       love()
     }
+  }
+}
+
+//MARK: ANIContributionCommentViewDelegate
+extension ANIStoryViewCell: ANIContributionCommentViewDelegate {
+  func loadedCommentUser(user: FirebaseUser) {
+    self.delegate?.loadedStoryUser(user: user)
   }
 }
 

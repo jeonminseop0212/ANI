@@ -282,7 +282,7 @@ class ANIContributionViewController: UIViewController {
                       hashtags[hashtagElement] = date
                     }
                     
-                    let story = FirebaseStory(id: id, storyImageUrls: urls, storyVideoUrl: nil, thumbnailImageUrl: nil, story: content, userId: uid, recruitId: nil, recruitTitle: nil, recruitSubTitle: nil, date: date, day: day, isLoved: nil, hideUserIds: nil, loveCount: 0, hashtags: hashtags)
+                    let story = FirebaseStory(id: id, storyImageUrls: urls, storyVideoUrl: nil, thumbnailImageUrl: nil, story: content, userId: uid, recruitId: nil, recruitTitle: nil, recruitSubTitle: nil, date: date, day: day, isLoved: nil, hideUserIds: nil, loveCount: 0, hashtags: hashtags, comments: nil)
                     
                     self.upateStroyDatabase(story: story, id: id)
                   }
@@ -400,7 +400,7 @@ class ANIContributionViewController: UIViewController {
             hashtags[hashtagElement] = date
           }
           
-          let story = FirebaseStory(id: id, storyImageUrls: nil, storyVideoUrl: videoUrl, thumbnailImageUrl: thumbnailImageUrl, story: content, userId: uid, recruitId: nil, recruitTitle: nil, recruitSubTitle: nil, date: date, day: day, isLoved: nil, hideUserIds: nil, loveCount: 0, hashtags: hashtags)
+          let story = FirebaseStory(id: id, storyImageUrls: nil, storyVideoUrl: videoUrl, thumbnailImageUrl: thumbnailImageUrl, story: content, userId: uid, recruitId: nil, recruitTitle: nil, recruitSubTitle: nil, date: date, day: day, isLoved: nil, hideUserIds: nil, loveCount: 0, hashtags: hashtags, comments: nil)
 
           self.upateStroyDatabase(story: story, id: id)
         }
@@ -431,7 +431,7 @@ class ANIContributionViewController: UIViewController {
             hashtags[hashtagElement] = date
           }
           
-          let qna = FirebaseQna(id: id, qnaImageUrls: nil, qna: content, userId: uid, date: date, isLoved: nil, hideUserIds: nil, hashtags: hashtags)
+          let qna = FirebaseQna(id: id, qnaImageUrls: nil, qna: content, userId: uid, date: date, isLoved: nil, hideUserIds: nil, hashtags: hashtags, comments: nil)
           
           DispatchQueue.main.async {
             self.delegate?.loadThumnailImage(thumbnailImage: nil)
@@ -479,7 +479,7 @@ class ANIContributionViewController: UIViewController {
                         hashtags[hashtagElement] = date
                       }
                       
-                      let qna = FirebaseQna(id: id, qnaImageUrls: urls, qna: content, userId: uid, date: date, isLoved: nil, hideUserIds: nil, hashtags: hashtags)
+                      let qna = FirebaseQna(id: id, qnaImageUrls: urls, qna: content, userId: uid, date: date, isLoved: nil, hideUserIds: nil, hashtags: hashtags, comments: nil)
   
                       self.upateQnaDatabase(qna: qna, id: id)
                     }
