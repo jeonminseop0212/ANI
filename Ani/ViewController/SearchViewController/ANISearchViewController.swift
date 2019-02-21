@@ -255,6 +255,40 @@ class ANISearchViewController: UIViewController {
     //overCurrentContextだとtabBarが消えないのでtabBarからpresentする
     self.tabBarController?.present(imageBrowserViewController, animated: false, completion: nil)
   }
+  
+  private func navigationAnimation(scrollY: CGFloat) {
+    guard let myNavigationBarTopConstroint = self.myNavigationBarTopConstroint,
+          let searchBar = self.searchBar,
+          let categoriesView = self.categoriesView,
+          let categoryCollectionView = categoriesView.categoryCollectionView else { return }
+    
+    let topHeight = UIViewController.NAVIGATION_BAR_HEIGHT + ANIRecruitViewController.FILTERS_VIEW_HEIGHT
+    let newScrollY = topHeight + scrollY
+    
+    //navigation animate
+    if topHeight < newScrollY {
+      if scrollY < topHeight {
+        myNavigationBarTopConstroint.constant = -scrollY
+        self.view.layoutIfNeeded()
+        
+        let alpha = 1 - (scrollY / topHeight)
+        searchBar.alpha = alpha
+        categoryCollectionView.alpha = alpha
+      } else {
+        myNavigationBarTopConstroint.constant = -topHeight
+        self.view.layoutIfNeeded()
+        
+        searchBar.alpha = 0.0
+        categoryCollectionView.alpha = 0.0
+      }
+    } else {
+      myNavigationBarTopConstroint.constant = 0.0
+      self.view.layoutIfNeeded()
+      
+      searchBar.alpha = 1.0
+      categoryCollectionView.alpha = 1.0
+    }
+  }
 }
 
 //MARK: UISearchBarDelegate
@@ -298,34 +332,12 @@ extension ANISearchViewController: UISearchBarDelegate {
 }
 
 //MARK: ANIUserSearchViewDelegate
-extension ANISearchViewController: ANISearchViewDelegate, ANIPopularUsersViewDelegate {
-  func viewDidScroll(scrollY: CGFloat) {
-    guard let myNavigationBarTopConstroint = self.myNavigationBarTopConstroint else { return }
+extension ANISearchViewController: ANISearchViewDelegate {
+  func searchViewDidScroll(scrollY: CGFloat) {
+    guard let popularUsersView = self.popularUsersView else { return }
     
-    let topHeight = UIViewController.NAVIGATION_BAR_HEIGHT + ANIRecruitViewController.FILTERS_VIEW_HEIGHT
-    let newScrollY = topHeight + scrollY
-    
-    //navigation animate
-    if topHeight < newScrollY {
-      if scrollY < topHeight {
-        myNavigationBarTopConstroint.constant = -scrollY
-        self.view.layoutIfNeeded()
-        
-        let alpha = 1 - (scrollY / topHeight)
-        searchBar?.alpha = alpha
-        categoriesView?.categoryCollectionView?.alpha = alpha
-      } else {
-        myNavigationBarTopConstroint.constant = -topHeight
-        searchBar?.alpha = 0.0
-        categoriesView?.categoryCollectionView?.alpha = 0.0
-        self.view.layoutIfNeeded()
-      }
-    } else {
-      myNavigationBarTopConstroint.constant = 0.0
-      self.view.layoutIfNeeded()
-      
-      searchBar?.alpha = 1.0
-      categoriesView?.categoryCollectionView?.alpha = 1.0
+    if popularUsersView.alpha == 0.0 {
+      navigationAnimation(scrollY: scrollY)
     }
   }
   
@@ -392,6 +404,17 @@ extension ANISearchViewController: ANISearchViewDelegate, ANIPopularUsersViewDel
     }
     popupOptionViewController.delegate = self
     self.tabBarController?.present(popupOptionViewController, animated: false, completion: nil)
+  }
+}
+
+//MARK: ANIPopularUsersViewDelegate
+extension ANISearchViewController: ANIPopularUsersViewDelegate {
+  func popularUsersViewDidScroll(scrollY: CGFloat) {
+    guard let popularUsersView = self.popularUsersView else { return }
+
+    if popularUsersView.alpha == 1.0 {
+      navigationAnimation(scrollY: scrollY)
+    }
   }
 }
 

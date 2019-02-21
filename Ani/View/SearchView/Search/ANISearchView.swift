@@ -12,7 +12,7 @@ import InstantSearchClient
 import AVKit
 
 protocol ANISearchViewDelegate {
-  func viewDidScroll(scrollY: CGFloat)
+  func searchViewDidScroll(scrollY: CGFloat)
   func storyViewCellDidSelect(selectedStory: FirebaseStory, user: FirebaseUser)
   func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser)
   func qnaViewCellDidSelect(selectedQna: FirebaseQna, user:FirebaseUser)
@@ -321,7 +321,7 @@ extension ANISearchView: UITableViewDelegate {
     
     //navigation bar animation
     let scrollY = scrollView.contentOffset.y
-    self.delegate?.viewDidScroll(scrollY: scrollY)
+    self.delegate?.searchViewDidScroll(scrollY: scrollY)
   }
 }
 
