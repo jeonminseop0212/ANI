@@ -11,7 +11,7 @@ import FirebaseFirestore
 import CodableFirebase
 
 protocol ANIPopularUsersViewDelegate {
-  func viewDidScroll(scrollY: CGFloat)
+  func popularUsersViewDidScroll(scrollY: CGFloat)
   func reject()
 }
 
@@ -139,7 +139,7 @@ extension ANIPopularUsersView: UICollectionViewDelegate {
     
     //navigation bar animation
     let scrollY = scrollView.contentOffset.y
-    self.delegate?.viewDidScroll(scrollY: scrollY)
+    self.delegate?.popularUsersViewDidScroll(scrollY: scrollY)
   }
 }
 
