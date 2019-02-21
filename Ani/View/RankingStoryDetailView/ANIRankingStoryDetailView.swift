@@ -97,7 +97,6 @@ extension ANIRankingStoryDetailView: UITableViewDataSource {
       let cell = tableView.dequeueReusableCell(withIdentifier: videoStoryCellId, for: indexPath) as! ANIVideoStoryViewCell
       cell.delegate = self
       
-      cell.isRanking = true
       cell.indexPath = indexPath.row
       cell.story = story
       
@@ -107,7 +106,6 @@ extension ANIRankingStoryDetailView: UITableViewDataSource {
       let cell = tableView.dequeueReusableCell(withIdentifier: storyCellId, for: indexPath) as! ANIStoryViewCell
       cell.delegate = self
 
-      cell.isRanking = true
       cell.indexPath = indexPath.row
       cell.story = story
       

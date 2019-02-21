@@ -225,12 +225,11 @@ class ANIQnaView: UIView {
     activityIndicatorView.stopAnimating()
     
     qnaTableView.reloadData()
-    
+    qnaTableView.alpha = 0.0
+
     if let sender = sender {
       sender.endRefreshing()
     }
-    
-    qnaTableView.alpha = 0.0
     
     UIView.animate(withDuration: 0.2, animations: {
       reloadView.alpha = 1.0
@@ -326,6 +325,27 @@ extension ANIQnaView: UITableViewDataSource {
       } else {
         cell.user = nil
       }
+      
+      if let comments = qnas[indexPath.row].comments {
+        var commentUsersTemp = [FirebaseUser?]()
+        for comment in comments {
+          if users.contains(where: { $0.uid == comment.userId }) {
+            for user in users {
+              if comment.userId == user.uid {
+                commentUsersTemp.append(user)
+                break
+              }
+            }
+          } else {
+            commentUsersTemp.append(nil)
+          }
+        }
+        
+        cell.commentUsers = commentUsersTemp
+      } else {
+        cell.commentUsers = nil
+      }
+      
       cell.indexPath = indexPath.row
       cell.qna = qnas[indexPath.row]
     }
@@ -346,7 +366,7 @@ extension ANIQnaView: UITableViewDelegate {
   func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
     let element = self.qnas.count - COUNT_LAST_CELL
     if !isLoading, indexPath.row >= element {
-      loadMoreQna()
+      loadMoreQna(sender: nil)
     }
     
     self.cellHeight[indexPath] = cell.frame.size.height
@@ -436,8 +456,7 @@ extension ANIQnaView: ANIReloadViewDelegate {
 extension ANIQnaView {
   @objc private func loadQna(sender: UIRefreshControl?) {
     guard let activityIndicatorView = self.activityIndicatorView,
-          let reloadView = self.reloadView,
-          let qnaTableView = self.qnaTableView else { return }
+          let reloadView = self.reloadView else { return }
     
     reloadView.alpha = 0.0
     
@@ -486,55 +505,31 @@ extension ANIQnaView {
               self.qnas.append(qna)
             }
             
-            DispatchQueue.main.async {
-              if index + 1 == snapshot.documents.count {
-                if let sender = sender {
-                  sender.endRefreshing()
-                }
-                
-                qnaTableView.reloadData()
-                
-                self.isLoading = false
-                
-                if self.qnas.isEmpty {
-                  self.loadMoreQna()
-                } else {
-                  if qnaTableView.alpha == 0.0 {
-                    activityIndicatorView.stopAnimating()
-                    
-                    UIView.animate(withDuration: 0.2, animations: {
-                      qnaTableView.alpha = 1.0
-                    })
-                  }
-                  
-                  self.isLoadedFirstData = true
-                }
+            if index + 1 == snapshot.documents.count {
+              if self.qnas.isEmpty {
+                self.loadMoreQna(sender: sender)
+              } else {
+                self.loadQnaComment(qnas: self.qnas, sender: sender)
               }
             }
           } catch let error {
             DLog(error)
             
-            activityIndicatorView.stopAnimating()
-            
-            UIView.animate(withDuration: 0.2, animations: {
-              reloadView.alpha = 1.0
-            })
-            
-            if let sender = sender {
-              sender.endRefreshing()
+            if index + 1 == snapshot.documents.count {
+              if self.qnas.isEmpty {
+                self.loadMoreQna(sender: sender)
+              } else {
+                self.loadQnaComment(qnas: self.qnas, sender: sender)
+              }
             }
-            
-            self.isLoading = false
           }
         }
       })
     }
   }
   
-  private func loadMoreQna() {
-    guard let qnaTableView = self.qnaTableView,
-          let lastQna = self.lastQna,
-          let activityIndicatorView = self.activityIndicatorView,
+  private func loadMoreQna(sender: UIRefreshControl?) {
+    guard let lastQna = self.lastQna,
           !isLoading,
           !isLastQnaPage else { return }
     
@@ -555,6 +550,10 @@ extension ANIQnaView {
         guard let lastQna = snapshot.documents.last else {
           self.isLastQnaPage = true
           self.isLoading = false
+          
+          if self.qnas.isEmpty {
+            self.showReloadView(sender: sender)
+          }
           return
         }
         
@@ -567,33 +566,155 @@ extension ANIQnaView {
               self.qnas.append(qna)
             }
             
-            DispatchQueue.main.async {
-              if index + 1 == snapshot.documents.count {
-                qnaTableView.reloadData()
-                
-                self.isLoading = false
-                
-                if self.qnas.isEmpty {
-                  self.loadMoreQna()
-                } else {
-                  if qnaTableView.alpha == 0.0 {
-                    activityIndicatorView.stopAnimating()
-                    
-                    UIView.animate(withDuration: 0.2, animations: {
-                      qnaTableView.alpha = 1.0
-                    })
-                  }
+            if index + 1 == snapshot.documents.count {
+              if self.qnas.isEmpty {
+                self.loadMoreQna(sender: sender)
+              } else {
+                self.loadQnaComment(qnas: self.qnas, sender: sender)
+              }
+            }
+          } catch let error {
+            DLog(error)
+            
+            if index + 1 == snapshot.documents.count {
+              if self.qnas.isEmpty {
+                self.loadMoreQna(sender: sender)
+              } else {
+                self.loadQnaComment(qnas: self.qnas, sender: sender)
+              }
+            }
+          }
+        }
+      })
+    }
+  }
+  
+  private func loadQnaComment(qnas: [FirebaseQna], sender: UIRefreshControl?) {
+    let database = Firestore.firestore()
+    
+    var count = 0
+    
+    for (index, qna) in qnas.enumerated() {
+      var commentsTemp = [FirebaseComment]()
+      
+      guard let qnaId = qna.id else { return }
+      
+      database.collection(KEY_QNAS).document(qnaId).collection(KEY_COMMENTS).order(by: KEY_DATE, descending: true).limit(to: 2).getDocuments { (snapshot, error) in
+        if let error = error {
+          DLog("Error get document: \(error)")
+          self.isLoading = false
+          
+          return
+        }
+        
+        guard let snapshot = snapshot else { return }
+        
+        var isParentComment = false
+        
+        for (commentIndex, document) in snapshot.documents.enumerated() {
+          do {
+            let comment = try FirestoreDecoder().decode(FirebaseComment.self, from: document.data())
+            
+            if commentIndex == 0, let parentCommentId = comment.parentCommentId {
+              isParentComment = true
+              
+              database.collection(KEY_QNAS).document(qnaId).collection(KEY_COMMENTS).document(parentCommentId).getDocument(completion: { (parentCommentSnapshot, parentCommentError) in
+                if let parentCommentError = parentCommentError {
+                  DLog("Error get document: \(parentCommentError)")
+                  self.isLoading = false
                   
-                  self.isLoadedFirstData = true
+                  return
+                }
+                
+                if let parentCommentSnapshot = parentCommentSnapshot, let data = parentCommentSnapshot.data() {
+                  do {
+                    let parentComment = try FirestoreDecoder().decode(FirebaseComment.self, from: data)
+                    
+                    commentsTemp.append(parentComment)
+                    commentsTemp.append(comment)
+                    
+                    var qnaTemp = qna
+                    qnaTemp.comments = commentsTemp
+                    self.qnas[index] = qnaTemp
+                    
+                    count = count + 1
+                    
+                    if count == qnas.count {
+                      self.loadDone(sender: sender)
+                    }
+                  } catch let error {
+                    DLog(error)
+                  }
+                } else {
+                  let parentComment = FirebaseComment(id: "", userId: "", comment: "", date: "", isLoved: nil, parentCommentId: nil, parentCommentUserId: nil)
+                  
+                  commentsTemp.append(parentComment)
+                  commentsTemp.append(comment)
+                  
+                  var qnaTemp = qna
+                  qnaTemp.comments = commentsTemp
+                  self.qnas[index] = qnaTemp
+                  
+                  count = count + 1
+                  
+                  if count == qnas.count {
+                    self.loadDone(sender: sender)
+                  }
+                }
+              })
+            } else if !isParentComment {
+              commentsTemp.append(comment)
+              
+              if snapshot.documents.count == commentsTemp.count {
+                var qnaTemp = qna
+                qnaTemp.comments = commentsTemp.reversed()
+                self.qnas[index] = qnaTemp
+                
+                count = count + 1
+                
+                if count == qnas.count {
+                  self.loadDone(sender: sender)
                 }
               }
             }
           } catch let error {
             DLog(error)
-            self.isLoading = false
           }
         }
-      })
+        
+        if snapshot.documents.isEmpty {
+          count = count + 1
+          
+          if count == qnas.count {
+            self.loadDone(sender: sender)
+          }
+        }
+      }
+    }
+  }
+  
+  private func loadDone(sender: UIRefreshControl?) {
+    guard let qnaTableView = self.qnaTableView,
+          let activityIndicatorView = self.activityIndicatorView else { return }
+    
+    DispatchQueue.main.async {
+      self.isLoading = false
+      
+      if let sender = sender {
+        sender.endRefreshing()
+      }
+      
+      qnaTableView.reloadData()
+      
+      if qnaTableView.alpha == 0.0 {
+        activityIndicatorView.stopAnimating()
+        
+        UIView.animate(withDuration: 0.2, animations: {
+          qnaTableView.alpha = 1.0
+        })
+      }
+      
+      self.isLoadedFirstData = true
     }
   }
 }

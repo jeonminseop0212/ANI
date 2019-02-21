@@ -144,7 +144,7 @@ class ANIParentCommentCell: UITableViewCell {
     let parentCommentUserNameLabel = UILabel()
     parentCommentUserNameLabel.text = "aoaoaoao"
     parentCommentUserNameLabel.textColor = ANIColor.dark
-    parentCommentUserNameLabel.font = UIFont.boldSystemFont(ofSize: 14.0)
+    parentCommentUserNameLabel.font = UIFont.boldSystemFont(ofSize: 13.0)
     parentCommentUserNameLabel.numberOfLines = 2
     parentCommentView.addSubview(parentCommentUserNameLabel)
     parentCommentUserNameLabel.leftToRight(of: parentCommentProfileImageView, offset: 10.0)
@@ -267,7 +267,7 @@ class ANIParentCommentCell: UITableViewCell {
     //userNameLabel
     let userNameLabel = UILabel()
     userNameLabel.textColor = ANIColor.dark
-    userNameLabel.font = UIFont.boldSystemFont(ofSize: 15.0)
+    userNameLabel.font = UIFont.boldSystemFont(ofSize: 14.0)
     userNameLabel.numberOfLines = 2
     addSubview(userNameLabel)
     userNameLabel.leftToRight(of: profileImageView, offset: 10.0)

@@ -21,12 +21,15 @@ protocol ANIQnaViewCellDelegate {
 }
 
 class ANIQnaViewCell: UITableViewCell {
+  private weak var stackView: UIStackView?
+
+  private weak var qnaLabelBase: UIView?
   private weak var questionLabel: ActiveLabel?
   
-  private var qnaImagesViewTopConstraint: Constraint?
-  private var qnaImagesViewHeightConstraint: Constraint?
-  private var qnaImagesViewHeight: CGFloat = 0.0
+  private var qnaImagesViewBase: UIView?
   private weak var qnaImagesView: ANIQnaImagesView?
+  
+  private weak var qnaCommentView: ANIContributionCommentView?
   
   private weak var bottomArea: UIView?
   private weak var profileImageView: UIImageView?
@@ -40,11 +43,16 @@ class ANIQnaViewCell: UITableViewCell {
   
   var qna: FirebaseQna? {
     didSet {
+      guard let qnaCommentView = self.qnaCommentView else  { return }
+
       if user == nil {
         loadUser()
       }
-
+      
       reloadLayout()
+      
+      qnaCommentView.qna = qna
+
       observeLove()
       observeComment()
     }
@@ -54,6 +62,21 @@ class ANIQnaViewCell: UITableViewCell {
     didSet {
       DispatchQueue.main.async {
         self.reloadUserLayout()
+      }
+    }
+  }
+  
+  var commentUsers: [FirebaseUser?]? {
+    didSet {
+      guard let qnaCommentView = self.qnaCommentView,
+            let commentUsers = self.commentUsers else  { return }
+      
+      if !commentUsers.isEmpty {
+        qnaCommentView.commentOneUser = commentUsers[0]
+        
+        if commentUsers.count > 1 {
+          qnaCommentView.commentTwoUser = commentUsers[1]
+        }
       }
     }
   }
@@ -105,6 +128,21 @@ class ANIQnaViewCell: UITableViewCell {
   private func setup() {
     self.selectionStyle = .none
     self.backgroundColor = .white
+    
+    //stackView
+    let stackView = UIStackView()
+    stackView.axis = .vertical
+    stackView.distribution = .equalSpacing
+    stackView.spacing = 0.0
+    addSubview(stackView)
+    stackView.edgesToSuperview(excluding: .bottom)
+    self.stackView = stackView
+    
+    //qnaLabelBase
+    let qnaLabelBase = UIView()
+    qnaLabelBase.backgroundColor = .white
+    stackView.addArrangedSubview(qnaLabelBase)
+    self.qnaLabelBase = qnaLabelBase
 
     //questionLabel
     let questionLabel = ActiveLabel()
@@ -118,26 +156,40 @@ class ANIQnaViewCell: UITableViewCell {
     questionLabel.handleHashtagTap { (hashtag) in
       ANINotificationManager.postTapHashtag(contributionKind: KEY_CONTRIBUTION_KIND_QNA, hashtag: hashtag)
     }
-    addSubview(questionLabel)
+    qnaLabelBase.addSubview(questionLabel)
     questionLabel.topToSuperview(offset: 10.0)
     questionLabel.leftToSuperview(offset: 10.0)
     questionLabel.rightToSuperview(offset: -10.0)
+    questionLabel.bottomToSuperview()
     self.questionLabel = questionLabel
+    
+    //qnaImagesViewBase
+    let qnaImagesViewBase = UIView()
+    qnaImagesViewBase.backgroundColor = .white
+    qnaImagesViewBase.isHidden = true
+    stackView.addArrangedSubview(qnaImagesViewBase)
+    self.qnaImagesViewBase = qnaImagesViewBase
     
     //qnaImagesView
     let qnaImagesView = ANIQnaImagesView()
-    addSubview(qnaImagesView)
-    qnaImagesViewTopConstraint = qnaImagesView.topToBottom(of: questionLabel, offset: 10.0)
+    qnaImagesViewBase.addSubview(qnaImagesView)
+    qnaImagesView.topToBottom(of: questionLabel, offset: 10.0)
     qnaImagesView.leftToSuperview()
     qnaImagesView.rightToSuperview()
-    qnaImagesViewHeight = UIScreen.main.bounds.width / 2 - 30
-    qnaImagesViewHeightConstraint = qnaImagesView.height(0, priority: .defaultHigh)
+    qnaImagesView.height(UIScreen.main.bounds.width / 2 - 30, priority: .defaultHigh)
+    qnaImagesView.bottomToSuperview()
     self.qnaImagesView = qnaImagesView
+    
+    //qnaCommentView
+    let qnaCommentView = ANIContributionCommentView()
+    qnaCommentView.delegate = self
+    stackView.addArrangedSubview(qnaCommentView)
+    self.qnaCommentView = qnaCommentView
     
     //bottomArea
     let bottomArea = UIView()
     addSubview(bottomArea)
-    bottomArea.topToBottom(of: qnaImagesView, offset: 10.0)
+    bottomArea.topToBottom(of: stackView, offset: 10.0)
     bottomArea.edgesToSuperview(excluding: .top)
     self.bottomArea = bottomArea
     
@@ -147,23 +199,13 @@ class ANIQnaViewCell: UITableViewCell {
     profileImageView.isUserInteractionEnabled = true
     profileImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped)))
     addSubview(profileImageView)
-    profileImageView.topToBottom(of: qnaImagesView, offset: 10.0)
+    profileImageView.top(to: bottomArea)
     profileImageView.leftToSuperview(offset: 10.0)
     profileImageView.width(32.0)
     profileImageView.height(32.0)
     profileImageView.layer.cornerRadius = profileImageView.constraints[0].constant / 2
     profileImageView.layer.masksToBounds = true
     self.profileImageView = profileImageView
-    
-    //bottomSpace
-    let spaceView = UIView()
-    spaceView.backgroundColor = ANIColor.bg
-    addSubview(spaceView)
-    spaceView.topToBottom(of: profileImageView, offset: 10)
-    spaceView.leftToSuperview()
-    spaceView.rightToSuperview()
-    spaceView.height(10.0)
-    spaceView.bottomToSuperview()
     
     //optionButton
     let optionButton = UIButton()
@@ -246,26 +288,40 @@ class ANIQnaViewCell: UITableViewCell {
     userNameLabel.rightToLeft(of: loveButton, offset: -10)
     userNameLabel.centerY(to: profileImageView)
     self.userNameLabel = userNameLabel
+    
+    //bottomSpace
+    let spaceView = UIView()
+    spaceView.backgroundColor = ANIColor.bg
+    addSubview(spaceView)
+    spaceView.topToBottom(of: profileImageView, offset: 10)
+    spaceView.leftToSuperview()
+    spaceView.rightToSuperview()
+    spaceView.height(10.0)
+    spaceView.bottomToSuperview(priority: .defaultHigh)
   }
   
   private func reloadLayout() {
     guard let questionLabel = self.questionLabel,
+          let qnaImagesViewBase = self.qnaImagesViewBase,
           let qnaImagesView = self.qnaImagesView,
+          let qnaCommentView = self.qnaCommentView,
           let loveButtonBG = self.loveButtonBG,
           let loveButton = self.loveButton,
-          let qna = self.qna,
-          let qnaImagesViewTopConstraint = self.qnaImagesViewTopConstraint,
-          let qnaImagesViewHeightConstraint = self.qnaImagesViewHeightConstraint else { return }
+          let qna = self.qna else { return }
     
     questionLabel.text = qna.qna
 
     if let qnaImageUrls = qna.qnaImageUrls {
-      qnaImagesViewTopConstraint.constant = 10.0
-      qnaImagesViewHeightConstraint.constant = qnaImagesViewHeight
       qnaImagesView.imageUrls = qnaImageUrls
+      qnaImagesViewBase.isHidden = false
     } else {
-      qnaImagesViewTopConstraint.constant = 0.0
-      qnaImagesViewHeightConstraint.constant = 0.0
+      qnaImagesViewBase.isHidden = true
+    }
+    
+    if qna.comments != nil {
+      qnaCommentView.isHidden = false
+    } else {
+      qnaCommentView.isHidden = true
     }
 
     if ANISessionManager.shared.isAnonymous {
@@ -499,6 +555,13 @@ extension ANIQnaViewCell: ANIButtonViewDelegate {
     if view === self.loveButton {
       love()
     }
+  }
+}
+
+//MARK: ANIContributionCommentViewDelegate
+extension ANIQnaViewCell: ANIContributionCommentViewDelegate {
+  func loadedCommentUser(user: FirebaseUser) {
+    self.delegate?.loadedQnaUser(user: user)
   }
 }
 

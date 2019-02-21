@@ -24,11 +24,9 @@ protocol ANISupportViewCellDelegate {
 
 class ANISupportViewCell: UITableViewCell {
   
-  private let MESSAGE_LABEL_TOP_CONSTANT: CGFloat = 10.0
-  private var messageLabelTopConstraint: Constraint?
-  private var messageLabelHeightConstraint: Constraint?
-  private weak var messageLabel: ActiveLabel?
-  
+  private weak var stackView: UIStackView?
+
+  private weak var base: UIView?
   private let RECRUIT_BASE_BORDER_WIDHT: CGFloat = 1.2
   private weak var deleteRecruitBase: UIView?
   private weak var deleteRecruitImageView: UIImageView?
@@ -43,6 +41,11 @@ class ANISupportViewCell: UITableViewCell {
   private weak var sexLabel: UILabel?
   private weak var titleLabel: UILabel?
   private weak var subTitleLabel: UILabel?
+  
+  private weak var messageLabelBase: UIView?
+  private weak var messageLabel: ActiveLabel?
+  
+  private weak var storyCommentView: ANIContributionCommentView?
   
   private weak var bottomArea: UIView?
   private let PROFILE_IMAGE_VIEW_HEIGHT: CGFloat = 32.0
@@ -59,12 +62,16 @@ class ANISupportViewCell: UITableViewCell {
   
   var story: FirebaseStory? {
     didSet {
+      guard let storyCommentView = self.storyCommentView else  { return }
+
       if user == nil {
         loadUser()
       }
       if recruit == nil, isDeleteRecruit == nil {
         loadRecruit()
       }
+      
+      storyCommentView.story = story
 
       reloadLayout()
       observeLove()
@@ -106,6 +113,21 @@ class ANISupportViewCell: UITableViewCell {
     didSet {
       DispatchQueue.main.async {
         self.reloadUserLayout()
+      }
+    }
+  }
+  
+  var commentUsers: [FirebaseUser?]? {
+    didSet {
+      guard let storyCommentView = self.storyCommentView,
+            let commentUsers = self.commentUsers else { return }
+      
+      if !commentUsers.isEmpty {
+        storyCommentView.commentOneUser = commentUsers[0]
+        
+        if commentUsers.count > 1 {
+          storyCommentView.commentTwoUser = commentUsers[1]
+        }
       }
     }
   }
@@ -159,6 +181,21 @@ class ANISupportViewCell: UITableViewCell {
     self.selectionStyle = .none
     self.backgroundColor = .white
     
+    //stackView
+    let stackView = UIStackView()
+    stackView.axis = .vertical
+    stackView.distribution = .equalSpacing
+    stackView.spacing = 0.0
+    addSubview(stackView)
+    stackView.edgesToSuperview(excluding: .bottom)
+    self.stackView = stackView
+    
+    //base
+    let base = UIView()
+    base.backgroundColor = .white
+    stackView.addArrangedSubview(base)
+    self.base = base
+    
     //deleteRecruitBase
     let deleteRecruitBase = UIView()
     deleteRecruitBase.backgroundColor = .white
@@ -166,7 +203,7 @@ class ANISupportViewCell: UITableViewCell {
     deleteRecruitBase.layer.masksToBounds = true
     deleteRecruitBase.layer.borderColor = ANIColor.gray.cgColor
     deleteRecruitBase.layer.borderWidth = RECRUIT_BASE_BORDER_WIDHT
-    addSubview(deleteRecruitBase)
+    base.addSubview(deleteRecruitBase)
     self.deleteRecruitBase = deleteRecruitBase
     
     //deleteRecruitImageView
@@ -203,10 +240,11 @@ class ANISupportViewCell: UITableViewCell {
     recruitBase.layer.borderWidth = RECRUIT_BASE_BORDER_WIDHT
     recruitBase.isUserInteractionEnabled = true
     recruitBase.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(recruitTapped)))
-    addSubview(recruitBase)
+    base.addSubview(recruitBase)
     recruitBase.topToSuperview(offset: 10.0)
     recruitBase.leftToSuperview(offset: 10.0)
     recruitBase.rightToSuperview(offset: -10.0)
+    recruitBase.bottomToSuperview()
     self.recruitBase = recruitBase
     
     deleteRecruitBase.edges(to: recruitBase)
@@ -220,7 +258,7 @@ class ANISupportViewCell: UITableViewCell {
     recruitImageView.topToSuperview()
     recruitImageView.leftToSuperview()
     recruitImageView.rightToSuperview()
-    recruitImageView.height(recruitImageViewHeight)
+    recruitImageView.height(recruitImageViewHeight, priority: .defaultHigh)
     self.recruitImageView = recruitImageView
     
     //basicInfoStackView
@@ -307,11 +345,17 @@ class ANISupportViewCell: UITableViewCell {
     subTitleLabel.font = UIFont.systemFont(ofSize: 14.0)
     subTitleLabel.textColor = ANIColor.subTitle
     recruitBase.addSubview(subTitleLabel)
-    subTitleLabel.topToBottom(of: titleLabel, offset: 10.0)
+    subTitleLabel.topToBottom(of: titleLabel, offset: 10.0, priority: .defaultHigh)
     subTitleLabel.leftToSuperview(offset: 10.0)
     subTitleLabel.rightToSuperview(offset: -10.0)
     subTitleLabel.bottomToSuperview(offset: -10)
     self.subTitleLabel = subTitleLabel
+    
+    //messageLabelBase
+    let messageLabelBase = UIView()
+    messageLabelBase.backgroundColor = .white
+    stackView.addArrangedSubview(messageLabelBase)
+    self.messageLabelBase = messageLabelBase
     
     //messageLabel
     let messageLabel = ActiveLabel()
@@ -326,17 +370,23 @@ class ANISupportViewCell: UITableViewCell {
     messageLabel.handleHashtagTap { (hashtag) in
       ANINotificationManager.postTapHashtag(contributionKind: KEY_CONTRIBUTION_KIND_STROY, hashtag: hashtag)
     }
-    addSubview(messageLabel)
-    messageLabelTopConstraint = messageLabel.topToBottom(of: recruitBase, offset: MESSAGE_LABEL_TOP_CONSTANT)
+    messageLabelBase.addSubview(messageLabel)
+    messageLabel.topToBottom(of: recruitBase, offset: 10.0)
     messageLabel.leftToSuperview(offset: 10.0)
     messageLabel.rightToSuperview(offset: -10.0)
-    messageLabelHeightConstraint = messageLabel.height(0.0)
+    messageLabel.bottomToSuperview()
     self.messageLabel = messageLabel
+    
+    //storyCommentView
+    let storyCommentView = ANIContributionCommentView()
+    storyCommentView.delegate = self
+    stackView.addArrangedSubview(storyCommentView)
+    self.storyCommentView = storyCommentView
     
     //bottomArea
     let bottomArea = UIView()
     addSubview(bottomArea)
-    bottomArea.topToBottom(of: messageLabel, offset: 10.0)
+    bottomArea.topToBottom(of: stackView, offset: 10.0)
     bottomArea.edgesToSuperview(excluding: .top)
     self.bottomArea = bottomArea
     
@@ -346,7 +396,7 @@ class ANISupportViewCell: UITableViewCell {
     profileImageView.isUserInteractionEnabled = true
     profileImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped)))
     addSubview(profileImageView)
-    profileImageView.topToBottom(of: messageLabel, offset: 10.0)
+    profileImageView.top(to: bottomArea)
     profileImageView.leftToSuperview(offset: 10.0)
     profileImageView.width(PROFILE_IMAGE_VIEW_HEIGHT)
     profileImageView.height(PROFILE_IMAGE_VIEW_HEIGHT)
@@ -443,30 +493,34 @@ class ANISupportViewCell: UITableViewCell {
     spaceView.leftToSuperview()
     spaceView.rightToSuperview()
     spaceView.height(10.0)
-    spaceView.bottomToSuperview()
+    spaceView.bottomToSuperview(priority: .defaultHigh)
   }
   
   private func reloadLayout() {
-    guard let messageLabelTopConstraint = self.messageLabelTopConstraint,
-          let messageLabelHeightConstraint = self.messageLabelHeightConstraint,
-          let messageLabel = self.messageLabel,
-          let titleLabel = self.titleLabel,
+    guard let titleLabel = self.titleLabel,
           let subTitleLabel = self.subTitleLabel,
+          let messageLabelBase = self.messageLabelBase,
+          let messageLabel = self.messageLabel,
+          let storyCommentView = self.storyCommentView,
           let loveButtonBG = self.loveButtonBG,
           let loveButton = self.loveButton,
           let story = self.story else { return }
     
-    messageLabel.text = story.story
-    if story.story == "" {
-      messageLabelTopConstraint.constant = 0
-      messageLabelHeightConstraint.isActive = true
-    } else {
-      messageLabelTopConstraint.constant = MESSAGE_LABEL_TOP_CONSTANT
-      messageLabelHeightConstraint.isActive = false
-    }
-    
     titleLabel.text = story.recruitTitle
     subTitleLabel.text = story.recruitSubTitle
+    
+    messageLabel.text = story.story
+    if story.story == "" {
+      messageLabelBase.isHidden = true
+    } else {
+      messageLabelBase.isHidden = false
+    }
+    
+    if story.comments != nil {
+      storyCommentView.isHidden = false
+    } else {
+      storyCommentView.isHidden = true
+    }
 
     if ANISessionManager.shared.isAnonymous {
       loveButtonBG.isUserInteractionEnabled = true
@@ -758,6 +812,13 @@ extension ANISupportViewCell: ANIButtonViewDelegate {
     if view === self.loveButton {
       love()
     }
+  }
+}
+
+//MARK: ANIContributionCommentViewDelegate
+extension ANISupportViewCell: ANIContributionCommentViewDelegate {
+  func loadedCommentUser(user: FirebaseUser) {
+    self.delegate?.loadedStoryUser(user: user)
   }
 }
 
