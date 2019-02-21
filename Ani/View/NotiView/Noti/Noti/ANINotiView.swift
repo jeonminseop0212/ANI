@@ -115,7 +115,7 @@ class ANINotiView: UIView {
   }
   
   private func setupNotifications() {
-    ANINotificationManager.receive(notiTabTapped: self, selector: #selector(scrollToTop))
+    ANINotificationManager.receive(notiTabTapped: self, selector: #selector(notiTabTapped))
     ANINotificationManager.receive(login: self, selector: #selector(reloadNotifications))
     ANINotificationManager.receive(logout: self, selector: #selector(hideTableView))
     ANINotificationManager.receive(tapNotiNotification: self, selector: #selector(reloadNotifications))
@@ -123,12 +123,16 @@ class ANINotiView: UIView {
     ANINotificationManager.postDidSetupViewNotifications()
   }
   
-  @objc private func scrollToTop() {
+  @objc private func notiTabTapped() {
+    scrollToTop(animation: true)
+  }
+  
+  private func scrollToTop(animation: Bool) {
     guard let notiTableView = notiTableView,
           !notifications.isEmpty,
           isCellSelected else { return }
     
-    notiTableView.scrollToRow(at: [0, 0], at: .top, animated: true)
+    notiTableView.scrollToRow(at: [0, 0], at: .top, animated: animation)
   }
   
   @objc private func reloadNotifications() {
@@ -136,7 +140,7 @@ class ANINotiView: UIView {
     
     notiTableView.alpha = 0.0
     
-    loadNoti(sender: nil)
+    loadNoti(sender: nil)    
   }
   
   @objc private func hideTableView() {
@@ -333,6 +337,10 @@ extension ANINotiView {
                 }
                 
                 notiTableView.reloadData() {
+                  if sender == nil {
+                    self.scrollToTop(animation: false)
+                  }
+                  
                   if !updated {
                     self.updateCheckNotiDate()
                     updated = true
