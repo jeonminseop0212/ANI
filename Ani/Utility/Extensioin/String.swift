@@ -7,8 +7,10 @@
 //
 
 import UIKit
+
+private var appleColorEmojiFont = CTFontCreateWithName("AppleColorEmoji" as CFString, 20, nil)
+
 extension String {
-  
   func substring(_ r: CountableRange<Int>) -> String {
     
     let length = self.count
@@ -44,5 +46,14 @@ extension String {
     let to = r.upperBound
     
     return self.substring(from..<to)
+  }
+  
+  var isAppleColorEmoji: Bool {
+    let chars = Array(self.utf16)
+    if chars.count == 1 && chars[0] <= 57 { // 制御文字やスペース、数字を除外
+      return false
+    }
+    var glyphs = [CGGlyph](repeating: 0, count: chars.count)
+    return CTFontGetGlyphsForCharacters(appleColorEmojiFont, chars, &glyphs, glyphs.count)
   }
 }
