@@ -75,34 +75,46 @@ public class ANIPlaceHolderTextView: UITextView {
   
   func resolveHashTags(text: String, hashtagArray: [String]) {
     var nsText: NSString = text as NSString
-
     var ranges = [NSRange]()
-    for (index, var word) in hashtagArray.enumerated() {
-      if index == 0 {
-        word = "#" + word
-        if word.hasPrefix("#") {
-          var range = nsText.range(of: word as String)
-          if !ranges.isEmpty, let lastRage = ranges.last {
-            range = NSRange(location: lastRage.upperBound + range.lowerBound, length: word.count)
-          }
-          
-          ranges.append(range)
-          
-          nsText = text[text.index(text.startIndex, offsetBy: range.upperBound)...] as NSString
-        }
+    
+    var replaceRanges = [NSRange]()
+    
+    for (index, word) in hashtagArray.enumerated() {
+      var newWord = ""
+      //タグが文字列の一番前にいる時
+      var range = nsText.range(of: "#" + word as String)
+      if range.lowerBound == 0 && index == 0 {
+        newWord = "#" + word
       } else {
-        word = " #" + word
-        if word.hasPrefix(" #") {
-          var range = nsText.range(of: word as String)
-          if !ranges.isEmpty, let lastRage = ranges.last {
-            range = NSRange(location: lastRage.upperBound + range.lowerBound, length: word.count)
+        //普通の場合
+        range = nsText.range(of: " #" + word as String)
+        if range.length > 0 {
+          newWord = " #" + word
+        } else {
+          //改行の次にタグが来る場合
+          range = nsText.range(of: "\n#" + word as String)
+          if range.length > 0 {
+            newWord = "\n#" + word
           }
-          
-          ranges.append(range)
-          
-          nsText = text[text.index(text.startIndex, offsetBy: range.upperBound)...] as NSString
         }
       }
+      
+      if !ranges.isEmpty, let lastRage = ranges.last {
+        range = NSRange(location: lastRage.upperBound + range.lowerBound, length: newWord.count)
+      }
+      
+      ranges.append(range)
+      
+      //絵文字が入るとずれるから絵文字をなくして計算する
+      let replaceText = textEmojiExclusion(checkString: nsText as String) as NSString
+      var replaceRange = replaceText.range(of: newWord as String)
+      if !replaceRanges.isEmpty, let lastReplaceRage = replaceRanges.last {
+        replaceRange = NSRange(location: lastReplaceRage.upperBound + replaceRange.lowerBound, length: newWord.count)
+      }
+      
+      replaceRanges.append(replaceRange)
+      
+      nsText = text[text.index(text.startIndex, offsetBy: replaceRange.upperBound)...] as NSString
     }
     
     let attrs = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17.0), NSAttributedString.Key.foregroundColor: ANIColor.dark]
@@ -121,6 +133,21 @@ public class ANIPlaceHolderTextView: UITextView {
     self.attributedText = attrString
     
     updateCursorPoint(cursorPoint: cursorPoint)
+  }
+  
+  private func textEmojiExclusion(checkString: String) -> String {
+    var replaceText = ""
+    let replaceCh = "E"
+    for ch in checkString {
+      let str: String = ch.description
+      if str.isAppleColorEmoji {
+        replaceText += replaceCh
+      } else {
+        replaceText += str
+      }
+    }
+    
+    return replaceText
   }
   
   private func getCursorPosition() -> Int {
