@@ -111,6 +111,7 @@ class ANIContributionView: UIView {
     
     //contentTextView
     let contentTextView = ANIPlaceHolderTextView()
+    contentTextView.backgroundColor = .white
     contentTextView.keyboardType = .twitter
     contentTextView.textColor = ANIColor.dark
     contentTextView.font = UIFont.systemFont(ofSize: 17.0)

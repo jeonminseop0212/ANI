@@ -239,6 +239,7 @@ class ANISearchViewController: UIViewController {
     let initialViewController = ANIInitialViewController()
     initialViewController.myTabBarController = self.tabBarController as? ANITabBarController
     let navigationController = UINavigationController(rootViewController: initialViewController)
+    navigationController.modalPresentationStyle = .fullScreen
     self.present(navigationController, animated: true, completion: nil)
   }
   

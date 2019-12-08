@@ -105,22 +105,24 @@ class ANIRecruitContributionViewController: UIViewController {
     if recruitContributionMode == .edit, let recruit = self.recruit {
       recruitContributionView.recruit = recruit
     }
-    recruitContributionView.headerMinHeight = UIViewController.STATUS_BAR_HEIGHT + UIViewController.NAVIGATION_BAR_HEIGHT
+    recruitContributionView.headerMinHeight = UIViewController.NAVIGATION_BAR_HEIGHT
     recruitContributionView.delegate = self
     self.view.addSubview(recruitContributionView)
     recruitContributionViewBottomConstraint = recruitContributionView.bottomToSuperview()
     recruitContributionViewOriginalBottomConstraintConstant = recruitContributionViewBottomConstraint?.constant
-    recruitContributionView.edgesToSuperview(excluding: .bottom)
+    recruitContributionView.topToSuperview(usingSafeArea: true)
+    recruitContributionView.leftToSuperview()
+    recruitContributionView.rightToSuperview()
     self.recruitContributionView = recruitContributionView
     
     //myNavigationBar
     let myNavigationBar = UIView()
     myNavigationBar.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0)
     self.view.addSubview(myNavigationBar)
-    myNavigationBar.topToSuperview()
+    myNavigationBar.topToSuperview(usingSafeArea: true)
     myNavigationBar.leftToSuperview()
     myNavigationBar.rightToSuperview()
-    myNavigationBar.height(UIViewController.STATUS_BAR_HEIGHT + UIViewController.NAVIGATION_BAR_HEIGHT)
+    myNavigationBar.height(UIViewController.NAVIGATION_BAR_HEIGHT)
     self.myNavigationBar = myNavigationBar
     
     //dismissButton
@@ -258,6 +260,7 @@ class ANIRecruitContributionViewController: UIViewController {
         Gallery.Config.tabsToShow = [.imageTab, .cameraTab]
       }
       let galleryNV = UINavigationController(rootViewController: galleryUnrap)
+      galleryNV.modalPresentationStyle = .fullScreen
       present(galleryNV, animated: animation, completion: nil)
       
       isHaderImagePick = true
@@ -279,6 +282,7 @@ class ANIRecruitContributionViewController: UIViewController {
       Gallery.Config.Grid.previewRatio = 1.0
       Config.tabsToShow = [.imageTab, .cameraTab]
       let galleryNV = UINavigationController(rootViewController: galleryUnrap)
+      galleryNV.modalPresentationStyle = .fullScreen
       present(galleryNV, animated: animation, completion: nil)
       
       isHaderImagePick = false

@@ -48,7 +48,7 @@ class VideosController: UIViewController {
   override func viewWillAppear(_ animated: Bool) {
     if #available(iOS 10.0, *) {
       do {
-        try AVAudioSession.sharedInstance().setCategory(.ambient, mode: .default)
+        try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryAmbient, mode: AVAudioSessionModeDefault)
       } catch {
         print("AVAudioSession catgery set error \(error)")
       }
@@ -72,9 +72,9 @@ class VideosController: UIViewController {
     
     view.addSubview(gridView)
     
-    addChild(dropdownController)
+    addChildViewController(dropdownController)
     gridView.insertSubview(dropdownController.view, belowSubview: gridView.topView)
-    dropdownController.didMove(toParent: self)
+    dropdownController.didMove(toParentViewController: self)
     
     gridView.g_pinEdges()
     gridView.dropDownController = dropdownController

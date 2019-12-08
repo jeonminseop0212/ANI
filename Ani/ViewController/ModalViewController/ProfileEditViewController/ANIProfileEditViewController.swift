@@ -582,6 +582,7 @@ extension ANIProfileEditViewController: ANIProfileEditViewDelegate {
       Gallery.Config.Grid.previewRatio = 1.0
       
       let galleryNV = UINavigationController(rootViewController: galleryUnrap)
+      galleryNV.modalPresentationStyle = .fullScreen
       self.present(galleryNV, animated: true, completion: nil)
       
       isFamilyAdd = true
@@ -605,6 +606,7 @@ extension ANIProfileEditViewController: ANIProfileEditViewDelegate {
       Gallery.Config.Grid.previewRatio = 1.0
       
       let galleryNV = UINavigationController(rootViewController: galleryUnrap)
+      galleryNV.modalPresentationStyle = .fullScreen
       self.present(galleryNV, animated: true, completion: nil)
       
       isFamilyAdd = false

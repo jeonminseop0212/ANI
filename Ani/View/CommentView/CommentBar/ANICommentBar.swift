@@ -50,6 +50,8 @@ class ANICommentBar: UIView {
   }
   
   private func setup() {
+    self.backgroundColor = .white
+    
     //parentCommentUserView
     let parentCommentUserView = UIView()
     parentCommentUserView.backgroundColor = ANIColor.bg
@@ -133,6 +135,7 @@ class ANICommentBar: UIView {
     
     //commentTextView
     let commentTextView = GrowingTextView()
+    commentTextView.backgroundColor = .white
     commentTextView.textColor = ANIColor.dark
     commentTextView.font = UIFont.systemFont(ofSize: 15.0)
     commentTextView.placeholder = "コメント"

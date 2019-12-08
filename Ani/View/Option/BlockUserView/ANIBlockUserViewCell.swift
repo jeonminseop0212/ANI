@@ -45,6 +45,7 @@ class ANIBlockUserViewCell: UITableViewCell {
   
   private func setup() {
     self.selectionStyle = .none
+    self.backgroundColor = .white
     
     //stackView
     let stackView = UIStackView()
@@ -69,6 +70,7 @@ class ANIBlockUserViewCell: UITableViewCell {
     
     //userNameLabel
     let userNameLabel = UILabel()
+    userNameLabel.backgroundColor = .white
     userNameLabel.textColor = ANIColor.dark
     stackView.addArrangedSubview(userNameLabel)
     userNameLabel.centerY(to: profileImageView)
@@ -89,6 +91,7 @@ class ANIBlockUserViewCell: UITableViewCell {
     
     //blockLabel
     let blockLabel = UILabel()
+    blockLabel.backgroundColor = .white
     blockLabel.font = UIFont.boldSystemFont(ofSize: 14)
     blockLabel.textColor = ANIColor.emerald
     blockLabel.text = "ブロック中"

@@ -277,6 +277,7 @@ class ANIRecruitViewController: UIViewController {
     let initialViewController = ANIInitialViewController()
     initialViewController.myTabBarController = self.tabBarController as? ANITabBarController
     let navigationController = UINavigationController(rootViewController: initialViewController)
+    navigationController.modalPresentationStyle = .fullScreen
     self.present(navigationController, animated: true, completion: nil)
   }
 }
@@ -289,6 +290,7 @@ extension ANIRecruitViewController:ANIButtonViewDelegate {
         let recruitContribtionViewController = ANIRecruitContributionViewController()
         recruitContribtionViewController.delegate = self
         let recruitContributionNV = UINavigationController(rootViewController: recruitContribtionViewController)
+        recruitContributionNV.modalPresentationStyle = .fullScreen
         self.navigationController?.present(recruitContributionNV, animated: true, completion: nil)
       } else {
         reject()

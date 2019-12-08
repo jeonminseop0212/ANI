@@ -443,7 +443,7 @@ class GridView: UIView {
   }
   
   private func makeLoadingIndicator() -> UIActivityIndicatorView {
-    let view = UIActivityIndicatorView(style: .whiteLarge)
+    let view = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
     view.color = .gray
     view.hidesWhenStopped = true
     
@@ -502,7 +502,7 @@ class GridView: UIView {
     guard let player = self.player else { return }
 
     player.actionAtItemEnd = .none
-    player.seek(to: CMTime.zero)
+    player.seek(to: kCMTimeZero)
     player.play()
   }
 }

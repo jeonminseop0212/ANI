@@ -48,6 +48,7 @@ class ANIFollowUserViewCell: UITableViewCell {
     self.isUserInteractionEnabled = true
     let tapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped))
     self.addGestureRecognizer(tapGesture)
+    self.backgroundColor = .white
     
     //stackView
     let stackView = UIStackView()
@@ -73,6 +74,7 @@ class ANIFollowUserViewCell: UITableViewCell {
     //userNameLabel
     let userNameLabel = UILabel()
     userNameLabel.textColor = ANIColor.dark
+    userNameLabel.backgroundColor = .white
     stackView.addArrangedSubview(userNameLabel)
     userNameLabel.centerY(to: profileImageView)
     self.userNameLabel = userNameLabel
@@ -92,6 +94,7 @@ class ANIFollowUserViewCell: UITableViewCell {
     
     //followLabel
     let followLabel = UILabel()
+    followLabel.backgroundColor = .white
     followLabel.font = UIFont.boldSystemFont(ofSize: 14)
     followLabel.textColor = .white
     followLabel.text = "フォロー"

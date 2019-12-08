@@ -76,6 +76,7 @@ class ANICommentView: UIView {
     let commentTableView = UITableView()
     commentTableView.separatorStyle = .none
     commentTableView.alpha = 0.0
+    commentTableView.backgroundColor = .white
     let contentCellId = NSStringFromClass(ANICommentContentCell.self)
     commentTableView.register(ANICommentContentCell.self, forCellReuseIdentifier: contentCellId)
     let commentCellId = NSStringFromClass(ANICommentCell.self)

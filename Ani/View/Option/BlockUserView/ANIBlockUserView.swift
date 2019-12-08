@@ -48,6 +48,7 @@ class ANIBlockUserView: UIView {
     //followUserTableView
     let blockUserTableView = UITableView()
     let id = NSStringFromClass(ANIBlockUserViewCell.self)
+    blockUserTableView.backgroundColor = .white
     blockUserTableView.register(ANIBlockUserViewCell.self, forCellReuseIdentifier: id)
     blockUserTableView.separatorStyle = .none
     blockUserTableView.alpha = 0.0

@@ -169,6 +169,7 @@ class ANITabBarController: UITabBarController {
     let initialViewController = ANIInitialViewController()
     initialViewController.myTabBarController = self
     let initialNV = UINavigationController(rootViewController: initialViewController)
+    initialNV.modalPresentationStyle = .fullScreen
     self.present(initialNV, animated: true, completion: nil)
     
     userDefaults.set(false, forKey: KEY_FIRST_LAUNCH)
@@ -249,7 +250,7 @@ class ANITabBarController: UITabBarController {
     
     let userDefaults = UserDefaults.standard
     
-    if ANISessionManager.shared.isHiddenInitial && ANISessionManager.shared.isHiddenSplash && ANISessionManager.shared.isCheckedVersion {
+    if ANISessionManager.shared.isHiddenInitial && ANISessionManager.shared.isHiddenSplash {
       DispatchQueue.global().async {
         database.collection(KEY_EVENTS).getDocuments(completion: { (snapshot, error) in
           if let error = error {
