@@ -264,6 +264,7 @@ class ANIRecruitDetailViewController: UIViewController {
       let navigationContoller = UINavigationController(rootViewController: chatViewController)
       chatViewController.user = user
       chatViewController.isPush = false
+      navigationContoller.modalPresentationStyle = .fullScreen
       self.present(navigationContoller, animated: true, completion: nil)
     } else {
       self.reject()
@@ -334,6 +335,7 @@ class ANIRecruitDetailViewController: UIViewController {
     let initialViewController = ANIInitialViewController()
     initialViewController.myTabBarController = self.tabBarController as? ANITabBarController
     let navigationController = UINavigationController(rootViewController: initialViewController)
+    navigationController.modalPresentationStyle = .fullScreen
     self.present(navigationController, animated: true, completion: nil)
   }
   
@@ -503,6 +505,7 @@ extension ANIRecruitDetailViewController: ANIPopupOptionViewControllerDelegate {
             recruitContribtionViewController.delegate = self
           }
           let recruitContributionNV = UINavigationController(rootViewController: recruitContribtionViewController)
+          recruitContributionNV.modalPresentationStyle = .fullScreen
           self.navigationController?.present(recruitContributionNV, animated: true, completion: nil)
         }
       } else {

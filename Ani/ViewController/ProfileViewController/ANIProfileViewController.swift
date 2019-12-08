@@ -244,6 +244,7 @@ class ANIProfileViewController: UIViewController {
     let profileEditViewController = ANIProfileEditViewController()
     profileEditViewController.delegate = self
     profileEditViewController.currentUser = currentUser
+    profileEditViewController.modalPresentationStyle = .fullScreen
     self.present(profileEditViewController, animated: true, completion: nil)
   }
   
@@ -422,6 +423,7 @@ extension ANIProfileViewController: ANINeedLoginViewDelegate {
     let initialViewController = ANIInitialViewController()
     initialViewController.myTabBarController = self.tabBarController as? ANITabBarController
     let navigationController = UINavigationController(rootViewController: initialViewController)
+    navigationController.modalPresentationStyle = .fullScreen
     self.present(navigationController, animated: true, completion: nil)
   }
 }

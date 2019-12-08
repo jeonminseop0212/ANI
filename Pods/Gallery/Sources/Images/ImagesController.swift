@@ -54,9 +54,9 @@ class ImagesController: UIViewController {
     
     view.addSubview(gridView)
     
-    addChild(dropdownController)
+    addChildViewController(dropdownController)
     gridView.insertSubview(dropdownController.view, belowSubview: gridView.topView)
-    dropdownController.didMove(toParent: self)
+    dropdownController.didMove(toParentViewController: self)
     
     gridView.bottomView.addSubview(stackView)
     gridView.g_pinEdges()
@@ -373,18 +373,26 @@ class ImageManager: NSObject {
   }
   @discardableResult
   class func fetchImage(viaAsset asset: PHAsset?, imageResultHandler: @escaping (_ image: UIImage?)->Void) -> PHImageRequestID? {
-    guard asset != nil else {
+    guard let asset = asset else {
       return nil
     }
     let options = PHImageRequestOptions()
-    options.resizeMode = PHImageRequestOptionsResizeMode.exact
-    return PHCachingImageManager.default().requestImage(for: asset!,
-                                                        targetSize: PHImageManagerMaximumSize,
-                                                        contentMode: .aspectFill,
-                                                        options: options) {
-                                                          (result, info) -> Void in
-                                                          imageResultHandler(result)
+//    options.resizeMode = .exact
+    options.deliveryMode = .highQualityFormat
+    return PHCachingImageManager.default().requestImage(for: asset,
+                                                 targetSize: PHImageManagerMaximumSize,
+                                                 contentMode: .aspectFill,
+                                                 options: options) { (result, info) in
+//                                                  guard let a = info?[PHImageResultIsDegradedKey] as? Bool else { return }
+                                                  imageResultHandler(result)
     }
+//    return PHCachingImageManager.default().requestImage(for: asset!,
+//                                                        targetSize: PHImageManagerMaximumSize,
+//                                                        contentMode: .aspectFill,
+//                                                        options: options) {
+//                                                          (result, info) -> Void in
+//                                                          imageResultHandler(result)
+//    }
   }
 }
 

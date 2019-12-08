@@ -153,7 +153,7 @@ class ANISignUpView: UIView {
     adressTextField.font = UIFont.systemFont(ofSize: 18.0)
     adressTextField.textColor = ANIColor.dark
     adressTextField.backgroundColor = .clear
-    adressTextField.placeholder = "ex)MYAU@myau.com"
+    adressTextField.attributedPlaceholder = NSAttributedString(string: "ex)MYAU@myau.com", attributes: [NSAttributedString.Key.foregroundColor : UIColor.lightGray])
     adressTextField.returnKeyType = .done
     adressTextField.keyboardType = .emailAddress
     adressTextField.delegate = self
@@ -189,7 +189,7 @@ class ANISignUpView: UIView {
     passwordTextField.font = UIFont.systemFont(ofSize: 18.0)
     passwordTextField.textColor = ANIColor.dark
     passwordTextField.backgroundColor = .clear
-    passwordTextField.placeholder = "パスワード"
+    passwordTextField.attributedPlaceholder = NSAttributedString(string: "パスワード", attributes: [NSAttributedString.Key.foregroundColor : UIColor.lightGray])
     passwordTextField.returnKeyType = .done
     passwordTextField.isSecureTextEntry = true
     passwordTextField.delegate = self
@@ -213,7 +213,7 @@ class ANISignUpView: UIView {
     passwordCheckTextField.font = UIFont.systemFont(ofSize: 18.0)
     passwordCheckTextField.textColor = ANIColor.dark
     passwordCheckTextField.backgroundColor = .clear
-    passwordCheckTextField.placeholder = "パスワードの確認"
+    passwordCheckTextField.attributedPlaceholder = NSAttributedString(string: "パスワードの確認", attributes: [NSAttributedString.Key.foregroundColor : UIColor.lightGray])
     passwordCheckTextField.returnKeyType = .done
     passwordCheckTextField.isSecureTextEntry = true
     passwordCheckTextField.delegate = self
@@ -248,7 +248,7 @@ class ANISignUpView: UIView {
     userNameTextField.font = UIFont.systemFont(ofSize: 18.0)
     userNameTextField.textColor = ANIColor.dark
     userNameTextField.backgroundColor = .clear
-    userNameTextField.placeholder = "ex)MYAU-myau"
+    userNameTextField.attributedPlaceholder = NSAttributedString(string: "ex)MYAU-myau", attributes: [NSAttributedString.Key.foregroundColor : UIColor.lightGray])
     userNameTextField.returnKeyType = .done
     userNameTextField.delegate = self
     userNameTextFieldBG.addSubview(userNameTextField)

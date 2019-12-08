@@ -33,9 +33,11 @@ class ANIPopupOptionViewCell: UITableViewCell {
   private func setup() {
     //basic
     self.selectionStyle = .none
+    self.backgroundColor = .white
     
     //optionLabel
     let optionLabel = UILabel()
+    optionLabel.backgroundColor = .white
     optionLabel.textAlignment = .center
     optionLabel.font = UIFont.boldSystemFont(ofSize: 17.0)
     optionLabel.textColor = ANIColor.dark

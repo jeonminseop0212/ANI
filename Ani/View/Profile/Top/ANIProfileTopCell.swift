@@ -53,6 +53,7 @@ class ANIProfileTopCell: UITableViewCell {
   
   private func setup() {
     self.selectionStyle = .none
+    self.backgroundColor = .white
     
     //familyView
     let familyView = ANIFamilyView()

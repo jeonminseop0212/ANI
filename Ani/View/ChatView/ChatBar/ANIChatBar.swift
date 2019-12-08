@@ -86,6 +86,7 @@ class ANIChatBar: UIView {
     
     //chattTextView
     let chatTextView = GrowingTextView()
+    chatTextView.backgroundColor = .white
     chatTextView.textColor = ANIColor.dark
     chatTextView.font = UIFont.systemFont(ofSize: 15.0)
     chatTextView.placeholder = "メッセージ"

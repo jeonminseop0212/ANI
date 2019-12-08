@@ -92,6 +92,7 @@ class ANIPopupOptionView: UIView {
     
     //optionTableView
     let optionTableView = UITableView()
+    optionTableView.backgroundColor = .white
     optionTableView.isScrollEnabled = false
     optionTableView.separatorStyle = .none
     optionTableView.dataSource = self

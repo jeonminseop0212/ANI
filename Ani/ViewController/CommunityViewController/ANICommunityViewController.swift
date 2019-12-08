@@ -196,7 +196,7 @@ class ANICommunityViewController: UIViewController {
     
     let userDefaults = UserDefaults.standard
     
-    if ANISessionManager.shared.isHiddenInitial && ANISessionManager.shared.isHiddenSplash && ANISessionManager.shared.isCheckedVersion {
+    if ANISessionManager.shared.isHiddenInitial && ANISessionManager.shared.isHiddenSplash {
       DispatchQueue.global().async {
         database.collection(KEY_EVENTS).getDocuments(completion: { (snapshot, error) in
           if let error = error {
@@ -298,6 +298,7 @@ class ANICommunityViewController: UIViewController {
     let initialViewController = ANIInitialViewController()
     initialViewController.myTabBarController = self.tabBarController as? ANITabBarController
     let navigationController = UINavigationController(rootViewController: initialViewController)
+    navigationController.modalPresentationStyle = .fullScreen
     self.present(navigationController, animated: true, completion: nil)
   }
 }
@@ -379,6 +380,7 @@ extension ANICommunityViewController: ANIButtonViewDelegate{
           contributionViewController.selectedContributionMode = ContributionMode.story
           contributionViewController.delegate = self
           let contributionNV = UINavigationController(rootViewController: contributionViewController)
+          contributionNV.modalPresentationStyle = .fullScreen
           self.present(contributionNV, animated: true, completion: nil)
         } else {
           let contributionViewController = ANIContributionViewController()
@@ -386,6 +388,7 @@ extension ANICommunityViewController: ANIButtonViewDelegate{
           contributionViewController.selectedContributionMode = ContributionMode.qna
           contributionViewController.delegate = self
           let contributionNV = UINavigationController(rootViewController: contributionViewController)
+          contributionNV.modalPresentationStyle = .fullScreen
           self.present(contributionNV, animated: true, completion: nil)
         }
       } else {

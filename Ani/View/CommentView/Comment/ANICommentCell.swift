@@ -76,6 +76,7 @@ class ANICommentCell: UITableViewCell {
     //basic
     self.selectionStyle = .none
     self.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(commentCellTapped)))
+    self.backgroundColor = .white
     
     //commentLabel
     let commentLabel = UILabel()

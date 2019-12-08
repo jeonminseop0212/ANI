@@ -46,6 +46,7 @@ class ANIOptionView: UIView {
   
   private func setup() {
     let tableView = UITableView()
+    tableView.backgroundColor = .white
     let id = NSStringFromClass(ANIOptionViewCell.self)
     tableView.register(ANIOptionViewCell.self, forCellReuseIdentifier: id)
     tableView.dataSource = self

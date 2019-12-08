@@ -223,6 +223,7 @@ extension ANISignUpViewController: ANISignUpViewDelegate {
       Gallery.Config.Grid.previewRatio = 1.0
       
       let galleryNV = UINavigationController(rootViewController: galleryUnrap)
+      galleryNV.modalPresentationStyle = .fullScreen
       self.present(galleryNV, animated: true, completion: nil)
     }
   }

@@ -63,6 +63,7 @@ class ANIFollowUserView: UIView {
     //followUserTableView
     let followUserTableView = UITableView()
     let id = NSStringFromClass(ANIFollowUserViewCell.self)
+    followUserTableView.backgroundColor = .white
     followUserTableView.register(ANIFollowUserViewCell.self, forCellReuseIdentifier: id)
     followUserTableView.separatorStyle = .none
     followUserTableView.alpha = 0.0
