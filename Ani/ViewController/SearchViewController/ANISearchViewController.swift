@@ -32,7 +32,7 @@ class ANISearchViewController: UIViewController {
             let searchBar = self.searchBar,
             let popularUsersView = self.popularUsersView else { return }
 
-      if let text = searchBar.textField?.text, text != "" {
+      if let text = searchBar.textField.text, text != "" {
         searchView.searchText = text
       }
 
@@ -42,7 +42,7 @@ class ANISearchViewController: UIViewController {
         searchView.selectedCategory = .qna
       }
       
-      if searchBar.textField?.text != "" {
+      if searchBar.textField.text != "" {
         UIView.animate(withDuration: 0.2) {
           popularUsersView.alpha = 0.0
         }
@@ -58,7 +58,7 @@ class ANISearchViewController: UIViewController {
 
       searchView.searchText = searchText
       
-      if searchBar.textField?.text != "" {
+      if searchBar.textField.text != "" {
         UIView.animate(withDuration: 0.2) {
           popularUsersView.alpha = 0.0
         }
@@ -133,10 +133,11 @@ class ANISearchViewController: UIViewController {
     //searchBar
     let searchBar = UISearchBar()
     searchBar.placeholder = "Search"
-    searchBar.textField?.backgroundColor = ANIColor.lightGray
+    searchBar.textField.backgroundColor = ANIColor.lightGray
     searchBar.delegate = self
     searchBar.backgroundImage = UIImage()
     searchBar.tintColor = ANIColor.darkGray
+    searchBar.textField.textColor = ANIColor.dark
     myNavigationBar.addSubview(searchBar)
     searchBar.topToSuperview()
     searchBar.leftToSuperview()
@@ -198,15 +199,11 @@ class ANISearchViewController: UIViewController {
   }
   
   @objc private func hideKeyboard() {
-    guard let searchBar = self.searchBar,
-      let searchBarTextField = searchBar.textField else { return }
-    if searchBarTextField.isFirstResponder {
-      searchBarTextField.resignFirstResponder()
+    guard let searchBar = self.searchBar  else { return }
+    if searchBar.textField.isFirstResponder {
+      searchBar.textField.resignFirstResponder()
       searchBar.setShowsCancelButton(false, animated: true)
-      
-      if let searchCancelButton = searchBar.cancelButton {
-        searchCancelButton.alpha = 0.0
-      }
+      searchBar.cancelButton.alpha = 0.0
     }
   }
   
@@ -294,28 +291,24 @@ class ANISearchViewController: UIViewController {
 //MARK: UISearchBarDelegate
 extension ANISearchViewController: UISearchBarDelegate {
   func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-    guard let searchBarTextField = searchBar.textField,
-          let text = searchBarTextField.text else { return }
+    guard let text = searchBar.textField.text else { return }
     
-    if searchBarTextField.isFirstResponder {
-      searchBarTextField.resignFirstResponder()
+    if searchBar.textField.isFirstResponder {
+      searchBar.textField.resignFirstResponder()
       
       self.searchText = text
     }
   }
   
   func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-    guard let searchBarTextField = searchBar.textField,
-          let popularUsersView = self.popularUsersView else { return }
+    guard let popularUsersView = self.popularUsersView else { return }
     
-    if searchBarTextField.isFirstResponder {
-      searchBarTextField.resignFirstResponder()
+    if searchBar.textField.isFirstResponder {
+      searchBar.textField.resignFirstResponder()
     }
     
     searchBar.setShowsCancelButton(false, animated: true)
-    if let searchCancelButton = searchBar.cancelButton {
-      searchCancelButton.alpha = 0.0
-    }
+    searchBar.cancelButton.alpha = 0.0
     
     UIView.animate(withDuration: 0.2) {
       popularUsersView.alpha = 1.0
@@ -324,9 +317,7 @@ extension ANISearchViewController: UISearchBarDelegate {
 
   func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
     searchBar.setShowsCancelButton(true, animated: true)
-    if let searchCancelButton = searchBar.cancelButton {
-      searchCancelButton.alpha = 1.0
-    }
+    searchBar.cancelButton.alpha = 1.0
     return true
   }
 }
