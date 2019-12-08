@@ -10,7 +10,6 @@ import UIKit
 import Firebase
 import FirebaseMessaging
 import UserNotifications
-import Siren
 import TwitterKit
 import GoogleSignIn
 import CodableFirebase
@@ -49,42 +48,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     window?.rootViewController = tabBarController
     window?.makeKeyAndVisible()
     
-    let siren = Siren.shared
-    siren.forceLanguageLocalization = .japanese
-    siren.alertMessaging = SirenAlertMessaging(updateTitle: NSAttributedString(string: "アップデートのお知らせ"),
-                                               updateMessage: NSAttributedString(string: "MYAUの新規バージョンがご利用になれます。アップデートしてください。"),
-                                               updateButtonMessage: NSAttributedString(string: "アップデート"),
-                                               nextTimeButtonMessage: NSAttributedString(string: "次回"),
-                                               skipVersionButtonMessage: NSAttributedString(string: "このバージョンをスキップ"))
-    siren.countryCode = "jp"
-    siren.delegate = self
-    
     ANIFirebaseRemoteConfigManager.shared.getShowReivewConditions { (conditions, error) in
       if error == nil, let conditions = conditions {
         ANISessionManager.shared.showReviewConditions = conditions
-      }
-    }
-
-    ANIFirebaseRemoteConfigManager.shared.getSirenAlertType { (type, error) in
-      if error == nil, let type = type {
-        switch type {
-        case SirenAlertType.force.rawValue:
-          siren.alertType = .force
-        case SirenAlertType.option.rawValue:
-          siren.alertType = .option
-        case SirenAlertType.skip.rawValue:
-          siren.alertType = .skip
-        case SirenAlertType.none.rawValue:
-          siren.alertType = .none
-        default:
-          siren.alertType = .skip
-        }
-
-        siren.checkVersion(checkType: .immediately)
-      } else {
-        siren.alertType = .force
-
-        siren.checkVersion(checkType: .immediately)
       }
     }
     
@@ -113,10 +79,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
 
   func applicationWillEnterForeground(_ application: UIApplication) {
-    if !ANISessionManager.shared.isCheckedVersion {
-      Siren.shared.checkVersion(checkType: .immediately)
-    }
-    
     playTopViewControllerVideo()
   }
 
@@ -162,7 +124,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     let userDefaults = UserDefaults.standard
     
-    if ANISessionManager.shared.isHiddenInitial && ANISessionManager.shared.isHiddenSplash && ANISessionManager.shared.isCheckedVersion {
+    if ANISessionManager.shared.isHiddenInitial && ANISessionManager.shared.isHiddenSplash {
       DispatchQueue.global().async {
         database.collection(KEY_EVENTS).getDocuments(completion: { (snapshot, error) in
           if let error = error {
@@ -263,37 +225,5 @@ extension AppDelegate: MessagingDelegate {
   }
   
   func messaging(_ messaging: Messaging, didReceive remoteMessage: MessagingRemoteMessage) {
-  }
-}
-
-//MARK: SirenDelegate
-extension AppDelegate: SirenDelegate {
-  func sirenLatestVersionInstalled() {
-    ANISessionManager.shared.isCheckedVersion = true
-    showEventIfNeeded()
-  }
-
-  func sirenVersionIsSkip() {
-    ANISessionManager.shared.isCheckedVersion = true
-    showEventIfNeeded()
-  }
-
-  func sirenUserDidCancel() {
-    ANISessionManager.shared.isCheckedVersion = true
-    showEventIfNeeded()
-  }
-
-  func sirenUserDidSkipVersion() {
-    ANISessionManager.shared.isCheckedVersion = true
-    showEventIfNeeded()
-  }
-
-  func sirenDidFailVersionCheck(error: Error) {
-    if IS_DEBUG {
-      ANISessionManager.shared.isCheckedVersion = true
-      showEventIfNeeded()
-    } else {
-      ANINotificationManager.postFailLoadVersion()
-    }
   }
 }

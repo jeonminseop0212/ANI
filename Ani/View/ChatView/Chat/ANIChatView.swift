@@ -71,6 +71,7 @@ class ANIChatView: UIView {
     //chatTableView
     let chatTableView = UITableView()
     chatTableView.separatorStyle = .none
+    chatTableView.backgroundColor = .white
     let myChatId = NSStringFromClass(ANIMyChatViewCell.self)
     chatTableView.register(ANIMyChatViewCell.self, forCellReuseIdentifier: myChatId)
     let otherChatId = NSStringFromClass(ANIOtherChatViewCell.self)

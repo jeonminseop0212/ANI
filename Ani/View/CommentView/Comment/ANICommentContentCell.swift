@@ -35,6 +35,7 @@ class ANICommentContentCell: UITableViewCell {
   private func setup() {
     //basic
     self.selectionStyle = .none
+    self.backgroundColor = .white
     
     //storyLabel
     let storyLabel = UILabel()

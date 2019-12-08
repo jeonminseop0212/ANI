@@ -34,13 +34,13 @@ class ANIInitialViewController: UIViewController {
     setup()
   }
   
-  override func viewWillAppear(_ animated: Bool) {
-    UIApplication.shared.statusBar?.alpha = 0.0
-  }
-  
-  override func viewWillDisappear(_ animated: Bool) {
-    UIApplication.shared.statusBar?.alpha = 1.0
-  }
+//  override func viewWillAppear(_ animated: Bool) {
+//    UIApplication.shared.statusBar?.alpha = 0.0
+//  }
+//  
+//  override func viewWillDisappear(_ animated: Bool) {
+//    UIApplication.shared.statusBar?.alpha = 1.0
+//  }
   
   private func setup() {
     //basic

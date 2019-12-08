@@ -42,6 +42,7 @@ class ANIMyChatViewCell: UITableViewCell {
   
   private func setup() {
     self.selectionStyle = .none
+    self.backgroundColor = .white
     
     //stackView
     let stackView = UIStackView()
@@ -53,6 +54,7 @@ class ANIMyChatViewCell: UITableViewCell {
     
     //dateLabelBG
     let dateLabelBG = UIView()
+    dateLabelBG.backgroundColor = .white
     stackView.addArrangedSubview(dateLabelBG)
     dateLabelBG.height(30)
     self.dateLabelBG = dateLabelBG
@@ -90,6 +92,7 @@ class ANIMyChatViewCell: UITableViewCell {
     
     //base
     let base = UIView()
+    base.backgroundColor = .white
     stackView.addArrangedSubview(base)
     self.base = base
     

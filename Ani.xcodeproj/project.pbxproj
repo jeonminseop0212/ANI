@@ -75,7 +75,6 @@
 		CD529783213E17F7001609DB /* ANIPopupOptionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD529782213E17F7001609DB /* ANIPopupOptionViewCell.swift */; };
 		CD6229DC20B64A6400E36875 /* ANISignUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6229DB20B64A6400E36875 /* ANISignUpViewController.swift */; };
 		CD6229DE20B64B9900E36875 /* ANISignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6229DD20B64B9900E36875 /* ANISignUpView.swift */; };
-		CD6762DE20F8285E0098E033 /* InstantSearchClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD6762DD20F8285E0098E033 /* InstantSearchClient.framework */; };
 		CD6762E020FD75AC0098E033 /* PickUpItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6762DF20FD75AC0098E033 /* PickUpItem.swift */; };
 		CD6B675120A8844B009BF63D /* ANIRecruitContributionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6B675020A8844B009BF63D /* ANIRecruitContributionView.swift */; };
 		CD6B675420A90F8A009BF63D /* ANIPlaceholderTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6B675320A90F8A009BF63D /* ANIPlaceholderTextView.swift */; };
@@ -461,7 +460,6 @@
 			files = (
 				CD1C829D21F5822400F4725F /* TwitterKit.framework in Frameworks */,
 				CD492A0321C740FE00C5AF81 /* PryntTrimmerView.framework in Frameworks */,
-				CD6762DE20F8285E0098E033 /* InstantSearchClient.framework in Frameworks */,
 				CD0BFF1020C6186500D5959B /* CodableFirebase.framework in Frameworks */,
 				CD047EBE20C4E9A000248958 /* NVActivityIndicatorView.framework in Frameworks */,
 				CDDD04AF20B4F8130094DBFA /* GrowingTextView.framework in Frameworks */,
@@ -1883,7 +1881,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-Ani/Pods-Ani-resources.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-Ani/Pods-Ani-resources.sh",
 				"${PODS_CONFIGURATION_BUILD_DIR}/FirebaseFirestore/gRPCCertificates-Firestore.bundle",
 				"${PODS_ROOT}/GoogleSignIn/Resources/GoogleSignIn.bundle",
 			);
@@ -1894,7 +1892,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Ani/Pods-Ani-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Ani/Pods-Ani-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		62BE84D0F0E3D26B0AF0897B /* [CP] Check Pods Manifest.lock */ = {
@@ -1970,16 +1968,16 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-Ani/Pods-Ani-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-Ani/Pods-Ani-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/ActiveLabel/ActiveLabel.framework",
 				"${BUILT_PRODUCTS_DIR}/BoringSSL/openssl.framework",
 				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
 				"${BUILT_PRODUCTS_DIR}/Gallery/Gallery.framework",
 				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac/GoogleToolboxForMac.framework",
 				"${BUILT_PRODUCTS_DIR}/GoogleUtilities/GoogleUtilities.framework",
+				"${BUILT_PRODUCTS_DIR}/InstantSearchClient/InstantSearchClient.framework",
 				"${BUILT_PRODUCTS_DIR}/Protobuf/Protobuf.framework",
 				"${BUILT_PRODUCTS_DIR}/SDWebImage/SDWebImage.framework",
-				"${BUILT_PRODUCTS_DIR}/Siren/Siren.framework",
 				"${BUILT_PRODUCTS_DIR}/gRPC-C++/grpcpp.framework",
 				"${BUILT_PRODUCTS_DIR}/gRPC-Core/grpc.framework",
 				"${BUILT_PRODUCTS_DIR}/leveldb-library/leveldb.framework",
@@ -1993,9 +1991,9 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Gallery.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleUtilities.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/InstantSearchClient.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Protobuf.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SDWebImage.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Siren.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/grpcpp.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/grpc.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/leveldb.framework",
@@ -2003,7 +2001,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Ani/Pods-Ani-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Ani/Pods-Ani-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		F5B1EFC62072666A000CFB0B /* ShellScript */ = {
@@ -2016,7 +2014,6 @@
 				"$(SRCROOT)/Carthage/Build/iOS/GrowingTextView.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/NVActivityIndicatorView.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/CodableFirebase.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/InstantSearchClient.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/PryntTrimmerView.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/TwitterKit.framework",
 			);

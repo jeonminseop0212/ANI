@@ -45,7 +45,6 @@ class ANISessionManager: NSObject {
   var blockingUserIds: [String]?
   
   var isLoadedFirstData: Bool = false
-  var isCheckedVersion: Bool = false
   
   var isLaunchNoti: Bool = false
   

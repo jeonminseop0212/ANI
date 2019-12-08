@@ -105,7 +105,7 @@ class ANILoginView: UIView {
     emailTextField.font = UIFont.systemFont(ofSize: 18.0)
     emailTextField.textColor = ANIColor.dark
     emailTextField.backgroundColor = .clear
-    emailTextField.placeholder = "IDまたはユーザーネーム"
+    emailTextField.attributedPlaceholder = NSAttributedString(string: "IDまたはユーザーネーム", attributes: [NSAttributedString.Key.foregroundColor : UIColor.lightGray])
     emailTextField.returnKeyType = .done
     emailTextField.keyboardType = .emailAddress
     emailTextField.delegate = self
@@ -141,7 +141,7 @@ class ANILoginView: UIView {
     passwordTextField.font = UIFont.systemFont(ofSize: 18.0)
     passwordTextField.textColor = ANIColor.dark
     passwordTextField.backgroundColor = .clear
-    passwordTextField.placeholder = "パスワード"
+    passwordTextField.attributedPlaceholder = NSAttributedString(string: "パスワード", attributes: [NSAttributedString.Key.foregroundColor : UIColor.lightGray])
     passwordTextField.returnKeyType = .done
     passwordTextField.isSecureTextEntry = true
     passwordTextField.delegate = self

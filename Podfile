@@ -14,9 +14,9 @@ pod 'FirebaseUI/Storage'
 pod 'Firebase/Firestore'
 pod 'Firebase/Messaging'
 pod 'Firebase/RemoteConfig'
-pod 'Siren'
 pod 'GoogleSignIn'
 pod 'ActiveLabel'
+pod 'InstantSearchClient', '~> 7.0'
 
   target 'AniTests' do
     inherit! :search_paths
