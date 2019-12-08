@@ -9,16 +9,24 @@
 import UIKit
 
 extension UISearchBar {
-  var textField: UITextField? {
-    return value(forKey: "_searchField") as? UITextField
+  var textField: UITextField {
+    if let textFiled = self.value(forKey: "searchField") as? UITextField {
+      return textFiled
+    } else {
+      return UITextField()
+    }
   }
-  
+
   func disableBlur() {
     backgroundImage = UIImage()
     isTranslucent = true
   }
-  
-  var cancelButton: UIButton? {
-    return value(forKey: "_cancelButton") as? UIButton
+
+  var cancelButton: UIButton {
+    if let cancelButton = self.value(forKey: "cancelButton") as? UIButton {
+      return cancelButton
+    } else {
+      return UIButton()
+    }
   }
 }

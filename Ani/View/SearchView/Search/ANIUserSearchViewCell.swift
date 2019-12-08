@@ -46,6 +46,7 @@ class ANIUserSearchViewCell: UITableViewCell {
     self.selectionStyle = .none
     self.isUserInteractionEnabled = true
     self.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped)))
+    self.backgroundColor = .white
     
     //stackView
     let stackView = UIStackView()
@@ -70,6 +71,7 @@ class ANIUserSearchViewCell: UITableViewCell {
     
     //userNameLabel
     let userNameLabel = UILabel()
+    userNameLabel.backgroundColor = .white
     userNameLabel.textColor = ANIColor.dark
     stackView.addArrangedSubview(userNameLabel)
     userNameLabel.centerY(to: profileImageView)
