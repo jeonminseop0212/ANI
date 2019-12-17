@@ -1,5 +1,5 @@
 //
-//  ANIStoryDetailViewController.swift
+//  ANIRankingStoryDetailViewController.swift
 //  Ani
 //
 //  Created by jeonminseop on 2018/11/26.
@@ -306,7 +306,6 @@ extension ANIRankingStoryDetailViewController {
         }
         
         database.collection(KEY_STORIES).document(rankingStoryId).delete()
-        self.delegateStoryAlgolia(storyId: rankingStoryId)
         
         DispatchQueue.main.async {
           self.navigationController?.popViewController(animated: true)

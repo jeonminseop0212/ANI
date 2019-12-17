@@ -9,6 +9,8 @@
 import UIKit
 import Firebase
 import FirebaseMessaging
+import FirebaseDynamicLinks
+import FirebaseFirestore
 import UserNotifications
 import TwitterKit
 import GoogleSignIn
@@ -92,8 +94,45 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
     let twitter =  TWTRTwitter.sharedInstance().application(app, open: url, options: options)
     let google = GIDSignIn.sharedInstance().handle(url, sourceApplication:options[UIApplication.OpenURLOptionsKey.sourceApplication] as? String, annotation: [:])
+    let dynamicLink = DynamicLinks.dynamicLinks().dynamicLink(fromCustomSchemeURL: url) != nil ? true : false
     
-    return twitter || google
+    return twitter || google || dynamicLink
+  }
+  
+  func application(_ application: UIApplication, continue userActivity: NSUserActivity,
+                   restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
+    
+    if let webpageURL = userActivity.webpageURL {
+      let handled = DynamicLinks.dynamicLinks().handleUniversalLink(webpageURL) { (dynamiclink, error) in
+        if let error = error {
+          DLog(error)
+          return
+        }
+        
+        guard let innerLink = webpageURL.queryValue(for: "link") else { return }
+        
+        let type = String(innerLink.split(separator: "/")[2])
+        let id = String(innerLink.split(separator: "/")[3])
+        
+        self.openLink(id: id, type: type)
+      }
+
+      return handled
+    } else {
+      return false
+    }
+  }
+  
+  private func openLink(id: String, type: String) {
+    guard let tabBarController = self.tabBarController,
+          let navigationViewController = tabBarController.selectedViewController as? UINavigationController else { return }
+    
+    if type == KEY_STORY {
+      let storyDetailViewController = ANIStoryDetailViewController()
+      storyDetailViewController.storyId = id
+      storyDetailViewController.hidesBottomBarWhenPushed = true
+      navigationViewController.pushViewController(storyDetailViewController, animated: true)
+    }
   }
   
   private func playTopViewControllerVideo() {
@@ -103,6 +142,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       }
       if let rankingStoryDetailViewController = topController as? ANIRankingStoryDetailViewController {
         rankingStoryDetailViewController.playVideo()
+      }
+      if let storyDetailViewController = topController as? ANIStoryDetailViewController {
+        storyDetailViewController.playVideo()
       }
       if let notiDetailViewController = topController as? ANINotiDetailViewController {
         notiDetailViewController.playVideo()

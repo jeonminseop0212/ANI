@@ -23,12 +23,15 @@ class ANINotiDetailViewController: UIViewController {
   
   var navigationTitle: String = ""
   
+  private var isMe: Bool?
   var contributionKind: ContributionKind?
   var notiKind: NotiKind?
   var noti: FirebaseNotification?
   
   private var contentType: ContentType?
   private var contributionId: String?
+  
+  private weak var activityIndicatorView: ANIActivityIndicator?
   
   override func viewDidLoad() {
     setup()
@@ -103,6 +106,13 @@ class ANINotiDetailViewController: UIViewController {
     notiDetailView.topToBottom(of: myNavigationBase)
     notiDetailView.edgesToSuperview(excluding: .top)
     self.notiDetailView = notiDetailView
+    
+    //activityIndicatorView
+    let activityIndicatorView = ANIActivityIndicator()
+    activityIndicatorView.isFull = true
+    self.tabBarController?.view.addSubview(activityIndicatorView)
+    activityIndicatorView.edgesToSuperview()
+    self.activityIndicatorView = activityIndicatorView
   }
   
   func playVideo() {
@@ -224,11 +234,22 @@ extension ANINotiDetailViewController: ANINotiDetailViewDelegate {
   }
   
   func popupOptionView(isMe: Bool, contentType: ContentType, id: String) {
+    self.isMe = isMe
     self.contentType = contentType
     self.contributionId = id
     let popupOptionViewController = ANIPopupOptionViewController()
     popupOptionViewController.modalPresentationStyle = .overCurrentContext
     popupOptionViewController.isMe = isMe
+    if !isMe {
+      popupOptionViewController.options = ["非表示"]
+      if contentType == ContentType.story {
+        popupOptionViewController.options?.insert("シェア", at: 0)
+      }
+    } else {
+      if contentType == ContentType.story {
+        popupOptionViewController.options = ["シェア"]
+      }
+    }
     popupOptionViewController.delegate = self
     self.tabBarController?.present(popupOptionViewController, animated: false, completion: nil)
   }
@@ -296,9 +317,156 @@ extension ANINotiDetailViewController: ANIPopupOptionViewControllerDelegate {
   }
   
   func reportContribution() {
+    let alertController = UIAlertController(title: nil, message: "投稿を通報しますか？", preferredStyle: .alert)
+    
+    let reportAction = UIAlertAction(title: "通報", style: .default) { (action) in
+      self.reportData()
+    }
+    let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
+    
+    alertController.addAction(reportAction)
+    alertController.addAction(cancelAction)
+    
+    self.present(alertController, animated: true, completion: nil)
   }
   
   func optionTapped(index: Int) {
+    guard let isMe = self.isMe,
+          let contentType = self.contentType,
+          let contributionId = self.contributionId else { return }
+    
+    var alertTitle = ""
+    var alertMessage = ""
+    var collection = ""
+    
+    if contentType == .story {
+      if isMe {
+        if index == 0 {
+          let activityItems = [ANIActivityItemSorce(shareContent: "https://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/story/\(contributionId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU")]
+          let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+          self.present(activityViewController, animated: true)
+        }
+      } else {
+        if index == 0 {
+          let activityItems = [ANIActivityItemSorce(shareContent: "https://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/story/\(contributionId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU")]
+          let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+          self.present(activityViewController, animated: true)
+        } else if index == 1 {
+          alertTitle = "このストーリーを非表示にしますか？"
+          alertMessage = "非表示にしたストーリーはアプリの中で見えなくなります。後から非表示を解除することは出来ません。"
+          collection = KEY_STORIES
+          
+          self.hideContribution(contentType: contentType, collection: collection, contributionId: contributionId, title: alertTitle, message: alertMessage)
+        }
+      }
+    } else if contentType == .qna {
+      if index == 0 {
+        alertTitle = "この質問を非表示にしますか？"
+        alertMessage = "非表示にした質問はアプリの中で見えなくなります。後から非表示を解除することは出来ません。"
+        collection = KEY_QNAS
+        
+        self.hideContribution(contentType: contentType, collection: collection, contributionId: contributionId, title: alertTitle, message: alertMessage)
+      }
+    }
+  }
+  
+  private func hideContribution(contentType: ContentType, collection: String, contributionId: String, title: String, message: String) {
+    guard let currentUserId = ANISessionManager.shared.currentUserUid else {
+      return
+    }
+    
+    let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+    
+    let hideAction = UIAlertAction(title: "非表示", style: .default) { (action) in
+      let database = Firestore.firestore()
+      
+      self.activityIndicatorView?.startAnimating()
+      
+      DispatchQueue.global().async {
+        database.collection(collection).document(contributionId).getDocument(completion: { (snapshot, error) in
+          if let error = error {
+            DLog("Error get document: \(error)")
+            return
+          }
+          
+          guard let snapshot = snapshot, let data = snapshot.data() else { return }
+          
+          if contentType == .story {
+            do {
+              let story = try FirestoreDecoder().decode(FirebaseStory.self, from: data)
+              
+              if let hideUserIds = story.hideUserIds {
+                var hideUserIdsTemp = hideUserIds
+                hideUserIdsTemp.append(currentUserId)
+                
+                database.collection(collection).document(contributionId).updateData([KEY_HIDE_USER_IDS: hideUserIdsTemp])
+                
+                self.updateDataAlgolia(objectId: contributionId, data: [KEY_HIDE_USER_IDS: hideUserIdsTemp as AnyObject], indexName: KEY_STORIES_INDEX)
+              } else {
+                let hideUserIds = [currentUserId]
+                
+                database.collection(collection).document(contributionId).updateData([KEY_HIDE_USER_IDS: hideUserIds])
+                
+                self.updateDataAlgolia(objectId: contributionId, data: [KEY_HIDE_USER_IDS: hideUserIds as AnyObject], indexName: KEY_STORIES_INDEX)
+              }
+              
+              DispatchQueue.main.async {
+                self.activityIndicatorView?.stopAnimating()
+                
+                ANINotificationManager.postDeleteStory(id: contributionId)
+              }
+            } catch let error {
+              DLog(error)
+            }
+          } else if contentType == .qna {
+            do {
+              let qna = try FirestoreDecoder().decode(FirebaseQna.self, from: data)
+              
+              if let hideUserIds = qna.hideUserIds {
+                var hideUserIdsTemp = hideUserIds
+                hideUserIdsTemp.append(currentUserId)
+                
+                database.collection(collection).document(contributionId).updateData([KEY_HIDE_USER_IDS: hideUserIdsTemp])
+                
+                self.updateDataAlgolia(objectId: contributionId, data: [KEY_HIDE_USER_IDS: hideUserIdsTemp as AnyObject], indexName: KEY_QNAS_INDEX)
+              } else {
+                let hideUserIds = [currentUserId]
+                
+                database.collection(collection).document(contributionId).updateData([KEY_HIDE_USER_IDS: hideUserIds])
+                
+                self.updateDataAlgolia(objectId: contributionId, data: [KEY_HIDE_USER_IDS: hideUserIds as AnyObject], indexName: KEY_QNAS_INDEX)
+              }
+              
+              DispatchQueue.main.async {
+                self.activityIndicatorView?.stopAnimating()
+                
+                ANINotificationManager.postDeleteQna(id: contributionId)
+              }
+            } catch let error {
+              DLog(error)
+            }
+          }
+        })
+      }
+    }
+    let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
+    
+    alertController.addAction(hideAction)
+    alertController.addAction(cancelAction)
+    
+    self.present(alertController, animated: true, completion: nil)
+  }
+  
+  private func updateDataAlgolia(objectId: String, data: [String: AnyObject], indexName: String) {
+    let index = ANISessionManager.shared.client.index(withName: indexName)
+    
+    DispatchQueue.global().async {
+      index.partialUpdateObject(data, withID: objectId, completionHandler: { (content, error) -> Void in
+        if error == nil {
+          DLog("Object IDs: \(content!)")
+        }
+      })
+    }
   }
 }
 
@@ -478,5 +646,25 @@ extension ANINotiDetailViewController {
         }
       }
     }
+  }
+  
+  private func reportData() {
+    guard let contentType = self.contentType, let contributionId = self.contributionId else { return }
+    
+    let database = Firestore.firestore()
+    
+    var contentTypeString = ""
+
+    if contentType == .recruit {
+      contentTypeString = KEY_RECRUIT
+    } else if contentType == .story {
+      contentTypeString = KEY_STORY
+    } else if contentType == .qna {
+      contentTypeString = KEY_QNA
+    }
+    
+    let date = ANIFunction.shared.getToday()
+    let values = [KEY_CONTENT_TYPE: contentTypeString, KEY_DATE: date]
+    database.collection(KEY_REPORTS).document(contributionId).collection(KEY_REPORT).addDocument(data: values)
   }
 }
