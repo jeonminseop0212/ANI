@@ -77,7 +77,11 @@ class ANIChatViewController: UIViewController {
   }
   
   override func viewDidAppear(_ animated: Bool) {
-    UIApplication.shared.statusBarStyle = .default
+    if #available(iOS 13.0, *) {
+      UIApplication.shared.statusBarStyle = .darkContent
+    } else {
+      UIApplication.shared.statusBarStyle = .default
+    }
   }
   
   override func viewDidDisappear(_ animated: Bool) {
