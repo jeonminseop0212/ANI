@@ -438,7 +438,11 @@ extension ANIRecruitContributionViewController: ANIRecruitContributionViewDelega
       let tintColorOffset = 1.0 - offset
       dismissButton.tintColor = UIColor(hue: 0, saturation: 0, brightness: tintColorOffset, alpha: 1)
       myNavigationBar.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: backGroundColorOffset)
-      UIApplication.shared.statusBarStyle = .default
+      if #available(iOS 13.0, *) {
+        UIApplication.shared.statusBarStyle = .darkContent
+      } else {
+        UIApplication.shared.statusBarStyle = .default
+      }
     } else {
       let tintColorOffset = 1.0 - offset
       let ANIColorDarkBrightness: CGFloat = 0.18

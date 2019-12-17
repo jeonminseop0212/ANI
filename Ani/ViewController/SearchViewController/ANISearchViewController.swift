@@ -83,7 +83,11 @@ class ANISearchViewController: UIViewController {
   }
   
   override func viewWillAppear(_ animated: Bool) {
-    UIApplication.shared.statusBarStyle = .default
+    if #available(iOS 13.0, *) {
+      UIApplication.shared.statusBarStyle = .darkContent
+    } else {
+      UIApplication.shared.statusBarStyle = .default
+    }
     setupNotifications()
   }
   
@@ -420,7 +424,11 @@ extension ANISearchViewController: ANISearchCategoriesViewDelegate {
 //MARK: ANIImageBrowserViewControllerDelegate
 extension ANISearchViewController: ANIImageBrowserViewControllerDelegate {
   func imageBrowserDidDissmiss() {
-    UIApplication.shared.statusBarStyle = .default
+    if #available(iOS 13.0, *) {
+      UIApplication.shared.statusBarStyle = .darkContent
+    } else {
+      UIApplication.shared.statusBarStyle = .default
+    }
   }
 }
 

@@ -50,6 +50,12 @@ class ANIRecruitDetailViewController: UIViewController {
     super.viewDidLoad()
     setup()
     checkClipped()
+    
+    if #available(iOS 13.0, *) {
+      statusBarStyle = .darkContent
+    } else {
+      statusBarStyle = .default
+    }
   }
   
   override func viewWillAppear(_ animated: Bool) {
@@ -375,8 +381,16 @@ extension ANIRecruitDetailViewController: ANIRecruitDetailViewDelegate {
         clipButton.tintColor = clipButtonColor
       }
       myNavigationBar.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: backGroundColorOffset)
-      UIApplication.shared.statusBarStyle = .default
-      statusBarStyle = .default
+      if #available(iOS 13.0, *) {
+        UIApplication.shared.statusBarStyle = .darkContent
+      } else {
+        UIApplication.shared.statusBarStyle = .default
+      }
+      if #available(iOS 13.0, *) {
+        statusBarStyle = .darkContent
+      } else {
+        statusBarStyle = .default
+      }
     } else {
       let tintColorOffset = 1.0 - offset
       let ANIColorDarkBrightness: CGFloat = 0.18

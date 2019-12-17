@@ -46,7 +46,11 @@ class ANIOtherProfileViewController: UIViewController {
   }
   
   override func viewWillAppear(_ animated: Bool) {
-    UIApplication.shared.statusBarStyle = .default
+    if #available(iOS 13.0, *) {
+      UIApplication.shared.statusBarStyle = .darkContent
+    } else {
+      UIApplication.shared.statusBarStyle = .default
+    }
     setupNotifications()
     
     playVideo()
@@ -454,7 +458,11 @@ extension ANIOtherProfileViewController: ANIOtherProfileBasicViewDelegate {
 //MARK: ANIImageBrowserViewControllerDelegate
 extension ANIOtherProfileViewController: ANIImageBrowserViewControllerDelegate {
   func imageBrowserDidDissmiss() {
-    UIApplication.shared.statusBarStyle = .default
+    if #available(iOS 13.0, *) {
+      UIApplication.shared.statusBarStyle = .darkContent
+    } else {
+      UIApplication.shared.statusBarStyle = .default
+    }
   }
 }
 
