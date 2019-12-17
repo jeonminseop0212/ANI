@@ -105,24 +105,22 @@ class ANIRecruitContributionViewController: UIViewController {
     if recruitContributionMode == .edit, let recruit = self.recruit {
       recruitContributionView.recruit = recruit
     }
-    recruitContributionView.headerMinHeight = UIViewController.NAVIGATION_BAR_HEIGHT
+    recruitContributionView.headerMinHeight = UIViewController.STATUS_BAR_HEIGHT + UIViewController.NAVIGATION_BAR_HEIGHT
     recruitContributionView.delegate = self
     self.view.addSubview(recruitContributionView)
     recruitContributionViewBottomConstraint = recruitContributionView.bottomToSuperview()
     recruitContributionViewOriginalBottomConstraintConstant = recruitContributionViewBottomConstraint?.constant
-    recruitContributionView.topToSuperview(usingSafeArea: true)
-    recruitContributionView.leftToSuperview()
-    recruitContributionView.rightToSuperview()
+    recruitContributionView.edgesToSuperview(excluding: .bottom)
     self.recruitContributionView = recruitContributionView
     
     //myNavigationBar
     let myNavigationBar = UIView()
     myNavigationBar.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0)
     self.view.addSubview(myNavigationBar)
-    myNavigationBar.topToSuperview(usingSafeArea: true)
+    myNavigationBar.topToSuperview()
     myNavigationBar.leftToSuperview()
     myNavigationBar.rightToSuperview()
-    myNavigationBar.height(UIViewController.NAVIGATION_BAR_HEIGHT)
+    myNavigationBar.height(UIViewController.STATUS_BAR_HEIGHT + UIViewController.NAVIGATION_BAR_HEIGHT)
     self.myNavigationBar = myNavigationBar
     
     //dismissButton
