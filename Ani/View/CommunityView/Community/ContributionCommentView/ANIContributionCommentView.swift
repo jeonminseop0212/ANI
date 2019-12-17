@@ -157,6 +157,7 @@ class ANIContributionCommentView: UIView {
     commentOneUserLabel.text = " "
     commentOneUserLabel.numberOfLines = 1
     commentOneUserLabel.font = UIFont.boldSystemFont(ofSize: 13.0)
+    commentOneUserLabel.textColor = ANIColor.dark
     commentOneLabelBase.addSubview(commentOneUserLabel)
     commentOneUserLabel.topToBottom(of: commentOneLabel, offset: 2.0)
     commentOneUserLabel.leftToSuperview(offset: 10.0)
@@ -221,6 +222,7 @@ class ANIContributionCommentView: UIView {
     commentTwoUserLabel.text = " "
     commentTwoUserLabel.numberOfLines = 1
     commentTwoUserLabel.font = UIFont.boldSystemFont(ofSize: 13.0)
+    commentTwoUserLabel.textColor = ANIColor.dark
     commentTwoLabelBase.addSubview(commentTwoUserLabel)
     commentTwoUserLabel.topToBottom(of: commentTwoLabel, offset: 2.0)
     commentTwoUserLabel.leftToRight(of: commentLineBase, offset: 10.0)
