@@ -35,8 +35,12 @@ class ANIImageBrowserViewController: UIViewController {
     openAnimation()
   }
   
+  override func viewWillAppear(_ animated: Bool) {
+    UIApplication.shared.isStatusBarHidden = true
+  }
+  
   override func viewWillDisappear(_ animated: Bool) {
-    UIApplication.shared.statusBar?.alpha = 1.0
+    UIApplication.shared.isStatusBarHidden = false
   }
   
   private func setup() {
@@ -45,7 +49,6 @@ class ANIImageBrowserViewController: UIViewController {
     self.view.backgroundColor = .clear
     self.navigationController?.setNavigationBarHidden(true, animated: false)
     self.navigationController?.navigationBar.isTranslucent = false
-    UIApplication.shared.statusBarStyle = .lightContent
     
     //container
     let flowLayout = UICollectionViewFlowLayout()
@@ -115,24 +118,20 @@ class ANIImageBrowserViewController: UIViewController {
   }
   
   private func showNavigationBar() {
-    guard let myNavigationBar = self.myNavigationBar,
-          let statusBar = UIApplication.shared.statusBar else { return }
+    guard let myNavigationBar = self.myNavigationBar else { return }
     
     UIView.animate(withDuration: 0.3, animations: {
       myNavigationBar.alpha = 1.0
-      statusBar.alpha = 1.0
     })
     
     myNavigationBarOriginalAlpha = myNavigationBar.alpha
   }
   
   private func hideNavigationBar() {
-    guard let myNavigationBar = self.myNavigationBar,
-          let statusBar = UIApplication.shared.statusBar else { return }
+    guard let myNavigationBar = self.myNavigationBar else { return }
 
     UIView.animate(withDuration: 0.3, animations: {
       myNavigationBar.alpha = 0.0
-      statusBar.alpha = 0.0
     })
     
     myNavigationBarOriginalAlpha = myNavigationBar.alpha
