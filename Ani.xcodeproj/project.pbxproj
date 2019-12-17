@@ -2452,7 +2452,7 @@
 				CODE_SIGN_ENTITLEMENTS = Ani/d_MYAU.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1.2.6.0;
+				CURRENT_PROJECT_VERSION = 1.2.7.0;
 				DEVELOPMENT_TEAM = BY8G5B9E3U;
 				DOMAIN = myaudev.page.link;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -2462,7 +2462,7 @@
 				GOOGLE_REVERSED_CLIENT_ID = "com.googleusercontent.apps.614974892806-8r2t2thki1ld04imfq1c27os327hsblg";
 				INFOPLIST_FILE = Ani/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.2.6;
+				MARKETING_VERSION = 1.2.7;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.gmail-jeonminsopdev.MYAU.dev";
 				PRODUCT_NAME = d_MYAU;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2482,7 +2482,7 @@
 				CODE_SIGN_ENTITLEMENTS = Ani/MYAU.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1.2.6.0;
+				CURRENT_PROJECT_VERSION = 1.2.7.0;
 				DEVELOPMENT_TEAM = BY8G5B9E3U;
 				DOMAIN = myaurelease.page.link;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -2492,7 +2492,7 @@
 				GOOGLE_REVERSED_CLIENT_ID = "com.googleusercontent.apps.504196481868-jn48am95m7l79njke5asvhtqf8ouj6ru";
 				INFOPLIST_FILE = Ani/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.2.6;
+				MARKETING_VERSION = 1.2.7;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.gmail-jeonminsopdev.MYAU";
 				PRODUCT_NAME = MYAU;
 				PROVISIONING_PROFILE_SPECIFIER = "";
