@@ -40,6 +40,9 @@
 		CD1C6A3121CA11350075D651 /* ANIContributionVideoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD1C6A3021CA11350075D651 /* ANIContributionVideoCell.swift */; };
 		CD1C829D21F5822400F4725F /* TwitterKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD1C829C21F5822400F4725F /* TwitterKit.framework */; };
 		CD1C82A021F5875C00F4725F /* ANITwitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD1C829F21F5875C00F4725F /* ANITwitter.swift */; };
+		CD2B960123A53FF600F08C92 /* ANIStoryDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2B960023A53FF600F08C92 /* ANIStoryDetailViewController.swift */; };
+		CD2B960423A543C300F08C92 /* ANIStoryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2B960323A543C300F08C92 /* ANIStoryDetailView.swift */; };
+		CD2B960623A7910300F08C92 /* ANIActivityItemSorce.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2B960523A7910300F08C92 /* ANIActivityItemSorce.swift */; };
 		CD2C414520A556AE00581267 /* ANIRecruitContributionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2C414420A556AE00581267 /* ANIRecruitContributionViewController.swift */; };
 		CD2C414820A5A23C00581267 /* ANIImageFilterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2C414720A5A23C00581267 /* ANIImageFilterViewController.swift */; };
 		CD325F5921FEA5990044ADFD /* ANIHashtagListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD325F5821FEA5990044ADFD /* ANIHashtagListViewController.swift */; };
@@ -262,6 +265,9 @@
 		CD1C6A3021CA11350075D651 /* ANIContributionVideoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIContributionVideoCell.swift; sourceTree = "<group>"; };
 		CD1C829C21F5822400F4725F /* TwitterKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TwitterKit.framework; path = Carthage/Build/iOS/TwitterKit.framework; sourceTree = "<group>"; };
 		CD1C829F21F5875C00F4725F /* ANITwitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANITwitter.swift; sourceTree = "<group>"; };
+		CD2B960023A53FF600F08C92 /* ANIStoryDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIStoryDetailViewController.swift; sourceTree = "<group>"; };
+		CD2B960323A543C300F08C92 /* ANIStoryDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIStoryDetailView.swift; sourceTree = "<group>"; };
+		CD2B960523A7910300F08C92 /* ANIActivityItemSorce.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIActivityItemSorce.swift; sourceTree = "<group>"; };
 		CD2C414420A556AE00581267 /* ANIRecruitContributionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitContributionViewController.swift; sourceTree = "<group>"; };
 		CD2C414720A5A23C00581267 /* ANIImageFilterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIImageFilterViewController.swift; sourceTree = "<group>"; };
 		CD325F5821FEA5990044ADFD /* ANIHashtagListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIHashtagListViewController.swift; sourceTree = "<group>"; };
@@ -570,6 +576,22 @@
 			path = Twitter;
 			sourceTree = "<group>";
 		};
+		CD2B95FD23A536D900F08C92 /* StoryDetailViewController */ = {
+			isa = PBXGroup;
+			children = (
+				CD2B960023A53FF600F08C92 /* ANIStoryDetailViewController.swift */,
+			);
+			path = StoryDetailViewController;
+			sourceTree = "<group>";
+		};
+		CD2B960223A543A500F08C92 /* StoryDetailView */ = {
+			isa = PBXGroup;
+			children = (
+				CD2B960323A543C300F08C92 /* ANIStoryDetailView.swift */,
+			);
+			path = StoryDetailView;
+			sourceTree = "<group>";
+		};
 		CD2C414320A5566B00581267 /* RecruitContributionViewController */ = {
 			isa = PBXGroup;
 			children = (
@@ -747,6 +769,7 @@
 				CDDE4B6220E0A985005762A1 /* ANIfunction.swift */,
 				CDD0550F20A6C64300BEF482 /* ANIFilter.swift */,
 				CD3DBF96215A31F50010A219 /* Macros.swift */,
+				CD2B960523A7910300F08C92 /* ANIActivityItemSorce.swift */,
 			);
 			path = Supporting;
 			sourceTree = "<group>";
@@ -1633,6 +1656,7 @@
 				CDDD04B720B5382D0094DBFA /* Recruit */,
 				F5E9E2312079AFA40021D4CC /* CommunityViewController */,
 				CD9DB0C721AB969C00091483 /* RankingStoryDetailViewController */,
+				CD2B95FD23A536D900F08C92 /* StoryDetailViewController */,
 				CD33BEDB20F31F4C00D2A367 /* Noti */,
 				F57F7D8620844A62008A2645 /* SearchViewController */,
 				F53E87BB2085AF9D00B19A2F /* ProfileViewController */,
@@ -1667,6 +1691,7 @@
 				F56634842075265E006CB81B /* RecruitView */,
 				F5E9E2352079B16F0021D4CC /* CommunityView */,
 				CDACB3EE21AB9FFC00274D88 /* RankingStoryDetailView */,
+				CD2B960223A543A500F08C92 /* StoryDetailView */,
 				F57F7D4B2081FC26008A2645 /* NotiView */,
 				F57F7D8920844BD4008A2645 /* SearchView */,
 				F53E87BE2085B14A00B19A2F /* Profile */,
@@ -2070,6 +2095,7 @@
 				CD92792220C0DCB400B1F006 /* ANIKey.swift in Sources */,
 				F5DF835D207A17C200EA7FBE /* ANICommunityQnaCell.swift in Sources */,
 				CDD0550C20A5D29900BEF482 /* ANIImageFilterView.swift in Sources */,
+				CD2B960423A543C300F08C92 /* ANIStoryDetailView.swift in Sources */,
 				CDDE4B6320E0A985005762A1 /* ANIfunction.swift in Sources */,
 				CD2C414520A556AE00581267 /* ANIRecruitContributionViewController.swift in Sources */,
 				CD9E52B32094304700715F50 /* ANIRecruitDetailImagesView.swift in Sources */,
@@ -2126,6 +2152,7 @@
 				CD4793722187F1E6002643E2 /* ANIAutoLoginViewController.swift in Sources */,
 				CD334E8221421C7F001C6289 /* ANIReloadView.swift in Sources */,
 				F5DF8365207A27DC00EA7FBE /* ANIStoryViewCell.swift in Sources */,
+				CD2B960123A53FF600F08C92 /* ANIStoryDetailViewController.swift in Sources */,
 				CD47936B2186A5F7002643E2 /* ANIOpinionBoxViewController.swift in Sources */,
 				F5E9E22F2079AEC30021D4CC /* ANIOrientation.swift in Sources */,
 				CDDD04B320B50FEA0094DBFA /* ANIInitialViewController.swift in Sources */,
@@ -2219,6 +2246,7 @@
 				F5E9E221207692C60021D4CC /* ANIRecruitViewCell.swift in Sources */,
 				F5B1EF9120725964000CFB0B /* AppDelegate.swift in Sources */,
 				CDA32A8A20AEA7BC008A2AC1 /* ANIDraggableView.swift in Sources */,
+				CD2B960623A7910300F08C92 /* ANIActivityItemSorce.swift in Sources */,
 				CDDD04A620B26CD50094DBFA /* ANICommentContentCell.swift in Sources */,
 				CDDC23B4210988AC00C9A8E5 /* ANIPopupOptionViewController.swift in Sources */,
 				F57F7D8C20844C41008A2645 /* ANISearchCategoriesView.swift in Sources */,
@@ -2426,6 +2454,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1.2.6.0;
 				DEVELOPMENT_TEAM = BY8G5B9E3U;
+				DOMAIN = myaudev.page.link;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
@@ -2455,6 +2484,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1.2.6.0;
 				DEVELOPMENT_TEAM = BY8G5B9E3U;
+				DOMAIN = myaurelease.page.link;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",

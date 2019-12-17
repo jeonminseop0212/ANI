@@ -265,7 +265,7 @@ extension ANIInitialViewController: GIDSignInDelegate, GIDSignInUIDelegate {
   
   func uploadUserData(userName: String, profileImage: UIImage) {
     guard let currentUser = Auth.auth().currentUser,
-      let profileImageData = profileImage.jpegData(compressionQuality: 0.5) else { return }
+          let profileImageData = profileImage.jpegData(compressionQuality: 0.5) else { return }
     
     let storageRef = Storage.storage().reference()
     storageRef.child(KEY_PROFILE_IMAGES).child("\(currentUser.uid).jpeg").putData(profileImageData, metadata: nil) { (metaData, error) in
