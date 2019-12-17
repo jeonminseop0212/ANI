@@ -366,6 +366,9 @@ extension ANIProfileViewController: ANIProfileBasicViewDelegate {
     let popupOptionViewController = ANIPopupOptionViewController()
     popupOptionViewController.modalPresentationStyle = .overCurrentContext
     popupOptionViewController.isMe = isMe
+    if contentType == ContentType.story {
+      popupOptionViewController.options = ["シェア"]
+    }
     popupOptionViewController.delegate = self
     self.tabBarController?.present(popupOptionViewController, animated: false, completion: nil)
   }
@@ -455,6 +458,16 @@ extension ANIProfileViewController: ANIPopupOptionViewControllerDelegate {
   }
   
   func optionTapped(index: Int) {
+    guard let contentType = self.contentType,
+          let contributionId = self.contributionId else { return }
+    
+    if contentType == .story {
+      if index == 0 {
+        let activityItems = [ANIActivityItemSorce(shareContent: "https://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/story/\(contributionId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU")]
+        let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+        self.present(activityViewController, animated: true)
+      }
+    }
   }
 }
 
