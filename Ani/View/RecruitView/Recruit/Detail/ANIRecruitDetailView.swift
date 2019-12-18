@@ -15,7 +15,7 @@ protocol ANIRecruitDetailViewDelegate {
   func recruitDetailViewDidScroll(offset: CGFloat)
   func imageCellTapped(index: Int, introduceImageUrls: [String])
   func failRecruitLoad()
-  func successRecruitLoad(recruit: FirebaseRecruit)
+  func successRecruitLoad(recruit: FirebaseRecruit, recruitUser: FirebaseUser)
 }
 
 class ANIRecruitDetailView: UIView {
@@ -543,7 +543,7 @@ extension ANIRecruitDetailView {
                     self.user = user
                     
                     activityIndicatorView.stopAnimating()
-                    self.delegate?.successRecruitLoad(recruit: recruit)
+                    self.delegate?.successRecruitLoad(recruit: recruit, recruitUser: user)
 
                     UIView.animate(withDuration: 0.2) {
                       headerImageView.alpha = 1.0

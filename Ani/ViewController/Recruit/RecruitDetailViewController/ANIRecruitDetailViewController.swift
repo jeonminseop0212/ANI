@@ -438,14 +438,18 @@ extension ANIRecruitDetailViewController: ANIRecruitDetailViewDelegate {
     self.present(alertController, animated: true, completion: nil)
   }
   
-  func successRecruitLoad(recruit: FirebaseRecruit) {
+  func successRecruitLoad(recruit: FirebaseRecruit, recruitUser: FirebaseUser) {
     guard let applyButton = self.applyButton else { return }
+    
+    self.user = recruitUser
     
     if let currentUserId = ANISessionManager.shared.currentUserUid,
        currentUserId != recruit.userId && recruit.recruitState == 0 {
       UIView.animate(withDuration: 0.2) {
         applyButton.alpha = 1.0
       }
+    } else {
+      applyButton.alpha = 1.0
     }
   }
 }
