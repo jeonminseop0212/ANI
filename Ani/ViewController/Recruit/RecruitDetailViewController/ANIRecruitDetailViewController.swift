@@ -38,6 +38,8 @@ class ANIRecruitDetailViewController: UIViewController {
   
   var user: FirebaseUser?
   
+  var recruitId: String?
+  
   private var isBack: Bool = false
   
   private var isClipped: Bool = false
@@ -79,6 +81,7 @@ class ANIRecruitDetailViewController: UIViewController {
     recruitDetailView.delegate = self
     recruitDetailView.recruit = recruit
     recruitDetailView.user = user
+    recruitDetailView.recruitId = recruitId
     self.view.addSubview(recruitDetailView)
     recruitDetailView.edgesToSuperview()
     self.recruitDetailView = recruitDetailView
@@ -138,10 +141,14 @@ class ANIRecruitDetailViewController: UIViewController {
     applyButton.baseCornerRadius = ANIRecruitDetailViewController.APPLY_BUTTON_HEIGHT / 2
     applyButton.dropShadow(opacity: 0.2)
     applyButton.delegate = self
-    if let currentUserId = ANISessionManager.shared.currentUserUid,
-      let recruit = self.recruit,
-      currentUserId == recruit.userId || recruit.recruitState != 0 {
-      applyButton.isHidden = true
+    applyButton.alpha = 0.0
+    if let recruit = self.recruit {
+      if let currentUserId = ANISessionManager.shared.currentUserUid,
+         currentUserId == recruit.userId || recruit.recruitState != 0 {
+        applyButton.alpha = 0.0
+      } else {
+        applyButton.alpha = 1.0
+      }
     }
     self.view.addSubview(applyButton)
     applyButton.bottomToSuperview(offset: -15.0)
@@ -352,10 +359,10 @@ class ANIRecruitDetailViewController: UIViewController {
     popupOptionViewController.modalPresentationStyle = .overCurrentContext
     if let currentUserId = ANISessionManager.shared.currentUserUid, recruit.userId == currentUserId {
       popupOptionViewController.isMe = true
-      popupOptionViewController.options = ["家族決定！😻", "募集中止", "編集する"]
+      popupOptionViewController.options = ["シェア", "家族決定！😻", "募集中止", "編集する"]
     } else {
       popupOptionViewController.isMe = false
-      popupOptionViewController.options = ["非表示"]
+      popupOptionViewController.options = ["シェア", "非表示"]
     }
     popupOptionViewController.delegate = self
     self.tabBarController?.present(popupOptionViewController, animated: false, completion: nil)
@@ -419,6 +426,28 @@ extension ANIRecruitDetailViewController: ANIRecruitDetailViewDelegate {
   func imageCellTapped(index: Int, introduceImageUrls: [String]) {
     presentImageBrowser(index: index, imageUrls: introduceImageUrls)
   }
+  
+  func failRecruitLoad() {
+    let alertController = UIAlertController(title: nil, message: "募集を開くことができません", preferredStyle: .alert)
+    
+    let popAction = UIAlertAction(title: "閉じる", style: .default) { (action) in
+      self.navigationController?.popViewController(animated: true)
+    }
+    alertController.addAction(popAction)
+    
+    self.present(alertController, animated: true, completion: nil)
+  }
+  
+  func successRecruitLoad(recruit: FirebaseRecruit) {
+    guard let applyButton = self.applyButton else { return }
+    
+    if let currentUserId = ANISessionManager.shared.currentUserUid,
+       currentUserId != recruit.userId && recruit.recruitState == 0 {
+      UIView.animate(withDuration: 0.2) {
+        applyButton.alpha = 1.0
+      }
+    }
+  }
 }
 
 //MARK: ANIButtonViewDelegate
@@ -475,11 +504,16 @@ extension ANIRecruitDetailViewController: ANIPopupOptionViewControllerDelegate {
   }
   
   func optionTapped(index: Int) {
-    guard let recruit = self.recruit else { return }
+    guard let recruit = self.recruit,
+          let recruitId = recruit.id else { return }
 
     if let currentUserId = ANISessionManager.shared.currentUserUid {
       if recruit.userId == currentUserId {
         if index == 0 {
+          let activityItems = [ANIActivityItemSorce(shareContent: "https://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/recruit/\(recruitId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU")]
+          let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+          self.present(activityViewController, animated: true)
+        } else if index == 1 {
           let alertController = UIAlertController(title: "家族決定おめでどうございます！", message: "決定でよろしければこの募集を中止してください", preferredStyle: .alert)
           
           let stopAction = UIAlertAction(title: "中止", style: .default) { (action) in
@@ -495,7 +529,7 @@ extension ANIRecruitDetailViewController: ANIPopupOptionViewControllerDelegate {
           alertController.addAction(cancelAction)
           
           self.present(alertController, animated: true, completion: nil)
-        } else if index == 1 {
+        } else if index == 2 {
           let alertController = UIAlertController(title: nil, message: "この募集を中止しますか？", preferredStyle: .alert)
           
           let stopAction = UIAlertAction(title: "中止", style: .default) { (action) in
@@ -511,7 +545,7 @@ extension ANIRecruitDetailViewController: ANIPopupOptionViewControllerDelegate {
           alertController.addAction(cancelAction)
           
           self.present(alertController, animated: true, completion: nil)
-        } else if index == 2 {
+        } else if index == 3 {
           let recruitContribtionViewController = ANIRecruitContributionViewController()
           if let recruit = self.recruit {
             recruitContribtionViewController.recruitContributionMode = .edit
@@ -524,6 +558,10 @@ extension ANIRecruitDetailViewController: ANIPopupOptionViewControllerDelegate {
         }
       } else {
         if index == 0 {
+          let activityItems = [ANIActivityItemSorce(shareContent: "https://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/recruit/\(recruitId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU")]
+          let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+          self.present(activityViewController, animated: true)
+        } else if index == 1 {
           let alertController = UIAlertController(title: "この募集を非表示にしますか？", message: "非表示にした募集はアプリの中で見えなくなります。後から非表示を解除することは出来ません。", preferredStyle: .alert)
           
           let hideAction = UIAlertAction(title: "非表示", style: .default) { (action) in

@@ -132,6 +132,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       storyDetailViewController.storyId = id
       storyDetailViewController.hidesBottomBarWhenPushed = true
       navigationViewController.pushViewController(storyDetailViewController, animated: true)
+    } else if type == KEY_RECRUIT {
+      let recruitDetailViewController = ANIRecruitDetailViewController()
+      recruitDetailViewController.recruitId = id
+      recruitDetailViewController.hidesBottomBarWhenPushed = true
+      navigationViewController.pushViewController(recruitDetailViewController, animated: true)
     }
   }
   
