@@ -2452,7 +2452,7 @@
 				CODE_SIGN_ENTITLEMENTS = Ani/d_MYAU.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1.2.7.0;
+				CURRENT_PROJECT_VERSION = 1.2.7.1;
 				DEVELOPMENT_TEAM = BY8G5B9E3U;
 				DOMAIN = myaudev.page.link;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -2482,7 +2482,7 @@
 				CODE_SIGN_ENTITLEMENTS = Ani/MYAU.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1.2.7.0;
+				CURRENT_PROJECT_VERSION = 1.2.7.1;
 				DEVELOPMENT_TEAM = BY8G5B9E3U;
 				DOMAIN = myaurelease.page.link;
 				FRAMEWORK_SEARCH_PATHS = (
