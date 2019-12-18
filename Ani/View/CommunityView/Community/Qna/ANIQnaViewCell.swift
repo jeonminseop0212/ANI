@@ -173,7 +173,7 @@ class ANIQnaViewCell: UITableViewCell {
     //qnaImagesView
     let qnaImagesView = ANIQnaImagesView()
     qnaImagesViewBase.addSubview(qnaImagesView)
-    qnaImagesView.topToBottom(of: questionLabel, offset: 10.0)
+    qnaImagesView.topToSuperview(offset: 10.0)
     qnaImagesView.leftToSuperview()
     qnaImagesView.rightToSuperview()
     qnaImagesView.height(UIScreen.main.bounds.width / 2 - 30, priority: .defaultHigh)
