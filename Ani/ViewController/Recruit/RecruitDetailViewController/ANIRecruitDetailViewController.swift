@@ -620,6 +620,10 @@ extension ANIRecruitDetailViewController: ANIPopupOptionViewControllerDelegate {
       }
     } else {
       if index == 0 {
+        let activityItems = [ANIActivityItemSorce(shareContent: "https://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/recruit/\(recruitId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU")]
+        let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+        self.present(activityViewController, animated: true)
+      } else if index == 1 {
         self.reject()
       }
     }
