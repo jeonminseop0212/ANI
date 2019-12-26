@@ -162,7 +162,7 @@ class ANIContributionView: UIView {
     
     //twitterShareLabel
     let twitterShareLabel = UILabel()
-    twitterShareLabel.text = "Twitterにも投稿"
+    twitterShareLabel.text = "Twittersにシェアする"
     twitterShareLabel.font = UIFont.systemFont(ofSize: 15.0)
     twitterShareLabel.textColor = ANIColor.darkGray
     twitterShareBase.addSubview(twitterShareLabel)

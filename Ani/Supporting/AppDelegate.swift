@@ -137,6 +137,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       recruitDetailViewController.recruitId = id
       recruitDetailViewController.hidesBottomBarWhenPushed = true
       navigationViewController.pushViewController(recruitDetailViewController, animated: true)
+    } else if type == KEY_QNA {
+      let qnaDetailViewController = ANIQnaDetailViewController()
+      qnaDetailViewController.qnaId = id
+      qnaDetailViewController.hidesBottomBarWhenPushed = true
+      navigationViewController.pushViewController(qnaDetailViewController, animated: true)
     }
   }
   

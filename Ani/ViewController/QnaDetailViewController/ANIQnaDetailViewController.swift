@@ -1,8 +1,8 @@
 //
-//  ANIHashtagListViewController.swift
+//  ANIQnaDetailViewController.swift
 //  Ani
 //
-//  Created by jeonminseop on 2019/01/28.
+//  Created by jeonminseop on 2019/12/26.
 //  Copyright © 2019 JeonMinseop. All rights reserved.
 //
 
@@ -12,20 +12,16 @@ import CodableFirebase
 import FirebaseStorage
 import InstantSearchClient
 import TinyConstraints
+import SafariServices
 
-enum HashtagList: String {
-  case story = "ストーリー";
-  case question = "Q&A";
-}
-
-class ANIHashtagListViewController: UIViewController {
+class ANIQnaDetailViewController: UIViewController {
   
   private weak var myNavigationBar: UIView?
   private weak var myNavigationBase: UIView?
   private weak var navigationTitleLabel: UILabel?
   private weak var backButton: UIButton?
   
-  private weak var hashtagListView: ANIHashtagListView?
+  private weak var qnaDetailView: ANIQnaDetailView?
   
   private var rejectViewBottomConstraint: Constraint?
   private var rejectViewBottomConstraintOriginalConstant: CGFloat?
@@ -35,25 +31,22 @@ class ANIHashtagListViewController: UIViewController {
   
   private weak var activityIndicatorView: ANIActivityIndicator?
   
-  var hashtag: String?
-  var hashtagList: HashtagList?
-
+  var qnaId: String?
+  
   private var isMe: Bool?
-  private var contentType: ContentType?
-  private var contributionId: String?
   
   override func viewDidLoad() {
     setup()
   }
   
   override func viewWillAppear(_ animated: Bool) {
+    if #available(iOS 13.0, *) {
+      UIApplication.shared.statusBarStyle = .darkContent
+    } else {
+      UIApplication.shared.statusBarStyle = .default
+    }
+    UIApplication.shared.isStatusBarHidden = false
     setupNotifications()
-    
-    playVideo()
-  }
-  
-  override func viewWillDisappear(_ animated: Bool) {
-    stopVideo()
   }
   
   override func viewDidDisappear(_ animated: Bool) {
@@ -81,6 +74,15 @@ class ANIHashtagListViewController: UIViewController {
     myNavigationBase.height(UIViewController.NAVIGATION_BAR_HEIGHT)
     self.myNavigationBase = myNavigationBase
     
+    //navigationTitleLabel
+    let navigationTitleLabel = UILabel()
+    navigationTitleLabel.textColor = ANIColor.dark
+    navigationTitleLabel.font = UIFont.boldSystemFont(ofSize: 17)
+    navigationTitleLabel.text = "Q&A"
+    myNavigationBase.addSubview(navigationTitleLabel)
+    navigationTitleLabel.centerInSuperview()
+    self.navigationTitleLabel = navigationTitleLabel
+    
     //backButton
     let backButton = UIButton()
     let backButtonImage = UIImage(named: "backButton")?.withRenderingMode(.alwaysTemplate)
@@ -94,31 +96,14 @@ class ANIHashtagListViewController: UIViewController {
     backButton.centerYToSuperview()
     self.backButton = backButton
     
-    //navigationTitleLabel
-    let navigationTitleLabel = UILabel()
-    if let hashtag = self.hashtag, let hashtagList = self.hashtagList {
-      navigationTitleLabel.text = "#\(hashtag) " + hashtagList.rawValue
-    }
-    navigationTitleLabel.textColor = ANIColor.dark
-    navigationTitleLabel.font = UIFont.boldSystemFont(ofSize: 17)
-    navigationTitleLabel.textAlignment = .center
-    myNavigationBase.addSubview(navigationTitleLabel)
-    navigationTitleLabel.centerYToSuperview()
-    navigationTitleLabel.leftToRight(of: backButton, offset: 10.0)
-    navigationTitleLabel.rightToSuperview(offset: -54.0)
-    self.navigationTitleLabel = navigationTitleLabel
-    
-    //hashtagListView
-    let hashtagListView = ANIHashtagListView()
-    if let hashtagList = self.hashtagList, let hashtag = self.hashtag {
-      hashtagListView.hashtag = hashtag
-      hashtagListView.hashtagList = hashtagList
-    }
-    hashtagListView.delegate = self
-    self.view.addSubview(hashtagListView)
-    hashtagListView.topToBottom(of: myNavigationBar)
-    hashtagListView.edgesToSuperview(excluding: .top)
-    self.hashtagListView = hashtagListView
+    //qnaDetailView
+    let qnaDetailView = ANIQnaDetailView()
+    qnaDetailView.qnaId = qnaId
+    qnaDetailView.delegate = self
+    self.view.addSubview(qnaDetailView)
+    qnaDetailView.topToBottom(of: myNavigationBase)
+    qnaDetailView.edgesToSuperview(excluding: .top)
+    self.qnaDetailView = qnaDetailView
     
     //rejectView
     let rejectView = ANIRejectView()
@@ -145,21 +130,9 @@ class ANIHashtagListViewController: UIViewController {
     //activityIndicatorView
     let activityIndicatorView = ANIActivityIndicator()
     activityIndicatorView.isFull = true
-    self.view.addSubview(activityIndicatorView)
+    self.tabBarController?.view.addSubview(activityIndicatorView)
     activityIndicatorView.edgesToSuperview()
     self.activityIndicatorView = activityIndicatorView
-  }
-  
-  func playVideo() {
-    guard let hashtagListView = self.hashtagListView else { return }
-    
-    hashtagListView.playVideo()
-  }
-  
-  private func stopVideo() {
-    guard let hashtagListView = self.hashtagListView else { return }
-    
-    hashtagListView.stopVideo()
   }
   
   //MARK: Notifications
@@ -168,135 +141,17 @@ class ANIHashtagListViewController: UIViewController {
     ANINotificationManager.receive(profileImageViewTapped: self, selector: #selector(pushOtherProfile))
     ANINotificationManager.receive(imageCellTapped: self, selector: #selector(presentImageBrowser(_:)))
     ANINotificationManager.receive(tapHashtag: self, selector: #selector(pushHashtagList))
+    ANINotificationManager.receive(tapUrl: self, selector: #selector(pushSafari))
   }
   
   private func removeNotifications() {
     ANINotificationManager.remove(self)
   }
   
-  @objc private func pushOtherProfile(_ notification: NSNotification) {
-    guard let userId = notification.object as? String else { return }
-    
-    if let currentUserUid = ANISessionManager.shared.currentUserUid, currentUserUid == userId {
-      let profileViewController = ANIProfileViewController()
-      profileViewController.hidesBottomBarWhenPushed = true
-      profileViewController.isBackButtonHide = false
-      self.navigationController?.pushViewController(profileViewController, animated: true)
-    } else {
-      let otherProfileViewController = ANIOtherProfileViewController()
-      otherProfileViewController.hidesBottomBarWhenPushed = true
-      otherProfileViewController.userId = userId
-      self.navigationController?.pushViewController(otherProfileViewController, animated: true)
-    }
-  }
-  
-  @objc private func presentImageBrowser(_ notification: NSNotification) {
-    guard let item = notification.object as? (Int, [String]) else { return }
-    let selectedIndex = item.0
-    let imageUrls = item.1
-    let imageBrowserViewController = ANIImageBrowserViewController()
-    imageBrowserViewController.selectedIndex = selectedIndex
-    imageBrowserViewController.imageUrls = imageUrls
-    imageBrowserViewController.modalPresentationStyle = .overCurrentContext
-    self.present(imageBrowserViewController, animated: false, completion: nil)
-  }
-  
-  @objc private func pushHashtagList(_ notification: NSNotification) {
-    if let userInfo = notification.userInfo,
-      let contributionKind = userInfo[KEY_CONTRIBUTION_KIND] as? String,
-      let hashtag = userInfo[KEY_HASHTAG] as? String {
-      let hashtagListViewController = ANIHashtagListViewController()
-      hashtagListViewController.hashtag = hashtag
-      if contributionKind == KEY_CONTRIBUTION_KIND_STROY {
-        hashtagListViewController.hashtagList = .story
-      } else if contributionKind == KEY_CONTRIBUTION_KIND_QNA {
-        hashtagListViewController.hashtagList = .question
-      }
-      hashtagListViewController.hidesBottomBarWhenPushed = true
-      self.navigationController?.pushViewController(hashtagListViewController, animated: true)
-    }
-  }
-  
-  //MARK: action
-  @objc private func back() {
-    self.navigationController?.popViewController(animated: true)
-  }
-  
-  @objc private func rejectViewTapped() {
-    let initialViewController = ANIInitialViewController()
-    initialViewController.myTabBarController = self.tabBarController as? ANITabBarController
-    let navigationController = UINavigationController(rootViewController: initialViewController)
-    navigationController.modalPresentationStyle = .fullScreen
-    self.present(navigationController, animated: true, completion: nil)
-  }
-}
-
-//MARK: ANIHashtagListViewDelegate
-extension ANIHashtagListViewController: ANIHashtagListViewDelegate {
-  func storyViewCellDidSelect(selectedStory: FirebaseStory, user: FirebaseUser) {
-    let commentViewController = ANICommentViewController()
-    commentViewController.hidesBottomBarWhenPushed = true
-    commentViewController.commentMode = CommentMode.story
-    commentViewController.story = selectedStory
-    commentViewController.user = user
-    self.navigationController?.pushViewController(commentViewController, animated: true)
-  }
-  
-  func supportCellRecruitTapped(recruit: FirebaseRecruit, user: FirebaseUser) {
-    let recruitDetailViewController = ANIRecruitDetailViewController()
-    recruitDetailViewController.hidesBottomBarWhenPushed = true
-    recruitDetailViewController.recruit = recruit
-    recruitDetailViewController.user = user
-    self.navigationController?.pushViewController(recruitDetailViewController, animated: true)
-  }
-  
-  func qnaViewCellDidSelect(selectedQna: FirebaseQna, user: FirebaseUser) {
-    let commentViewController = ANICommentViewController()
-    commentViewController.hidesBottomBarWhenPushed = true
-    commentViewController.commentMode = CommentMode.qna
-    commentViewController.qna = selectedQna
-    commentViewController.user = user
-    self.navigationController?.pushViewController(commentViewController, animated: true)
-  }
-  
-  func supportButtonTapped(supportRecruit: FirebaseRecruit, user: FirebaseUser) {
-    let supportViewController = ANISupportViewController()
-    supportViewController.modalPresentationStyle = .overCurrentContext
-    supportViewController.recruit = supportRecruit
-    supportViewController.user = user
-    self.tabBarController?.present(supportViewController, animated: false, completion: nil)
-  }
-  
-  func popupOptionView(isMe: Bool, contentType: ContentType, id: String) {
-    self.isMe = isMe
-    self.contentType = contentType
-    self.contributionId = id
-    
-    let popupOptionViewController = ANIPopupOptionViewController()
-    popupOptionViewController.modalPresentationStyle = .overCurrentContext
-    popupOptionViewController.isMe = isMe
-    if !isMe {
-      popupOptionViewController.options = ["非表示"]
-      if contentType == ContentType.story {
-        popupOptionViewController.options?.insert("シェア", at: 0)
-      } else if contentType == ContentType.qna {
-        popupOptionViewController.options?.insert("シェア", at: 0)
-      }
-    } else {
-      if contentType == ContentType.story {
-        popupOptionViewController.options = ["シェア"]
-      } else if contentType == ContentType.qna {
-        popupOptionViewController.options = ["シェア"]
-      }
-    }
-    popupOptionViewController.delegate = self
-    self.tabBarController?.present(popupOptionViewController, animated: false, completion: nil)
-  }
-  
   func reject() {
     guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
-          !isRejectAnimating,
-          let rejectTapView = self.rejectTapView else { return }
+      !isRejectAnimating,
+      let rejectTapView = self.rejectTapView else { return }
     
     rejectViewBottomConstraint.constant = UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
     rejectTapView.isHidden = false
@@ -317,10 +172,119 @@ extension ANIHashtagListViewController: ANIHashtagListViewDelegate {
       })
     }
   }
+  
+  @objc private func back() {
+    self.navigationController?.popViewController(animated: true)
+  }
+  
+  @objc private func pushOtherProfile(_ notification: NSNotification) {
+    guard let userId = notification.object as? String else { return }
+    
+    if let currentUserUid = ANISessionManager.shared.currentUserUid, currentUserUid == userId {
+      let profileViewController = ANIProfileViewController()
+      profileViewController.hidesBottomBarWhenPushed = true
+      self.navigationController?.pushViewController(profileViewController, animated: true)
+      profileViewController.isBackButtonHide = false
+    } else {
+      let otherProfileViewController = ANIOtherProfileViewController()
+      otherProfileViewController.hidesBottomBarWhenPushed = true
+      otherProfileViewController.userId = userId
+      self.navigationController?.pushViewController(otherProfileViewController, animated: true)
+    }
+  }
+  
+  @objc private func presentImageBrowser(_ notification: NSNotification) {
+    guard let item = notification.object as? (Int, [String]) else { return }
+    let selectedIndex = item.0
+    let imageUrls = item.1
+    let imageBrowserViewController = ANIImageBrowserViewController()
+    imageBrowserViewController.selectedIndex = selectedIndex
+    imageBrowserViewController.imageUrls = imageUrls
+    imageBrowserViewController.modalPresentationStyle = .overCurrentContext
+    imageBrowserViewController.delegate = self
+    //overCurrentContextだとtabBarが消えないのでtabBarからpresentする
+    self.tabBarController?.present(imageBrowserViewController, animated: false, completion: nil)
+  }
+  
+  @objc private func pushHashtagList(_ notification: NSNotification) {
+    if let userInfo = notification.userInfo,
+      let contributionKind = userInfo[KEY_CONTRIBUTION_KIND] as? String,
+      let hashtag = userInfo[KEY_HASHTAG] as? String {
+      let hashtagListViewController = ANIHashtagListViewController()
+      hashtagListViewController.hashtag = hashtag
+      if contributionKind == KEY_CONTRIBUTION_KIND_STROY {
+        hashtagListViewController.hashtagList = .story
+      } else if contributionKind == KEY_CONTRIBUTION_KIND_QNA {
+        hashtagListViewController.hashtagList = .question
+      }
+      hashtagListViewController.hidesBottomBarWhenPushed = true
+      self.navigationController?.pushViewController(hashtagListViewController, animated: true)
+    }
+  }
+  
+  @objc private func pushSafari(_ notification: NSNotification) {
+    if let userInfo = notification.userInfo,
+       let url = userInfo[KEY_URL] as? String {
+      let webUrlString = ANIFunction.shared.webURLScheme(urlString: url)
+      
+      if let webUrl = URL(string: webUrlString) {
+        let safariViewController = SFSafariViewController(url: webUrl)
+        self.present(safariViewController, animated: true, completion: nil)
+      }
+    }
+  }
+  
+  @objc private func rejectViewTapped() {
+    let initialViewController = ANIInitialViewController()
+    initialViewController.myTabBarController = self.tabBarController as? ANITabBarController
+    let navigationController = UINavigationController(rootViewController: initialViewController)
+    navigationController.modalPresentationStyle = .fullScreen
+    self.present(navigationController, animated: true, completion: nil)
+  }
+}
+
+//MARK: ANIQnaDetailViewDelegate
+extension ANIQnaDetailViewController: ANIQnaDetailViewDelegate {
+  func qnaViewCellDidSelect(selectedQna: FirebaseQna, user: FirebaseUser) {
+    let commentViewController = ANICommentViewController()
+    commentViewController.hidesBottomBarWhenPushed = true
+    commentViewController.commentMode = CommentMode.qna
+    commentViewController.qna = selectedQna
+    commentViewController.user = user
+    self.navigationController?.pushViewController(commentViewController, animated: true)
+  }
+  
+  func popupOptionView(isMe: Bool, id: String) {
+    self.isMe = isMe
+    self.qnaId = id
+    
+    let popupOptionViewController = ANIPopupOptionViewController()
+    popupOptionViewController.modalPresentationStyle = .overCurrentContext
+    popupOptionViewController.isMe = isMe
+    if !isMe {
+      popupOptionViewController.options = ["非表示"]
+      popupOptionViewController.options?.insert("シェア", at: 0)
+    } else {
+      popupOptionViewController.options = ["シェア"]
+    }
+    popupOptionViewController.delegate = self
+    self.tabBarController?.present(popupOptionViewController, animated: false, completion: nil)
+  }
+}
+
+//MARK: ANIImageBrowserViewControllerDelegate
+extension ANIQnaDetailViewController: ANIImageBrowserViewControllerDelegate {
+  func imageBrowserDidDissmiss() {
+    if #available(iOS 13.0, *) {
+      UIApplication.shared.statusBarStyle = .darkContent
+    } else {
+      UIApplication.shared.statusBarStyle = .default
+    }
+  }
 }
 
 //MARK: ANIPopupOptionViewControllerDelegate
-extension ANIHashtagListViewController: ANIPopupOptionViewControllerDelegate {
+extension ANIQnaDetailViewController: ANIPopupOptionViewControllerDelegate {
   func deleteContribution() {
     let alertController = UIAlertController(title: nil, message: "投稿を削除しますか？", preferredStyle: .alert)
     
@@ -354,53 +318,25 @@ extension ANIHashtagListViewController: ANIPopupOptionViewControllerDelegate {
   }
   
   func optionTapped(index: Int) {
-    guard let isMe = self.isMe,
-          let contentType = self.contentType,
-          let contributionId = self.contributionId else { return }
+    guard let qnaId = self.qnaId,
+          let isMe = self.isMe else { return }
     
-    var alertTitle = ""
-    var alertMessage = ""
-    var collection = ""
-    
-    if contentType == .story {
-      if isMe {
-        if index == 0 {
-          let activityItems = [ANIActivityItemSorce(shareContent: "https://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/story/\(contributionId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU")]
-          let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
-          self.present(activityViewController, animated: true)
-        }
-      } else {
-        if index == 0 {
-          let activityItems = [ANIActivityItemSorce(shareContent: "https://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/story/\(contributionId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU")]
-          let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
-          self.present(activityViewController, animated: true)
-        } else if index == 1 {
-          alertTitle = "このストーリーを非表示にしますか？"
-          alertMessage = "非表示にしたストーリーはアプリの中で見えなくなります。後から非表示を解除することは出来ません。"
-          collection = KEY_STORIES
-          
-          self.hideContribution(contentType: contentType, collection: collection, contributionId: contributionId, title: alertTitle, message: alertMessage)
-        }
+    if isMe {
+      if index == 0 {
+        let activityItems = [ANIActivityItemSorce(shareContent: "https://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/qna/\(qnaId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU")]
+        let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+        self.present(activityViewController, animated: true)
       }
-    } else if contentType == .qna {
-      if isMe {
-        if index == 0 {
-          let activityItems = [ANIActivityItemSorce(shareContent: "https://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/qna/\(contributionId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU")]
-          let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
-          self.present(activityViewController, animated: true)
-        }
-      } else {
-        if index == 0 {
-          let activityItems = [ANIActivityItemSorce(shareContent: "https://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/qna/\(contributionId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU")]
-          let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
-          self.present(activityViewController, animated: true)
-        } else if index == 1 {
-          alertTitle = "この質問を非表示にしますか？"
-          alertMessage = "非表示にした質問はアプリの中で見えなくなります。後から非表示を解除することは出来ません。"
-          collection = KEY_QNAS
-          
-          self.hideContribution(contentType: contentType, collection: collection, contributionId: contributionId, title: alertTitle, message: alertMessage)
-        }
+    } else {
+      if index == 0 {
+        let activityItems = [ANIActivityItemSorce(shareContent: "https://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/qna/\(qnaId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU")]
+        let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+        self.present(activityViewController, animated: true)
+      } else if index == 1 {
+        let alertTitle = "この質問を非表示にしますか？"
+        let alertMessage = "非表示にした質問はアプリの中で見えなくなります。後から非表示を解除することは出来ません。"
+        
+        self.hideContribution(contentType: ContentType.qna, collection: KEY_QNAS, contributionId: qnaId, title: alertTitle, message: alertMessage)
       }
     }
   }
@@ -449,7 +385,7 @@ extension ANIHashtagListViewController: ANIPopupOptionViewControllerDelegate {
               DispatchQueue.main.async {
                 self.activityIndicatorView?.stopAnimating()
                 
-                ANINotificationManager.postDeleteStory(id: contributionId)
+                ANINotificationManager.postDeleteQna(id: contributionId)
               }
             } catch let error {
               DLog(error)
@@ -507,92 +443,39 @@ extension ANIHashtagListViewController: ANIPopupOptionViewControllerDelegate {
 }
 
 //MAKR: data
-extension ANIHashtagListViewController {
+extension ANIQnaDetailViewController {
   private func deleteData() {
-    guard let contentType = self.contentType, let contributionId = self.contributionId else { return }
+    guard let qnaId = self.qnaId else { return }
     
     let database = Firestore.firestore()
     
-    var collection = ""
-    var loveIDsCollection = ""
-    
-    if contentType == .story {
-      collection = KEY_STORIES
-      loveIDsCollection = KEY_LOVE_STORY_IDS
-    } else if contentType == .qna {
-      collection = KEY_QNAS
-      loveIDsCollection = KEY_LOVE_QNA_IDS
-    }
-    
     DispatchQueue.global().async {
-      database.collection(collection).document(contributionId).getDocument(completion: { (snapshot, error) in
+      database.collection(KEY_QNAS).document(qnaId).getDocument(completion: { (snapshot, error) in
         if let error = error {
           DLog("get document error \(error)")
           
           return
         }
         
-        database.collection(collection).document(contributionId).delete()
-        self.deleteDataAlgolia(contentType: contentType, contributionId: contributionId)
+        database.collection(KEY_QNAS).document(qnaId).delete()
         
         DispatchQueue.main.async {
-          if contentType == .story {
-            ANINotificationManager.postDeleteStory(id: contributionId)
-          } else if contentType == .qna {
-            ANINotificationManager.postDeleteQna(id: contributionId)
-          }
+          self.navigationController?.popViewController(animated: true)
         }
         
         guard let snapshot = snapshot, let data = snapshot.data() else { return }
         
         do {
-          if contentType == .story {
-            let story = try FirestoreDecoder().decode(FirebaseStory.self, from: data)
-            let storage = Storage.storage()
-            
-            if let urls = story.storyImageUrls {
-              for url in urls {
-                let storageRef = storage.reference(forURL: url)
-                
-                storageRef.delete { error in
-                  if let error = error {
-                    DLog(error)
-                  }
-                }
-              }
-            }
-            
-            if let videoUrl = story.storyVideoUrl {
-              let storageRef = storage.reference(forURL: videoUrl)
+          let qna = try FirestoreDecoder().decode(FirebaseQna.self, from: data)
+          let storage = Storage.storage()
+
+          if let urls = qna.qnaImageUrls {
+            for url in urls {
+              let storageRef = storage.reference(forURL: url)
               
               storageRef.delete { error in
                 if let error = error {
                   DLog(error)
-                }
-              }
-            }
-            
-            if let thumbnailImageUrl = story.thumbnailImageUrl {
-              let storageRef = storage.reference(forURL: thumbnailImageUrl)
-              
-              storageRef.delete { error in
-                if let error = error {
-                  DLog(error)
-                }
-              }
-            }
-          } else if contentType == .qna {
-            let qna = try FirestoreDecoder().decode(FirebaseQna.self, from: data)
-            
-            if let urls = qna.qnaImageUrls {
-              for url in urls {
-                let storage = Storage.storage()
-                let storageRef = storage.reference(forURL: url)
-                
-                storageRef.delete { error in
-                  if let error = error {
-                    DLog(error)
-                  }
                 }
               }
             }
@@ -604,7 +487,7 @@ extension ANIHashtagListViewController {
     }
     
     DispatchQueue.global().async {
-      database.collection(collection).document(contributionId).collection(KEY_LOVE_IDS).getDocuments(completion: { (snapshot, error) in
+      database.collection(KEY_QNAS).document(qnaId).collection(KEY_LOVE_IDS).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           DLog("Get document error \(error)")
           
@@ -614,11 +497,12 @@ extension ANIHashtagListViewController {
         guard let snapshot = snapshot else { return }
         
         for document in snapshot.documents {
-          database.collection(KEY_USERS).document(document.documentID).collection(loveIDsCollection).document(contributionId).delete()
-          database.collection(collection).document(contributionId).collection(KEY_LOVE_IDS).document(document.documentID).delete()
+         database.collection(KEY_USERS).document(document.documentID).collection(KEY_LOVE_QNA_IDS).document(qnaId).delete()
+          database.collection(KEY_USERS).document(qnaId).collection(KEY_LOVE_IDS).document(document.documentID).delete()
         }
       })
-      database.collection(collection).document(contributionId).collection(KEY_COMMENTS).getDocuments(completion: { (snapshot, error) in
+      
+      database.collection(KEY_USERS).document(qnaId).collection(KEY_COMMENTS).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           DLog("Get document error \(error)")
           
@@ -628,50 +512,19 @@ extension ANIHashtagListViewController {
         guard let snapshot = snapshot else { return }
         
         for document in snapshot.documents {
-          database.collection(collection).document(contributionId).collection(KEY_COMMENTS).document(document.documentID).delete()
+          database.collection(KEY_USERS).document(qnaId).collection(KEY_COMMENTS).document(document.documentID).delete()
         }
       })
     }
   }
   
   private func reportData() {
-    guard let contentType = self.contentType, let contributionId = self.contributionId else { return }
+    guard let qnaId = self.qnaId else { return }
     
     let database = Firestore.firestore()
-    
-    var contentTypeString = ""
-    
-    if contentType == .recruit {
-      contentTypeString = "recurit"
-    } else if contentType == .story {
-      contentTypeString = "story"
-    } else if contentType == .qna {
-      contentTypeString = "qna"
-    }
-    
+        
     let date = ANIFunction.shared.getToday()
-    let values = ["contentType": contentTypeString, "date": date]
-    database.collection(KEY_REPORTS).document(contributionId).collection(KEY_REPORT).addDocument(data: values)
-  }
-  
-  private func deleteDataAlgolia(contentType: ContentType, contributionId: String) {
-    var index: Index?
-    
-    if contentType == .story {
-      index = ANISessionManager.shared.client.index(withName: KEY_STORIES_INDEX)
-    } else if contentType == .qna {
-      index = ANISessionManager.shared.client.index(withName: KEY_QNAS_INDEX)
-    }
-    
-    DispatchQueue.global().async {
-      index?.deleteObject(withID: contributionId)
-    }
-  }
-}
-
-//MARK: UIGestureRecognizerDelegate
-extension ANIHashtagListViewController: UIGestureRecognizerDelegate {
-  func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-    return true
+    let values = [KEY_CONTENT_TYPE: KEY_QNA, KEY_DATE: date]
+    database.collection(KEY_REPORTS).document(qnaId).collection(KEY_REPORT).addDocument(data: values)
   }
 }
