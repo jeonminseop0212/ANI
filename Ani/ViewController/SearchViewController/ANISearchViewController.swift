@@ -491,13 +491,13 @@ extension ANISearchViewController: ANIPopupOptionViewControllerDelegate {
     if contentType == .story {
       if isMe {
         if index == 0 {
-          let activityItems = [ANIActivityItemSorce(shareContent: "https://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/story/\(contributionId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU")]
+          let activityItems = [ANIActivityItemSorce(shareContent: "#ミャウ #MYAU #猫 #ねこ #猫好き\nhttps://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/story/\(contributionId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU")]
           let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
           self.present(activityViewController, animated: true)
         }
       } else {
         if index == 0 {
-          let activityItems = [ANIActivityItemSorce(shareContent: "https://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/story/\(contributionId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU")]
+          let activityItems = [ANIActivityItemSorce(shareContent: "#ミャウ #MYAU #猫 #ねこ #猫好き\nhttps://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/story/\(contributionId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU")]
           let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
           self.present(activityViewController, animated: true)
         } else if index == 1 {
@@ -511,13 +511,13 @@ extension ANISearchViewController: ANIPopupOptionViewControllerDelegate {
     } else if contentType == .qna {
       if isMe {
         if index == 0 {
-          let activityItems = [ANIActivityItemSorce(shareContent: "https://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/qna/\(contributionId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU")]
+          let activityItems = [ANIActivityItemSorce(shareContent: "#ミャウ #MYAU #猫 #ねこ #猫好き\nhttps://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/qna/\(contributionId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU")]
           let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
           self.present(activityViewController, animated: true)
         }
       } else {
         if index == 0 {
-          let activityItems = [ANIActivityItemSorce(shareContent: "https://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/qna/\(contributionId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU")]
+          let activityItems = [ANIActivityItemSorce(shareContent: "#ミャウ #MYAU #猫 #ねこ #猫好き\nhttps://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/qna/\(contributionId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU")]
           let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
           self.present(activityViewController, animated: true)
         } else if index == 1 {

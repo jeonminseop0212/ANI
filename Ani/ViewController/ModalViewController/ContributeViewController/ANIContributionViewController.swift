@@ -576,7 +576,7 @@ class ANIContributionViewController: UIViewController {
   
   private func postTwitter(story: FirebaseStory? = nil, qna: FirebaseQna? = nil) {
     if let story = story, let storyId = story.id {
-      let shareText = "https://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/story/\(storyId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU"
+      let shareText = "#ミャウ #MYAU #猫好き #猫 #ねこ\nhttps://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/story/\(storyId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU"
       TWTRAPIClient.withCurrentUser().sendTweet(withText: shareText, completion: { (tweet, error) in
         if let error = error {
           DLog("story post twitter error \(error)")
@@ -589,7 +589,7 @@ class ANIContributionViewController: UIViewController {
     }
     
     if let qna = qna, let qnaId = qna.id {
-      let shareText = "https://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/qna/\(qnaId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU"
+      let shareText = "#ミャウ #MYAU #猫好き #猫 #ねこ\nhttps://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/qna/\(qnaId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU"
       TWTRAPIClient.withCurrentUser().sendTweet(withText: shareText, completion: { (tweet, error) in
         if let error = error {
           DLog("qna post twitter error \(error)")
