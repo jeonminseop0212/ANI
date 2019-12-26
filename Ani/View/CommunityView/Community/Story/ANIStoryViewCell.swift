@@ -173,7 +173,7 @@ class ANIStoryViewCell: UITableViewCell {
     storyLabelBase.addSubview(storyLabel)
     storyLabel.topToSuperview(offset: 5.0)
     storyLabel.leftToSuperview(offset: 10.0)
-    storyLabel.rightToSuperview(offset: -10.0, priority: .defaultHigh)
+    storyLabel.rightToSuperview(offset: -10.0)
     storyLabel.bottomToSuperview()
     self.storyLabel = storyLabel
     
