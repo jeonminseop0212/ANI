@@ -74,6 +74,7 @@ let KEY_DAY = "day"
 let KEY_LOVE_COUNT = "loveCount"
 let KEY_HASHTAG = "hashtag"
 let KEY_HASHTAGS = "hashtags"
+let KEY_URL = "url"
 
 //qna
 let KEY_QNA = "qna"
