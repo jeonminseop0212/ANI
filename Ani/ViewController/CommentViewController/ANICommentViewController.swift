@@ -10,6 +10,7 @@ import UIKit
 import TinyConstraints
 import FirebaseFirestore
 import CodableFirebase
+import SafariServices
 
 enum CommentMode {
   case story
@@ -204,6 +205,8 @@ class ANICommentViewController: UIViewController {
     ANINotificationManager.receive(profileImageViewTapped: self, selector: #selector(pushOtherProfile))
     ANINotificationManager.receive(login: self, selector: #selector(setAnonymousCommentTapViewUserInteractionEnabled))
     ANINotificationManager.receive(logout: self, selector: #selector(setAnonymousCommentTapViewUserInteractionEnabled))
+    ANINotificationManager.receive(tapHashtag: self, selector: #selector(pushHashtagList))
+    ANINotificationManager.receive(tapUrl: self, selector: #selector(pushSafari))
   }
   
   private func removeNotifications() {
@@ -291,6 +294,34 @@ class ANICommentViewController: UIViewController {
         self.isRejectAnimating = false
         rejectTapView.isHidden = true
       })
+    }
+  }
+  
+  @objc private func pushHashtagList(_ notification: NSNotification) {
+    if let userInfo = notification.userInfo,
+      let contributionKind = userInfo[KEY_CONTRIBUTION_KIND] as? String,
+      let hashtag = userInfo[KEY_HASHTAG] as? String {
+      let hashtagListViewController = ANIHashtagListViewController()
+      hashtagListViewController.hashtag = hashtag
+      if contributionKind == KEY_CONTRIBUTION_KIND_STROY {
+        hashtagListViewController.hashtagList = .story
+      } else if contributionKind == KEY_CONTRIBUTION_KIND_QNA {
+        hashtagListViewController.hashtagList = .question
+      }
+      hashtagListViewController.hidesBottomBarWhenPushed = true
+      self.navigationController?.pushViewController(hashtagListViewController, animated: true)
+    }
+  }
+  
+  @objc private func pushSafari(_ notification: NSNotification) {
+    if let userInfo = notification.userInfo,
+       let url = userInfo[KEY_URL] as? String {
+      let webUrlString = ANIFunction.shared.webURLScheme(urlString: url)
+      
+      if let webUrl = URL(string: webUrlString) {
+        let safariViewController = SFSafariViewController(url: webUrl)
+        self.present(safariViewController, animated: true, completion: nil)
+      }
     }
   }
   

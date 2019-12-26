@@ -298,7 +298,8 @@ extension ANIContributionView: UITextViewDelegate {
       activtyLabel.text = replaceText
       
       if !activtyLabel.hashtagElements.isEmpty {
-        textView.resolveHashTags(text: replaceText, hashtagArray: activtyLabel.hashtagElements)
+        // 投稿の時にタグをわかりやすくするために色付けしてたけど落ちるから一旦やめる
+//        textView.resolveHashTags(text: replaceText, hashtagArray: activtyLabel.hashtagElements)
       } else {
         let attrs = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17.0), NSAttributedString.Key.foregroundColor: ANIColor.dark]
 
