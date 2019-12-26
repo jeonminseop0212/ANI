@@ -104,11 +104,16 @@ class ANIStoryRankingCell: UICollectionViewCell {
     storyLabel.font = UIFont.systemFont(ofSize: 14.0)
     storyLabel.textColor = ANIColor.subTitle
     storyLabel.numberOfLines = 2
+    storyLabel.enabledTypes = [.hashtag, .url]
     storyLabel.customize { (label) in
       label.hashtagColor = ANIColor.darkblue
+      label.URLColor = ANIColor.darkblue
     }
     storyLabel.handleHashtagTap { (hashtag) in
       ANINotificationManager.postTapHashtag(contributionKind: KEY_CONTRIBUTION_KIND_STROY, hashtag: hashtag)
+    }
+    storyLabel.handleURLTap { (url) in
+      ANINotificationManager.postTapUrl(url: url.absoluteString)
     }
     base.addSubview(storyLabel)
     storyLabel.topToBottom(of: storyImageView, offset: 5.0)

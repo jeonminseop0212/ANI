@@ -13,6 +13,7 @@ import CodableFirebase
 import FirebaseStorage
 import InstantSearchClient
 import AVKit
+import SafariServices
 
 class ANICommunityViewController: UIViewController {
   
@@ -247,6 +248,7 @@ class ANICommunityViewController: UIViewController {
     ANINotificationManager.receive(imageCellTapped: self, selector: #selector(presentImageBrowser(_:)))
     ANINotificationManager.receive(profileImageViewTapped: self, selector: #selector(pushOtherProfile))
     ANINotificationManager.receive(tapHashtag: self, selector: #selector(pushHashtagList))
+    ANINotificationManager.receive(tapUrl: self, selector: #selector(pushSafari))
   }
   
   private func removeNotifications() {
@@ -295,6 +297,18 @@ class ANICommunityViewController: UIViewController {
       }
       hashtagListViewController.hidesBottomBarWhenPushed = true
       self.navigationController?.pushViewController(hashtagListViewController, animated: true)
+    }
+  }
+  
+  @objc private func pushSafari(_ notification: NSNotification) {
+    if let userInfo = notification.userInfo,
+       let url = userInfo[KEY_URL] as? String {
+      let webUrlString = ANIFunction.shared.webURLScheme(urlString: url)
+      
+      if let webUrl = URL(string: webUrlString) {
+        let safariViewController = SFSafariViewController(url: webUrl)
+        self.present(safariViewController, animated: true, completion: nil)
+      }
     }
   }
   

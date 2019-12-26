@@ -196,4 +196,13 @@ class ANINotificationManager: NSObject {
     self.post(name: N_TAP_HASHTAG, object: nil, userInfo:userInfo)
   }
   static func receive(tapHashtag observer:Any, selector:Selector) { receive(name: N_TAP_HASHTAG, observer: observer, selector: selector) }
+  
+  //MARK: tap url
+  private static let N_TAP_URL = "N_TAP_URL"
+  static func postTapUrl(url: String) {
+    var userInfo:[AnyHashable: Any] = [AnyHashable: Any]()
+    userInfo[KEY_URL] = url
+    self.post(name: N_TAP_URL, object: nil, userInfo:userInfo)
+  }
+  static func receive(tapUrl observer:Any, selector:Selector) { receive(name: N_TAP_URL, observer: observer, selector: selector) }
 }

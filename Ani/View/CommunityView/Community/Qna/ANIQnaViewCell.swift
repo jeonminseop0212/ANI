@@ -149,12 +149,16 @@ class ANIQnaViewCell: UITableViewCell {
     questionLabel.font = UIFont.systemFont(ofSize: 14.0)
     questionLabel.textColor = ANIColor.subTitle
     questionLabel.numberOfLines = 0
-    questionLabel.enabledTypes = [.hashtag]
+    questionLabel.enabledTypes = [.hashtag, .url]
     questionLabel.customize { (label) in
       label.hashtagColor = ANIColor.darkblue
+      label.URLColor = ANIColor.darkblue
     }
     questionLabel.handleHashtagTap { (hashtag) in
       ANINotificationManager.postTapHashtag(contributionKind: KEY_CONTRIBUTION_KIND_QNA, hashtag: hashtag)
+    }
+    questionLabel.handleURLTap { (url) in
+      ANINotificationManager.postTapUrl(url: url.absoluteString)
     }
     qnaLabelBase.addSubview(questionLabel)
     questionLabel.topToSuperview(offset: 10.0)

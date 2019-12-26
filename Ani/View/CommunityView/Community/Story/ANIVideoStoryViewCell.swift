@@ -165,12 +165,16 @@ class ANIVideoStoryViewCell: UITableViewCell {
     storyLabel.textAlignment = .left
     storyLabel.textColor = ANIColor.subTitle
     storyLabel.numberOfLines = 0
-    storyLabel.enabledTypes = [.hashtag]
+    storyLabel.enabledTypes = [.hashtag, .url]
     storyLabel.customize { (label) in
       label.hashtagColor = ANIColor.darkblue
+      label.URLColor = ANIColor.darkblue
     }
     storyLabel.handleHashtagTap { (hashtag) in
       ANINotificationManager.postTapHashtag(contributionKind: KEY_CONTRIBUTION_KIND_STROY, hashtag: hashtag)
+    }
+    storyLabel.handleURLTap { (url) in
+      ANINotificationManager.postTapUrl(url: url.absoluteString)
     }
     storyLabelBase.addSubview(storyLabel)
     storyLabel.topToSuperview(offset: 10.0)
