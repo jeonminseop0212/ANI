@@ -575,58 +575,30 @@ class ANIContributionViewController: UIViewController {
   }
   
   private func postTwitter(story: FirebaseStory? = nil, qna: FirebaseQna? = nil) {
-    if let story = story {
-      if story.storyImageUrls != nil {
-        if !self.contentImages.isEmpty, let image = self.contentImages[0] {
-          TWTRAPIClient.withCurrentUser().sendTweet(withText: story.story, image: image) { (tweet, error) in
-            if let error = error {
-              DLog("image story post twitter error \(error)")
-              DLog(error.localizedDescription)
-              return
-            }
-            
-            DLog("image story post twitter success")
-          }
+    if let story = story, let storyId = story.id {
+      let shareText = "https://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/story/\(storyId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU"
+      TWTRAPIClient.withCurrentUser().sendTweet(withText: shareText, completion: { (tweet, error) in
+        if let error = error {
+          DLog("story post twitter error \(error)")
+          DLog(error.localizedDescription)
+          return
         }
-      } else if let storyVideoUrl = story.storyVideoUrl {
-        if let url = URL(string: storyVideoUrl), let videoData = try? Data(contentsOf: url) {
-          TWTRAPIClient.withCurrentUser().sendTweet(withText: story.story, videoData: videoData) { (tweet, error) in
-            if let error = error {
-              DLog("video story post twitter error \(error)")
-              DLog(error.localizedDescription)
-              return
-            }
-            
-            DLog("video story post twitter success")
-          }
-        }
-      }
+        
+        DLog("story post twitter success")
+      })
     }
     
-    if let qna = qna {
-      if qna.qnaImageUrls != nil {
-        if !self.contentImages.isEmpty, let image = self.contentImages[0] {
-          TWTRAPIClient.withCurrentUser().sendTweet(withText: qna.qna, image: image) { (tweet, error) in
-            if let error = error {
-              DLog("image qna post twitter error \(error)")
-              DLog(error.localizedDescription)
-              return
-            }
-            
-            DLog("image qna post twitter success")
-          }
+    if let qna = qna, let qnaId = qna.id {
+      let shareText = "https://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/qna/\(qnaId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU"
+      TWTRAPIClient.withCurrentUser().sendTweet(withText: shareText, completion: { (tweet, error) in
+        if let error = error {
+          DLog("qna post twitter error \(error)")
+          DLog(error.localizedDescription)
+          return
         }
-      }  else {
-        TWTRAPIClient.withCurrentUser().sendTweet(withText: qna.qna) { (tweet, error) in
-          if let error = error {
-            DLog("qna post twitter error \(error)")
-            DLog(error.localizedDescription)
-            return
-          }
-          
-          DLog("qna post twitter success")
-        }
-      }
+        
+        DLog("qna post twitter success")
+      })
     }
   }
   

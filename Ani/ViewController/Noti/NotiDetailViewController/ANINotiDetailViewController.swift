@@ -248,9 +248,13 @@ extension ANINotiDetailViewController: ANINotiDetailViewDelegate {
       popupOptionViewController.options = ["非表示"]
       if contentType == ContentType.story {
         popupOptionViewController.options?.insert("シェア", at: 0)
+      } else if contentType == ContentType.qna {
+        popupOptionViewController.options?.insert("シェア", at: 0)
       }
     } else {
       if contentType == ContentType.story {
+        popupOptionViewController.options = ["シェア"]
+      } else if contentType == ContentType.qna {
         popupOptionViewController.options = ["シェア"]
       }
     }
@@ -368,12 +372,24 @@ extension ANINotiDetailViewController: ANIPopupOptionViewControllerDelegate {
         }
       }
     } else if contentType == .qna {
-      if index == 0 {
-        alertTitle = "この質問を非表示にしますか？"
-        alertMessage = "非表示にした質問はアプリの中で見えなくなります。後から非表示を解除することは出来ません。"
-        collection = KEY_QNAS
-        
-        self.hideContribution(contentType: contentType, collection: collection, contributionId: contributionId, title: alertTitle, message: alertMessage)
+      if isMe {
+        if index == 0 {
+          let activityItems = [ANIActivityItemSorce(shareContent: "https://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/qna/\(contributionId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU")]
+          let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+          self.present(activityViewController, animated: true)
+        }
+      } else {
+        if index == 0 {
+          let activityItems = [ANIActivityItemSorce(shareContent: "https://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/qna/\(contributionId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU")]
+          let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+          self.present(activityViewController, animated: true)
+        } else if index == 1 {
+          alertTitle = "この質問を非表示にしますか？"
+          alertMessage = "非表示にした質問はアプリの中で見えなくなります。後から非表示を解除することは出来ません。"
+          collection = KEY_QNAS
+          
+          self.hideContribution(contentType: contentType, collection: collection, contributionId: contributionId, title: alertTitle, message: alertMessage)
+        }
       }
     }
   }

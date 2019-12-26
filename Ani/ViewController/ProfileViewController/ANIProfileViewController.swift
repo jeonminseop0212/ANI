@@ -372,6 +372,8 @@ extension ANIProfileViewController: ANIProfileBasicViewDelegate {
     popupOptionViewController.isMe = isMe
     if contentType == ContentType.story {
       popupOptionViewController.options = ["シェア"]
+    } else if contentType == ContentType.qna {
+      popupOptionViewController.options = ["シェア"]
     }
     popupOptionViewController.delegate = self
     self.tabBarController?.present(popupOptionViewController, animated: false, completion: nil)
@@ -475,6 +477,10 @@ extension ANIProfileViewController: ANIPopupOptionViewControllerDelegate {
         let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
         self.present(activityViewController, animated: true)
       }
+    } else if contentType == .qna {
+      let activityItems = [ANIActivityItemSorce(shareContent: "https://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/qna/\(contributionId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU")]
+      let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+      self.present(activityViewController, animated: true)
     }
   }
 }
