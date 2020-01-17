@@ -277,9 +277,7 @@ class ANIOtherProfileBasicView: UIView {
   @objc private func deleteRecruit(_ notification: NSNotification) {
     guard let id = notification.object as? String,
           let basicTableView = self.basicTableView else { return }
-    
-    var indexPath: IndexPath = [0, 0]
-    
+        
     for (index, recruit) in recruits.enumerated() {
       if recruit.id == id {
         recruits.remove(at: index)
@@ -299,9 +297,7 @@ class ANIOtherProfileBasicView: UIView {
   @objc private func deleteStory(_ notification: NSNotification) {
     guard let id = notification.object as? String,
           let basicTableView = self.basicTableView else { return }
-    
-    var indexPath: IndexPath = [0, 0]
-    
+        
     for (index, story) in stories.enumerated() {
       if story.id == id {
         stories.remove(at: index)
@@ -321,9 +317,7 @@ class ANIOtherProfileBasicView: UIView {
   @objc private func deleteQna(_ notification: NSNotification) {
     guard let id = notification.object as? String,
           let basicTableView = self.basicTableView else { return }
-    
-    var indexPath: IndexPath = [0, 0]
-    
+        
     for (index, qna) in qnas.enumerated() {
       if qna.id == id {
         qnas.remove(at: index)
@@ -427,14 +421,6 @@ extension ANIOtherProfileBasicView: UITableViewDataSource {
 
       cell.selectedIndex = contentType.rawValue
       cell.user = user
-      
-      if let bottomSpace = cell.bottomSpace {
-        if contentType == .recruit {
-          bottomSpace.isHidden = false
-        } else {
-          bottomSpace.isHidden = true
-        }
-      }
       
       return cell
     } else {

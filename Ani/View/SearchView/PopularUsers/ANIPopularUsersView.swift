@@ -44,9 +44,9 @@ class ANIPopularUsersView: UIView {
     //collectionView
     let flowLayout = UICollectionViewFlowLayout()
     flowLayout.scrollDirection = .vertical
-    flowLayout.minimumLineSpacing = 10.0
-    flowLayout.minimumInteritemSpacing = 10.0
-    flowLayout.sectionInset = UIEdgeInsets(top: 0.0, left: 10.0, bottom: 10.0, right: 10.0)
+    flowLayout.minimumLineSpacing = 0.0
+    flowLayout.minimumInteritemSpacing = 0.0
+    flowLayout.sectionInset = UIEdgeInsets(top: 0.0, left: 5.0, bottom: 5.0, right: 5.0)
     let collectionView = UICollectionView(frame: self.frame, collectionViewLayout: flowLayout)
     let topInset = UIViewController.NAVIGATION_BAR_HEIGHT + ANIRecruitViewController.FILTERS_VIEW_HEIGHT
     collectionView.contentInset = UIEdgeInsets(top: topInset, left: 0, bottom: 0, right: 0)
@@ -149,7 +149,7 @@ extension ANIPopularUsersView: UICollectionViewDelegateFlowLayout {
     if indexPath.item == 0 {
       return CGSize(width: self.frame.size.width, height: 20.0)
     } else {
-      return CGSize(width: self.frame.size.width / 2 - 15.0, height: 250.0)
+      return CGSize(width: self.frame.size.width / 2 - 5.0, height: 250.0)
     }
   }
 }

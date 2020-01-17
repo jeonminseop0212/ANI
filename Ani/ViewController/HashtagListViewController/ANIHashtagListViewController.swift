@@ -100,7 +100,7 @@ class ANIHashtagListViewController: UIViewController {
       navigationTitleLabel.text = "#\(hashtag) " + hashtagList.rawValue
     }
     navigationTitleLabel.textColor = ANIColor.dark
-    navigationTitleLabel.font = UIFont.boldSystemFont(ofSize: 17)
+    navigationTitleLabel.font = UIFont.boldSystemFont(ofSize: 16)
     navigationTitleLabel.textAlignment = .center
     myNavigationBase.addSubview(navigationTitleLabel)
     navigationTitleLabel.centerYToSuperview()

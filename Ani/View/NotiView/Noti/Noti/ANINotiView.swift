@@ -221,6 +221,7 @@ extension ANINotiView: UITableViewDataSource {
         } else {
           cell.user = nil
         }
+        cell.indexPath = indexPath.row
         cell.noti = notifications[indexPath.row]
         cell.delegate = self
         
@@ -239,6 +240,7 @@ extension ANINotiView: UITableViewDataSource {
         } else {
           cell.user = nil
         }
+        cell.indexPath = indexPath.row
         cell.noti = notifications[indexPath.row]
         cell.delegate = self
         

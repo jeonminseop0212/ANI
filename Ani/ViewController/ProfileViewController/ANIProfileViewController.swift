@@ -129,7 +129,7 @@ class ANIProfileViewController: UIViewController {
     }
     navigationTitleLabel.textAlignment = .center
     navigationTitleLabel.textColor = ANIColor.dark
-    navigationTitleLabel.font = UIFont.boldSystemFont(ofSize: 17)
+    navigationTitleLabel.font = UIFont.boldSystemFont(ofSize: 16)
     myNavigationBase.addSubview(navigationTitleLabel)
     navigationTitleLabel.centerYToSuperview()
     navigationTitleLabel.leftToRight(of: backButton)

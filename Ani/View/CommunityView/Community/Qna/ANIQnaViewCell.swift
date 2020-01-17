@@ -21,6 +21,9 @@ protocol ANIQnaViewCellDelegate {
 }
 
 class ANIQnaViewCell: UITableViewCell {
+  private var shadowVidewTopConstraint: Constraint?
+  private weak var shadowVidew: UIView?
+
   private weak var stackView: UIStackView?
 
   private weak var qnaLabelBase: UIView?
@@ -104,7 +107,18 @@ class ANIQnaViewCell: UITableViewCell {
   private var loveListener: ListenerRegistration?
   private var commentListener: ListenerRegistration?
   
-  var indexPath: Int?
+  var indexPath: Int? {
+    didSet {
+      guard let indexPath = self.indexPath,
+            let shadowVidewTopConstraint = self.shadowVidewTopConstraint else { return }
+      
+      if indexPath == 0 {
+        shadowVidewTopConstraint.constant = 0.0
+      } else {
+        shadowVidewTopConstraint.constant = 10.0
+      }
+    }
+  }
   
   var delegate: ANIQnaViewCellDelegate?
   
@@ -129,12 +143,23 @@ class ANIQnaViewCell: UITableViewCell {
     self.selectionStyle = .none
     self.backgroundColor = .white
     
+    //shadowVidew
+    let shadowVidew = UIView()
+    shadowVidew.backgroundColor = .white
+    shadowVidew.dropShadow(opacity: 0.03)
+    addSubview(shadowVidew)
+    shadowVidewTopConstraint = shadowVidew.topToSuperview(offset: 10.0)
+    shadowVidew.leftToSuperview()
+    shadowVidew.rightToSuperview()
+    shadowVidew.bottomToSuperview(offset: -10.0)
+    self.shadowVidew = shadowVidew
+    
     //stackView
     let stackView = UIStackView()
     stackView.axis = .vertical
     stackView.distribution = .equalSpacing
     stackView.spacing = 0.0
-    addSubview(stackView)
+    shadowVidew.addSubview(stackView)
     stackView.edgesToSuperview(excluding: .bottom)
     self.stackView = stackView
     
@@ -192,7 +217,7 @@ class ANIQnaViewCell: UITableViewCell {
     
     //bottomArea
     let bottomArea = UIView()
-    addSubview(bottomArea)
+    shadowVidew.addSubview(bottomArea)
     bottomArea.topToBottom(of: stackView, offset: 10.0)
     bottomArea.edgesToSuperview(excluding: .top)
     self.bottomArea = bottomArea
@@ -202,11 +227,12 @@ class ANIQnaViewCell: UITableViewCell {
     profileImageView.backgroundColor = ANIColor.gray
     profileImageView.isUserInteractionEnabled = true
     profileImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped)))
-    addSubview(profileImageView)
+    shadowVidew.addSubview(profileImageView)
     profileImageView.top(to: bottomArea)
     profileImageView.leftToSuperview(offset: 10.0)
     profileImageView.width(32.0)
     profileImageView.height(32.0)
+    profileImageView.bottomToSuperview(offset: -10.0, priority: .defaultHigh)
     profileImageView.layer.cornerRadius = profileImageView.constraints[0].constant / 2
     profileImageView.layer.masksToBounds = true
     self.profileImageView = profileImageView
@@ -215,7 +241,7 @@ class ANIQnaViewCell: UITableViewCell {
     let optionButton = UIButton()
     optionButton.setImage(UIImage(named: "cellOptionButton"), for: .normal)
     optionButton.addTarget(self, action: #selector(showOption), for: .touchUpInside)
-    addSubview(optionButton)
+    shadowVidew.addSubview(optionButton)
     optionButton.centerY(to: profileImageView)
     optionButton.rightToSuperview(offset: -10.0)
     optionButton.width(30.0)
@@ -226,7 +252,7 @@ class ANIQnaViewCell: UITableViewCell {
     let commentCountLabel = UILabel()
     commentCountLabel.font = UIFont.boldSystemFont(ofSize: 14.0)
     commentCountLabel.textColor = ANIColor.dark
-    addSubview(commentCountLabel)
+    shadowVidew.addSubview(commentCountLabel)
     commentCountLabel.centerY(to: profileImageView)
     commentCountLabel.rightToLeft(of: optionButton, offset: -5.0)
     commentCountLabel.width(25.0)
@@ -237,7 +263,7 @@ class ANIQnaViewCell: UITableViewCell {
     let commentButton = UIButton()
     commentButton.setImage(UIImage(named: "commentButton"), for: .normal)
     commentButton.addTarget(self, action: #selector(cellTapped), for: .touchUpInside)
-    addSubview(commentButton)
+    shadowVidew.addSubview(commentButton)
     commentButton.centerY(to: profileImageView)
     commentButton.rightToLeft(of: commentCountLabel, offset: -5.0)
     commentButton.width(30.0)
@@ -248,7 +274,7 @@ class ANIQnaViewCell: UITableViewCell {
     let loveCountLabel = UILabel()
     loveCountLabel.font = UIFont.boldSystemFont(ofSize: 14.0)
     loveCountLabel.textColor = ANIColor.dark
-    addSubview(loveCountLabel)
+    shadowVidew.addSubview(loveCountLabel)
     loveCountLabel.centerY(to: profileImageView)
     loveCountLabel.rightToLeft(of: commentButton, offset: -5.0)
     loveCountLabel.width(25.0)
@@ -260,7 +286,7 @@ class ANIQnaViewCell: UITableViewCell {
     loveButtonBG.isUserInteractionEnabled = false
     let loveButtonBGtapGesture = UITapGestureRecognizer(target: self, action: #selector(loveButtonBGTapped))
     loveButtonBG.addGestureRecognizer(loveButtonBGtapGesture)
-    addSubview(loveButtonBG)
+    shadowVidew.addSubview(loveButtonBG)
     loveButtonBG.centerY(to: profileImageView)
     loveButtonBG.rightToLeft(of: loveCountLabel, offset: -5.0)
     loveButtonBG.width(30.0)
@@ -273,7 +299,7 @@ class ANIQnaViewCell: UITableViewCell {
     loveButton.unSelectedImage = UIImage(named: "loveButton")
     loveButton.selectedImage = UIImage(named: "loveButtonSelected")
     loveButton.delegate = self
-    addSubview(loveButton)
+    shadowVidew.addSubview(loveButton)
     loveButton.centerY(to: profileImageView)
     loveButton.rightToLeft(of: loveCountLabel, offset: -5.0)
     loveButton.width(30.0)
@@ -287,21 +313,11 @@ class ANIQnaViewCell: UITableViewCell {
     userNameLabel.numberOfLines = 2
     userNameLabel.isUserInteractionEnabled = true
     userNameLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped)))
-    addSubview(userNameLabel)
+    shadowVidew.addSubview(userNameLabel)
     userNameLabel.leftToRight(of: profileImageView, offset: 10.0)
     userNameLabel.rightToLeft(of: loveButton, offset: -10)
     userNameLabel.centerY(to: profileImageView)
     self.userNameLabel = userNameLabel
-    
-    //bottomSpace
-    let spaceView = UIView()
-    spaceView.backgroundColor = ANIColor.bg
-    addSubview(spaceView)
-    spaceView.topToBottom(of: profileImageView, offset: 10)
-    spaceView.leftToSuperview()
-    spaceView.rightToSuperview()
-    spaceView.height(10.0)
-    spaceView.bottomToSuperview(priority: .defaultHigh)
   }
   
   private func reloadLayout() {

@@ -36,7 +36,7 @@ class ANIRecuruitView: UIView {
   
   private weak var activityIndicatorView: ANIActivityIndicator?
 
-  private let TABLE_VIEW_TOP_MARGIN: CGFloat = 10.0
+  private let TABLE_VIEW_TOP_MARGIN: CGFloat = 0.0
   
   private var recruits = [FirebaseRecruit]()
   private var users = [FirebaseUser]()

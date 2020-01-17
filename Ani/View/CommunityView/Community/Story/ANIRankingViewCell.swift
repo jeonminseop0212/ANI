@@ -14,8 +14,6 @@ protocol ANIRankingViewCellDelegate {
 
 class ANIRankingViewCell: UITableViewCell {
   
-  private weak var titleLabel: UILabel?
-  
   private weak var storyRankingView: ANIStoryRankingView?
   
   var rankingStories: [FirebaseStory]? {
@@ -43,22 +41,11 @@ class ANIRankingViewCell: UITableViewCell {
     self.backgroundColor = ANIColor.bg
     self.selectionStyle = .none
     
-    //titleLabel
-    let titleLabel = UILabel()
-    titleLabel.textColor = ANIColor.dark
-    titleLabel.font = UIFont.boldSystemFont(ofSize: 16.0)
-    titleLabel.text = "今日のニャンズ"
-    addSubview(titleLabel)
-    titleLabel.topToSuperview(offset: 10.0)
-    titleLabel.leftToSuperview(offset: 10.0)
-    titleLabel.rightToSuperview(offset: -10.0)
-    self.titleLabel = titleLabel
-    
     //storyRankingView
     let storyRankingView = ANIStoryRankingView()
     storyRankingView.delegate = self
     addSubview(storyRankingView)
-    storyRankingView.topToBottom(of: titleLabel, offset: 10.0)
+    storyRankingView.topToSuperview(offset: 10.0)
     storyRankingView.leftToSuperview()
     storyRankingView.rightToSuperview()
     storyRankingView.bottomToSuperview(offset: -10.0, priority: .defaultHigh)

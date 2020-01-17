@@ -83,7 +83,7 @@ class ANIStoryDetailViewController: UIViewController {
     //navigationTitleLabel
     let navigationTitleLabel = UILabel()
     navigationTitleLabel.textColor = ANIColor.dark
-    navigationTitleLabel.font = UIFont.boldSystemFont(ofSize: 17)
+    navigationTitleLabel.font = UIFont.boldSystemFont(ofSize: 16)
     navigationTitleLabel.text = "ストーリー"
     myNavigationBase.addSubview(navigationTitleLabel)
     navigationTitleLabel.centerInSuperview()

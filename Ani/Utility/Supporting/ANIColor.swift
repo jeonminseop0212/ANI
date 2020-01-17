@@ -16,7 +16,7 @@ struct ANIColor {
   static var moreDarkGray = UIColor(red: 122, green: 122, blue: 122)
   static var gray = UIColor(red: 216, green: 216, blue: 216)
   static var emerald = UIColor(red: 33, green: 183, blue: 169)
-  static var bg = UIColor(red: 244, green: 244, blue: 244)
+  static var bg = UIColor(red: 255, green: 255, blue: 255)
   static var red = UIColor(red: 224, green: 71, blue: 71)
   static var pink = UIColor(red: 243, green: 141, blue: 155)
   static var lightPink = UIColor(red: 255, green: 174, blue: 204)

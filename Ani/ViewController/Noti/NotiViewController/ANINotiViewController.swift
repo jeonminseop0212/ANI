@@ -260,8 +260,8 @@ extension ANINotiViewController: UICollectionViewDelegateFlowLayout {
 //MARK: UICollectionViewDelegate
 extension ANINotiViewController: UICollectionViewDelegate {
   func scrollViewDidScroll(_ scrollView: UIScrollView) {
-    guard let menuBar = self.menuBar, let horizontalBarleftConstraint = menuBar.horizontalBarleftConstraint else { return }
-    horizontalBarleftConstraint.constant = scrollView.contentOffset.x / 2
+    guard let menuBar = self.menuBar, let horizontalBarBaseleftConstraint = menuBar.horizontalBarBaseleftConstraint else { return }
+    horizontalBarBaseleftConstraint.constant = scrollView.contentOffset.x / 2
   }
   
   func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {

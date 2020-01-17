@@ -22,6 +22,8 @@ protocol ANIRecruitViewCellDelegate {
 
 class ANIRecruitViewCell: UITableViewCell {
   
+  private weak var shadowVidew: UIView?
+
   private weak var base: UIView?
   private weak var tapArea: UIView?
   private weak var recruitImageView: UIImageView?
@@ -105,16 +107,25 @@ class ANIRecruitViewCell: UITableViewCell {
     self.selectionStyle = .none
     self.backgroundColor = ANIColor.bg
     
+    //shadowVidew
+    let shadowVidew = UIView()
+    shadowVidew.backgroundColor = .white
+    shadowVidew.layer.cornerRadius = 10.0
+    shadowVidew.dropShadow(opacity: 0.035)
+    addSubview(shadowVidew)
+    shadowVidew.topToSuperview(offset: 10.0)
+    shadowVidew.leftToSuperview(offset: 10.0)
+    shadowVidew.rightToSuperview(offset: -10.0)
+    shadowVidew.bottomToSuperview(offset: -10.0)
+    self.shadowVidew = shadowVidew
+    
     //base
     let base = UIView()
     base.backgroundColor = .white
     base.layer.cornerRadius = 10.0
     base.layer.masksToBounds = true
-    addSubview(base)
-    base.topToSuperview(offset: 0)
-    base.leftToSuperview(offset: 10)
-    base.rightToSuperview(offset: -10)
-    base.bottomToSuperview(offset: -10)
+    shadowVidew.addSubview(base)
+    base.edgesToSuperview()
     self.base = base
     
     //tapArea

@@ -172,7 +172,7 @@ class ANINotiParentCommentViewCell: UITableViewCell {
     
     //parentCommentLine
     let parentCommentLine = UIView()
-    parentCommentLine.backgroundColor = ANIColor.bg
+    parentCommentLine.backgroundColor = ANIColor.lightGray
     base.addSubview(parentCommentLine)
     parentCommentLine.width(2.0)
     parentCommentLine.topToBottom(of: parentCommentProfileImageView, offset: 5.0)

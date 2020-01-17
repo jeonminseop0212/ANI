@@ -21,10 +21,8 @@ class ANIOtherProfileTopCell: UITableViewCell {
   private weak var stackView: UIStackView?
 
   private weak var menuBar: ANIProfileMenuBar?
-  private let MENU_BAR_HEIGHT: CGFloat = 60.0
-  
-  weak var bottomSpace: UIView?
-  
+  private let MENU_BAR_HEIGHT: CGFloat = 40.0
+    
   var user: FirebaseUser? {
     didSet {
       guard let familyView = self.familyView,
@@ -81,13 +79,6 @@ class ANIOtherProfileTopCell: UITableViewCell {
     stackView.addArrangedSubview(menuBar)
     menuBar.height(MENU_BAR_HEIGHT, priority: .defaultHigh)
     self.menuBar = menuBar
-    
-    //bottomSpace
-    let bottomSpace = UIView()
-    bottomSpace.backgroundColor = ANIColor.bg
-    bottomSpace.height(10.0)
-    stackView.addArrangedSubview(bottomSpace)
-    self.bottomSpace = bottomSpace
   }
   
   private func reloadLayout() {

@@ -43,9 +43,9 @@ class ANIStoryRankingView: UIView {
     //rankingColletionView
     let flowLayot = UICollectionViewFlowLayout()
     flowLayot.scrollDirection = .horizontal
-    flowLayot.minimumLineSpacing = 10.0
+    flowLayot.minimumLineSpacing = 0.0
     let rankingColletionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayot)
-    rankingColletionView.contentInset = UIEdgeInsets(top: 0.0, left: 10.0, bottom: 0.0, right: 10.0)
+    rankingColletionView.contentInset = UIEdgeInsets(top: 0.0, left: 5.0, bottom: 0.0, right: 5.0)
     rankingColletionView.delegate = self
     rankingColletionView.dataSource = self
     rankingColletionView.showsHorizontalScrollIndicator = false

@@ -137,6 +137,7 @@ extension ANIMessageView: UITableViewDataSource {
     let id = NSStringFromClass(ANIMessageViewCell.self)
     let cell = tableView.dequeueReusableCell(withIdentifier: id, for: indexPath) as! ANIMessageViewCell
     
+    cell.indexPath = indexPath.row
     cell.chatGroup = chatGroups[indexPath.row]
     cell.delegate = self
     
