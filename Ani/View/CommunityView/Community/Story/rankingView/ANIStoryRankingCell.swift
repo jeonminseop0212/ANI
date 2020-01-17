@@ -18,7 +18,7 @@ protocol ANIStoryRankingCellDelegate {
 class ANIStoryRankingCell: UICollectionViewCell {
   
   let RANKING_COLLECTION_VIEW_CELL_WIDHT: CGFloat = ceil(UIScreen.main.bounds.width / 2)
-  let MARGIN: CGFloat = 20.0
+  let MARGIN: CGFloat = 35.0
   
   private weak var shadowVidew: UIView?
   private weak var base: UIView?
