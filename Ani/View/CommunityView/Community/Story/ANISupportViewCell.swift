@@ -158,7 +158,18 @@ class ANISupportViewCell: UITableViewCell {
   private var loveListener: ListenerRegistration?
   private var commentListener: ListenerRegistration?
   
-  var indexPath: Int?
+  var indexPath: Int? {
+    didSet {
+      guard let indexPath = self.indexPath,
+            let shadowVidewTopConstraint = self.shadowVidewTopConstraint else { return }
+      
+      if indexPath == 0 {
+        shadowVidewTopConstraint.constant = 0.0
+      } else {
+        shadowVidewTopConstraint.constant = 10.0
+      }
+    }
+  }
   
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
