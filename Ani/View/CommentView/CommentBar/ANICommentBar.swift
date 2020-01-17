@@ -54,7 +54,7 @@ class ANICommentBar: UIView {
     
     //parentCommentUserView
     let parentCommentUserView = UIView()
-    parentCommentUserView.backgroundColor = ANIColor.bg
+    parentCommentUserView.backgroundColor = ANIColor.lightGray
     parentCommentUserView.alpha = 0.0
     addSubview(parentCommentUserView)
     parentCommentUserView.topToSuperview()
