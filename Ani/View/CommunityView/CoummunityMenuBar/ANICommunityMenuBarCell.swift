@@ -23,7 +23,7 @@ class ANICommunityMenuBarCell: UICollectionViewCell {
   private func setup() {
     let menuLabel = UILabel()
     menuLabel.textAlignment = .center
-    menuLabel.font = UIFont.boldSystemFont(ofSize: 17)
+    menuLabel.font = UIFont.boldSystemFont(ofSize: 16)
     menuLabel.textColor = ANIColor.gray
     addSubview(menuLabel)
     menuLabel.edgesToSuperview()

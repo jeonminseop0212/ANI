@@ -17,6 +17,8 @@ protocol ANIPopularUserCellDelegate {
 
 class ANIPopularUserCell: UICollectionViewCell {
   
+  private weak var shadowVidew: UIView?
+
   private weak var base: UIView?
   private let PROFILE_IMAGE_VIEW_HEIGHT: CGFloat = 60.0
   private weak var profileImageView: UIImageView?
@@ -57,12 +59,24 @@ class ANIPopularUserCell: UICollectionViewCell {
     self.isUserInteractionEnabled = true
     self.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped)))
     
+    //shadowVidew
+    let shadowVidew = UIView()
+    shadowVidew.backgroundColor = .white
+    shadowVidew.dropShadow()
+    shadowVidew.layer.cornerRadius = 5.0
+    addSubview(shadowVidew)
+    shadowVidew.topToSuperview(offset: 5.0)
+    shadowVidew.leftToSuperview(offset: 5.0)
+    shadowVidew.rightToSuperview(offset: -5.0)
+    shadowVidew.bottomToSuperview(offset: -5.0)
+    self.shadowVidew = shadowVidew
+    
     //base
     let base = UIView()
     base.backgroundColor = .white
     base.layer.cornerRadius = 10.0
     base.layer.masksToBounds = true
-    self.addSubview(base)
+    shadowVidew.addSubview(base)
     base.edgesToSuperview()
     self.base = base
     

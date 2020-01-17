@@ -61,7 +61,7 @@ class ANICommentContentCell: UITableViewCell {
     
     //bottomMarginArea
     let bottomMarginArea = UIView()
-    bottomMarginArea.backgroundColor = ANIColor.lightGray
+    bottomMarginArea.backgroundColor = ANIColor.bg
     addSubview(bottomMarginArea)
     bottomMarginArea.topToBottom(of: storyLabel, offset: 20.0)
     bottomMarginArea.edgesToSuperview(excluding: .top)
@@ -70,7 +70,7 @@ class ANICommentContentCell: UITableViewCell {
     
     //bottomLabel
     let bottomLabel = UILabel()
-    bottomLabel.textColor = ANIColor.subTitle
+    bottomLabel.textColor = ANIColor.dark
     bottomLabel.text = "コメント"
     bottomLabel.font = UIFont.boldSystemFont(ofSize: 15.0)
     bottomMarginArea.addSubview(bottomLabel)

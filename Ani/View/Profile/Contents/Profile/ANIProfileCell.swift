@@ -93,7 +93,7 @@ class ANIProfileCell: UITableViewCell {
     nameLabel.textColor = ANIColor.dark
     nameLabel.numberOfLines = 0
     addSubview(nameLabel)
-    nameLabel.topToSuperview(offset: 10.0)
+    nameLabel.topToSuperview(offset: 20.0)
     nameLabel.leftToSuperview(offset: 10.0)
     nameLabel.rightToLeft(of: profileEditButton, offset: -10.0)
     self.nameLabel = nameLabel
@@ -246,7 +246,7 @@ class ANIProfileCell: UITableViewCell {
     
     //introduceBG
     let introduceBG = UIView()
-    introduceBG.backgroundColor = ANIColor.bg
+    introduceBG.backgroundColor = ANIColor.lightGray
     introduceBG.layer.cornerRadius = 10.0
     introduceBG.layer.masksToBounds = true
     introduceBG.isHidden = true

@@ -136,7 +136,7 @@ class ANIContributionViewController: UIViewController {
     //titleLabel
     let titleLabel = UILabel()
     titleLabel.text = navigationTitle
-    titleLabel.font = UIFont.boldSystemFont(ofSize: 17)
+    titleLabel.font = UIFont.boldSystemFont(ofSize: 16)
     titleLabel.textColor = ANIColor.dark
     myNavigationBarBase.addSubview(titleLabel)
     titleLabel.centerInSuperview()

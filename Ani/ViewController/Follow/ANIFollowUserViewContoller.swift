@@ -77,7 +77,7 @@ class ANIFollowUserViewContoller: UIViewController {
       }
     }
     navigationTitleLabel.textColor = ANIColor.dark
-    navigationTitleLabel.font = UIFont.boldSystemFont(ofSize: 17)
+    navigationTitleLabel.font = UIFont.boldSystemFont(ofSize: 16)
     myNavigationBase.addSubview(navigationTitleLabel)
     navigationTitleLabel.centerInSuperview()
     self.navigationTitleLabel = navigationTitleLabel

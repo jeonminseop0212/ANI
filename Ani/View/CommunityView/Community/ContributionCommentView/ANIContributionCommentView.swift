@@ -99,7 +99,7 @@ class ANIContributionCommentView: UIView {
     
     //lineView
     let lineView = UIView()
-    lineView.backgroundColor = ANIColor.bg
+    lineView.backgroundColor = ANIColor.lightGray
     addSubview(lineView)
     lineView.leftToSuperview(offset: 14.0)
     lineView.rightToSuperview(offset: -14.0, priority: .defaultHigh)
@@ -196,7 +196,7 @@ class ANIContributionCommentView: UIView {
     
     //commentLine
     let commentLine = UIView()
-    commentLine.backgroundColor = ANIColor.bg
+    commentLine.backgroundColor = ANIColor.lightGray
     commentLineBase.addSubview(commentLine)
     commentLine.topToSuperview(offset: 5.0)
     commentLine.rightToSuperview()

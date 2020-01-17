@@ -9,12 +9,16 @@
 import UIKit
 import FirebaseFirestore
 import CodableFirebase
+import TinyConstraints
 
 protocol ANIFollowNotiViewCellDelegate {
   func loadedNotiUser(user: FirebaseUser)
 }
 
 class ANIFollowNotiViewCell: UITableViewCell {
+  
+  private var shadowVidewTopConstraint: Constraint?
+  private weak var shadowVidew: UIView?
   
   private weak var base: UIView?
   private weak var stackView: UIStackView?
@@ -41,6 +45,19 @@ class ANIFollowNotiViewCell: UITableViewCell {
     }
   }
   
+  var indexPath: Int? {
+    didSet {
+      guard let indexPath = self.indexPath,
+            let shadowVidewTopConstraint = self.shadowVidewTopConstraint else { return }
+      
+      if indexPath == 0 {
+        shadowVidewTopConstraint.constant = 0.0
+      } else {
+        shadowVidewTopConstraint.constant = 10.0
+      }
+    }
+  }
+  
   var delegate: ANIFollowNotiViewCellDelegate?
   
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -60,10 +77,21 @@ class ANIFollowNotiViewCell: UITableViewCell {
     let tapGesture = UITapGestureRecognizer(target: self, action: #selector(cellTapped))
     self.addGestureRecognizer(tapGesture)
     
+    //shadowVidew
+    let shadowVidew = UIView()
+    shadowVidew.backgroundColor = .white
+    shadowVidew.dropShadow(opacity: 0.03)
+    addSubview(shadowVidew)
+    shadowVidewTopConstraint = shadowVidew.topToSuperview(offset: 10.0)
+    shadowVidew.leftToSuperview()
+    shadowVidew.rightToSuperview()
+    shadowVidew.bottomToSuperview(offset: -10.0)
+    self.shadowVidew = shadowVidew
+    
     //base
     let base = UIView()
     base.backgroundColor = .white
-    addSubview(base)
+    shadowVidew.addSubview(base)
     base.edgesToSuperview()
     self.base = base
     
@@ -75,6 +103,7 @@ class ANIFollowNotiViewCell: UITableViewCell {
     base.addSubview(stackView)
     stackView.topToSuperview(offset: 10.0)
     stackView.leftToSuperview(offset: 10.0)
+    stackView.bottomToSuperview(offset: -10.0)
     self.stackView = stackView
     
     //profileImageView
@@ -121,16 +150,6 @@ class ANIFollowNotiViewCell: UITableViewCell {
     followButton.addContent(followLabel)
     followLabel.edgesToSuperview()
     self.followLabel = followLabel
-    
-    //bottomSpace
-    let spaceView = UIView()
-    spaceView.backgroundColor = ANIColor.bg
-    base.addSubview(spaceView)
-    spaceView.topToBottom(of: stackView, offset: 10)
-    spaceView.leftToSuperview()
-    spaceView.rightToSuperview()
-    spaceView.height(10.0)
-    spaceView.bottomToSuperview()
   }
   
   private func reloadLayout() {

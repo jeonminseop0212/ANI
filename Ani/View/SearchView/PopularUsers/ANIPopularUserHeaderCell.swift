@@ -31,7 +31,7 @@ class ANIPopularUserHeaderCell: UICollectionViewCell {
     headerLabel.textColor = ANIColor.dark
     headerLabel.font = UIFont.boldSystemFont(ofSize: 15)
     addSubview(headerLabel)
-    headerLabel.leftToSuperview()
+    headerLabel.leftToSuperview(offset: 5.0)
     headerLabel.centerYToSuperview()
     self.headerLabel = headerLabel
   }

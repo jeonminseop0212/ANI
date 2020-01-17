@@ -20,6 +20,7 @@ class ANIStoryRankingCell: UICollectionViewCell {
   let RANKING_COLLECTION_VIEW_CELL_WIDHT: CGFloat = ceil(UIScreen.main.bounds.width / 2)
   let MARGIN: CGFloat = 20.0
   
+  private weak var shadowVidew: UIView?
   private weak var base: UIView?
   private weak var storyImageView: UIImageView?
   
@@ -79,12 +80,24 @@ class ANIStoryRankingCell: UICollectionViewCell {
   private func setup() {
     self.backgroundColor = ANIColor.bg
     
+    //shadowVidew
+    let shadowVidew = UIView()
+    shadowVidew.backgroundColor = .white
+    shadowVidew.dropShadow()
+    shadowVidew.layer.cornerRadius = 5.0
+    addSubview(shadowVidew)
+    shadowVidew.topToSuperview(offset: 5.0)
+    shadowVidew.leftToSuperview(offset: 5.0)
+    shadowVidew.rightToSuperview(offset: -5.0)
+    shadowVidew.bottomToSuperview(offset: -10.0)
+    self.shadowVidew = shadowVidew
+    
     //base
     let base = UIView()
     base.backgroundColor = .white
-    base.layer.cornerRadius = 10.0
+    base.layer.cornerRadius = 5.0
     base.layer.masksToBounds = true
-    addSubview(base)
+    shadowVidew.addSubview(base)
     base.edgesToSuperview()
     self.base = base
     
@@ -135,6 +148,7 @@ class ANIStoryRankingCell: UICollectionViewCell {
     profileImageView.leftToSuperview(offset: 10.0)
     profileImageView.width(PROFILE_IMAGE_VIEW_HEIGHT)
     profileImageView.height(PROFILE_IMAGE_VIEW_HEIGHT)
+    profileImageView.bottomToSuperview(offset: -10.0)
     self.profileImageView = profileImageView
     
     //userNameLabel
