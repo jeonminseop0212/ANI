@@ -83,6 +83,8 @@
 		CD6762E020FD75AC0098E033 /* PickUpItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6762DF20FD75AC0098E033 /* PickUpItem.swift */; };
 		CD6B675120A8844B009BF63D /* ANIRecruitContributionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6B675020A8844B009BF63D /* ANIRecruitContributionView.swift */; };
 		CD6B675420A90F8A009BF63D /* ANIPlaceholderTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6B675320A90F8A009BF63D /* ANIPlaceholderTextView.swift */; };
+		CD70459E24307B2100CFDA93 /* ANIForgetPasswordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD70459D24307B2100CFDA93 /* ANIForgetPasswordViewController.swift */; };
+		CD7045A124307B7800CFDA93 /* ANIForgetPasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD7045A024307B7800CFDA93 /* ANIForgetPasswordView.swift */; };
 		CD7FD158221B988800BFEF11 /* ANIContributionCommentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD7FD157221B988800BFEF11 /* ANIContributionCommentView.swift */; };
 		CD85F558215F547300AB9A0C /* AniTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD85F557215F547300AB9A0C /* AniTests.swift */; };
 		CD92792220C0DCB400B1F006 /* ANIKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD92792120C0DCB400B1F006 /* ANIKey.swift */; };
@@ -313,6 +315,8 @@
 		CD6762DF20FD75AC0098E033 /* PickUpItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickUpItem.swift; sourceTree = "<group>"; };
 		CD6B675020A8844B009BF63D /* ANIRecruitContributionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIRecruitContributionView.swift; sourceTree = "<group>"; };
 		CD6B675320A90F8A009BF63D /* ANIPlaceholderTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIPlaceholderTextView.swift; sourceTree = "<group>"; };
+		CD70459D24307B2100CFDA93 /* ANIForgetPasswordViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIForgetPasswordViewController.swift; sourceTree = "<group>"; };
+		CD7045A024307B7800CFDA93 /* ANIForgetPasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIForgetPasswordView.swift; sourceTree = "<group>"; };
 		CD7FD157221B988800BFEF11 /* ANIContributionCommentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANIContributionCommentView.swift; sourceTree = "<group>"; };
 		CD85F555215F547200AB9A0C /* AniTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AniTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CD85F557215F547300AB9A0C /* AniTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AniTests.swift; sourceTree = "<group>"; };
@@ -812,6 +816,22 @@
 			path = PlaceholderTextView;
 			sourceTree = "<group>";
 		};
+		CD70459C24307B0300CFDA93 /* forgetPasswordViewController */ = {
+			isa = PBXGroup;
+			children = (
+				CD70459D24307B2100CFDA93 /* ANIForgetPasswordViewController.swift */,
+			);
+			path = forgetPasswordViewController;
+			sourceTree = "<group>";
+		};
+		CD70459F24307B6500CFDA93 /* forgetPasswordView */ = {
+			isa = PBXGroup;
+			children = (
+				CD7045A024307B7800CFDA93 /* ANIForgetPasswordView.swift */,
+			);
+			path = forgetPasswordView;
+			sourceTree = "<group>";
+		};
 		CD7FD156221B986300BFEF11 /* ContributionCommentView */ = {
 			isa = PBXGroup;
 			children = (
@@ -1139,6 +1159,7 @@
 		CDDD04B520B5381B0094DBFA /* Initial */ = {
 			isa = PBXGroup;
 			children = (
+				CD70459C24307B0300CFDA93 /* forgetPasswordViewController */,
 				CDDD04B120B50FCE0094DBFA /* InitialViewController */,
 				CDDD04B820B538400094DBFA /* LoginViewController */,
 				CDDD04BB20B539EE0094DBFA /* SignUpViewController */,
@@ -1183,6 +1204,7 @@
 		CDDD04C120B53C110094DBFA /* Initial */ = {
 			isa = PBXGroup;
 			children = (
+				CD70459F24307B6500CFDA93 /* forgetPasswordView */,
 				CDDD04BE20B53A7C0094DBFA /* InitialView */,
 				CDDD04C220B53C1A0094DBFA /* LoginView */,
 				CDDD04C320B53C760094DBFA /* SignUpView */,
@@ -2131,6 +2153,7 @@
 				CD08B5DC2217E40C00C0913E /* ANIPopularUsersView.swift in Sources */,
 				CDA97ACE20B0018600F46DA4 /* ANIProfileEditFamilyCell.swift in Sources */,
 				CDDC23B721098A6000C9A8E5 /* ANIPopupOptionView.swift in Sources */,
+				CD7045A124307B7800CFDA93 /* ANIForgetPasswordView.swift in Sources */,
 				CDA32A8620AE8DD4008A2AC1 /* ANIImageBrowserCell.swift in Sources */,
 				CDF7F171208F651E00254A0F /* ANIButtonView.swift in Sources */,
 				F57F7D8E20844C4E008A2645 /* ANISearchCategoryCell.swift in Sources */,
@@ -2140,6 +2163,7 @@
 				CD9E52B520943C9500715F50 /* ANIRecruitDetailImagesViewFlowLayout.swift in Sources */,
 				F5C381FF207A068D000BBB8C /* ANIQnaView.swift in Sources */,
 				CDBAB5F121E57AE1007AADF9 /* ANIParentCommentCell.swift in Sources */,
+				CD70459E24307B2100CFDA93 /* ANIForgetPasswordViewController.swift in Sources */,
 				CDF7F168208D772300254A0F /* ANINotificationManager.swift in Sources */,
 				CDA32A8320AE7B02008A2AC1 /* ANIImageBrowserViewController.swift in Sources */,
 				F5DF8367207A27E900EA7FBE /* ANIQnaViewCell.swift in Sources */,

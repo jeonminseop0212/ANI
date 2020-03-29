@@ -16,6 +16,7 @@ protocol ANILoginViewDelegate {
   func loginSuccess()
   func startAnimaing()
   func stopAnimating()
+  func forgetPassword()
 }
 
 class ANILoginView: UIView {
@@ -35,6 +36,8 @@ class ANILoginView: UIView {
   private let LOGIN_BUTTON_HEIGHT: CGFloat = 45.0
   private weak var loginButton: ANIAreaButtonView?
   private weak var loginButtonLabel: UILabel?
+  
+  private weak var forgetPasswordLabel: UILabel?
   
   private var selectedTextFieldMaxY: CGFloat?
   
@@ -105,7 +108,7 @@ class ANILoginView: UIView {
     emailTextField.font = UIFont.systemFont(ofSize: 18.0)
     emailTextField.textColor = ANIColor.dark
     emailTextField.backgroundColor = .clear
-    emailTextField.attributedPlaceholder = NSAttributedString(string: "IDまたはユーザーネーム", attributes: [NSAttributedString.Key.foregroundColor : UIColor.lightGray])
+    emailTextField.attributedPlaceholder = NSAttributedString(string: "メールアドレス", attributes: [NSAttributedString.Key.foregroundColor : UIColor.lightGray])
     emailTextField.returnKeyType = .done
     emailTextField.keyboardType = .emailAddress
     emailTextField.delegate = self
@@ -161,7 +164,6 @@ class ANILoginView: UIView {
     logButton.centerXToSuperview()
     logButton.width(190.0)
     logButton.height(LOGIN_BUTTON_HEIGHT)
-    logButton.bottomToSuperview(offset: -10)
     self.loginButton = logButton
 
     //loginButtonLabel
@@ -173,10 +175,27 @@ class ANILoginView: UIView {
     logButton.addContent(loginButtonLabel)
     loginButtonLabel.edgesToSuperview()
     self.loginButtonLabel = loginButtonLabel
+    
+    //forgetPasswordLabel
+    let forgetPasswordLabel = UILabel()
+    forgetPasswordLabel.font = UIFont.systemFont(ofSize: 13.0)
+    forgetPasswordLabel.textColor = ANIColor.darkGray
+    forgetPasswordLabel.text = "パスワードを忘れた方はこちら"
+    forgetPasswordLabel.isUserInteractionEnabled = true
+    forgetPasswordLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(forgetPasswordLabelTapped)))
+    contentView.addSubview(forgetPasswordLabel)
+    forgetPasswordLabel.topToBottom(of: logButton, offset: 12.0)
+    forgetPasswordLabel.centerXToSuperview()
+    forgetPasswordLabel.bottomToSuperview(offset: -10)
+    self.forgetPasswordLabel = forgetPasswordLabel
   }
   
   private func setupNotifications() {
     ANINotificationManager.receive(keyboardWillChangeFrame: self, selector: #selector(keyboardWillChangeFrame))
+  }
+  
+  @objc private func forgetPasswordLabelTapped() {
+    self.delegate?.forgetPassword()
   }
   
   @objc func keyboardWillChangeFrame(_ notification: Notification) {
@@ -203,42 +222,46 @@ extension ANILoginView: ANIButtonViewDelegate {
             let passwordTextField = self.passwordTextField,
             let password = passwordTextField.text else { return }
       
-      self.delegate?.startAnimaing()
-      
-      self.endEditing(true)
-      
-      Auth.auth().signIn(withEmail: email, password: password) { (successUser, error) in
-        if let errorUnrap = error {
-          let nsError = errorUnrap as NSError
-          
-          self.delegate?.stopAnimating()
-          
-          DLog("nsError \(nsError)")
-          if nsError.code == 17008 || nsError.code == 17011 {
-            self.delegate?.reject(notiText: "存在しないメールアドレスです！")
-          } else if nsError.code == 17009 {
-            self.delegate?.reject(notiText: "パスワードが違います！")
-          } else {
-            self.delegate?.reject(notiText: "ログインに失敗しました！")
-          }
-        } else {
-          if let currentUser = Auth.auth().currentUser {
-            if currentUser.isEmailVerified {
-              self.myTabBarController?.isLoadedUser = false
-              self.myTabBarController?.isLoadedFirstData = false
-              self.myTabBarController?.loadUser() {
-                self.delegate?.loginSuccess()
-                self.myTabBarController?.observeChatGroup()
-                
-                self.delegate?.stopAnimating()
-              }
-            } else {
-              self.delegate?.stopAnimating()
-              
-              self.delegate?.reject(notiText: "アドレスの認証メールを確認してください！")
-            }
+      if email == "" {
+        self.delegate?.reject(notiText: "メールアドレスを入力してください！")
+      } else if password == "" {
+        self.delegate?.reject(notiText: "パスワードを入力してください！")
+      } else {
+        self.delegate?.startAnimaing()
+        self.endEditing(true)
+        
+        Auth.auth().signIn(withEmail: email, password: password) { (successUser, error) in
+          if let errorUnrap = error {
+            let nsError = errorUnrap as NSError
             
-            self.endEditing(true)
+            self.delegate?.stopAnimating()
+            
+            if nsError.code == 17008 || nsError.code == 17011 {
+              self.delegate?.reject(notiText: "存在しないメールアドレスです！")
+            } else if nsError.code == 17009 {
+              self.delegate?.reject(notiText: "パスワードが違います！")
+            } else {
+              self.delegate?.reject(notiText: "ログインに失敗しました！")
+            }
+          } else {
+            if let currentUser = Auth.auth().currentUser {
+              if currentUser.isEmailVerified {
+                self.myTabBarController?.isLoadedUser = false
+                self.myTabBarController?.isLoadedFirstData = false
+                self.myTabBarController?.loadUser() {
+                  self.delegate?.loginSuccess()
+                  self.myTabBarController?.observeChatGroup()
+                  
+                  self.delegate?.stopAnimating()
+                }
+              } else {
+                self.delegate?.stopAnimating()
+                
+                self.delegate?.reject(notiText: "アドレスの認証メールを確認してください！")
+              }
+              
+              self.endEditing(true)
+            }
           }
         }
       }

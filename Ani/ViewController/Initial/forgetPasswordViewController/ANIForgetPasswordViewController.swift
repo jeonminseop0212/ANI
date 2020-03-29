@@ -1,23 +1,21 @@
 //
-//  ANILoginViewController.swift
+//  File.swift
 //  Ani
 //
-//  Created by jeonminseop on 2018/05/23.
-//  Copyright © 2018年 JeonMinseop. All rights reserved.
+//  Created by jeonminseop on 2020/03/29.
+//  Copyright © 2020 JeonMinseop. All rights reserved.
 //
 
 import UIKit
 import TinyConstraints
 
-class ANILoginViewController: UIViewController {
+class ANIForgetPasswordViewController: UIViewController {
   
   private weak var myNavigationBar: UIView?
   private weak var myNavigationBarBase: UIView?
   private weak var backButton: UIButton?
   
-  private var loginViewOriginalBottomConstraintConstant: CGFloat?
-  private var loginViewBottomConstraint: Constraint?
-  private weak var loginView: ANILoginView?
+  private weak var forgetPasswordView: ANIForgetPasswordView?
   
   private var rejectViewBottomConstraint: Constraint?
   private var rejectViewBottomConstraintOriginalConstant: CGFloat?
@@ -26,20 +24,10 @@ class ANILoginViewController: UIViewController {
   private weak var rejectLabel: UILabel?
   private var isRejectAnimating: Bool = false
   
-  var myTabBarController: ANITabBarController?
-  
   private weak var activityIndicatorView: ANIActivityIndicator?
   
   override func viewDidLoad() {
     setup()
-  }
-  
-  override func viewWillAppear(_ animated: Bool) {
-    setupNotifications()
-  }
-  
-  override func viewDidDisappear(_ animated: Bool) {
-    removeNotifications()
   }
   
   private func setup() {
@@ -78,17 +66,15 @@ class ANILoginViewController: UIViewController {
     backButton.centerYToSuperview()
     self.backButton = backButton
     
-    //loginView
-    let loginView = ANILoginView()
-    loginView.myTabBarController = myTabBarController
-    loginView.delegate = self
-    self.view.addSubview(loginView)
-    loginView.topToBottom(of: myNavigationBar)
-    loginView.leftToSuperview()
-    loginView.rightToSuperview()
-    loginViewBottomConstraint = loginView.bottomToSuperview()
-    rejectViewBottomConstraintOriginalConstant = loginViewBottomConstraint?.constant
-    self.loginView = loginView
+    //forgetPasswordView
+    let forgetPasswordView = ANIForgetPasswordView()
+    forgetPasswordView.delegate = self
+    self.view.addSubview(forgetPasswordView)
+    forgetPasswordView.topToBottom(of: myNavigationBar)
+    forgetPasswordView.leftToSuperview()
+    forgetPasswordView.rightToSuperview()
+    forgetPasswordView.bottomToSuperview()
+    self.forgetPasswordView = forgetPasswordView
     
     //rejectView
     let rejectView = UIView()
@@ -114,56 +100,11 @@ class ANILoginViewController: UIViewController {
     rejectLabel.textAlignment = .center
     rejectLabel.textColor = .white
     rejectLabel.font = UIFont.boldSystemFont(ofSize: 16.0)
-    rejectLabel.text = "ユーザーが見つかりません！"
+    rejectLabel.text = "登録されていないメールアドレスです！"
     rejectLabel.textAlignment = .center
     rejectBaseView.addSubview(rejectLabel)
     rejectLabel.edgesToSuperview()
     self.rejectLabel = rejectLabel
-    
-    //activityIndicatorView
-    let activityIndicatorView = ANIActivityIndicator()
-    activityIndicatorView.isFull = true
-    self.view.addSubview(activityIndicatorView)
-    activityIndicatorView.edgesToSuperview()
-    self.activityIndicatorView = activityIndicatorView
-  }
-  
-  private func setupNotifications() {
-    removeNotifications()
-    ANINotificationManager.receive(keyboardWillChangeFrame: self, selector: #selector(keyboardWillChangeFrame))
-    ANINotificationManager.receive(keyboardWillHide: self, selector: #selector(keyboardWillHide))
-  }
-  
-  private func removeNotifications() {
-    ANINotificationManager.remove(self)
-  }
-  
-  @objc private func keyboardWillChangeFrame(_ notification: Notification) {
-    guard let keyboardFrame = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
-          let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval,
-          let curve = notification.userInfo?[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt,
-          let loginViewBottomConstraint = self.loginViewBottomConstraint else { return }
-    
-    let h = keyboardFrame.height
-    
-    loginViewBottomConstraint.constant = -h
-    
-    UIView.animate(withDuration: duration, delay: 0, options: UIView.AnimationOptions(rawValue: curve), animations: {
-      self.view.layoutIfNeeded()
-    })
-  }
-  
-  @objc private func keyboardWillHide(_ notification: Notification) {
-    guard let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval,
-          let curve = notification.userInfo?[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt,
-          let loginViewOriginalBottomConstraintConstant = self.loginViewOriginalBottomConstraintConstant,
-          let loginViewBottomConstraint = self.loginViewBottomConstraint else { return }
-    
-    loginViewBottomConstraint.constant = loginViewOriginalBottomConstraintConstant
-    
-    UIView.animate(withDuration: duration, delay: 0, options: UIView.AnimationOptions(rawValue: curve), animations: {
-      self.view.layoutIfNeeded()
-    })
   }
   
   //MARK: action
@@ -172,15 +113,8 @@ class ANILoginViewController: UIViewController {
   }
 }
 
-//MARK: ANILoginViewDelegate
-extension ANILoginViewController: ANILoginViewDelegate {
-  func loginSuccess() {
-    ANINotificationManager.postLogin()
-
-    ANISessionManager.shared.isHiddenInitial = true
-    self.navigationController?.dismiss(animated: true, completion: nil)
-  }
-  
+//MARK: ANIForgetPasswordViewDelegate
+extension ANIForgetPasswordViewController: ANIForgetPasswordViewDelegate {
   func reject(notiText: String) {
     guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
           !isRejectAnimating,
@@ -211,10 +145,5 @@ extension ANILoginViewController: ANILoginViewDelegate {
   
   func stopAnimating() {
     self.activityIndicatorView?.stopAnimating()
-  }
-  
-  func forgetPassword() {
-    let forgetPasswordViewController = ANIForgetPasswordViewController()
-    self.navigationController?.pushViewController(forgetPasswordViewController, animated: true)
   }
 }
