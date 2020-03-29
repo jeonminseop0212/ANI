@@ -39,9 +39,9 @@ class ANISplashView: UIView {
     logoImageView.image = UIImage(named: "MYAULogo")
     logoImageView.contentMode = .scaleAspectFit
     backGroundImageView.addSubview(logoImageView)
-    logoImageView.centerXToSuperview(offset: 5.0)
+    logoImageView.centerXToSuperview()
     logoImageView.centerYToSuperview(offset: -40.0)
-    logoImageView.width(100.0)
+    logoImageView.width(80.0)
     self.logoImageView = logoImageView
     
     //activityIndicatorView
