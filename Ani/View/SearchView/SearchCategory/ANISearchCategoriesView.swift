@@ -17,7 +17,7 @@ class ANISearchCategoriesView: UIView {
   
   weak var categoryCollectionView: UICollectionView?
   
-  private var category = [SearchCategory.user.rawValue, SearchCategory.story.rawValue, SearchCategory.qna.rawValue]
+  private var category = [SearchCategory.user.rawValue, SearchCategory.qna.rawValue]
   
   var delegate: ANISearchCategoriesViewDelegate?
   

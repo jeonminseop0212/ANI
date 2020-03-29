@@ -9,6 +9,7 @@
 import UIKit
 import FirebaseFirestore
 import CodableFirebase
+import ActiveLabel
 
 protocol ANISupportViewDelegate {
   func supportButtonTapped()
@@ -128,23 +129,6 @@ class ANISupportView: UIView {
       }
     }
   }
-  
-  private func pushDataAlgolia(data: [String: AnyObject]) {
-    let index = ANISessionManager.shared.client.index(withName: KEY_STORIES_INDEX)
-    
-    var newData = data
-    if let objectId = data[KEY_ID] {
-      newData.updateValue(objectId, forKey: KEY_OBJECT_ID)
-    }
-    
-    DispatchQueue.global().async {
-      index.addObject(newData, completionHandler: { (content, error) -> Void in
-        if error == nil {
-          DLog("Object IDs: \(content!)")
-        }
-      })
-    }
-  }
 }
 
 //MARK: ANIButtonViewDelegate
@@ -159,7 +143,16 @@ extension ANISupportView: ANIButtonViewDelegate {
       let database = Firestore.firestore()
       let id = NSUUID().uuidString
       let date = ANIFunction.shared.getToday()
-      let story = FirebaseStory(id: id, storyImageUrls: nil, story: messageTextView.text, userId: uid, loveIds: nil, commentIds: nil, recruitId: recruitId, recruitTitle: recruit.title, recruitSubTitle: recruit.reason, date: date, isLoved: nil)
+      let activityLabel = ActiveLabel()
+      activityLabel.enabledTypes = [.hashtag]
+      activityLabel.text = messageTextView.text
+      
+      var hashtags = [String: String]()
+      for hashtagElement in activityLabel.hashtagElements {
+        hashtags[hashtagElement] = date
+      }
+      
+      let story = FirebaseStory(id: id, storyImageUrls: nil, storyVideoUrl: nil, thumbnailImageUrl: nil, story: messageTextView.text, userId: uid, recruitId: recruitId, recruitTitle: recruit.title, recruitSubTitle: recruit.reason, date: date, day: nil, isLoved: nil, hideUserIds: nil, loveCount: nil, hashtags: hashtags, comments: nil)
       
       DispatchQueue.global().async {
         do {
@@ -170,8 +163,6 @@ extension ANISupportView: ANIButtonViewDelegate {
               DLog("Error set document: \(error)")
               return
             }
-            
-            self.pushDataAlgolia(data: data as [String : AnyObject])
           }
         } catch let error {
           DLog(error)
@@ -179,7 +170,7 @@ extension ANISupportView: ANIButtonViewDelegate {
       }
       
       DispatchQueue.global().async {
-        database.collection(KEY_RECRUITS).document(recruitId).collection(KEY_SUPPORT_IDS).document(uid).setData([uid: true], options: .merge())
+        database.collection(KEY_RECRUITS).document(recruitId).collection(KEY_SUPPORT_IDS).document(uid).setData([uid: true])
       }
       
       updateNoti(storyId: id)

@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import FirebaseStorageUI
+import FirebaseUI
 
 protocol ANIFamilyViewDelegate {
   func presentImageBrowser(index: Int, imageUrls: [String])

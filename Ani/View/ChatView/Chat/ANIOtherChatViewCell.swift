@@ -52,6 +52,7 @@ class ANIOtherChatViewCell: UITableViewCell {
   
   private func setup() {
     self.selectionStyle = .none
+    self.backgroundColor = .white
     
     //stackView
     let stackView = UIStackView()
@@ -63,6 +64,7 @@ class ANIOtherChatViewCell: UITableViewCell {
     
     //dateLabelBG
     let dateLabelBG = UIView()
+    dateLabelBG.backgroundColor = .white
     stackView.addArrangedSubview(dateLabelBG)
     dateLabelBG.height(30)
     self.dateLabelBG = dateLabelBG
@@ -100,6 +102,7 @@ class ANIOtherChatViewCell: UITableViewCell {
     
     //base
     let base = UIView()
+    base.backgroundColor = .white
     stackView.addArrangedSubview(base)
     self.base = base
     
@@ -108,7 +111,7 @@ class ANIOtherChatViewCell: UITableViewCell {
     profileImageView.layer.cornerRadius = PROFILE_IMAGE_VIEW_HEIGHT / 2
     profileImageView.layer.masksToBounds = true
     profileImageView.isUserInteractionEnabled = true
-    profileImageView.backgroundColor = ANIColor.gray
+    profileImageView.backgroundColor = ANIColor.lightGray
     let tapGesture = UITapGestureRecognizer(target: self, action: #selector(profileTapped))
     profileImageView.addGestureRecognizer(tapGesture)
     base.addSubview(profileImageView)
@@ -120,7 +123,7 @@ class ANIOtherChatViewCell: UITableViewCell {
     
     //messageBG
     let messageBG = UIView()
-    messageBG.backgroundColor = ANIColor.bg
+    messageBG.backgroundColor = ANIColor.lightGray
     messageBG.layer.cornerRadius = 10.0
     messageBG.layer.masksToBounds = true
     base.addSubview(messageBG)
@@ -168,7 +171,8 @@ class ANIOtherChatViewCell: UITableViewCell {
     
     messageLabel.text = message.message
     
-    let suffixString = String(message.date.prefix(16))
+    let currentDate = ANIFunction.shared.getCurrentLocaleDateFromString(string: message.date)
+    let suffixString = String(currentDate.prefix(16))
     timeLabel.text = String(suffixString.suffix(5))
   }
   

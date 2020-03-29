@@ -30,9 +30,18 @@ class ANISignUpViewController: UIViewController {
   
   private let IMAGE_SIZE: CGSize = CGSize(width: 500.0, height: 500.0)
   
+  private weak var activityIndicatorView: ANIActivityIndicator?
+  
   override func viewDidLoad() {
     setup()
-    setupNotification()
+  }
+  
+  override func viewWillAppear(_ animated: Bool) {
+    setupNotifications()
+  }
+  
+  override func viewDidDisappear(_ animated: Bool) {
+    removeNotifications()
   }
   
   private func setup() {
@@ -110,11 +119,23 @@ class ANISignUpViewController: UIViewController {
     rejectBaseView.addSubview(rejectLabel)
     rejectLabel.edgesToSuperview()
     self.rejectLabel = rejectLabel
+    
+    //activityIndicatorView
+    let activityIndicatorView = ANIActivityIndicator()
+    activityIndicatorView.isFull = true
+    self.view.addSubview(activityIndicatorView)
+    activityIndicatorView.edgesToSuperview()
+    self.activityIndicatorView = activityIndicatorView
   }
   
-  private func setupNotification() {
+  private func setupNotifications() {
+    removeNotifications()
     ANINotificationManager.receive(keyboardWillChangeFrame: self, selector: #selector(keyboardWillChangeFrame))
     ANINotificationManager.receive(keyboardWillHide: self, selector: #selector(keyboardWillHide))
+  }
+  
+  private func removeNotifications() {
+    ANINotificationManager.remove(self)
   }
   
   @objc private func keyboardWillChangeFrame(_ notification: Notification) {
@@ -181,10 +202,13 @@ extension ANISignUpViewController: ANISignUpViewDelegate {
   }
   
   func donButtonTapped() {
+    ANISessionManager.shared.isHiddenInitial = true
     self.navigationController?.dismiss(animated: true, completion: nil)
   }
   
   func prifileImagePickButtonTapped() {
+    self.view.endEditing(true)
+    
     gallery = GalleryController()
     if let galleryUnrap = gallery {
       galleryUnrap.delegate = self
@@ -199,6 +223,7 @@ extension ANISignUpViewController: ANISignUpViewDelegate {
       Gallery.Config.Grid.previewRatio = 1.0
       
       let galleryNV = UINavigationController(rootViewController: galleryUnrap)
+      galleryNV.modalPresentationStyle = .fullScreen
       self.present(galleryNV, animated: true, completion: nil)
     }
   }
@@ -225,6 +250,14 @@ extension ANISignUpViewController: ANISignUpViewDelegate {
         self.isRejectAnimating = false
       })
     }
+  }
+  
+  func startAnimaing() {
+    self.activityIndicatorView?.startAnimating()
+  }
+  
+  func stopAnimating() {
+    self.activityIndicatorView?.stopAnimating()
   }
 }
 

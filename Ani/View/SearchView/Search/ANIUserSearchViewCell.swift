@@ -45,8 +45,8 @@ class ANIUserSearchViewCell: UITableViewCell {
   private func setup() {
     self.selectionStyle = .none
     self.isUserInteractionEnabled = true
-    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped))
-    self.addGestureRecognizer(tapGesture)
+    self.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped)))
+    self.backgroundColor = .white
     
     //stackView
     let stackView = UIStackView()
@@ -63,7 +63,7 @@ class ANIUserSearchViewCell: UITableViewCell {
     let profileImageView = UIImageView()
     profileImageView.layer.cornerRadius = PROFILE_IMAGE_VIEW_HEIGHT / 2
     profileImageView.layer.masksToBounds = true
-    profileImageView.backgroundColor = ANIColor.gray
+    profileImageView.backgroundColor = ANIColor.lightGray
     stackView.addArrangedSubview(profileImageView)
     profileImageView.width(PROFILE_IMAGE_VIEW_HEIGHT)
     profileImageView.height(PROFILE_IMAGE_VIEW_HEIGHT)
@@ -71,6 +71,7 @@ class ANIUserSearchViewCell: UITableViewCell {
     
     //userNameLabel
     let userNameLabel = UILabel()
+    userNameLabel.backgroundColor = .white
     userNameLabel.textColor = ANIColor.dark
     stackView.addArrangedSubview(userNameLabel)
     userNameLabel.centerY(to: profileImageView)
@@ -240,6 +241,7 @@ extension ANIUserSearchViewCell: ANIButtonViewDelegate {
             database.collection(KEY_USERS).document(userId).collection(KEY_FOLLOWER_IDS).document(currentUserUid).setData([KEY_DATE: date])
             
             self.updateNoti()
+            ANIFunction.shared.showReviewAlertFollow()
           }
           
           followButton.base?.backgroundColor = .clear

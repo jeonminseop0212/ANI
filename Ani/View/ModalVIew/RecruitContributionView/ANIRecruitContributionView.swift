@@ -8,7 +8,6 @@
 
 import UIKit
 import TinyConstraints
-import NVActivityIndicatorView
 
 protocol ANIRecruitContributionViewDelegate {
   func recruitContributeViewDidScroll(offset: CGFloat)
@@ -67,8 +66,8 @@ class ANIRecruitContributionView: UIView {
   private weak var passingBG: UIView?
   private weak var passingTextView: ANIPlaceHolderTextView?
   
-  private weak var activityIndicatorView: NVActivityIndicatorView?
-  
+  private weak var activityIndicatorView: ANIActivityIndicator?
+
   private let KEYBOARD_HIDE_TOOL_BAR_HEIGHT: CGFloat = 40.0
   
   var headerMinHeight: CGFloat?
@@ -548,11 +547,10 @@ class ANIRecruitContributionView: UIView {
     setHideButtonOnKeyboard(textView: passingTextView)
     
     //activityIndicatorView
-    let activityIndicatorView = NVActivityIndicatorView(frame: .zero, type: .lineScale, color: ANIColor.emerald, padding: 0)
-    addSubview(activityIndicatorView)
-    activityIndicatorView.width(40.0)
-    activityIndicatorView.height(40.0)
-    activityIndicatorView.centerInSuperview()
+    let activityIndicatorView = ANIActivityIndicator()
+    activityIndicatorView.isFull = false
+    self.addSubview(activityIndicatorView)
+    activityIndicatorView.edgesToSuperview()
     self.activityIndicatorView = activityIndicatorView
   }
   
@@ -575,7 +573,7 @@ class ANIRecruitContributionView: UIView {
     basicInfoSexLabel.text = "性別：" + recruit.sex
     basicInfoHomeLabel.text = "お家：" + recruit.home
     basicInfoVaccineLabel.text = "ワクチン：" + recruit.vaccine
-    basicInfoCastrationLabel.text = "去勢：" + recruit.vaccine
+    basicInfoCastrationLabel.text = "去勢：" + recruit.castration
     reasonTextView.text = recruit.reason
     introduceTextView.text = recruit.introduce
     passingTextView.text = recruit.passing
@@ -660,28 +658,38 @@ class ANIRecruitContributionView: UIView {
     return recruitInfo
   }
   
+  @objc private func hideKeyboard() {
+    self.endEditing(true)
+  }
+  
   //MARK: action
   @objc private func kindSelectButtonTapped() {
+    self.endEditing(true)
     self.delegate?.kindSelectButtonTapped()
   }
   
   @objc private func ageSelectButtonTapped() {
+    self.endEditing(true)
     self.delegate?.ageSelectButtonTapped()
   }
   
   @objc private func sexSelectButtonTapped() {
+    self.endEditing(true)
     self.delegate?.sexSelectButtonTapped()
   }
   
   @objc private func homeSelectButtonTapped() {
+    self.endEditing(true)
     self.delegate?.homeSelectButtonTapped()
   }
   
   @objc private func vaccineSelectButtonTapped() {
+    self.endEditing(true)
     self.delegate?.vaccineSelectButtonTapped()
   }
   
   @objc private func castrationSelectButtonTapped() {
+    self.endEditing(true)
     self.delegate?.castrationSelectButtonTapped()
   }
   
@@ -773,6 +781,8 @@ extension ANIRecruitContributionView: UIScrollViewDelegate {
 //MARK: ANIButtonViewDelegate
 extension ANIRecruitContributionView: ANIButtonViewDelegate {
   func buttonViewTapped(view: ANIButtonView) {
+    self.endEditing(true)
+    
     if view === self.headerImagePickupButton {
       self.delegate?.imagePickButtonTapped()
     }

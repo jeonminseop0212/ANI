@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import TinyConstraints
 
 enum FollowUserViewMode {
   case following;
@@ -19,6 +20,12 @@ class ANIFollowUserViewContoller: UIViewController {
   private weak var myNavigationBase: UIView?
   private weak var navigationTitleLabel: UILabel?
   private weak var backButton: UIButton?
+  
+  private var rejectViewBottomConstraint: Constraint?
+  private var rejectViewBottomConstraintOriginalConstant: CGFloat?
+  private weak var rejectView: ANIRejectView?
+  private var isRejectAnimating: Bool = false
+  private var rejectTapView: UIView?
   
   private weak var followUserView: ANIFollowUserView?
     
@@ -34,7 +41,7 @@ class ANIFollowUserViewContoller: UIViewController {
     setupNotifications()
   }
   
-  override func viewWillDisappear(_ animated: Bool) {
+  override func viewDidDisappear(_ animated: Bool) {
     removeNotifications()
   }
   
@@ -70,7 +77,7 @@ class ANIFollowUserViewContoller: UIViewController {
       }
     }
     navigationTitleLabel.textColor = ANIColor.dark
-    navigationTitleLabel.font = UIFont.boldSystemFont(ofSize: 17)
+    navigationTitleLabel.font = UIFont.boldSystemFont(ofSize: 16)
     myNavigationBase.addSubview(navigationTitleLabel)
     navigationTitleLabel.centerInSuperview()
     self.navigationTitleLabel = navigationTitleLabel
@@ -92,14 +99,38 @@ class ANIFollowUserViewContoller: UIViewController {
     let followUserView = ANIFollowUserView()
     followUserView.followUserViewMode = followUserViewMode
     followUserView.userId = userId
+    followUserView.delegate = self
     self.view.addSubview(followUserView)
     followUserView.topToBottom(of: myNavigationBar)
     followUserView.edgesToSuperview(excluding: .top)
     self.followUserView = followUserView
+    
+    //rejectView
+    let rejectView = ANIRejectView()
+    rejectView.setRejectText("ログインが必要です。")
+    self.view.addSubview(rejectView)
+    rejectViewBottomConstraint = rejectView.bottomToTop(of: self.view)
+    rejectViewBottomConstraintOriginalConstant = rejectViewBottomConstraint?.constant
+    rejectView.leftToSuperview()
+    rejectView.rightToSuperview()
+    self.rejectView = rejectView
+    
+    //rejectTapView
+    let rejectTapView = UIView()
+    rejectTapView.isUserInteractionEnabled = true
+    let rejectTapGesture = UITapGestureRecognizer(target: self, action: #selector(rejectViewTapped))
+    rejectTapView.addGestureRecognizer(rejectTapGesture)
+    rejectTapView.isHidden = true
+    rejectTapView.backgroundColor = .clear
+    self.view.addSubview(rejectTapView)
+    rejectTapView.size(to: rejectView)
+    rejectTapView.topToSuperview()
+    self.rejectTapView = rejectTapView
   }
   
   //MARK: Notifications
   private func setupNotifications() {
+    removeNotifications()
     ANINotificationManager.receive(profileImageViewTapped: self, selector: #selector(pushOtherProfile))
   }
   
@@ -126,5 +157,41 @@ class ANIFollowUserViewContoller: UIViewController {
   //MARK: action
   @objc private func back() {
     self.navigationController?.popViewController(animated: true)
+  }
+  
+  @objc private func rejectViewTapped() {
+    let initialViewController = ANIInitialViewController()
+    initialViewController.myTabBarController = self.tabBarController as? ANITabBarController
+    let navigationController = UINavigationController(rootViewController: initialViewController)
+    navigationController.modalPresentationStyle = .fullScreen
+    self.present(navigationController, animated: true, completion: nil)
+  }
+}
+
+//MARK: ANIFollowUserViewDeleate
+extension ANIFollowUserViewContoller: ANIFollowUserViewDeleate {
+  func reject() {
+    guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
+          !isRejectAnimating,
+          let rejectTapView = self.rejectTapView else { return }
+    
+    rejectViewBottomConstraint.constant = UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    rejectTapView.isHidden = false
+    
+    UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut, animations: {
+      self.isRejectAnimating = true
+      self.view.layoutIfNeeded()
+    }) { (complete) in
+      guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
+        let rejectViewBottomConstraintOriginalConstant = self.rejectViewBottomConstraintOriginalConstant else { return }
+      
+      rejectViewBottomConstraint.constant = rejectViewBottomConstraintOriginalConstant
+      UIView.animate(withDuration: 0.3, delay: 1.0, options: .curveEaseInOut, animations: {
+        self.view.layoutIfNeeded()
+      }, completion: { (complete) in
+        self.isRejectAnimating = false
+        rejectTapView.isHidden = true
+      })
+    }
   }
 }

@@ -10,11 +10,13 @@ import UIKit
 import FirebaseFirestore
 import FirebaseAuth
 import CodableFirebase
-import NVActivityIndicatorView
 
 protocol ANILoginViewDelegate {
   func reject(notiText: String)
   func loginSuccess()
+  func startAnimaing()
+  func stopAnimating()
+  func forgetPassword()
 }
 
 class ANILoginView: UIView {
@@ -35,7 +37,11 @@ class ANILoginView: UIView {
   private weak var loginButton: ANIAreaButtonView?
   private weak var loginButtonLabel: UILabel?
   
+  private weak var forgetPasswordLabel: UILabel?
+  
   private var selectedTextFieldMaxY: CGFloat?
+  
+  var myTabBarController: ANITabBarController?
   
   var delegate: ANILoginViewDelegate?
   
@@ -43,7 +49,7 @@ class ANILoginView: UIView {
     super.init(frame: frame)
     
     setup()
-    setupNotification()
+    setupNotifications()
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -102,7 +108,7 @@ class ANILoginView: UIView {
     emailTextField.font = UIFont.systemFont(ofSize: 18.0)
     emailTextField.textColor = ANIColor.dark
     emailTextField.backgroundColor = .clear
-    emailTextField.placeholder = "IDまたはユーザーネーム"
+    emailTextField.attributedPlaceholder = NSAttributedString(string: "メールアドレス", attributes: [NSAttributedString.Key.foregroundColor : UIColor.lightGray])
     emailTextField.returnKeyType = .done
     emailTextField.keyboardType = .emailAddress
     emailTextField.delegate = self
@@ -138,7 +144,7 @@ class ANILoginView: UIView {
     passwordTextField.font = UIFont.systemFont(ofSize: 18.0)
     passwordTextField.textColor = ANIColor.dark
     passwordTextField.backgroundColor = .clear
-    passwordTextField.placeholder = "パスワード"
+    passwordTextField.attributedPlaceholder = NSAttributedString(string: "パスワード", attributes: [NSAttributedString.Key.foregroundColor : UIColor.lightGray])
     passwordTextField.returnKeyType = .done
     passwordTextField.isSecureTextEntry = true
     passwordTextField.delegate = self
@@ -158,7 +164,6 @@ class ANILoginView: UIView {
     logButton.centerXToSuperview()
     logButton.width(190.0)
     logButton.height(LOGIN_BUTTON_HEIGHT)
-    logButton.bottomToSuperview(offset: -10)
     self.loginButton = logButton
 
     //loginButtonLabel
@@ -170,10 +175,27 @@ class ANILoginView: UIView {
     logButton.addContent(loginButtonLabel)
     loginButtonLabel.edgesToSuperview()
     self.loginButtonLabel = loginButtonLabel
+    
+    //forgetPasswordLabel
+    let forgetPasswordLabel = UILabel()
+    forgetPasswordLabel.font = UIFont.systemFont(ofSize: 13.0)
+    forgetPasswordLabel.textColor = ANIColor.darkGray
+    forgetPasswordLabel.text = "パスワードを忘れた方はこちら"
+    forgetPasswordLabel.isUserInteractionEnabled = true
+    forgetPasswordLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(forgetPasswordLabelTapped)))
+    contentView.addSubview(forgetPasswordLabel)
+    forgetPasswordLabel.topToBottom(of: logButton, offset: 12.0)
+    forgetPasswordLabel.centerXToSuperview()
+    forgetPasswordLabel.bottomToSuperview(offset: -10)
+    self.forgetPasswordLabel = forgetPasswordLabel
   }
   
-  private func setupNotification() {
+  private func setupNotifications() {
     ANINotificationManager.receive(keyboardWillChangeFrame: self, selector: #selector(keyboardWillChangeFrame))
+  }
+  
+  @objc private func forgetPasswordLabelTapped() {
+    self.delegate?.forgetPassword()
   }
   
   @objc func keyboardWillChangeFrame(_ notification: Notification) {
@@ -200,74 +222,46 @@ extension ANILoginView: ANIButtonViewDelegate {
             let passwordTextField = self.passwordTextField,
             let password = passwordTextField.text else { return }
       
-      let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.emerald)
-      NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData, nil)
-      
-      self.endEditing(true)
-      
-      Auth.auth().signIn(withEmail: email, password: password) { (successUser, error) in
-        if let errorUnrap = error {
-          let nsError = errorUnrap as NSError
-          
-          NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
-
-          DLog("nsError \(nsError)")
-          if nsError.code == 17008 || nsError.code == 17011 {
-            self.delegate?.reject(notiText: "存在しないメールアドレスです！")
-          } else if nsError.code == 17009 {
-            self.delegate?.reject(notiText: "パスワードが違います！")
-          } else {
-            self.delegate?.reject(notiText: "ログインに失敗しました！")
-          }
-        } else {
-          if let currentUser = Auth.auth().currentUser {
-            if currentUser.isEmailVerified {
-              let database = Firestore.firestore()
-              
-              ANISessionManager.shared.currentUserUid = Auth.auth().currentUser?.uid
-              if let currentUserUid = ANISessionManager.shared.currentUserUid, let fcmToken = UserDefaults.standard.string(forKey: KEY_FCM_TOKEN) {
-                database.collection(KEY_USERS).document(currentUserUid).updateData([KEY_FCM_TOKEN: fcmToken], completion: { (error) in
-                  if let error = error {
-                    DLog("fcm token update error: \(error)")
-                    
-                    return
-                  }
-                  
-                  DispatchQueue.global().async {
-                    database.collection(KEY_USERS).document(currentUserUid).addSnapshotListener({ (snapshot, error) in
-                      if let error = error {
-                        DLog("Error adding document: \(error)")
-                        
-                        return
-                      }
-                      
-                      guard let snapshot = snapshot, let value = snapshot.data() else { return }
-                      
-                      do {
-                        let user = try FirestoreDecoder().decode(FirebaseUser.self, from: value)
-                        
-                        DispatchQueue.main.async {
-                          ANISessionManager.shared.currentUser = user
-                          ANISessionManager.shared.isAnonymous = false
-                          self.delegate?.loginSuccess()
-                          
-                          NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
-                        }
-                      } catch let error {
-                        DLog(error)
-                        NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
-                      }
-                    })
-                  }
-                })
-              }
-            } else {
-              NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
-              
-              self.delegate?.reject(notiText: "アドレスの認証メールを確認してください！")
-            }
+      if email == "" {
+        self.delegate?.reject(notiText: "メールアドレスを入力してください！")
+      } else if password == "" {
+        self.delegate?.reject(notiText: "パスワードを入力してください！")
+      } else {
+        self.delegate?.startAnimaing()
+        self.endEditing(true)
+        
+        Auth.auth().signIn(withEmail: email, password: password) { (successUser, error) in
+          if let errorUnrap = error {
+            let nsError = errorUnrap as NSError
             
-            self.endEditing(true)
+            self.delegate?.stopAnimating()
+            
+            if nsError.code == 17008 || nsError.code == 17011 {
+              self.delegate?.reject(notiText: "存在しないメールアドレスです！")
+            } else if nsError.code == 17009 {
+              self.delegate?.reject(notiText: "パスワードが違います！")
+            } else {
+              self.delegate?.reject(notiText: "ログインに失敗しました！")
+            }
+          } else {
+            if let currentUser = Auth.auth().currentUser {
+              if currentUser.isEmailVerified {
+                self.myTabBarController?.isLoadedUser = false
+                self.myTabBarController?.isLoadedFirstData = false
+                self.myTabBarController?.loadUser() {
+                  self.delegate?.loginSuccess()
+                  self.myTabBarController?.observeChatGroup()
+                  
+                  self.delegate?.stopAnimating()
+                }
+              } else {
+                self.delegate?.stopAnimating()
+                
+                self.delegate?.reject(notiText: "アドレスの認証メールを確認してください！")
+              }
+              
+              self.endEditing(true)
+            }
           }
         }
       }

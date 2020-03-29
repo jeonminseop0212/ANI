@@ -12,6 +12,8 @@ import FirebaseFirestore
 import CodableFirebase
 import FirebaseStorage
 import InstantSearchClient
+import AVKit
+import SafariServices
 
 class ANICommunityViewController: UIViewController {
   
@@ -27,10 +29,15 @@ class ANICommunityViewController: UIViewController {
   private var isRejectAnimating: Bool = false
   private var rejectTapView: UIView?
   
+  private weak var uploadProgressView: ANIUploadProgressView?
+  
   private var selectedIndex: Int = 0
   
+  private var isMe: Bool?
   private var contentType: ContentType?
   private var contributionId: String?
+  
+  private weak var activityIndicatorView: ANIActivityIndicator?
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -38,13 +45,38 @@ class ANICommunityViewController: UIViewController {
   }
   
   override func viewWillAppear(_ animated: Bool) {
-    UIApplication.shared.statusBarStyle = .default
+    if #available(iOS 13.0, *) {
+      UIApplication.shared.statusBarStyle = .darkContent
+    } else {
+      UIApplication.shared.statusBarStyle = .default
+    }
     UIApplication.shared.isStatusBarHidden = false
-    setupNotification()
+    setupNotifications()
+    
+    do {
+      try AVAudioSession.sharedInstance().setCategory(.ambient, mode: .default)
+    } catch {
+      DLog("AVAudioSession catgery set error \(error)")
+    }
+    
+    playVideo()
+  }
+  
+  override func viewDidAppear(_ animated: Bool) {
+    if !ANISessionManager.shared.isShowEvent {
+      showEventIfNeeded()
+    }
   }
   
   override func viewWillDisappear(_ animated: Bool) {
+    stopVideo()
+  }
+  
+  override func viewDidDisappear(_ animated: Bool) {
     removeNotifications()
+    
+    ANIStoryView.endRefresh()
+    ANIQnaView.endRefresh()
   }
   
   private func setup() {
@@ -96,7 +128,11 @@ class ANICommunityViewController: UIViewController {
     contributionButon.width(CONTRIBUTION_BUTTON_HEIGHT)
     contributionButon.height(CONTRIBUTION_BUTTON_HEIGHT)
     contributionButon.rightToSuperview(offset: -15.0)
-    contributionButon.bottomToSuperview(offset: -15.0, usingSafeArea: true)
+    var tabBarHeight: CGFloat = 0.0
+    if let tabBarController = self.tabBarController {
+      tabBarHeight = tabBarController.tabBar.height
+    }
+    contributionButon.bottomToSuperview(offset: -(15.0 + tabBarHeight))
     self.contributionButon = contributionButon
     
     //rejectView
@@ -120,12 +156,99 @@ class ANICommunityViewController: UIViewController {
     rejectTapView.size(to: rejectView)
     rejectTapView.topToSuperview()
     self.rejectTapView = rejectTapView
+    
+    //uploadProgressView
+    let uploadProgressView = ANIUploadProgressView()
+    uploadProgressView.alpha = 0.95
+    uploadProgressView.isHidden = true
+    uploadProgressView.delegate = self
+    self.view.addSubview(uploadProgressView)
+    uploadProgressView.topToBottom(of: menuBar)
+    uploadProgressView.leftToSuperview()
+    uploadProgressView.rightToSuperview()
+    uploadProgressView.height(50.0)
+    self.uploadProgressView = uploadProgressView
+
+    //activityIndicatorView
+    let activityIndicatorView = ANIActivityIndicator()
+    activityIndicatorView.isFull = true
+    self.tabBarController?.view.addSubview(activityIndicatorView)
+    activityIndicatorView.edgesToSuperview()
+    self.activityIndicatorView = activityIndicatorView
+  }
+  
+  func playVideo() {
+    guard let containerCollectionView = self.containerCollectionView else { return }
+    
+    for visibleCell in containerCollectionView.visibleCells {
+      if let communityStoryCell = visibleCell as? ANICommunityStoryCell {
+        communityStoryCell.playVideo()
+      }
+    }
+  }
+  
+  private func stopVideo() {
+    guard let containerCollectionView = self.containerCollectionView else { return }
+    
+    for visibleCell in containerCollectionView.visibleCells {
+      if let communityStoryCell = visibleCell as? ANICommunityStoryCell {
+        communityStoryCell.stopVideo()
+      }
+    }
+  }
+  
+  private func showEventIfNeeded() {
+    let database = Firestore.firestore()
+    
+    let userDefaults = UserDefaults.standard
+    
+    if ANISessionManager.shared.isHiddenInitial && ANISessionManager.shared.isHiddenSplash {
+      DispatchQueue.global().async {
+        database.collection(KEY_EVENTS).getDocuments(completion: { (snapshot, error) in
+          if let error = error {
+            DLog("get event document error \(error)")
+            return
+          }
+          
+          guard let snapshot = snapshot else { return }
+          
+          for document in snapshot.documents {
+            do {
+              let event = try FirestoreDecoder().decode(FirebaseEvent.self, from: document.data())
+              
+              if userDefaults.object(forKey: KEY_SHOW_EVENT) == nil {
+                let showEvents = [Int]()
+                userDefaults.set(showEvents, forKey: KEY_SHOW_EVENT)
+              }
+              
+              if let eventId = Int(event.id),
+                let showEvents = userDefaults.object(forKey: KEY_SHOW_EVENT) as? [Int],
+                !showEvents.contains(eventId) {
+                let eventPopupViewController = ANIEventPopupViewController()
+                eventPopupViewController.event = event
+                eventPopupViewController.modalPresentationStyle = .overCurrentContext
+                self.tabBarController?.present(eventPopupViewController, animated: false, completion: nil)
+                
+                userDefaults.set([eventId], forKey: KEY_SHOW_EVENT)
+                
+                ANISessionManager.shared.isShowEvent = true
+              }
+            } catch let error {
+              DLog(error)
+            }
+          }
+        })
+      }
+    }
   }
   
   //MAKR: notification
-  private func setupNotification() {
+  private func setupNotifications() {
+    removeNotifications()
     ANINotificationManager.receive(imageCellTapped: self, selector: #selector(presentImageBrowser(_:)))
     ANINotificationManager.receive(profileImageViewTapped: self, selector: #selector(pushOtherProfile))
+    ANINotificationManager.receive(tapHashtag: self, selector: #selector(pushHashtagList))
+    ANINotificationManager.receive(tapUrl: self, selector: #selector(pushSafari))
   }
   
   private func removeNotifications() {
@@ -161,10 +284,40 @@ class ANICommunityViewController: UIViewController {
     self.tabBarController?.present(imageBrowserViewController, animated: false, completion: nil)
   }
   
+  @objc private func pushHashtagList(_ notification: NSNotification) {
+    if let userInfo = notification.userInfo,
+      let contributionKind = userInfo[KEY_CONTRIBUTION_KIND] as? String,
+      let hashtag = userInfo[KEY_HASHTAG] as? String {
+      let hashtagListViewController = ANIHashtagListViewController()
+      hashtagListViewController.hashtag = hashtag
+      if contributionKind == KEY_CONTRIBUTION_KIND_STROY {
+        hashtagListViewController.hashtagList = .story
+      } else if contributionKind == KEY_CONTRIBUTION_KIND_QNA {
+        hashtagListViewController.hashtagList = .question
+      }
+      hashtagListViewController.hidesBottomBarWhenPushed = true
+      self.navigationController?.pushViewController(hashtagListViewController, animated: true)
+    }
+  }
+  
+  @objc private func pushSafari(_ notification: NSNotification) {
+    if let userInfo = notification.userInfo,
+       let url = userInfo[KEY_URL] as? String {
+      let webUrlString = ANIFunction.shared.webURLScheme(urlString: url)
+      
+      if let webUrl = URL(string: webUrlString) {
+        let safariViewController = SFSafariViewController(url: webUrl)
+        self.present(safariViewController, animated: true, completion: nil)
+      }
+    }
+  }
+  
   //action
   @objc private func rejectViewTapped() {
     let initialViewController = ANIInitialViewController()
+    initialViewController.myTabBarController = self.tabBarController as? ANITabBarController
     let navigationController = UINavigationController(rootViewController: initialViewController)
+    navigationController.modalPresentationStyle = .fullScreen
     self.present(navigationController, animated: true, completion: nil)
   }
 }
@@ -180,6 +333,7 @@ extension ANICommunityViewController: UICollectionViewDataSource {
     if indexPath.item == 0 {
       let storyId = NSStringFromClass(ANICommunityStoryCell.self)
       let cell = collectionView.dequeueReusableCell(withReuseIdentifier: storyId, for: indexPath) as! ANICommunityStoryCell
+      
       cell.frame.origin.y = collectionView.frame.origin.y
       cell.delegate = self
       return cell
@@ -204,8 +358,8 @@ extension ANICommunityViewController: UICollectionViewDelegateFlowLayout {
 //MARK: UICollectionViewDelegate
 extension ANICommunityViewController: UICollectionViewDelegate {
   func scrollViewDidScroll(_ scrollView: UIScrollView) {
-    guard let menuBar = self.menuBar, let horizontalBarleftConstraint = menuBar.horizontalBarleftConstraint else { return }
-    horizontalBarleftConstraint.constant = scrollView.contentOffset.x / 2
+    guard let menuBar = self.menuBar, let horizontalBarBaseleftConstraint = menuBar.horizontalBarBaseleftConstraint else { return }
+    horizontalBarBaseleftConstraint.constant = scrollView.contentOffset.x / 2
   }
   
   func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
@@ -243,13 +397,17 @@ extension ANICommunityViewController: ANIButtonViewDelegate{
           let contributionViewController = ANIContributionViewController()
           contributionViewController.navigationTitle = "STORY"
           contributionViewController.selectedContributionMode = ContributionMode.story
+          contributionViewController.delegate = self
           let contributionNV = UINavigationController(rootViewController: contributionViewController)
+          contributionNV.modalPresentationStyle = .fullScreen
           self.present(contributionNV, animated: true, completion: nil)
         } else {
           let contributionViewController = ANIContributionViewController()
           contributionViewController.navigationTitle = "Q&A"
           contributionViewController.selectedContributionMode = ContributionMode.qna
+          contributionViewController.delegate = self
           let contributionNV = UINavigationController(rootViewController: contributionViewController)
+          contributionNV.modalPresentationStyle = .fullScreen
           self.present(contributionNV, animated: true, completion: nil)
         }
       } else {
@@ -270,7 +428,7 @@ extension ANICommunityViewController: ANICommunityMenuBarDelegate {
 
 //MARK: ANIStoryViewDelegate
 extension ANICommunityViewController: ANIStoryViewDelegate {
-  func storyViewCellDidSelect(selectedStory: FirebaseStory, user: FirebaseUser) {
+  func didSelectStoryViewCell(selectedStory: FirebaseStory, user: FirebaseUser) {
     let commentViewController = ANICommentViewController()
     commentViewController.hidesBottomBarWhenPushed = true
     commentViewController.commentMode = CommentMode.story
@@ -313,14 +471,44 @@ extension ANICommunityViewController: ANIStoryViewDelegate {
   }
   
   func popupOptionView(isMe: Bool, contentType: ContentType, id: String) {
+    self.isMe = isMe
     self.contentType = contentType
     self.contributionId = id
     
     let popupOptionViewController = ANIPopupOptionViewController()
     popupOptionViewController.modalPresentationStyle = .overCurrentContext
     popupOptionViewController.isMe = isMe
+    if !isMe {
+      popupOptionViewController.options = ["非表示"]
+      if contentType == ContentType.story {
+        popupOptionViewController.options?.insert("シェア", at: 0)
+      } else if contentType == ContentType.qna {
+        popupOptionViewController.options?.insert("シェア", at: 0)
+      }
+    } else {
+      if contentType == ContentType.story {
+        popupOptionViewController.options = ["シェア"]
+      } else if contentType == ContentType.qna {
+        popupOptionViewController.options = ["シェア"]
+      }
+    }
     popupOptionViewController.delegate = self
     self.tabBarController?.present(popupOptionViewController, animated: false, completion: nil)
+  }
+  
+  func didSelectRankingCell(rankingStory: FirebaseStory, ranking: Int) {
+    let rankingStoryDetailViewController = ANIRankingStoryDetailViewController()
+    rankingStoryDetailViewController.hidesBottomBarWhenPushed = true
+    rankingStoryDetailViewController.rankingStory = rankingStory
+    rankingStoryDetailViewController.ranking = ranking
+    self.navigationController?.pushViewController(rankingStoryDetailViewController, animated: true)
+  }
+  
+  func showEvent(event: FirebaseEvent) {
+    let eventPopupViewController = ANIEventPopupViewController()
+    eventPopupViewController.event = event
+    eventPopupViewController.modalPresentationStyle = .overCurrentContext
+    self.tabBarController?.present(eventPopupViewController, animated: false, completion: nil)
   }
 }
 
@@ -339,7 +527,11 @@ extension ANICommunityViewController: ANIQnaViewDelegate {
 //MARK: ANIImageBrowserViewControllerDelegate
 extension ANICommunityViewController: ANIImageBrowserViewControllerDelegate {
   func imageBrowserDidDissmiss() {
-    UIApplication.shared.statusBarStyle = .default
+    if #available(iOS 13.0, *) {
+      UIApplication.shared.statusBarStyle = .darkContent
+    } else {
+      UIApplication.shared.statusBarStyle = .default
+    }
   }
 }
 
@@ -378,6 +570,204 @@ extension ANICommunityViewController: ANIPopupOptionViewControllerDelegate {
   }
   
   func optionTapped(index: Int) {
+    guard let isMe = self.isMe,
+          let contentType = self.contentType,
+          let contributionId = self.contributionId else { return }
+    
+    var alertTitle = ""
+    var alertMessage = ""
+    var collection = ""
+    
+    if contentType == .story {
+      if isMe {
+        if index == 0 {
+          let activityItems = [ANIActivityItemSorce(shareContent: "#ミャウ #MYAU #猫 #ねこ #猫好き\nhttps://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/story/\(contributionId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU")]
+          let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+          self.present(activityViewController, animated: true)
+        }
+      } else {
+        if index == 0 {
+          let activityItems = [ANIActivityItemSorce(shareContent: "#ミャウ #MYAU #猫 #ねこ #猫好き\nhttps://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/story/\(contributionId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU")]
+          let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+          self.present(activityViewController, animated: true)
+        } else if index == 1 {
+          alertTitle = "このストーリーを非表示にしますか？"
+          alertMessage = "非表示にしたストーリーはアプリの中で見えなくなります。後から非表示を解除することは出来ません。"
+          collection = KEY_STORIES
+          
+          self.hideContribution(contentType: contentType, collection: collection, contributionId: contributionId, title: alertTitle, message: alertMessage)
+        }
+      }
+    } else if contentType == .qna {
+      if isMe {
+        if index == 0 {
+          let activityItems = [ANIActivityItemSorce(shareContent: "#ミャウ #MYAU #猫 #ねこ #猫好き\nhttps://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/qna/\(contributionId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU")]
+          let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+          self.present(activityViewController, animated: true)
+        }
+      } else {
+        if index == 0 {
+          let activityItems = [ANIActivityItemSorce(shareContent: "#ミャウ #MYAU #猫 #ねこ #猫好き\nhttps://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/qna/\(contributionId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU")]
+          let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+          self.present(activityViewController, animated: true)
+        } else if index == 1 {
+          alertTitle = "この質問を非表示にしますか？"
+          alertMessage = "非表示にした質問はアプリの中で見えなくなります。後から非表示を解除することは出来ません。"
+          collection = KEY_QNAS
+          
+          self.hideContribution(contentType: contentType, collection: collection, contributionId: contributionId, title: alertTitle, message: alertMessage)
+        }
+      }
+    }
+  }
+  
+  private func hideContribution(contentType: ContentType, collection: String, contributionId: String, title: String, message: String) {
+    guard let currentUserId = ANISessionManager.shared.currentUserUid else {
+      self.reject()
+      return
+    }
+    
+    let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+    
+    let hideAction = UIAlertAction(title: "非表示", style: .default) { (action) in
+      let database = Firestore.firestore()
+      
+      self.activityIndicatorView?.startAnimating()
+      
+      DispatchQueue.global().async {
+        database.collection(collection).document(contributionId).getDocument(completion: { (snapshot, error) in
+          if let error = error {
+            DLog("Error get document: \(error)")
+            return
+          }
+          
+          guard let snapshot = snapshot, let data = snapshot.data() else { return }
+          
+          if contentType == .story {
+            do {
+              let story = try FirestoreDecoder().decode(FirebaseStory.self, from: data)
+              
+              if let hideUserIds = story.hideUserIds {
+                var hideUserIdsTemp = hideUserIds
+                hideUserIdsTemp.append(currentUserId)
+                
+                database.collection(collection).document(contributionId).updateData([KEY_HIDE_USER_IDS: hideUserIdsTemp])
+                
+                self.updateDataAlgolia(objectId: contributionId, data: [KEY_HIDE_USER_IDS: hideUserIdsTemp as AnyObject], indexName: KEY_STORIES_INDEX)
+              } else {
+                let hideUserIds = [currentUserId]
+                
+                database.collection(collection).document(contributionId).updateData([KEY_HIDE_USER_IDS: hideUserIds])
+                
+                self.updateDataAlgolia(objectId: contributionId, data: [KEY_HIDE_USER_IDS: hideUserIds as AnyObject], indexName: KEY_STORIES_INDEX)
+              }
+              
+              DispatchQueue.main.async {
+                self.activityIndicatorView?.stopAnimating()
+                
+                ANINotificationManager.postDeleteStory(id: contributionId)
+              }
+            } catch let error {
+              DLog(error)
+            }
+          } else if contentType == .qna {
+            do {
+              let qna = try FirestoreDecoder().decode(FirebaseQna.self, from: data)
+              
+              if let hideUserIds = qna.hideUserIds {
+                var hideUserIdsTemp = hideUserIds
+                hideUserIdsTemp.append(currentUserId)
+                
+                database.collection(collection).document(contributionId).updateData([KEY_HIDE_USER_IDS: hideUserIdsTemp])
+                
+                self.updateDataAlgolia(objectId: contributionId, data: [KEY_HIDE_USER_IDS: hideUserIdsTemp as AnyObject], indexName: KEY_QNAS_INDEX)
+              } else {
+                let hideUserIds = [currentUserId]
+                
+                database.collection(collection).document(contributionId).updateData([KEY_HIDE_USER_IDS: hideUserIds])
+                
+                self.updateDataAlgolia(objectId: contributionId, data: [KEY_HIDE_USER_IDS: hideUserIds as AnyObject], indexName: KEY_QNAS_INDEX)
+              }
+              
+              DispatchQueue.main.async {
+                self.activityIndicatorView?.stopAnimating()
+                
+                ANINotificationManager.postDeleteQna(id: contributionId)
+              }
+            } catch let error {
+              DLog(error)
+            }
+          }
+        })
+      }
+    }
+    let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
+    
+    alertController.addAction(hideAction)
+    alertController.addAction(cancelAction)
+    
+    self.present(alertController, animated: true, completion: nil)
+  }
+  
+  private func updateDataAlgolia(objectId: String, data: [String: AnyObject], indexName: String) {
+    let index = ANISessionManager.shared.client.index(withName: indexName)
+    
+    DispatchQueue.global().async {
+      index.partialUpdateObject(data, withID: objectId, completionHandler: { (content, error) -> Void in
+        if error == nil {
+          DLog("Object IDs: \(content!)")
+        }
+      })
+    }
+  }
+}
+
+//MARK: UIGestureRecognizerDelegate
+extension ANICommunityViewController: UIGestureRecognizerDelegate {
+  func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+    return true
+  }
+}
+
+//MARK: ANIContributionViewControllerDelegate
+extension ANICommunityViewController: ANIContributionViewControllerDelegate {
+  func loadThumnailImage(thumbnailImage: UIImage?) {
+    guard let uploadProgressView = self.uploadProgressView,
+          let thumbnailImageView = uploadProgressView.thumbnailImageView else { return }
+
+    if let thumbnailImage = thumbnailImage {
+      thumbnailImageView.image = thumbnailImage
+      thumbnailImageView.isHidden = false
+    } else {
+      thumbnailImageView.image = nil
+      thumbnailImageView.isHidden = true
+    }
+  }
+  
+  func updateProgress(progress: CGFloat) {
+    guard let uploadProgressView = self.uploadProgressView else { return }
+    
+    uploadProgressView.updateProgress(progress: progress)
+    
+    if progress != 1.0 {
+      UIView.animate(withDuration: 0.2) {
+        uploadProgressView.alpha = 0.95
+      }
+      uploadProgressView.isHidden = false
+    }
+  }
+}
+
+//MARK: ANIUploadProgressViewDelegate
+extension ANICommunityViewController: ANIUploadProgressViewDelegate {
+  func completeProgress() {
+    guard let uploadProgressView = self.uploadProgressView else { return }
+    
+    UIView.animate(withDuration: 0.2, animations: {
+      uploadProgressView.alpha = 0.0
+    }) { (complete) in
+      uploadProgressView.isHidden = true
+    }
   }
 }
 
@@ -408,7 +798,7 @@ extension ANICommunityViewController {
         }
         
         database.collection(collection).document(contributionId).delete()
-        self.delegateDataAlgolia(contentType: contentType, contributionId: contributionId)
+        self.deleteDataAlgolia(contentType: contentType, contributionId: contributionId)
         
         DispatchQueue.main.async {
           if contentType == .story {
@@ -423,16 +813,36 @@ extension ANICommunityViewController {
         do {
           if contentType == .story {
             let story = try FirestoreDecoder().decode(FirebaseStory.self, from: data)
-            
+            let storage = Storage.storage()
+
             if let urls = story.storyImageUrls {
               for url in urls {
-                let storage = Storage.storage()
                 let storageRef = storage.reference(forURL: url)
                 
                 storageRef.delete { error in
                   if let error = error {
                     DLog(error)
                   }
+                }
+              }
+            }
+            
+            if let videoUrl = story.storyVideoUrl {
+              let storageRef = storage.reference(forURL: videoUrl)
+              
+              storageRef.delete { error in
+                if let error = error {
+                  DLog(error)
+                }
+              }
+            }
+            
+            if let thumbnailImageUrl = story.thumbnailImageUrl {
+              let storageRef = storage.reference(forURL: thumbnailImageUrl)
+              
+              storageRef.delete { error in
+                if let error = error {
+                  DLog(error)
                 }
               }
             }
@@ -498,19 +908,19 @@ extension ANICommunityViewController {
     var contentTypeString = ""
 
     if contentType == .recruit {
-      contentTypeString = "recurit"
+      contentTypeString = KEY_RECRUIT
     } else if contentType == .story {
-      contentTypeString = "story"
+      contentTypeString = KEY_STORY
     } else if contentType == .qna {
-      contentTypeString = "qna"
+      contentTypeString = KEY_QNA
     }
     
     let date = ANIFunction.shared.getToday()
-    let values = ["contentType": contentTypeString, "date": date]
+    let values = [KEY_CONTENT_TYPE: contentTypeString, KEY_DATE: date]
     database.collection(KEY_REPORTS).document(contributionId).collection(KEY_REPORT).addDocument(data: values)
   }
   
-  private func delegateDataAlgolia(contentType: ContentType, contributionId: String) {
+  private func deleteDataAlgolia(contentType: ContentType, contributionId: String) {
     var index: Index?
 
     if contentType == .story {
@@ -522,12 +932,5 @@ extension ANICommunityViewController {
     DispatchQueue.global().async {
       index?.deleteObject(withID: contributionId)
     }
-  }
-}
-
-//MARK: UIGestureRecognizerDelegate
-extension ANICommunityViewController: UIGestureRecognizerDelegate {
-  func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-    return true
   }
 }

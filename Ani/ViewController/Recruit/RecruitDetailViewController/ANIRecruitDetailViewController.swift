@@ -38,16 +38,26 @@ class ANIRecruitDetailViewController: UIViewController {
   
   var user: FirebaseUser?
   
+  var recruitId: String?
+  
   private var isBack: Bool = false
   
   private var isClipped: Bool = false
   
   private var clipButtonColor = UIColor()
+  
+  private weak var activityIndicatorView: ANIActivityIndicator?
 
   override func viewDidLoad() {
     super.viewDidLoad()
     setup()
     checkClipped()
+    
+    if #available(iOS 13.0, *) {
+      statusBarStyle = .darkContent
+    } else {
+      statusBarStyle = .default
+    }
   }
   
   override func viewWillAppear(_ animated: Bool) {
@@ -56,7 +66,7 @@ class ANIRecruitDetailViewController: UIViewController {
     UIApplication.shared.statusBarStyle = statusBarStyle
   }
   
-  override func viewWillDisappear(_ animated: Bool) {
+  override func viewDidDisappear(_ animated: Bool) {
     removeNotifications()
   }
   
@@ -71,6 +81,7 @@ class ANIRecruitDetailViewController: UIViewController {
     recruitDetailView.delegate = self
     recruitDetailView.recruit = recruit
     recruitDetailView.user = user
+    recruitDetailView.recruitId = recruitId
     self.view.addSubview(recruitDetailView)
     recruitDetailView.edgesToSuperview()
     self.recruitDetailView = recruitDetailView
@@ -130,10 +141,14 @@ class ANIRecruitDetailViewController: UIViewController {
     applyButton.baseCornerRadius = ANIRecruitDetailViewController.APPLY_BUTTON_HEIGHT / 2
     applyButton.dropShadow(opacity: 0.2)
     applyButton.delegate = self
-    if let currentUserId = ANISessionManager.shared.currentUserUid,
-      let recruit = self.recruit,
-      currentUserId == recruit.userId || recruit.recruitState != 0 {
-      applyButton.isHidden = true
+    applyButton.alpha = 0.0
+    if let recruit = self.recruit {
+      if let currentUserId = ANISessionManager.shared.currentUserUid,
+         currentUserId == recruit.userId || recruit.recruitState != 0 {
+        applyButton.alpha = 0.0
+      } else {
+        applyButton.alpha = 1.0
+      }
     }
     self.view.addSubview(applyButton)
     applyButton.bottomToSuperview(offset: -15.0)
@@ -173,10 +188,18 @@ class ANIRecruitDetailViewController: UIViewController {
     rejectTapView.size(to: rejectView)
     rejectTapView.topToSuperview()
     self.rejectTapView = rejectTapView
+    
+    //activityIndicatorView
+    let activityIndicatorView = ANIActivityIndicator()
+    activityIndicatorView.isFull = true
+    self.view.addSubview(activityIndicatorView)
+    activityIndicatorView.edgesToSuperview()
+    self.activityIndicatorView = activityIndicatorView
   }
   
   //MARK: Notifications
   private func setupNotifications() {
+    removeNotifications()
     ANINotificationManager.receive(profileImageViewTapped: self, selector: #selector(pushOtherProfile))
   }
   
@@ -254,6 +277,7 @@ class ANIRecruitDetailViewController: UIViewController {
       let navigationContoller = UINavigationController(rootViewController: chatViewController)
       chatViewController.user = user
       chatViewController.isPush = false
+      navigationContoller.modalPresentationStyle = .fullScreen
       self.present(navigationContoller, animated: true, completion: nil)
     } else {
       self.reject()
@@ -322,7 +346,9 @@ class ANIRecruitDetailViewController: UIViewController {
   
   @objc private func rejectViewTapped() {
     let initialViewController = ANIInitialViewController()
+    initialViewController.myTabBarController = self.tabBarController as? ANITabBarController
     let navigationController = UINavigationController(rootViewController: initialViewController)
+    navigationController.modalPresentationStyle = .fullScreen
     self.present(navigationController, animated: true, completion: nil)
   }
   
@@ -333,9 +359,10 @@ class ANIRecruitDetailViewController: UIViewController {
     popupOptionViewController.modalPresentationStyle = .overCurrentContext
     if let currentUserId = ANISessionManager.shared.currentUserUid, recruit.userId == currentUserId {
       popupOptionViewController.isMe = true
-      popupOptionViewController.options = ["家族決定！😻", "募集中止", "編集する"]
+      popupOptionViewController.options = ["シェア", "家族決定！😻", "募集中止", "編集する"]
     } else {
       popupOptionViewController.isMe = false
+      popupOptionViewController.options = ["シェア", "非表示"]
     }
     popupOptionViewController.delegate = self
     self.tabBarController?.present(popupOptionViewController, animated: false, completion: nil)
@@ -361,8 +388,16 @@ extension ANIRecruitDetailViewController: ANIRecruitDetailViewDelegate {
         clipButton.tintColor = clipButtonColor
       }
       myNavigationBar.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: backGroundColorOffset)
-      UIApplication.shared.statusBarStyle = .default
-      statusBarStyle = .default
+      if #available(iOS 13.0, *) {
+        UIApplication.shared.statusBarStyle = .darkContent
+      } else {
+        UIApplication.shared.statusBarStyle = .default
+      }
+      if #available(iOS 13.0, *) {
+        statusBarStyle = .darkContent
+      } else {
+        statusBarStyle = .default
+      }
     } else {
       let tintColorOffset = 1.0 - offset
       let ANIColorDarkBrightness: CGFloat = 0.18
@@ -390,6 +425,32 @@ extension ANIRecruitDetailViewController: ANIRecruitDetailViewDelegate {
   
   func imageCellTapped(index: Int, introduceImageUrls: [String]) {
     presentImageBrowser(index: index, imageUrls: introduceImageUrls)
+  }
+  
+  func failRecruitLoad() {
+    let alertController = UIAlertController(title: nil, message: "募集を開くことができません", preferredStyle: .alert)
+    
+    let popAction = UIAlertAction(title: "閉じる", style: .default) { (action) in
+      self.navigationController?.popViewController(animated: true)
+    }
+    alertController.addAction(popAction)
+    
+    self.present(alertController, animated: true, completion: nil)
+  }
+  
+  func successRecruitLoad(recruit: FirebaseRecruit, recruitUser: FirebaseUser) {
+    guard let applyButton = self.applyButton else { return }
+    
+    self.user = recruitUser
+    
+    if let currentUserId = ANISessionManager.shared.currentUserUid,
+       currentUserId != recruit.userId && recruit.recruitState == 0 {
+      UIView.animate(withDuration: 0.2) {
+        applyButton.alpha = 1.0
+      }
+    } else {
+      applyButton.alpha = 1.0
+    }
   }
 }
 
@@ -447,47 +508,124 @@ extension ANIRecruitDetailViewController: ANIPopupOptionViewControllerDelegate {
   }
   
   func optionTapped(index: Int) {
-    if index == 0 {
-      let alertController = UIAlertController(title: "家族決定おめでどうございます！", message: "決定でよろしければこの募集を中止してください", preferredStyle: .alert)
-      
-      let stopAction = UIAlertAction(title: "中止", style: .default) { (action) in
-        if let recruit = self.recruit, let recruitId = recruit.id {
-          let database = Firestore.firestore()
+    guard let recruit = self.recruit,
+          let recruitId = recruit.id else { return }
+
+    if let currentUserId = ANISessionManager.shared.currentUserUid {
+      if recruit.userId == currentUserId {
+        if index == 0 {
+          let activityItems = [ANIActivityItemSorce(shareContent: "#ミャウ #MYAU #猫好き #猫 #ねこ #里親募集\nhttps://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/recruit/\(recruitId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU")]
+          let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+          self.present(activityViewController, animated: true)
+        } else if index == 1 {
+          let alertController = UIAlertController(title: "家族決定おめでどうございます！", message: "決定でよろしければこの募集を中止してください", preferredStyle: .alert)
           
-          database.collection(KEY_RECRUITS).document(recruitId).updateData(["recruitState": 1])
+          let stopAction = UIAlertAction(title: "中止", style: .default) { (action) in
+            if let recruit = self.recruit, let recruitId = recruit.id {
+              let database = Firestore.firestore()
+              
+              database.collection(KEY_RECRUITS).document(recruitId).updateData([KEY_RECRUIT_STATE: 1])
+            }
+          }
+          let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
+          
+          alertController.addAction(stopAction)
+          alertController.addAction(cancelAction)
+          
+          self.present(alertController, animated: true, completion: nil)
+        } else if index == 2 {
+          let alertController = UIAlertController(title: nil, message: "この募集を中止しますか？", preferredStyle: .alert)
+          
+          let stopAction = UIAlertAction(title: "中止", style: .default) { (action) in
+            if let recruit = self.recruit, let recruitId = recruit.id {
+              let database = Firestore.firestore()
+              
+              database.collection(KEY_RECRUITS).document(recruitId).updateData([KEY_RECRUIT_STATE: 2])
+            }
+          }
+          let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
+          
+          alertController.addAction(stopAction)
+          alertController.addAction(cancelAction)
+          
+          self.present(alertController, animated: true, completion: nil)
+        } else if index == 3 {
+          let recruitContribtionViewController = ANIRecruitContributionViewController()
+          if let recruit = self.recruit {
+            recruitContribtionViewController.recruitContributionMode = .edit
+            recruitContribtionViewController.recruit = recruit
+            recruitContribtionViewController.delegate = self
+          }
+          let recruitContributionNV = UINavigationController(rootViewController: recruitContribtionViewController)
+          recruitContributionNV.modalPresentationStyle = .fullScreen
+          self.navigationController?.present(recruitContributionNV, animated: true, completion: nil)
+        }
+      } else {
+        if index == 0 {
+          let activityItems = [ANIActivityItemSorce(shareContent: "#ミャウ #MYAU #猫好き #猫 #ねこ #里親募集\nhttps://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/recruit/\(recruitId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU")]
+          let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+          self.present(activityViewController, animated: true)
+        } else if index == 1 {
+          let alertController = UIAlertController(title: "この募集を非表示にしますか？", message: "非表示にした募集はアプリの中で見えなくなります。後から非表示を解除することは出来ません。", preferredStyle: .alert)
+          
+          let hideAction = UIAlertAction(title: "非表示", style: .default) { (action) in
+            if let recruit = self.recruit, let recruitId = recruit.id {
+              let database = Firestore.firestore()
+              
+              self.activityIndicatorView?.startAnimating()
+              
+              DispatchQueue.global().async {
+                database.collection(KEY_RECRUITS).document(recruitId).getDocument(completion: { (snapshot, error) in
+                  if let error = error {
+                    DLog("Error get document: \(error)")
+                    return
+                  }
+                  
+                  guard let snapshot = snapshot, let data = snapshot.data() else { return }
+                  
+                  do {
+                    let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: data)
+                    
+                    if let hideUserIds = recruit.hideUserIds {
+                      var hideUserIdsTemp = hideUserIds
+                      hideUserIdsTemp.append(currentUserId)
+                      
+                      database.collection(KEY_RECRUITS).document(recruitId).updateData([KEY_HIDE_USER_IDS: hideUserIdsTemp])
+                    } else {
+                      let hideUserIds = [currentUserId]
+                      
+                      database.collection(KEY_RECRUITS).document(recruitId).updateData([KEY_HIDE_USER_IDS: hideUserIds])
+                    }
+                    
+                    DispatchQueue.main.async {
+                      self.activityIndicatorView?.stopAnimating()
+                      
+                      self.navigationController?.popViewController(animated: true)
+                      ANINotificationManager.postDeleteRecruit(id: recruitId)
+                    }
+                  } catch let error {
+                    DLog(error)
+                  }
+                })
+              }
+            }
+          }
+          let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
+          
+          alertController.addAction(hideAction)
+          alertController.addAction(cancelAction)
+          
+          self.present(alertController, animated: true, completion: nil)
         }
       }
-      let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
-      
-      alertController.addAction(stopAction)
-      alertController.addAction(cancelAction)
-      
-      self.present(alertController, animated: true, completion: nil)
-    } else if index == 1 {
-      let alertController = UIAlertController(title: nil, message: "この募集を中止しますか？", preferredStyle: .alert)
-      
-      let stopAction = UIAlertAction(title: "中止", style: .default) { (action) in
-        if let recruit = self.recruit, let recruitId = recruit.id {
-          let database = Firestore.firestore()
-          
-          database.collection(KEY_RECRUITS).document(recruitId).updateData(["recruitState": 2])
-        }
+    } else {
+      if index == 0 {
+        let activityItems = [ANIActivityItemSorce(shareContent: "#ミャウ #MYAU #猫好き #猫 #ねこ #里親募集\nhttps://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/recruit/\(recruitId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU")]
+        let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+        self.present(activityViewController, animated: true)
+      } else if index == 1 {
+        self.reject()
       }
-      let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
-      
-      alertController.addAction(stopAction)
-      alertController.addAction(cancelAction)
-      
-      self.present(alertController, animated: true, completion: nil)
-    } else if index == 2 {
-      let recruitContribtionViewController = ANIRecruitContributionViewController()
-      if let recruit = self.recruit {
-        recruitContribtionViewController.recruitContributionMode = .edit
-        recruitContribtionViewController.recruit = recruit
-        recruitContribtionViewController.delegate = self
-      }
-      let recruitContributionNV = UINavigationController(rootViewController: recruitContribtionViewController)
-      self.navigationController?.present(recruitContributionNV, animated: true, completion: nil)
     }
   }
 }
@@ -563,7 +701,9 @@ extension ANIRecruitDetailViewController {
           database.collection(KEY_RECRUITS).document(recruitId).collection(KEY_LOVE_IDS).document(document.documentID).delete()
         }
       })
-      
+    }
+    
+    DispatchQueue.global().async {
       database.collection(KEY_RECRUITS).document(recruitId).collection(KEY_CLIP_IDS).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           DLog("Get document error \(error)")
@@ -574,7 +714,24 @@ extension ANIRecruitDetailViewController {
         guard let snapshot = snapshot else { return }
         
         for document in snapshot.documents {
+          database.collection(KEY_USERS).document(document.documentID).collection(KEY_CLIP_RECRUIT_IDS).document(recruitId).delete()
           database.collection(KEY_RECRUITS).document(recruitId).collection(KEY_CLIP_IDS).document(document.documentID).delete()
+        }
+      })
+    }
+    
+    DispatchQueue.global().async {
+      database.collection(KEY_RECRUITS).document(recruitId).collection(KEY_SUPPORT_IDS).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          DLog("Get document error \(error)")
+          
+          return
+        }
+        
+        guard let snapshot = snapshot else { return }
+        
+        for document in snapshot.documents {
+          database.collection(KEY_RECRUITS).document(recruitId).collection(KEY_SUPPORT_IDS).document(document.documentID).delete()
         }
       })
     }
@@ -600,5 +757,11 @@ extension ANIRecruitDetailViewController: ANIRecruitContributionViewControllerDe
     
     self.recruit = recruit
     recruitDetailView.recruit = recruit
+  }
+  
+  func loadThumnailImage(thumbnailImage: UIImage?) {
+  }
+  
+  func updateProgress(progress: CGFloat) {
   }
 }

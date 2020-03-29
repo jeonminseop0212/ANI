@@ -6,13 +6,20 @@ public class Video: Equatable {
   
   public let asset: PHAsset
   
+  //修正
+  public var offset: CGPoint
+  public var scale: CGFloat
+  
   var durationRequestID: Int = 0
-  var duration: Double = 0
+  public var duration: Double = 0
   
   // MARK: - Initialization
   
-  init(asset: PHAsset) {
+  //修正
+  init(asset: PHAsset, offset: CGPoint = CGPoint(x: 0.0, y: 0.0), scale: CGFloat = 1.0) {
     self.asset = asset
+    self.offset = offset
+    self.scale = scale
   }
   
   /// Fetch video duration asynchronously

@@ -41,6 +41,19 @@ class ANISessionManager: NSObject {
   
   var isAnonymous: Bool = false
   
+  var blockUserIds: [String]?
+  var blockingUserIds: [String]?
+  
+  var isLoadedFirstData: Bool = false
+  
+  var isLaunchNoti: Bool = false
+  
+  var showReviewConditions: [String: Int]?
+  
+  var isHiddenInitial: Bool = true
+  var isHiddenSplash: Bool = false
+  var isShowEvent: Bool = false
+  
   #if DEBUG
   let client = Client(appID: "RBJYX5VF88", apiKey: "ebf262fa4367637cd49431402d70455c")
   #else

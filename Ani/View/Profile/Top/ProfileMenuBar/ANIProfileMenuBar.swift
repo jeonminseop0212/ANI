@@ -17,7 +17,7 @@ class ANIProfileMenuBar: UIView {
   var delegate: ANIProfileMenuBarDelegate?
 
   weak var menuCollectionView: UICollectionView?
-  private let menus = ["プロフィール", "募集", "ストーリー", "Q&A"]
+  private let menus = ["プロフィール", "ストーリー", "Q&A", "募集"]
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -36,7 +36,7 @@ class ANIProfileMenuBar: UIView {
     collectionView.register(ANIProfileMenuBarCell.self, forCellWithReuseIdentifier: id)
     collectionView.dataSource = self
     collectionView.delegate = self
-    collectionView.backgroundColor = ANIColor.gray
+    collectionView.backgroundColor = ANIColor.bg
     let selectedIndexPath = IndexPath(item: 0, section: 0)
     collectionView.selectItem(at: selectedIndexPath, animated: false, scrollPosition: .left)
     addSubview(collectionView)

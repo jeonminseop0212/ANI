@@ -17,14 +17,14 @@ public class ANIPlaceHolderTextView: UITextView {
   public override init(frame: CGRect, textContainer: NSTextContainer?) {
     super.init(frame: frame, textContainer: textContainer)
     
-    setupNotification()
+    setupNotifications()
   }
   
   required public init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
   
-  private func setupNotification() {
+  private func setupNotifications() {
     ANINotificationManager.receive(textViewTextDidChange: self, selector: #selector(textChanged))
   }
   
@@ -71,5 +71,98 @@ public class ANIPlaceHolderTextView: UITextView {
   
   func showPlaceHolder() {
     self.viewWithTag(1)?.alpha = 1
+  }
+  
+  func resolveHashTags(text: String, hashtagArray: [String]) {
+    var nsText: NSString = text as NSString
+    var ranges = [NSRange]()
+    
+    var replaceRanges = [NSRange]()
+    
+    for (index, word) in hashtagArray.enumerated() {
+      var newWord = ""
+      //タグが文字列の一番前にいる時
+      var range = nsText.range(of: "#" + word as String)
+      if range.lowerBound == 0 && index == 0 {
+        newWord = "#" + word
+      } else {
+        //普通の場合
+        range = nsText.range(of: " #" + word as String)
+        if range.length > 0 {
+          newWord = " #" + word
+        } else {
+          //改行の次にタグが来る場合
+          range = nsText.range(of: "\n#" + word as String)
+          if range.length > 0 {
+            newWord = "\n#" + word
+          }
+        }
+      }
+      
+      if !ranges.isEmpty, let lastRage = ranges.last {
+        range = NSRange(location: lastRage.upperBound + range.lowerBound, length: newWord.count)
+      }
+      
+      ranges.append(range)
+      
+      //絵文字が入るとずれるから絵文字をなくして計算する
+      let replaceText = textEmojiExclusion(checkString: nsText as String) as NSString
+      var replaceRange = replaceText.range(of: newWord as String)
+      if !replaceRanges.isEmpty, let lastReplaceRage = replaceRanges.last {
+        replaceRange = NSRange(location: lastReplaceRage.upperBound + replaceRange.lowerBound, length: newWord.count)
+      }
+      
+      replaceRanges.append(replaceRange)
+      
+      nsText = text[text.index(text.startIndex, offsetBy: replaceRange.upperBound)...] as NSString
+    }
+    
+    let attrs = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17.0), NSAttributedString.Key.foregroundColor: ANIColor.dark]
+
+    let attrString = NSMutableAttributedString(string: text, attributes: attrs)
+
+    if(ranges.count != 0) {
+      let attrs = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17.0), NSAttributedString.Key.foregroundColor: ANIColor.darkblue]
+      for range in ranges {
+        attrString.addAttributes(attrs, range: range)
+      }
+    }
+    
+    let cursorPoint = getCursorPosition()
+
+    self.attributedText = attrString
+    
+    updateCursorPoint(cursorPoint: cursorPoint)
+  }
+  
+  private func textEmojiExclusion(checkString: String) -> String {
+    var replaceText = ""
+    let replaceCh = "E"
+    for ch in checkString {
+      let str: String = ch.description
+      if str.isAppleColorEmoji {
+        replaceText += replaceCh
+      } else {
+        replaceText += str
+      }
+    }
+    
+    return replaceText
+  }
+  
+  private func getCursorPosition() -> Int {
+    if let selectedRange = self.selectedTextRange {
+      let cursorPosition = self.offset(from: self.beginningOfDocument, to: selectedRange.start)
+      
+      return cursorPosition
+    }
+    
+    return 0
+  }
+  
+  private func updateCursorPoint(cursorPoint: Int) {
+    if let newPosition = self.position(from: self.beginningOfDocument, offset: cursorPoint) {
+      self.selectedTextRange = self.textRange(from: newPosition, to: newPosition)
+    }
   }
 }

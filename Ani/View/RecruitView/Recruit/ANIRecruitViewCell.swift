@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import WCLShineButton
 import FirebaseFirestore
 import CodableFirebase
 
@@ -23,6 +22,8 @@ protocol ANIRecruitViewCellDelegate {
 
 class ANIRecruitViewCell: UITableViewCell {
   
+  private weak var shadowVidew: UIView?
+
   private weak var base: UIView?
   private weak var tapArea: UIView?
   private weak var recruitImageView: UIImageView?
@@ -39,9 +40,10 @@ class ANIRecruitViewCell: UITableViewCell {
   private weak var supportCountLabel: UILabel?
   private weak var supportButton: UIButton?
   private weak var loveButtonBG: UIView?
-  private weak var loveButton: WCLShineButton?
+  private weak var loveButton: ANICellButtonView?
   private weak var loveCountLabel: UILabel?
-  private weak var clipButton: UIButton?
+  private weak var clipButtonBG: UIView?
+  private weak var clipButton: ANICellButtonView?
   
   var recruit: FirebaseRecruit? {
     didSet {
@@ -49,12 +51,6 @@ class ANIRecruitViewCell: UITableViewCell {
       
       if user == nil {
         loadUser()
-      }
-      if recruit.isLoved == nil {
-        isLoved()
-      }
-      if recruit.isSupported == nil {
-        isSupported()
       }
       if recruit.isCliped == nil {
         isClipped()
@@ -70,6 +66,26 @@ class ANIRecruitViewCell: UITableViewCell {
   var user: FirebaseUser? {
     didSet {
       self.reloadUserLayout()
+    }
+  }
+  
+  private var supportCount: Int = 0 {
+    didSet {
+      guard let supportCountLabel = self.supportCountLabel else { return }
+      
+      DispatchQueue.main.async {
+        supportCountLabel.text = "\(self.supportCount)"
+      }
+    }
+  }
+  
+  private var loveCount: Int = 0 {
+    didSet {
+      guard let loveCountLabel = self.loveCountLabel else { return }
+      
+      DispatchQueue.main.async {
+        loveCountLabel.text = "\(self.loveCount)"
+      }
     }
   }
   
@@ -91,29 +107,37 @@ class ANIRecruitViewCell: UITableViewCell {
     self.selectionStyle = .none
     self.backgroundColor = ANIColor.bg
     
+    //shadowVidew
+    let shadowVidew = UIView()
+    shadowVidew.backgroundColor = .white
+    shadowVidew.layer.cornerRadius = 10.0
+    shadowVidew.dropShadow(opacity: 0.035)
+    addSubview(shadowVidew)
+    shadowVidew.topToSuperview(offset: 10.0)
+    shadowVidew.leftToSuperview(offset: 10.0)
+    shadowVidew.rightToSuperview(offset: -10.0)
+    shadowVidew.bottomToSuperview(offset: -10.0)
+    self.shadowVidew = shadowVidew
+    
     //base
     let base = UIView()
     base.backgroundColor = .white
     base.layer.cornerRadius = 10.0
     base.layer.masksToBounds = true
-    addSubview(base)
-    base.topToSuperview(offset: 0)
-    base.leftToSuperview(offset: 10)
-    base.rightToSuperview(offset: -10)
-    base.bottomToSuperview(offset: -10)
+    shadowVidew.addSubview(base)
+    base.edgesToSuperview()
     self.base = base
     
     //tapArea
     let tapArea = UIView()
-    let cellTapGesture = UITapGestureRecognizer(target: self, action: #selector(cellTapped))
-    tapArea.addGestureRecognizer(cellTapGesture)
+    tapArea.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(cellTapped)))
     base.addSubview(tapArea)
     tapArea.edgesToSuperview(excluding: .bottom)
     self.tapArea = tapArea
     
     //recruitImageView
     let recruitImageView = UIImageView()
-    recruitImageView.backgroundColor = ANIColor.gray
+    recruitImageView.backgroundColor = ANIColor.lightGray
     recruitImageView.contentMode = .scaleAspectFill
     recruitImageView.clipsToBounds = true
     tapArea.addSubview(recruitImageView)
@@ -217,9 +241,8 @@ class ANIRecruitViewCell: UITableViewCell {
     //profileImageView
     let profileImageView = UIImageView()
     profileImageView.isUserInteractionEnabled = true
-    let profileImageTapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped))
-    profileImageView.addGestureRecognizer(profileImageTapGesture)
-    profileImageView.backgroundColor = ANIColor.gray
+    profileImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped)))
+    profileImageView.backgroundColor = ANIColor.lightGray
     base.addSubview(profileImageView)
     profileImageView.topToBottom(of: tapArea, offset: 10.0)
     profileImageView.leftToSuperview(offset: 10.0)
@@ -230,16 +253,28 @@ class ANIRecruitViewCell: UITableViewCell {
     profileImageView.layer.masksToBounds = true
     self.profileImageView = profileImageView
     
+    //clipButtonBG
+    let clipButtonBG = UIView()
+    clipButtonBG.isUserInteractionEnabled = false
+    clipButtonBG.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(clipButtonBGTapped)))
+    base.addSubview(clipButtonBG)
+    clipButtonBG.centerY(to: profileImageView)
+    clipButtonBG.rightToSuperview(offset: -10.0)
+    clipButtonBG.width(30.0)
+    clipButtonBG.height(30.0)
+    self.clipButtonBG = clipButtonBG
+    
     //clipButton
-    let clipButton = UIButton()
-    clipButton.setImage(UIImage(named: "clip")?.withRenderingMode(.alwaysTemplate), for: .normal)
-    clipButton.tintColor = ANIColor.gray
-    clipButton.addTarget(self, action: #selector(clip), for: .touchUpInside)
+    let clipButton = ANICellButtonView()
+    clipButton.image = UIImage(named: "cellClipButton")
+    clipButton.unSelectedImage = UIImage(named: "cellClipButton")
+    clipButton.selectedImage = UIImage(named: "cellClipButtonSelected")
+    clipButton.delegate = self
     base.addSubview(clipButton)
     clipButton.centerY(to: profileImageView)
     clipButton.rightToSuperview(offset: -10.0)
-    clipButton.width(20.0)
-    clipButton.height(20.0)
+    clipButton.width(30.0)
+    clipButton.height(30.0)
     self.clipButton = clipButton
     
     //loveCountLabel
@@ -248,7 +283,7 @@ class ANIRecruitViewCell: UITableViewCell {
     loveCountLabel.textColor = ANIColor.dark
     base.addSubview(loveCountLabel)
     loveCountLabel.centerY(to: profileImageView)
-    loveCountLabel.rightToLeft(of: clipButton, offset: -10.0)
+    loveCountLabel.rightToLeft(of: clipButton, offset: -5.0)
     loveCountLabel.width(25.0)
     loveCountLabel.height(20.0)
     self.loveCountLabel = loveCountLabel
@@ -256,30 +291,25 @@ class ANIRecruitViewCell: UITableViewCell {
     //loveButtonBG
     let loveButtonBG = UIView()
     loveButtonBG.isUserInteractionEnabled = false
-    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(loveButtonBGTapped))
-    loveButtonBG.addGestureRecognizer(tapGesture)
+    loveButtonBG.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(loveButtonBGTapped)))
     base.addSubview(loveButtonBG)
     loveButtonBG.centerY(to: profileImageView)
-    loveButtonBG.rightToLeft(of: loveCountLabel, offset: -10.0)
-    loveButtonBG.width(20.0)
-    loveButtonBG.height(20.0)
+    loveButtonBG.rightToLeft(of: loveCountLabel, offset: -5.0)
+    loveButtonBG.width(30.0)
+    loveButtonBG.height(30.0)
     self.loveButtonBG = loveButtonBG
     
     //loveButton
-    var param = WCLShineParams()
-    param.bigShineColor = ANIColor.pink
-    param.smallShineColor = ANIColor.lightPink
-    let loveButton = WCLShineButton(frame: CGRect(x: 0.0, y: 0.0, width: 20.0, height: 20.0), params: param)
-    loveButton.fillColor = ANIColor.pink
-    loveButton.color = ANIColor.gray
-    loveButton.image = .heart
-    loveButton.isEnabled = false
-    loveButton.addTarget(self, action: #selector(love), for: .valueChanged)
-    base.addSubview(loveButton)
+    let loveButton = ANICellButtonView()
+    loveButton.image = UIImage(named: "loveButton")
+    loveButton.unSelectedImage = UIImage(named: "loveButton")
+    loveButton.selectedImage = UIImage(named: "loveButtonSelected")
+    loveButton.delegate = self
+    addSubview(loveButton)
     loveButton.centerY(to: profileImageView)
-    loveButton.rightToLeft(of: loveCountLabel, offset: -10.0)
-    loveButton.width(20.0)
-    loveButton.height(20.0)
+    loveButton.rightToLeft(of: loveCountLabel, offset: -5.0)
+    loveButton.width(30.0)
+    loveButton.height(30.0)
     self.loveButton = loveButton
     
     //supportCountLabel
@@ -288,21 +318,20 @@ class ANIRecruitViewCell: UITableViewCell {
     supportCountLabel.textColor = ANIColor.dark
     base.addSubview(supportCountLabel)
     supportCountLabel.centerY(to: profileImageView)
-    supportCountLabel.rightToLeft(of: loveButton, offset: -10.0)
+    supportCountLabel.rightToLeft(of: loveButton, offset: -5.0)
     supportCountLabel.width(25.0)
     supportCountLabel.height(20.0)
     self.supportCountLabel = supportCountLabel
     
     //supportButton
     let supportButton = UIButton()
-    supportButton.setImage(UIImage(named: "support")?.withRenderingMode(.alwaysTemplate), for: .normal)
-    supportButton.tintColor = ANIColor.gray
+    supportButton.setImage(UIImage(named: "supportButton"), for: .normal)
     supportButton.addTarget(self, action: #selector(support), for: .touchUpInside)
     base.addSubview(supportButton)
     supportButton.centerY(to: profileImageView)
-    supportButton.rightToLeft(of: supportCountLabel, offset: -10.0)
-    supportButton.width(20.0)
-    supportButton.height(20.0)
+    supportButton.rightToLeft(of: supportCountLabel, offset: -5.0)
+    supportButton.width(30.0)
+    supportButton.height(30.0)
     self.supportButton = supportButton
     
     //userNameLabel
@@ -310,6 +339,8 @@ class ANIRecruitViewCell: UITableViewCell {
     userNameLabel.font = UIFont.systemFont(ofSize: 13.0)
     userNameLabel.textColor = ANIColor.subTitle
     userNameLabel.numberOfLines = 2
+    userNameLabel.isUserInteractionEnabled = true
+    userNameLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped)))
     base.addSubview(userNameLabel)
     userNameLabel.leftToRight(of: profileImageView, offset: 10.0)
     userNameLabel.rightToLeft(of: supportButton, offset: -10.0)
@@ -328,6 +359,7 @@ class ANIRecruitViewCell: UITableViewCell {
           let supportButton = self.supportButton,
           let loveButtonBG = self.loveButtonBG,
           let loveButton = self.loveButton,
+          let clipButtonBG = self.clipButtonBG,
           let clipButton = self.clipButton,
           let recruit = self.recruit,
           let headerImageUrl = recruit.headerImageUrl else { return }
@@ -349,21 +381,21 @@ class ANIRecruitViewCell: UITableViewCell {
     titleLabel.text = recruit.title
     subTitleLabel.text = recruit.reason
     
-    supportButton.tintColor = ANIColor.gray
+    supportButton.setImage(UIImage(named: "supportButton"), for: .normal)
     if let isSupported = recruit.isSupported {
       if isSupported {
-        supportButton.tintColor = ANIColor.moreDarkGray
+        supportButton.setImage(UIImage(named: "supportButtonSelected"), for: .normal)
       } else {
-        supportButton.tintColor = ANIColor.gray
+        supportButton.setImage(UIImage(named: "supportButton"), for: .normal)
       }
     }
     
     if ANISessionManager.shared.isAnonymous {
       loveButtonBG.isUserInteractionEnabled = true
-      loveButton.isEnabled = false
+      loveButton.isUserInteractionEnabled = false
     } else {
       loveButtonBG.isUserInteractionEnabled = false
-      loveButton.isEnabled = true
+      loveButton.isUserInteractionEnabled = true
     }
     loveButton.isSelected = false
     if let isLoved = recruit.isLoved {
@@ -374,12 +406,19 @@ class ANIRecruitViewCell: UITableViewCell {
       }
     }
     
-    clipButton.tintColor = ANIColor.gray
+    if ANISessionManager.shared.isAnonymous {
+      clipButtonBG.isUserInteractionEnabled = true
+      clipButton.isUserInteractionEnabled = false
+    } else {
+      clipButtonBG.isUserInteractionEnabled = false
+      clipButton.isUserInteractionEnabled = true
+    }
+    clipButton.isSelected = false
     if let isCliped = recruit.isCliped {
       if isCliped {
-        clipButton.tintColor = ANIColor.moreDarkGray
+        clipButton.isSelected = true
       } else {
-        clipButton.tintColor = ANIColor.gray
+        clipButton.isSelected = false
       }
     }
   }
@@ -404,9 +443,10 @@ class ANIRecruitViewCell: UITableViewCell {
   private func observeLove() {
     guard let recruit = self.recruit,
           let recuritId = recruit.id,
-          let loveCountLabel = self.loveCountLabel else { return }
+          let loveButton = self.loveButton,
+          let indexPath = self.indexPath else { return }
     
-    loveCountLabel.text = "0"
+    self.loveCount = 0
 
     let database = Firestore.firestore()
     DispatchQueue.global().async {
@@ -417,12 +457,30 @@ class ANIRecruitViewCell: UITableViewCell {
           return
         }
         
-        DispatchQueue.main.async {
-          if let snapshot = snapshot {
-            loveCountLabel.text = "\(snapshot.documents.count)"
-          } else {
-            loveCountLabel.text = "0"
+        if let snapshot = snapshot {
+          self.loveCount = snapshot.documents.count
+          
+          DispatchQueue.main.async {
+            if let currentUserUid = ANISessionManager.shared.currentUserUid {
+              var documentIDTemp = [String]()
+              for document in snapshot.documents {
+                documentIDTemp.append(document.documentID)
+              }
+              
+              if documentIDTemp.contains(currentUserUid) {
+                loveButton.isSelected = true
+                self.delegate?.loadedRecruitIsLoved(indexPath: indexPath, isLoved: true)
+              } else {
+                loveButton.isSelected = false
+                self.delegate?.loadedRecruitIsLoved(indexPath: indexPath, isLoved: false)
+              }
+            } else {
+              loveButton.isSelected = false
+            }
           }
+        } else {
+          self.loveCount = 0
+          loveButton.isSelected = false
         }
       })
     }
@@ -437,9 +495,10 @@ class ANIRecruitViewCell: UITableViewCell {
   private func observeSupport() {
     guard let recruit = self.recruit,
           let recuritId = recruit.id,
-          let supportCountLabel = self.supportCountLabel else { return }
+          let supportButton = self.supportButton,
+          let indexPath = self.indexPath else { return }
     
-    supportCountLabel.text = "0"
+    self.supportCount = 0
     
     let database = Firestore.firestore()
     DispatchQueue.global().async {
@@ -452,12 +511,29 @@ class ANIRecruitViewCell: UITableViewCell {
         
         DispatchQueue.main.async {
           if let snapshot = snapshot {
-            supportCountLabel.text = "\(snapshot.documents.count)"
+            self.supportCount = snapshot.documents.count
+            
+            DispatchQueue.main.async {
+              if let currentUserUid = ANISessionManager.shared.currentUserUid {
+                var documentIDTemp = [String]()
+                for document in snapshot.documents {
+                  
+                  documentIDTemp.append(document.documentID)
+                }
+                
+                if documentIDTemp.contains(currentUserUid) {
+                  supportButton.setImage(UIImage(named: "supportButtonSelected"), for: .normal)
+                  self.delegate?.loadedRecruitIsSupported(indexPath: indexPath, isSupported: true)
+                } else {
+                  supportButton.setImage(UIImage(named: "supportButton"), for: .normal)
+                  self.delegate?.loadedRecruitIsSupported(indexPath: indexPath, isSupported: false)
+                }
+              }
+            }
           } else {
-            supportCountLabel.text = "0"
+            self.supportCount = 0
+            supportButton.setImage(UIImage(named: "supportButton"), for: .normal)
           }
-          
-          self.isSupported()
         }
       })
     }
@@ -468,95 +544,12 @@ class ANIRecruitViewCell: UITableViewCell {
     
     supportListener.remove()
   }
-  
-  private func isLoved() {
-    guard let recruit = self.recruit,
-          let recuritId = recruit.id,
-          let loveButton = self.loveButton else { return }
 
-    if let currentUserId = ANISessionManager.shared.currentUserUid {
-      let database = Firestore.firestore()
-      
-      DispatchQueue.global().async {
-        database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_LOVE_IDS).getDocuments(completion: { (snapshot, error) in
-          if let error = error {
-            DLog("Error get document: \(error)")
-            
-            return
-          }
-          
-          guard let snapshot = snapshot else { return }
-          
-          var isLoved = false
-          
-          DispatchQueue.main.async {
-            for document in snapshot.documents {
-              if document.documentID == currentUserId {
-                loveButton.isSelected = true
-                isLoved = true
-                break
-              } else {
-                isLoved = false
-              }
-            }
-            
-            if let indexPath = self.indexPath {
-              self.delegate?.loadedRecruitIsLoved(indexPath: indexPath, isLoved: isLoved)
-            }
-          }
-        })
-      }
-    } else {
-      loveButton.isSelected = false
-    }
-  }
-  
-  private func isSupported() {
-    guard let recruit = self.recruit,
-          let recuritId = recruit.id,
-          let supportButton = self.supportButton else { return }
-
-    if let currentUserId = ANISessionManager.shared.currentUserUid {
-      let database = Firestore.firestore()
-      
-      DispatchQueue.global().async {
-        database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_SUPPORT_IDS).getDocuments(completion: { (snapshot, error) in
-          if let error = error {
-            DLog("Error get document: \(error)")
-            
-            return
-          }
-          
-          guard let snapshot = snapshot else { return }
-          
-          var isSuport = false
-          
-          DispatchQueue.main.async {
-            for document in snapshot.documents {
-              if document.documentID == currentUserId {
-                supportButton.tintColor = ANIColor.moreDarkGray
-                isSuport = true
-                break
-              } else {
-                isSuport = false
-              }
-            }
-            
-            if let indexPath = self.indexPath {
-              self.delegate?.loadedRecruitIsSupported(indexPath: indexPath, isSupported: isSuport)
-            }
-          }
-        })
-      }
-    } else {
-      supportButton.tintColor = ANIColor.gray
-    }
-  }
-  
   private func isClipped() {
     guard let recruit = self.recruit,
           let recuritId = recruit.id,
-          let clipButton = self.clipButton else { return }
+          let clipButton = self.clipButton,
+          let indexPath = self.indexPath else { return }
 
     if let currentUserId = ANISessionManager.shared.currentUserUid {
       let database = Firestore.firestore()
@@ -571,27 +564,24 @@ class ANIRecruitViewCell: UITableViewCell {
           
           guard let snapshot = snapshot else { return }
           
-          var isCliped = false
-          
           DispatchQueue.main.async {
+            var documentIDTemp = [String]()
             for document in snapshot.documents {
-              if document.documentID == currentUserId {
-                clipButton.tintColor = ANIColor.moreDarkGray
-                isCliped = true
-                break
-              } else {
-                isCliped = false
-              }
+              
+              documentIDTemp.append(document.documentID)
             }
             
-            if let indexPath = self.indexPath {
-              self.delegate?.loadedRecruitIsCliped(indexPath: indexPath, isCliped: isCliped)
+            if documentIDTemp.contains(currentUserId) {
+              clipButton.isSelected = true
+              self.delegate?.loadedRecruitIsCliped(indexPath: indexPath, isCliped: true)
+            } else {
+              self.delegate?.loadedRecruitIsCliped(indexPath: indexPath, isCliped: false)
             }
           }
         })
       }
     } else {
-      clipButton.tintColor = ANIColor.gray
+      clipButton.isSelected = false
     }
   }
   
@@ -638,7 +628,7 @@ class ANIRecruitViewCell: UITableViewCell {
   }
   
   //MARK: action
-  @objc private func love() {
+  private func love() {
     guard let recruit = self.recruit,
           let recuritId = recruit.id,
           let currentUserId = ANISessionManager.shared.currentUserUid,
@@ -651,21 +641,29 @@ class ANIRecruitViewCell: UITableViewCell {
       DispatchQueue.global().async {
         let date = ANIFunction.shared.getToday()
  
-        database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_LOVE_IDS).document(currentUserId).setData([currentUserId: true, KEY_DATE: date])
+        DispatchQueue.global().async {
+          database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_LOVE_IDS).document(currentUserId).setData([currentUserId: true, KEY_DATE: date])
+        }
         
-        database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_RECRUIT_IDS).document(recuritId).setData([KEY_DATE: date])
+        DispatchQueue.global().async {
+          database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_RECRUIT_IDS).document(recuritId).setData([KEY_DATE: date])
+        }
 
         self.updateNoti()
+        ANIFunction.shared.showReviewAlertLove()
         
         self.delegate?.loadedRecruitIsLoved(indexPath: indexPath, isLoved: true)
       }
     } else {
       DispatchQueue.global().async {
         database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_LOVE_IDS).document(currentUserId).delete()
-        database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_RECRUIT_IDS).document(recuritId).delete()
-        
-        self.delegate?.loadedRecruitIsLoved(indexPath: indexPath, isLoved: false)
       }
+      
+      DispatchQueue.global().async {
+        database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_RECRUIT_IDS).document(recuritId).delete()
+      }
+      
+      self.delegate?.loadedRecruitIsLoved(indexPath: indexPath, isLoved: false)
     }
   }
   
@@ -676,7 +674,7 @@ class ANIRecruitViewCell: UITableViewCell {
           let indexPath = self.indexPath else { return }
     
     if !ANISessionManager.shared.isAnonymous {
-      if supportButton.tintColor == ANIColor.gray {
+      if supportButton.imageView?.image == UIImage(named: "supportButton") {
         self.delegate?.supportButtonTapped(supportRecruit: recruit, user: user)
         self.delegate?.loadedRecruitIsSupported(indexPath: indexPath, isSupported: true)
       }
@@ -686,45 +684,41 @@ class ANIRecruitViewCell: UITableViewCell {
     }
   }
   
-  @objc private func clip() {
+  private func clip() {
     guard let recruit = self.recruit,
           let recuritId = recruit.id,
+          let currentUserId = ANISessionManager.shared.currentUserUid,
           let clipButton = self.clipButton,
           let indexPath = self.indexPath else { return }
     
-    if !ANISessionManager.shared.isAnonymous, let currentUserId = ANISessionManager.shared.currentUserUid {
-      let database = Firestore.firestore()
+    let database = Firestore.firestore()
 
-      if clipButton.tintColor == ANIColor.gray {
-        UIView.animate(withDuration: 0.15) {
-          clipButton.tintColor = ANIColor.moreDarkGray
-        }
-        
-        DispatchQueue.global().async {
-        database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_CLIP_IDS).document(currentUserId).setData([currentUserId: true])
-          let date = ANIFunction.shared.getToday()
-          database.collection(KEY_USERS).document(currentUserId).collection(KEY_CLIP_RECRUIT_IDS).document(recuritId).setData([KEY_DATE: date])
-          
-          self.delegate?.loadedRecruitIsCliped(indexPath: indexPath, isCliped: true)
-        }
-      } else {
-        UIView.animate(withDuration: 0.15) {
-          clipButton.tintColor = ANIColor.gray
-        }
-        
-        DispatchQueue.global().async {
-          database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_CLIP_IDS).document(currentUserId).delete()
-          database.collection(KEY_USERS).document(currentUserId).collection(KEY_CLIP_RECRUIT_IDS).document(recuritId).delete()
-          
-          self.delegate?.loadedRecruitIsCliped(indexPath: indexPath, isCliped: false)
-        }
+    if clipButton.isSelected == true {
+      DispatchQueue.global().async {
+      database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_CLIP_IDS).document(currentUserId).setData([currentUserId: true])
       }
+      
+      DispatchQueue.global().async {
+        let date = ANIFunction.shared.getToday()
+        database.collection(KEY_USERS).document(currentUserId).collection(KEY_CLIP_RECRUIT_IDS).document(recuritId).setData([KEY_DATE: date])
+      }
+      
+      self.delegate?.loadedRecruitIsCliped(indexPath: indexPath, isCliped: true)
     } else {
-      self.delegate?.reject()
+      DispatchQueue.global().async {
+        database.collection(KEY_RECRUITS).document(recuritId).collection(KEY_CLIP_IDS).document(currentUserId).delete()
+        database.collection(KEY_USERS).document(currentUserId).collection(KEY_CLIP_RECRUIT_IDS).document(recuritId).delete()
+        
+        self.delegate?.loadedRecruitIsCliped(indexPath: indexPath, isCliped: false)
+      }
     }
   }
   
   @objc private func loveButtonBGTapped() {
+    self.delegate?.reject()
+  }
+  
+  @objc private func clipButtonBGTapped() {
     self.delegate?.reject()
   }
   
@@ -739,6 +733,18 @@ class ANIRecruitViewCell: UITableViewCell {
           let user = self.user else { return }
     
     self.delegate?.cellTapped(recruit: recruit, user: user)
+  }
+}
+
+//MARK: ANIButtonViewDelegate
+extension ANIRecruitViewCell: ANIButtonViewDelegate {
+  func buttonViewTapped(view: ANIButtonView) {
+    if view === self.loveButton {
+      love()
+    }
+    if view === self.clipButton {
+      clip()
+    }
   }
 }
 

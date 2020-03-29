@@ -17,7 +17,7 @@ enum MenuKind {
 class ANiNotiMenuBar: UIView {
   weak var menuCollectionView: UICollectionView?
   private let menus = ["通知", "メッセージ"]
-  var horizontalBarleftConstraint:Constraint?
+  var horizontalBarBaseleftConstraint:Constraint?
   var notiViewController: ANINotiViewController?
   
   override init(frame: CGRect) {
@@ -48,14 +48,23 @@ class ANiNotiMenuBar: UIView {
     collectionView.height(ANICommunityViewController.NAVIGATION_BAR_HEIGHT)
     self.menuCollectionView = collectionView
     
+    //horizontalBarBase
+    let horizontalBarBase = UIView()
+    horizontalBarBase.backgroundColor = ANIColor.bg
+    addSubview(horizontalBarBase)
+    horizontalBarBase.widthToSuperview(multiplier: 1/2)
+    horizontalBarBase.height(2.0)
+    horizontalBarBase.bottomToSuperview()
+    self.horizontalBarBaseleftConstraint = horizontalBarBase.leftToSuperview()
+    
     //horizontalBar
     let horizontalBar = UIView()
     horizontalBar.backgroundColor = ANIColor.emerald
-    addSubview(horizontalBar)
-    horizontalBarleftConstraint = horizontalBar.leftToSuperview()
-    horizontalBar.widthToSuperview(multiplier: 1/2)
-    horizontalBar.height(2.0)
+    horizontalBarBase.addSubview(horizontalBar)
+    horizontalBar.width(30)
+    horizontalBar.topToSuperview()
     horizontalBar.bottomToSuperview()
+    horizontalBar.centerXToSuperview()
   }
 }
 

@@ -18,7 +18,7 @@ class ANINotiMenuBarCell: UICollectionViewCell {
   var menuLabel: UILabel?
   var menuKind: MenuKind = .noti {
     didSet {
-      setupNotification()
+      setupNotifications()
     }
   }
   
@@ -47,7 +47,7 @@ class ANINotiMenuBarCell: UICollectionViewCell {
     //menuLabel
     let menuLabel = UILabel()
     menuLabel.textAlignment = .center
-    menuLabel.font = UIFont.boldSystemFont(ofSize: 17)
+    menuLabel.font = UIFont.boldSystemFont(ofSize: 16)
     menuLabel.textColor = ANIColor.gray
     addSubview(menuLabel)
     menuLabel.centerInSuperview()
@@ -67,7 +67,7 @@ class ANINotiMenuBarCell: UICollectionViewCell {
     self.badge = badge
   }
   
-  private func setupNotification() {
+  private func setupNotifications() {
     if menuKind == .noti {
       ANINotificationManager.receive(changeIsHaveUnreadNoti: self, selector: #selector(updateNotiBadge))
     } else if menuKind == .message {

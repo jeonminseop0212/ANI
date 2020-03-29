@@ -9,7 +9,6 @@
 import UIKit
 import FirebaseFirestore
 import CodableFirebase
-import NVActivityIndicatorView
 
 protocol ANIChatViewDelegate {
   func loadedMessage(messages: [FirebaseChatMessage])
@@ -54,8 +53,8 @@ class ANIChatView: UIView {
   
   private var cellHeight = [IndexPath: CGFloat]()
   
-  private weak var activityIndicatorView: NVActivityIndicatorView?
-  
+  private weak var activityIndicatorView: ANIActivityIndicator?
+
   override init(frame: CGRect) {
     super.init(frame: frame)
     
@@ -72,6 +71,7 @@ class ANIChatView: UIView {
     //chatTableView
     let chatTableView = UITableView()
     chatTableView.separatorStyle = .none
+    chatTableView.backgroundColor = .white
     let myChatId = NSStringFromClass(ANIMyChatViewCell.self)
     chatTableView.register(ANIMyChatViewCell.self, forCellReuseIdentifier: myChatId)
     let otherChatId = NSStringFromClass(ANIOtherChatViewCell.self)
@@ -87,11 +87,10 @@ class ANIChatView: UIView {
     self.chatTableView = chatTableView
     
     //activityIndicatorView
-    let activityIndicatorView = NVActivityIndicatorView(frame: .zero, type: .lineScale, color: ANIColor.emerald, padding: 0)
-    addSubview(activityIndicatorView)
-    activityIndicatorView.width(40.0)
-    activityIndicatorView.height(40.0)
-    activityIndicatorView.centerInSuperview()
+    let activityIndicatorView = ANIActivityIndicator()
+    activityIndicatorView.isFull = false
+    self.addSubview(activityIndicatorView)
+    activityIndicatorView.edgesToSuperview()
     self.activityIndicatorView = activityIndicatorView
   }
   
@@ -99,11 +98,7 @@ class ANIChatView: UIView {
     guard let chatTableView = self.chatTableView else { return }
     
     if !messages.isEmpty {
-      if isLoadFirstMessage {
-        chatTableView.scrollToRow(at: [0, messages.count - 1], at: .bottom, animated: false)
-      } else {
-        chatTableView.scrollToRow(at: [0, messages.count], at: .bottom, animated: false)
-      }
+      chatTableView.scrollToRow(at: [0, messages.count - 1], at: .bottom, animated: false)
     }
   }
   
@@ -126,14 +121,8 @@ class ANIChatView: UIView {
     chatTableView.reloadData()
     chatTableView.beginUpdates()
     chatTableView.endUpdates()
-    
-    var indexPath = IndexPath(row: 0, section: 0)
-    if isLoadFirstMessage {
-      indexPath.row = newMessage.count
-    } else {
-      indexPath.row = newMessage.count + 1
-    }
   
+    let indexPath = IndexPath(row: newMessage.count + 1, section: 0)
     chatTableView.scrollToRow(at: indexPath, at: .top, animated: false)
     
     var contentOffset = chatTableView.contentOffset
@@ -144,6 +133,14 @@ class ANIChatView: UIView {
     CATransaction.commit()
     
     self.isLoading = false
+  }
+  
+  private func getIsDiffrentBeforeDate(beforeDate: String, date: String) -> Bool {
+    if beforeDate != date {
+      return true
+    } else {
+      return false
+    }
   }
   
   private func reloadTableView(completion:(()->())? = nil) {
@@ -170,11 +167,14 @@ class ANIChatView: UIView {
       
       self.scrollToBottom()
       
+      activityIndicatorView.stopAnimating()
+      
       UIView.animate(withDuration: 0.2, animations: {
+        ANISessionManager.shared.isLoadedFirstData = true
+        ANINotificationManager.postDismissSplash()
+        
         chatTableView.alpha = 1.0
       })
-      
-      activityIndicatorView.stopAnimating()
       
       self.isLoading = false
       
@@ -189,12 +189,16 @@ extension ANIChatView: UITableViewDataSource {
     if isLoadFirstMessage {
       return messages.count
     } else {
-      return messages.count + 1
+      return messages.count
     }
   }
   
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     guard let currentUserUid = ANISessionManager.shared.currentUserUid else { return UITableViewCell() }
+    if indexPath.row != 0 {
+      beforeDate = ANIFunction.shared.getCurrentLocaleDateFromString(string: messages[indexPath.row - 1].date, format: "yyyy/MM/dd")
+    }
+    let date = ANIFunction.shared.getCurrentLocaleDateFromString(string: messages[indexPath.row].date, format: "yyyy/MM/dd")
     
     if isLoadFirstMessage {
       if messages[indexPath.row].sendUserId == currentUserUid {
@@ -202,10 +206,14 @@ extension ANIChatView: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: myChatId, for: indexPath) as! ANIMyChatViewCell
   
         cell.message = messages[indexPath.row]
-        if messages[indexPath.row].isDiffrentBeforeDate {
-          cell.chagedDate = getDate(date: messages[indexPath.row].date)
+        if indexPath.row == 0 {
+          cell.chagedDate = date
         } else {
-          cell.chagedDate = nil
+          if getIsDiffrentBeforeDate(beforeDate: beforeDate, date: date) {
+            cell.chagedDate = date
+          } else {
+            cell.chagedDate = nil
+          }
         }
   
         return cell
@@ -215,10 +223,14 @@ extension ANIChatView: UITableViewDataSource {
   
         cell.message = messages[indexPath.row]
         cell.user = self.user
-        if messages[indexPath.row].isDiffrentBeforeDate {
-          cell.chagedDate = getDate(date: messages[indexPath.row].date)
+        if indexPath.row == 0 {
+          cell.chagedDate = date
         } else {
-          cell.chagedDate = nil
+          if getIsDiffrentBeforeDate(beforeDate: beforeDate, date: date) {
+            cell.chagedDate = date
+          } else {
+            cell.chagedDate = nil
+          }
         }
         
         return cell
@@ -230,15 +242,19 @@ extension ANIChatView: UITableViewDataSource {
         
         return cell
       } else {
-        if messages[indexPath.row - 1].sendUserId == currentUserUid {
+        if messages[indexPath.row].sendUserId == currentUserUid {
           let myChatId = NSStringFromClass(ANIMyChatViewCell.self)
           let cell = tableView.dequeueReusableCell(withIdentifier: myChatId, for: indexPath) as! ANIMyChatViewCell
 
-          cell.message = messages[indexPath.row - 1]
-          if messages[indexPath.row - 1].isDiffrentBeforeDate {
-            cell.chagedDate = getDate(date: messages[indexPath.row - 1].date)
+          cell.message = messages[indexPath.row]
+          if indexPath.row == 0 {
+            cell.chagedDate = date
           } else {
-            cell.chagedDate = nil
+            if getIsDiffrentBeforeDate(beforeDate: beforeDate, date: date) {
+              cell.chagedDate = date
+            } else {
+              cell.chagedDate = nil
+            }
           }
 
           return cell
@@ -246,12 +262,16 @@ extension ANIChatView: UITableViewDataSource {
           let otherChatId = NSStringFromClass(ANIOtherChatViewCell.self)
           let cell = tableView.dequeueReusableCell(withIdentifier: otherChatId, for: indexPath) as! ANIOtherChatViewCell
 
-          cell.message = messages[indexPath.row - 1]
+          cell.message = messages[indexPath.row]
           cell.user = self.user
-          if messages[indexPath.row - 1].isDiffrentBeforeDate {
-            cell.chagedDate = getDate(date: messages[indexPath.row - 1].date)
+          if indexPath.row == 0 {
+            cell.chagedDate = date
           } else {
-            cell.chagedDate = nil
+            if getIsDiffrentBeforeDate(beforeDate: beforeDate, date: date) {
+              cell.chagedDate = date
+            } else {
+              cell.chagedDate = nil
+            }
           }
           
           return cell
@@ -329,7 +349,7 @@ extension ANIChatView {
       self.isLoading = true
       self.isLastPage = false
 
-      database.collection(KEY_CHAT_GROUPS).document(chatGroupId).collection(KEY_CHAT_MESSAGES).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments { (snapshot, error) in
+      database.collection(KEY_CHAT_GROUPS).document(chatGroupId).collection(KEY_CHAT_MESSAGES).order(by: KEY_DATE, descending: true).limit(to: 21).getDocuments { (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
           self.isLoading = false
@@ -387,7 +407,7 @@ extension ANIChatView {
     DispatchQueue.global().async {
       self.isLoading = true
       
-      database.collection(KEY_CHAT_GROUPS).document(chatGroupId).collection(KEY_CHAT_MESSAGES).order(by: KEY_DATE, descending: true).start(afterDocument: lastMessage).limit(to: 20).getDocuments { (snapshot, error) in
+      database.collection(KEY_CHAT_GROUPS).document(chatGroupId).collection(KEY_CHAT_MESSAGES).order(by: KEY_DATE, descending: true).start(afterDocument: lastMessage).limit(to: 21).getDocuments { (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
           self.isLoading = false

@@ -4,6 +4,8 @@ import AVKit
 
 class VideosController: UIViewController {
   
+  lazy var dropdownController: DropdownController = self.makeDropdownController()
+  
   lazy var gridView: GridView = self.makeGridView()
   lazy var videoBox: VideoBox = self.makeVideoBox()
   lazy var infoLabel: UILabel = self.makeInfoLabel()
@@ -12,11 +14,14 @@ class VideosController: UIViewController {
   var items: [Video] = [] {
     didSet {
       if !items.isEmpty {
-        changeVideo(video: items[0])
+        gridView.collectionView.reloadData()
+        
+        items[0].fetchThumbnail(size: CGSize(width: UIScreen.main.bounds.width / 4, height: UIScreen.main.bounds.width / 4)) { (image) in
+          self.changeVideo(video: self.items[0], thumbnailImage: image, isDefaultVideo: true)
+        }
       }
     }
   }
-  //  var items: [Video] = []
   
   let library = VideosLibrary()
   let once = Once()
@@ -40,9 +45,24 @@ class VideosController: UIViewController {
     
     setup()
   }
+  override func viewWillAppear(_ animated: Bool) {
+    if #available(iOS 10.0, *) {
+      do {
+        try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryAmbient, mode: AVAudioSessionModeDefault)
+      } catch {
+        print("AVAudioSession catgery set error \(error)")
+      }
+    }
+    
+    self.gridView.addReachEndObserver()
+  }
   
   override func viewWillDisappear(_ animated: Bool) {
     self.gridView.player?.pause()
+  }
+  
+  override func viewDidDisappear(_ animated: Bool) {
+    self.gridView.removeReachEndObserver()
   }
   
   // MARK: - Setup
@@ -51,6 +71,21 @@ class VideosController: UIViewController {
     view.backgroundColor = UIColor.white
     
     view.addSubview(gridView)
+    
+    addChildViewController(dropdownController)
+    gridView.insertSubview(dropdownController.view, belowSubview: gridView.topView)
+    dropdownController.didMove(toParentViewController: self)
+    
+    gridView.g_pinEdges()
+    gridView.dropDownController = dropdownController
+    
+    dropdownController.view.g_pin(on: .left)
+    dropdownController.view.g_pin(on: .right)
+    dropdownController.view.g_pin(on: .height, constant: -40) // subtract gridView.topView height
+    
+    dropdownController.expandedTopConstraint = dropdownController.view.g_pin(on: .top, view: gridView.topView, on: .bottom, constant: 1)
+    dropdownController.expandedTopConstraint?.isActive = false
+    dropdownController.collapsedTopConstraint = dropdownController.view.g_pin(on: .top, on: .bottom)
     
     [videoBox, infoLabel].forEach {
       gridView.bottomView.addSubview($0)
@@ -75,9 +110,12 @@ class VideosController: UIViewController {
     
     gridView.arrowButton.updateText("Gallery.AllVideos".g_localize(fallback: "ビデオ"))
     gridView.arrowButton.arrow.isHidden = true
+  }
+  
+  func makeDropdownController() -> DropdownController {
+    let controller = DropdownController()
     
-    //修正
-    gridView.previewImageView.isHidden = true
+    return controller
   }
   
   // MARK: - Action
@@ -93,7 +131,6 @@ class VideosController: UIViewController {
   // MARK: - View
   
   func refreshView() {
-    //修正
     //修正
     let hasVideo = (cart.video != nil)
     if hasVideo {
@@ -122,6 +159,7 @@ class VideosController: UIViewController {
   func makeGridView() -> GridView {
     let view = GridView()
     view.bottomView.alpha = 0
+    view.delegate = self
     
     return view
   }
@@ -144,9 +182,12 @@ class VideosController: UIViewController {
   }
   
   //修正
-  func changeVideo(video: Video) {
+  func changeVideo(video: Video, thumbnailImage: UIImage? = nil, isDefaultVideo: Bool) {
     video.fetchAVAsset { (myAVAsset) in
       guard let asset = myAVAsset else { return }
+      
+      self.gridView.isDefaultVideo = isDefaultVideo
+      self.gridView.thumnailImage = thumbnailImage
       self.gridView.videoPlayerItem = AVPlayerItem(asset: asset)
     }
   }
@@ -185,7 +226,7 @@ extension VideosController: VideoBoxDelegate {
   }
 }
 
-extension VideosController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+extension VideosController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UICollectionViewDelegate {
   
   // MARK: - UICollectionViewDataSource
   
@@ -218,20 +259,30 @@ extension VideosController: UICollectionViewDataSource, UICollectionViewDelegate
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
     let item = items[(indexPath as NSIndexPath).item]
     
-    if let selectedItem = cart.video , selectedItem == item {
-      cart.video = nil
-    } else {
-      cart.video = item
+    if cart.images.isEmpty {
+      if let selectedItem = cart.video , selectedItem == item {
+        cart.video = nil
+      } else {
+        cart.video = item
+      }
       
+      configureFrameViews()
       //修正
-      changeVideo(video: item)
+      if let videoCell = collectionView.cellForItem(at: indexPath) as? VideoCell,
+        let thumbnailImage = videoCell.imageView.image {
+        
+        changeVideo(video: item, thumbnailImage: thumbnailImage, isDefaultVideo: false)
+      }
     }
     
     refreshView()
-    configureFrameViews()
-    
-    //修正
     gridView.panGestureHelper.resetToOriginalStateTappedCell(index: indexPath)
+  }
+  
+  func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+    let cell = cell as! VideoCell
+    
+    configureFrameView(cell, indexPath: indexPath)
   }
   
   func configureFrameViews() {
@@ -245,10 +296,34 @@ extension VideosController: UICollectionViewDataSource, UICollectionViewDelegate
   func configureFrameView(_ cell: VideoCell, indexPath: IndexPath) {
     let item = items[(indexPath as NSIndexPath).item]
     
-    if let selectedItem = cart.video , selectedItem == item {
-      cell.frameView.g_quickFade()
+    if cart.images.isEmpty {
+      if let selectedItem = cart.video, selectedItem == item {
+        cell.frameView.g_quickFade()
+      } else {
+        cell.frameView.alpha = 0.0
+      }
+      
+      cell.coverView.alpha = 0.0
     } else {
-      cell.frameView.alpha = 0
+      cell.frameView.alpha = 0.0
+      cell.coverView.alpha = 0.5
     }
+  }
+}
+
+//MARK: GridViewDelegate
+extension VideosController: GridViewDelegate {
+  func previewImageDidScroll(offset: CGPoint) {
+  }
+  
+  func previewImageDidZoom(scale: CGFloat) {
+  }
+  
+  func previewVideoDidScroll(offset: CGPoint) {
+    cart.video?.offset = offset
+  }
+  
+  func previewVideoDidZoom(scale: CGFloat) {
+    cart.video?.scale = scale
   }
 }

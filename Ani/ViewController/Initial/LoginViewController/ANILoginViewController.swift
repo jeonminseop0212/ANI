@@ -26,9 +26,20 @@ class ANILoginViewController: UIViewController {
   private weak var rejectLabel: UILabel?
   private var isRejectAnimating: Bool = false
   
+  var myTabBarController: ANITabBarController?
+  
+  private weak var activityIndicatorView: ANIActivityIndicator?
+  
   override func viewDidLoad() {
     setup()
-    setupNotification()
+  }
+  
+  override func viewWillAppear(_ animated: Bool) {
+    setupNotifications()
+  }
+  
+  override func viewDidDisappear(_ animated: Bool) {
+    removeNotifications()
   }
   
   private func setup() {
@@ -69,6 +80,7 @@ class ANILoginViewController: UIViewController {
     
     //loginView
     let loginView = ANILoginView()
+    loginView.myTabBarController = myTabBarController
     loginView.delegate = self
     self.view.addSubview(loginView)
     loginView.topToBottom(of: myNavigationBar)
@@ -107,11 +119,23 @@ class ANILoginViewController: UIViewController {
     rejectBaseView.addSubview(rejectLabel)
     rejectLabel.edgesToSuperview()
     self.rejectLabel = rejectLabel
+    
+    //activityIndicatorView
+    let activityIndicatorView = ANIActivityIndicator()
+    activityIndicatorView.isFull = true
+    self.view.addSubview(activityIndicatorView)
+    activityIndicatorView.edgesToSuperview()
+    self.activityIndicatorView = activityIndicatorView
   }
   
-  private func setupNotification() {
+  private func setupNotifications() {
+    removeNotifications()
     ANINotificationManager.receive(keyboardWillChangeFrame: self, selector: #selector(keyboardWillChangeFrame))
     ANINotificationManager.receive(keyboardWillHide: self, selector: #selector(keyboardWillHide))
+  }
+  
+  private func removeNotifications() {
+    ANINotificationManager.remove(self)
   }
   
   @objc private func keyboardWillChangeFrame(_ notification: Notification) {
@@ -151,9 +175,10 @@ class ANILoginViewController: UIViewController {
 //MARK: ANILoginViewDelegate
 extension ANILoginViewController: ANILoginViewDelegate {
   func loginSuccess() {
-    self.navigationController?.dismiss(animated: true, completion: {
-      ANINotificationManager.postLogin()
-    })
+    ANINotificationManager.postLogin()
+
+    ANISessionManager.shared.isHiddenInitial = true
+    self.navigationController?.dismiss(animated: true, completion: nil)
   }
   
   func reject(notiText: String) {
@@ -178,5 +203,18 @@ extension ANILoginViewController: ANILoginViewDelegate {
         self.isRejectAnimating = false
       })
     }
+  }
+  
+  func startAnimaing() {
+    self.activityIndicatorView?.startAnimating()
+  }
+  
+  func stopAnimating() {
+    self.activityIndicatorView?.stopAnimating()
+  }
+  
+  func forgetPassword() {
+    let forgetPasswordViewController = ANIForgetPasswordViewController()
+    self.navigationController?.pushViewController(forgetPasswordViewController, animated: true)
   }
 }

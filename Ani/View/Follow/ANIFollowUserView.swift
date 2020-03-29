@@ -9,14 +9,17 @@
 import UIKit
 import FirebaseFirestore
 import CodableFirebase
-import NVActivityIndicatorView
+
+protocol ANIFollowUserViewDeleate {
+  func reject()
+}
 
 class ANIFollowUserView: UIView {
   
   private weak var followUserTableView: UITableView?
   
-  private weak var activityIndicatorView: NVActivityIndicatorView?
-  
+  private weak var activityIndicatorView: ANIActivityIndicator?
+
   var followUserViewMode: FollowUserViewMode?
   
   var userId: String? {
@@ -41,6 +44,8 @@ class ANIFollowUserView: UIView {
   private let COUNT_LAST_CELL: Int = 4
   
   private var cellHeight = [IndexPath: CGFloat]()
+  
+  var delegate: ANIFollowUserViewDeleate?
 
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -58,6 +63,7 @@ class ANIFollowUserView: UIView {
     //followUserTableView
     let followUserTableView = UITableView()
     let id = NSStringFromClass(ANIFollowUserViewCell.self)
+    followUserTableView.backgroundColor = .white
     followUserTableView.register(ANIFollowUserViewCell.self, forCellReuseIdentifier: id)
     followUserTableView.separatorStyle = .none
     followUserTableView.alpha = 0.0
@@ -74,11 +80,10 @@ class ANIFollowUserView: UIView {
     self.followUserTableView = followUserTableView
     
     //activityIndicatorView
-    let activityIndicatorView = NVActivityIndicatorView(frame: .zero, type: .lineScale, color: ANIColor.emerald, padding: 0)
-    addSubview(activityIndicatorView)
-    activityIndicatorView.width(40.0)
-    activityIndicatorView.height(40.0)
-    activityIndicatorView.centerInSuperview()
+    let activityIndicatorView = ANIActivityIndicator()
+    activityIndicatorView.isFull = false
+    self.addSubview(activityIndicatorView)
+    activityIndicatorView.edgesToSuperview()
     self.activityIndicatorView = activityIndicatorView
   }
   
@@ -91,6 +96,19 @@ class ANIFollowUserView: UIView {
     case .follower:
       loadFollower(sender: sender)
     }
+  }
+  
+  private func isBlockUser(user: FirebaseUser) -> Bool {
+    guard let userId = user.uid else { return false }
+    
+    if let blockUserIds = ANISessionManager.shared.blockUserIds, blockUserIds.contains(userId) {
+      return true
+    }
+    if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(userId) {
+      return true
+    }
+    
+    return false
   }
 }
 
@@ -124,6 +142,8 @@ extension ANIFollowUserView: UITableViewDataSource {
       }
     }
     
+    cell.delegate = self
+    
     return cell
   }
 }
@@ -155,6 +175,13 @@ extension ANIFollowUserView: UITableViewDelegate {
     } else {
       return UITableView.automaticDimension
     }
+  }
+}
+
+//MARK: ANIFollowUserViewCellDelegate
+extension ANIFollowUserView: ANIFollowUserViewCellDelegate {
+  func reject() {
+    self.delegate?.reject()
   }
 }
 
@@ -238,19 +265,24 @@ extension ANIFollowUserView {
             
             for followingUser in followingUserTemp {
               if let followingUser = followingUser {
-                self.followingUsers.append(followingUser)
+                if !self.isBlockUser(user: followingUser) {
+                  self.followingUsers.append(followingUser)
+                }
               }
             }
             followUserTableView.reloadData()
             
-            
-            activityIndicatorView.stopAnimating()
-            
-            UIView.animate(withDuration: 0.2, animations: {
-              followUserTableView.alpha = 1.0
-            })
-            
             self.isLoading = false
+
+            if self.followingUsers.isEmpty {
+              self.loadMoreFollowingUser()
+            } else {
+              activityIndicatorView.stopAnimating()
+              
+              UIView.animate(withDuration: 0.2, animations: {
+                followUserTableView.alpha = 1.0
+              })
+            }
           }
         }
       }
@@ -261,6 +293,7 @@ extension ANIFollowUserView {
     guard let followUserTableView = self.followUserTableView,
           let lastContent = self.lastContent,
           let userId = self.userId,
+          let activityIndicatorView = self.activityIndicatorView,
           !isLoading,
           !isLastPage else { return }
     
@@ -326,12 +359,26 @@ extension ANIFollowUserView {
           DispatchQueue.main.async {
             for followingUser in followingUserTemp {
               if let followingUser = followingUser {
-                self.followingUsers.append(followingUser)
+                if !self.isBlockUser(user: followingUser) {
+                  self.followingUsers.append(followingUser)
+                }
               }
             }
             followUserTableView.reloadData()
             
             self.isLoading = false
+            
+            if self.followingUsers.isEmpty {
+              self.loadMoreFollowingUser()
+            } else {
+              if followUserTableView.alpha == 0 {
+                activityIndicatorView.stopAnimating()
+                
+                UIView.animate(withDuration: 0.2, animations: {
+                  followUserTableView.alpha = 1.0
+                })
+              }
+            }
           }
         }
       })
@@ -420,20 +467,27 @@ extension ANIFollowUserView {
                 sender.endRefreshing()
               }
               
-              for user in followUserTemp {
-                if let user = user {
-                  self.followers.append(user)
+              for follower in followUserTemp {
+                if let follower = follower {
+                  if !self.isBlockUser(user: follower) {
+                    self.followers.append(follower)
+                  }
                 }
               }
               
               followUserTableView.reloadData()
-              activityIndicatorView.stopAnimating()
-
-              UIView.animate(withDuration: 0.2, animations: {
-                followUserTableView.alpha = 1.0
-              })
               
               self.isLoading = false
+
+              if self.followers.isEmpty {
+                self.loadMoreFollower()
+              } else {
+                activityIndicatorView.stopAnimating()
+                
+                UIView.animate(withDuration: 0.2, animations: {
+                  followUserTableView.alpha = 1.0
+                })
+              }
             }
           }
         }
@@ -445,6 +499,7 @@ extension ANIFollowUserView {
     guard let followUserTableView = self.followUserTableView,
           let lastContent = self.lastContent,
           let userId = self.userId,
+          let activityIndicatorView = self.activityIndicatorView,
           !isLoading,
           !isLastPage else { return }
     
@@ -510,12 +565,26 @@ extension ANIFollowUserView {
           DispatchQueue.main.async {
             for follower in followerTemp {
               if let follower = follower {
-                self.followers.append(follower)
+                if !self.isBlockUser(user: follower) {
+                  self.followers.append(follower)
+                }
               }
             }
             followUserTableView.reloadData()
             
             self.isLoading = false
+            
+            if self.followers.isEmpty {
+              self.loadMoreFollower()
+            } else {
+              if followUserTableView.alpha == 0 {
+                activityIndicatorView.stopAnimating()
+                
+                UIView.animate(withDuration: 0.2, animations: {
+                  followUserTableView.alpha = 1.0
+                })
+              }
+            }
           }
         }
       })

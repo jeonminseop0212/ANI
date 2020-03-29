@@ -23,11 +23,18 @@ class ANISupportViewController: UIViewController {
   
   override func viewDidLoad() {
     setup()
-    setupNotification()
+  }
+  
+  override func viewWillAppear(_ animated: Bool) {
+    setupNotifications()
   }
   
   override func viewDidAppear(_ animated: Bool) {
     supprotViewPop()
+  }
+  
+  override func viewDidDisappear(_ animated: Bool) {
+    removeNotifications()
   }
   
   private func setup() {
@@ -62,8 +69,13 @@ class ANISupportViewController: UIViewController {
     }
   }
   
-  private func setupNotification() {
+  private func setupNotifications() {
+    removeNotifications()
     ANINotificationManager.receive(keyboardWillShow: self, selector: #selector(keyboardWillShow))
+  }
+  
+  private func removeNotifications() {
+    ANINotificationManager.remove(self)
   }
   
   @objc private func supportViewDismiss() {

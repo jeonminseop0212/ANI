@@ -3,6 +3,8 @@
 # https://docs.fastlane.tools
 fastlane_version "1.109.0"
 
+import '../config/Fastfile'
+
 before_all do
 	
 end
@@ -15,6 +17,8 @@ platform :ios do
 			clean: true,
 			xcargs: prepare_api_keys
 		)
+		code_coverage
+		run_swift_lint
 	end
 end
 
@@ -51,10 +55,9 @@ platform :watch do
 	end
 end
 
-lane :deploytest do
-
+lane :runswiftlint do
+	run_swift_lint # From ../config/Fastile
 end
-
 
 desc "Available options: type:major|minor|patch"
 lane :deploy do |options|
@@ -178,3 +181,18 @@ end
 after_all do
   #slack
 end
+
+lane :code_coverage do
+	# NOTE: You must have ran scan before being able to generate the code coverage
+
+  xcov(
+		workspace: "AlgoliaSearch.xcworkspace",
+		scheme: "AlgoliaSearch iOS",
+		output_directory: "build/xcov_output",
+		slack_url: ENV['SLACK_WEBHOOK'],
+		slack_channel: "#notif-deploy-mobile",
+		slack_message: "InstantSearchClient code coverage report",
+		include_targets: "InstantSearchClient.framework"
+		#only_project_targets: true # trying to exclude pods, but not working, it s excluding everything
+	)
+end 

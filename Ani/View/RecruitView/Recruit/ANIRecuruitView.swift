@@ -9,13 +9,15 @@
 import UIKit
 import FirebaseFirestore
 import CodableFirebase
-import NVActivityIndicatorView
+import TinyConstraints
 
 protocol ANIRecruitViewDelegate {
   func recruitCellTap(selectedRecruit: FirebaseRecruit, user: FirebaseUser)
   func recruitViewDidScroll(scrollY: CGFloat)
   func supportButtonTapped(supportRecruit: FirebaseRecruit, user: FirebaseUser)
   func reject()
+  func showNewRecruitButton()
+  func hideNewRecruitButton()
 }
 
 class ANIRecuruitView: UIView {
@@ -30,7 +32,11 @@ class ANIRecuruitView: UIView {
     }
   }
   
-  private let TABLE_VIEW_TOP_MARGIN: CGFloat = 10.0
+  private weak var refreshControl: UIRefreshControl?
+  
+  private weak var activityIndicatorView: ANIActivityIndicator?
+
+  private let TABLE_VIEW_TOP_MARGIN: CGFloat = 0.0
   
   private var recruits = [FirebaseRecruit]()
   private var users = [FirebaseUser]()
@@ -82,11 +88,26 @@ class ANIRecuruitView: UIView {
   private var ageFilter: String?
   private var sexFilter: String?
   
-  private var query: Query?
+  private var query: Query? {
+    didSet {
+      observeRecruit()
+      
+      hideNewRecruitButton()
+      isNewRecruit = false
+      
+      loadRecruit(sender: nil)
+    }
+  }
   
-  private weak var activityIndicatorView: NVActivityIndicatorView?
+  private var isLoadedFirstData: Bool = false
+  private var isNewRecruit: Bool = false
+  private var isShowNewRecruitButton: Bool = false
   
-  var delegate:ANIRecruitViewDelegate?
+  private var scrollBeginingPoint: CGPoint?
+  
+  private var recruitListener: ListenerRegistration?
+  
+  var delegate: ANIRecruitViewDelegate?
   
   private var cellHeight = [IndexPath: CGFloat]()
   
@@ -94,7 +115,6 @@ class ANIRecuruitView: UIView {
     super.init(frame: frame)
     setup()
     setupNotifications()
-    loadRecruit(sender: nil)
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -131,20 +151,20 @@ class ANIRecuruitView: UIView {
     let refreshControl = UIRefreshControl()
     refreshControl.backgroundColor = .clear
     refreshControl.tintColor = ANIColor.moreDarkGray
-    refreshControl.addTarget(self, action: #selector(loadRecruit(sender:)), for: .valueChanged)
+    refreshControl.addTarget(self, action: #selector(reloadData(sender:)), for: .valueChanged)
     tableView.alpha = 0.0
     tableView.rowHeight = UITableView.automaticDimension
     tableView.addSubview(refreshControl)
+    self.refreshControl = refreshControl
     addSubview(tableView)
     tableView.edgesToSuperview()
     self.recruitTableView = tableView
     
     //activityIndicatorView
-    let activityIndicatorView = NVActivityIndicatorView(frame: .zero, type: .lineScale, color: ANIColor.emerald, padding: 0)
-    addSubview(activityIndicatorView)
-    activityIndicatorView.width(40.0)
-    activityIndicatorView.height(40.0)
-    activityIndicatorView.centerInSuperview()
+    let activityIndicatorView = ANIActivityIndicator()
+    activityIndicatorView.isFull = false
+    self.addSubview(activityIndicatorView)
+    activityIndicatorView.edgesToSuperview()
     self.activityIndicatorView = activityIndicatorView
     
     let database = Firestore.firestore()
@@ -154,24 +174,28 @@ class ANIRecuruitView: UIView {
   
   //MARK: Notifications
   private func setupNotifications() {
-    ANINotificationManager.receive(logout: self, selector: #selector(reloadRecruitLayout))
-    ANINotificationManager.receive(login: self, selector: #selector(reloadRecruitLayout))
+    ANINotificationManager.receive(logout: self, selector: #selector(reloadRecruit))
+    ANINotificationManager.receive(login: self, selector: #selector(reloadRecruit))
     ANINotificationManager.receive(recruitTabTapped: self, selector: #selector(scrollToTop))
     ANINotificationManager.receive(deleteRecruit: self, selector: #selector(deleteRecruit))
   }
   
-  @objc private func reloadRecruitLayout() {
+  @objc private func reloadData(sender:  UIRefreshControl?) {
+    hideNewRecruitButton()
+    isNewRecruit = false
+    
+    loadRecruit(sender: sender)
+  }
+  
+  @objc private func reloadRecruit() {
     guard let recruitTableView = self.recruitTableView else { return }
+
+    hideNewRecruitButton()
+    isNewRecruit = false
     
-    for (index, recruit) in recruits.enumerated() {
-      var recruitTemp = recruit
-      recruitTemp.isLoved = nil
-      recruitTemp.isCliped = nil
-      recruitTemp.isSupported = nil
-      self.recruits[index] = recruitTemp
-    }
+    recruitTableView.alpha = 0.0
     
-    recruitTableView.reloadData()
+    loadRecruit(sender: nil)
   }
   
   @objc private func scrollToTop() {
@@ -207,24 +231,40 @@ class ANIRecuruitView: UIView {
     }
     
     query = queryTemp
+  }
+  
+  func endRefresh() {
+    guard let refreshControl = self.refreshControl,
+          let recruitTableView = self.recruitTableView else { return }
     
-    loadRecruit(sender: nil)
+    refreshControl.endRefreshing()
+    
+    let topInset = UIViewController.NAVIGATION_BAR_HEIGHT + ANIRecruitViewController.FILTERS_VIEW_HEIGHT + TABLE_VIEW_TOP_MARGIN
+    if recruitTableView.contentOffset.y + topInset < 0 {
+      recruitTableView.scrollToRow(at: [0, 0], at: .top, animated: false)
+    }
   }
   
   @objc private func deleteRecruit(_ notification: NSNotification) {
     guard let id = notification.object as? String,
           let recruitTableView = self.recruitTableView else { return }
 
-    var indexPath: IndexPath = [0, 0]
-
     for (index, recruit) in recruits.enumerated() {
       if recruit.id == id {
         recruits.remove(at: index)
-        indexPath = [0, index]
+        
+        if !recruits.isEmpty {
+          recruitTableView.beginUpdates()
+          let indexPath: IndexPath = [0, index]
+          recruitTableView.deleteRows(at: [indexPath], with: .automatic)
+          recruitTableView.endUpdates()
+        } else {
+          recruitTableView.reloadData()
+          recruitTableView.alpha = 0.0
+          showReloadView(sender: nil)
+        }
       }
     }
-
-    recruitTableView.deleteRows(at: [indexPath], with: .automatic)
   }
   
   private func showReloadView(sender: UIRefreshControl?) {
@@ -242,13 +282,86 @@ class ANIRecuruitView: UIView {
     
     recruitTableView.alpha = 0.0
     
-    UIView.animate(withDuration: 0.2, animations: {
+    UIView.animate(withDuration: 0.2) {
       reloadView.alpha = 1.0
-    }) { (complete) in
-      ANINotificationManager.postDismissSplash()
     }
     
     self.isLoading = false
+  }
+  
+  private func isBlockRecruit(recruit: FirebaseRecruit) -> Bool {
+    guard let currentUserUid = ANISessionManager.shared.currentUserUid else { return false }
+    
+    if let blockUserIds = ANISessionManager.shared.blockUserIds, blockUserIds.contains(recruit.userId) {
+      return true
+    }
+    if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(recruit.userId) {
+      return true
+    }
+    if let hideUserIds = recruit.hideUserIds, hideUserIds.contains(currentUserUid) {
+      return true
+    }
+    
+    return false
+  }
+  
+  private func observeRecruit() {
+    guard let query = self.query else { return }
+    
+    if let recruitListener = self.recruitListener {
+      recruitListener.remove()
+      self.isLoadedFirstData = false
+    }
+    
+    recruitListener = query.order(by: KEY_DATE, descending: true).limit(to: 1).addSnapshotListener { (snapshot, error) in
+      if let error = error {
+        DLog("stories observe error \(error)")
+        return
+      }
+      
+      guard let snapshot = snapshot else { return }
+      
+      snapshot.documentChanges.forEach({ (diff) in
+        if diff.type == .added && self.isLoadedFirstData {
+          self.isNewRecruit = true
+          self.showNewRecruitButton()
+        }
+      })
+    }
+  }
+  
+  private func showNewRecruitButton() {
+    guard isNewRecruit,
+          !isShowNewRecruitButton else { return }
+    
+    isShowNewRecruitButton = true
+    
+    self.delegate?.showNewRecruitButton()
+  }
+  
+  private func hideNewRecruitButton() {
+    guard isNewRecruit,
+          isShowNewRecruitButton else { return }
+    
+    isShowNewRecruitButton = false
+    
+    self.delegate?.hideNewRecruitButton()
+  }
+  
+  func newRecruitButtonTapped() {
+    guard let recruitTableView = self.recruitTableView,
+          let refreshControl = self.refreshControl else { return }
+    
+    hideNewRecruitButton()
+    isNewRecruit = false
+    
+    refreshControl.beginRefreshing()
+    let offsetY = 60 + UIViewController.NAVIGATION_BAR_HEIGHT + ANIRecruitViewController.FILTERS_VIEW_HEIGHT
+    recruitTableView.setContentOffset(CGPoint(x: 0.0, y: -offsetY), animated: true)
+    
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+      self.loadRecruit(sender: refreshControl)
+    }
   }
 }
 
@@ -261,8 +374,9 @@ extension ANIRecuruitView: UITableViewDataSource {
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let id = NSStringFromClass(ANIRecruitViewCell.self)
     let cell = tableView.dequeueReusableCell(withIdentifier: id, for: indexPath) as! ANIRecruitViewCell
-    
-    if !recruits.isEmpty {
+    cell.delegate = self
+
+    if !recruits.isEmpty && recruits.count > indexPath.row {
       if users.contains(where: { $0.uid == recruits[indexPath.row].userId }) {
         for user in users {
           if recruits[indexPath.row].userId == user.uid {
@@ -273,9 +387,8 @@ extension ANIRecuruitView: UITableViewDataSource {
       } else {
         cell.user = nil
       }
-      cell.recruit = recruits[indexPath.row]
-      cell.delegate = self
       cell.indexPath = indexPath.row
+      cell.recruit = recruits[indexPath.row]
     }
     
     return cell
@@ -284,14 +397,6 @@ extension ANIRecuruitView: UITableViewDataSource {
 
 //MARK: UITableViewDelegate
 extension ANIRecuruitView: UITableViewDelegate {
-  func scrollViewDidScroll(_ scrollView: UIScrollView) {
-    ANINotificationManager.postViewScrolled()
-    
-    //navigation bar animation
-    let scrollY = scrollView.contentOffset.y
-    self.delegate?.recruitViewDidScroll(scrollY: scrollY)
-  }
-  
   func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
     if let cell = cell as? ANIRecruitViewCell {
       cell.unobserveLove()
@@ -315,6 +420,27 @@ extension ANIRecuruitView: UITableViewDelegate {
       return UITableView.automaticDimension
     }
   }
+  
+  func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+    scrollBeginingPoint = scrollView.contentOffset
+  }
+  
+  func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    ANINotificationManager.postViewScrolled()
+    
+    //navigation bar animation
+    let scrollY = scrollView.contentOffset.y
+    self.delegate?.recruitViewDidScroll(scrollY: scrollY)
+    
+    //new story button show or hide
+    if let scrollBeginingPoint = self.scrollBeginingPoint {
+      if scrollBeginingPoint.y < scrollView.contentOffset.y {
+        hideNewRecruitButton()
+      } else {
+        showNewRecruitButton()
+      }
+    }
+  }
 }
 
 //MARK: ANIRecruitViewCellDelegate
@@ -332,25 +458,38 @@ extension ANIRecuruitView: ANIRecruitViewCellDelegate {
   }
   
   func loadedRecruitIsLoved(indexPath: Int, isLoved: Bool) {
-    var recruit = self.recruits[indexPath]
-    recruit.isLoved = isLoved
-    self.recruits[indexPath] = recruit
+    if recruits.isEmpty && recruits.count > indexPath {
+      var recruit = self.recruits[indexPath]
+      recruit.isLoved = isLoved
+      self.recruits[indexPath] = recruit
+    }
   }
   
   func loadedRecruitIsCliped(indexPath: Int, isCliped: Bool) {
-    var recruit = self.recruits[indexPath]
-    recruit.isCliped = isCliped
-    self.recruits[indexPath] = recruit
+    if recruits.isEmpty && recruits.count > indexPath {
+      var recruit = self.recruits[indexPath]
+      recruit.isCliped = isCliped
+      self.recruits[indexPath] = recruit
+    }
   }
   
   func loadedRecruitIsSupported(indexPath: Int, isSupported: Bool) {
-    var recruit = self.recruits[indexPath]
-    recruit.isSupported = isSupported
-    self.recruits[indexPath] = recruit
+    if recruits.isEmpty && recruits.count > indexPath {
+      var recruit = self.recruits[indexPath]
+      recruit.isSupported = isSupported
+      self.recruits[indexPath] = recruit
+    }
   }
   
   func loadedRecruitUser(user: FirebaseUser) {
     self.users.append(user)
+  }
+}
+
+//MARK: ANIReloadViewDelegate
+extension ANIRecuruitView: ANIReloadViewDelegate {
+  func reloadButtonTapped() {
+    loadRecruit(sender: nil)
   }
 }
 
@@ -379,7 +518,7 @@ extension ANIRecuruitView {
       self.isLoading = true
       self.isLastRecruitPage = false
 
-      query.order(by: KEY_DATE, descending: true).limit(to: 15).getDocuments(completion: { (snapshot, error) in
+      query.order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
           self.isLoading = false
@@ -400,27 +539,37 @@ extension ANIRecuruitView {
         
         self.lastRecruit = lastRecruit
         
-        for document in snapshot.documents {
+        for (index, document) in snapshot.documents.enumerated() {
           do {
             let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: document.data())
-            self.recruits.append(recruit)
+            if !self.isBlockRecruit(recruit: recruit) {
+              self.recruits.append(recruit)
+            }
 
             DispatchQueue.main.async {
-              if let sender = sender {
-                sender.endRefreshing()
+              if index + 1 == snapshot.documents.count {
+                if let sender = sender {
+                  sender.endRefreshing()
+                }
+                
+                recruitTableView.reloadData()
+                
+                self.isLoading = false
+                
+                if self.recruits.isEmpty {
+                  self.loadMoreRecruit()
+                } else {
+                  if recruitTableView.alpha == 0.0 {
+                    activityIndicatorView.stopAnimating()
+
+                    UIView.animate(withDuration: 0.2, animations: {
+                      recruitTableView.alpha = 1.0
+                    })
+                  }
+                  
+                  self.isLoadedFirstData = true
+                }
               }
-              
-              activityIndicatorView.stopAnimating()
-              
-              recruitTableView.reloadData()
-              
-              UIView.animate(withDuration: 0.4, animations: {
-                recruitTableView.alpha = 1.0
-              }, completion: { (complete) in
-                ANINotificationManager.postDismissSplash()
-              })
-              
-              self.isLoading = false
             }
           } catch let error {
             DLog(error)
@@ -446,13 +595,14 @@ extension ANIRecuruitView {
     guard let query = self.query,
           let recruitTableView = self.recruitTableView,
           let lastRecruit = self.lastRecruit,
+          let activityIndicatorView = self.activityIndicatorView,
           !isLoading,
           !isLastRecruitPage else { return }
     
     DispatchQueue.global().async {
       self.isLoading = true
       
-      query.order(by: KEY_DATE, descending: true).start(afterDocument: lastRecruit).limit(to: 15).getDocuments(completion: { (snapshot, error) in
+      query.order(by: KEY_DATE, descending: true).start(afterDocument: lastRecruit).limit(to: 20).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
           self.isLoading = false
@@ -472,13 +622,29 @@ extension ANIRecuruitView {
         for (index, document) in snapshot.documents.enumerated() {
           do {
             let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: document.data())
-            self.recruits.append(recruit)
+            if !self.isBlockRecruit(recruit: recruit) {
+              self.recruits.append(recruit)
+            }
             
             DispatchQueue.main.async {
               if index + 1 == snapshot.documents.count {
                 recruitTableView.reloadData()
                 
                 self.isLoading = false
+                
+                if self.recruits.isEmpty {
+                  self.loadMoreRecruit()
+                } else {
+                  if recruitTableView.alpha == 0.0 {
+                    activityIndicatorView.stopAnimating()
+
+                    UIView.animate(withDuration: 0.2, animations: {
+                      recruitTableView.alpha = 1.0
+                    })
+                  }
+                  
+                  self.isLoadedFirstData = true
+                }
               }
             }
           } catch let error {
@@ -488,13 +654,5 @@ extension ANIRecuruitView {
         }
       })
     }
-  }
-}
-
-
-//MARK: ANIReloadViewDelegate
-extension ANIRecuruitView: ANIReloadViewDelegate {
-  func reloadButtonTapped() {
-    loadRecruit(sender: nil)
   }
 }

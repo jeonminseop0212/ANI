@@ -1,13 +1,28 @@
 {
-  "commitish" : "4.4.0",
+  "Mac" : [
+
+  ],
+  "watchOS" : [
+
+  ],
+  "tvOS" : [
+    {
+      "name" : "NVActivityIndicatorView",
+      "hash" : "2cd80dd4bf1157674655ce2f8b2e2be6b94803752dfaed1f2b9b0dfb368c7ebd",
+      "swiftToolchainVersion" : "5.1.2 (swiftlang-1100.0.278 clang-1100.0.33.9)"
+    }
+  ],
+  "commitish" : "4.8.0",
   "iOS" : [
     {
       "name" : "NVActivityIndicatorViewAppExtension",
-      "hash" : "fe37154dff584b8677a549e785d49baba7034707d3cf66dec83051d5c347f298"
+      "hash" : "93be51704ff380a19f1d00cbb74c2a6f2630defbdef3c2481477a5004f18dd5a",
+      "swiftToolchainVersion" : "5.1.2 (swiftlang-1100.0.278 clang-1100.0.33.9)"
     },
     {
       "name" : "NVActivityIndicatorView",
-      "hash" : "c66046bcc06f7c59caf32e7db470c02e261355cc532cd63b1c31e7a4e3dc73ea"
+      "hash" : "4529f51154a1a0e395d4a471a8e41054219cbae2b2c6636d4802048bf156d073",
+      "swiftToolchainVersion" : "5.1.2 (swiftlang-1100.0.278 clang-1100.0.33.9)"
     }
   ]
 }

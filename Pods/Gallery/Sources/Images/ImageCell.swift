@@ -6,6 +6,17 @@ class ImageCell: UICollectionViewCell {
   lazy var imageView: UIImageView = self.makeImageView()
   lazy var highlightOverlay: UIView = self.makeHighlightOverlay()
   lazy var frameView: FrameView = self.makeFrameView()
+  lazy var coverView: UIView = self.makeCoverView()
+  
+  var isLimit: Bool = false {
+    didSet {
+      if isLimit {
+        coverView.alpha = 0.5
+      } else {
+        coverView.alpha = 0.0
+      }
+    }
+  }
   
   // MARK: - Initialization
   
@@ -41,13 +52,14 @@ class ImageCell: UICollectionViewCell {
   // MARK: - Setup
   
   func setup() {
-    [imageView, frameView, highlightOverlay].forEach {
+    [imageView, frameView, highlightOverlay, coverView].forEach {
       self.contentView.addSubview($0)
     }
     
     imageView.g_pinEdges()
     frameView.g_pinEdges()
     highlightOverlay.g_pinEdges()
+    coverView.g_pinEdges()
   }
   
   // MARK: - Controls
@@ -74,5 +86,13 @@ class ImageCell: UICollectionViewCell {
     frameView.alpha = 0
     
     return frameView
+  }
+  
+  private func makeCoverView() -> UIView {
+    let coverView = UIView()
+    coverView.backgroundColor = .white
+    coverView.alpha = 0.0
+    
+    return coverView
   }
 }

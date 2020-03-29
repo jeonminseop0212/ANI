@@ -24,11 +24,13 @@ class ANIOptionViewCell: UITableViewCell {
   
   private func setup() {
     self.selectionStyle = .none
+    self.backgroundColor = .white
     
     //titleLabel
     let titleLabel = UILabel()
     titleLabel.font = UIFont.systemFont(ofSize: 16.0)
     titleLabel.textColor = ANIColor.dark
+    titleLabel.backgroundColor = .white
     addSubview(titleLabel)
     let insets = UIEdgeInsets(top: 15, left: 10, bottom: 15, right: 10)
     titleLabel.edgesToSuperview(insets: insets)

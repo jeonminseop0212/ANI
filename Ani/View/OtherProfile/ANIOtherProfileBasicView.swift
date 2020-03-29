@@ -9,7 +9,7 @@
 import UIKit
 import FirebaseFirestore
 import CodableFirebase
-import NVActivityIndicatorView
+import AVKit
 
 protocol ANIOtherProfileBasicViewDelegate {
   func loadedUser(user: FirebaseUser)
@@ -22,6 +22,10 @@ protocol ANIOtherProfileBasicViewDelegate {
   func supportButtonTapped(supportRecruit: FirebaseRecruit, user: FirebaseUser)
   func reject()
   func popupOptionView(isMe: Bool, contentType: ContentType, id: String)
+  func presentImageBrowser(index: Int, imageUrls: [String])
+  func twitterOpenReject()
+  func instagramOpenReject()
+  func openUrl(url: URL)
 }
 
 class ANIOtherProfileBasicView: UIView {
@@ -30,6 +34,11 @@ class ANIOtherProfileBasicView: UIView {
   
   private var contentType: ContentType = .profile {
     didSet {
+      if contentType == .story {
+        playVideo()
+      } else {
+        stopVideo()
+      }
       self.basicTableView?.reloadData()
       self.layoutIfNeeded()
       
@@ -38,12 +47,15 @@ class ANIOtherProfileBasicView: UIView {
   }
   
   private weak var basicTableView: UITableView?
-  
+    
+  private weak var activityIndicatorView: ANIActivityIndicator?
+
   private var lastRecruit: QueryDocumentSnapshot?
   private var recruits = [FirebaseRecruit]()
   private var recruitUsers = [FirebaseUser]()
   private var lastStory: QueryDocumentSnapshot?
   private var stories = [FirebaseStory]()
+  private var storyVideoAssets = [String: AVAsset]()
   private var storyUsers = [FirebaseUser]()
   private var lastQna: QueryDocumentSnapshot?
   private var qnas = [FirebaseQna]()
@@ -51,6 +63,8 @@ class ANIOtherProfileBasicView: UIView {
   private var supportRecruits = [String: FirebaseRecruit?]()
 
   private let COUNT_LAST_CELL: Int = 4
+  
+  private var beforeVideoViewCell: ANIVideoStoryViewCell?
 
   private var isFollowed: Bool?
   
@@ -69,8 +83,6 @@ class ANIOtherProfileBasicView: UIView {
     }
   }
   
-  private weak var activityIndicatorView: NVActivityIndicatorView?
-  
   private var isMenuChange: Bool = false
   
   private var isLoading: Bool = false
@@ -81,11 +93,14 @@ class ANIOtherProfileBasicView: UIView {
   private var storyCellHeight = [IndexPath: CGFloat]()
   private var qnaCellHeight = [IndexPath: CGFloat]()
   
+  private var scollViewContentOffsetY: CGFloat = 0.0
+  
   var delegate: ANIOtherProfileBasicViewDelegate?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()
+    setupNotifications()
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -106,6 +121,8 @@ class ANIOtherProfileBasicView: UIView {
     basicTableView.register(ANIRecruitViewCell.self, forCellReuseIdentifier: recruitCellid)
     let storyCellid = NSStringFromClass(ANIStoryViewCell.self)
     basicTableView.register(ANIStoryViewCell.self, forCellReuseIdentifier: storyCellid)
+    let videoStoryCellId = NSStringFromClass(ANIVideoStoryViewCell.self)
+    basicTableView.register(ANIVideoStoryViewCell.self, forCellReuseIdentifier: videoStoryCellId)
     let supportCellId = NSStringFromClass(ANISupportViewCell.self)
     basicTableView.register(ANISupportViewCell.self, forCellReuseIdentifier: supportCellId)
     let qnaCellid = NSStringFromClass(ANIQnaViewCell.self)
@@ -122,12 +139,39 @@ class ANIOtherProfileBasicView: UIView {
     self.basicTableView = basicTableView
     
     //activityIndicatorView
-    let activityIndicatorView = NVActivityIndicatorView(frame: .zero, type: .lineScale, color: ANIColor.emerald, padding: 0)
-    addSubview(activityIndicatorView)
-    activityIndicatorView.width(40.0)
-    activityIndicatorView.height(40.0)
-    activityIndicatorView.centerInSuperview()
+    let activityIndicatorView = ANIActivityIndicator()
+    activityIndicatorView.isFull = false
+    self.addSubview(activityIndicatorView)
+    activityIndicatorView.edgesToSuperview()
     self.activityIndicatorView = activityIndicatorView
+  }
+  
+  func playVideo() {
+    guard let basicTableView = self.basicTableView else { return }
+    
+    let centerX = basicTableView.center.x
+    let centerY = basicTableView.center.y + scollViewContentOffsetY + UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    
+    if let indexPath = basicTableView.indexPathForRow(at: CGPoint(x: centerX, y: centerY)) {
+      if let videoCell = basicTableView.cellForRow(at: indexPath) as? ANIVideoStoryViewCell,
+        let storyVideoView = videoCell.storyVideoView {
+        storyVideoView.play()
+      }
+    }
+  }
+  
+  func stopVideo() {
+    guard let basicTableView = self.basicTableView else { return }
+    
+    let centerX = basicTableView.center.x
+    let centerY = basicTableView.center.y + scollViewContentOffsetY + UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    
+    if let indexPath = basicTableView.indexPathForRow(at: CGPoint(x: centerX, y: centerY)) {
+      if let videoCell = basicTableView.cellForRow(at: indexPath) as? ANIVideoStoryViewCell,
+        let storyVideoView = videoCell.storyVideoView {
+        storyVideoView.stop()
+      }
+    }
   }
   
   private func checkFollowed() {
@@ -190,6 +234,12 @@ class ANIOtherProfileBasicView: UIView {
     }
   }
   
+  private func setupNotifications() {
+    ANINotificationManager.receive(deleteRecruit: self, selector: #selector(deleteRecruit))
+    ANINotificationManager.receive(deleteStory: self, selector: #selector(deleteStory))
+    ANINotificationManager.receive(deleteQna: self, selector: #selector(deleteQna))
+  }
+  
   @objc private func reloadData(sender: UIRefreshControl?) {
     loadUser(sender: sender)
   }
@@ -222,6 +272,117 @@ class ANIOtherProfileBasicView: UIView {
         }
       }
     }
+  }
+  
+  @objc private func deleteRecruit(_ notification: NSNotification) {
+    guard let id = notification.object as? String,
+          let basicTableView = self.basicTableView else { return }
+        
+    for (index, recruit) in recruits.enumerated() {
+      if recruit.id == id {
+        recruits.remove(at: index)
+        
+        if !recruits.isEmpty {
+          basicTableView.beginUpdates()
+          let indexPath: IndexPath = [1, index]
+          basicTableView.deleteRows(at: [indexPath], with: .automatic)
+          basicTableView.endUpdates()
+        } else {
+          basicTableView.reloadData()
+        }
+      }
+    }
+  }
+  
+  @objc private func deleteStory(_ notification: NSNotification) {
+    guard let id = notification.object as? String,
+          let basicTableView = self.basicTableView else { return }
+        
+    for (index, story) in stories.enumerated() {
+      if story.id == id {
+        stories.remove(at: index)
+        
+        if !stories.isEmpty {
+          basicTableView.beginUpdates()
+          let indexPath: IndexPath = [1, index]
+          basicTableView.deleteRows(at: [indexPath], with: .automatic)
+          basicTableView.endUpdates()
+        } else {
+          basicTableView.reloadData()
+        }
+      }
+    }
+  }
+  
+  @objc private func deleteQna(_ notification: NSNotification) {
+    guard let id = notification.object as? String,
+          let basicTableView = self.basicTableView else { return }
+        
+    for (index, qna) in qnas.enumerated() {
+      if qna.id == id {
+        qnas.remove(at: index)
+        
+        if !qnas.isEmpty {
+          basicTableView.beginUpdates()
+          let indexPath: IndexPath = [1, index]
+          basicTableView.deleteRows(at: [indexPath], with: .automatic)
+          basicTableView.endUpdates()
+        } else {
+          basicTableView.reloadData()
+        }
+      }
+    }
+  }
+  
+  private func isBlockRecruit(recruit: FirebaseRecruit) -> Bool {
+    guard let currentUserUid = ANISessionManager.shared.currentUserUid else { return false }
+    
+    if let blockUserIds = ANISessionManager.shared.blockUserIds, blockUserIds.contains(recruit.userId) {
+      return true
+    }
+    if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(recruit.userId) {
+      return true
+    }
+    if let hideUserIds = recruit.hideUserIds, hideUserIds.contains(currentUserUid) {
+      return true
+    }
+    
+    return false
+  }
+  
+  private func isBlockStory(story: FirebaseStory) -> Bool {
+    guard let currentUserUid = ANISessionManager.shared.currentUserUid else { return false }
+    
+    if let blockUserIds = ANISessionManager.shared.blockUserIds, blockUserIds.contains(story.userId) {
+      return true
+    }
+    if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(story.userId) {
+      return true
+    }
+    if let hideUserIds = story.hideUserIds, hideUserIds.contains(currentUserUid) {
+      return true
+    }
+    if story.storyImageUrls == nil && story.recruitId == nil && story.thumbnailImageUrl == nil {
+      return true
+    }
+    
+    return false
+  }
+  
+  private func isBlockQna(qna: FirebaseQna) -> Bool {
+    guard let currentUserUid = ANISessionManager.shared.currentUserUid else { return false }
+    
+    if let blockUserIds = ANISessionManager.shared.blockUserIds, blockUserIds.contains(qna.userId) {
+      return true
+    }
+    if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(qna.userId) {
+      return true
+    }
+    if let hideUserIds = qna.hideUserIds, hideUserIds.contains(currentUserUid) {
+      return true
+    }
+    
+    return false
   }
 }
 
@@ -256,36 +417,29 @@ extension ANIOtherProfileBasicView: UITableViewDataSource {
     if section == 0 {
       let topCellId = NSStringFromClass(ANIOtherProfileTopCell.self)
       let cell = tableView.dequeueReusableCell(withIdentifier: topCellId, for: indexPath) as! ANIOtherProfileTopCell
-      
       cell.delegate = self
+
       cell.selectedIndex = contentType.rawValue
       cell.user = user
-      
-      if let bottomSpace = cell.bottomSpace {
-        if contentType == .recruit {
-          bottomSpace.isHidden = false
-        } else {
-          bottomSpace.isHidden = true
-        }
-      }
       
       return cell
     } else {
       if contentType == .profile {
         let profileCellid = NSStringFromClass(ANIOtherProfileCell.self)
         let cell = tableView.dequeueReusableCell(withIdentifier: profileCellid, for: indexPath) as! ANIOtherProfileCell
-        
+        cell.delegate = self
+
         cell.user = user
         if let isFollowed = self.isFollowed {
           cell.isFollowed = isFollowed
         }
-        cell.delegate = self
         
         return cell
       } else if contentType == .recruit {
         let recruitCellid = NSStringFromClass(ANIRecruitViewCell.self)
         let cell = tableView.dequeueReusableCell(withIdentifier: recruitCellid, for: indexPath) as! ANIRecruitViewCell
-        
+        cell.delegate = self
+
         if recruitUsers.contains(where: { $0.uid == recruits[indexPath.row].userId }) {
           for user in recruitUsers {
             if recruits[indexPath.row].userId == user.uid {
@@ -296,9 +450,8 @@ extension ANIOtherProfileBasicView: UITableViewDataSource {
         } else {
           cell.user = nil
         }
-        cell.recruit = recruits[indexPath.row]
-        cell.delegate = self
         cell.indexPath = indexPath.row
+        cell.recruit = recruits[indexPath.row]
         
         return cell
       } else if contentType == .story {
@@ -306,7 +459,8 @@ extension ANIOtherProfileBasicView: UITableViewDataSource {
           if let recruitId = stories[indexPath.row].recruitId {
             let supportCellId = NSStringFromClass(ANISupportViewCell.self)
             let cell = tableView.dequeueReusableCell(withIdentifier: supportCellId, for: indexPath) as! ANISupportViewCell
-            
+            cell.delegate = self
+
             if let supportRecruit = supportRecruits[recruitId] {
               if let supportRecruit = supportRecruit {
                 cell.recruit = supportRecruit
@@ -330,14 +484,14 @@ extension ANIOtherProfileBasicView: UITableViewDataSource {
             } else {
               cell.user = nil
             }
-            cell.story = stories[indexPath.row]
-            cell.delegate = self
             cell.indexPath = indexPath.row
+            cell.story = stories[indexPath.row]
             
             return cell
-          } else {
-            let storyCellId = NSStringFromClass(ANIStoryViewCell.self)
-            let cell = tableView.dequeueReusableCell(withIdentifier: storyCellId, for: indexPath) as! ANIStoryViewCell
+          } else if stories[indexPath.row].thumbnailImageUrl != nil {
+            let videoStoryCellId = NSStringFromClass(ANIVideoStoryViewCell.self)
+            let cell = tableView.dequeueReusableCell(withIdentifier: videoStoryCellId, for: indexPath) as! ANIVideoStoryViewCell
+            cell.delegate = self
             
             if storyUsers.contains(where: { $0.uid == stories[indexPath.row].userId }) {
               for user in storyUsers {
@@ -349,9 +503,35 @@ extension ANIOtherProfileBasicView: UITableViewDataSource {
             } else {
               cell.user = nil
             }
-            cell.story = stories[indexPath.row]
-            cell.delegate = self
+            
+            if let storyVideoUrl = stories[indexPath.row].storyVideoUrl,
+              storyVideoAssets.contains(where: { $0.0 == storyVideoUrl }) {
+              cell.videoAsset = storyVideoAssets[storyVideoUrl]
+            } else {
+              cell.videoAsset = nil
+            }
+            
             cell.indexPath = indexPath.row
+            cell.story = stories[indexPath.row]
+            
+            return cell
+          } else {
+            let storyCellId = NSStringFromClass(ANIStoryViewCell.self)
+            let cell = tableView.dequeueReusableCell(withIdentifier: storyCellId, for: indexPath) as! ANIStoryViewCell
+            cell.delegate = self
+
+            if storyUsers.contains(where: { $0.uid == stories[indexPath.row].userId }) {
+              for user in storyUsers {
+                if stories[indexPath.row].userId == user.uid {
+                  cell.user = user
+                  break
+                }
+              }
+            } else {
+              cell.user = nil
+            }
+            cell.indexPath = indexPath.row
+            cell.story = stories[indexPath.row]
             
             return cell
           }
@@ -361,7 +541,8 @@ extension ANIOtherProfileBasicView: UITableViewDataSource {
       } else {
         let qnaCellid = NSStringFromClass(ANIQnaViewCell.self)
         let cell = tableView.dequeueReusableCell(withIdentifier: qnaCellid, for: indexPath) as! ANIQnaViewCell
-        
+        cell.delegate = self
+
         if qnaUsers.contains(where: { $0.uid == qnas[indexPath.row].userId }) {
           for user in qnaUsers {
             if qnas[indexPath.row].userId == user.uid {
@@ -372,9 +553,8 @@ extension ANIOtherProfileBasicView: UITableViewDataSource {
         } else {
           cell.user = nil
         }
-        cell.qna = qnas[indexPath.row]
-        cell.delegate = self
         cell.indexPath = indexPath.row
+        cell.qna = qnas[indexPath.row]
         
         return cell
       }
@@ -391,10 +571,15 @@ extension ANIOtherProfileBasicView: UITableViewDelegate {
       cell.unobserveLove()
       cell.unobserveSupport()
     } else if contentType == .story {
-      if !stories.isEmpty {
+      if !stories.isEmpty && stories.count > indexPath.row {
         if stories[indexPath.row].recruitId != nil, let cell = cell as? ANISupportViewCell {
           cell.unobserveLove()
           cell.unobserveComment()
+        } else if stories[indexPath.row].thumbnailImageUrl != nil, let cell = cell as? ANIVideoStoryViewCell {
+          cell.unobserveLove()
+          cell.unobserveComment()
+          cell.storyVideoView?.removeReachEndObserver()
+          cell.storyVideoView?.stop()
         } else if let cell = cell as? ANIStoryViewCell {
           cell.unobserveLove()
           cell.unobserveComment()
@@ -455,10 +640,42 @@ extension ANIOtherProfileBasicView: UITableViewDelegate {
       return UITableView.automaticDimension
     }
   }
+  
+  func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    guard let basicTableView = self.basicTableView else { return }
+    
+    scollViewContentOffsetY = scrollView.contentOffset.y
+    
+    //play video
+    let centerX = basicTableView.center.x
+    let centerY = basicTableView.center.y + scrollView.contentOffset.y + UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    
+    if let indexPath = basicTableView.indexPathForRow(at: CGPoint(x: centerX, y: centerY)) {
+      if let videoCell = basicTableView.cellForRow(at: indexPath) as? ANIVideoStoryViewCell,
+        let storyVideoView = videoCell.storyVideoView {
+        if beforeVideoViewCell != videoCell {
+          if let beforeVideoViewCell = self.beforeVideoViewCell,
+            let beforeStoryVideoView = beforeVideoViewCell.storyVideoView {
+            beforeStoryVideoView.stop()
+          }
+          
+          storyVideoView.play()
+          beforeVideoViewCell = videoCell
+        }
+      } else {
+        if let beforeVideoViewCell = self.beforeVideoViewCell,
+          let beforeStoryVideoView = beforeVideoViewCell.storyVideoView {
+          beforeStoryVideoView.stop()
+        }
+        
+        beforeVideoViewCell = nil
+      }
+    }
+  }
 }
 
-//MARK: ANIProfileMenuBarDelegate
-extension ANIOtherProfileBasicView: ANIProfileMenuBarDelegate {
+//MARK: ANIProfileTopCellDelegate
+extension ANIOtherProfileBasicView: ANIOtherProfileTopCellDelegate {
   func didSelecteMenuItem(selectedIndex: Int) {
     guard let basicTableView = self.basicTableView else { return }
     
@@ -480,6 +697,10 @@ extension ANIOtherProfileBasicView: ANIProfileMenuBarDelegate {
     
     basicTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
   }
+  
+  func presentImageBrowser(index: Int, imageUrls: [String]) {
+    self.delegate?.presentImageBrowser(index: index, imageUrls: imageUrls)
+  }
 }
 
 //MARK: ANIOtherProfileCellDelegate
@@ -490,6 +711,18 @@ extension ANIOtherProfileBasicView: ANIOtherProfileCellDelegate {
   
   func followerTapped() {
     self.delegate?.followerTapped()
+  }
+  
+  func twitterOpenReject() {
+    self.delegate?.twitterOpenReject()
+  }
+  
+  func instagramOpenReject() {
+    self.delegate?.instagramOpenReject()
+  }
+  
+  func openUrl(url: URL) {
+    self.delegate?.openUrl(url: url)
   }
 }
 
@@ -530,8 +763,8 @@ extension ANIOtherProfileBasicView: ANIRecruitViewCellDelegate {
   }
 }
 
-//MARK: ANIStoryViewCellDelegate
-extension ANIOtherProfileBasicView: ANIStoryViewCellDelegate {
+//MARK: ANIStoryViewCellDelegate, ANIVideoStoryViewCellDelegate
+extension ANIOtherProfileBasicView: ANIStoryViewCellDelegate, ANIVideoStoryViewCellDelegate {
   func storyCellTapped(story: FirebaseStory, user: FirebaseUser) {
     self.delegate?.storyViewCellDidSelect(selectedStory: story, user: user)
   }
@@ -548,6 +781,10 @@ extension ANIOtherProfileBasicView: ANIStoryViewCellDelegate {
   
   func loadedStoryUser(user: FirebaseUser) {
     self.storyUsers.append(user)
+  }
+  
+  func loadedVideo(urlString: String, asset: AVAsset) {
+    storyVideoAssets[urlString] = asset
   }
 }
 
@@ -636,7 +873,9 @@ extension ANIOtherProfileBasicView {
   
   private func loadRecruit() {
     guard let user = self.user,
-          let uid = user.uid else { return }
+          let uid = user.uid,
+          let basicTableView = self.basicTableView else { return }
+
     
     if !self.recruits.isEmpty {
       self.recruits.removeAll()
@@ -666,17 +905,23 @@ extension ANIOtherProfileBasicView {
         
         self.lastRecruit = lastRecruit
         
-        for document in snapshot.documents {
+        for (index, document) in snapshot.documents.enumerated() {
           do {
             let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: document.data())
-            self.recruits.append(recruit)
+            if !self.isBlockRecruit(recruit: recruit) {
+              self.recruits.append(recruit)
+            }
             
             DispatchQueue.main.async {
-              guard let basicTableView = self.basicTableView else { return }
-              
-              basicTableView.reloadData()
-              
-              self.isLoading = false
+              if index + 1 == snapshot.documents.count {
+                basicTableView.reloadData()
+                
+                self.isLoading = false
+                
+                if self.recruits.isEmpty {
+                  self.loadMoreRecruit()
+                }
+              }
             }
           } catch let error {
             DLog(error)
@@ -721,13 +966,19 @@ extension ANIOtherProfileBasicView {
         for (index, document) in snapshot.documents.enumerated() {
           do {
             let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: document.data())
-            self.recruits.append(recruit)
+            if !self.isBlockRecruit(recruit: recruit) {
+              self.recruits.append(recruit)
+            }
             
             DispatchQueue.main.async {
               if index + 1 == snapshot.documents.count {
                 basicTableView.reloadData()
                 
                 self.isLoading = false
+                
+                if self.recruits.isEmpty {
+                  self.loadMoreRecruit()
+                }
               }
             }
           } catch let error {
@@ -741,7 +992,8 @@ extension ANIOtherProfileBasicView {
   
   private func loadStory() {
     guard let user = self.user,
-          let uid = user.uid else { return }
+          let uid = user.uid,
+          let basicTableView = self.basicTableView else { return }
     
     if !self.stories.isEmpty {
       self.stories.removeAll()
@@ -774,17 +1026,31 @@ extension ANIOtherProfileBasicView {
         
         self.lastStory = lastStory
         
-        for document in snapshot.documents {
+        for (index, document) in snapshot.documents.enumerated() {
           do {
             let story = try FirestoreDecoder().decode(FirebaseStory.self, from: document.data())
-            self.stories.append(story)
+            
+            if !self.isBlockStory(story: story) {
+              if let storyVideoUrl = story.storyVideoUrl,
+                let url = URL(string: storyVideoUrl),
+                !self.storyVideoAssets.contains(where: { $0.0 == storyVideoUrl }) {
+                let asset = AVAsset(url: url)
+                self.storyVideoAssets[storyVideoUrl] = asset
+              }
+              
+              self.stories.append(story)
+            }
             
             DispatchQueue.main.async {
-              guard let basicTableView = self.basicTableView else { return }
-              
-              basicTableView.reloadData()
-              
-              self.isLoading = false
+              if index + 1 == snapshot.documents.count {
+                basicTableView.reloadData()
+                
+                self.isLoading = false
+                
+                if self.stories.isEmpty {
+                  self.loadMoreStory()
+                }
+              }
             }
           } catch let error {
             DLog(error)
@@ -829,13 +1095,27 @@ extension ANIOtherProfileBasicView {
         for (index, document) in snapshot.documents.enumerated() {
           do {
             let story = try FirestoreDecoder().decode(FirebaseStory.self, from: document.data())
-            self.stories.append(story)
+            
+            if !self.isBlockStory(story: story) {
+              if let storyVideoUrl = story.storyVideoUrl,
+                let url = URL(string: storyVideoUrl),
+                !self.storyVideoAssets.contains(where: { $0.0 == storyVideoUrl }) {
+                let asset = AVAsset(url: url)
+                self.storyVideoAssets[storyVideoUrl] = asset
+              }
+              
+              self.stories.append(story)
+            }
             
             DispatchQueue.main.async {
               if index + 1 == snapshot.documents.count {
                 basicTableView.reloadData()
                 
                 self.isLoading = false
+                
+                if self.stories.isEmpty {
+                  self.loadMoreStory()
+                }
               }
             }
           } catch let error {
@@ -849,7 +1129,8 @@ extension ANIOtherProfileBasicView {
   
   private func loadQna() {
     guard let user = self.user,
-          let uid = user.uid else { return }
+          let uid = user.uid,
+          let basicTableView = self.basicTableView else { return }
     
     if !self.qnas.isEmpty {
       self.qnas.removeAll()
@@ -880,18 +1161,23 @@ extension ANIOtherProfileBasicView {
         
         self.lastQna = lastQna
         
-        for document in snapshot.documents {
+        for (index, document) in snapshot.documents.enumerated() {
           do {
             let qna = try FirestoreDecoder().decode(FirebaseQna.self.self, from: document.data())
-            self.qnas.append(qna)
+            if !self.isBlockQna(qna: qna) {
+              self.qnas.append(qna)
+            }
             
             DispatchQueue.main.async {
-              
-              guard let basicTableView = self.basicTableView else { return }
-              
-              basicTableView.reloadData()
-              
-              self.isLoading = false
+              if index + 1 == snapshot.documents.count {
+                basicTableView.reloadData()
+                
+                self.isLoading = false
+                
+                if self.qnas.isEmpty {
+                  self.loadMoreQna()
+                }
+              }
             }
           } catch let error {
             DLog(error)
@@ -936,13 +1222,19 @@ extension ANIOtherProfileBasicView {
         for (index, document) in snapshot.documents.enumerated() {
           do {
             let qna = try FirestoreDecoder().decode(FirebaseQna.self, from: document.data())
-            self.qnas.append(qna)
+            if !self.isBlockQna(qna: qna) {
+              self.qnas.append(qna)
+            }
             
             DispatchQueue.main.async {
               if index + 1 == snapshot.documents.count {
                 basicTableView.reloadData()
                 
                 self.isLoading = false
+                
+                if self.qnas.isEmpty {
+                  self.loadMoreQna()
+                }
               }
             }
           } catch let error {

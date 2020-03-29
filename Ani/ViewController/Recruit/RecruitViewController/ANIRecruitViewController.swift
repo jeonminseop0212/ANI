@@ -18,6 +18,7 @@ enum FilterPickMode: Int {
 
 class ANIRecruitViewController: UIViewController {
   
+  private weak var myNavigationBartopArea: UIView?
   private weak var myNavigationBar: UIView?
   private weak var myNavigationBarTopConstroint: Constraint?
   private weak var navigaitonTitleLabel: UILabel?
@@ -39,20 +40,37 @@ class ANIRecruitViewController: UIViewController {
   private var isRejectAnimating: Bool = false
   private var rejectTapView: UIView?
   
+  private let NEW_RECRUIT_BUTTON_OFFSET: CGFloat = 7.0
+  private let NEW_RECRUIT_BUTTON_HIDE_OFFSET: CGFloat = -60.0
+  private let NEW_RECRUIT_BUTTON_HEIGHT: CGFloat = 30.0
+  private var newRecruitButtonTopConstraint: Constraint?
+  private weak var newRecruitButton: ANIAreaButtonView?
+  private weak var arrowImageView: UIImageView?
+  private weak var newRecruitLabel: UILabel?
+  
+  private weak var uploadProgressView: ANIUploadProgressView?
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     setup()
-    ifNeedsShowInitialView()
   }
   
   override func viewWillAppear(_ animated: Bool) {
-    UIApplication.shared.statusBarStyle = .default
+    if #available(iOS 13.0, *) {
+      UIApplication.shared.statusBarStyle = .darkContent
+    } else {
+      UIApplication.shared.statusBarStyle = .default
+    }
     UIApplication.shared.isStatusBarHidden = false
     setupNotifications()
   }
   
-  override func viewWillDisappear(_ animated: Bool) {
+  override func viewDidDisappear(_ animated: Bool) {
+    guard let recruitView = self.recruitView else { return }
+    
     removeNotifications()
+    
+    recruitView.endRefresh()
   }
   
   private func setup() {
@@ -71,6 +89,40 @@ class ANIRecruitViewController: UIViewController {
     recruitView.edgesToSuperview(excluding: .top)
     self.recruitView = recruitView
     
+    //newRecuritButton
+    let newRecruitButton = ANIAreaButtonView()
+    newRecruitButton.base?.backgroundColor = ANIColor.emerald
+    newRecruitButton.baseCornerRadius = NEW_RECRUIT_BUTTON_HEIGHT / 2
+    newRecruitButton.dropShadow(opacity: 0.1)
+    newRecruitButton.delegate = self
+    self.view.addSubview(newRecruitButton)
+    newRecruitButton.centerXToSuperview()
+    newRecruitButton.width(160.0)
+    newRecruitButton.height(NEW_RECRUIT_BUTTON_HEIGHT)
+    self.newRecruitButton = newRecruitButton
+    
+    //newRecruitLabel
+    let newRecruitLabel = UILabel()
+    newRecruitLabel.text = "新しい募集"
+    newRecruitLabel.textAlignment = .center
+    newRecruitLabel.font = UIFont.boldSystemFont(ofSize: 12.0)
+    newRecruitLabel.textColor = .white
+    newRecruitButton.addContent(newRecruitLabel)
+    newRecruitLabel.centerXToSuperview(offset: 8.0)
+    newRecruitLabel.centerYToSuperview()
+    self.newRecruitLabel = newRecruitLabel
+    
+    //arrowImageView
+    let arrowImageView = UIImageView()
+    arrowImageView.image = UIImage(named: "arrow")
+    arrowImageView.contentMode = .scaleAspectFit
+    newRecruitButton.addContent(arrowImageView)
+    arrowImageView.centerYToSuperview()
+    arrowImageView.rightToLeft(of: newRecruitLabel, offset: -5.0)
+    arrowImageView.width(12.0)
+    arrowImageView.height(11.0)
+    self.arrowImageView = arrowImageView
+    
     //myNavigationBar
     let myNavigationBar = UIView()
     myNavigationBar.backgroundColor = .white
@@ -83,12 +135,22 @@ class ANIRecruitViewController: UIViewController {
     
     //navigaitonTitleLabel
     let navigaitonTitleLabel = UILabel()
-    navigaitonTitleLabel.text = "M Y A U"
+    navigaitonTitleLabel.text = "家族さがし"
     navigaitonTitleLabel.textColor = ANIColor.dark
-    navigaitonTitleLabel.font = UIFont.boldSystemFont(ofSize: 22)
+    navigaitonTitleLabel.font = UIFont.boldSystemFont(ofSize: 16)
     myNavigationBar.addSubview(navigaitonTitleLabel)
     navigaitonTitleLabel.centerInSuperview()
     self.navigaitonTitleLabel = navigaitonTitleLabel
+    
+    //myNavigationBartopArea
+    let myNavigationBartopArea = UIView()
+    myNavigationBartopArea.backgroundColor = .white
+    self.view.addSubview(myNavigationBartopArea)
+    myNavigationBartopArea.leftToSuperview()
+    myNavigationBartopArea.rightToSuperview()
+    myNavigationBartopArea.bottomToTop(of: myNavigationBar)
+    myNavigationBartopArea.height(UIViewController.STATUS_BAR_HEIGHT)
+    self.myNavigationBartopArea = myNavigationBartopArea
     
     //filtersView
     let filtersView = ANIRecruitFiltersView()
@@ -100,6 +162,8 @@ class ANIRecruitViewController: UIViewController {
     filtersView.height(ANIRecruitViewController.FILTERS_VIEW_HEIGHT)
     self.filtersView = filtersView
     
+    newRecruitButtonTopConstraint = newRecruitButton.topToBottom(of: filtersView, offset: NEW_RECRUIT_BUTTON_HIDE_OFFSET)
+    
     //contributionButon
     let contributionButon = ANIImageButtonView()
     contributionButon.image = UIImage(named: "contributionButton")
@@ -110,7 +174,11 @@ class ANIRecruitViewController: UIViewController {
     contributionButon.width(CONTRIBUTION_BUTTON_HEIGHT)
     contributionButon.height(CONTRIBUTION_BUTTON_HEIGHT)
     contributionButon.rightToSuperview(offset: -15.0)
-    contributionButon.bottomToSuperview(offset: -15, usingSafeArea: true)
+    var tabBarHeight: CGFloat = 0.0
+    if let tabBarController = self.tabBarController {
+      tabBarHeight = tabBarController.tabBar.height
+    }
+    contributionButon.bottomToSuperview(offset: -(15.0 + tabBarHeight))
     self.contributionButon = contributionButon
     
     //rejectView
@@ -134,22 +202,23 @@ class ANIRecruitViewController: UIViewController {
     rejectTapView.size(to: rejectView)
     rejectTapView.topToSuperview()
     self.rejectTapView = rejectTapView
-  }
-  
-  private func ifNeedsShowInitialView() {
-    let userDefaults = UserDefaults.standard
-
-    if userDefaults.bool(forKey: KEY_FIRST_LAUNCH) {
-      let initialViewController = ANIInitialViewController()
-      let initialNV = UINavigationController(rootViewController: initialViewController)
-      self.present(initialNV, animated: true, completion: nil)
-      
-      userDefaults.set(false, forKey: KEY_FIRST_LAUNCH)
-    }
+    
+    //uploadProgressView
+    let uploadProgressView = ANIUploadProgressView()
+    uploadProgressView.alpha = 0.95
+    uploadProgressView.isHidden = true
+    uploadProgressView.delegate = self
+    self.view.addSubview(uploadProgressView)
+    uploadProgressView.topToBottom(of: filtersView)
+    uploadProgressView.leftToSuperview()
+    uploadProgressView.rightToSuperview()
+    uploadProgressView.height(50.0)
+    self.uploadProgressView = uploadProgressView
   }
   
   //MARK: Notifications
   private func setupNotifications() {
+    removeNotifications()
     ANINotificationManager.receive(profileImageViewTapped: self, selector: #selector(pushOtherProfile))
     ANINotificationManager.receive(pickerViewDidSelect: self, selector: #selector(updateFilter))
   }
@@ -187,10 +256,32 @@ class ANIRecruitViewController: UIViewController {
     recruitView.pickItem = pickItem
   }
   
+  func showNewRecruitButtonAnimation() {
+    guard let newRecruitButtonTopConstraint = self.newRecruitButtonTopConstraint else { return }
+    
+    newRecruitButtonTopConstraint.constant = self.NEW_RECRUIT_BUTTON_OFFSET
+    
+    UIView.animate(withDuration: 0.4, delay: 0.0, options: .curveEaseInOut, animations: {
+      self.view.layoutIfNeeded()
+    }, completion: nil)
+  }
+  
+  func hideNewRecruitButtonAnimation() {
+    guard let newRecruitButtonTopConstraint = self.newRecruitButtonTopConstraint else { return }
+    
+    newRecruitButtonTopConstraint.constant = NEW_RECRUIT_BUTTON_HIDE_OFFSET
+    
+    UIView.animate(withDuration: 0.4, delay: 0.0, options: .curveEaseInOut, animations: {
+      self.view.layoutIfNeeded()
+    }, completion: nil)
+  }
+  
   //MARK: Action
   @objc private func rejectViewTapped() {
     let initialViewController = ANIInitialViewController()
+    initialViewController.myTabBarController = self.tabBarController as? ANITabBarController
     let navigationController = UINavigationController(rootViewController: initialViewController)
+    navigationController.modalPresentationStyle = .fullScreen
     self.present(navigationController, animated: true, completion: nil)
   }
 }
@@ -201,11 +292,19 @@ extension ANIRecruitViewController:ANIButtonViewDelegate {
     if view === self.contributionButon {
       if ANISessionManager.shared.isAnonymous == false {
         let recruitContribtionViewController = ANIRecruitContributionViewController()
+        recruitContribtionViewController.delegate = self
         let recruitContributionNV = UINavigationController(rootViewController: recruitContribtionViewController)
+        recruitContributionNV.modalPresentationStyle = .fullScreen
         self.navigationController?.present(recruitContributionNV, animated: true, completion: nil)
       } else {
         reject()
       }
+    }
+    
+    if view === self.newRecruitButton {
+      guard let recruitView = self.recruitView else { return }
+      
+      recruitView.newRecruitButtonTapped()
     }
   }
 }
@@ -285,6 +384,14 @@ extension ANIRecruitViewController: ANIRecruitViewDelegate {
       })
     }
   }
+  
+  func showNewRecruitButton() {
+    showNewRecruitButtonAnimation()
+  }
+  
+  func hideNewRecruitButton() {
+    hideNewRecruitButtonAnimation()
+  }
 }
 
 //MARK: ANIRecruitFiltersViewDelegate
@@ -330,5 +437,50 @@ extension ANIRecruitViewController: ANIRecruitFiltersViewDelegate {
 extension ANIRecruitViewController: UIGestureRecognizerDelegate {
   func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
     return true
+  }
+}
+
+//MARK: ANIRecruitContributionViewDelegate
+extension ANIRecruitViewController: ANIRecruitContributionViewControllerDelegate {
+  func doneEditingRecruit(recruit: FirebaseRecruit) {
+  }
+  
+  func loadThumnailImage(thumbnailImage: UIImage?) {
+    guard let uploadProgressView = self.uploadProgressView,
+          let thumbnailImageView = uploadProgressView.thumbnailImageView else { return }
+    
+    if let thumbnailImage = thumbnailImage {
+      thumbnailImageView.image = thumbnailImage
+      thumbnailImageView.isHidden = false
+    } else {
+      thumbnailImageView.image = nil
+      thumbnailImageView.isHidden = true
+    }
+  }
+  
+  func updateProgress(progress: CGFloat) {
+    guard let uploadProgressView = self.uploadProgressView else { return }
+    
+    uploadProgressView.updateProgress(progress: progress)
+    
+    if progress != 1.0 {
+      UIView.animate(withDuration: 0.2) {
+        uploadProgressView.alpha = 0.95
+      }
+      uploadProgressView.isHidden = false
+    }
+  }
+}
+
+//MARK: ANIUploadProgressViewDelegate
+extension ANIRecruitViewController: ANIUploadProgressViewDelegate {
+  func completeProgress() {
+    guard let uploadProgressView = self.uploadProgressView else { return }
+    
+    UIView.animate(withDuration: 0.2, animations: {
+      uploadProgressView.alpha = 0.0
+    }) { (complete) in
+      uploadProgressView.isHidden = true
+    }
   }
 }

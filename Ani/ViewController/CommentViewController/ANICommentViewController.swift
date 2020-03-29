@@ -8,6 +8,9 @@
 
 import UIKit
 import TinyConstraints
+import FirebaseFirestore
+import CodableFirebase
+import SafariServices
 
 enum CommentMode {
   case story
@@ -20,7 +23,6 @@ class ANICommentViewController: UIViewController {
   private weak var myNavigationBase: UIView?
   private weak var backButton: UIButton?
   private let NAVIGATION_PROFILE_IMAGE_VIEW_HEIGHT: CGFloat = 30.0
-  private weak var navigationProfileImageShadowView: UIView?
   private weak var navigationProfileImageView: UIImageView?
   
   private weak var commentView: ANICommentView?
@@ -41,6 +43,13 @@ class ANICommentViewController: UIViewController {
   var story: FirebaseStory?
   var qna: FirebaseQna?
   var user: FirebaseUser?
+  var selectedComment: FirebaseComment?
+  var selectedCommentUser: FirebaseUser?
+  
+  private var commentId: String?
+  private var contentId: String?
+  
+  private var isfirstLoad: Bool = true
   
   override func viewDidLoad() {
     setup()
@@ -49,10 +58,10 @@ class ANICommentViewController: UIViewController {
   }
   
   override func viewWillAppear(_ animated: Bool) {
-    setupNotification()
+    setupNotifications()
   }
   
-  override func viewWillDisappear(_ animated: Bool) {
+  override func viewDidDisappear(_ animated: Bool) {
     removeNotifications()
   }
   
@@ -90,30 +99,19 @@ class ANICommentViewController: UIViewController {
     backButton.centerYToSuperview()
     self.backButton = backButton
     
-    //navigationProfileImageShadowView
-    let navigationProfileImageShadowView = UIView()
-    navigationProfileImageShadowView.layer.cornerRadius = NAVIGATION_PROFILE_IMAGE_VIEW_HEIGHT / 2
-    navigationProfileImageShadowView.dropShadow(opacity: 0.25, offset: CGSize(width: 0.0, height: 1.0))
-    myNavigationBase.addSubview(navigationProfileImageShadowView)
-    navigationProfileImageShadowView.width(NAVIGATION_PROFILE_IMAGE_VIEW_HEIGHT)
-    navigationProfileImageShadowView.height(NAVIGATION_PROFILE_IMAGE_VIEW_HEIGHT)
-    navigationProfileImageShadowView.centerInSuperview()
-    self.navigationProfileImageShadowView = navigationProfileImageShadowView
-    
     //navigationProfileImageView
     let navigationProfileImageView = UIImageView()
     navigationProfileImageView.contentMode = .scaleAspectFit
     navigationProfileImageView.layer.cornerRadius = NAVIGATION_PROFILE_IMAGE_VIEW_HEIGHT / 2
     navigationProfileImageView.layer.masksToBounds = true
-    navigationProfileImageShadowView.addSubview(navigationProfileImageView)
-    navigationProfileImageView.edgesToSuperview()
+    myNavigationBase.addSubview(navigationProfileImageView)
+    navigationProfileImageView.width(NAVIGATION_PROFILE_IMAGE_VIEW_HEIGHT)
+    navigationProfileImageView.height(NAVIGATION_PROFILE_IMAGE_VIEW_HEIGHT)
+    navigationProfileImageView.centerInSuperview()
     self.navigationProfileImageView = navigationProfileImageView
     
     //commentBar
     let commentBar = ANICommentBar()
-    if let user = self.user {
-      commentBar.user = user
-    }
     self.view.addSubview(commentBar)
     commentBar.leftToSuperview()
     commentBar.rightToSuperview()
@@ -128,7 +126,7 @@ class ANICommentViewController: UIViewController {
     } else {
       anonymousCommentTapView.isUserInteractionEnabled = true
     }
-    let anonymousCommentTapGesture = UITapGestureRecognizer(target: self, action: #selector(reject))
+    let anonymousCommentTapGesture = UITapGestureRecognizer(target: self, action: #selector(rejectAnimation))
     anonymousCommentTapView.addGestureRecognizer(anonymousCommentTapGesture)
     self.view.addSubview(anonymousCommentTapView)
     anonymousCommentTapView.edges(to: commentBar)
@@ -136,6 +134,7 @@ class ANICommentViewController: UIViewController {
     
     //commentView
     let commentView = ANICommentView()
+    commentView.delegate = self
     self.view.addSubview(commentView)
     commentView.topToBottom(of: myNavigationBar)
     commentView.leftToSuperview()
@@ -169,10 +168,12 @@ class ANICommentViewController: UIViewController {
   private func passingData() {
     guard let commentView = self.commentView,
           let commentBar = self.commentBar,
-          let commentMode = self.commentMode else { return }
+          let commentMode = self.commentMode,
+          let user = self.user else { return }
 
     commentView.commentMode = commentMode
     commentBar.commentMode = commentMode
+    commentBar.user = user
     
     switch commentMode {
     case .story:
@@ -181,6 +182,10 @@ class ANICommentViewController: UIViewController {
     case .qna:
       commentView.qna = qna
       commentBar.qna = qna
+    }
+    
+    if let selectedComment = self.selectedComment {
+      commentView.selectedComment = selectedComment
     }
   }
   
@@ -193,12 +198,15 @@ class ANICommentViewController: UIViewController {
   }
   
   //MARK: notification
-  private func setupNotification() {
+  private func setupNotifications() {
+    removeNotifications()
     ANINotificationManager.receive(keyboardWillChangeFrame: self, selector: #selector(keyboardWillChangeFrame))
     ANINotificationManager.receive(keyboardWillHide: self, selector: #selector(keyboardWillHide))
     ANINotificationManager.receive(profileImageViewTapped: self, selector: #selector(pushOtherProfile))
     ANINotificationManager.receive(login: self, selector: #selector(setAnonymousCommentTapViewUserInteractionEnabled))
     ANINotificationManager.receive(logout: self, selector: #selector(setAnonymousCommentTapViewUserInteractionEnabled))
+    ANINotificationManager.receive(tapHashtag: self, selector: #selector(pushHashtagList))
+    ANINotificationManager.receive(tapUrl: self, selector: #selector(pushSafari))
   }
   
   private func removeNotifications() {
@@ -264,10 +272,10 @@ class ANICommentViewController: UIViewController {
     }
   }
   
-  @objc private func reject() {
+  @objc private func rejectAnimation() {
     guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
-      !isRejectAnimating,
-      let rejectTapView = self.rejectTapView else { return }
+          !isRejectAnimating,
+          let rejectTapView = self.rejectTapView else { return }
     
     rejectViewBottomConstraint.constant = UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
     rejectTapView.isHidden = false
@@ -289,6 +297,34 @@ class ANICommentViewController: UIViewController {
     }
   }
   
+  @objc private func pushHashtagList(_ notification: NSNotification) {
+    if let userInfo = notification.userInfo,
+      let contributionKind = userInfo[KEY_CONTRIBUTION_KIND] as? String,
+      let hashtag = userInfo[KEY_HASHTAG] as? String {
+      let hashtagListViewController = ANIHashtagListViewController()
+      hashtagListViewController.hashtag = hashtag
+      if contributionKind == KEY_CONTRIBUTION_KIND_STROY {
+        hashtagListViewController.hashtagList = .story
+      } else if contributionKind == KEY_CONTRIBUTION_KIND_QNA {
+        hashtagListViewController.hashtagList = .question
+      }
+      hashtagListViewController.hidesBottomBarWhenPushed = true
+      self.navigationController?.pushViewController(hashtagListViewController, animated: true)
+    }
+  }
+  
+  @objc private func pushSafari(_ notification: NSNotification) {
+    if let userInfo = notification.userInfo,
+       let url = userInfo[KEY_URL] as? String {
+      let webUrlString = ANIFunction.shared.webURLScheme(urlString: url)
+      
+      if let webUrl = URL(string: webUrlString) {
+        let safariViewController = SFSafariViewController(url: webUrl)
+        self.present(safariViewController, animated: true, completion: nil)
+      }
+    }
+  }
+  
   //MARK: Action
   @objc private func back() {
     self.navigationController?.popViewController(animated: true)
@@ -296,7 +332,134 @@ class ANICommentViewController: UIViewController {
   
   @objc private func rejectViewTapped() {
     let initialViewController = ANIInitialViewController()
+    initialViewController.myTabBarController = self.tabBarController as? ANITabBarController
     let navigationController = UINavigationController(rootViewController: initialViewController)
+    navigationController.modalPresentationStyle = .fullScreen
     self.present(navigationController, animated: true, completion: nil)
+  }
+}
+
+//MARK: ANICommentViewDelegate
+extension ANICommentViewController: ANICommentViewDelegate {
+  func reject() {
+    self.rejectAnimation()
+  }
+  
+  func popupOptionView(isMe: Bool, contentId: String, commentId: String) {
+    self.contentId = contentId
+    self.commentId = commentId
+    
+    let popupOptionViewController = ANIPopupOptionViewController()
+    popupOptionViewController.modalPresentationStyle = .overCurrentContext
+    popupOptionViewController.isMe = isMe
+    popupOptionViewController.delegate = self
+    self.tabBarController?.present(popupOptionViewController, animated: false, completion: nil)
+  }
+  
+  func commentCellTapped(comment: FirebaseComment, user: FirebaseUser) {
+    guard let commentBar = self.commentBar else { return }
+    
+    commentBar.showParentCommentUser(comment: comment, parentCommentUser: user, isAnimated: true)
+  }
+  
+  func loadedComments() {
+    guard let commentBar = self.commentBar else { return }
+    
+    if let selectedComment = self.selectedComment,
+      let selectedCommentUser = self.selectedCommentUser,
+      isfirstLoad {
+      commentBar.showParentCommentUser(comment: selectedComment, parentCommentUser: selectedCommentUser, isAnimated: false)
+      
+      isfirstLoad = false
+    }
+  }
+}
+
+//MARK: ANIPopupOptionViewControllerDelegate
+extension ANICommentViewController: ANIPopupOptionViewControllerDelegate {
+  func deleteContribution() {
+    let alertController = UIAlertController(title: nil, message: "コメントを削除しますか？", preferredStyle: .alert)
+    
+    let deleteAction = UIAlertAction(title: "削除", style: .default) { (action) in
+      self.deleteData()
+    }
+    let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
+    
+    alertController.addAction(deleteAction)
+    alertController.addAction(cancelAction)
+    
+    self.present(alertController, animated: true, completion: nil)
+  }
+  
+  func reportContribution() {
+    let alertController = UIAlertController(title: nil, message: "コメントを通報しますか？", preferredStyle: .alert)
+    
+    let reportAction = UIAlertAction(title: "通報", style: .default) { (action) in
+      if !ANISessionManager.shared.isAnonymous {
+        self.reportData()
+      } else {
+        self.rejectAnimation()
+      }
+    }
+    let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
+    
+    alertController.addAction(reportAction)
+    alertController.addAction(cancelAction)
+    
+    self.present(alertController, animated: true, completion: nil)
+  }
+  
+  func optionTapped(index: Int) {
+  }
+}
+
+//MARK: data
+extension ANICommentViewController {
+  private func deleteData() {
+    guard let contentId = self.contentId,
+          let commentId = self.commentId else { return }
+    
+    let database = Firestore.firestore()
+    
+    var collection = ""
+    
+    if commentMode == .story {
+      collection = KEY_STORIES
+    } else if commentMode == .qna {
+      collection = KEY_QNAS
+    }
+    
+    DispatchQueue.global().async {
+     database.collection(collection).document(contentId).collection(KEY_COMMENTS).document(commentId).delete()
+      DispatchQueue.main.async {
+        ANINotificationManager.postDeleteComment(id: commentId)
+      }
+    }
+    
+    DispatchQueue.global().async {
+      database.collection(collection).document(contentId).collection(KEY_COMMENTS).document(commentId).collection(KEY_LOVE_IDS).getDocuments(completion: { (snapshot, error) in
+        if let error = error {
+          DLog("Get document error \(error)")
+
+          return
+        }
+
+        guard let snapshot = snapshot else { return }
+
+        for document in snapshot.documents {
+          database.collection(collection).document(contentId).collection(KEY_COMMENTS).document(commentId).collection(KEY_LOVE_IDS).document(document.documentID).delete()
+        }
+      })
+    }
+  }
+  
+  private func reportData() {
+    guard let commentId = self.commentId else { return }
+    
+    let database = Firestore.firestore()
+    
+    let date = ANIFunction.shared.getToday()
+    let values = [KEY_CONTENT_TYPE: KEY_COMMENT, KEY_DATE: date]
+    database.collection(KEY_REPORTS).document(commentId).collection(KEY_REPORT).addDocument(data: values)
   }
 }

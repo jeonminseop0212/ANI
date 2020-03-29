@@ -9,7 +9,6 @@
 import UIKit
 import FirebaseFirestore
 import CodableFirebase
-import NVActivityIndicatorView
 
 class ANIMessageView: UIView {
   
@@ -21,8 +20,8 @@ class ANIMessageView: UIView {
   
   private var chatGroupListener: ListenerRegistration?
   
-  private weak var activityIndicatorView: NVActivityIndicatorView?
-  
+  private weak var activityIndicatorView: ANIActivityIndicator?
+
   var isCellSelected: Bool = false
   
   override init(frame: CGRect) {
@@ -38,11 +37,6 @@ class ANIMessageView: UIView {
   
   private func setup() {
     self.backgroundColor = ANIColor.bg
-    let window = UIApplication.shared.keyWindow
-    var bottomSafeArea: CGFloat = 0.0
-    if let windowUnrap = window {
-      bottomSafeArea = windowUnrap.safeAreaInsets.bottom
-    }
     
     //reloadView
     let reloadView = ANIReloadView()
@@ -58,8 +52,8 @@ class ANIMessageView: UIView {
     
     //messageTableView
     let messageTableView = UITableView()
-    messageTableView.contentInset = UIEdgeInsets(top: ANICommunityViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: bottomSafeArea, right: 0)
-    messageTableView.scrollIndicatorInsets  = UIEdgeInsets(top: UIViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: bottomSafeArea, right: 0)
+    messageTableView.contentInset = UIEdgeInsets(top: ANICommunityViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: 0, right: 0)
+    messageTableView.scrollIndicatorInsets  = UIEdgeInsets(top: UIViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: 0, right: 0)
     let id = NSStringFromClass(ANIMessageViewCell.self)
     messageTableView.register(ANIMessageViewCell.self, forCellReuseIdentifier: id)
     messageTableView.backgroundColor = ANIColor.bg
@@ -72,11 +66,10 @@ class ANIMessageView: UIView {
     self.messageTableView = messageTableView
     
     //activityIndicatorView
-    let activityIndicatorView = NVActivityIndicatorView(frame: .zero, type: .lineScale, color: ANIColor.emerald, padding: 0)
-    addSubview(activityIndicatorView)
-    activityIndicatorView.width(40.0)
-    activityIndicatorView.height(40.0)
-    activityIndicatorView.centerInSuperview()
+    let activityIndicatorView = ANIActivityIndicator()
+    activityIndicatorView.isFull = false
+    self.addSubview(activityIndicatorView)
+    activityIndicatorView.edgesToSuperview()
     self.activityIndicatorView = activityIndicatorView
   }
   
@@ -84,6 +77,8 @@ class ANIMessageView: UIView {
     ANINotificationManager.receive(notiTabTapped: self, selector: #selector(scrollToTop))
     ANINotificationManager.receive(login: self, selector: #selector(reloadChatGroups))
     ANINotificationManager.receive(logout: self, selector: #selector(hideTableView))
+    ANINotificationManager.receive(loadedCurrentUser: self, selector: #selector(reloadChatGroups))
+    ANINotificationManager.postDidSetupViewNotifications()
   }
   
   @objc private func scrollToTop() {
@@ -95,6 +90,10 @@ class ANIMessageView: UIView {
   }
   
   @objc private func reloadChatGroups() {
+    guard let messageTableView = self.messageTableView else { return }
+    
+    messageTableView.alpha = 0.0
+    
     loadChatGroup()
   }
   
@@ -102,6 +101,29 @@ class ANIMessageView: UIView {
     guard let messageTableView = self.messageTableView else { return }
     
     messageTableView.alpha = 0.0
+  }
+  
+  private func isBlockChatGroup(chatGroup: FirebaseChatGroup) -> Bool {
+    guard let memberIds = chatGroup.memberIds,
+          let currentUserUid = ANISessionManager.shared.currentUserUid else { return false }
+    
+    var userId = ""
+    
+    for key in memberIds.keys {
+      if key != currentUserUid {
+        userId = key
+        break
+      }
+    }
+    
+    if let blockUserIds = ANISessionManager.shared.blockUserIds, blockUserIds.contains(userId) {
+      return true
+    }
+    if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(userId) {
+      return true
+    }
+
+    return false
   }
 }
 
@@ -115,6 +137,7 @@ extension ANIMessageView: UITableViewDataSource {
     let id = NSStringFromClass(ANIMessageViewCell.self)
     let cell = tableView.dequeueReusableCell(withIdentifier: id, for: indexPath) as! ANIMessageViewCell
     
+    cell.indexPath = indexPath.row
     cell.chatGroup = chatGroups[indexPath.row]
     cell.delegate = self
     
@@ -130,10 +153,8 @@ extension ANIMessageView: ANIMessageViewCellDelegate {
     
     activityIndicatorView.stopAnimating()
     
-    UIView.animate(withDuration: 0.2, animations: {
+    UIView.animate(withDuration: 0.2) {
       messageTableView.alpha = 1.0
-    }) { (complete) in
-      ANINotificationManager.postDismissSplash()
     }
   }
 }
@@ -152,6 +173,9 @@ extension ANIMessageView {
     
     activityIndicatorView.startAnimating()
     
+    if !chatGroups.isEmpty {
+      chatGroups.removeAll()
+    }
     if let chatGroupListener = self.chatGroupListener {
       chatGroupListener.remove()
     }
@@ -170,8 +194,10 @@ extension ANIMessageView {
           if diff.type == .added {
             do {
               let group = try FirebaseDecoder().decode(FirebaseChatGroup.self, from: diff.document.data())
-              chatGroupsTemp.append(group)
-              chatGroupsTemp.sort(by: {$0.updateDate > $1.updateDate})
+              if !self.isBlockChatGroup(chatGroup: group) {
+                chatGroupsTemp.append(group)
+                chatGroupsTemp.sort(by: {$0.updateDate > $1.updateDate})
+              }
               
               self.chatGroups = chatGroupsTemp
 
@@ -185,8 +211,6 @@ extension ANIMessageView {
               
               UIView.animate(withDuration: 0.2, animations: {
                 reloadView.alpha = 1.0
-              }, completion: { (complete) in
-                ANINotificationManager.postDismissSplash()
               })
             }
           } else if diff.type == .modified {
@@ -221,8 +245,6 @@ extension ANIMessageView {
           
           UIView.animate(withDuration: 0.2, animations: {
             reloadView.alpha = 1.0
-          }, completion: { (complete) in
-            ANINotificationManager.postDismissSplash()
           })
         }
       })

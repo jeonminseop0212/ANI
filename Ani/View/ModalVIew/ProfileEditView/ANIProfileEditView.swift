@@ -34,6 +34,13 @@ class ANIProfileEditView: UIView {
   private weak var kindLabel: UILabel?
   private weak var kindSelectButton: ANIImageButtonView?
   
+  private weak var snsTitleLabel: UILabel?
+  private weak var snsBG: UIView?
+  private weak var twitterImageView: UIImageView?
+  private weak var twitterTextView: ANIPlaceHolderTextView?
+  private weak var instagramImageView: UIImageView?
+  private weak var instagramTextView: ANIPlaceHolderTextView?
+  
   private weak var introduceTitleLabel: UILabel?
   private weak var introduceBG: UIView?
   private weak var introduceTextView: ANIPlaceHolderTextView?
@@ -194,13 +201,88 @@ class ANIProfileEditView: UIView {
     kindSelectButton.leftToRight(of: kindLabel, offset: 10.0)
     self.kindSelectButton = kindSelectButton
     
+    //snsTitleLabel
+    let snsTitleLabel = UILabel()
+    snsTitleLabel.text = "SNS"
+    snsTitleLabel.textColor = ANIColor.dark
+    snsTitleLabel.font = UIFont.boldSystemFont(ofSize: 20.0)
+    contentView.addSubview(snsTitleLabel)
+    snsTitleLabel.topToBottom(of: kindBG, offset: 10.0)
+    snsTitleLabel.leftToSuperview(offset: 10.0)
+    snsTitleLabel.rightToSuperview(offset: -10.0)
+    self.snsTitleLabel = snsTitleLabel
+    
+    //snsBG
+    let snsBG = UIView()
+    snsBG.backgroundColor = ANIColor.lightGray
+    snsBG.layer.cornerRadius = 10.0
+    snsBG.layer.masksToBounds = true
+    contentView.addSubview(snsBG)
+    snsBG.topToBottom(of: snsTitleLabel, offset: 10.0)
+    snsBG.leftToSuperview(offset: 10.0)
+    snsBG.rightToSuperview(offset: -10.0)
+    self.snsBG = snsBG
+    
+    //twitterImageView
+    let twitterImageView = UIImageView()
+    twitterImageView.image = UIImage(named: "twitter")
+    twitterImageView.contentMode = .scaleAspectFit
+    snsBG.addSubview(twitterImageView)
+    twitterImageView.width(20.0)
+    twitterImageView.height(20.0)
+    twitterImageView.topToSuperview(offset: 12.0)
+    twitterImageView.leftToSuperview(offset: 10.0)
+    self.twitterImageView = twitterImageView
+    
+    //twitterTextView
+    let twitterTextView = ANIPlaceHolderTextView()
+    twitterTextView.font = UIFont.systemFont(ofSize: 15.0)
+    twitterTextView.textColor = ANIColor.dark
+    twitterTextView.backgroundColor = .clear
+    twitterTextView.isScrollEnabled = false
+    twitterTextView.placeHolder = "＠MYAU_twitter"
+    twitterTextView.delegate = self
+    snsBG.addSubview(twitterTextView)
+    twitterTextView.leftToRight(of: twitterImageView, offset: 5.0)
+    twitterTextView.topToSuperview(offset: 5.0)
+    twitterTextView.rightToSuperview(offset: -5.0)
+    self.twitterTextView = twitterTextView
+    setHideButtonOnKeyboard(textView: twitterTextView)
+    
+    //instagramImageView
+    let instagramImageView = UIImageView()
+    instagramImageView.image = UIImage(named: "instagram")
+    instagramImageView.contentMode = .scaleAspectFit
+    snsBG.addSubview(instagramImageView)
+    instagramImageView.width(20.0)
+    instagramImageView.height(20.0)
+    instagramImageView.leftToSuperview(offset: 10.0)
+    instagramImageView.topToBottom(of: twitterTextView, offset: 5.0)
+    self.instagramImageView = instagramImageView
+    
+    //instagramTextView
+    let instagramTextView = ANIPlaceHolderTextView()
+    instagramTextView.font = UIFont.systemFont(ofSize: 15.0)
+    instagramTextView.textColor = ANIColor.dark
+    instagramTextView.backgroundColor = .clear
+    instagramTextView.isScrollEnabled = false
+    instagramTextView.placeHolder = "＠MYAU_instagram"
+    instagramTextView.delegate = self
+    snsBG.addSubview(instagramTextView)
+    instagramTextView.topToBottom(of: twitterTextView, offset: -3.0)
+    instagramTextView.leftToRight(of: instagramImageView, offset: 5.0)
+    instagramTextView.rightToSuperview(offset: -5.0)
+    instagramTextView.bottomToSuperview(offset: -5.0)
+    self.instagramTextView = instagramTextView
+    setHideButtonOnKeyboard(textView: instagramTextView)
+
     //introduceTitleLabel
     let introduceTitleLabel = UILabel()
     introduceTitleLabel.text = "紹介"
     introduceTitleLabel.textColor = ANIColor.dark
     introduceTitleLabel.font = UIFont.boldSystemFont(ofSize: 20.0)
     contentView.addSubview(introduceTitleLabel)
-    introduceTitleLabel.topToBottom(of: kindBG, offset: 10.0)
+    introduceTitleLabel.topToBottom(of: snsBG, offset: 10.0)
     introduceTitleLabel.leftToSuperview(offset: 10.0)
     introduceTitleLabel.rightToSuperview(offset: -10.0)
     self.introduceTitleLabel = introduceTitleLabel
@@ -239,11 +321,15 @@ class ANIProfileEditView: UIView {
   private func reloadLayout() {
     guard let nameTextView = self.nameTextView,
           let kindLabel = self.kindLabel,
+          let twitterTextView = self.twitterTextView,
+          let instagramTextView = self.instagramTextView,
           let introduceTextView = self.introduceTextView,
           let currentUser = self.currentUser else { return }
     
     nameTextView.text = currentUser.userName
     kindLabel.text = currentUser.kind
+    twitterTextView.text = currentUser.twitterAccount
+    instagramTextView.text = currentUser.instagramAccount
     introduceTextView.text = currentUser.introduce
   }
   
@@ -272,12 +358,18 @@ class ANIProfileEditView: UIView {
           let name = nameTextView.text,
           let kindLabel = self.kindLabel,
           let kind = kindLabel.text,
+          let twitterTextView = self.twitterTextView,
+          let twitterAccount = twitterTextView.text,
+          let instagramTextView = self.instagramTextView,
+          let instagramAccount = instagramTextView.text,
           let introduceTextView = self.introduceTextView,
           let introduce = introduceTextView.text else { return nil }
     
     var updateUser = FirebaseUser()
     updateUser.userName = name
     updateUser.kind = kind
+    updateUser.twitterAccount = twitterAccount
+    updateUser.instagramAccount = instagramAccount
     updateUser.introduce = introduce
     return updateUser
   }

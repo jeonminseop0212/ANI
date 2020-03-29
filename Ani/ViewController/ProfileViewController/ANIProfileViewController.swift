@@ -12,6 +12,7 @@ import FirebaseFirestore
 import CodableFirebase
 import FirebaseStorage
 import InstantSearchClient
+import SafariServices
 
 class ANIProfileViewController: UIViewController {
   
@@ -45,12 +46,23 @@ class ANIProfileViewController: UIViewController {
   }
   
   override func viewWillAppear(_ animated: Bool) {
-    UIApplication.shared.statusBarStyle = .default
-    setupNotification()
+    if #available(iOS 13.0, *) {
+      UIApplication.shared.statusBarStyle = .darkContent
+    } else {
+      UIApplication.shared.statusBarStyle = .default
+    }
+    setupNotifications()
     showNeedLoginView()
+    reloadNavigationTitle()
+    
+    playVideo()
   }
   
   override func viewWillDisappear(_ animated: Bool) {
+    stopVideo()
+  }
+  
+  override func viewDidDisappear(_ animated: Bool) {
     removeNotifications()
   }
   
@@ -117,7 +129,7 @@ class ANIProfileViewController: UIViewController {
     }
     navigationTitleLabel.textAlignment = .center
     navigationTitleLabel.textColor = ANIColor.dark
-    navigationTitleLabel.font = UIFont.boldSystemFont(ofSize: 17)
+    navigationTitleLabel.font = UIFont.boldSystemFont(ofSize: 16)
     myNavigationBase.addSubview(navigationTitleLabel)
     navigationTitleLabel.centerYToSuperview()
     navigationTitleLabel.leftToRight(of: backButton)
@@ -178,16 +190,24 @@ class ANIProfileViewController: UIViewController {
     }
   }
   
-  @objc private func updateLayoutLogin() {
-    reloadNavigationTitle()
-    showNeedLoginView()
+  func playVideo() {
+    guard let profileBasicView = self.profileBasicView else { return }
+    
+    profileBasicView.playVideo()
+  }
+  
+  private func stopVideo() {
+    guard let profileBasicView = self.profileBasicView else { return }
+
+    profileBasicView.stopVideo()
   }
   
   //MAKR: notification
-  private func setupNotification() {
+  private func setupNotifications() {
+    removeNotifications()
     ANINotificationManager.receive(imageCellTapped: self, selector: #selector(presentImageBrowser(_:)))
     ANINotificationManager.receive(profileEditButtonTapped: self, selector: #selector(openProfileEdit))
-    ANINotificationManager.receive(login: self, selector: #selector(updateLayoutLogin))
+    ANINotificationManager.receive(tapHashtag: self, selector: #selector(pushHashtagList))
   }
   
   private func removeNotifications() {
@@ -208,10 +228,27 @@ class ANIProfileViewController: UIViewController {
     self.tabBarController?.present(imageBrowserViewController, animated: false, completion: nil)
   }
   
+  @objc private func pushHashtagList(_ notification: NSNotification) {
+    if let userInfo = notification.userInfo,
+      let contributionKind = userInfo[KEY_CONTRIBUTION_KIND] as? String,
+      let hashtag = userInfo[KEY_HASHTAG] as? String {
+      let hashtagListViewController = ANIHashtagListViewController()
+      hashtagListViewController.hashtag = hashtag
+      if contributionKind == KEY_CONTRIBUTION_KIND_STROY {
+        hashtagListViewController.hashtagList = .story
+      } else if contributionKind == KEY_CONTRIBUTION_KIND_QNA {
+        hashtagListViewController.hashtagList = .question
+      }
+      hashtagListViewController.hidesBottomBarWhenPushed = true
+      self.navigationController?.pushViewController(hashtagListViewController, animated: true)
+    }
+  }
+  
   @objc private func openProfileEdit() {
     let profileEditViewController = ANIProfileEditViewController()
     profileEditViewController.delegate = self
     profileEditViewController.currentUser = currentUser
+    profileEditViewController.modalPresentationStyle = .fullScreen
     self.present(profileEditViewController, animated: true, completion: nil)
   }
   
@@ -220,6 +257,27 @@ class ANIProfileViewController: UIViewController {
           let currentUser = self.currentUser else { return }
     
     navigationTitleLabel.text = currentUser.userName
+  }
+  
+  private func rejectAnimation() {
+    guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
+          !isRejectAnimating else { return }
+    
+    rejectViewBottomConstraint.constant = UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut, animations: {
+      self.isRejectAnimating = true
+      self.view.layoutIfNeeded()
+    }) { (complete) in
+      guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
+        let rejectViewBottomConstraintOriginalConstant = self.rejectViewBottomConstraintOriginalConstant else { return }
+      
+      rejectViewBottomConstraint.constant = rejectViewBottomConstraintOriginalConstant
+      UIView.animate(withDuration: 0.3, delay: 1.0, options: .curveEaseInOut, animations: {
+        self.view.layoutIfNeeded()
+      }, completion: { (complete) in
+        self.isRejectAnimating = false
+      })
+    }
   }
   
   //MARK: action
@@ -299,24 +357,10 @@ extension ANIProfileViewController: ANIProfileBasicViewDelegate {
   }
   
   func reject() {
-    guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
-          !isRejectAnimating else { return }
+    guard let rejectView = self.rejectView else { return }
     
-    rejectViewBottomConstraint.constant = UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
-    UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut, animations: {
-      self.isRejectAnimating = true
-      self.view.layoutIfNeeded()
-    }) { (complete) in
-      guard let rejectViewBottomConstraint = self.rejectViewBottomConstraint,
-        let rejectViewBottomConstraintOriginalConstant = self.rejectViewBottomConstraintOriginalConstant else { return }
-      
-      rejectViewBottomConstraint.constant = rejectViewBottomConstraintOriginalConstant
-      UIView.animate(withDuration: 0.3, delay: 1.0, options: .curveEaseInOut, animations: {
-        self.view.layoutIfNeeded()
-      }, completion: { (complete) in
-        self.isRejectAnimating = false
-      })
-    }
+    rejectView.setRejectText("ログインが必要です。")
+    self.rejectAnimation()
   }
   
   func popupOptionView(isMe: Bool, contentType: ContentType, id: String) {
@@ -326,6 +370,11 @@ extension ANIProfileViewController: ANIProfileBasicViewDelegate {
     let popupOptionViewController = ANIPopupOptionViewController()
     popupOptionViewController.modalPresentationStyle = .overCurrentContext
     popupOptionViewController.isMe = isMe
+    if contentType == ContentType.story {
+      popupOptionViewController.options = ["シェア"]
+    } else if contentType == ContentType.qna {
+      popupOptionViewController.options = ["シェア"]
+    }
     popupOptionViewController.delegate = self
     self.tabBarController?.present(popupOptionViewController, animated: false, completion: nil)
   }
@@ -338,6 +387,30 @@ extension ANIProfileViewController: ANIProfileBasicViewDelegate {
     imageBrowserViewController.delegate = self
     //overCurrentContextだとtabBarが消えないのでtabBarからpresentする
     self.tabBarController?.present(imageBrowserViewController, animated: false, completion: nil)
+  }
+  
+  func twitterOpenReject() {
+    guard let rejectView = self.rejectView else { return }
+    
+    rejectView.setRejectText("Twitterを開けません。")
+    self.rejectAnimation()
+  }
+  
+  func instagramOpenReject() {
+    guard let rejectView = self.rejectView else { return }
+    
+    rejectView.setRejectText("Instagramを開けません。")
+    self.rejectAnimation()
+  }
+  
+  func openUrl(url: URL) {
+    let urlString = url.absoluteString
+    let webUrlString = ANIFunction.shared.webURLScheme(urlString: urlString)
+    
+    if let webUrl = URL(string: webUrlString) {
+      let safariViewController = SFSafariViewController(url: webUrl)
+      self.present(safariViewController, animated: true, completion: nil)
+    }
   }
 }
 
@@ -357,7 +430,9 @@ extension ANIProfileViewController: ANIProfileEditViewControllerDelegate {
 extension ANIProfileViewController: ANINeedLoginViewDelegate {
   func loginButtonTapped() {
     let initialViewController = ANIInitialViewController()
+    initialViewController.myTabBarController = self.tabBarController as? ANITabBarController
     let navigationController = UINavigationController(rootViewController: initialViewController)
+    navigationController.modalPresentationStyle = .fullScreen
     self.present(navigationController, animated: true, completion: nil)
   }
 }
@@ -365,7 +440,11 @@ extension ANIProfileViewController: ANINeedLoginViewDelegate {
 //MARK: ANIImageBrowserViewControllerDelegate
 extension ANIProfileViewController: ANIImageBrowserViewControllerDelegate {
   func imageBrowserDidDissmiss() {
-    UIApplication.shared.statusBarStyle = .default
+    if #available(iOS 13.0, *) {
+      UIApplication.shared.statusBarStyle = .darkContent
+    } else {
+      UIApplication.shared.statusBarStyle = .default
+    }
   }
 }
 
@@ -389,6 +468,20 @@ extension ANIProfileViewController: ANIPopupOptionViewControllerDelegate {
   }
   
   func optionTapped(index: Int) {
+    guard let contentType = self.contentType,
+          let contributionId = self.contributionId else { return }
+    
+    if contentType == .story {
+      if index == 0 {
+        let activityItems = [ANIActivityItemSorce(shareContent: "#ミャウ #MYAU #猫 #ねこ #猫好き\nhttps://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/story/\(contributionId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU")]
+        let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+        self.present(activityViewController, animated: true)
+      }
+    } else if contentType == .qna {
+      let activityItems = [ANIActivityItemSorce(shareContent: "#ミャウ #MYAU #猫 #ねこ #猫好き\nhttps://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/qna/\(contributionId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU")]
+      let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+      self.present(activityViewController, animated: true)
+    }
   }
 }
 
@@ -419,12 +512,14 @@ extension ANIProfileViewController {
         }
         
         database.collection(collection).document(contributionId).delete()
-        self.delegateDataAlgolia(contentType: contentType, contributionId: contributionId)
+        self.deleteDataAlgolia(contentType: contentType, contributionId: contributionId)
         
         DispatchQueue.main.async {
-          guard let profileBasicView = self.profileBasicView else { return }
-          
-          profileBasicView.deleteData(id: contributionId)
+          if contentType == .story {
+            ANINotificationManager.postDeleteStory(id: contributionId)
+          } else if contentType == .qna {
+            ANINotificationManager.postDeleteQna(id: contributionId)
+          }
         }
         
         guard let snapshot = snapshot, let data = snapshot.data() else { return }
@@ -432,16 +527,36 @@ extension ANIProfileViewController {
         do {
           if contentType == .story {
             let story = try FirestoreDecoder().decode(FirebaseStory.self, from: data)
-            
+            let storage = Storage.storage()
+
             if let urls = story.storyImageUrls {
               for url in urls {
-                let storage = Storage.storage()
                 let storageRef = storage.reference(forURL: url)
                 
                 storageRef.delete { error in
                   if let error = error {
                     DLog(error)
                   }
+                }
+              }
+            }
+            
+            if let videoUrl = story.storyVideoUrl {
+              let storageRef = storage.reference(forURL: videoUrl)
+              
+              storageRef.delete { error in
+                if let error = error {
+                  DLog(error)
+                }
+              }
+            }
+            
+            if let thumbnailImageUrl = story.thumbnailImageUrl {
+              let storageRef = storage.reference(forURL: thumbnailImageUrl)
+              
+              storageRef.delete { error in
+                if let error = error {
+                  DLog(error)
                 }
               }
             }
@@ -499,7 +614,7 @@ extension ANIProfileViewController {
     }
   }
   
-  private func delegateDataAlgolia(contentType: ContentType, contributionId: String) {
+  private func deleteDataAlgolia(contentType: ContentType, contributionId: String) {
     var index: Index?
     
     if contentType == .story {

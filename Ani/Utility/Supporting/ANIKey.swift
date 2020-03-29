@@ -12,6 +12,10 @@ let KEY_FIRST_LAUNCH = "firstLaunch"
 let KEY_ID = "id"
 let KEY_DATE = "date"
 let KEY_FCM_TOKEN = "fcmToken"
+let KEY_CONTENT_TYPE = "contentType"
+let KEY_CONTRIBUTION_KIND = "contributionKind"
+let KEY_SHOW_EVENT = "showEvent"
+let KEY_IS_TWITTER_SHARE = "isTwitterShare"
 
 //user
 let KEY_UID = "uid"
@@ -40,8 +44,14 @@ let KEY_IS_HAVE_UNREAD_NOTI = "isHaveUnreadNoti"
 let KEY_UNREAD_NOTI_COUNT = "unreadNotiCount"
 let KEY_IS_HAVE_UNREAD_MESSAGE = "isHaveUnreadMessage"
 let KEY_UNREAD_MESSAGE_COUNT = "unreadMessageCount"
+let KEY_BLOCK_USER_IDS = "blockUserIds"
+let KEY_BLOCKING_USER_IDS = "blockingUserIds"
+let KEY_TWITTER_ACCOUNT = "twitterAccount"
+let KEY_INSTAGRAM_ACCOUNT = "instagramAccount"
+let KEY_IS_TWITTER_LINK = "isTwitterLink"
 
 //recruit
+let KEY_RECRUIT = "recruit"
 let KEY_RECRUIT_HEADER_IMAGES = "recruit_header_images"
 let KEY_RECRUIT_INTRODUCE_IMAGES = "recruit_introduce_images"
 let KEY_RECRUITS = "recruits"
@@ -51,16 +61,28 @@ let KEY_RECRUIT_HOME = "home"
 let KEY_RECRUIT_KIND = "kind"
 let KEY_RECRUIT_AGE = "age"
 let KEY_RECRUIT_SEX = "sex"
+let KEY_RECRUIT_STATE = "recruitState"
+let KEY_HIDE_USER_IDS = "hideUserIds"
 
 //story
+let KEY_STORY = "story"
 let KEY_STORY_IMAGES = "story_images"
+let KEY_STORY_VIDEOS = "story_videos"
+let KYE_THUMNAIL_IMAGES = "thumbnail_images"
 let KEY_STORIES = "stories"
+let KEY_DAY = "day"
+let KEY_LOVE_COUNT = "loveCount"
+let KEY_HASHTAG = "hashtag"
+let KEY_HASHTAGS = "hashtags"
+let KEY_URL = "url"
 
 //qna
+let KEY_QNA = "qna"
 let KEY_QNA_IMAGES = "qna_images"
 let KEY_QNAS = "qnas"
 
 //comment
+let KEY_COMMENT = "comment"
 let KEY_COMMENTS = "comments"
 
 //chat group
@@ -81,6 +103,8 @@ let KEY_CONTRIBUTION_KIND_RECRUIT = "recruit"
 let KEY_CONTRIBUTION_KIND_STROY = "story"
 let KEY_CONTRIBUTION_KIND_QNA = "qna"
 let KEY_CONTRIBUTION_KIND_USER = "user"
+let KEY_CONTRIBUTION_KIND_STORY_COMMENT = "storyComment"
+let KEY_CONTRIBUTION_KIND_QNA_COMMENT = "qnaComment"
 let KEY_NOTI_KIND_COMMENT = "comment"
 let KEY_NOTI_KIND_FOLLOW = "follow"
 let KEY_NOTI_KIND_LOVE = "love"
@@ -97,4 +121,27 @@ let KEY_HITS = "hits"
 //report
 let KEY_REPORTS = "reports"
 let KEY_REPORT = "report"
+
+//remote congif
+let KEY_SIREN_ALERT_TYPE = "sirenAlertType"
+let KEY_SHOW_REVIEW_CONDITIONS = "showReviewConditions"
+
+//review
+let KEY_REVIEW_LOVE = "love"
+let KEY_REVIEW_LOVE_MULTIPLY = "reviewLoveMultiply"
+let KEY_REVIEW_OPEN_APP = "openApp"
+let KEY_REVIEW_OPEN_APP_MULTIPLY = "reviewOppenAppMultiply"
+let KEY_REVIEW_COMMENT = "comment"
+let KEY_REVIEW_COMMENT_MULTIPLY = "reviewCommentMultiply"
+let KEY_REVIEW_CONTRIBUTION = "contribution"
+let KEY_REVIEW_CONTRIBUTION_MULTIPLY = "reviewContributionMultiply"
+let KEY_REVIEW_FOLLOW = "follow"
+let KEY_REVIEW_FOLLOW_MULTIPLY = "reviewFollowMultiply"
+
+//event
+let KEY_EVENTS = "events"
+
+//popular user
+let KEY_POPULAR_USERS = "popularUsers"
+let KEY_ORDER = "order"
 

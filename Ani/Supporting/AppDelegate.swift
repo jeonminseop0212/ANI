@@ -9,7 +9,12 @@
 import UIKit
 import Firebase
 import FirebaseMessaging
+import FirebaseDynamicLinks
+import FirebaseFirestore
 import UserNotifications
+import TwitterKit
+import GoogleSignIn
+import CodableFirebase
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -18,21 +23,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   var orientationLock = UIInterfaceOrientationMask.all
   private weak var tabBarController: ANITabBarController?
   private let NOTI_VIEW_CONTROLLER_INDEX: Int = 2
-
+  
+  enum SirenAlertType: String {
+    case force;
+    case option;
+    case skip;
+    case none;
+  }
+  
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
     
     self.orientationLock = .portrait
     
-    var firebasePlistName = ""
-    
-    if IS_DEBUG {
-      firebasePlistName = "GoogleService-Info"
-    } else {
-      firebasePlistName = "GoogleService-Info-release"
-    }
-    if let path = Bundle.main.path(forResource: firebasePlistName, ofType: "plist"), let firbaseOptions = FirebaseOptions(contentsOfFile: path) {
-      FirebaseApp.configure(options: firbaseOptions)
-    }
+    _ = ANITwitter()
+    ANIFirebaseRemoteConfigManager.shared.fetch()
     
     //notification
     application.registerForRemoteNotifications()
@@ -45,6 +49,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     window = UIWindow(frame: UIScreen.main.bounds)
     window?.rootViewController = tabBarController
     window?.makeKeyAndVisible()
+    
+    ANIFirebaseRemoteConfigManager.shared.getShowReivewConditions { (conditions, error) in
+      if error == nil, let conditions = conditions {
+        ANISessionManager.shared.showReviewConditions = conditions
+      }
+    }
     
     //navigation bar
     let navigationBarAppearane = UINavigationBar.appearance()
@@ -71,7 +81,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
 
   func applicationWillEnterForeground(_ application: UIApplication) {
-    // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
+    playTopViewControllerVideo()
   }
 
   func applicationDidBecomeActive(_ application: UIApplication) {
@@ -79,6 +89,131 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func applicationWillTerminate(_ application: UIApplication) {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+  }
+  
+  func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+    let twitter =  TWTRTwitter.sharedInstance().application(app, open: url, options: options)
+    let google = GIDSignIn.sharedInstance().handle(url, sourceApplication:options[UIApplication.OpenURLOptionsKey.sourceApplication] as? String, annotation: [:])
+    let dynamicLink = DynamicLinks.dynamicLinks().dynamicLink(fromCustomSchemeURL: url) != nil ? true : false
+    
+    return twitter || google || dynamicLink
+  }
+  
+  func application(_ application: UIApplication, continue userActivity: NSUserActivity,
+                   restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
+    
+    if let webpageURL = userActivity.webpageURL {
+      let handled = DynamicLinks.dynamicLinks().handleUniversalLink(webpageURL) { (dynamiclink, error) in
+        if let error = error {
+          DLog(error)
+          return
+        }
+        
+        guard let innerLink = webpageURL.queryValue(for: "link") else { return }
+        
+        let type = String(innerLink.split(separator: "/")[2])
+        let id = String(innerLink.split(separator: "/")[3])
+        
+        self.openLink(id: id, type: type)
+      }
+
+      return handled
+    } else {
+      return false
+    }
+  }
+  
+  private func openLink(id: String, type: String) {
+    guard let tabBarController = self.tabBarController,
+          let navigationViewController = tabBarController.selectedViewController as? UINavigationController else { return }
+    
+    if type == KEY_STORY {
+      let storyDetailViewController = ANIStoryDetailViewController()
+      storyDetailViewController.storyId = id
+      storyDetailViewController.hidesBottomBarWhenPushed = true
+      navigationViewController.pushViewController(storyDetailViewController, animated: true)
+    } else if type == KEY_RECRUIT {
+      let recruitDetailViewController = ANIRecruitDetailViewController()
+      recruitDetailViewController.recruitId = id
+      recruitDetailViewController.hidesBottomBarWhenPushed = true
+      navigationViewController.pushViewController(recruitDetailViewController, animated: true)
+    } else if type == KEY_QNA {
+      let qnaDetailViewController = ANIQnaDetailViewController()
+      qnaDetailViewController.qnaId = id
+      qnaDetailViewController.hidesBottomBarWhenPushed = true
+      navigationViewController.pushViewController(qnaDetailViewController, animated: true)
+    }
+  }
+  
+  private func playTopViewControllerVideo() {
+    if let topController = UIApplication.topViewController() {
+      if let communityViewController = topController as? ANICommunityViewController {
+        communityViewController.playVideo()
+      }
+      if let rankingStoryDetailViewController = topController as? ANIRankingStoryDetailViewController {
+        rankingStoryDetailViewController.playVideo()
+      }
+      if let storyDetailViewController = topController as? ANIStoryDetailViewController {
+        storyDetailViewController.playVideo()
+      }
+      if let notiDetailViewController = topController as? ANINotiDetailViewController {
+        notiDetailViewController.playVideo()
+      }
+      if let profileViewController = topController as? ANIProfileViewController {
+        profileViewController.playVideo()
+      }
+      if let otherProfileViewController = topController as? ANIOtherProfileViewController {
+        otherProfileViewController.playVideo()
+      }
+      if let listViewController = topController as? ANIListViewController {
+        listViewController.playVideo()
+      }
+    }
+  }
+  
+  private func showEventIfNeeded() {
+    let database = Firestore.firestore()
+    
+    let userDefaults = UserDefaults.standard
+    
+    if ANISessionManager.shared.isHiddenInitial && ANISessionManager.shared.isHiddenSplash {
+      DispatchQueue.global().async {
+        database.collection(KEY_EVENTS).getDocuments(completion: { (snapshot, error) in
+          if let error = error {
+            DLog("get event document error \(error)")
+            return
+          }
+          
+          guard let snapshot = snapshot else { return }
+          
+          for document in snapshot.documents {
+            do {
+              let event = try FirestoreDecoder().decode(FirebaseEvent.self, from: document.data())
+              
+              if userDefaults.object(forKey: KEY_SHOW_EVENT) == nil {
+                let showEvents = [Int]()
+                userDefaults.set(showEvents, forKey: KEY_SHOW_EVENT)
+              }
+              
+              if let eventId = Int(event.id),
+                let showEvents = userDefaults.object(forKey: KEY_SHOW_EVENT) as? [Int],
+                !showEvents.contains(eventId) {
+                let eventPopupViewController = ANIEventPopupViewController()
+                eventPopupViewController.event = event
+                eventPopupViewController.modalPresentationStyle = .overCurrentContext
+                self.tabBarController?.present(eventPopupViewController, animated: false, completion: nil)
+                
+                userDefaults.set([eventId], forKey: KEY_SHOW_EVENT)
+                
+                ANISessionManager.shared.isShowEvent = true
+              }
+            } catch let error {
+              DLog(error)
+            }
+          }
+        })
+      }
+    }
   }
 }
 
@@ -116,6 +251,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
           let notiNavigationController = viewControllers[NOTI_VIEW_CONTROLLER_INDEX] as? UINavigationController,
           let notiViewController = notiNavigationController.viewControllers.first as? ANINotiViewController else { return }
     
+    ANISessionManager.shared.isLaunchNoti = true
     
     let userInfo = response.notification.request.content.userInfo
     if let notificationKind = userInfo[AnyHashable("notificationKind")] as? String {
@@ -133,7 +269,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
   }
 }
 
-// MARK: - MessagingDelegate
+// MARK: MessagingDelegate
 extension AppDelegate: MessagingDelegate {
   func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String) {
     UserDefaults.standard.set(fcmToken, forKey: KEY_FCM_TOKEN)

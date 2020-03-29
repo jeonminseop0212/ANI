@@ -24,25 +24,45 @@ class ANISearchViewController: UIViewController {
   private weak var searchBar: UISearchBar?
   private weak var searchView: ANISearchView?
   
+  private weak var popularUsersView: ANIPopularUsersView?
+  
   private var selectedIndex: Int = 0 {
     didSet {
-      guard let searchView = self.searchView else { return }
+      guard let searchView = self.searchView,
+            let searchBar = self.searchBar,
+            let popularUsersView = self.popularUsersView else { return }
+
+      if let text = searchBar.textField.text, text != "" {
+        searchView.searchText = text
+      }
 
       if selectedIndex == 0 {
         searchView.selectedCategory = .user
-      } else if selectedIndex == 1 {
-        searchView.selectedCategory = .story
       } else {
         searchView.selectedCategory = .qna
+      }
+      
+      if searchBar.textField.text != "" {
+        UIView.animate(withDuration: 0.2) {
+          popularUsersView.alpha = 0.0
+        }
       }
     }
   }
   
   private var searchText: String = "" {
     didSet {
-      guard let searchView = self.searchView else { return }
+      guard let searchView = self.searchView,
+            let searchBar = self.searchBar,
+            let popularUsersView = self.popularUsersView else { return }
 
       searchView.searchText = searchText
+      
+      if searchBar.textField.text != "" {
+        UIView.animate(withDuration: 0.2) {
+          popularUsersView.alpha = 0.0
+        }
+      }
     }
   }
   
@@ -52,8 +72,11 @@ class ANISearchViewController: UIViewController {
   private var isRejectAnimating: Bool = false
   private var rejectTapView: UIView?
   
+  private var isMe: Bool?
   private var contentType: ContentType?
   private var contributionId: String?
+  
+  private weak var activityIndicatorView: ANIActivityIndicator?
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -61,12 +84,20 @@ class ANISearchViewController: UIViewController {
   }
   
   override func viewWillAppear(_ animated: Bool) {
-    UIApplication.shared.statusBarStyle = .default
+    if #available(iOS 13.0, *) {
+      UIApplication.shared.statusBarStyle = .darkContent
+    } else {
+      UIApplication.shared.statusBarStyle = .default
+    }
     setupNotifications()
   }
   
-  override func viewWillDisappear(_ animated: Bool) {
+  override func viewDidDisappear(_ animated: Bool) {
+    guard let popularUsersView = self.popularUsersView else { return }
+    
     removeNotifications()
+    
+    popularUsersView.endRefresh()
   }
   
   private func setup() {
@@ -76,6 +107,7 @@ class ANISearchViewController: UIViewController {
     self.navigationController?.setNavigationBarHidden(true, animated: false)
     self.navigationController?.navigationBar.isTranslucent = false
     self.navigationController?.interactivePopGestureRecognizer?.delegate = self
+    self.automaticallyAdjustsScrollViewInsets = false
     
     //searchView
     let searchView = ANISearchView()
@@ -84,6 +116,14 @@ class ANISearchViewController: UIViewController {
     searchView.topToSuperview(usingSafeArea: true)
     searchView.edgesToSuperview(excluding: .top)
     self.searchView = searchView
+    
+    //popularUsersView
+    let popularUsersView = ANIPopularUsersView()
+    popularUsersView.delegate = self
+    self.view.addSubview(popularUsersView)
+    popularUsersView.topToSuperview(usingSafeArea: true)
+    popularUsersView.edgesToSuperview(excluding: .top)
+    self.popularUsersView = popularUsersView
     
     //myNavigationBar
     let myNavigationBar = UIView()
@@ -98,10 +138,11 @@ class ANISearchViewController: UIViewController {
     //searchBar
     let searchBar = UISearchBar()
     searchBar.placeholder = "Search"
-    searchBar.textField?.backgroundColor = ANIColor.lightGray
+    searchBar.textField.backgroundColor = ANIColor.lightGray
     searchBar.delegate = self
     searchBar.backgroundImage = UIImage()
     searchBar.tintColor = ANIColor.darkGray
+    searchBar.textField.textColor = ANIColor.dark
     myNavigationBar.addSubview(searchBar)
     searchBar.topToSuperview()
     searchBar.leftToSuperview()
@@ -140,13 +181,22 @@ class ANISearchViewController: UIViewController {
     rejectTapView.size(to: rejectView)
     rejectTapView.topToSuperview()
     self.rejectTapView = rejectTapView
+    
+    //activityIndicatorView
+    let activityIndicatorView = ANIActivityIndicator()
+    activityIndicatorView.isFull = true
+    self.tabBarController?.view.addSubview(activityIndicatorView)
+    activityIndicatorView.edgesToSuperview()
+    self.activityIndicatorView = activityIndicatorView
   }
   
   //MARK: Notifications
   private func setupNotifications() {
+    removeNotifications()
     ANINotificationManager.receive(viewScrolled: self, selector: #selector(hideKeyboard))
     ANINotificationManager.receive(profileImageViewTapped: self, selector: #selector(pushOtherProfile))
     ANINotificationManager.receive(imageCellTapped: self, selector: #selector(presentImageBrowser(_:)))
+    ANINotificationManager.receive(tapHashtag: self, selector: #selector(pushHashtagList))
   }
   
   private func removeNotifications() {
@@ -154,15 +204,11 @@ class ANISearchViewController: UIViewController {
   }
   
   @objc private func hideKeyboard() {
-    guard let searchBar = self.searchBar,
-      let searchBarTextField = searchBar.textField else { return }
-    if searchBarTextField.isFirstResponder {
-      searchBarTextField.resignFirstResponder()
+    guard let searchBar = self.searchBar  else { return }
+    if searchBar.textField.isFirstResponder {
+      searchBar.textField.resignFirstResponder()
       searchBar.setShowsCancelButton(false, animated: true)
-      
-      if let searchCancelButton = searchBar.cancelButton {
-        searchCancelButton.alpha = 0.0
-      }
+      searchBar.cancelButton.alpha = 0.0
     }
   }
   
@@ -175,9 +221,27 @@ class ANISearchViewController: UIViewController {
     self.navigationController?.pushViewController(otherProfileViewController, animated: true)
   }
   
+  @objc private func pushHashtagList(_ notification: NSNotification) {
+    if let userInfo = notification.userInfo,
+      let contributionKind = userInfo[KEY_CONTRIBUTION_KIND] as? String,
+      let hashtag = userInfo[KEY_HASHTAG] as? String {
+      let hashtagListViewController = ANIHashtagListViewController()
+      hashtagListViewController.hashtag = hashtag
+      if contributionKind == KEY_CONTRIBUTION_KIND_STROY {
+        hashtagListViewController.hashtagList = .story
+      } else if contributionKind == KEY_CONTRIBUTION_KIND_QNA {
+        hashtagListViewController.hashtagList = .question
+      }
+      hashtagListViewController.hidesBottomBarWhenPushed = true
+      self.navigationController?.pushViewController(hashtagListViewController, animated: true)
+    }
+  }
+  
   @objc private func rejectViewTapped() {
     let initialViewController = ANIInitialViewController()
+    initialViewController.myTabBarController = self.tabBarController as? ANITabBarController
     let navigationController = UINavigationController(rootViewController: initialViewController)
+    navigationController.modalPresentationStyle = .fullScreen
     self.present(navigationController, animated: true, completion: nil)
   }
   
@@ -194,45 +258,12 @@ class ANISearchViewController: UIViewController {
     //overCurrentContextだとtabBarが消えないのでtabBarからpresentする
     self.tabBarController?.present(imageBrowserViewController, animated: false, completion: nil)
   }
-}
-
-//MARK: UISearchBarDelegate
-extension ANISearchViewController: UISearchBarDelegate {
-  func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-    guard let searchBarTextField = searchBar.textField,
-          let text = searchBarTextField.text else { return }
-    if searchBarTextField.isFirstResponder {
-      searchBarTextField.resignFirstResponder()
-      
-      self.searchText = text
-    }
-  }
   
-  func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-    guard let searchBarTextField = searchBar.textField else { return }
-    if searchBarTextField.isFirstResponder {
-      searchBarTextField.resignFirstResponder()
-    }
-    
-    searchBar.setShowsCancelButton(false, animated: true)
-    if let searchCancelButton = searchBar.cancelButton {
-      searchCancelButton.alpha = 0.0
-    }
-  }
-
-  func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
-    searchBar.setShowsCancelButton(true, animated: true)
-    if let searchCancelButton = searchBar.cancelButton {
-      searchCancelButton.alpha = 1.0
-    }
-    return true
-  }
-}
-
-//MARK: ANIUserSearchViewDelegate
-extension ANISearchViewController: ANISearchViewDelegate {
-  func searchViewDidScroll(scrollY: CGFloat) {
-    guard let myNavigationBarTopConstroint = self.myNavigationBarTopConstroint else { return }
+  private func navigationAnimation(scrollY: CGFloat) {
+    guard let myNavigationBarTopConstroint = self.myNavigationBarTopConstroint,
+          let searchBar = self.searchBar,
+          let categoriesView = self.categoriesView,
+          let categoryCollectionView = categoriesView.categoryCollectionView else { return }
     
     let topHeight = UIViewController.NAVIGATION_BAR_HEIGHT + ANIRecruitViewController.FILTERS_VIEW_HEIGHT
     let newScrollY = topHeight + scrollY
@@ -244,20 +275,66 @@ extension ANISearchViewController: ANISearchViewDelegate {
         self.view.layoutIfNeeded()
         
         let alpha = 1 - (scrollY / topHeight)
-        searchBar?.alpha = alpha
-        categoriesView?.categoryCollectionView?.alpha = alpha
+        searchBar.alpha = alpha
+        categoryCollectionView.alpha = alpha
       } else {
         myNavigationBarTopConstroint.constant = -topHeight
-        searchBar?.alpha = 0.0
-        categoriesView?.categoryCollectionView?.alpha = 0.0
         self.view.layoutIfNeeded()
+        
+        searchBar.alpha = 0.0
+        categoryCollectionView.alpha = 0.0
       }
     } else {
       myNavigationBarTopConstroint.constant = 0.0
       self.view.layoutIfNeeded()
       
-      searchBar?.alpha = 1.0
-      categoriesView?.categoryCollectionView?.alpha = 1.0
+      searchBar.alpha = 1.0
+      categoryCollectionView.alpha = 1.0
+    }
+  }
+}
+
+//MARK: UISearchBarDelegate
+extension ANISearchViewController: UISearchBarDelegate {
+  func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+    guard let text = searchBar.textField.text else { return }
+    
+    if searchBar.textField.isFirstResponder {
+      searchBar.textField.resignFirstResponder()
+      
+      self.searchText = text
+    }
+  }
+  
+  func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+    guard let popularUsersView = self.popularUsersView else { return }
+    
+    if searchBar.textField.isFirstResponder {
+      searchBar.textField.resignFirstResponder()
+    }
+    
+    searchBar.setShowsCancelButton(false, animated: true)
+    searchBar.cancelButton.alpha = 0.0
+    
+    UIView.animate(withDuration: 0.2) {
+      popularUsersView.alpha = 1.0
+    }
+  }
+
+  func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
+    searchBar.setShowsCancelButton(true, animated: true)
+    searchBar.cancelButton.alpha = 1.0
+    return true
+  }
+}
+
+//MARK: ANIUserSearchViewDelegate
+extension ANISearchViewController: ANISearchViewDelegate {
+  func searchViewDidScroll(scrollY: CGFloat) {
+    guard let popularUsersView = self.popularUsersView else { return }
+    
+    if popularUsersView.alpha == 0.0 {
+      navigationAnimation(scrollY: scrollY)
     }
   }
   
@@ -313,14 +390,40 @@ extension ANISearchViewController: ANISearchViewDelegate {
   }
   
   func popupOptionView(isMe: Bool, contentType: ContentType, id: String) {
+    self.isMe = isMe
     self.contentType = contentType
     self.contributionId = id
     
     let popupOptionViewController = ANIPopupOptionViewController()
     popupOptionViewController.modalPresentationStyle = .overCurrentContext
     popupOptionViewController.isMe = isMe
+    if !isMe {
+      popupOptionViewController.options = ["非表示"]
+      if contentType == ContentType.story {
+        popupOptionViewController.options?.insert("シェア", at: 0)
+      } else if contentType == ContentType.qna {
+        popupOptionViewController.options?.insert("シェア", at: 0)
+      }
+    } else {
+      if contentType == ContentType.story {
+        popupOptionViewController.options = ["シェア"]
+      } else if contentType == ContentType.qna {
+        popupOptionViewController.options = ["シェア"]
+      }
+    }
     popupOptionViewController.delegate = self
     self.tabBarController?.present(popupOptionViewController, animated: false, completion: nil)
+  }
+}
+
+//MARK: ANIPopularUsersViewDelegate
+extension ANISearchViewController: ANIPopularUsersViewDelegate {
+  func popularUsersViewDidScroll(scrollY: CGFloat) {
+    guard let popularUsersView = self.popularUsersView else { return }
+
+    if popularUsersView.alpha == 1.0 {
+      navigationAnimation(scrollY: scrollY)
+    }
   }
 }
 
@@ -334,7 +437,11 @@ extension ANISearchViewController: ANISearchCategoriesViewDelegate {
 //MARK: ANIImageBrowserViewControllerDelegate
 extension ANISearchViewController: ANIImageBrowserViewControllerDelegate {
   func imageBrowserDidDissmiss() {
-    UIApplication.shared.statusBarStyle = .default
+    if #available(iOS 13.0, *) {
+      UIApplication.shared.statusBarStyle = .darkContent
+    } else {
+      UIApplication.shared.statusBarStyle = .default
+    }
   }
 }
 
@@ -358,7 +465,11 @@ extension ANISearchViewController: ANIPopupOptionViewControllerDelegate {
     let alertController = UIAlertController(title: nil, message: "投稿を通報しますか？", preferredStyle: .alert)
     
     let reportAction = UIAlertAction(title: "通報", style: .default) { (action) in
-      self.reportData()
+      if !ANISessionManager.shared.isAnonymous {
+        self.reportData()
+      } else {
+        self.reject()
+      }
     }
     let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
     
@@ -369,6 +480,154 @@ extension ANISearchViewController: ANIPopupOptionViewControllerDelegate {
   }
   
   func optionTapped(index: Int) {
+    guard let isMe = self.isMe,
+          let contentType = self.contentType,
+          let contributionId = self.contributionId else { return }
+    
+    var alertTitle = ""
+    var alertMessage = ""
+    var collection = ""
+    
+    if contentType == .story {
+      if isMe {
+        if index == 0 {
+          let activityItems = [ANIActivityItemSorce(shareContent: "#ミャウ #MYAU #猫 #ねこ #猫好き\nhttps://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/story/\(contributionId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU")]
+          let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+          self.present(activityViewController, animated: true)
+        }
+      } else {
+        if index == 0 {
+          let activityItems = [ANIActivityItemSorce(shareContent: "#ミャウ #MYAU #猫 #ねこ #猫好き\nhttps://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/story/\(contributionId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU")]
+          let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+          self.present(activityViewController, animated: true)
+        } else if index == 1 {
+          alertTitle = "このストーリーを非表示にしますか？"
+          alertMessage = "非表示にしたストーリーはアプリの中で見えなくなります。後から非表示を解除することは出来ません。"
+          collection = KEY_STORIES
+          
+          self.hideContribution(contentType: contentType, collection: collection, contributionId: contributionId, title: alertTitle, message: alertMessage)
+        }
+      }
+    } else if contentType == .qna {
+      if isMe {
+        if index == 0 {
+          let activityItems = [ANIActivityItemSorce(shareContent: "#ミャウ #MYAU #猫 #ねこ #猫好き\nhttps://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/qna/\(contributionId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU")]
+          let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+          self.present(activityViewController, animated: true)
+        }
+      } else {
+        if index == 0 {
+          let activityItems = [ANIActivityItemSorce(shareContent: "#ミャウ #MYAU #猫 #ねこ #猫好き\nhttps://myaurelease.page.link/?link=https://ani-release.firebaseapp.com/qna/\(contributionId)/&isi=1441739235&ibi=com.gmail-jeonminsopdev.MYAU")]
+          let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+          self.present(activityViewController, animated: true)
+        } else if index == 1 {
+          alertTitle = "この質問を非表示にしますか？"
+          alertMessage = "非表示にした質問はアプリの中で見えなくなります。後から非表示を解除することは出来ません。"
+          collection = KEY_QNAS
+          
+          self.hideContribution(contentType: contentType, collection: collection, contributionId: contributionId, title: alertTitle, message: alertMessage)
+        }
+      }
+    }
+  }
+  
+  private func hideContribution(contentType: ContentType, collection: String, contributionId: String, title: String, message: String) {
+    guard let currentUserId = ANISessionManager.shared.currentUserUid else {
+      return
+    }
+    
+    let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+    
+    let hideAction = UIAlertAction(title: "非表示", style: .default) { (action) in
+      let database = Firestore.firestore()
+      
+      self.activityIndicatorView?.startAnimating()
+      
+      DispatchQueue.global().async {
+        database.collection(collection).document(contributionId).getDocument(completion: { (snapshot, error) in
+          if let error = error {
+            DLog("Error get document: \(error)")
+            return
+          }
+          
+          guard let snapshot = snapshot, let data = snapshot.data() else { return }
+          
+          if contentType == .story {
+            do {
+              let story = try FirestoreDecoder().decode(FirebaseStory.self, from: data)
+              
+              if let hideUserIds = story.hideUserIds {
+                var hideUserIdsTemp = hideUserIds
+                hideUserIdsTemp.append(currentUserId)
+                
+                database.collection(collection).document(contributionId).updateData([KEY_HIDE_USER_IDS: hideUserIdsTemp])
+                
+                self.updateDataAlgolia(objectId: contributionId, data: [KEY_HIDE_USER_IDS: hideUserIdsTemp as AnyObject], indexName: KEY_STORIES_INDEX)
+              } else {
+                let hideUserIds = [currentUserId]
+                
+                database.collection(collection).document(contributionId).updateData([KEY_HIDE_USER_IDS: hideUserIds])
+                
+                self.updateDataAlgolia(objectId: contributionId, data: [KEY_HIDE_USER_IDS: hideUserIds as AnyObject], indexName: KEY_STORIES_INDEX)
+              }
+              
+              DispatchQueue.main.async {
+                self.activityIndicatorView?.stopAnimating()
+                
+                ANINotificationManager.postDeleteStory(id: contributionId)
+              }
+            } catch let error {
+              DLog(error)
+            }
+          } else if contentType == .qna {
+            do {
+              let qna = try FirestoreDecoder().decode(FirebaseQna.self, from: data)
+              
+              if let hideUserIds = qna.hideUserIds {
+                var hideUserIdsTemp = hideUserIds
+                hideUserIdsTemp.append(currentUserId)
+                
+                database.collection(collection).document(contributionId).updateData([KEY_HIDE_USER_IDS: hideUserIdsTemp])
+                
+                self.updateDataAlgolia(objectId: contributionId, data: [KEY_HIDE_USER_IDS: hideUserIdsTemp as AnyObject], indexName: KEY_QNAS_INDEX)
+              } else {
+                let hideUserIds = [currentUserId]
+                
+                database.collection(collection).document(contributionId).updateData([KEY_HIDE_USER_IDS: hideUserIds])
+                
+                self.updateDataAlgolia(objectId: contributionId, data: [KEY_HIDE_USER_IDS: hideUserIds as AnyObject], indexName: KEY_QNAS_INDEX)
+              }
+              
+              DispatchQueue.main.async {
+                self.activityIndicatorView?.stopAnimating()
+                
+                ANINotificationManager.postDeleteQna(id: contributionId)
+              }
+            } catch let error {
+              DLog(error)
+            }
+          }
+        })
+      }
+    }
+    let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel)
+    
+    alertController.addAction(hideAction)
+    alertController.addAction(cancelAction)
+    
+    self.present(alertController, animated: true, completion: nil)
+  }
+  
+  private func updateDataAlgolia(objectId: String, data: [String: AnyObject], indexName: String) {
+    let index = ANISessionManager.shared.client.index(withName: indexName)
+    
+    DispatchQueue.global().async {
+      index.partialUpdateObject(data, withID: objectId, completionHandler: { (content, error) -> Void in
+        if error == nil {
+          DLog("Object IDs: \(content!)")
+        }
+      })
+    }
   }
 }
 
@@ -399,12 +658,14 @@ extension ANISearchViewController {
         }
         
         database.collection(collection).document(contributionId).delete()
-        self.delegateDataAlgolia(contentType: contentType, contributionId: contributionId)
+        self.deleteDataAlgolia(contentType: contentType, contributionId: contributionId)
         
         DispatchQueue.main.async {
-          guard let searchView = self.searchView else { return }
-          
-          searchView.deleteData(id: contributionId)
+          if contentType == .story {
+            ANINotificationManager.postDeleteStory(id: contributionId)
+          } else if contentType == .qna {
+            ANINotificationManager.postDeleteQna(id: contributionId)
+          }
         }
         
         guard let snapshot = snapshot, let data = snapshot.data() else { return }
@@ -412,16 +673,36 @@ extension ANISearchViewController {
         do {
           if contentType == .story {
             let story = try FirestoreDecoder().decode(FirebaseStory.self, from: data)
-            
+            let storage = Storage.storage()
+
             if let urls = story.storyImageUrls {
               for url in urls {
-                let storage = Storage.storage()
                 let storageRef = storage.reference(forURL: url)
                 
                 storageRef.delete { error in
                   if let error = error {
                     DLog(error)
                   }
+                }
+              }
+            }
+            
+            if let videoUrl = story.storyVideoUrl {
+              let storageRef = storage.reference(forURL: videoUrl)
+              
+              storageRef.delete { error in
+                if let error = error {
+                  DLog(error)
+                }
+              }
+            }
+            
+            if let thumbnailImageUrl = story.thumbnailImageUrl {
+              let storageRef = storage.reference(forURL: thumbnailImageUrl)
+              
+              storageRef.delete { error in
+                if let error = error {
+                  DLog(error)
                 }
               }
             }
@@ -499,7 +780,7 @@ extension ANISearchViewController {
     database.collection(KEY_REPORTS).document(contributionId).collection(KEY_REPORT).addDocument(data: values)
   }
   
-  private func delegateDataAlgolia(contentType: ContentType, contributionId: String) {
+  private func deleteDataAlgolia(contentType: ContentType, contributionId: String) {
     var index: Index?
     
     if contentType == .story {

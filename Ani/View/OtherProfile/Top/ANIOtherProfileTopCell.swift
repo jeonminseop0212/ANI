@@ -8,6 +8,11 @@
 
 import UIKit
 
+protocol ANIOtherProfileTopCellDelegate {
+  func presentImageBrowser(index: Int, imageUrls: [String])
+  func didSelecteMenuItem(selectedIndex: Int)
+}
+
 class ANIOtherProfileTopCell: UITableViewCell {
   
   private weak var familyView: ANIFamilyView?
@@ -16,10 +21,8 @@ class ANIOtherProfileTopCell: UITableViewCell {
   private weak var stackView: UIStackView?
 
   private weak var menuBar: ANIProfileMenuBar?
-  private let MENU_BAR_HEIGHT: CGFloat = 60.0
-  
-  weak var bottomSpace: UIView?
-  
+  private let MENU_BAR_HEIGHT: CGFloat = 40.0
+    
   var user: FirebaseUser? {
     didSet {
       guard let familyView = self.familyView,
@@ -29,10 +32,7 @@ class ANIOtherProfileTopCell: UITableViewCell {
     }
   }
   
-  var delegate: ANIProfileMenuBarDelegate? {
-    get { return self.menuBar?.delegate }
-    set(v) { self.menuBar?.delegate = v }
-  }
+  var delegate: ANIOtherProfileTopCellDelegate?
   
   var selectedIndex: Int? {
     didSet {
@@ -51,9 +51,11 @@ class ANIOtherProfileTopCell: UITableViewCell {
   
   private func setup() {
     self.selectionStyle = .none
+    self.backgroundColor = .white
     
     //familyView
     let familyView = ANIFamilyView()
+    familyView.delegate = self
     addSubview(familyView)
     familyView.topToSuperview()
     familyView.leftToSuperview()
@@ -73,21 +75,10 @@ class ANIOtherProfileTopCell: UITableViewCell {
     
     //menuBar
     let menuBar = ANIProfileMenuBar()
+    menuBar.delegate = self
     stackView.addArrangedSubview(menuBar)
-    menuBar.topToBottom(of: familyView, offset: 10.0)
-    menuBar.leftToSuperview()
-    menuBar.rightToSuperview()
-    menuBar.widthToSuperview()
-    menuBar.height(MENU_BAR_HEIGHT)
-    menuBar.bottomToSuperview()
+    menuBar.height(MENU_BAR_HEIGHT, priority: .defaultHigh)
     self.menuBar = menuBar
-    
-    //bottomSpace
-    let bottomSpace = UIView()
-    bottomSpace.backgroundColor = ANIColor.bg
-    bottomSpace.height(10.0)
-    stackView.addArrangedSubview(bottomSpace)
-    self.bottomSpace = bottomSpace
   }
   
   private func reloadLayout() {
@@ -95,5 +86,19 @@ class ANIOtherProfileTopCell: UITableViewCell {
       let selectedIndex = self.selectedIndex else { return }
     let indexPath = IndexPath(item: selectedIndex, section: 0)
     menuBar.menuCollectionView?.selectItem(at: indexPath, animated: false, scrollPosition: .left)
+  }
+}
+
+//MARK: ANIProfileMenuBarDelegate
+extension ANIOtherProfileTopCell: ANIProfileMenuBarDelegate {
+  func didSelecteMenuItem(selectedIndex: Int) {
+    self.delegate?.didSelecteMenuItem(selectedIndex: selectedIndex)
+  }
+}
+
+//MARK: ANIFamilyViewDelegate
+extension ANIOtherProfileTopCell: ANIFamilyViewDelegate {
+  func presentImageBrowser(index: Int, imageUrls: [String]) {
+    self.delegate?.presentImageBrowser(index: index, imageUrls: imageUrls)
   }
 }

@@ -72,17 +72,22 @@ class ANIChatViewController: UIViewController {
     setup()
   }
   
-  override func viewDidAppear(_ animated: Bool) {
-    UIApplication.shared.statusBarStyle = .default
+  override func viewWillAppear(_ animated: Bool) {
     setupNotifications()
   }
   
-  override func viewWillDisappear(_ animated: Bool) {
-    removeNotifications()
-    removeGroup()
+  override func viewDidAppear(_ animated: Bool) {
+    if #available(iOS 13.0, *) {
+      UIApplication.shared.statusBarStyle = .darkContent
+    } else {
+      UIApplication.shared.statusBarStyle = .default
+    }
   }
   
   override func viewDidDisappear(_ animated: Bool) {
+    removeNotifications()
+    removeGroup()
+    
     guard let chatView = self.chatView,
           let chatViewChatGroupListener = chatView.chatGroupListener,
           let chatBarChatGroupListener = self.chatGroupListener,
@@ -108,10 +113,10 @@ class ANIChatViewController: UIViewController {
     let myNavigationBar = UIView()
     myNavigationBar.backgroundColor = .white
     self.view.addSubview(myNavigationBar)
-    myNavigationBar.topToSuperview()
+    myNavigationBar.topToSuperview(usingSafeArea: true)
     myNavigationBar.leftToSuperview()
     myNavigationBar.rightToSuperview()
-    myNavigationBar.height(UIViewController.STATUS_BAR_HEIGHT + UIViewController.NAVIGATION_BAR_HEIGHT)
+    myNavigationBar.height(UIViewController.NAVIGATION_BAR_HEIGHT)
     self.myNavigationBar = myNavigationBar
     
     //myNavigationBase
@@ -145,7 +150,7 @@ class ANIChatViewController: UIViewController {
       navigationTitleLabel.text = userName
     }
     navigationTitleLabel.textColor = ANIColor.dark
-    navigationTitleLabel.font = UIFont.boldSystemFont(ofSize: 17)
+    navigationTitleLabel.font = UIFont.boldSystemFont(ofSize: 16)
     myNavigationBase.addSubview(navigationTitleLabel)
     navigationTitleLabel.centerInSuperview()
     self.navigationTitleLabel = navigationTitleLabel
@@ -276,6 +281,7 @@ class ANIChatViewController: UIViewController {
   
   //MARK: notification
   private func setupNotifications() {
+    removeNotifications()
     ANINotificationManager.receive(keyboardWillChangeFrame: self, selector: #selector(keyboardWillChangeFrame))
     ANINotificationManager.receive(keyboardWillHide: self, selector: #selector(keyboardWillHide))
     ANINotificationManager.receive(profileImageViewTapped: self, selector: #selector(pushOtherProfile))

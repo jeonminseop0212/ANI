@@ -10,7 +10,6 @@
 import UIKit
 import FirebaseFirestore
 import CodableFirebase
-import NVActivityIndicatorView
 
 protocol ANINotiViewDelegate {
   func cellTapped(noti: FirebaseNotification)
@@ -22,6 +21,10 @@ class ANINotiView: UIView {
   
   private weak var notiTableView: UITableView?
   
+  private weak var refreshControl: UIRefreshControl?
+  
+  private weak var activityIndicatorView: ANIActivityIndicator?
+
   private var notifications = [FirebaseNotification]()
   
   private var users = [FirebaseUser]()
@@ -33,11 +36,11 @@ class ANINotiView: UIView {
   
   var isCellSelected: Bool = false
   
-  private weak var activityIndicatorView: NVActivityIndicatorView?
-  
   var delegate: ANINotiViewDelegate?
   
   private var cellHeight = [IndexPath: CGFloat]()
+  
+  static var shared: ANINotiView?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -51,11 +54,7 @@ class ANINotiView: UIView {
   }
   
   private func setup() {
-    let window = UIApplication.shared.keyWindow
-    var bottomSafeArea: CGFloat = 0.0
-    if let windowUnrap = window {
-      bottomSafeArea = windowUnrap.safeAreaInsets.bottom
-    }
+    self.backgroundColor = ANIColor.bg
     
     //reloadView
     let reloadView = ANIReloadView()
@@ -71,8 +70,8 @@ class ANINotiView: UIView {
     
     //notiTableView
     let notiTableView = UITableView()
-    notiTableView.contentInset = UIEdgeInsets(top: ANICommunityViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: bottomSafeArea, right: 0)
-    notiTableView.scrollIndicatorInsets  = UIEdgeInsets(top: UIViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: bottomSafeArea, right: 0)
+    notiTableView.contentInset = UIEdgeInsets(top: ANICommunityViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: 0, right: 0)
+    notiTableView.scrollIndicatorInsets  = UIEdgeInsets(top: UIViewController.NAVIGATION_BAR_HEIGHT, left: 0, bottom: 0, right: 0)
     let basicNotiId = NSStringFromClass(ANIBasicNotiViewCell.self)
     notiTableView.register(ANIBasicNotiViewCell.self, forCellReuseIdentifier: basicNotiId)
     let followNotiId = NSStringFromClass(ANIFollowNotiViewCell.self)
@@ -89,32 +88,51 @@ class ANINotiView: UIView {
     refreshControl.tintColor = ANIColor.moreDarkGray
     refreshControl.addTarget(self, action: #selector(loadNoti(sender:)), for: .valueChanged)
     notiTableView.addSubview(refreshControl)
+    self.refreshControl = refreshControl
     addSubview(notiTableView)
     notiTableView.edgesToSuperview()
     self.notiTableView = notiTableView
     
     //activityIndicatorView
-    let activityIndicatorView = NVActivityIndicatorView(frame: .zero, type: .lineScale, color: ANIColor.emerald, padding: 0)
-    addSubview(activityIndicatorView)
-    activityIndicatorView.width(40.0)
-    activityIndicatorView.height(40.0)
-    activityIndicatorView.centerInSuperview()
+    let activityIndicatorView = ANIActivityIndicator()
+    activityIndicatorView.isFull = false
+    self.addSubview(activityIndicatorView)
+    activityIndicatorView.edgesToSuperview()
     self.activityIndicatorView = activityIndicatorView
   }
   
+  static func endRefresh() {
+    guard let shared = ANINotiView.shared,
+          let refreshControl = shared.refreshControl,
+          let notiTableView = shared.notiTableView else { return }
+    
+    refreshControl.endRefreshing()
+    
+    let topInset = ANICommunityViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    if notiTableView.contentOffset.y + topInset < 0 {
+      notiTableView.scrollToRow(at: [0, 0], at: .top, animated: false)
+    }
+  }
+  
   private func setupNotifications() {
-    ANINotificationManager.receive(notiTabTapped: self, selector: #selector(scrollToTop))
+    ANINotificationManager.receive(notiTabTapped: self, selector: #selector(notiTabTapped))
     ANINotificationManager.receive(login: self, selector: #selector(reloadNotifications))
     ANINotificationManager.receive(logout: self, selector: #selector(hideTableView))
     ANINotificationManager.receive(tapNotiNotification: self, selector: #selector(reloadNotifications))
+    ANINotificationManager.receive(loadedCurrentUser: self, selector: #selector(reloadNotifications))
+    ANINotificationManager.postDidSetupViewNotifications()
   }
   
-  @objc private func scrollToTop() {
+  @objc private func notiTabTapped() {
+    scrollToTop(animation: true)
+  }
+  
+  private func scrollToTop(animation: Bool) {
     guard let notiTableView = notiTableView,
           !notifications.isEmpty,
           isCellSelected else { return }
     
-    notiTableView.scrollToRow(at: [0, 0], at: .top, animated: true)
+    notiTableView.scrollToRow(at: [0, 0], at: .top, animated: animation)
   }
   
   @objc private func reloadNotifications() {
@@ -122,7 +140,7 @@ class ANINotiView: UIView {
     
     notiTableView.alpha = 0.0
     
-    loadNoti(sender: nil)
+    loadNoti(sender: nil)    
   }
   
   @objc private func hideTableView() {
@@ -149,6 +167,7 @@ class ANINotiView: UIView {
     UIView.animate(withDuration: 0.2, animations: {
       reloadView.alpha = 1.0
     }) { (complete) in
+      ANISessionManager.shared.isLoadedFirstData = true
       ANINotificationManager.postDismissSplash()
     }
     
@@ -166,6 +185,17 @@ class ANINotiView: UIView {
     
     let date = ANIFunction.shared.getToday()
     database.collection(KEY_USERS).document(currentUserUid).updateData([KEY_CHECK_NOTI_DATE: date, KEY_IS_HAVE_UNREAD_NOTI: false, KEY_UNREAD_NOTI_COUNT: 0])
+  }
+  
+  private func isBlockNotification(notification: FirebaseNotification) -> Bool {
+    if let blockUserIds = ANISessionManager.shared.blockUserIds, blockUserIds.contains(notification.userId) {
+      return true
+    }
+    if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(notification.userId) {
+      return true
+    }
+    
+    return false
   }
 }
 
@@ -191,6 +221,7 @@ extension ANINotiView: UITableViewDataSource {
         } else {
           cell.user = nil
         }
+        cell.indexPath = indexPath.row
         cell.noti = notifications[indexPath.row]
         cell.delegate = self
         
@@ -209,6 +240,7 @@ extension ANINotiView: UITableViewDataSource {
         } else {
           cell.user = nil
         }
+        cell.indexPath = indexPath.row
         cell.noti = notifications[indexPath.row]
         cell.delegate = self
         
@@ -293,32 +325,45 @@ extension ANINotiView {
         
         var updated: Bool = false
         
-        for document in snapshot.documents {
+        for (index, document) in snapshot.documents.enumerated() {
           do {
             let notification = try FirestoreDecoder().decode(FirebaseNotification.self, from: document.data())
-            self.notifications.append(notification)
+            if !self.isBlockNotification(notification: notification) {
+              self.notifications.append(notification)
+            }
             
             DispatchQueue.main.async {
-              if let sender = sender {
-                sender.endRefreshing()
-              }
-              
-              activityIndicatorView.stopAnimating()
-              
-              notiTableView.reloadData() {
-                if !updated {
-                  self.updateCheckNotiDate()
-                  updated = true
+              if index + 1 == snapshot.documents.count {
+                if let sender = sender {
+                  sender.endRefreshing()
+                }
+                
+                notiTableView.reloadData() {
+                  if sender == nil {
+                    self.scrollToTop(animation: false)
+                  }
+                  
+                  if !updated {
+                    self.updateCheckNotiDate()
+                    updated = true
+                  }
+                }
+                
+                self.isLoading = false
+                
+                if self.notifications.isEmpty {
+                  self.loadMoreNoti()
+                } else {
+                  activityIndicatorView.stopAnimating()
+
+                  UIView.animate(withDuration: 0.2, animations: {
+                    notiTableView.alpha = 1.0
+                  }, completion: { (complete) in
+                    ANISessionManager.shared.isLoadedFirstData = true
+                    ANINotificationManager.postDismissSplash()
+                  })
                 }
               }
-              
-              UIView.animate(withDuration: 0.2, animations: {
-                notiTableView.alpha = 1.0
-              }, completion: { (complete) in
-                ANINotificationManager.postDismissSplash()
-              })
-              
-              self.isLoading = false
             }
           } catch let error {
             DLog(error)
@@ -344,6 +389,7 @@ extension ANINotiView {
     guard let currentUserUid = ANISessionManager.shared.currentUserUid,
           let notiTableView = self.notiTableView,
           let lastNoti = self.lastNoti,
+          let activityIndicatorView = self.activityIndicatorView,
           !isLoading,
           !isLastNotiPage else { return }
     
@@ -370,14 +416,31 @@ extension ANINotiView {
         
         for (index, document) in snapshot.documents.enumerated() {
           do {
-            let noti = try FirestoreDecoder().decode(FirebaseNotification.self, from: document.data())
-            self.notifications.append(noti)
+            let notification = try FirestoreDecoder().decode(FirebaseNotification.self, from: document.data())
+            if !self.isBlockNotification(notification: notification) {
+              self.notifications.append(notification)
+            }
             
             DispatchQueue.main.async {
               if index + 1 == snapshot.documents.count {
                 notiTableView.reloadData()
                 
                 self.isLoading = false
+                
+                if self.notifications.isEmpty {
+                  self.loadMoreNoti()
+                } else {
+                  if notiTableView.alpha == 0.0 {
+                    activityIndicatorView.stopAnimating()
+                    
+                    UIView.animate(withDuration: 0.2, animations: {
+                      notiTableView.alpha = 1.0
+                    }, completion: { (complete) in
+                      ANISessionManager.shared.isLoadedFirstData = true
+                      ANINotificationManager.postDismissSplash()
+                    })
+                  }
+                }
               }
             }
           } catch let error {

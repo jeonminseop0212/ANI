@@ -45,17 +45,17 @@ class ANIStoryImagesView: UIView {
     imagesCollectionView.dataSource = self
     imagesCollectionView.isPagingEnabled = true
     imagesCollectionView.showsHorizontalScrollIndicator = false
-    imagesCollectionView.backgroundColor = ANIColor.gray
+    imagesCollectionView.backgroundColor = ANIColor.lightGray
     let id = NSStringFromClass(ANIStoryImagesCell.self)
     imagesCollectionView.register(ANIStoryImagesCell.self, forCellWithReuseIdentifier: id)
     addSubview(imagesCollectionView)
-    imagesCollectionView.height(UIScreen.main.bounds.width)
+    imagesCollectionView.height(UIScreen.main.bounds.width, priority: .defaultHigh)
     imagesCollectionView.edgesToSuperview(excluding: .bottom)
     self.imagesCollectionView = imagesCollectionView
     
     //pageControl
     let pageControl = UIPageControl()
-    pageControl.pageIndicatorTintColor = ANIColor.gray
+    pageControl.pageIndicatorTintColor = ANIColor.lightGray
     pageControl.currentPageIndicatorTintColor = ANIColor.emerald
     pageControl.currentPage = 0
     pageControl.isUserInteractionEnabled = false
@@ -63,7 +63,7 @@ class ANIStoryImagesView: UIView {
     pageControl.topToBottom(of: imagesCollectionView, offset: 5.0)
     pageControl.leftToSuperview()
     pageControl.rightToSuperview()
-    pageControlHeightConstraint = pageControl.height(PAGE_CONTROL_HEIGHT)
+    pageControlHeightConstraint = pageControl.height(PAGE_CONTROL_HEIGHT, priority: .defaultHigh)
     pageControl.bottomToSuperview()
     self.pageControl = pageControl
   }
@@ -82,7 +82,8 @@ class ANIStoryImagesView: UIView {
   }
 }
 
-extension ANIStoryImagesView: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+//MARK: UICollectionViewDataSource
+extension ANIStoryImagesView: UICollectionViewDataSource {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
     return imageUrls.count
   }
@@ -93,14 +94,20 @@ extension ANIStoryImagesView: UICollectionViewDataSource, UICollectionViewDelega
     cell.imageView?.sd_setImage(with: URL(string: imageUrls[indexPath.item]), completed: nil)
     return cell
   }
-  
-  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-    let size = CGSize(width: collectionView.frame.width, height: collectionView.frame.width)
-    return size
-  }
-  
+}
+
+//MARK: UICollectionViewDelegate
+extension ANIStoryImagesView: UICollectionViewDelegate {
   func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
     guard let pageControl = self.pageControl else { return }
     pageControl.currentPage = Int(targetContentOffset.pointee.x / pageControl.frame.width)
+  }
+}
+
+//MARK: UICollectionViewDelegateFlowLayout
+extension ANIStoryImagesView: UICollectionViewDelegateFlowLayout {
+  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    let size = CGSize(width: collectionView.frame.width, height: collectionView.frame.width)
+    return size
   }
 }

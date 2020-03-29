@@ -12,7 +12,6 @@ import TinyConstraints
 import FirebaseStorage
 import FirebaseFirestore
 import CodableFirebase
-import NVActivityIndicatorView
 
 enum BasicInfoPickMode {
   case kind
@@ -30,6 +29,8 @@ enum RecruitContributionMode {
 
 protocol ANIRecruitContributionViewControllerDelegate {
   func doneEditingRecruit(recruit: FirebaseRecruit)
+  func loadThumnailImage(thumbnailImage: UIImage?)
+  func updateProgress(progress: CGFloat)
 }
 
 class ANIRecruitContributionViewController: UIViewController {
@@ -76,15 +77,21 @@ class ANIRecruitContributionViewController: UIViewController {
   
   var delegate: ANIRecruitContributionViewControllerDelegate?
   
+  private weak var activityIndicatorView: ANIActivityIndicator?
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     
     setup()
-    setupNotification()
   }
   
   override func viewWillAppear(_ animated: Bool) {
     UIApplication.shared.isStatusBarHidden = false
+    setupNotifications()
+  }
+  
+  override func viewDidDisappear(_ animated: Bool) {
+    removeNotifications()
   }
   
   private func setup() {
@@ -188,11 +195,23 @@ class ANIRecruitContributionViewController: UIViewController {
     rejectBaseView.addSubview(rejectLabel)
     rejectLabel.edgesToSuperview()
     self.rejectLabel = rejectLabel
+    
+    //activityIndicatorView
+    let activityIndicatorView = ANIActivityIndicator()
+    activityIndicatorView.isFull = true
+    self.view.addSubview(activityIndicatorView)
+    activityIndicatorView.edgesToSuperview()
+    self.activityIndicatorView = activityIndicatorView
   }
   
-  private func setupNotification() {
+  private func setupNotifications() {
+    removeNotifications()
     ANINotificationManager.receive(keyboardWillChangeFrame: self, selector: #selector(keyboardWillChangeFrame))
     ANINotificationManager.receive(keyboardWillHide: self, selector: #selector(keyboardWillHide))
+  }
+  
+  private func removeNotifications() {
+    ANINotificationManager.remove(self)
   }
   
   @objc private func keyboardWillChangeFrame(_ notification: Notification) {
@@ -239,6 +258,7 @@ class ANIRecruitContributionViewController: UIViewController {
         Gallery.Config.tabsToShow = [.imageTab, .cameraTab]
       }
       let galleryNV = UINavigationController(rootViewController: galleryUnrap)
+      galleryNV.modalPresentationStyle = .fullScreen
       present(galleryNV, animated: animation, completion: nil)
       
       isHaderImagePick = true
@@ -253,12 +273,14 @@ class ANIRecruitContributionViewController: UIViewController {
       Gallery.Config.initialTab = .imageTab
       Gallery.Config.PageIndicator.backgroundColor = .white
       Gallery.Config.Camera.oneImageMode = false
+      Gallery.Config.Camera.imageLimit = 10
       Gallery.Config.Font.Main.regular = UIFont.boldSystemFont(ofSize: 17)
       Gallery.Config.Grid.ArrowButton.tintColor = ANIColor.dark
       Gallery.Config.Grid.FrameView.borderColor = ANIColor.emerald
       Gallery.Config.Grid.previewRatio = 1.0
       Config.tabsToShow = [.imageTab, .cameraTab]
       let galleryNV = UINavigationController(rootViewController: galleryUnrap)
+      galleryNV.modalPresentationStyle = .fullScreen
       present(galleryNV, animated: animation, completion: nil)
       
       isHaderImagePick = false
@@ -292,13 +314,20 @@ class ANIRecruitContributionViewController: UIViewController {
         let data = try FirestoreEncoder().encode(recruit) as [String: AnyObject]
         
         if recruitContributionMode == .new {
-          database.collection(KEY_RECRUITS).document(id).setData(data)
+          database.collection(KEY_RECRUITS).document(id).setData(data) { (error) in
+            if let error = error {
+              DLog("Error set document: \(error)")
+              return
+            }
+            
+            self.delegate?.updateProgress(progress: 1.0)
+          }
         } else if recruitContributionMode == .edit {
           database.collection(KEY_RECRUITS).document(id).setData(data) { (error) in
             if let error = error {
               DLog(error)
             } else {
-              NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+              self.activityIndicatorView?.stopAnimating()
               
               self.delegate?.doneEditingRecruit(recruit: recruit)
               self.dismiss(animated: true, completion: nil)
@@ -407,7 +436,11 @@ extension ANIRecruitContributionViewController: ANIRecruitContributionViewDelega
       let tintColorOffset = 1.0 - offset
       dismissButton.tintColor = UIColor(hue: 0, saturation: 0, brightness: tintColorOffset, alpha: 1)
       myNavigationBar.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: backGroundColorOffset)
-      UIApplication.shared.statusBarStyle = .default
+      if #available(iOS 13.0, *) {
+        UIApplication.shared.statusBarStyle = .darkContent
+      } else {
+        UIApplication.shared.statusBarStyle = .default
+      }
     } else {
       let tintColorOffset = 1.0 - offset
       let ANIColorDarkBrightness: CGFloat = 0.18
@@ -519,8 +552,7 @@ extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
       if recruitInfo.headerImage != UIImage(named: "headerDefault") && recruitInfo.title.count > 0 && recruitInfo.kind.count > 0 && recruitInfo.age.count > 0 && recruitInfo.age.count > 0 && recruitInfo.sex.count > 0 && recruitInfo.home.count > 0 && recruitInfo.vaccine.count > 0 && recruitInfo.castration.count > 0 && recruitInfo.reason.count > 0 && recruitInfo.introduce.count > 0 && recruitInfo.passing.count > 0 && !recruitInfo.introduceImages.isEmpty {
         
         if recruitContributionMode == .edit {
-          let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.emerald)
-          NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData, nil)
+          self.activityIndicatorView?.startAnimating()
         }
         
         let storageRef = Storage.storage().reference()
@@ -537,9 +569,13 @@ extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
           date = recruit.date
         }
         
-        var recruit = FirebaseRecruit(id: id, headerImageUrl: nil, title: recruitInfo.title, kind: recruitInfo.kind, age: recruitInfo.age, sex: recruitInfo.sex, home: recruitInfo.home, vaccine: recruitInfo.vaccine, castration: recruitInfo.castration, reason: recruitInfo.reason, introduce: recruitInfo.introduce, introduceImageUrls: nil, passing: recruitInfo.passing, recruitState: 0, userId: userId, date: date, isLoved: nil, isCliped: nil, isSupported: nil)
+        var recruit = FirebaseRecruit(id: id, headerImageUrl: nil, title: recruitInfo.title, kind: recruitInfo.kind, age: recruitInfo.age, sex: recruitInfo.sex, home: recruitInfo.home, vaccine: recruitInfo.vaccine, castration: recruitInfo.castration, reason: recruitInfo.reason, introduce: recruitInfo.introduce, introduceImageUrls: nil, passing: recruitInfo.passing, recruitState: 0, userId: userId, date: date, isLoved: nil, isCliped: nil, isSupported: nil, hideUserIds: nil)
         
         DispatchQueue.global().async {
+          DispatchQueue.main.async {
+            self.delegate?.loadThumnailImage(thumbnailImage: recruitInfo.headerImage)
+          }
+          
           if let recruitHeaderImageData = recruitInfo.headerImage.jpegData(compressionQuality: 0.5) {
             let uuid = NSUUID().uuidString
             storageRef.child(KEY_RECRUIT_HEADER_IMAGES).child(uuid).putData(recruitHeaderImageData, metadata: nil) { (metaData, error) in
@@ -548,13 +584,20 @@ extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
                 return
               }
               
-              if let recruitHeaderImageUrl = metaData?.downloadURL() {
-                recruit.headerImageUrl = recruitHeaderImageUrl.absoluteString
-                
-                DispatchQueue.main.async {
-                  self.updateDatabase(recruit: recruit, id: id)
+              storageRef.child(KEY_RECRUIT_HEADER_IMAGES).child(uuid).downloadURL(completion: { (url, error) in
+                if error != nil {
+                  DLog("storage download url error")
+                  return
                 }
-              }
+                
+                if let recruitHeaderImageUrl = url {
+                  recruit.headerImageUrl = recruitHeaderImageUrl.absoluteString
+  
+                  DispatchQueue.main.async {
+                    self.updateDatabase(recruit: recruit, id: id)
+                  }
+                }
+              })
             }
           }
         }
@@ -564,28 +607,45 @@ extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
           for (index, introduceImage) in recruitInfo.introduceImages.enumerated() {
             if let introduceImage = introduceImage, let introduceImageData = introduceImage.jpegData(compressionQuality: 0.5) {
               let uuid = NSUUID().uuidString
-              storageRef.child(KEY_RECRUIT_INTRODUCE_IMAGES).child(uuid).putData(introduceImageData, metadata: nil) { (metaData, error) in
+              let uploadTask = storageRef.child(KEY_RECRUIT_INTRODUCE_IMAGES).child(uuid).putData(introduceImageData, metadata: nil) { (metaData, error) in
                 if error != nil {
                   DLog("storageError")
                   return
                 }
                 
-                if let introduceImageUrl = metaData?.downloadURL() {
-                  introduceImageUrls[index] = introduceImageUrl.absoluteString
-                  if introduceImageUrls.count == recruitInfo.introduceImages.count {
-                    let sortdUrls = introduceImageUrls.sorted(by: {$0.0 < $1.0})
-                    var urls = [String]()
-                    for url in sortdUrls {
-                      urls.append(url.value)
-                    }
-                    
-                    recruit.introduceImageUrls = urls
-                    
-                    DispatchQueue.main.async {
-                      self.updateDatabase(recruit: recruit, id: id)
+                storageRef.child(KEY_RECRUIT_INTRODUCE_IMAGES).child(uuid).downloadURL(completion: { (url, error) in
+                  if error != nil {
+                    DLog("storage download url error")
+                    return
+                  }
+                  
+                  if let introduceImageUrl = url {
+                    introduceImageUrls[index] = introduceImageUrl.absoluteString
+                    if introduceImageUrls.count == recruitInfo.introduceImages.count {
+                      let sortdUrls = introduceImageUrls.sorted(by: {$0.0 < $1.0})
+                      var urls = [String]()
+                      for url in sortdUrls {
+                        urls.append(url.value)
+                      }
+  
+                      recruit.introduceImageUrls = urls
+  
+                      DispatchQueue.main.async {
+                        self.updateDatabase(recruit: recruit, id: id)
+                      }
                     }
                   }
-                }
+                })
+              }
+              
+              if index == 0 {
+                uploadTask.observe(.progress, handler: { (snpashot) in
+                  guard let progress = snpashot.progress else { return }
+                  
+                  let floorProgress = (floor((CGFloat(progress.completedUnitCount) / CGFloat(progress.totalUnitCount)) * 10) / 10) * 0.9
+                  
+                  self.delegate?.updateProgress(progress: floorProgress)
+                })
               }
             }
           }
@@ -594,7 +654,9 @@ extension ANIRecruitContributionViewController: ANIButtonViewDelegate {
         self.view.endEditing(true)
         
         if recruitContributionMode == .new {
-          self.dismiss(animated: true, completion: nil)
+          self.dismiss(animated: true) {
+            ANIFunction.shared.showReviewAlertContribution()
+          }
         }
       } else {
         rejectViewBottomConstraint.constant = UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT

@@ -16,7 +16,7 @@ protocol ANICommunityMenuBarDelegate {
 class ANICommunityMenuBar: UIView {
   weak var menuCollectionView: UICollectionView?
   private let menus = ["ストーリー", "Q&A"]
-  var horizontalBarleftConstraint:Constraint?
+  var horizontalBarBaseleftConstraint: Constraint?
   
   var delegate: ANICommunityMenuBarDelegate?
     
@@ -48,14 +48,23 @@ class ANICommunityMenuBar: UIView {
     collectionView.height(UIViewController.NAVIGATION_BAR_HEIGHT)
     self.menuCollectionView = collectionView
     
+    //horizontalBarBase
+    let horizontalBarBase = UIView()
+    horizontalBarBase.backgroundColor = ANIColor.bg
+    addSubview(horizontalBarBase)
+    horizontalBarBase.widthToSuperview(multiplier: 1/2)
+    horizontalBarBase.height(2.0)
+    horizontalBarBase.bottomToSuperview()
+    self.horizontalBarBaseleftConstraint = horizontalBarBase.leftToSuperview()
+    
     //horizontalBar
     let horizontalBar = UIView()
     horizontalBar.backgroundColor = ANIColor.emerald
-    addSubview(horizontalBar)
-    horizontalBarleftConstraint = horizontalBar.leftToSuperview()
-    horizontalBar.widthToSuperview(multiplier: 1/2)
-    horizontalBar.height(2.0)
+    horizontalBarBase.addSubview(horizontalBar)
+    horizontalBar.width(30)
+    horizontalBar.topToSuperview()
     horizontalBar.bottomToSuperview()
+    horizontalBar.centerXToSuperview()
   }
 }
 

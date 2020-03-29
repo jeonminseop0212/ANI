@@ -9,6 +9,7 @@
 import UIKit
 import FirebaseFirestore
 import CodableFirebase
+import AVKit
 
 protocol ANIProfileBasicViewDelegate {
   func followingTapped()
@@ -21,22 +22,31 @@ protocol ANIProfileBasicViewDelegate {
   func reject()
   func popupOptionView(isMe: Bool, contentType: ContentType, id: String)
   func presentImageBrowser(index: Int, imageUrls: [String])
+  func twitterOpenReject()
+  func instagramOpenReject()
+  func openUrl(url: URL)
 }
 
 enum ContentType: Int {
   case profile;
-  case recruit;
   case story;
   case qna;
+  case recruit;
   case user;
+  case comment;
 }
 
 class ANIProfileBasicView: UIView {
   
   enum SectionType:Int { case top = 0; case content = 1 }
   
-  private var contentType:ContentType = .profile {
+  private var contentType: ContentType = .profile {
     didSet {
+      if contentType == .story {
+        playVideo()
+      } else {
+        stopVideo()
+      }
       self.basicTableView?.reloadData()
       self.layoutIfNeeded()
       
@@ -51,6 +61,7 @@ class ANIProfileBasicView: UIView {
   private var recruitUsers = [FirebaseUser]()
   private var lastStory: QueryDocumentSnapshot?
   private var stories = [FirebaseStory]()
+  private var storyVideoAssets = [String: AVAsset]()
   private var storyUsers = [FirebaseUser]()
   private var lastQna: QueryDocumentSnapshot?
   private var qnas = [FirebaseQna]()
@@ -93,6 +104,8 @@ class ANIProfileBasicView: UIView {
   private var isLastStoryPage: Bool = false
   private var isLastQnaPage: Bool = false
   private let COUNT_LAST_CELL: Int = 4
+  
+  private var beforeVideoViewCell: ANIVideoStoryViewCell?
 
   private var recruitCellHeight = [IndexPath: CGFloat]()
   private var storyCellHeight = [IndexPath: CGFloat]()
@@ -101,6 +114,8 @@ class ANIProfileBasicView: UIView {
   private var recruitListener: ListenerRegistration?
   private var storyListener: ListenerRegistration?
   private var qnaListener: ListenerRegistration?
+  
+  private var scollViewContentOffsetY: CGFloat = 0.0
   
   var delegate: ANIProfileBasicViewDelegate?
   
@@ -129,6 +144,8 @@ class ANIProfileBasicView: UIView {
     basicTableView.register(ANIRecruitViewCell.self, forCellReuseIdentifier: recruitCellId)
     let storyCellId = NSStringFromClass(ANIStoryViewCell.self)
     basicTableView.register(ANIStoryViewCell.self, forCellReuseIdentifier: storyCellId)
+    let videoStoryCellId = NSStringFromClass(ANIVideoStoryViewCell.self)
+    basicTableView.register(ANIVideoStoryViewCell.self, forCellReuseIdentifier: videoStoryCellId)
     let supportCellId = NSStringFromClass(ANISupportViewCell.self)
     basicTableView.register(ANISupportViewCell.self, forCellReuseIdentifier: supportCellId)
     let qnaCellId = NSStringFromClass(ANIQnaViewCell.self)
@@ -138,9 +155,40 @@ class ANIProfileBasicView: UIView {
     self.basicTableView = basicTableView
   }
   
+  func playVideo() {
+    guard let basicTableView = self.basicTableView else { return }
+    
+    let centerX = basicTableView.center.x
+    let centerY = basicTableView.center.y + scollViewContentOffsetY + UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    
+    if let indexPath = basicTableView.indexPathForRow(at: CGPoint(x: centerX, y: centerY)) {
+      if let videoCell = basicTableView.cellForRow(at: indexPath) as? ANIVideoStoryViewCell,
+        let storyVideoView = videoCell.storyVideoView {
+        storyVideoView.play()
+      }
+    }
+  }
+  
+  func stopVideo() {
+    guard let basicTableView = self.basicTableView else { return }
+    
+    let centerX = basicTableView.center.x
+    let centerY = basicTableView.center.y + scollViewContentOffsetY + UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    
+    if let indexPath = basicTableView.indexPathForRow(at: CGPoint(x: centerX, y: centerY)) {
+      if let videoCell = basicTableView.cellForRow(at: indexPath) as? ANIVideoStoryViewCell,
+        let storyVideoView = videoCell.storyVideoView {
+        storyVideoView.stop()
+      }
+    }
+  }
+  
   private func setupNotifications() {
     ANINotificationManager.receive(login: self, selector: #selector(reloadUser))
     ANINotificationManager.receive(profileTabTapped: self, selector: #selector(scrollToTop))
+    ANINotificationManager.receive(deleteRecruit: self, selector: #selector(deleteRecruit))
+    ANINotificationManager.receive(deleteStory: self, selector: #selector(deleteStory))
+    ANINotificationManager.receive(deleteQna: self, selector: #selector(deleteQna))
   }
   
   @objc private func reloadUser() {
@@ -167,38 +215,64 @@ class ANIProfileBasicView: UIView {
     }
   }
   
-  func deleteData(id: String) {
-    guard let basicTableView = self.basicTableView else { return }
+  @objc private func deleteRecruit(_ notification: NSNotification) {
+    guard let id = notification.object as? String,
+          let basicTableView = self.basicTableView else { return }
     
-    var indexPath: IndexPath = [0, 0]
-    
-    switch contentType {
-    case .recruit:
-      for (index, recruit) in recruits.enumerated() {
-        if recruit.id == id {
-          recruits.remove(at: index)
-          indexPath = [1, index]
+    for (index, recruit) in recruits.enumerated() {
+      if recruit.id == id {
+        recruits.remove(at: index)
+        
+        if !recruits.isEmpty {
+          basicTableView.beginUpdates()
+          let indexPath: IndexPath = [1, index]
+          basicTableView.deleteRows(at: [indexPath], with: .automatic)
+          basicTableView.endUpdates()
+        } else {
+          basicTableView.reloadData()
         }
       }
-    case .story:
-      for (index, story) in stories.enumerated() {
-        if story.id == id {
-          stories.remove(at: index)
-          indexPath = [1, index]
-        }
-      }
-    case .qna:
-      for (index, qna) in qnas.enumerated() {
-        if qna.id == id {
-          qnas.remove(at: index)
-          indexPath = [1, index]
-        }
-      }
-    default:
-      DLog("profile")
     }
+  }
+  
+  @objc private func deleteStory(_ notification: NSNotification) {
+    guard let id = notification.object as? String,
+          let basicTableView = self.basicTableView else { return }
     
-    basicTableView.deleteRows(at: [indexPath], with: .automatic)
+    for (index, story) in stories.enumerated() {
+      if story.id == id {
+        stories.remove(at: index)
+        
+        if !stories.isEmpty {
+          basicTableView.beginUpdates()
+          let indexPath: IndexPath = [1, index]
+          basicTableView.deleteRows(at: [indexPath], with: .automatic)
+          basicTableView.endUpdates()
+        } else {
+          basicTableView.reloadData()
+        }
+      }
+    }
+  }
+  
+  @objc private func deleteQna(_ notification: NSNotification) {
+    guard let id = notification.object as? String,
+          let basicTableView = self.basicTableView else { return }
+    
+    for (index, qna) in qnas.enumerated() {
+      if qna.id == id {
+        qnas.remove(at: index)
+        
+        if !qnas.isEmpty {
+          basicTableView.beginUpdates()
+          let indexPath: IndexPath = [1, index]
+          basicTableView.deleteRows(at: [indexPath], with: .automatic)
+          basicTableView.endUpdates()
+        } else {
+          basicTableView.reloadData()
+        }
+      }
+    }
   }
   
   private func unobserveBeforeMenu() {
@@ -261,33 +335,26 @@ extension ANIProfileBasicView: UITableViewDataSource {
     if indexPath.section == 0 {
       let topCellId = NSStringFromClass(ANIProfileTopCell.self)
       let cell = tableView.dequeueReusableCell(withIdentifier: topCellId, for: indexPath) as! ANIProfileTopCell
-      
       cell.delegate = self
+
       cell.selectedIndex = contentType.rawValue
       cell.user = currentUser
-      
-      if let bottomSpace = cell.bottomSpace {
-        if contentType == .recruit {
-          bottomSpace.isHidden = false
-        } else {
-          bottomSpace.isHidden = true
-        }
-      }
       
       return cell
     } else {
       if contentType == .profile {
         let profileCellid = NSStringFromClass(ANIProfileCell.self)
         let cell = tableView.dequeueReusableCell(withIdentifier: profileCellid, for: indexPath) as! ANIProfileCell
-        
-        cell.user = currentUser
         cell.delegate = self
+
+        cell.user = currentUser
         
         return cell
       } else if contentType == .recruit {
         let recruitCellid = NSStringFromClass(ANIRecruitViewCell.self)
         let cell = tableView.dequeueReusableCell(withIdentifier: recruitCellid, for: indexPath) as! ANIRecruitViewCell
-        
+        cell.delegate = self
+
         if recruitUsers.contains(where: { $0.uid == recruits[indexPath.row].userId }) {
           for user in recruitUsers {
             if recruits[indexPath.row].userId == user.uid {
@@ -298,9 +365,8 @@ extension ANIProfileBasicView: UITableViewDataSource {
         } else {
           cell.user = nil
         }
-        cell.recruit = recruits[indexPath.row]
-        cell.delegate = self
         cell.indexPath = indexPath.row
+        cell.recruit = recruits[indexPath.row]
 
         return cell
       } else if contentType == .story {
@@ -308,7 +374,8 @@ extension ANIProfileBasicView: UITableViewDataSource {
           if let recruitId = stories[indexPath.row].recruitId {
             let supportCellId = NSStringFromClass(ANISupportViewCell.self)
             let cell = tableView.dequeueReusableCell(withIdentifier: supportCellId, for: indexPath) as! ANISupportViewCell
-            
+            cell.delegate = self
+
             if let supportRecruit = supportRecruits[recruitId] {
               if let supportRecruit = supportRecruit {
                 cell.recruit = supportRecruit
@@ -332,14 +399,14 @@ extension ANIProfileBasicView: UITableViewDataSource {
             } else {
               cell.user = nil
             }
-            cell.story = stories[indexPath.row]
-            cell.delegate = self
             cell.indexPath = indexPath.row
+            cell.story = stories[indexPath.row]
             
             return cell
-          } else {
-            let storyCellId = NSStringFromClass(ANIStoryViewCell.self)
-            let cell = tableView.dequeueReusableCell(withIdentifier: storyCellId, for: indexPath) as! ANIStoryViewCell
+          } else if stories[indexPath.row].thumbnailImageUrl != nil {
+            let videoStoryCellId = NSStringFromClass(ANIVideoStoryViewCell.self)
+            let cell = tableView.dequeueReusableCell(withIdentifier: videoStoryCellId, for: indexPath) as! ANIVideoStoryViewCell
+            cell.delegate = self
             
             if storyUsers.contains(where: { $0.uid == stories[indexPath.row].userId }) {
               for user in storyUsers {
@@ -351,9 +418,35 @@ extension ANIProfileBasicView: UITableViewDataSource {
             } else {
               cell.user = nil
             }
-            cell.story = stories[indexPath.row]
-            cell.delegate = self
+            
+            if let storyVideoUrl = stories[indexPath.row].storyVideoUrl,
+              storyVideoAssets.contains(where: { $0.0 == storyVideoUrl }) {
+              cell.videoAsset = storyVideoAssets[storyVideoUrl]
+            } else {
+              cell.videoAsset = nil
+            }
+            
             cell.indexPath = indexPath.row
+            cell.story = stories[indexPath.row]
+            
+            return cell
+          } else {
+            let storyCellId = NSStringFromClass(ANIStoryViewCell.self)
+            let cell = tableView.dequeueReusableCell(withIdentifier: storyCellId, for: indexPath) as! ANIStoryViewCell
+            cell.delegate = self
+
+            if storyUsers.contains(where: { $0.uid == stories[indexPath.row].userId }) {
+              for user in storyUsers {
+                if stories[indexPath.row].userId == user.uid {
+                  cell.user = user
+                  break
+                }
+              }
+            } else {
+              cell.user = nil
+            }
+            cell.indexPath = indexPath.row
+            cell.story = stories[indexPath.row]
             
             return cell
           }
@@ -363,7 +456,8 @@ extension ANIProfileBasicView: UITableViewDataSource {
       } else {
         let qnaCellid = NSStringFromClass(ANIQnaViewCell.self)
         let cell = tableView.dequeueReusableCell(withIdentifier: qnaCellid, for: indexPath) as! ANIQnaViewCell
-        
+        cell.delegate = self
+
         if qnaUsers.contains(where: { $0.uid == qnas[indexPath.row].userId }) {
           for user in qnaUsers {
             if qnas[indexPath.row].userId == user.uid {
@@ -374,9 +468,8 @@ extension ANIProfileBasicView: UITableViewDataSource {
         } else {
           cell.user = nil
         }
-        cell.qna = qnas[indexPath.row]
-        cell.delegate = self
         cell.indexPath = indexPath.row
+        cell.qna = qnas[indexPath.row]
 
         return cell
       }
@@ -393,10 +486,15 @@ extension ANIProfileBasicView: UITableViewDelegate {
         cell.unobserveLove()
         cell.unobserveSupport()
     } else if contentType == .story {
-      if !stories.isEmpty {
+      if !stories.isEmpty && stories.count > indexPath.row {
         if stories[indexPath.row].recruitId != nil, let cell = cell as? ANISupportViewCell {
           cell.unobserveLove()
           cell.unobserveComment()
+        } else if stories[indexPath.row].thumbnailImageUrl != nil, let cell = cell as? ANIVideoStoryViewCell {
+          cell.unobserveLove()
+          cell.unobserveComment()
+          cell.storyVideoView?.removeReachEndObserver()
+          cell.storyVideoView?.stop()
         } else if let cell = cell as? ANIStoryViewCell {
           cell.unobserveLove()
           cell.unobserveComment()
@@ -457,6 +555,38 @@ extension ANIProfileBasicView: UITableViewDelegate {
       return UITableView.automaticDimension
     }
   }
+  
+  func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    guard let basicTableView = self.basicTableView else { return }
+    
+    scollViewContentOffsetY = scrollView.contentOffset.y
+
+    //play video
+    let centerX = basicTableView.center.x
+    let centerY = basicTableView.center.y + scrollView.contentOffset.y + UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    
+    if let indexPath = basicTableView.indexPathForRow(at: CGPoint(x: centerX, y: centerY)) {
+      if let videoCell = basicTableView.cellForRow(at: indexPath) as? ANIVideoStoryViewCell,
+        let storyVideoView = videoCell.storyVideoView {
+        if beforeVideoViewCell != videoCell {
+          if let beforeVideoViewCell = self.beforeVideoViewCell,
+            let beforeStoryVideoView = beforeVideoViewCell.storyVideoView {
+            beforeStoryVideoView.stop()
+          }
+          
+          storyVideoView.play()
+          beforeVideoViewCell = videoCell
+        }
+      } else {
+        if let beforeVideoViewCell = self.beforeVideoViewCell,
+          let beforeStoryVideoView = beforeVideoViewCell.storyVideoView {
+          beforeStoryVideoView.stop()
+        }
+        
+        beforeVideoViewCell = nil
+      }
+    }
+  }
 }
 
 //MARK: ANIProfileTopCellDelegate
@@ -497,6 +627,18 @@ extension ANIProfileBasicView: ANIProfileCellDelegate {
   func followerTapped() {
     self.delegate?.followerTapped()
   }
+  
+  func twitterOpenReject() {
+    self.delegate?.twitterOpenReject()
+  }
+  
+  func instagramOpenReject() {
+    self.delegate?.instagramOpenReject()
+  }
+  
+  func openUrl(url: URL) {
+    self.delegate?.openUrl(url: url)
+  }
 }
 
 //MARK: ANIRecruitViewCellDelegate
@@ -536,8 +678,8 @@ extension ANIProfileBasicView: ANIRecruitViewCellDelegate {
   }
 }
 
-//MARK: ANIStoryViewCellDelegate
-extension ANIProfileBasicView: ANIStoryViewCellDelegate {
+//MARK: ANIStoryViewCellDelegate, ANIVideoStoryViewCellDelegate
+extension ANIProfileBasicView: ANIStoryViewCellDelegate, ANIVideoStoryViewCellDelegate {
   func storyCellTapped(story: FirebaseStory, user: FirebaseUser) {
     self.delegate?.storyViewCellDidSelect(selectedStory: story, user: user)
   }
@@ -554,6 +696,10 @@ extension ANIProfileBasicView: ANIStoryViewCellDelegate {
   
   func loadedStoryUser(user: FirebaseUser) {
     self.storyUsers.append(user)
+  }
+  
+  func loadedVideo(urlString: String, asset: AVAsset) {
+    storyVideoAssets[urlString] = asset
   }
 }
 
@@ -741,6 +887,13 @@ extension ANIProfileBasicView {
         for (index, document) in snapshot.documents.enumerated() {
           do {
             let story = try FirestoreDecoder().decode(FirebaseStory.self, from: document.data())
+            
+            if let storyVideoUrl = story.storyVideoUrl,
+              let url = URL(string: storyVideoUrl),
+              !self.storyVideoAssets.contains(where: { $0.0 == storyVideoUrl }) {
+              let asset = AVAsset(url: url)
+              self.storyVideoAssets[storyVideoUrl] = asset
+            }
             self.stories.append(story)
             
             DispatchQueue.main.async {
@@ -797,6 +950,13 @@ extension ANIProfileBasicView {
         for (index, document) in snapshot.documents.enumerated() {
           do {
             let story = try FirestoreDecoder().decode(FirebaseStory.self, from: document.data())
+            
+            if let storyVideoUrl = story.storyVideoUrl,
+              let url = URL(string: storyVideoUrl),
+              !self.storyVideoAssets.contains(where: { $0.0 == storyVideoUrl }) {
+              let asset = AVAsset(url: url)
+              self.storyVideoAssets[storyVideoUrl] = asset
+            }
             self.stories.append(story)
             
             DispatchQueue.main.async {
@@ -935,7 +1095,7 @@ extension ANIProfileBasicView {
     let database = Firestore.firestore()
     
     DispatchQueue.global().async {
-      self.recruitListener = database.collection(KEY_RECRUITS).whereField(KEY_USER_ID, isEqualTo: currentUserId).addSnapshotListener({ (snapshot, error) in
+      self.recruitListener = database.collection(KEY_RECRUITS).whereField(KEY_USER_ID, isEqualTo: currentUserId).order(by: KEY_DATE, descending: true).limit(to: 15).addSnapshotListener({ (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
           
@@ -1014,7 +1174,7 @@ extension ANIProfileBasicView {
     let database = Firestore.firestore()
     
     DispatchQueue.global().async {
-      self.storyListener = database.collection(KEY_STORIES).whereField(KEY_USER_ID, isEqualTo: currentUserId).addSnapshotListener({ (snapshot, error) in
+      self.storyListener = database.collection(KEY_STORIES).whereField(KEY_USER_ID, isEqualTo: currentUserId).order(by: KEY_DATE, descending: true).limit(to: 10).addSnapshotListener({ (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
           
@@ -1073,7 +1233,7 @@ extension ANIProfileBasicView {
     let database = Firestore.firestore()
 
     DispatchQueue.global().async {
-      self.qnaListener = database.collection(KEY_QNAS).whereField(KEY_USER_ID, isEqualTo: currentUserId).addSnapshotListener({ (snapshot, error) in
+      self.qnaListener = database.collection(KEY_QNAS).whereField(KEY_USER_ID, isEqualTo: currentUserId).order(by: KEY_DATE, descending: true).limit(to: 20).addSnapshotListener({ (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
           

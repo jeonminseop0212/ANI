@@ -9,7 +9,7 @@
 import UIKit
 import FirebaseFirestore
 import CodableFirebase
-import NVActivityIndicatorView
+import AVKit
 
 protocol ANIListViewDelegate {
   func recruitViewCellDidSelect(selectedRecruit: FirebaseRecruit, user: FirebaseUser)
@@ -24,23 +24,26 @@ class ANIListView: UIView {
   
   private weak var listTableView: UITableView?
   
-  private weak var activityIndicatorView: NVActivityIndicatorView?
-  
+  private weak var activityIndicatorView: ANIActivityIndicator?
+
   var list: List? {
     didSet {
       guard let list = self.list,
-            let activityIndicatorView = self.activityIndicatorView else { return }
+            let activityIndicatorView = self.activityIndicatorView,
+            let listTableView = self.listTableView else { return }
       
       activityIndicatorView.startAnimating()
       
       switch list {
       case .loveRecruit:
+        listTableView.contentInset = UIEdgeInsets(top: 10.0, left: 0.0, bottom: 0.0, right: 0.0)
         loadLoveRecruit()
       case .loveStroy:
         loadLoveStory()
       case .loveQuestion:
         loadLoveQna()
       case .clipRecruit:
+        listTableView.contentInset = UIEdgeInsets(top: 10.0, left: 0.0, bottom: 0.0, right: 0.0)
         loadClipRecruit()
       }
     }
@@ -48,6 +51,7 @@ class ANIListView: UIView {
   
   private var loveRecruits = [FirebaseRecruit]()
   private var loveStories = [FirebaseStory]()
+  private var storyVideoAssets = [String: AVAsset]()
   private var loveQnas = [FirebaseQna]()
   private var supportRecruits = [String: FirebaseRecruit?]()
   private var clipRecruits = [FirebaseRecruit]()
@@ -58,8 +62,12 @@ class ANIListView: UIView {
   private var lastContent: QueryDocumentSnapshot?
   private var isLoading: Bool = false
   private let COUNT_LAST_CELL: Int = 4
+  
+  private var beforeVideoViewCell: ANIVideoStoryViewCell?
 
   private var cellHeight = [IndexPath: CGFloat]()
+  
+  private var scollViewContentOffsetY: CGFloat = 0.0
   
   var delegate: ANIListViewDelegate?
   
@@ -67,6 +75,7 @@ class ANIListView: UIView {
     super.init(frame: frame)
     
     setup()
+    setupNotifications()
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -82,6 +91,8 @@ class ANIListView: UIView {
     listTableView.register(ANIRecruitViewCell.self, forCellReuseIdentifier: recruitCellId)
     let storyCellId = NSStringFromClass(ANIStoryViewCell.self)
     listTableView.register(ANIStoryViewCell.self, forCellReuseIdentifier: storyCellId)
+    let videoStoryCellId = NSStringFromClass(ANIVideoStoryViewCell.self)
+    listTableView.register(ANIVideoStoryViewCell.self, forCellReuseIdentifier: videoStoryCellId)
     let supportCellId = NSStringFromClass(ANISupportViewCell.self)
     listTableView.register(ANISupportViewCell.self, forCellReuseIdentifier: supportCellId)
     let qnaCellId = NSStringFromClass(ANIQnaViewCell.self)
@@ -97,52 +108,174 @@ class ANIListView: UIView {
     self.listTableView = listTableView
     
     //activityIndicatorView
-    let activityIndicatorView = NVActivityIndicatorView(frame: .zero, type: .lineScale, color: ANIColor.emerald, padding: 0)
-    addSubview(activityIndicatorView)
-    activityIndicatorView.width(40.0)
-    activityIndicatorView.height(40.0)
-    activityIndicatorView.centerInSuperview()
+    let activityIndicatorView = ANIActivityIndicator()
+    activityIndicatorView.isFull = false
+    self.addSubview(activityIndicatorView)
+    activityIndicatorView.edgesToSuperview()
     self.activityIndicatorView = activityIndicatorView
   }
   
-  func deleteData(id: String) {
-    guard let list = self.list,
+  func playVideo() {
+    guard let listTableView = self.listTableView else { return }
+    
+    let centerX = listTableView.center.x
+    let centerY = listTableView.center.y + scollViewContentOffsetY + UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    
+    if let indexPath = listTableView.indexPathForRow(at: CGPoint(x: centerX, y: centerY)) {
+      if let videoCell = listTableView.cellForRow(at: indexPath) as? ANIVideoStoryViewCell,
+        let storyVideoView = videoCell.storyVideoView {
+        storyVideoView.play()
+      }
+    }
+  }
+  
+  func stopVideo() {
+    guard let listTableView = self.listTableView else { return }
+    
+    let centerX = listTableView.center.x
+    let centerY = listTableView.center.y + scollViewContentOffsetY + UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    
+    if let indexPath = listTableView.indexPathForRow(at: CGPoint(x: centerX, y: centerY)) {
+      if let videoCell = listTableView.cellForRow(at: indexPath) as? ANIVideoStoryViewCell,
+        let storyVideoView = videoCell.storyVideoView {
+        storyVideoView.stop()
+      }
+    }
+  }
+  
+  private func setupNotifications() {
+    ANINotificationManager.receive(deleteRecruit: self, selector: #selector(deleteRecruit))
+    ANINotificationManager.receive(deleteStory: self, selector: #selector(deleteStory))
+    ANINotificationManager.receive(deleteQna: self, selector: #selector(deleteQna))
+  }
+  
+  @objc private func deleteRecruit(_ notification: NSNotification) {
+    guard let id = notification.object as? String,
+          let list = self.list,
           let listTableView = self.listTableView else { return }
     
-    var indexPath: IndexPath = [0, 0]
-    
-    switch list {
-    case .loveRecruit:
-      for (index, loveRecruit) in loveRecruits.enumerated() {
-        if loveRecruit.id == id {
+    if list == .loveRecruit {
+      for (index, recruit) in loveRecruits.enumerated() {
+        if recruit.id == id {
           loveRecruits.remove(at: index)
-          indexPath = [0, index]
+          
+          if !loveRecruits.isEmpty {
+            listTableView.beginUpdates()
+            let indexPath: IndexPath = [0, index]
+            listTableView.deleteRows(at: [indexPath], with: .automatic)
+            listTableView.endUpdates()
+          } else {
+            listTableView.reloadData()
+          }
         }
       }
-    case .loveStroy:
-      for (index, loveStory) in loveStories.enumerated() {
-        if loveStory.id == id {
-          loveStories.remove(at: index)
-          indexPath = [0, index]
-        }
-      }
-    case .loveQuestion:
-      for (index, loveQna) in loveQnas.enumerated() {
-        if loveQna.id == id {
-          loveQnas.remove(at: index)
-          indexPath = [0, index]
-        }
-      }
-    case .clipRecruit:
-      for (index, clipRecruit) in clipRecruits.enumerated() {
-        if clipRecruit.id == id {
+    } else if list == .clipRecruit {
+      for (index, recruit) in clipRecruits.enumerated() {
+        if recruit.id == id {
           clipRecruits.remove(at: index)
-          indexPath = [0, index]
+          
+          if !clipRecruits.isEmpty {
+            listTableView.beginUpdates()
+            let indexPath: IndexPath = [0, index]
+            listTableView.deleteRows(at: [indexPath], with: .automatic)
+            listTableView.endUpdates()
+          } else {
+            listTableView.reloadData()
+          }
         }
       }
     }
+  }
+  
+  @objc private func deleteStory(_ notification: NSNotification) {
+    guard let id = notification.object as? String,
+          let listTableView = self.listTableView else { return }
     
-    listTableView.deleteRows(at: [indexPath], with: .automatic)
+    for (index, loveStory) in loveStories.enumerated() {
+      if loveStory.id == id {
+        loveStories.remove(at: index)
+        
+        if !loveStories.isEmpty {
+          listTableView.beginUpdates()
+          let indexPath: IndexPath = [0, index]
+          listTableView.deleteRows(at: [indexPath], with: .automatic)
+          listTableView.endUpdates()
+        } else {
+          listTableView.reloadData()
+        }
+      }
+    }
+  }
+  
+  @objc private func deleteQna(_ notification: NSNotification) {
+    guard let id = notification.object as? String,
+          let listTableView = self.listTableView else { return }
+    
+    for (index, loveQna) in loveQnas.enumerated() {
+      if loveQna.id == id {
+        loveQnas.remove(at: index)
+        
+        if !loveQnas.isEmpty {
+          listTableView.beginUpdates()
+          let indexPath: IndexPath = [0, index]
+          listTableView.deleteRows(at: [indexPath], with: .automatic)
+          listTableView.endUpdates()
+        } else {
+          listTableView.reloadData()
+        }
+      }
+    }
+  }
+  
+  private func isBlockRecruit(recruit: FirebaseRecruit) -> Bool {
+    guard let currentUserUid = ANISessionManager.shared.currentUserUid else { return false }
+    
+    if let blockUserIds = ANISessionManager.shared.blockUserIds, blockUserIds.contains(recruit.userId) {
+      return true
+    }
+    if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(recruit.userId) {
+      return true
+    }
+    if let hideUserIds = recruit.hideUserIds, hideUserIds.contains(currentUserUid) {
+      return true
+    }
+    
+    return false
+  }
+  
+  private func isBlockStory(story: FirebaseStory) -> Bool {
+    guard let currentUserUid = ANISessionManager.shared.currentUserUid else { return false }
+    
+    if let blockUserIds = ANISessionManager.shared.blockUserIds, blockUserIds.contains(story.userId) {
+      return true
+    }
+    if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(story.userId) {
+      return true
+    }
+    if let hideUserIds = story.hideUserIds, hideUserIds.contains(currentUserUid) {
+      return true
+    }
+    if story.storyImageUrls == nil && story.recruitId == nil && story.thumbnailImageUrl == nil {
+      return true
+    }
+    
+    return false
+  }
+  
+  private func isBlockQna(qna: FirebaseQna) -> Bool {
+    guard let currentUserUid = ANISessionManager.shared.currentUserUid else { return false }
+    
+    if let blockUserIds = ANISessionManager.shared.blockUserIds, blockUserIds.contains(qna.userId) {
+      return true
+    }
+    if let blockingUserIds = ANISessionManager.shared.blockingUserIds, blockingUserIds.contains(qna.userId) {
+      return true
+    }
+    if let hideUserIds = qna.hideUserIds, hideUserIds.contains(currentUserUid) {
+      return true
+    }
+    
+    return false
   }
 }
 
@@ -170,6 +303,7 @@ extension ANIListView: UITableViewDataSource {
     case .loveRecruit:
       let recruitCellid = NSStringFromClass(ANIRecruitViewCell.self)
       let cell = tableView.dequeueReusableCell(withIdentifier: recruitCellid, for: indexPath) as! ANIRecruitViewCell
+      cell.delegate = self
 
       if users.contains(where: { $0.uid == loveRecruits[indexPath.row].userId }) {
         for user in users {
@@ -181,9 +315,8 @@ extension ANIListView: UITableViewDataSource {
       } else {
         cell.user = nil
       }
-      cell.recruit = loveRecruits[indexPath.row]
-      cell.delegate = self
       cell.indexPath = indexPath.row
+      cell.recruit = loveRecruits[indexPath.row]
       
       return cell
     case .loveStroy:
@@ -191,7 +324,8 @@ extension ANIListView: UITableViewDataSource {
         if let recruitId = loveStories[indexPath.row].recruitId {
           let supportCellId = NSStringFromClass(ANISupportViewCell.self)
           let cell = tableView.dequeueReusableCell(withIdentifier: supportCellId, for: indexPath) as! ANISupportViewCell
-          
+          cell.delegate = self
+
           if let supportRecruit = supportRecruits[recruitId] {
             if let supportRecruit = supportRecruit {
               cell.recruit = supportRecruit
@@ -215,9 +349,35 @@ extension ANIListView: UITableViewDataSource {
           } else {
             cell.user = nil
           }
-          cell.story = loveStories[indexPath.row]
-          cell.delegate = self
           cell.indexPath = indexPath.row
+          cell.story = loveStories[indexPath.row]
+          
+          return cell
+        } else if loveStories[indexPath.row].thumbnailImageUrl != nil {
+          let videoStoryCellId = NSStringFromClass(ANIVideoStoryViewCell.self)
+          let cell = tableView.dequeueReusableCell(withIdentifier: videoStoryCellId, for: indexPath) as! ANIVideoStoryViewCell
+          cell.delegate = self
+          
+          if users.contains(where: { $0.uid == loveStories[indexPath.row].userId }) {
+            for user in users {
+              if loveStories[indexPath.row].userId == user.uid {
+                cell.user = user
+                break
+              }
+            }
+          } else {
+            cell.user = nil
+          }
+          
+          if let storyVideoUrl = loveStories[indexPath.row].storyVideoUrl,
+            storyVideoAssets.contains(where: { $0.0 == storyVideoUrl }) {
+            cell.videoAsset = storyVideoAssets[storyVideoUrl]
+          } else {
+            cell.videoAsset = nil
+          }
+          
+          cell.indexPath = indexPath.row
+          cell.story = loveStories[indexPath.row]
           
           return cell
         } else {
@@ -234,9 +394,9 @@ extension ANIListView: UITableViewDataSource {
           } else {
             cell.user = nil
           }
+          cell.indexPath = indexPath.row
           cell.story = loveStories[indexPath.row]
           cell.delegate = self
-          cell.indexPath = indexPath.row
           
           return cell
         }
@@ -246,7 +406,8 @@ extension ANIListView: UITableViewDataSource {
     case .loveQuestion:
       let qnaCellid = NSStringFromClass(ANIQnaViewCell.self)
       let cell = tableView.dequeueReusableCell(withIdentifier: qnaCellid, for: indexPath) as! ANIQnaViewCell
-      
+      cell.delegate = self
+
       if users.contains(where: { $0.uid == loveQnas[indexPath.row].userId }) {
         for user in users {
           if loveQnas[indexPath.row].userId == user.uid {
@@ -257,15 +418,15 @@ extension ANIListView: UITableViewDataSource {
       } else {
         cell.user = nil
       }
-      cell.qna = loveQnas[indexPath.row]
-      cell.delegate = self
       cell.indexPath = indexPath.row
+      cell.qna = loveQnas[indexPath.row]
       
       return cell
     case .clipRecruit:
       let recruitCellid = NSStringFromClass(ANIRecruitViewCell.self)
       let cell = tableView.dequeueReusableCell(withIdentifier: recruitCellid, for: indexPath) as! ANIRecruitViewCell
-      
+      cell.delegate = self
+
       if users.contains(where: { $0.uid == clipRecruits[indexPath.row].userId }) {
         for user in users {
           if clipRecruits[indexPath.row].userId == user.uid {
@@ -276,9 +437,8 @@ extension ANIListView: UITableViewDataSource {
       } else {
         cell.user = nil
       }
-      cell.recruit = clipRecruits[indexPath.row]
-      cell.delegate = self
       cell.indexPath = indexPath.row
+      cell.recruit = clipRecruits[indexPath.row]
       
       return cell
     }
@@ -297,10 +457,15 @@ extension ANIListView: UITableViewDelegate {
         cell.unobserveSupport()
       }
     case .loveStroy:
-      if !loveStories.isEmpty {
+      if !loveStories.isEmpty && loveStories.count > indexPath.row {
         if loveStories[indexPath.row].recruitId != nil, let cell = cell as? ANISupportViewCell {
           cell.unobserveLove()
           cell.unobserveComment()
+        } else if loveStories[indexPath.row].thumbnailImageUrl != nil, let cell = cell as? ANIVideoStoryViewCell {
+          cell.unobserveLove()
+          cell.unobserveComment()
+          cell.storyVideoView?.removeReachEndObserver()
+          cell.storyVideoView?.stop()
         } else if let cell = cell as? ANIStoryViewCell {
           cell.unobserveLove()
           cell.unobserveComment()
@@ -353,6 +518,38 @@ extension ANIListView: UITableViewDelegate {
       return height
     } else {
       return UITableView.automaticDimension
+    }
+  }
+  
+  func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    guard let listTableView = self.listTableView else { return }
+    
+    scollViewContentOffsetY = scrollView.contentOffset.y
+    
+    //play video
+    let centerX = listTableView.center.x
+    let centerY = listTableView.center.y + scrollView.contentOffset.y + UIViewController.NAVIGATION_BAR_HEIGHT + UIViewController.STATUS_BAR_HEIGHT
+    
+    if let indexPath = listTableView.indexPathForRow(at: CGPoint(x: centerX, y: centerY)) {
+      if let videoCell = listTableView.cellForRow(at: indexPath) as? ANIVideoStoryViewCell,
+        let storyVideoView = videoCell.storyVideoView {
+        if beforeVideoViewCell != videoCell {
+          if let beforeVideoViewCell = self.beforeVideoViewCell,
+            let beforeStoryVideoView = beforeVideoViewCell.storyVideoView {
+            beforeStoryVideoView.stop()
+          }
+          
+          storyVideoView.play()
+          beforeVideoViewCell = videoCell
+        }
+      } else {
+        if let beforeVideoViewCell = self.beforeVideoViewCell,
+          let beforeStoryVideoView = beforeVideoViewCell.storyVideoView {
+          beforeStoryVideoView.stop()
+        }
+        
+        beforeVideoViewCell = nil
+      }
     }
   }
 }
@@ -418,8 +615,8 @@ extension ANIListView: ANIRecruitViewCellDelegate {
   }
 }
 
-//MARK: ANIStoryViewCellDelegate
-extension ANIListView: ANIStoryViewCellDelegate {
+//MARK: ANIStoryViewCellDelegate, ANIVideoStoryViewCellDelegate
+extension ANIListView: ANIStoryViewCellDelegate, ANIVideoStoryViewCellDelegate {
   func storyCellTapped(story: FirebaseStory, user: FirebaseUser) {
     self.delegate?.storyViewCellDidSelect(selectedStory: story, user: user)
   }
@@ -440,6 +637,10 @@ extension ANIListView: ANIStoryViewCellDelegate {
   
   func loadedStoryUser(user: FirebaseUser) {
     self.users.append(user)
+  }
+  
+  func loadedVideo(urlString: String, asset: AVAsset) {
+    storyVideoAssets[urlString] = asset
   }
 }
 
@@ -491,7 +692,7 @@ extension ANIListView {
       self.isLoading = true
       self.isLastPage = false
       
-      database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_RECRUIT_IDS).order(by: KEY_DATE, descending: true).limit(to: 15).getDocuments(completion: { (snapshot, error) in
+      database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_RECRUIT_IDS).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
           self.isLoading = false
@@ -548,19 +749,25 @@ extension ANIListView {
             
             for loveRecruit in loveRecruitsTemp {
               if let loveRecruit = loveRecruit {
-                self.loveRecruits.append(loveRecruit)
+                if !self.isBlockRecruit(recruit: loveRecruit) {
+                  self.loveRecruits.append(loveRecruit)
+                }
               }
             }
             
             listTableView.reloadData()
             
-            activityIndicatorView.stopAnimating()
-            
-            UIView.animate(withDuration: 0.2, animations: {
-              listTableView.alpha = 1.0
-            })
-            
             self.isLoading = false
+            
+            if self.loveRecruits.isEmpty {
+              self.loadMoreLoveRecruit()
+            } else {
+              activityIndicatorView.stopAnimating()
+              
+              UIView.animate(withDuration: 0.2, animations: {
+                listTableView.alpha = 1.0
+              })
+            }
           }
         }
       })
@@ -571,6 +778,7 @@ extension ANIListView {
     guard let listTableView = self.listTableView,
           let lastContent = self.lastContent,
           let currentUserId = ANISessionManager.shared.currentUserUid,
+          let activityIndicatorView = self.activityIndicatorView,
           !isLoading,
           !isLastPage else { return }
     
@@ -579,7 +787,7 @@ extension ANIListView {
     DispatchQueue.global().async {
       self.isLoading = true
       
-      database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_RECRUIT_IDS).order(by: KEY_DATE, descending: true).start(afterDocument: lastContent).limit(to: 15).getDocuments(completion: { (snapshot, error) in
+      database.collection(KEY_USERS).document(currentUserId).collection(KEY_LOVE_RECRUIT_IDS).order(by: KEY_DATE, descending: true).start(afterDocument: lastContent).limit(to: 20).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
           self.isLoading = false
@@ -591,6 +799,7 @@ extension ANIListView {
         guard let lastContent = snapshot.documents.last else {
           self.isLastPage = true
           self.isLoading = false
+          activityIndicatorView.stopAnimating()
           return
         }
         
@@ -636,12 +845,24 @@ extension ANIListView {
           DispatchQueue.main.async {
             for loveRecruit in loveRecruitsTemp {
               if let loveRecruit = loveRecruit {
-                self.loveRecruits.append(loveRecruit)
+                if !self.isBlockRecruit(recruit: loveRecruit) {
+                  self.loveRecruits.append(loveRecruit)
+                }
               }
             }
             listTableView.reloadData()
             
             self.isLoading = false
+            
+            if self.loveRecruits.isEmpty {
+              self.loadMoreLoveRecruit()
+            } else {
+              activityIndicatorView.stopAnimating()
+              
+              UIView.animate(withDuration: 0.2, animations: {
+                listTableView.alpha = 1.0
+              })
+            }
           }
         }
       })
@@ -716,19 +937,25 @@ extension ANIListView {
             
             for loveStory in loveStoriesTemp {
               if let loveStory = loveStory {
-                self.loveStories.append(loveStory)
+                if !self.isBlockStory(story: loveStory) {
+                  self.loveStories.append(loveStory)
+                }
               }
             }
             
             listTableView.reloadData()
             
-            activityIndicatorView.stopAnimating()
-            
-            UIView.animate(withDuration: 0.2, animations: {
-              listTableView.alpha = 1.0
-            })
-            
             self.isLoading = false
+
+            if self.loveStories.isEmpty {
+              self.loadMoreLoveStory()
+            } else {
+              activityIndicatorView.stopAnimating()
+              
+              UIView.animate(withDuration: 0.2, animations: {
+                listTableView.alpha = 1.0
+              })
+            }
           }
         }
       })
@@ -739,6 +966,7 @@ extension ANIListView {
     guard let listTableView = self.listTableView,
           let lastContent = self.lastContent,
           let currentUserId = ANISessionManager.shared.currentUserUid,
+          let activityIndicatorView = self.activityIndicatorView,
           !isLoading,
           !isLastPage else { return }
     
@@ -759,6 +987,7 @@ extension ANIListView {
         guard let lastContent = snapshot.documents.last else {
           self.isLastPage = true
           self.isLoading = false
+          activityIndicatorView.stopAnimating()
           return
         }
         
@@ -804,12 +1033,24 @@ extension ANIListView {
           DispatchQueue.main.async {
             for loveStory in loveStoriesTemp {
               if let loveStory = loveStory {
-                self.loveStories.append(loveStory)
+                if !self.isBlockStory(story: loveStory) {
+                  self.loveStories.append(loveStory)
+                }
               }
             }
             listTableView.reloadData()
             
             self.isLoading = false
+            
+            if self.loveStories.isEmpty {
+              self.loadMoreLoveStory()
+            } else {
+              activityIndicatorView.stopAnimating()
+              
+              UIView.animate(withDuration: 0.2, animations: {
+                listTableView.alpha = 1.0
+              })
+            }
           }
         }
       })
@@ -883,19 +1124,25 @@ extension ANIListView {
             
             for loveQna in loveQnasTemp {
               if let loveQna = loveQna {
-                self.loveQnas.append(loveQna)
+                if !self.isBlockQna(qna: loveQna) {
+                  self.loveQnas.append(loveQna)
+                }
               }
             }
             
             listTableView.reloadData()
             
-            activityIndicatorView.stopAnimating()
-            
-            UIView.animate(withDuration: 0.2, animations: {
-              listTableView.alpha = 1.0
-            })
-            
             self.isLoading = false
+            
+            if self.loveQnas.isEmpty {
+              self.loadMoreLoveQna()
+            } else {
+              activityIndicatorView.stopAnimating()
+              
+              UIView.animate(withDuration: 0.2, animations: {
+                listTableView.alpha = 1.0
+              })
+            }
           }
         }
       })
@@ -906,6 +1153,7 @@ extension ANIListView {
     guard let listTableView = self.listTableView,
           let lastContent = self.lastContent,
           let currentUserId = ANISessionManager.shared.currentUserUid,
+          let activityIndicatorView = self.activityIndicatorView,
           !isLoading,
           !isLastPage else { return }
     
@@ -926,6 +1174,7 @@ extension ANIListView {
         guard let lastContent = snapshot.documents.last else {
           self.isLastPage = true
           self.isLoading = false
+          activityIndicatorView.stopAnimating()
           return
         }
         
@@ -971,12 +1220,24 @@ extension ANIListView {
           DispatchQueue.main.async {
             for loveQna in loveQnasTemp {
               if let loveQna = loveQna {
-                self.loveQnas.append(loveQna)
+                if !self.isBlockQna(qna: loveQna) {
+                  self.loveQnas.append(loveQna)
+                }
               }
             }
             listTableView.reloadData()
             
             self.isLoading = false
+            
+            if self.loveQnas.isEmpty {
+              self.loadMoreLoveQna()
+            } else {
+              activityIndicatorView.stopAnimating()
+              
+              UIView.animate(withDuration: 0.2, animations: {
+                listTableView.alpha = 1.0
+              })
+            }
           }
         }
       })
@@ -993,7 +1254,7 @@ extension ANIListView {
       self.isLoading = true
       self.isLastPage = false
       
-      database.collection(KEY_USERS).document(currentUserId).collection(KEY_CLIP_RECRUIT_IDS).order(by: KEY_DATE, descending: true).limit(to: 15).getDocuments(completion: { (snapshot, error) in
+      database.collection(KEY_USERS).document(currentUserId).collection(KEY_CLIP_RECRUIT_IDS).order(by: KEY_DATE, descending: true).limit(to: 20).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
           self.isLoading = false
@@ -1013,7 +1274,6 @@ extension ANIListView {
         var clipRecruitsTemp = [FirebaseRecruit?]()
         
         for (index, document) in snapshot.documents.enumerated() {
-          
           group.enter()
           clipRecruitsTemp.append(nil)
           
@@ -1051,19 +1311,25 @@ extension ANIListView {
             
             for clipRecruit in clipRecruitsTemp {
               if let clipRecruit = clipRecruit {
-                self.clipRecruits.append(clipRecruit)
+                if !self.isBlockRecruit(recruit: clipRecruit) {
+                  self.clipRecruits.append(clipRecruit)
+                }
               }
             }
             
             listTableView.reloadData()
             
-            activityIndicatorView.stopAnimating()
-            
-            UIView.animate(withDuration: 0.2, animations: {
-              listTableView.alpha = 1.0
-            })
-            
             self.isLoading = false
+
+            if self.clipRecruits.isEmpty {
+              self.loadMoreClipRecruit()
+            } else {
+              activityIndicatorView.stopAnimating()
+              
+              UIView.animate(withDuration: 0.2, animations: {
+                listTableView.alpha = 1.0
+              })
+            }
           }
         }
       })
@@ -1074,6 +1340,7 @@ extension ANIListView {
     guard let listTableView = self.listTableView,
           let lastContent = self.lastContent,
           let currentUserId = ANISessionManager.shared.currentUserUid,
+          let activityIndicatorView = self.activityIndicatorView,
           !isLoading,
           !isLastPage else { return }
     
@@ -1082,7 +1349,7 @@ extension ANIListView {
     DispatchQueue.global().async {
       self.isLoading = true
       
-      database.collection(KEY_USERS).document(currentUserId).collection(KEY_CLIP_RECRUIT_IDS).order(by: KEY_DATE, descending: true).start(afterDocument: lastContent).limit(to: 15).getDocuments(completion: { (snapshot, error) in
+      database.collection(KEY_USERS).document(currentUserId).collection(KEY_CLIP_RECRUIT_IDS).order(by: KEY_DATE, descending: true).start(afterDocument: lastContent).limit(to: 20).getDocuments(completion: { (snapshot, error) in
         if let error = error {
           DLog("Error get document: \(error)")
           self.isLoading = false
@@ -1094,6 +1361,7 @@ extension ANIListView {
         guard let lastContent = snapshot.documents.last else {
           self.isLastPage = true
           self.isLoading = false
+          activityIndicatorView.stopAnimating()
           return
         }
         
@@ -1112,6 +1380,7 @@ extension ANIListView {
               if let recruitError = recruitError {
                 DLog("Error get document: \(recruitError)")
                 self.isLoading = false
+                group.leave()
                 
                 return
               }
@@ -1139,12 +1408,25 @@ extension ANIListView {
           DispatchQueue.main.async {
             for clipRecruit in clipRecruitsTemp {
               if let clipRecruit = clipRecruit {
-                self.clipRecruits.append(clipRecruit)
+                if !self.isBlockRecruit(recruit: clipRecruit) {
+                  self.clipRecruits.append(clipRecruit)
+                }
               }
             }
+            
             listTableView.reloadData()
             
             self.isLoading = false
+            
+            if self.clipRecruits.isEmpty {
+              self.loadMoreClipRecruit()
+            } else {
+              activityIndicatorView.stopAnimating()
+              
+              UIView.animate(withDuration: 0.2, animations: {
+                listTableView.alpha = 1.0
+              })
+            }
           }
         }
       })

@@ -17,6 +17,9 @@ protocol ANIBasicNotiViewCellDelegate {
 
 class ANIBasicNotiViewCell: UITableViewCell {
   
+  private var shadowVidewTopConstraint: Constraint?
+  private weak var shadowVidew: UIView?
+  
   private weak var base: UIView?
   private weak var stackView: UIStackView?
   private let PROFILE_IMAGE_VIEW_HEIGHT: CGFloat = 50.0
@@ -42,6 +45,19 @@ class ANIBasicNotiViewCell: UITableViewCell {
     }
   }
   
+  var indexPath: Int? {
+    didSet {
+      guard let indexPath = self.indexPath,
+            let shadowVidewTopConstraint = self.shadowVidewTopConstraint else { return }
+      
+      if indexPath == 0 {
+        shadowVidewTopConstraint.constant = 0.0
+      } else {
+        shadowVidewTopConstraint.constant = 10.0
+      }
+    }
+  }
+  
   var delegate: ANIBasicNotiViewCellDelegate?
   
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -58,10 +74,21 @@ class ANIBasicNotiViewCell: UITableViewCell {
     self.selectionStyle = .none
     backgroundColor = .white
     
+    //shadowVidew
+    let shadowVidew = UIView()
+    shadowVidew.backgroundColor = .white
+    shadowVidew.dropShadow(opacity: 0.03)
+    addSubview(shadowVidew)
+    shadowVidewTopConstraint = shadowVidew.topToSuperview(offset: 10.0)
+    shadowVidew.leftToSuperview()
+    shadowVidew.rightToSuperview()
+    shadowVidew.bottomToSuperview(offset: -10.0)
+    self.shadowVidew = shadowVidew
+    
     //base
     let base = UIView()
     base.backgroundColor = .white
-    addSubview(base)
+    shadowVidew.addSubview(base)
     base.edgesToSuperview()
     self.base = base
     
@@ -74,11 +101,12 @@ class ANIBasicNotiViewCell: UITableViewCell {
     stackView.topToSuperview(offset: 10.0)
     stackView.leftToSuperview(offset: 10.0)
     stackView.rightToSuperview(offset: -10.0)
+    stackView.bottomToSuperview(offset: -10.0)
     self.stackView = stackView
     
     //profileImageView
     let profileImageView = UIImageView()
-    profileImageView.backgroundColor = ANIColor.gray
+    profileImageView.backgroundColor = ANIColor.lightGray
     profileImageView.layer.cornerRadius = PROFILE_IMAGE_VIEW_HEIGHT / 2
     profileImageView.layer.masksToBounds = true
     profileImageView.isUserInteractionEnabled = true
@@ -96,17 +124,6 @@ class ANIBasicNotiViewCell: UITableViewCell {
     notiLabel.textColor = ANIColor.subTitle
     stackView.addArrangedSubview(notiLabel)
     self.notiLabel = notiLabel
-    
-    //bottomSpace
-    let spaceView = UIView()
-    spaceView.backgroundColor = ANIColor.bg
-    base.addSubview(spaceView)
-    spaceView.topToBottom(of: stackView, offset: 10.0)
-    spaceView.leftToSuperview()
-    spaceView.rightToSuperview()
-    spaceView.height(10.0)
-    spaceView.bottomToSuperview()
-    self.spaceView = spaceView
   }
   
   private func reloadLayout() {
@@ -116,13 +133,12 @@ class ANIBasicNotiViewCell: UITableViewCell {
     
     notiLabel.text = noti.noti
     
+    base.backgroundColor = .white
     if !checkRead(noti: noti) {
       base.backgroundColor = ANIColor.emerald.withAlphaComponent(0.1)
       UIView.animate(withDuration: 0.2, delay: 1, options: .curveEaseOut, animations: {
         base.backgroundColor = .white
       }, completion: nil)
-    } else {
-      base.backgroundColor = .white
     }
   }
   

@@ -9,12 +9,16 @@
 import UIKit
 import FirebaseFirestore
 import CodableFirebase
+import TinyConstraints
 
 protocol ANIMessageViewCellDelegate {
   func loadedUser()
 }
 
 class ANIMessageViewCell: UITableViewCell {
+  
+  private var shadowVidewTopConstraint: Constraint?
+  private weak var shadowVidew: UIView?
   
   private weak var base: UIView?
 
@@ -26,6 +30,10 @@ class ANIMessageViewCell: UITableViewCell {
   
   var chatGroup: FirebaseChatGroup? {
     didSet {
+      guard let base = self.base else { return }
+      
+      base.backgroundColor = .white
+
       loadUser()
     }
   }
@@ -35,6 +43,19 @@ class ANIMessageViewCell: UITableViewCell {
       self.delegate?.loadedUser()
       reloadUserLayout()
       reloadLayout()
+    }
+  }
+  
+  var indexPath: Int? {
+    didSet {
+      guard let indexPath = self.indexPath,
+            let shadowVidewTopConstraint = self.shadowVidewTopConstraint else { return }
+      
+      if indexPath == 0 {
+        shadowVidewTopConstraint.constant = 0.0
+      } else {
+        shadowVidewTopConstraint.constant = 10.0
+      }
     }
   }
   
@@ -57,16 +78,27 @@ class ANIMessageViewCell: UITableViewCell {
     let tapGesture = UITapGestureRecognizer(target: self, action: #selector(cellTapped))
     self.addGestureRecognizer(tapGesture)
     
+    //shadowVidew
+    let shadowVidew = UIView()
+    shadowVidew.backgroundColor = .white
+    shadowVidew.dropShadow(opacity: 0.03)
+    addSubview(shadowVidew)
+    shadowVidewTopConstraint = shadowVidew.topToSuperview(offset: 10.0)
+    shadowVidew.leftToSuperview()
+    shadowVidew.rightToSuperview()
+    shadowVidew.bottomToSuperview(offset: -10.0)
+    self.shadowVidew = shadowVidew
+    
     //base
     let base = UIView()
     base.backgroundColor = .white
-    addSubview(base)
+    shadowVidew.addSubview(base)
     base.edgesToSuperview()
     self.base = base
     
     //profileImageView
     let profileImageView = UIImageView()
-    profileImageView.backgroundColor = ANIColor.gray
+    profileImageView.backgroundColor = ANIColor.lightGray
     profileImageView.layer.cornerRadius = PROFILE_IMAGE_VIEW_HEIGHT / 2
     profileImageView.layer.masksToBounds = true
     profileImageView.isUserInteractionEnabled = true
@@ -75,6 +107,7 @@ class ANIMessageViewCell: UITableViewCell {
     base.addSubview(profileImageView)
     profileImageView.topToSuperview(offset: 10.0)
     profileImageView.leftToSuperview(offset: 10.0)
+    profileImageView.bottomToSuperview(offset: -10.0)
     profileImageView.width(PROFILE_IMAGE_VIEW_HEIGHT)
     profileImageView.height(PROFILE_IMAGE_VIEW_HEIGHT)
     self.profileImageView = profileImageView
@@ -110,16 +143,6 @@ class ANIMessageViewCell: UITableViewCell {
     messageLabel.left(to: userNameLabel)
     messageLabel.rightToSuperview(offset: -10.0)
     self.messageLabel = messageLabel
-    
-    //bottomSpace
-    let spaceView = UIView()
-    spaceView.backgroundColor = ANIColor.bg
-    base.addSubview(spaceView)
-    spaceView.topToBottom(of: profileImageView, offset: 10)
-    spaceView.leftToSuperview()
-    spaceView.rightToSuperview()
-    spaceView.height(10.0)
-    spaceView.bottomToSuperview()
   }
   
   private func reloadLayout() {
@@ -129,7 +152,8 @@ class ANIMessageViewCell: UITableViewCell {
           let base = self.base,
           let currentUserId = ANISessionManager.shared.currentUserUid else { return }
     
-    updateDateLabel.text = String(chatGroup.updateDate.prefix(10))
+    let currentDate = ANIFunction.shared.getCurrentLocaleDateFromString(string: chatGroup.updateDate, format: "yyyy/MM/dd")
+    updateDateLabel.text = currentDate
     messageLabel.text = chatGroup.lastMessage
     
     if let isHaveUnreadMessage = chatGroup.isHaveUnreadMessage, let currentUserIsHaveUnreadMessage = isHaveUnreadMessage[currentUserId] {

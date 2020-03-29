@@ -46,7 +46,7 @@ class ANIChatBar: UIView {
   private func setup() {
     //profileImageView
     let profileImageView = UIImageView()
-    profileImageView.backgroundColor = ANIColor.gray
+    profileImageView.backgroundColor = ANIColor.lightGray
     profileImageView.layer.cornerRadius = 40.0 / 2
     profileImageView.layer.masksToBounds = true
     profileImageView.contentMode = .scaleAspectFill
@@ -86,6 +86,7 @@ class ANIChatBar: UIView {
     
     //chattTextView
     let chatTextView = GrowingTextView()
+    chatTextView.backgroundColor = .white
     chatTextView.textColor = ANIColor.dark
     chatTextView.font = UIFont.systemFont(ofSize: 15.0)
     chatTextView.placeholder = "メッセージ"
@@ -164,17 +165,7 @@ class ANIChatBar: UIView {
 
     let date = ANIFunction.shared.getToday()
     
-    var isDiffrentBeforeDate = false
-    if !messages.isEmpty {
-      let beforeDate = messages[messages.count - 1].date
-      if String(beforeDate.prefix(10)) != String(date.prefix(10)) {
-        isDiffrentBeforeDate = true
-      }
-    } else {
-      isDiffrentBeforeDate = true
-    }
-    
-    let message = FirebaseChatMessage(sendUserId: currentuserUid, sendUserName: currentUserName, receiveUserId: userId, message: text, date: date, isDiffrentBeforeDate: isDiffrentBeforeDate)
+    let message = FirebaseChatMessage(sendUserId: currentuserUid, sendUserName: currentUserName, receiveUserId: userId, message: text, date: date, isDiffrentBeforeDate: nil)
     
     checkMember()
 

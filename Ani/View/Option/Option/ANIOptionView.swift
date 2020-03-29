@@ -10,14 +10,16 @@ import UIKit
 
 protocol ANIOptionViewDelegate {
   func listTapped(list: List)
+  func linkTwitterTapped()
   func logoutTapped()
+  func blockUserTapped()
   func opinionBoxTapped()
   func contactTapped()
 }
 
 enum List: String {
   case loveRecruit = "『いいね』した募集";
-  case loveStroy = "『いいね』したストーリ";
+  case loveStroy = "『いいね』したストーリー";
   case loveQuestion = "『いいね』した質問";
   case clipRecruit = "『クリップ』した募集";
 }
@@ -27,7 +29,7 @@ class ANIOptionView: UIView {
   private weak var tableView: UITableView?
   
   private var list = [List.loveRecruit, List.loveStroy, List.loveQuestion, List.clipRecruit]
-  private var account = ["ログアウト"]
+  private var account = ["Twitter連携", "ログアウト", "ブロックユーザー"]
   private var etc = ["意見箱", "お問合せ"]
   
   var delegate: ANIOptionViewDelegate?
@@ -44,6 +46,7 @@ class ANIOptionView: UIView {
   
   private func setup() {
     let tableView = UITableView()
+    tableView.backgroundColor = .white
     let id = NSStringFromClass(ANIOptionViewCell.self)
     tableView.register(ANIOptionViewCell.self, forCellReuseIdentifier: id)
     tableView.dataSource = self
@@ -124,8 +127,12 @@ extension ANIOptionView: UITableViewDelegate {
     case 0:
       self.delegate?.listTapped(list: list[indexPath.row])
     case 1:
-      if account[indexPath.row] == "ログアウト" {
+      if account[indexPath.row] == "Twitter連携" {
+        self.delegate?.linkTwitterTapped()
+      } else if account[indexPath.row] == "ログアウト" {
         self.delegate?.logoutTapped()
+      } else if account[indexPath.row] == "ブロックユーザー" {
+        self.delegate?.blockUserTapped()
       }
     case 2:
       if etc[indexPath.row] == "意見箱" {

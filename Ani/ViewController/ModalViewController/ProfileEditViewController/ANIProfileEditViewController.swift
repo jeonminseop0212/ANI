@@ -12,13 +12,12 @@ import TinyConstraints
 import FirebaseFirestore
 import FirebaseStorage
 import CodableFirebase
-import NVActivityIndicatorView
 
 protocol ANIProfileEditViewControllerDelegate {
   func didEdit()
 }
 
-class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewable {
+class ANIProfileEditViewController: UIViewController {
   
   private weak var myNavigationBar: UIView?
   private weak var myNavigationBase: UIView?
@@ -54,7 +53,7 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
     }
   }
   
-  var familyImages: [UIImage?]? {
+  private var familyImages: [UIImage?]? {
     didSet {
       guard let profileEditView = self.profileEditView,
             let familyImages = self.familyImages else { return }
@@ -68,16 +67,18 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
   
   var delegate: ANIProfileEditViewControllerDelegate?
   
+  private weak var activityIndicatorView: ANIActivityIndicator?
+  
   override func viewDidLoad() {
     setFamilyImages { (images) in
       self.familyImages = images
     }
     setup()
-    setupNotification()
   }
   
   override func viewWillAppear(_ animated: Bool) {
     UIApplication.shared.isStatusBarHidden = false
+    setupNotifications()
   }
   
   override func viewDidAppear(_ animated: Bool) {
@@ -90,6 +91,10 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
     guard let rejectView = self.rejectView else { return }
     
     rejectView.isHidden = true
+  }
+  
+  override func viewDidDisappear(_ animated: Bool) {
+    removeNotifications()
   }
   
   private func setup() {
@@ -132,7 +137,7 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
     let navigationTitleLabel = UILabel()
     navigationTitleLabel.text = "プロフィール設定"
     navigationTitleLabel.textColor = ANIColor.dark
-    navigationTitleLabel.font = UIFont.boldSystemFont(ofSize: 17)
+    navigationTitleLabel.font = UIFont.boldSystemFont(ofSize: 16)
     myNavigationBase.addSubview(navigationTitleLabel)
     navigationTitleLabel.centerInSuperview()
     self.navigationTitleLabel = navigationTitleLabel
@@ -203,11 +208,23 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
     rejectBaseView.addSubview(rejectLabel)
     rejectLabel.edgesToSuperview()
     self.rejectLabel = rejectLabel
+    
+    //activityIndicatorView
+    let activityIndicatorView = ANIActivityIndicator()
+    activityIndicatorView.isFull = true
+    self.view.addSubview(activityIndicatorView)
+    activityIndicatorView.edgesToSuperview()
+    self.activityIndicatorView = activityIndicatorView
   }
   
-  private func setupNotification() {
+  private func setupNotifications() {
+    removeNotifications()
     ANINotificationManager.receive(keyboardWillChangeFrame: self, selector: #selector(keyboardWillChangeFrame))
     ANINotificationManager.receive(keyboardWillHide: self, selector: #selector(keyboardWillHide))
+  }
+  
+  private func removeNotifications() {
+    ANINotificationManager.remove(self)
   }
   
   private func getCropImages(images: [UIImage?], items: [Image]) -> [UIImage] {
@@ -303,7 +320,7 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
           let user = try FirestoreDecoder().decode(FirebaseUser.self, from: data)
           ANISessionManager.shared.currentUser = user
           
-          NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+          self.activityIndicatorView?.stopAnimating()
           
           self.delegate?.didEdit()
           self.dismiss(animated: true, completion: nil)
@@ -384,17 +401,24 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
                 return
               }
               
-              if let familyImageUrl = metaData?.downloadURL() {
-                familyImageUrls[index] = familyImageUrl.absoluteString
-                if familyImageUrls.count == familyImages.count {
-                  let sortdUrls = familyImageUrls.sorted(by: {$0.0 < $1.0})
-                  var urls = [String]()
-                  for url in sortdUrls {
-                    urls.append(url.value)
-                  }
-                  completion?(urls)
+              storageRef.child(KEY_FAMILY_IMAGES).child(uuid).downloadURL(completion: { (url, error) in
+                if error != nil {
+                  DLog("storage download url error")
+                  return
                 }
-              }
+                
+                if let familyImageUrl = url {
+                  familyImageUrls[index] = familyImageUrl.absoluteString
+                  if familyImageUrls.count == familyImages.count {
+                    let sortdUrls = familyImageUrls.sorted(by: {$0.0 < $1.0})
+                    var urls = [String]()
+                    for url in sortdUrls {
+                      urls.append(url.value)
+                    }
+                    completion?(urls)
+                  }
+                }
+              })
             }
           }
         }
@@ -415,8 +439,9 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
     guard let currentUser = ANISessionManager.shared.currentUser,
           let currentUserUid = ANISessionManager.shared.currentUserUid else { return }
     
-    let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.emerald)
-    NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData, nil)
+    self.view.endEditing(true)
+    
+    self.activityIndicatorView?.startAnimating()
 
     if familyImagesChange {
       if let familyUrls = currentUser.familyImageUrls {
@@ -442,6 +467,8 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
           let updateUser = profileEditView.getUpdateUser(),
           let userName = updateUser.userName,
           let kind = updateUser.kind,
+          let twitterAccount = updateUser.twitterAccount,
+          let instagramAccount = updateUser.instagramAccount,
           let introduce = updateUser.introduce else { return }
     
     if currentUserName == userName {
@@ -453,13 +480,20 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
             return
           }
           
-          if let profileImageUrl = metaData?.downloadURL() {
-            let values = [KEY_USER_NAME: userName, KEY_KIND: kind, KEY_INTRODUCE: introduce, KEY_PROFILE_IMAGE_URL: profileImageUrl.absoluteString] as [String : AnyObject]
-            self.updateUserData(uid: currentUserUid, values: values)
-          }
+          storageRef.child(KEY_PROFILE_IMAGES).child("\(currentUserUid).jpeg").downloadURL(completion: { (url, error) in
+            if error != nil {
+              DLog("storage download url error")
+              return
+            }
+            
+            if let profileImageUrl = url {
+              let values = [KEY_USER_NAME: userName, KEY_KIND: kind, KEY_TWITTER_ACCOUNT: twitterAccount, KEY_INSTAGRAM_ACCOUNT: instagramAccount, KEY_INTRODUCE: introduce, KEY_PROFILE_IMAGE_URL: profileImageUrl.absoluteString] as [String : AnyObject]
+              self.updateUserData(uid: currentUserUid, values: values)
+            }
+          })
         }
       } else {
-        let values = [KEY_USER_NAME: userName, KEY_KIND: kind, KEY_INTRODUCE: introduce] as [String : AnyObject]
+        let values = [KEY_USER_NAME: userName, KEY_KIND: kind, KEY_TWITTER_ACCOUNT: twitterAccount, KEY_INSTAGRAM_ACCOUNT: instagramAccount, KEY_INTRODUCE: introduce] as [String : AnyObject]
         self.updateUserData(uid: currentUserUid, values: values)
       }
     } else {
@@ -483,17 +517,25 @@ class ANIProfileEditViewController: UIViewController, NVActivityIndicatorViewabl
                   return
                 }
                 
-                if let profileImageUrl = metaData?.downloadURL() {
-                  let values = [KEY_USER_NAME: userName, KEY_KIND: kind, KEY_INTRODUCE: introduce, KEY_PROFILE_IMAGE_URL: profileImageUrl.absoluteString] as [String : AnyObject]
-                  self.updateUserData(uid: currentUserUid, values: values)
-                }
+                storageRef.child(KEY_PROFILE_IMAGES).child("\(currentUserUid).jpeg").downloadURL(completion: { (url, error) in
+                  if error != nil {
+                    DLog("storage download url error")
+                    return
+                  }
+                  
+                  if let profileImageUrl = url {
+                    let values = [KEY_USER_NAME: userName, KEY_KIND: kind, KEY_TWITTER_ACCOUNT: twitterAccount, KEY_INSTAGRAM_ACCOUNT: instagramAccount, KEY_INTRODUCE: introduce, KEY_PROFILE_IMAGE_URL: profileImageUrl.absoluteString] as [String : AnyObject]
+                    self.updateUserData(uid: currentUserUid, values: values)
+                  }
+                })
               }
             } else {
-              let values = [KEY_USER_NAME: userName, KEY_KIND: kind, KEY_INTRODUCE: introduce] as [String : AnyObject]
+              let values = [KEY_USER_NAME: userName, KEY_KIND: kind, KEY_TWITTER_ACCOUNT: twitterAccount, KEY_INSTAGRAM_ACCOUNT: instagramAccount, KEY_INTRODUCE: introduce] as [String : AnyObject]
               self.updateUserData(uid: currentUserUid, values: values)
             }
           } else {
-            NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+            self.activityIndicatorView?.stopAnimating()
+
             self.reject(notiText: "すでに存在するユーザーネームです！")
           }
         })
@@ -540,6 +582,7 @@ extension ANIProfileEditViewController: ANIProfileEditViewDelegate {
       Gallery.Config.Grid.previewRatio = 1.0
       
       let galleryNV = UINavigationController(rootViewController: galleryUnrap)
+      galleryNV.modalPresentationStyle = .fullScreen
       self.present(galleryNV, animated: true, completion: nil)
       
       isFamilyAdd = true
@@ -563,6 +606,7 @@ extension ANIProfileEditViewController: ANIProfileEditViewDelegate {
       Gallery.Config.Grid.previewRatio = 1.0
       
       let galleryNV = UINavigationController(rootViewController: galleryUnrap)
+      galleryNV.modalPresentationStyle = .fullScreen
       self.present(galleryNV, animated: true, completion: nil)
       
       isFamilyAdd = false

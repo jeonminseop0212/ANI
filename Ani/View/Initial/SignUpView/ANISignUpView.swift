@@ -11,12 +11,13 @@ import FirebaseAuth
 import FirebaseStorage
 import FirebaseFirestore
 import CodableFirebase
-import NVActivityIndicatorView
 
 protocol ANISignUpViewDelegate {
   func prifileImagePickButtonTapped()
   func reject(notiText: String)
   func signUpSuccess(adress: String, password: String, userId: String)
+  func startAnimaing()
+  func stopAnimating()
 }
 
 class ANISignUpView: UIView {
@@ -32,6 +33,7 @@ class ANISignUpView: UIView {
   private weak var profileImagePickButton: ANIImageButtonView?
   
   private weak var adressTitleLabel: UILabel?
+  private weak var adressDescriptionLabel: UILabel?
   private weak var adressTextFieldBG: UIView?
   private weak var adressTextField: UITextField?
   
@@ -70,7 +72,7 @@ class ANISignUpView: UIView {
     super.init(frame: frame)
     
     setup()
-    setupNotification()
+    setupNotifications()
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -123,8 +125,17 @@ class ANISignUpView: UIView {
     contentView.addSubview(adressTitleLabel)
     adressTitleLabel.topToBottom(of: profileImageView, offset: CONTENT_SPACE)
     adressTitleLabel.leftToSuperview(offset: 10.0)
-    adressTitleLabel.rightToSuperview(offset: -10.0)
     self.adressTitleLabel = adressTitleLabel
+    
+    //adressDescriptionLabel
+    let adressDescriptionLabel = UILabel()
+    adressDescriptionLabel.font = UIFont.boldSystemFont(ofSize: 13.0)
+    adressDescriptionLabel.textColor = ANIColor.moreDarkGray
+    adressDescriptionLabel.text = "(メールアドレス)"
+    contentView.addSubview(adressDescriptionLabel)
+    adressDescriptionLabel.bottom(to: adressTitleLabel, offset: -2.0)
+    adressDescriptionLabel.leftToRight(of: adressTitleLabel)
+    self.adressDescriptionLabel = adressDescriptionLabel
     
     //adressTextFieldBG
     let adressTextFieldBG = UIView()
@@ -142,7 +153,7 @@ class ANISignUpView: UIView {
     adressTextField.font = UIFont.systemFont(ofSize: 18.0)
     adressTextField.textColor = ANIColor.dark
     adressTextField.backgroundColor = .clear
-    adressTextField.placeholder = "ex)MYAU@myau.com"
+    adressTextField.attributedPlaceholder = NSAttributedString(string: "ex)MYAU@myau.com", attributes: [NSAttributedString.Key.foregroundColor : UIColor.lightGray])
     adressTextField.returnKeyType = .done
     adressTextField.keyboardType = .emailAddress
     adressTextField.delegate = self
@@ -178,7 +189,7 @@ class ANISignUpView: UIView {
     passwordTextField.font = UIFont.systemFont(ofSize: 18.0)
     passwordTextField.textColor = ANIColor.dark
     passwordTextField.backgroundColor = .clear
-    passwordTextField.placeholder = "パスワード"
+    passwordTextField.attributedPlaceholder = NSAttributedString(string: "パスワード", attributes: [NSAttributedString.Key.foregroundColor : UIColor.lightGray])
     passwordTextField.returnKeyType = .done
     passwordTextField.isSecureTextEntry = true
     passwordTextField.delegate = self
@@ -202,7 +213,7 @@ class ANISignUpView: UIView {
     passwordCheckTextField.font = UIFont.systemFont(ofSize: 18.0)
     passwordCheckTextField.textColor = ANIColor.dark
     passwordCheckTextField.backgroundColor = .clear
-    passwordCheckTextField.placeholder = "パスワードの確認"
+    passwordCheckTextField.attributedPlaceholder = NSAttributedString(string: "パスワードの確認", attributes: [NSAttributedString.Key.foregroundColor : UIColor.lightGray])
     passwordCheckTextField.returnKeyType = .done
     passwordCheckTextField.isSecureTextEntry = true
     passwordCheckTextField.delegate = self
@@ -237,7 +248,7 @@ class ANISignUpView: UIView {
     userNameTextField.font = UIFont.systemFont(ofSize: 18.0)
     userNameTextField.textColor = ANIColor.dark
     userNameTextField.backgroundColor = .clear
-    userNameTextField.placeholder = "ex)MYAU-myau"
+    userNameTextField.attributedPlaceholder = NSAttributedString(string: "ex)MYAU-myau", attributes: [NSAttributedString.Key.foregroundColor : UIColor.lightGray])
     userNameTextField.returnKeyType = .done
     userNameTextField.delegate = self
     userNameTextFieldBG.addSubview(userNameTextField)
@@ -269,7 +280,7 @@ class ANISignUpView: UIView {
     self.doneButtonLabel = doneButtonLabel
   }
   
-  private func setupNotification() {
+  private func setupNotifications() {
     ANINotificationManager.receive(keyboardWillChangeFrame: self, selector: #selector(keyboardWillChangeFrame))
   }
   
@@ -277,8 +288,7 @@ class ANISignUpView: UIView {
     guard let userNameTextField = self.userNameTextField,
           let userName = userNameTextField.text else { return }
     
-    let activityData = ActivityData(size: CGSize(width: 40.0, height: 40.0),type: .lineScale, color: ANIColor.emerald)
-    NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData, nil)
+    self.delegate?.startAnimaing()
     
     let database = Firestore.firestore()
     DispatchQueue.global().async {
@@ -294,7 +304,7 @@ class ANISignUpView: UIView {
         if snapshot.documents.isEmpty {
           self.createAccount(adress: adress, password: password)
         } else {
-          NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+          self.delegate?.stopAnimating()
 
           self.delegate?.reject(notiText: "すでに存在するユーザーネームです！")
         }
@@ -307,14 +317,14 @@ class ANISignUpView: UIView {
       if let errorUnrap = error {
         let nsError = errorUnrap as NSError
         
-        NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+        self.delegate?.stopAnimating()
 
         if nsError.code == 17007 {
           self.delegate?.reject(notiText: "すでに存在するメールアドレスです！")
         } else if nsError.code == 17008 {
           self.delegate?.reject(notiText: "メールアドレスの書式が正しくありません！")
         } else if nsError.code == 17026 {
-          self.delegate?.reject(notiText: "パスワードが短いです！")
+          self.delegate?.reject(notiText: "パスワードが６文字未満です！")
         } else {
           self.delegate?.reject(notiText: "登録に失敗しました！")
         }
@@ -347,15 +357,22 @@ class ANISignUpView: UIView {
     storageRef.child(KEY_PROFILE_IMAGES).child("\(currentUser.uid).jpeg").putData(profileImageData, metadata: nil) { (metaData, error) in
       if error != nil {
         DLog("storageError")
-        NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+        self.delegate?.stopAnimating()
         return
       }
       
-      if let profileImageUrl = metaData?.downloadURL() {
-        let fcmToken = UserDefaults.standard.string(forKey: KEY_FCM_TOKEN)
-        let user = FirebaseUser(uid: currentUser.uid, userName: userName, kind: "個人", introduce: "", profileImageUrl: profileImageUrl.absoluteString, familyImageUrls: nil, checkNotiDate: nil, isHaveUnreadNoti: false, unreadNotiCount: 0, unreadMessageCount: 0, fcmToken: fcmToken)
-        self.uploadUserIntoDatabase(uid: currentUser.uid, user: user)
-      }
+      storageRef.child(KEY_PROFILE_IMAGES).child("\(currentUser.uid).jpeg").downloadURL(completion: { (url, error) in
+        if error != nil {
+          DLog("storage download url error")
+          return
+        }
+        
+        if let profileImageUrl = url {
+          let fcmToken = UserDefaults.standard.string(forKey: KEY_FCM_TOKEN)
+          let user = FirebaseUser(uid: currentUser.uid, userName: userName, kind: "個人", introduce: "", profileImageUrl: profileImageUrl.absoluteString, familyImageUrls: nil, checkNotiDate: nil, isHaveUnreadNoti: false, unreadNotiCount: 0, unreadMessageCount: 0, fcmToken: fcmToken, twitterAccount: nil, instagramAccount: nil, isTwitterLink: false)
+          self.uploadUserIntoDatabase(uid: currentUser.uid, user: user)
+        }
+      })
     }
   }
   
@@ -375,13 +392,13 @@ class ANISignUpView: UIView {
         
         self.delegate?.signUpSuccess(adress: self.adress, password: self.password, userId: uid)
         
-        NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+        self.delegate?.stopAnimating()
       }
       
       self.endEditing(true)
     } catch let error {
       DLog(error)
-      NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+      self.delegate?.stopAnimating()
     }
   }
   
@@ -395,9 +412,12 @@ class ANISignUpView: UIView {
     
     DispatchQueue.global().async {
       index.addObject(newData, completionHandler: { (content, error) -> Void in
-        if error == nil {
-          DLog("Object IDs: \(content!)")
+        if let error = error {
+          DLog("algolia error \(error)")
         }
+        
+        guard let content = content else { return }
+        DLog("Object IDs: \(content)")
       })
     }
   }

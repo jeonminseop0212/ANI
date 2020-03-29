@@ -10,7 +10,9 @@ import UIKit
 import TinyConstraints
 
 class ANIProfileMenuBarCell: UICollectionViewCell {
+  
   var menuLabel: UILabel?
+  var underBar: UIView?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -29,19 +31,28 @@ class ANIProfileMenuBarCell: UICollectionViewCell {
     addSubview(menuLabel)
     menuLabel.edgesToSuperview()
     self.menuLabel = menuLabel
+    
+    let underBar = UIView()
+    underBar.backgroundColor = ANIColor.bg
+    addSubview(underBar)
+    underBar.centerXToSuperview()
+    underBar.bottomToSuperview()
+    underBar.width(30.0)
+    underBar.height(2.0)
+    self.underBar = underBar
   }
   
   override var isHighlighted: Bool {
     didSet {
-      menuLabel?.textColor = isHighlighted ? ANIColor.dark : ANIColor.bg
-      menuLabel?.backgroundColor = isHighlighted ? ANIColor.bg : ANIColor.gray
+      menuLabel?.textColor = isHighlighted ? ANIColor.dark : ANIColor.gray
+      underBar?.backgroundColor = isHighlighted ? ANIColor.emerald : ANIColor.bg
     }
   }
   
   override var isSelected: Bool {
     didSet {
-      menuLabel?.textColor = isSelected ? ANIColor.dark : ANIColor.bg
-      menuLabel?.backgroundColor = isSelected ? ANIColor.bg : ANIColor.gray
+      menuLabel?.textColor = isSelected ? ANIColor.dark : ANIColor.gray
+      underBar?.backgroundColor = isSelected ? ANIColor.emerald : ANIColor.bg
     }
   }
 }

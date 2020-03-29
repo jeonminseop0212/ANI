@@ -24,6 +24,7 @@ class ANICommunityStoryCell: UICollectionViewCell {
     set(v) { self.storyView?.delegate = v }
   }
   
+  
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()
@@ -35,8 +36,21 @@ class ANICommunityStoryCell: UICollectionViewCell {
   
   private func setup() {
     let storyView = ANIStoryView()
+    ANIStoryView.shared = storyView
     addSubview(storyView)
     storyView.edgesToSuperview()
     self.storyView = storyView
+  }
+  
+  func playVideo() {
+    guard let storyView = self.storyView else { return }
+    
+    storyView.playVideo()
+  }
+  
+  func stopVideo() {
+    guard let storyView = self.storyView else { return }
+    
+    storyView.stopVideo()
   }
 }

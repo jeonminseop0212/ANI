@@ -7,11 +7,15 @@
 //
 
 import UIKit
+import FirebaseFirestore
+import CodableFirebase
 import TinyConstraints
 
 protocol ANIRecruitDetailViewDelegate {
   func recruitDetailViewDidScroll(offset: CGFloat)
   func imageCellTapped(index: Int, introduceImageUrls: [String])
+  func failRecruitLoad()
+  func successRecruitLoad(recruit: FirebaseRecruit, recruitUser: FirebaseUser)
 }
 
 class ANIRecruitDetailView: UIView {
@@ -57,6 +61,8 @@ class ANIRecruitDetailView: UIView {
   private weak var passingBG: UIView?
   private weak var passingLabel: UILabel?
   
+  private weak var activityIndicatorView: ANIActivityIndicator?
+  
   private var introduceImageUrls = [String]() {
     didSet {
       guard let introduceImagesView = self.introduceImagesView else { return }
@@ -75,6 +81,19 @@ class ANIRecruitDetailView: UIView {
   var user: FirebaseUser? {
     didSet {
       reloadUserLayout()
+    }
+  }
+  
+  var recruitId: String? {
+    didSet {
+      guard let recruitId = self.recruitId,
+            let headerImageView = self.headerImageView,
+            let scrollView = self.scrollView else { return }
+      
+      headerImageView.alpha = 0.0
+      scrollView.alpha = 0.0
+      
+      loadRecruit(recruitId: recruitId)
     }
   }
 
@@ -371,6 +390,13 @@ class ANIRecruitDetailView: UIView {
     passingBG.addSubview(passingLabel)
     passingLabel.edgesToSuperview(insets: insets)
     self.passingLabel = passingLabel
+    
+    //activityIndicatorView
+    let activityIndicatorView = ANIActivityIndicator()
+    activityIndicatorView.isFull = false
+    self.addSubview(activityIndicatorView)
+    activityIndicatorView.edgesToSuperview()
+    self.activityIndicatorView = activityIndicatorView
   }
   
   private func reloadLayout() {
@@ -399,7 +425,7 @@ class ANIRecruitDetailView: UIView {
     basicInfoSexLabel.text = "性別：\(recruit.sex)"
     basicInfoHomeLabel.text = "お家：\(recruit.home)"
     basicInfoVaccineLabel.text = "ワクチン：\(recruit.vaccine)"
-    basicInfoCastrationLabel.text = "去勢生：\(recruit.castration)"
+    basicInfoCastrationLabel.text = "去勢：\(recruit.castration)"
     
     reasonLabel.text = recruit.reason
     
@@ -433,6 +459,7 @@ class ANIRecruitDetailView: UIView {
   }
 }
 
+//MARK: UIScrollViewDelegate
 extension ANIRecruitDetailView: UIScrollViewDelegate {
   func scrollViewDidScroll(_ scrollView: UIScrollView) {
     guard let imageView = self.headerImageView,
@@ -467,9 +494,84 @@ extension ANIRecruitDetailView: UIScrollViewDelegate {
   }
 }
 
+//MARK: ANIRecruitDetailImagesViewDelegate
 extension ANIRecruitDetailView: ANIRecruitDetailImagesViewDelegate {
   func imageCellTapped(index: Int, introduceImageUrls: [String]) {
     self.delegate?.imageCellTapped(index: index, introduceImageUrls: introduceImageUrls)
   }
 }
 
+//MARK: data
+extension ANIRecruitDetailView {
+  private func loadRecruit(recruitId: String) {
+    guard let activityIndicatorView = self.activityIndicatorView,
+          let recruitId = self.recruitId,
+          let headerImageView = self.headerImageView,
+          let scrollView = self.scrollView else { return }
+
+    let database = Firestore.firestore()
+    
+    activityIndicatorView.startAnimating()
+
+    DispatchQueue.global().async {
+      database.collection(KEY_RECRUITS).document(recruitId).getDocument(completion: { (snapshot, error) in
+        if let error = error {
+          DLog("Error get document: \(error)")
+          
+          self.delegate?.failRecruitLoad()
+          return
+        }
+        
+        if let snapshot = snapshot, let data = snapshot.data() {
+          do {
+            let recruit = try FirestoreDecoder().decode(FirebaseRecruit.self, from: data)
+                        
+            database.collection(KEY_USERS).document(recruit.userId).getDocument { (userSnapshot, userError) in
+              if let userError = userError {
+                DLog("Error get document: \(userError)")
+                
+                self.delegate?.failRecruitLoad()
+                return
+              }
+              
+              if let userSnapshot = userSnapshot, let userData = userSnapshot.data() {
+                do {
+                  let user = try FirestoreDecoder().decode(FirebaseUser.self, from: userData)
+                  
+                  DispatchQueue.main.async {
+                    self.recruit = recruit
+                    self.user = user
+                    
+                    activityIndicatorView.stopAnimating()
+                    self.delegate?.successRecruitLoad(recruit: recruit, recruitUser: user)
+
+                    UIView.animate(withDuration: 0.2) {
+                      headerImageView.alpha = 1.0
+                      scrollView.alpha = 1.0
+                    }
+                  }
+                } catch let error {
+                  DLog(error)
+                  
+                  self.delegate?.failRecruitLoad()
+                  activityIndicatorView.stopAnimating()
+                }
+              } else {
+                self.delegate?.failRecruitLoad()
+                activityIndicatorView.stopAnimating()
+              }
+            }
+          } catch let error {
+            DLog(error)
+            
+            self.delegate?.failRecruitLoad()
+            activityIndicatorView.stopAnimating()
+          }
+        } else {
+          self.delegate?.failRecruitLoad()
+          activityIndicatorView.stopAnimating()
+        }
+      })
+    }
+  }
+}

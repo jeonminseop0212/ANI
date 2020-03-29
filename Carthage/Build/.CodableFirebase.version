@@ -1,9 +1,31 @@
 {
+  "Mac" : [
+    {
+      "name" : "CodableFirebase",
+      "hash" : "9799b70ff9e485a555805dac4125e3aa0c8ce8b9d82ec5db2537de1c662e0355",
+      "swiftToolchainVersion" : "5.1.2 (swiftlang-1100.0.278 clang-1100.0.33.9)"
+    }
+  ],
+  "watchOS" : [
+    {
+      "name" : "CodableFirebase",
+      "hash" : "1741200a99bc06aeca1f9df620e92c53a6bdbb9a2d05057839a1cbc0edc6a8bf",
+      "swiftToolchainVersion" : "5.1.2 (swiftlang-1100.0.278 clang-1100.0.33.9)"
+    }
+  ],
+  "tvOS" : [
+    {
+      "name" : "CodableFirebase",
+      "hash" : "8886a01cc448a9750708312a84d09292e7ca9d39b82b4c99ea998221714b93bc",
+      "swiftToolchainVersion" : "5.1.2 (swiftlang-1100.0.278 clang-1100.0.33.9)"
+    }
+  ],
   "commitish" : "0.2.1",
   "iOS" : [
     {
       "name" : "CodableFirebase",
-      "hash" : "f0fa7ee7ce2c2ce5fe4a41b490774d2746530fa18f43543d1abda8c86538a0a3"
+      "hash" : "225e25165b7723aad0dda0abc5e88362bc3de66d1dfebd27b4dc6f63c1841d88",
+      "swiftToolchainVersion" : "5.1.2 (swiftlang-1100.0.278 clang-1100.0.33.9)"
     }
   ]
 }

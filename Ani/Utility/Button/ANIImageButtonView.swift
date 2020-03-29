@@ -9,7 +9,7 @@
 import UIKit
 import TinyConstraints
 
-class ANIImageButtonView: ANIButtonView{
+class ANIImageButtonView: ANIButtonView {
   
   var imageView: UIImageView?
   private var imageWidthConst: Constraint?

@@ -22,7 +22,7 @@ class ANIStoryImagesCell: UICollectionViewCell {
   
   private func setup() {
     let imageView = UIImageView()
-    imageView.backgroundColor = ANIColor.gray
+    imageView.backgroundColor = ANIColor.lightGray
     imageView.contentMode = .scaleAspectFit
     imageView.clipsToBounds = true
     addSubview(imageView)

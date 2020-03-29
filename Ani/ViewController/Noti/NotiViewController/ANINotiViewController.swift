@@ -57,14 +57,20 @@ class ANINotiViewController: UIViewController {
   }
   
   override func viewWillAppear(_ animated: Bool) {
-    UIApplication.shared.statusBarStyle = .default
+    if #available(iOS 13.0, *) {
+      UIApplication.shared.statusBarStyle = .darkContent
+    } else {
+      UIApplication.shared.statusBarStyle = .default
+    }
     
     showNeedLoginView()
     setupNotifications()
   }
   
-  override func viewWillDisappear(_ animated: Bool) {
+  override func viewDidDisappear(_ animated: Bool) {
     removeNotifications()
+    
+    ANINotiView.endRefresh()
   }
   
   private func setup(completion:(()->())? = nil) {
@@ -120,6 +126,7 @@ class ANINotiViewController: UIViewController {
   }
   
   private func setupNotifications() {
+    removeNotifications()
     ANINotificationManager.receive(messageCellTapped: self, selector: #selector(pushChat))
     ANINotificationManager.receive(profileImageViewTapped: self, selector: #selector(pushOtherProfile))
     ANINotificationManager.receive(login: self, selector: #selector(showNeedLoginView))
@@ -253,8 +260,8 @@ extension ANINotiViewController: UICollectionViewDelegateFlowLayout {
 //MARK: UICollectionViewDelegate
 extension ANINotiViewController: UICollectionViewDelegate {
   func scrollViewDidScroll(_ scrollView: UIScrollView) {
-    guard let menuBar = self.menuBar, let horizontalBarleftConstraint = menuBar.horizontalBarleftConstraint else { return }
-    horizontalBarleftConstraint.constant = scrollView.contentOffset.x / 2
+    guard let menuBar = self.menuBar, let horizontalBarBaseleftConstraint = menuBar.horizontalBarBaseleftConstraint else { return }
+    horizontalBarBaseleftConstraint.constant = scrollView.contentOffset.x / 2
   }
   
   func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
@@ -284,7 +291,9 @@ extension ANINotiViewController: UICollectionViewDelegate {
 extension ANINotiViewController: ANINeedLoginViewDelegate {
   func loginButtonTapped() {
     let initialViewController = ANIInitialViewController()
+    initialViewController.myTabBarController = self.tabBarController as? ANITabBarController
     let navigationController = UINavigationController(rootViewController: initialViewController)
+    navigationController.modalPresentationStyle = .fullScreen
     self.present(navigationController, animated: true, completion: nil)
   }
 }
@@ -294,6 +303,7 @@ extension ANINotiViewController: ANINotiNotiCellDelegate {
   func cellTapped(noti: FirebaseNotification) {
     let notiDetailViewController = ANINotiDetailViewController()
     notiDetailViewController.noti = noti
+    notiDetailViewController.hidesBottomBarWhenPushed = true
     
     if noti.notiKind == KEY_NOTI_KIND_FOLLOW {
       notiDetailViewController.notiKind = .follow
@@ -314,6 +324,12 @@ extension ANINotiViewController: ANINotiNotiCellDelegate {
     } else if noti.contributionKind == KEY_CONTRIBUTION_KIND_QNA {
       notiDetailViewController.navigationTitle = "Q&A"
       notiDetailViewController.contributionKind = .qna
+    } else if noti.contributionKind == KEY_CONTRIBUTION_KIND_STORY_COMMENT {
+      notiDetailViewController.navigationTitle = "ストーリー"
+      notiDetailViewController.contributionKind = .storyComment
+    } else if noti.contributionKind == KEY_CONTRIBUTION_KIND_QNA_COMMENT {
+      notiDetailViewController.navigationTitle = "Q&A"
+      notiDetailViewController.contributionKind = .qnaComment
     }
     
     self.navigationController?.pushViewController(notiDetailViewController, animated: true)

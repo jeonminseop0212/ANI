@@ -54,9 +54,9 @@ class ImagesController: UIViewController {
     
     view.addSubview(gridView)
     
-    addChild(dropdownController)
+    addChildViewController(dropdownController)
     gridView.insertSubview(dropdownController.view, belowSubview: gridView.topView)
-    dropdownController.didMove(toParent: self)
+    dropdownController.didMove(toParentViewController: self)
     
     gridView.bottomView.addSubview(stackView)
     gridView.g_pinEdges()
@@ -207,6 +207,9 @@ extension ImagesController: CartDelegate {
     
     if newlyTaken {
       refreshSelectedAlbum()
+      selectedItem = image
+      changeImage(image)
+      selectedItemIndex = 0
     }
   }
   
@@ -233,7 +236,7 @@ extension ImagesController: DropdownControllerDelegate {
   }
 }
 
-extension ImagesController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+extension ImagesController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UICollectionViewDelegate {
   
   // MARK: - UICollectionViewDataSource
   
@@ -242,7 +245,6 @@ extension ImagesController: UICollectionViewDataSource, UICollectionViewDelegate
   }
   
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-    
     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: ImageCell.self), for: indexPath)
       as! ImageCell
     let item = items[(indexPath as NSIndexPath).item]
@@ -266,38 +268,54 @@ extension ImagesController: UICollectionViewDataSource, UICollectionViewDelegate
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
     let item = items[(indexPath as NSIndexPath).item]
     selectedItem = item
-
-    if Config.Camera.oneImageMode {
-      if !cart.images.contains(item) {
-        cart.images.removeAll()
-        
-        cart.add(item)
-        
-        changeImage(item)
-      }
-    } else {
-      if cart.images.contains(item) {
-        if selectedItemIndex == indexPath.item {
-          cart.remove(item)
-        }
-        selectedItemIndex = indexPath.item
-        
-        changeSelectedImage(item)
-      } else {
-        if Config.Camera.imageLimit == 0 || Config.Camera.imageLimit > cart.images.count{
+    
+    if cart.video == nil {
+      if Config.Camera.oneImageMode {
+        if !cart.images.contains(item) {
+          cart.images.removeAll()
+          
           cart.add(item)
           
           changeImage(item)
         }
-        
-        selectedItemIndex = indexPath.item
+      } else {
+        if cart.images.contains(item) {
+          if selectedItemIndex == indexPath.item {
+            cart.remove(item)
+          }
+          selectedItemIndex = indexPath.item
+          
+          for image in cart.images {
+            if image == item {
+              changeSelectedImage(image)
+            }
+          }
+        } else {
+          if Config.Camera.imageLimit == 0 || Config.Camera.imageLimit > cart.images.count{
+            cart.add(item)
+            
+            changeImage(item)
+          }
+          
+          selectedItemIndex = indexPath.item
+        }
       }
+      
+      //    gridView.panGestureHelper.resetToOriginalState()
+      gridView.panGestureHelper.resetToOriginalStateTappedCell(index: indexPath)
+      
+      configureFrameViews()
+    } else {
+      changeImage(item)
+      
+      gridView.panGestureHelper.resetToOriginalStateTappedCell(index: indexPath)
     }
+  }
+  
+  func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+    let cell = cell as! ImageCell
     
-    //    gridView.panGestureHelper.resetToOriginalState()
-    gridView.panGestureHelper.resetToOriginalStateTappedCell(index: indexPath)
-    
-    configureFrameViews()
+    configureFrameView(cell, indexPath: indexPath)
   }
   
   func configureFrameViews() {
@@ -311,13 +329,26 @@ extension ImagesController: UICollectionViewDataSource, UICollectionViewDelegate
   func configureFrameView(_ cell: ImageCell, indexPath: IndexPath) {
     let item = items[(indexPath as NSIndexPath).item]
     
-    if let index = cart.images.index(of: item) {
-      cell.frameView.g_quickFade()
-      if !Config.Camera.oneImageMode {
-        cell.frameView.label.text = "\(index + 1)"
+    if cart.video == nil {
+      if let index = cart.images.index(of: item) {
+        cell.frameView.g_quickFade()
+        if !Config.Camera.oneImageMode {
+          cell.frameView.label.text = "\(index + 1)"
+          cell.coverView.alpha = 0.0
+        }
+      } else {
+        cell.coverView.alpha = 0.0
+        cell.frameView.alpha = 0.0
+      }
+      
+      if !Config.Camera.oneImageMode && Config.Camera.imageLimit <= cart.images.count && !cart.images.contains(item) {
+        cell.coverView.alpha = 0.5
+      } else {
+        cell.coverView.alpha = 0.0
       }
     } else {
-      cell.frameView.alpha = 0
+      cell.frameView.alpha = 0.0
+      cell.coverView.alpha = 0.5
     }
   }
 }
@@ -342,18 +373,26 @@ class ImageManager: NSObject {
   }
   @discardableResult
   class func fetchImage(viaAsset asset: PHAsset?, imageResultHandler: @escaping (_ image: UIImage?)->Void) -> PHImageRequestID? {
-    guard asset != nil else {
+    guard let asset = asset else {
       return nil
     }
     let options = PHImageRequestOptions()
-    options.resizeMode = PHImageRequestOptionsResizeMode.exact
-    return PHCachingImageManager.default().requestImage(for: asset!,
-                                                        targetSize: PHImageManagerMaximumSize,
-                                                        contentMode: .aspectFill,
-                                                        options: options) {
-                                                          (result, info) -> Void in
-                                                          imageResultHandler(result)
+//    options.resizeMode = .exact
+    options.deliveryMode = .highQualityFormat
+    return PHCachingImageManager.default().requestImage(for: asset,
+                                                 targetSize: PHImageManagerMaximumSize,
+                                                 contentMode: .aspectFill,
+                                                 options: options) { (result, info) in
+//                                                  guard let a = info?[PHImageResultIsDegradedKey] as? Bool else { return }
+                                                  imageResultHandler(result)
     }
+//    return PHCachingImageManager.default().requestImage(for: asset!,
+//                                                        targetSize: PHImageManagerMaximumSize,
+//                                                        contentMode: .aspectFill,
+//                                                        options: options) {
+//                                                          (result, info) -> Void in
+//                                                          imageResultHandler(result)
+//    }
   }
 }
 
@@ -373,5 +412,11 @@ extension ImagesController: GridViewDelegate {
         cart.images[index].scale = scale
       }
     }
+  }
+  
+  func previewVideoDidScroll(offset: CGPoint) {
+  }
+  
+  func previewVideoDidZoom(scale: CGFloat) {
   }
 }
