@@ -224,7 +224,7 @@ class ANISupportViewCell: UITableViewCell {
     deleteRecruitBase.backgroundColor = .white
     deleteRecruitBase.layer.cornerRadius = 10.0
     deleteRecruitBase.layer.masksToBounds = true
-    deleteRecruitBase.layer.borderColor = ANIColor.gray.cgColor
+    deleteRecruitBase.layer.borderColor = ANIColor.lightGray.cgColor
     deleteRecruitBase.layer.borderWidth = RECRUIT_BASE_BORDER_WIDHT
     base.addSubview(deleteRecruitBase)
     self.deleteRecruitBase = deleteRecruitBase
@@ -259,7 +259,7 @@ class ANISupportViewCell: UITableViewCell {
     recruitBase.backgroundColor = .white
     recruitBase.layer.cornerRadius = 10.0
     recruitBase.layer.masksToBounds = true
-    recruitBase.layer.borderColor = ANIColor.gray.cgColor
+    recruitBase.layer.borderColor = ANIColor.lightGray.cgColor
     recruitBase.layer.borderWidth = RECRUIT_BASE_BORDER_WIDHT
     recruitBase.isUserInteractionEnabled = true
     recruitBase.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(recruitTapped)))
@@ -274,7 +274,7 @@ class ANISupportViewCell: UITableViewCell {
     
     //recruitImageView
     let recruitImageView = UIImageView()
-    recruitImageView.backgroundColor = ANIColor.gray
+    recruitImageView.backgroundColor = ANIColor.lightGray
     recruitImageView.contentMode = .redraw
     recruitBase.addSubview(recruitImageView)
     let recruitImageViewHeight: CGFloat = (UIScreen.main.bounds.width - 20) * UIViewController.HEADER_IMAGE_VIEW_RATIO
@@ -415,7 +415,7 @@ class ANISupportViewCell: UITableViewCell {
     
     //profileImageView
     let profileImageView = UIImageView()
-    profileImageView.backgroundColor = ANIColor.gray
+    profileImageView.backgroundColor = ANIColor.lightGray
     profileImageView.isUserInteractionEnabled = true
     profileImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped)))
     profileImageView.layer.cornerRadius = PROFILE_IMAGE_VIEW_HEIGHT / 2

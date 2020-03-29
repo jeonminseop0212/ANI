@@ -98,7 +98,7 @@ class ANIImageFilterPreviewView: UIView {
     
     //pageCotrol
     let pageControl = UIPageControl()
-    pageControl.pageIndicatorTintColor = ANIColor.gray
+    pageControl.pageIndicatorTintColor = ANIColor.lightGray
     pageControl.currentPageIndicatorTintColor = ANIColor.emerald
     pageControl.currentPage = 0
     pageControl.alpha = 0.0

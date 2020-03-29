@@ -53,7 +53,7 @@ class ANIStoryVideoView: UIView {
   }
   
   private func setup() {
-    self.backgroundColor = ANIColor.gray
+    self.backgroundColor = ANIColor.lightGray
     let singleTapGesture = UITapGestureRecognizer(target: self, action: #selector(singleTap))
     singleTapGesture.numberOfTapsRequired = 1
     self.addGestureRecognizer(singleTapGesture)
@@ -67,7 +67,7 @@ class ANIStoryVideoView: UIView {
     //playerLayer
     let playerLayer = AVPlayerLayer()
     playerLayer.videoGravity = .resizeAspect
-    playerLayer.backgroundColor = ANIColor.gray.cgColor
+    playerLayer.backgroundColor = ANIColor.lightGray.cgColor
     playerView.layer.addSublayer(playerLayer)
     self.playerLayer = playerLayer
     

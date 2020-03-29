@@ -29,7 +29,7 @@ class ANIFamilyViewCell: UICollectionViewCell {
     //familyBigImageView
     let familyBigImageView = UIImageView()
     familyBigImageView.contentMode = .scaleAspectFill
-    familyBigImageView.backgroundColor = ANIColor.gray
+    familyBigImageView.backgroundColor = ANIColor.lightGray
     familyBigImageView.layer.cornerRadius = FAMILY_BIG_IMAGE_VIEW_HEIGHT / 2
     familyBigImageView.layer.masksToBounds = true
     addSubview(familyBigImageView)
@@ -48,7 +48,7 @@ class ANIFamilyViewCell: UICollectionViewCell {
     //familySmallImageView
     let familySmallImageView = UIImageView()
     familySmallImageView.contentMode = .scaleAspectFill
-    familySmallImageView.backgroundColor = ANIColor.gray
+    familySmallImageView.backgroundColor = ANIColor.lightGray
     familySmallImageView.layer.cornerRadius = FAMILY_SMALL_IMAGE_VIEW_HEIGHT / 2
     familySmallImageView.layer.masksToBounds = true
     familySmallImageViewBG.addSubview(familySmallImageView)
