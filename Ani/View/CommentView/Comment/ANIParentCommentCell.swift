@@ -127,7 +127,7 @@ class ANIParentCommentCell: UITableViewCell {
     
     //parentCommentProfileImageView
     let parentCommentProfileImageView = UIImageView()
-    parentCommentProfileImageView.backgroundColor = ANIColor.gray
+    parentCommentProfileImageView.backgroundColor = ANIColor.lightGray
     parentCommentProfileImageView.layer.cornerRadius = PARENT_COMMENT_PROFILE_IMAGE_VIEW_HEIGHT / 2
     parentCommentProfileImageView.layer.masksToBounds = true
     parentCommentProfileImageView.isUserInteractionEnabled = true
@@ -193,7 +193,7 @@ class ANIParentCommentCell: UITableViewCell {
     
     //profileImageView
     let profileImageView = UIImageView()
-    profileImageView.backgroundColor = ANIColor.gray
+    profileImageView.backgroundColor = ANIColor.lightGray
     profileImageView.layer.cornerRadius = PROFILE_IMAGE_VIEW_HEIGHT / 2
     profileImageView.layer.masksToBounds = true
     profileImageView.isUserInteractionEnabled = true

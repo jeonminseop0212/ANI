@@ -137,7 +137,7 @@ class ANIRecruitViewCell: UITableViewCell {
     
     //recruitImageView
     let recruitImageView = UIImageView()
-    recruitImageView.backgroundColor = ANIColor.gray
+    recruitImageView.backgroundColor = ANIColor.lightGray
     recruitImageView.contentMode = .scaleAspectFill
     recruitImageView.clipsToBounds = true
     tapArea.addSubview(recruitImageView)
@@ -242,7 +242,7 @@ class ANIRecruitViewCell: UITableViewCell {
     let profileImageView = UIImageView()
     profileImageView.isUserInteractionEnabled = true
     profileImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped)))
-    profileImageView.backgroundColor = ANIColor.gray
+    profileImageView.backgroundColor = ANIColor.lightGray
     base.addSubview(profileImageView)
     profileImageView.topToBottom(of: tapArea, offset: 10.0)
     profileImageView.leftToSuperview(offset: 10.0)

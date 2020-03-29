@@ -103,7 +103,7 @@ class ANIStoryRankingCell: UICollectionViewCell {
     
     //storyImageView
     let storyImageView = UIImageView()
-    storyImageView.backgroundColor = ANIColor.gray
+    storyImageView.backgroundColor = ANIColor.lightGray
     storyImageView.contentMode = .scaleAspectFill
     storyImageView.layer.masksToBounds = true
     base.addSubview(storyImageView)
@@ -137,7 +137,7 @@ class ANIStoryRankingCell: UICollectionViewCell {
     
     //profileImageView
     let profileImageView = UIImageView()
-    profileImageView.backgroundColor = ANIColor.gray
+    profileImageView.backgroundColor = ANIColor.lightGray
     profileImageView.layer.cornerRadius = PROFILE_IMAGE_VIEW_HEIGHT / 2
     profileImageView.layer.masksToBounds = true
     profileImageView.contentMode = .scaleAspectFill

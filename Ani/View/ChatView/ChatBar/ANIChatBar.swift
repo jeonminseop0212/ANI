@@ -46,7 +46,7 @@ class ANIChatBar: UIView {
   private func setup() {
     //profileImageView
     let profileImageView = UIImageView()
-    profileImageView.backgroundColor = ANIColor.gray
+    profileImageView.backgroundColor = ANIColor.lightGray
     profileImageView.layer.cornerRadius = 40.0 / 2
     profileImageView.layer.masksToBounds = true
     profileImageView.contentMode = .scaleAspectFill

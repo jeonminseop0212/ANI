@@ -25,7 +25,7 @@ class ANIQnaImagesCell: UICollectionViewCell {
   private func setup() {
     //imageView
     let imageView = UIImageView()
-    imageView.backgroundColor = ANIColor.gray
+    imageView.backgroundColor = ANIColor.lightGray
     imageView.contentMode = .scaleAspectFill
     imageView.clipsToBounds = true
     imageView.layer.cornerRadius = 10.0
