@@ -31,6 +31,8 @@ class ANIStoryViewCell: UITableViewCell {
   private weak var storyImagesView: ANIStoryImagesView?
   private weak var storyLabelBase: UIView?
   private weak var storyLabel: ActiveLabel?
+  private weak var storyDateLabelBase: UIView?
+  private weak var storyDateLabel: UILabel?
   
   private weak var storyCommentView: ANIContributionCommentView?
   
@@ -207,6 +209,23 @@ class ANIStoryViewCell: UITableViewCell {
     storyLabel.bottomToSuperview()
     self.storyLabel = storyLabel
     
+    //storyDateLabelBase
+    let storyDateLabelBase = UIView()
+    stackView.addArrangedSubview(storyDateLabelBase)
+    self.storyDateLabelBase = storyDateLabelBase
+    
+    //storyDateLabel
+    let storyDateLabel = UILabel()
+    storyDateLabel.font = UIFont.systemFont(ofSize: 13.0)
+    storyDateLabel.textAlignment = .left
+    storyDateLabel.textColor = ANIColor.darkGray
+    storyDateLabelBase.addSubview(storyDateLabel)
+    storyDateLabel.topToSuperview(offset: 5.0)
+    storyDateLabel.leftToSuperview(offset: 10.0)
+    storyDateLabel.rightToSuperview(offset: -10.0)
+    storyDateLabel.bottomToSuperview(offset: -5.0)
+    self.storyDateLabel = storyDateLabel
+    
     //storyCommentView
     let storyCommentView = ANIContributionCommentView()
     storyCommentView.delegate = self
@@ -315,22 +334,13 @@ class ANIStoryViewCell: UITableViewCell {
     userNameLabel.rightToLeft(of: loveButton, offset: -10.0)
     userNameLabel.centerY(to: profileImageView)
     self.userNameLabel = userNameLabel
-    
-//    //bottomSpace
-//    let spaceView = UIView()
-//    spaceView.backgroundColor = ANIColor.bg
-//    shadowVidew.addSubview(spaceView)
-//    spaceView.topToBottom(of: profileImageView, offset: 10)
-//    spaceView.leftToSuperview()
-//    spaceView.rightToSuperview()
-//    spaceView.height(20.0)
-//    spaceView.bottomToSuperview(priority: .defaultHigh)
   }
   
   private func reloadLayout() {
     guard let storyImagesView = self.storyImagesView,
           let storyLabelBase = self.storyLabelBase,
           let storyLabel = self.storyLabel,
+          let storyDateLabel = self.storyDateLabel,
           let storyCommentView = self.storyCommentView,
           let bottomAreaTopConstraint = self.bottomAreaTopConstraint,
           let loveButtonBG = self.loveButtonBG,
@@ -348,6 +358,8 @@ class ANIStoryViewCell: UITableViewCell {
     } else {
       storyLabelBase.isHidden = false
     }
+    
+    storyDateLabel.text = ANIFunction.shared.getDateInterval(string: story.date)
     
     if story.comments != nil {
       storyCommentView.isHidden = false

@@ -34,6 +34,7 @@ class ANIRecruitViewCell: UITableViewCell {
   private weak var sexLabel: UILabel?
   private weak var titleLabel: UILabel?
   private weak var subTitleLabel: UILabel?
+  private weak var recruitDateLabel: UILabel?
   private let PROFILE_IMAGE_HEIGHT: CGFloat = 32.0
   private weak var profileImageView: UIImageView?
   private weak var userNameLabel: UILabel?
@@ -235,8 +236,19 @@ class ANIRecruitViewCell: UITableViewCell {
     subTitleLabel.topToBottom(of: titleLabel, offset: 10.0)
     subTitleLabel.leftToSuperview(offset: 10.0)
     subTitleLabel.rightToSuperview(offset: -10.0)
-    subTitleLabel.bottomToSuperview()
     self.subTitleLabel = subTitleLabel
+    
+    //recruitDateLabel
+    let recruitDateLabel = UILabel()
+    recruitDateLabel.font = UIFont.systemFont(ofSize: 13.0)
+    recruitDateLabel.textAlignment = .left
+    recruitDateLabel.textColor = ANIColor.darkGray
+    tapArea.addSubview(recruitDateLabel)
+    recruitDateLabel.topToBottom(of: subTitleLabel, offset: 5.0)
+    recruitDateLabel.leftToSuperview(offset: 10.0)
+    recruitDateLabel.rightToSuperview(offset: -10.0)
+    recruitDateLabel.bottomToSuperview()
+    self.recruitDateLabel = recruitDateLabel
     
     //profileImageView
     let profileImageView = UIImageView()
@@ -356,6 +368,7 @@ class ANIRecruitViewCell: UITableViewCell {
           let sexLabel = self.sexLabel,
           let titleLabel = self.titleLabel,
           let subTitleLabel = self.subTitleLabel,
+          let recruitDateLabel = self.recruitDateLabel,
           let supportButton = self.supportButton,
           let loveButtonBG = self.loveButtonBG,
           let loveButton = self.loveButton,
@@ -380,6 +393,7 @@ class ANIRecruitViewCell: UITableViewCell {
     sexLabel.text = recruit.sex
     titleLabel.text = recruit.title
     subTitleLabel.text = recruit.reason
+    recruitDateLabel.text = ANIFunction.shared.getDateInterval(string: recruit.date)
     
     supportButton.setImage(UIImage(named: "supportButton"), for: .normal)
     if let isSupported = recruit.isSupported {

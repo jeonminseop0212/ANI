@@ -32,6 +32,9 @@ class ANIQnaViewCell: UITableViewCell {
   private var qnaImagesViewBase: UIView?
   private weak var qnaImagesView: ANIQnaImagesView?
   
+  private weak var qnaDateLabelBase: UIView?
+  private weak var qnaDateLabel: UILabel?
+  
   private weak var qnaCommentView: ANIContributionCommentView?
   
   private weak var bottomArea: UIView?
@@ -209,6 +212,23 @@ class ANIQnaViewCell: UITableViewCell {
     qnaImagesView.bottomToSuperview()
     self.qnaImagesView = qnaImagesView
     
+    //qnaDateLabelBase
+    let qnaDateLabelBase = UIView()
+    stackView.addArrangedSubview(qnaDateLabelBase)
+    self.qnaDateLabelBase = qnaDateLabelBase
+    
+    //qnaDateLabel
+    let qnaDateLabel = UILabel()
+    qnaDateLabel.font = UIFont.systemFont(ofSize: 13.0)
+    qnaDateLabel.textAlignment = .left
+    qnaDateLabel.textColor = ANIColor.darkGray
+    qnaDateLabelBase.addSubview(qnaDateLabel)
+    qnaDateLabel.topToSuperview(offset: 5.0)
+    qnaDateLabel.leftToSuperview(offset: 10.0)
+    qnaDateLabel.rightToSuperview(offset: -10.0)
+    qnaDateLabel.bottomToSuperview(offset: -5.0)
+    self.qnaDateLabel = qnaDateLabel
+    
     //qnaCommentView
     let qnaCommentView = ANIContributionCommentView()
     qnaCommentView.delegate = self
@@ -324,6 +344,7 @@ class ANIQnaViewCell: UITableViewCell {
     guard let questionLabel = self.questionLabel,
           let qnaImagesViewBase = self.qnaImagesViewBase,
           let qnaImagesView = self.qnaImagesView,
+          let qnaDateLabel = self.qnaDateLabel,
           let qnaCommentView = self.qnaCommentView,
           let loveButtonBG = self.loveButtonBG,
           let loveButton = self.loveButton,
@@ -337,6 +358,8 @@ class ANIQnaViewCell: UITableViewCell {
     } else {
       qnaImagesViewBase.isHidden = true
     }
+    
+    qnaDateLabel.text = ANIFunction.shared.getDateInterval(string: qna.date)
     
     if qna.comments != nil {
       qnaCommentView.isHidden = false

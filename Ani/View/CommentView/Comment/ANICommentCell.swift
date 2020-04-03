@@ -21,6 +21,7 @@ protocol ANICommentCellDelegate {
 class ANICommentCell: UITableViewCell {
   
   private weak var commentLabel: UILabel?
+  private weak var commentDateLabel: UILabel?
 
   private let PROFILE_IMAGE_VIEW_HEIGHT: CGFloat = 25.0
   private weak var profileImageView: UIImageView?
@@ -88,6 +89,17 @@ class ANICommentCell: UITableViewCell {
     commentLabel.edgesToSuperview(excluding: .bottom, insets: insets)
     self.commentLabel = commentLabel
     
+    //commentDateLabel
+    let commentDateLabel = UILabel()
+    commentDateLabel.font = UIFont.systemFont(ofSize: 13.0)
+    commentDateLabel.textAlignment = .left
+    commentDateLabel.textColor = ANIColor.darkGray
+    addSubview(commentDateLabel)
+    commentDateLabel.topToBottom(of: commentLabel, offset: 5.0)
+    commentDateLabel.leftToSuperview(offset: 10.0)
+    commentDateLabel.rightToSuperview(offset: -10.0)
+    self.commentDateLabel = commentDateLabel
+    
     //profileImageView
     let profileImageView = UIImageView()
     profileImageView.backgroundColor = ANIColor.lightGray
@@ -99,7 +111,7 @@ class ANICommentCell: UITableViewCell {
     addSubview(profileImageView)
     profileImageView.width(PROFILE_IMAGE_VIEW_HEIGHT)
     profileImageView.height(PROFILE_IMAGE_VIEW_HEIGHT)
-    profileImageView.topToBottom(of: commentLabel, offset: 10.0)
+    profileImageView.topToBottom(of: commentDateLabel, offset: 10.0)
     profileImageView.leftToSuperview(offset: 10.0)
     self.profileImageView = profileImageView
     
@@ -183,11 +195,13 @@ class ANICommentCell: UITableViewCell {
   
   private func reloadLayout() {
     guard let commentLabel = self.commentLabel,
+          let commentDateLabel = self.commentDateLabel,
           let comment = self.comment,
           let loveButtonBG = self.loveButtonBG,
           let loveButton = self.loveButton else { return }
     
     commentLabel.text = comment.comment
+    commentDateLabel.text = ANIFunction.shared.getDateInterval(string: comment.date)
     
     if ANISessionManager.shared.isAnonymous {
       loveButtonBG.isUserInteractionEnabled = true
