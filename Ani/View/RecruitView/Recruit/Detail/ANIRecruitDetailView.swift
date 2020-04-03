@@ -31,6 +31,8 @@ class ANIRecruitDetailView: UIView {
   
   private weak var titleLabel: UILabel?
   
+  private weak var recruitDateLabel: UILabel?
+  
   private let PROFILE_IMAGE_HEIGHT: CGFloat = 32.0
   private weak var profileImageView: UIImageView?
   
@@ -159,6 +161,17 @@ class ANIRecruitDetailView: UIView {
     titleLabel.rightToSuperview(offset: -10.0)
     self.titleLabel = titleLabel
     
+    //recruitDateLabel
+    let recruitDateLabel = UILabel()
+    recruitDateLabel.font = UIFont.systemFont(ofSize: 13.0)
+    recruitDateLabel.textAlignment = .left
+    recruitDateLabel.textColor = ANIColor.darkGray
+    contentView.addSubview(recruitDateLabel)
+    recruitDateLabel.topToBottom(of: titleLabel, offset: 5.0)
+    recruitDateLabel.leftToSuperview(offset: 10.0)
+    recruitDateLabel.rightToSuperview(offset: -10.0)
+    self.recruitDateLabel = recruitDateLabel
+    
     //profileImageView
     let profileImageView = UIImageView()
     profileImageView.backgroundColor = ANIColor.bg
@@ -171,7 +184,7 @@ class ANIRecruitDetailView: UIView {
     contentView.addSubview(profileImageView)
     profileImageView.width(PROFILE_IMAGE_HEIGHT)
     profileImageView.height(PROFILE_IMAGE_HEIGHT)
-    profileImageView.topToBottom(of: titleLabel, offset: 10.0)
+    profileImageView.topToBottom(of: recruitDateLabel, offset: 10.0)
     profileImageView.leftToSuperview(offset: 10.0)
     self.profileImageView = profileImageView
     
@@ -402,6 +415,7 @@ class ANIRecruitDetailView: UIView {
   private func reloadLayout() {
     guard let headerImageView = self.headerImageView,
           let titleLabel = self.titleLabel,
+          let recruitDateLabel = self.recruitDateLabel,
           let basicInfoKindLabel = self.basicInfoKindLabel,
           let basicInfoAgeLabel = self.basicInfoAgeLabel,
           let basicInfoSexLabel = self.basicInfoSexLabel,
@@ -419,6 +433,8 @@ class ANIRecruitDetailView: UIView {
     headerImageView.sd_setImage(with: URL(string: headerImageUrl), completed: nil)
     
     titleLabel.text = recruit.title
+    
+    recruitDateLabel.text = ANIFunction.shared.getDateInterval(string: recruit.date)
     
     basicInfoKindLabel.text = "種類：\(recruit.kind)"
     basicInfoAgeLabel.text = "年齢：\(recruit.age)"

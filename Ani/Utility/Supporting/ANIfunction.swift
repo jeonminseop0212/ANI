@@ -12,7 +12,7 @@ import StoreKit
 class ANIFunction: NSObject {
   static let shared = ANIFunction()
 
-  func getToday(format:String = "yyyy/MM/dd HH:mm:ss.SSS") -> String {
+  func getToday(format: String = "yyyy/MM/dd HH:mm:ss.SSS") -> String {
     let now = Date()
     let formatter = DateFormatter()
     formatter.timeZone = TimeZone(secondsFromGMT: 0)
@@ -38,6 +38,30 @@ class ANIFunction: NSObject {
     currentformatter.locale = Locale.current
     currentformatter.dateFormat = format
     return currentformatter.string(from: date)
+  }
+  
+  func getDateInterval(string: String) -> String {
+    let postDate = dateFromString(string: string)
+    let now = Date()
+    
+    let timeInterval = now.timeIntervalSince(postDate)
+    
+    var postDateString = ""
+    if timeInterval < 60 {
+      postDateString = String(timeInterval) + "秒前"
+    } else if timeInterval < 3600 {
+      postDateString = String(Int(timeInterval / 60)) + "分前"
+    } else if timeInterval < 86400 {
+      postDateString = String(Int(timeInterval / 3600)) + "時間前"
+    } else if timeInterval < 604800 {
+      postDateString = String(Int(timeInterval / 86400)) + "日前"
+    } else if timeInterval < 31104000 {
+      postDateString = getCurrentLocaleDateFromString(string: string, format: "M月d日")
+    } else {
+      postDateString = getCurrentLocaleDateFromString(string: string, format: "yyyy年M月d日")
+    }
+    
+    return postDateString
   }
   
   func webURLScheme(urlString: String) -> String {

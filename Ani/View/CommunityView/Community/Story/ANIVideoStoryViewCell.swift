@@ -30,6 +30,8 @@ class ANIVideoStoryViewCell: UITableViewCell {
   weak var storyVideoView: ANIStoryVideoView?
   private weak var storyLabelBase: UIView?
   private weak var storyLabel: ActiveLabel?
+  private weak var storyDateLabelBase: UIView?
+  private weak var storyDateLabel: UILabel?
   
   private weak var storyCommentView: ANIContributionCommentView?
   
@@ -207,6 +209,23 @@ class ANIVideoStoryViewCell: UITableViewCell {
     storyLabel.bottomToSuperview()
     self.storyLabel = storyLabel
     
+    //storyDateLabelBase
+    let storyDateLabelBase = UIView()
+    stackView.addArrangedSubview(storyDateLabelBase)
+    self.storyDateLabelBase = storyDateLabelBase
+    
+    //storyDateLabel
+    let storyDateLabel = UILabel()
+    storyDateLabel.font = UIFont.systemFont(ofSize: 13.0)
+    storyDateLabel.textAlignment = .left
+    storyDateLabel.textColor = ANIColor.darkGray
+    storyDateLabelBase.addSubview(storyDateLabel)
+    storyDateLabel.topToSuperview(offset: 5.0)
+    storyDateLabel.leftToSuperview(offset: 10.0)
+    storyDateLabel.rightToSuperview(offset: -10.0)
+    storyDateLabel.bottomToSuperview(offset: -5.0)
+    self.storyDateLabel = storyDateLabel
+    
     //storyCommentView
     let storyCommentView = ANIContributionCommentView()
     storyCommentView.delegate = self
@@ -321,6 +340,7 @@ class ANIVideoStoryViewCell: UITableViewCell {
     guard let storyVideoView = self.storyVideoView,
           let storyLabelBase = self.storyLabelBase,
           let storyLabel = self.storyLabel,
+          let storyDateLabel = self.storyDateLabel,
           let storyCommentView = self.storyCommentView,
           let loveButtonBG = self.loveButtonBG,
           let loveButton = self.loveButton,
@@ -348,6 +368,8 @@ class ANIVideoStoryViewCell: UITableViewCell {
     } else {
       storyLabelBase.isHidden = false
     }
+    
+    storyDateLabel.text = ANIFunction.shared.getDateInterval(string: story.date)
     
     if story.comments != nil {
       storyCommentView.isHidden = false
